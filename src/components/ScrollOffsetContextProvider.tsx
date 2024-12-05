@@ -18,6 +18,12 @@ type ScrollOffsetContextValue = {
 
     /** Clean scroll offsets of screen that aren't anymore in the state */
     cleanStaleScrollOffsets: (state: State) => void;
+
+    // Saves the scroll offset of the first visible item for the given route.
+    saveFirstVisibleIndex: (route: PlatformStackRouteProp<ParamListBase>, scrollOffset: number) => void;
+
+    // Retrieves the previously saved scroll offset (first visible index) for the given route.
+    getFirstVisibleIndex: (route: PlatformStackRouteProp<ParamListBase>) => number | undefined;
 };
 
 type ScrollOffsetContextProviderOnyxProps = {
@@ -34,6 +40,8 @@ const defaultValue: ScrollOffsetContextValue = {
     saveScrollOffset: () => {},
     getScrollOffset: () => undefined,
     cleanStaleScrollOffsets: () => {},
+    getFirstVisibleIndex: () => undefined,
+    saveFirstVisibleIndex: () => {},
 };
 
 const ScrollOffsetContext = createContext<ScrollOffsetContextValue>(defaultValue);
@@ -48,6 +56,7 @@ function getKey(route: PlatformStackRouteProp<ParamListBase> | NavigationPartial
 
 function ScrollOffsetContextProvider({children, priorityMode}: ScrollOffsetContextProviderProps) {
     const scrollOffsetsRef = useRef<Record<string, number>>({});
+    const firstVisibleIndexRef = useRef<Record<string, number>>({});
     const previousPriorityMode = usePrevious(priorityMode);
 
     useEffect(() => {
@@ -65,6 +74,17 @@ function ScrollOffsetContextProvider({children, priorityMode}: ScrollOffsetConte
 
     const saveScrollOffset: ScrollOffsetContextValue['saveScrollOffset'] = useCallback((route, scrollOffset) => {
         scrollOffsetsRef.current[getKey(route)] = scrollOffset;
+    }, []);
+
+    const saveFirstVisibleIndex: ScrollOffsetContextValue['saveFirstVisibleIndex'] = useCallback((route, scrollOffset) => {
+        firstVisibleIndexRef.current[getKey(route)] = scrollOffset;
+    }, []);
+
+    const getFirstVisibleIndex: ScrollOffsetContextValue['getFirstVisibleIndex'] = useCallback((route) => {
+        if (!firstVisibleIndexRef.current) {
+            return;
+        }
+        return firstVisibleIndexRef.current[getKey(route)];
     }, []);
 
     const getScrollOffset: ScrollOffsetContextValue['getScrollOffset'] = useCallback((route) => {
@@ -92,6 +112,8 @@ function ScrollOffsetContextProvider({children, priorityMode}: ScrollOffsetConte
             saveScrollOffset,
             getScrollOffset,
             cleanStaleScrollOffsets,
+            saveFirstVisibleIndex,
+            getFirstVisibleIndex,
         }),
         [saveScrollOffset, getScrollOffset, cleanStaleScrollOffsets],
     );

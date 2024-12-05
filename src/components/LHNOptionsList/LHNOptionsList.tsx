@@ -1,8 +1,8 @@
-import {useRoute} from '@react-navigation/native';
+import { useRoute} from '@react-navigation/native';
 import type {FlashListProps} from '@shopify/flash-list';
 import {FlashList} from '@shopify/flash-list';
 import type {ReactElement} from 'react';
-import React, {memo, useCallback, useContext, useEffect, useMemo, useRef} from 'react';
+import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useOnyx} from 'react-native-onyx';
 import BlockingView from '@components/BlockingViews/BlockingView';
@@ -31,7 +31,7 @@ import type {LHNOptionsListProps, RenderItemProps} from './types';
 const keyExtractor = (item: string) => `report_${item}`;
 
 function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optionMode, shouldDisableFocusOptions = false, onFirstItemRendered = () => {}}: LHNOptionsListProps) {
-    const {saveScrollOffset, getScrollOffset} = useContext(ScrollOffsetContext);
+    const {saveScrollOffset, getScrollOffset, getFirstVisibleIndex, saveFirstVisibleIndex} = useContext(ScrollOffsetContext);
     const flashListRef = useRef<FlashList<string>>(null);
     const route = useRoute();
 
@@ -239,6 +239,13 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
         [route, saveScrollOffset],
     );
 
+
+    const handleViewableItemsChanged = ({viewableItems}) => {
+        if (viewableItems.length > 0) {
+            const currentIndex = viewableItems[0].index; // Get the first visible item
+            saveFirstVisibleIndex(route, currentIndex); // Save the index
+        }
+    };
     const onLayout = useCallback(() => {
         const offset = getScrollOffset(route);
 
@@ -282,6 +289,8 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
                     showsVerticalScrollIndicator={false}
                     onLayout={onLayout}
                     onScroll={onScroll}
+                    onViewableItemsChanged={handleViewableItemsChanged}
+                    initialScrollIndex={getFirstVisibleIndex(route)}
                 />
             )}
         </View>
