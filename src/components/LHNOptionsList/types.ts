@@ -30,6 +30,9 @@ type CustomLHNOptionsListProps = {
 
     /** Callback to fire when the list is laid out */
     onFirstItemRendered: () => void;
+
+    /** Callback triggered when the first item at the target scroll index becomes visible */
+    onInitialScrollIndexVisible?: () => void;
 };
 
 type LHNOptionsListProps = CustomLHNOptionsListProps;
@@ -123,6 +126,6 @@ type OptionRowLHNProps = {
     onLayout?: (event: LayoutChangeEvent) => void;
 };
 
-type RenderItemProps = {item: string};
+type RenderItemProps = {item: string; index: number};
 
 export type {LHNOptionsListProps, OptionRowLHNDataProps, OptionRowLHNProps, RenderItemProps};

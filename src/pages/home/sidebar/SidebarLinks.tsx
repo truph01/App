@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useEffect, useMemo} from 'react';
+import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
 import {InteractionManager, StyleSheet, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {EdgeInsets} from 'react-native-safe-area-context';
@@ -80,7 +80,7 @@ function SidebarLinks({insets, optionListItems, isLoading, priorityMode = CONST.
 
     // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     const contentContainerStyles = useMemo(() => StyleSheet.flatten([styles.sidebarListContainer, {paddingBottom: StyleUtils.getSafeAreaMargins(insets).marginBottom}]), [insets]);
-
+    const [initialScrollIndexVisible, setInitialScrollIndexVisible] = useState(false);
     return (
         <View style={[styles.flex1, styles.h100]}>
             <View style={[styles.pRelative, styles.flex1]}>
@@ -92,8 +92,11 @@ function SidebarLinks({insets, optionListItems, isLoading, priorityMode = CONST.
                     shouldDisableFocusOptions={shouldUseNarrowLayout}
                     optionMode={viewMode}
                     onFirstItemRendered={App.setSidebarLoaded}
+                    onInitialScrollIndexVisible={() => {
+                        setInitialScrollIndexVisible(true);
+                    }}
                 />
-                {!!isLoading && optionListItems?.length === 0 && (
+                {(!initialScrollIndexVisible || (!!isLoading && optionListItems?.length === 0)) && (
                     <View style={[StyleSheet.absoluteFillObject, styles.appBG]}>
                         <OptionsListSkeletonView shouldAnimate />
                     </View>

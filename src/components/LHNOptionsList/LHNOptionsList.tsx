@@ -1,8 +1,8 @@
-import { useRoute} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import type {FlashListProps} from '@shopify/flash-list';
 import {FlashList} from '@shopify/flash-list';
 import type {ReactElement} from 'react';
-import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useContext, useEffect, useMemo, useRef} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useOnyx} from 'react-native-onyx';
 import BlockingView from '@components/BlockingViews/BlockingView';
@@ -30,10 +30,20 @@ import type {LHNOptionsListProps, RenderItemProps} from './types';
 
 const keyExtractor = (item: string) => `report_${item}`;
 
-function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optionMode, shouldDisableFocusOptions = false, onFirstItemRendered = () => {}}: LHNOptionsListProps) {
+function LHNOptionsList({
+    style,
+    contentContainerStyles,
+    data,
+    onSelectRow,
+    optionMode,
+    shouldDisableFocusOptions = false,
+    onFirstItemRendered = () => {},
+    onInitialScrollIndexVisible = () => {},
+}: LHNOptionsListProps) {
     const {saveScrollOffset, getScrollOffset, getFirstVisibleIndex, saveFirstVisibleIndex} = useContext(ScrollOffsetContext);
     const flashListRef = useRef<FlashList<string>>(null);
     const route = useRoute();
+    const firstVisibleItem = useRef(getFirstVisibleIndex(route));
 
     const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const [reportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS);
@@ -115,7 +125,7 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
      * Function which renders a row in the list
      */
     const renderItem = useCallback(
-        ({item: reportID}: RenderItemProps): ReactElement => {
+        ({item: reportID, index}: RenderItemProps): ReactElement => {
             const itemFullReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
             const itemParentReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${itemFullReport?.parentReportID ?? '-1'}`];
             const itemReportActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
@@ -187,7 +197,12 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
                     preferredLocale={preferredLocale}
                     hasDraftComment={hasDraftComment}
                     transactionViolations={transactionViolations}
-                    onLayout={onLayoutItem}
+                    onLayout={() => {
+                        onLayoutItem();
+                        if (Math.abs(index - (firstVisibleItem.current ?? 0)) < 15) {
+                            onInitialScrollIndexVisible?.();
+                        }
+                    }}
                 />
             );
         },
@@ -204,6 +219,7 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
             transactions,
             transactionViolations,
             onLayoutItem,
+            onInitialScrollIndexVisible,
         ],
     );
 
@@ -238,7 +254,6 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
         },
         [route, saveScrollOffset],
     );
-
 
     const handleViewableItemsChanged = ({viewableItems}) => {
         if (viewableItems.length > 0) {
@@ -290,7 +305,6 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
                     onLayout={onLayout}
                     onScroll={onScroll}
                     onViewableItemsChanged={handleViewableItemsChanged}
-                    initialScrollIndex={getFirstVisibleIndex(route)}
                 />
             )}
         </View>
