@@ -1,5 +1,5 @@
 import {Str} from 'expensify-common';
-import React from 'react';
+import React, {useMemo} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import Checkbox from '@components/Checkbox';
@@ -59,6 +59,7 @@ type TransactionListItemRowProps = {
     isButtonSelected?: boolean;
     parentAction?: string;
     shouldShowTransactionCheckbox?: boolean;
+    isLoading?: boolean;
 };
 
 const getTypeIcon = (type?: SearchTransactionType) => {
@@ -146,7 +147,7 @@ function MerchantCell({transactionItem, showTooltip, isLargeScreenWidth}: Transa
     return (
         <TextWithTooltip
             shouldShowTooltip={showTooltip}
-            text={merchantToDisplay}
+            text={merchantToDisplay ?? ''}
             style={[isLargeScreenWidth ? styles.lineHeightLarge : styles.lh20, styles.pre, styles.justifyContentCenter]}
         />
     );
@@ -257,11 +258,14 @@ function TransactionListItemRow({
     isButtonSelected = false,
     parentAction = '',
     shouldShowTransactionCheckbox,
+    isLoading = false,
 }: TransactionListItemRowProps) {
     const styles = useThemeStyles();
     const {isLargeScreenWidth} = useResponsiveLayout();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
+
+    const isOnHold = useMemo(() => TransactionUtils.isOnHold(item), [item]);
 
     if (!isLargeScreenWidth) {
         return (
@@ -276,15 +280,17 @@ function TransactionListItemRow({
                         onButtonPress={onButtonPress}
                         canSelectMultiple={canSelectMultiple}
                         action={item.action}
+                        shouldUseSuccessStyle={!isOnHold}
                         isSelected={item.isSelected}
                         isDisabled={item.isDisabled}
                         isDisabledCheckbox={item.isDisabledCheckbox}
                         handleCheckboxPress={onCheckboxPress}
+                        isLoading={isLoading}
                     />
                 )}
 
                 <View style={[styles.flexRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.gap3]}>
-                    {canSelectMultiple && shouldShowTransactionCheckbox && (
+                    {canSelectMultiple && !!shouldShowTransactionCheckbox && (
                         <PressableWithFeedback
                             accessibilityLabel={item.text ?? ''}
                             role={CONST.ROLE.BUTTON}
@@ -293,7 +299,7 @@ function TransactionListItemRow({
                             style={[styles.cursorUnset, StyleUtils.getCheckboxPressableStyle(), item.isDisabledCheckbox && styles.cursorDisabled, styles.mr1]}
                         >
                             <View style={[StyleUtils.getCheckboxContainerStyle(20), StyleUtils.getMultiselectListStyles(!!item.isSelected, !!isDisabled)]}>
-                                {item.isSelected && (
+                                {!!item.isSelected && (
                                     <Icon
                                         src={Expensicons.Checkmark}
                                         fill={theme.textLight}
@@ -441,10 +447,12 @@ function TransactionListItemRow({
                 <View style={[StyleUtils.getSearchTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ACTION)]}>
                     <ActionCell
                         action={item.action}
+                        shouldUseSuccessStyle={!isOnHold}
                         isSelected={isButtonSelected}
                         isChildListItem={isChildListItem}
                         parentAction={parentAction}
                         goToItem={onButtonPress}
+                        isLoading={isLoading}
                     />
                 </View>
             </View>

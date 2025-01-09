@@ -2,10 +2,11 @@
 import type {LineLayerStyleProps} from '@rnmapbox/maps/src/utils/MapboxStyles';
 import lodashClamp from 'lodash/clamp';
 import type {LineLayer} from 'react-map-gl';
-import type {AnimatableNumericValue, Animated, ImageStyle, TextStyle, ViewStyle} from 'react-native';
+import type {Animated, ImageStyle, TextStyle, ViewStyle} from 'react-native';
 import {Platform, StyleSheet} from 'react-native';
 import type {CustomAnimation} from 'react-native-animatable';
 import type {PickerStyle} from 'react-native-picker-select';
+import type {SharedValue} from 'react-native-reanimated';
 import type {MixedStyleDeclaration, MixedStyleRecord} from 'react-native-render-html';
 import type {ValueOf} from 'type-fest';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
@@ -67,7 +68,7 @@ type CustomPickerStyle = PickerStyle & {icon?: ViewStyle};
 type OverlayStylesParams = {progress: Animated.AnimatedInterpolation<string | number>};
 
 type TwoFactorAuthCodesBoxParams = {isExtraSmallScreenWidth: boolean; isSmallScreenWidth: boolean};
-type WorkspaceUpgradeIntroBoxParams = {isExtraSmallScreenWidth: boolean; isSmallScreenWidth: boolean};
+type WorkspaceUpgradeIntroBoxParams = {isExtraSmallScreenWidth: boolean};
 
 type Translation = 'perspective' | 'rotate' | 'rotateX' | 'rotateY' | 'rotateZ' | 'scale' | 'scaleX' | 'scaleY' | 'translateX' | 'translateY' | 'skewX' | 'skewY' | 'matrix';
 
@@ -320,6 +321,11 @@ const styles = (theme: ThemeColors) =>
             color: theme.textSupporting,
         },
 
+        bottomTabBarLabel: {
+            lineHeight: 14,
+            height: 16,
+        },
+
         webViewStyles: webViewStyles(theme),
 
         link: link(theme),
@@ -362,6 +368,9 @@ const styles = (theme: ThemeColors) =>
             textAlign: 'left',
         },
 
+        verticalAlignTopText: {
+            verticalAlign: 'text-top',
+        },
         verticalAlignTop: {
             verticalAlign: 'top',
         },
@@ -410,7 +419,7 @@ const styles = (theme: ThemeColors) =>
             color: theme.text,
             ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,
             fontSize: variables.fontSizeSmall,
-            lineHeight: variables.lineHeightSmall,
+            lineHeight: variables.lineHeightNormal,
         },
 
         textMicroSupporting: {
@@ -517,10 +526,6 @@ const styles = (theme: ThemeColors) =>
             lineHeight: variables.lineHeightNormal,
         },
 
-        colorReversed: {
-            color: theme.textReversed,
-        },
-
         colorMutedReversed: {
             color: theme.textMutedReversed,
         },
@@ -531,10 +536,6 @@ const styles = (theme: ThemeColors) =>
 
         bgTransparent: {
             backgroundColor: 'transparent',
-        },
-
-        bgDark: {
-            backgroundColor: theme.inverse,
         },
 
         opacity0: {
@@ -610,7 +611,7 @@ const styles = (theme: ThemeColors) =>
             ...flex.justifyContentBetween,
             ...flex.alignItemsCenter,
             ...sizing.mnw120,
-            height: 64,
+            minHeight: 64,
         },
 
         buttonSmall: {
@@ -1075,6 +1076,11 @@ const styles = (theme: ThemeColors) =>
             height: CONST.DESKTOP_HEADER_PADDING,
         },
 
+        searchHeaderGap: {
+            zIndex: variables.searchTopBarZIndex + 1,
+            backgroundColor: theme.appBG,
+        },
+
         reportOptions: {
             marginLeft: 8,
         },
@@ -1109,6 +1115,17 @@ const styles = (theme: ThemeColors) =>
 
         offlineIndicatorRow: {
             height: 25,
+        },
+
+        deletedAttachmentIndicator: {
+            zIndex: 20,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+        },
+
+        deletedIndicatorOverlay: {
+            opacity: 0.8,
         },
 
         // Actions
@@ -1191,6 +1208,7 @@ const styles = (theme: ThemeColors) =>
             ...FontUtils.fontFamily.platform.EXP_NEUE,
             width: '100%',
             zIndex: 1,
+            transformOrigin: 'left center',
         },
 
         textInputLabelBackground: {
@@ -1201,14 +1219,13 @@ const styles = (theme: ThemeColors) =>
             backgroundColor: theme.componentBG,
         },
 
-        textInputLabelDesktop: {
-            transformOrigin: 'left center',
-        },
+        textInputLabelTransformation: (translateY: SharedValue<number>, scale: SharedValue<number>) => {
+            'worklet';
 
-        textInputLabelTransformation: (translateY: AnimatableNumericValue, translateX: AnimatableNumericValue, scale: AnimatableNumericValue) =>
-            ({
-                transform: [{translateY}, {translateX}, {scale}],
-            } satisfies TextStyle),
+            return {
+                transform: [{translateY: translateY.get()}, {scale: scale.get()}],
+            } satisfies TextStyle;
+        },
 
         baseTextInput: {
             ...FontUtils.fontFamily.platform.EXP_NEUE,
@@ -1595,10 +1612,14 @@ const styles = (theme: ThemeColors) =>
         },
 
         selectedAvatarBorder: {
-            padding: 2,
+            padding: 1,
             borderWidth: 2,
             borderRadius: 20,
+            height: variables.sidebarAvatarSize + 6,
+            width: variables.sidebarAvatarSize + 6,
             borderColor: theme.success,
+            right: -3,
+            top: -3,
         },
 
         statusIndicator: (backgroundColor: string = theme.danger) =>
@@ -1621,8 +1642,8 @@ const styles = (theme: ThemeColors) =>
             borderRadius: 8,
             borderWidth: 2,
             position: 'absolute',
-            right: -3,
-            top: -4,
+            right: -2,
+            top: -3,
             height: 12,
             width: 12,
             zIndex: 10,
@@ -1656,6 +1677,7 @@ const styles = (theme: ThemeColors) =>
         },
 
         sidebarListContainer: {
+            ...spacing.pt3,
             paddingBottom: 4,
         },
 
@@ -1729,6 +1751,31 @@ const styles = (theme: ThemeColors) =>
             lineHeight: variables.fontSizeOnlyEmojisHeight,
         },
 
+        emojisWithTextFontSizeAligned: {
+            fontSize: variables.fontSizeEmojisWithinText,
+            marginVertical: -7,
+        },
+
+        emojisFontFamily: {
+            fontFamily: FontUtils.fontFamily.platform.SYSTEM.fontFamily,
+        },
+
+        emojisWithTextFontSize: {
+            fontSize: variables.fontSizeEmojisWithinText,
+        },
+
+        emojisWithTextFontFamily: {
+            fontFamily: FontUtils.fontFamily.platform.SYSTEM.fontFamily,
+        },
+
+        emojisWithTextLineHeight: {
+            lineHeight: variables.lineHeightXLarge,
+        },
+
+        initialSettingsUsernameEmoji: {
+            fontSize: variables.fontSizeUsernameEmoji,
+        },
+
         createMenuPositionSidebar: (windowHeight: number) =>
             ({
                 horizontal: 18,
@@ -1779,6 +1826,13 @@ const styles = (theme: ThemeColors) =>
             width: variables.componentSizeNormal,
             justifyContent: 'center',
             alignItems: 'center',
+        },
+
+        popoverIconCircle: {
+            backgroundColor: theme.buttonDefaultBG,
+            borderRadius: variables.buttonBorderRadius,
+            height: variables.h40,
+            width: variables.w46,
         },
 
         rightLabelMenuItem: {
@@ -2295,7 +2349,7 @@ const styles = (theme: ThemeColors) =>
             height: 32,
             width: 32,
             padding: 6,
-            margin: 3,
+            marginHorizontal: 3,
             borderRadius: variables.componentBorderRadiusRounded,
             backgroundColor: theme.transparent,
             justifyContent: 'center',
@@ -2542,6 +2596,14 @@ const styles = (theme: ThemeColors) =>
             paddingLeft: 20,
             height: variables.contentHeaderHeight,
             width: '100%',
+        },
+
+        searchResultsHeaderBar: {
+            display: 'flex',
+            height: variables.contentHeaderDesktopHeight,
+            zIndex: variables.popoverzIndex,
+            position: 'relative',
+            paddingHorizontal: 20,
         },
 
         headerBarDesktopHeight: {
@@ -2885,8 +2947,9 @@ const styles = (theme: ThemeColors) =>
 
         sectionMenuItem: {
             borderRadius: 8,
-            paddingHorizontal: 8,
-            height: 56,
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            height: 52,
             alignItems: 'center',
         },
 
@@ -2990,6 +3053,13 @@ const styles = (theme: ThemeColors) =>
             ...spacing.mv3,
         },
 
+        sectionDividerLine: {
+            height: 1,
+            backgroundColor: theme.border,
+            ...spacing.mh5,
+            ...spacing.mv6,
+        },
+
         unreadIndicatorText: {
             color: theme.unreadIndicator,
             ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,
@@ -3068,7 +3138,6 @@ const styles = (theme: ThemeColors) =>
             justifyContent: 'center',
             borderRadius: 20,
             padding: 15,
-            backgroundColor: theme.success,
         },
 
         switchInactive: {
@@ -3086,16 +3155,11 @@ const styles = (theme: ThemeColors) =>
             backgroundColor: theme.appBG,
         },
 
-        switchThumbTransformation: (translateX: AnimatableNumericValue) =>
-            ({
-                transform: [{translateX}],
-            } satisfies ViewStyle),
-
         radioButtonContainer: {
             backgroundColor: theme.componentBG,
-            borderRadius: 10,
-            height: 20,
-            width: 20,
+            borderRadius: 14,
+            height: 28,
+            width: 28,
             borderColor: theme.border,
             borderWidth: 1,
             justifyContent: 'center',
@@ -3317,10 +3381,13 @@ const styles = (theme: ThemeColors) =>
             ...positioning.pFixed,
         },
 
-        growlNotificationTranslateY: (translateY: AnimatableNumericValue) =>
-            ({
-                transform: [{translateY}],
-            } satisfies ViewStyle),
+        growlNotificationTranslateY: (translateY: SharedValue<number>) => {
+            'worklet';
+
+            return {
+                transform: [{translateY: translateY.get()}],
+            };
+        },
 
         makeSlideInTranslation: (translationType: Translation, fromValue: number) =>
             ({
@@ -3609,19 +3676,47 @@ const styles = (theme: ThemeColors) =>
 
         searchInputStyle: {
             color: theme.textSupporting,
-            fontSize: 13,
-            lineHeight: 16,
+            fontSize: variables.fontSizeNormal,
+            lineHeight: variables.fontSizeNormalHeight,
         },
 
-        searchRouterInputStyle: {
+        searchRouterTextInputContainer: {
             borderRadius: variables.componentBorderRadiusSmall,
-            borderWidth: 2,
-            borderColor: theme.borderFocus,
+            borderWidth: 1,
+            borderBottomWidth: 1,
             paddingHorizontal: 8,
+        },
+
+        searchRouterInputResults: {
+            backgroundColor: theme.sidebarHover,
+            borderWidth: 1,
+            borderColor: theme.sidebarHover,
+        },
+
+        searchRouterInputResultsFocused: {
+            borderWidth: 1,
+            borderColor: theme.success,
+            backgroundColor: theme.appBG,
         },
 
         searchTableHeaderActive: {
             fontWeight: FontUtils.fontWeight.bold,
+        },
+
+        zIndex10: {
+            zIndex: 10,
+        },
+
+        searchListContentContainerStyles: {
+            paddingTop: variables.searchListContentMarginTop,
+        },
+
+        searchTopBarStyle: {
+            left: 0,
+            right: 0,
+            position: 'absolute',
+            zIndex: variables.searchTopBarZIndex,
+            backgroundColor: theme.appBG,
         },
 
         threeDotsPopoverOffset: (windowWidth: number) =>
@@ -3655,7 +3750,7 @@ const styles = (theme: ThemeColors) =>
             } satisfies AnchorPosition),
 
         iPhoneXSafeArea: {
-            backgroundColor: theme.inverse,
+            backgroundColor: theme.appBG,
             flex: 1,
         },
 
@@ -3911,19 +4006,15 @@ const styles = (theme: ThemeColors) =>
             borderRadius: variables.componentBorderRadiusMedium,
         },
 
-        quickActionTooltipWrapper: {
+        productTrainingTooltipWrapper: {
             backgroundColor: theme.tooltipHighlightBG,
+            borderRadius: variables.componentBorderRadiusNormal,
         },
 
-        quickActionTooltipTitle: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,
-            fontSize: variables.fontSizeLabel,
-            color: theme.tooltipHighlightText,
-        },
-
-        quickActionTooltipSubtitle: {
+        productTrainingTooltipText: {
             fontSize: variables.fontSizeLabel,
             color: theme.textDark,
+            lineHeight: variables.lineHeightLarge,
         },
 
         quickReactionsContainer: {
@@ -4118,11 +4209,6 @@ const styles = (theme: ThemeColors) =>
             width: 1,
         },
 
-        taskCheckboxWrapper: {
-            height: variables.fontSizeNormalHeight,
-            ...flex.justifyContentCenter,
-        },
-
         taskTitleMenuItem: {
             ...writingDirection.ltr,
             ...headlineFont,
@@ -4281,8 +4367,8 @@ const styles = (theme: ThemeColors) =>
                 marginLeft: 8,
                 ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,
                 color: isSelected ? theme.text : theme.textSupporting,
-                lineHeight: variables.lineHeightNormal,
-                fontSize: variables.fontSizeNormal,
+                lineHeight: variables.lineHeightLarge,
+                fontSize: variables.fontSizeLabel,
             } satisfies TextStyle),
 
         tabBackground: (hovered: boolean, isFocused: boolean, background: string | Animated.AnimatedInterpolation<string>) => ({
@@ -4462,17 +4548,9 @@ const styles = (theme: ThemeColors) =>
             position: 'absolute',
         },
 
-        assignedCardsIconContainer: {
-            height: variables.bankCardHeight,
-            width: variables.bankCardWidth,
-            borderRadius: 4,
-            overflow: 'hidden',
-            alignSelf: 'center',
-        },
-
         bankIconContainer: {
-            height: variables.bankCardWidth,
-            width: variables.bankCardWidth,
+            height: variables.cardIconWidth,
+            width: variables.cardIconWidth,
             borderRadius: 8,
             overflow: 'hidden',
             alignSelf: 'center',
@@ -4509,6 +4587,10 @@ const styles = (theme: ThemeColors) =>
             backgroundColor: theme.highlightBG,
         },
 
+        onboardingSmallIcon: {
+            padding: 10,
+        },
+
         sidebarStatusAvatarContainer: {
             height: 40,
             width: 40,
@@ -4517,6 +4599,13 @@ const styles = (theme: ThemeColors) =>
             justifyContent: 'center',
             borderRadius: 20,
         },
+
+        sidebarStatusAvatarWithEmojiContainer: {
+            height: 28,
+            width: 28,
+            top: -2,
+        },
+
         sidebarStatusAvatar: {
             alignItems: 'center',
             justifyContent: 'center',
@@ -4525,9 +4614,9 @@ const styles = (theme: ThemeColors) =>
             width: 20,
             borderRadius: 10,
             position: 'absolute',
-            right: -4,
-            bottom: -4,
-            borderColor: theme.highlightBG,
+            right: -6,
+            bottom: -6,
+            borderColor: theme.appBG,
             borderWidth: 2,
             overflow: 'hidden',
         },
@@ -4565,6 +4654,21 @@ const styles = (theme: ThemeColors) =>
             backgroundColor: theme.highlightBG,
             borderColor: theme.border,
             borderWidth: 1,
+        },
+
+        moneyRequestAttachReceiptThumbnail: {
+            backgroundColor: theme.hoverComponentBG,
+            width: '100%',
+            borderWidth: 0,
+        },
+
+        moneyRequestAttachReceiptThumbnailIcon: {
+            position: 'absolute',
+            bottom: -4,
+            right: -4,
+            borderColor: theme.highlightBG,
+            borderWidth: 2,
+            borderRadius: '50%',
         },
 
         mapViewContainer: {
@@ -4657,6 +4761,15 @@ const styles = (theme: ThemeColors) =>
             paddingVertical: 16,
             marginHorizontal: 20,
             backgroundColor: theme.highlightBG,
+            borderRadius: 8,
+            minHeight: variables.optionRowHeight,
+        },
+
+        searchQueryListItemStyle: {
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingHorizontal: 12,
+            paddingVertical: 12,
             borderRadius: 8,
         },
 
@@ -5108,10 +5221,14 @@ const styles = (theme: ThemeColors) =>
             height: 188,
         },
 
+        pendingBankCardIllustration: {
+            width: 217,
+            height: 150,
+        },
+
         cardIcon: {
             overflow: 'hidden',
             borderRadius: variables.cardBorderRadius,
-            height: variables.cardIconHeight,
             alignSelf: 'center',
         },
 
@@ -5198,6 +5315,11 @@ const styles = (theme: ThemeColors) =>
             backgroundColor: theme.border,
         },
 
+        integrationIcon: {
+            overflow: 'hidden',
+            borderRadius: variables.buttonBorderRadius,
+        },
+
         colorGreenSuccess: {
             color: colors.green400,
         },
@@ -5220,6 +5342,21 @@ const styles = (theme: ThemeColors) =>
         accountSwitcherAnchorPosition: {
             top: 80,
             left: 12,
+        },
+
+        qbdSetupLinkBox: {
+            backgroundColor: theme.hoverComponentBG,
+            borderRadius: variables.componentBorderRadiusMedium,
+            borderColor: theme.border,
+            padding: 16,
+        },
+        liDot: {
+            width: 4,
+            height: 4,
+            borderRadius: 4,
+            backgroundColor: theme.text,
+            marginHorizontal: 8,
+            alignSelf: 'center',
         },
     } satisfies Styles);
 

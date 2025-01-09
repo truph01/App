@@ -34,7 +34,7 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
 
     const checkIfCanBeRendered = useCallback(() => {
         const changeOwnerErrors = Object.keys(policy?.errorFields?.changeOwner ?? {});
-        if (changeOwnerErrors[0] !== CONST.POLICY.OWNERSHIP_ERRORS.NO_BILLING_CARD) {
+        if (changeOwnerErrors.at(0) !== CONST.POLICY.OWNERSHIP_ERRORS.NO_BILLING_CARD) {
             setShouldShowPaymentCardForm(false);
         }
 
@@ -67,7 +67,7 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
                 cardCVV: values.securityCode,
                 addressName: values.nameOnCard,
                 addressZip: values.addressZipCode,
-                currency: CONST.CURRENCY.USD,
+                currency: values.currency,
             };
 
             PolicyActions.addBillingCardAndRequestPolicyOwnerChange(policyID, cardData);
@@ -88,14 +88,14 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
                         {translate('workspace.changeOwner.addPaymentCardReadAndAcceptTextPart1')}{' '}
                         <TextLink
                             style={[styles.textMicroSupporting, styles.link]}
-                            href={CONST.TERMS_URL}
+                            href={CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}
                         >
                             {translate('workspace.changeOwner.addPaymentCardTerms')}
                         </TextLink>{' '}
                         {translate('workspace.changeOwner.addPaymentCardAnd')}{' '}
                         <TextLink
                             style={[styles.textMicroSupporting, styles.link]}
-                            href={CONST.PRIVACY_URL}
+                            href={CONST.OLD_DOT_PUBLIC_URLS.PRIVACY_URL}
                         >
                             {translate('workspace.changeOwner.addPaymentCardPrivacy')}
                         </TextLink>{' '}

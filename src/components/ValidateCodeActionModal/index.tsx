@@ -6,14 +6,30 @@ import Modal from '@components/Modal';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import useThemeStyles from '@hooks/useThemeStyles';
-import * as User from '@libs/actions/User';
+import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ValidateCodeActionModalProps} from './type';
 import ValidateCodeForm from './ValidateCodeForm';
 import type {ValidateCodeFormHandle} from './ValidateCodeForm/BaseValidateCodeForm';
 
-function ValidateCodeActionModal({isVisible, title, description, onClose, validatePendingAction, validateError, handleSubmitForm, clearError}: ValidateCodeActionModalProps) {
+function ValidateCodeActionModal({
+    isVisible,
+    title,
+    descriptionPrimary,
+    descriptionSecondary,
+    onClose,
+    onModalHide,
+    validatePendingAction,
+    validateError,
+    handleSubmitForm,
+    clearError,
+    footer,
+    sendValidateCode,
+    hasMagicCodeBeenSent,
+    isLoading,
+    shouldHandleNavigationBack,
+}: ValidateCodeActionModalProps) {
     const themeStyles = useThemeStyles();
     const firstRenderRef = useRef(true);
     const validateCodeFormRef = useRef<ValidateCodeFormHandle>(null);
@@ -22,29 +38,37 @@ function ValidateCodeActionModal({isVisible, title, description, onClose, valida
 
     const hide = useCallback(() => {
         clearError();
-        onClose();
+        onClose?.();
+        firstRenderRef.current = true;
     }, [onClose, clearError]);
 
     useEffect(() => {
-        if (!firstRenderRef.current || !isVisible) {
+        if (!firstRenderRef.current || !isVisible || hasMagicCodeBeenSent) {
             return;
         }
         firstRenderRef.current = false;
-        User.requestValidateCodeAction();
-    }, [isVisible]);
+
+        sendValidateCode();
+        // We only want to send validate code on first render not on change of hasMagicCodeBeenSent, so we don't add it as a dependency.
+        // eslint-disable-next-line react-compiler/react-compiler
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, sendValidateCode]);
 
     return (
         <Modal
+            shouldHandleNavigationBack={shouldHandleNavigationBack}
             type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
             isVisible={isVisible}
             onClose={hide}
-            onModalHide={hide}
+            onModalHide={onModalHide ?? hide}
+            onBackdropPress={() => Navigation.dismissModal()}
             hideModalContentWhileAnimating
             useNativeDriver
             shouldUseModalPaddingStyle={false}
         >
             <ScreenWrapper
-                includeSafeAreaPaddingBottom={false}
+                includeSafeAreaPaddingBottom
+                includePaddingTop
                 shouldEnableMaxHeight
                 testID={ValidateCodeActionModal.displayName}
                 offlineIndicatorStyle={themeStyles.mtAuto}
@@ -54,17 +78,23 @@ function ValidateCodeActionModal({isVisible, title, description, onClose, valida
                     onBackButtonPress={hide}
                 />
 
-                <View style={[themeStyles.ph5, themeStyles.mt3, themeStyles.mb7]}>
-                    <Text style={[themeStyles.mb3]}>{description}</Text>
+                <View style={[themeStyles.ph5, themeStyles.mt3, themeStyles.mb5, themeStyles.flex1]}>
+                    <Text style={[themeStyles.mb3]}>{descriptionPrimary}</Text>
+                    {!!descriptionSecondary && <Text style={[themeStyles.mb3]}>{descriptionSecondary}</Text>}
                     <ValidateCodeForm
+                        isLoading={isLoading}
                         validateCodeAction={validateCodeAction}
                         validatePendingAction={validatePendingAction}
                         validateError={validateError}
                         handleSubmitForm={handleSubmitForm}
+                        sendValidateCode={sendValidateCode}
                         clearError={clearError}
+                        buttonStyles={[themeStyles.justifyContentEnd, themeStyles.flex1]}
                         ref={validateCodeFormRef}
+                        hasMagicCodeBeenSent={hasMagicCodeBeenSent}
                     />
                 </View>
+                {footer?.()}
             </ScreenWrapper>
         </Modal>
     );

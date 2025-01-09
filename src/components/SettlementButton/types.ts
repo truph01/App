@@ -34,6 +34,9 @@ type SettlementButtonProps = {
     /** The IOU/Expense report we are paying */
     iouReport?: OnyxEntry<Report>;
 
+    /** Whether to use the success style or not */
+    shouldUseSuccessStyle?: boolean;
+
     /** Should we show the payment options? */
     shouldHidePaymentOptions?: boolean;
 
@@ -48,6 +51,9 @@ type SettlementButtonProps = {
 
     /** Additional styles to add to the component */
     style?: StyleProp<ViewStyle>;
+
+    /** Additional styles to add to the component wrapper */
+    wrapperStyle?: StyleProp<ViewStyle>;
 
     /** Additional styles to add to the component when it's disabled */
     disabledStyle?: StyleProp<ViewStyle>;
@@ -87,6 +93,9 @@ type SettlementButtonProps = {
 
     /** Whether to use keyboard shortcuts for confirmation or not */
     useKeyboardShortcuts?: boolean;
+
+    /** Whether we only show pay elsewhere button */
+    onlyShowPayElsewhere?: boolean;
 };
 
 export default SettlementButtonProps;

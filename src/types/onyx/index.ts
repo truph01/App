@@ -1,3 +1,4 @@
+import type {OnboardingPurpose} from '@src/CONST';
 import type Account from './Account';
 import type AccountData from './AccountData';
 import type {ApprovalWorkflowOnyx} from './ApprovalWorkflow';
@@ -12,12 +13,15 @@ import type CancellationDetails from './CancellationDetails';
 import type Card from './Card';
 import type {CardList, IssueNewCard, WorkspaceCardsList} from './Card';
 import type CardFeeds from './CardFeeds';
-import type {AddNewCompanyCardFeed} from './CardFeeds';
+import type {AddNewCompanyCardFeed, CompanyCardFeed} from './CardFeeds';
+import type CardOnWaitlist from './CardOnWaitlist';
 import type {CapturedLogs, Log} from './Console';
+import type CorpayFields from './CorpayFields';
 import type Credentials from './Credentials';
 import type Currency from './Currency';
 import type {CurrencyList} from './Currency';
 import type CustomStatusDraft from './CustomStatusDraft';
+import type DismissedProductTraining from './DismissedProductTraining';
 import type DismissedReferralBanners from './DismissedReferralBanners';
 import type Download from './Download';
 import type ExpensifyCardSettings from './ExpensifyCardSettings';
@@ -28,6 +32,7 @@ import type ImportedSpreadsheet from './ImportedSpreadsheet';
 import type IntroSelected from './IntroSelected';
 import type InvitedEmailsToAccountIDs from './InvitedEmailsToAccountIDs';
 import type IOU from './IOU';
+import type JoinablePolicies from './JoinablePolicies';
 import type LastExportMethod from './LastExportMethod';
 import type LastPaymentMethod from './LastPaymentMethod';
 import type LastSelectedDistanceRates from './LastSelectedDistanceRates';
@@ -39,6 +44,7 @@ import type MobileSelectionMode from './MobileSelectionMode';
 import type Modal from './Modal';
 import type Network from './Network';
 import type NewGroupChatDraft from './NewGroupChatDraft';
+import type Onboarding from './Onboarding';
 import type OnyxInputOrEntry from './OnyxInputOrEntry';
 import type {OnyxUpdateEvent, OnyxUpdatesFromServer} from './OnyxUpdatesFromServer';
 import type {DecisionName, OriginalMessageIOU} from './OriginalMessage';
@@ -64,6 +70,7 @@ import type QuickAction from './QuickAction';
 import type RecentlyUsedCategories from './RecentlyUsedCategories';
 import type RecentlyUsedReportFields from './RecentlyUsedReportFields';
 import type RecentlyUsedTags from './RecentlyUsedTags';
+import type {RecentSearchItem} from './RecentSearch';
 import type RecentWaypoint from './RecentWaypoint';
 import type ReimbursementAccount from './ReimbursementAccount';
 import type Report from './Report';
@@ -105,7 +112,6 @@ import type WalletOnfido from './WalletOnfido';
 import type WalletStatement from './WalletStatement';
 import type WalletTerms from './WalletTerms';
 import type WalletTransfer from './WalletTransfer';
-import type WorkspaceTooltip from './WorkspaceTooltip';
 
 export type {
     TryNewDot,
@@ -118,7 +124,9 @@ export type {
     BlockedFromConcierge,
     Card,
     CardList,
+    CardOnWaitlist,
     Credentials,
+    CorpayFields,
     Currency,
     CurrencyList,
     CustomStatusDraft,
@@ -133,6 +141,7 @@ export type {
     IOU,
     IssueNewCard,
     AddNewCompanyCardFeed,
+    CompanyCardFeed,
     LastExportMethod,
     Locale,
     Login,
@@ -227,9 +236,13 @@ export type {
     CancellationDetails,
     ApprovalWorkflowOnyx,
     MobileSelectionMode,
-    WorkspaceTooltip,
     CardFeeds,
     SaveSearch,
+    RecentSearchItem,
     ImportedSpreadsheet,
+    Onboarding,
+    OnboardingPurpose,
     ValidateMagicCodeAction,
+    JoinablePolicies,
+    DismissedProductTraining,
 };

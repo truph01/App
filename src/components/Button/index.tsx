@@ -122,6 +122,9 @@ type ButtonProps = Partial<ChildrenProps> & {
     /** Id to use for this button */
     id?: string;
 
+    /** Used to locate this button in ui tests */
+    testID?: string;
+
     /** Accessibility label for the component */
     accessibilityLabel?: string;
 
@@ -139,13 +142,24 @@ type ButtonProps = Partial<ChildrenProps> & {
 
     /** Whether button's content should be centered */
     isContentCentered?: boolean;
+
+    /** Whether the Enter keyboard listening is active whether or not the screen that contains the button is focused */
+    isPressOnEnterActive?: boolean;
 };
 
-type KeyboardShortcutComponentProps = Pick<ButtonProps, 'isDisabled' | 'isLoading' | 'onPress' | 'pressOnEnter' | 'allowBubble' | 'enterKeyEventListenerPriority'>;
+type KeyboardShortcutComponentProps = Pick<ButtonProps, 'isDisabled' | 'isLoading' | 'onPress' | 'pressOnEnter' | 'allowBubble' | 'enterKeyEventListenerPriority' | 'isPressOnEnterActive'>;
 
 const accessibilityRoles: string[] = Object.values(CONST.ROLE);
 
-function KeyboardShortcutComponent({isDisabled = false, isLoading = false, onPress = () => {}, pressOnEnter, allowBubble, enterKeyEventListenerPriority}: KeyboardShortcutComponentProps) {
+function KeyboardShortcutComponent({
+    isDisabled = false,
+    isLoading = false,
+    onPress = () => {},
+    pressOnEnter,
+    allowBubble,
+    enterKeyEventListenerPriority,
+    isPressOnEnterActive = false,
+}: KeyboardShortcutComponentProps) {
     const isFocused = useIsFocused();
     const activeElementRole = useActiveElementRole();
 
@@ -163,7 +177,7 @@ function KeyboardShortcutComponent({isDisabled = false, isLoading = false, onPre
 
     const config = useMemo(
         () => ({
-            isActive: pressOnEnter && !shouldDisableEnterShortcut && isFocused,
+            isActive: pressOnEnter && !shouldDisableEnterShortcut && (isFocused || isPressOnEnterActive),
             shouldBubble: allowBubble,
             priority: enterKeyEventListenerPriority,
             shouldPreventDefault: false,
@@ -226,10 +240,12 @@ function Button(
         shouldShowRightIcon = false,
 
         id = '',
+        testID = undefined,
         accessibilityLabel = '',
         isSplitButton = false,
         link = false,
         isContentCentered = false,
+        isPressOnEnterActive,
         ...rest
     }: ButtonProps,
     ref: ForwardedRef<View>,
@@ -277,15 +293,15 @@ function Button(
             return (
                 <View style={[isContentCentered ? styles.justifyContentCenter : styles.justifyContentBetween, styles.flexRow]}>
                     <View style={[styles.alignItemsCenter, styles.flexRow, styles.flexShrink1]}>
-                        {icon && (
-                            <View style={[large ? styles.mr2 : styles.mr1, !text && styles.mr0, iconStyles]}>
+                        {!!icon && (
+                            <View style={[styles.mr2, !text && styles.mr0, iconStyles]}>
                                 <Icon
                                     src={icon}
-                                    hasText={!!text}
                                     fill={isHovered ? iconHoverFill ?? defaultFill : iconFill ?? defaultFill}
                                     small={small}
                                     medium={medium}
                                     large={large}
+                                    isButtonIcon
                                 />
                             </View>
                         )}
@@ -300,6 +316,7 @@ function Button(
                                     small={small}
                                     medium={medium}
                                     large={large}
+                                    isButtonIcon
                                 />
                             ) : (
                                 <Icon
@@ -308,6 +325,7 @@ function Button(
                                     small={small}
                                     medium={medium}
                                     large={large}
+                                    isButtonIcon
                                 />
                             )}
                         </View>
@@ -329,6 +347,7 @@ function Button(
                     onPress={onPress}
                     pressOnEnter={pressOnEnter}
                     enterKeyEventListenerPriority={enterKeyEventListenerPriority}
+                    isPressOnEnterActive={isPressOnEnterActive}
                 />
             )}
             <PressableWithFeedback
@@ -345,6 +364,10 @@ function Button(
 
                     if (shouldEnableHapticFeedback) {
                         HapticFeedback.press();
+                    }
+
+                    if (isDisabled || isLoading) {
+                        return; // Prevent the onPress from being triggered when the button is disabled or in a loading state
                     }
                     return onPress(event);
                 }}
@@ -390,6 +413,7 @@ function Button(
                 ]}
                 disabledStyle={disabledStyle}
                 id={id}
+                testID={testID}
                 accessibilityLabel={accessibilityLabel}
                 role={CONST.ROLE.BUTTON}
                 hoverDimmingValue={1}

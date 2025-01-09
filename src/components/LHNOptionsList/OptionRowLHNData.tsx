@@ -37,8 +37,9 @@ function OptionRowLHNData({
 
     const optionItemRef = useRef<OptionData>();
 
-    const shouldDisplayViolations = ReportUtils.shouldDisplayTransactionThreadViolations(fullReport, transactionViolations, parentReportAction);
-    const shouldDisplayReportViolations = ReportUtils.isReportOwner(fullReport) && ReportUtils.hasReportViolations(reportID);
+    const shouldDisplayViolations = ReportUtils.shouldDisplayViolationsRBRInLHN(fullReport, transactionViolations);
+    const isSettled = ReportUtils.isSettled(fullReport);
+    const shouldDisplayReportViolations = !isSettled && ReportUtils.isReportOwner(fullReport) && ReportUtils.hasReportViolations(reportID);
 
     const optionItem = useMemo(() => {
         // Note: ideally we'd have this as a dependent selector in onyx!
@@ -54,10 +55,13 @@ function OptionRowLHNData({
             transactionViolations,
             invoiceReceiverPolicy,
         });
+        // eslint-disable-next-line react-compiler/react-compiler
         if (deepEqual(item, optionItemRef.current)) {
+            // eslint-disable-next-line react-compiler/react-compiler
             return optionItemRef.current;
         }
 
+        // eslint-disable-next-line react-compiler/react-compiler
         optionItemRef.current = item;
 
         return item;

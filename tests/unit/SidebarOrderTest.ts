@@ -17,6 +17,7 @@ jest.mock('@libs/Permissions');
 jest.mock('@components/Icon/Expensicons');
 jest.mock('@src/hooks/useActiveWorkspaceFromNavigationState');
 jest.mock('@src/hooks/useResponsiveLayout');
+jest.mock('@src/hooks/useIsCurrentRouteHome');
 
 describe('Sidebar', () => {
     beforeAll(() =>
@@ -135,9 +136,9 @@ describe('Sidebar', () => {
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
 
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -188,9 +189,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Two'); // this has `hasDraft` flag enabled so it will be on top
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Two'); // this has `hasDraft` flag enabled so it will be on top
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
                     })
             );
         });
@@ -239,9 +240,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Two');
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Two');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
                     })
             );
         });
@@ -293,10 +294,10 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(4);
-                        expect(displayNames[0]).toHaveTextContent(taskReportName);
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent(taskReportName);
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -367,10 +368,10 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(4);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Four owes $100.00');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four owes $100.00');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -446,10 +447,10 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(4);
-                        expect(displayNames[0]).toHaveTextContent('Email One');
-                        expect(displayNames[1]).toHaveTextContent('Workspace-Test-001 owes $100.00');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email One');
+                        expect(displayNames.at(1)).toHaveTextContent('Workspace-Test-001 owes $100.00');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -506,9 +507,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Three');
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -674,10 +675,10 @@ describe('Sidebar', () => {
                         expect(displayNames).toHaveLength(4);
                         expect(screen.queryAllByTestId('Pin Icon')).toHaveLength(1);
                         expect(screen.queryAllByTestId('Pencil Icon')).toHaveLength(1);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Two');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Five');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Two');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Five');
                     })
             );
         });
@@ -727,9 +728,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Two');
                     })
 
                     // When a new report is added
@@ -740,10 +741,10 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(4);
-                        expect(displayNames[0]).toHaveTextContent('Email Five');
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Five');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -796,9 +797,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Two');
                     })
 
                     // When a new report is added
@@ -816,10 +817,10 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(4);
-                        expect(displayNames[0]).toHaveTextContent('Email Five');
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Five');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -871,9 +872,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Report (archived)');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Report (archived)');
                     })
             );
         });
@@ -914,9 +915,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -954,9 +955,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Two');
                     })
 
                     // When a new report is added
@@ -967,10 +968,10 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(4);
-                        expect(displayNames[0]).toHaveTextContent('Email Five');
-                        expect(displayNames[1]).toHaveTextContent('Email Four');
-                        expect(displayNames[2]).toHaveTextContent('Email Three');
-                        expect(displayNames[3]).toHaveTextContent('Email Two');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Five');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(2)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(3)).toHaveTextContent('Email Two');
                     })
             );
         });
@@ -1021,9 +1022,9 @@ describe('Sidebar', () => {
                         const hintText = Localize.translateLocal('accessibilityHints.chatUserDisplayNames');
                         const displayNames = screen.queryAllByLabelText(hintText);
                         expect(displayNames).toHaveLength(3);
-                        expect(displayNames[0]).toHaveTextContent('Email Four');
-                        expect(displayNames[1]).toHaveTextContent('Email Three');
-                        expect(displayNames[2]).toHaveTextContent('Report (archived)');
+                        expect(displayNames.at(0)).toHaveTextContent('Email Four');
+                        expect(displayNames.at(1)).toHaveTextContent('Email Three');
+                        expect(displayNames.at(2)).toHaveTextContent('Report (archived)');
                     })
             );
         });

@@ -8,19 +8,23 @@ import MenuItem from '@components/MenuItem';
 import MenuItemList from '@components/MenuItemList';
 import type {MenuItemWithLink} from '@components/MenuItemList';
 import {usePersonalDetails} from '@components/OnyxProvider';
+import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import ScrollView from '@components/ScrollView';
 import type {SearchQueryJSON} from '@components/Search/types';
 import Text from '@components/Text';
 import useDeleteSavedSearch from '@hooks/useDeleteSavedSearch';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import * as SearchActions from '@libs/actions/Search';
 import Navigation from '@libs/Navigation/Navigation';
-import {getAllTaxRates} from '@libs/PolicyUtils';
-import * as SearchUtils from '@libs/SearchUtils';
+import {getAllTaxRates, hasWorkspaceWithInvoices} from '@libs/PolicyUtils';
+import {hasInvoiceReports} from '@libs/ReportUtils';
+import * as SearchQueryUtils from '@libs/SearchQueryUtils';
+import * as SearchUIUtils from '@libs/SearchUIUtils';
 import variables from '@styles/variables';
 import * as Expensicons from '@src/components/Icon/Expensicons';
 import CONST from '@src/CONST';
@@ -49,7 +53,7 @@ type SearchTypeMenuItem = {
     title: string;
     type: SearchDataTypes;
     icon: IconAsset;
-    route?: Route;
+    getRoute: (policyID?: string) => Route;
 };
 
 function SearchTypeMenu({queryJSON, searchName}: SearchTypeMenuProps) {
@@ -59,104 +63,129 @@ function SearchTypeMenu({queryJSON, searchName}: SearchTypeMenuProps) {
     const {singleExecution} = useSingleExecution();
     const {translate} = useLocalize();
     const [savedSearches] = useOnyx(ONYXKEYS.SAVED_SEARCHES);
-    const [shouldShowSavedSearchRenameTooltip] = useOnyx(ONYXKEYS.SHOULD_SHOW_SAVED_SEARCH_RENAME_TOOLTIP);
+    const {isOffline} = useNetwork();
+    const shouldShowSavedSearchesMenuItemTitle = Object.values(savedSearches ?? {}).filter((s) => s.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isOffline).length > 0;
+    const {shouldShowProductTrainingTooltip, renderProductTrainingTooltip, hideProductTrainingTooltip} = useProductTrainingContext(
+        CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.RENAME_SAVED_SEARCH,
+        shouldShowSavedSearchesMenuItemTitle,
+    );
     const {showDeleteModal, DeleteConfirmModal} = useDeleteSavedSearch();
+    const [session] = useOnyx(ONYXKEYS.SESSION);
 
     const personalDetails = usePersonalDetails();
     const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const taxRates = getAllTaxRates();
-    const [cardList = {}] = useOnyx(ONYXKEYS.CARD_LIST);
 
     const typeMenuItems: SearchTypeMenuItem[] = [
         {
             title: translate('common.expenses'),
             type: CONST.SEARCH.DATA_TYPES.EXPENSE,
             icon: Expensicons.Receipt,
-            route: ROUTES.SEARCH_CENTRAL_PANE.getRoute({query: SearchUtils.buildCannedSearchQuery()}),
+            getRoute: (policyID?: string) => {
+                const query = SearchQueryUtils.buildCannedSearchQuery({policyID});
+                return ROUTES.SEARCH_CENTRAL_PANE.getRoute({query});
+            },
         },
         {
             title: translate('common.chats'),
             type: CONST.SEARCH.DATA_TYPES.CHAT,
             icon: Expensicons.ChatBubbles,
-            route: ROUTES.SEARCH_CENTRAL_PANE.getRoute({query: SearchUtils.buildCannedSearchQuery(CONST.SEARCH.DATA_TYPES.CHAT, CONST.SEARCH.STATUS.TRIP.ALL)}),
-        },
-        {
-            title: translate('workspace.common.invoices'),
-            type: CONST.SEARCH.DATA_TYPES.INVOICE,
-            icon: Expensicons.InvoiceGeneric,
-            route: ROUTES.SEARCH_CENTRAL_PANE.getRoute({query: SearchUtils.buildCannedSearchQuery(CONST.SEARCH.DATA_TYPES.INVOICE, CONST.SEARCH.STATUS.INVOICE.ALL)}),
-        },
-        {
-            title: translate('travel.trips'),
-            type: CONST.SEARCH.DATA_TYPES.TRIP,
-            icon: Expensicons.Suitcase,
-            route: ROUTES.SEARCH_CENTRAL_PANE.getRoute({query: SearchUtils.buildCannedSearchQuery(CONST.SEARCH.DATA_TYPES.TRIP, CONST.SEARCH.STATUS.TRIP.ALL)}),
+            getRoute: (policyID?: string) => {
+                const query = SearchQueryUtils.buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.CHAT, status: CONST.SEARCH.STATUS.CHAT.ALL, policyID});
+                return ROUTES.SEARCH_CENTRAL_PANE.getRoute({query});
+            },
         },
     ];
 
+    if (hasWorkspaceWithInvoices(session?.email) || hasInvoiceReports()) {
+        typeMenuItems.push({
+            title: translate('workspace.common.invoices'),
+            type: CONST.SEARCH.DATA_TYPES.INVOICE,
+            icon: Expensicons.InvoiceGeneric,
+            getRoute: (policyID?: string) => {
+                const query = SearchQueryUtils.buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.INVOICE, status: CONST.SEARCH.STATUS.INVOICE.ALL, policyID});
+                return ROUTES.SEARCH_CENTRAL_PANE.getRoute({query});
+            },
+        });
+    }
+    typeMenuItems.push({
+        title: translate('travel.trips'),
+        type: CONST.SEARCH.DATA_TYPES.TRIP,
+        icon: Expensicons.Suitcase,
+        getRoute: (policyID?: string) => {
+            const query = SearchQueryUtils.buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.TRIP, status: CONST.SEARCH.STATUS.TRIP.ALL, policyID});
+            return ROUTES.SEARCH_CENTRAL_PANE.getRoute({query});
+        },
+    });
+
     const getOverflowMenu = useCallback(
-        (itemName: string, itemHash: number, itemQuery: string) => SearchUtils.getOverflowMenu(itemName, itemHash, itemQuery, showDeleteModal),
+        (itemName: string, itemHash: number, itemQuery: string) => SearchUIUtils.getOverflowMenu(itemName, itemHash, itemQuery, showDeleteModal),
         [showDeleteModal],
     );
 
-    const createSavedSearchMenuItem = (item: SaveSearchItem, key: string, isNarrow: boolean, index: number) => {
-        let title = item.name;
-        if (title === item.query) {
-            const jsonQuery = SearchUtils.buildSearchQueryJSON(item.query) ?? ({} as SearchQueryJSON);
-            title = SearchUtils.getSearchHeaderTitle(jsonQuery, personalDetails, cardList, reports, taxRates);
-        }
+    const createSavedSearchMenuItem = useCallback(
+        (item: SaveSearchItem, key: string, isNarrow: boolean, index: number) => {
+            let title = item.name;
+            if (title === item.query) {
+                const jsonQuery = SearchQueryUtils.buildSearchQueryJSON(item.query) ?? ({} as SearchQueryJSON);
+                title = SearchQueryUtils.buildUserReadableQueryString(jsonQuery, personalDetails, reports, taxRates);
+            }
 
-        const baseMenuItem: SavedSearchMenuItem = {
-            key,
-            title,
-            hash: key,
-            query: item.query,
-            shouldShowRightComponent: true,
-            focused: Number(key) === hash,
-            onPress: () => {
-                SearchActions.clearAllFilters();
-                Navigation.navigate(ROUTES.SEARCH_CENTRAL_PANE.getRoute({query: item?.query ?? '', name: item?.name}));
-            },
-            rightComponent: (
-                <SavedSearchItemThreeDotMenu
-                    menuItems={getOverflowMenu(title, Number(key), item.query)}
-                    isDisabledItem={item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}
-                />
-            ),
-            styles: [styles.alignItemsCenter],
-            pendingAction: item.pendingAction,
-            disabled: item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-        };
-
-        if (!isNarrow) {
-            return {
-                ...baseMenuItem,
-                shouldRenderTooltip: index === 0 && shouldShowSavedSearchRenameTooltip === true,
-                tooltipAnchorAlignment: {
-                    horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
-                    vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
+            const baseMenuItem: SavedSearchMenuItem = {
+                key,
+                title,
+                hash: key,
+                query: item.query,
+                shouldShowRightComponent: true,
+                focused: Number(key) === hash,
+                onPress: () => {
+                    SearchActions.clearAllFilters();
+                    Navigation.navigate(ROUTES.SEARCH_CENTRAL_PANE.getRoute({query: item?.query ?? '', name: item?.name}));
                 },
-                tooltipShiftHorizontal: -32,
-                tooltipShiftVertical: 15,
-                tooltipWrapperStyle: [styles.bgPaleGreen, styles.mh4, styles.pv2],
-                onHideTooltip: () => SearchActions.dismissSavedSearchRenameTooltip(),
-                renderTooltipContent: () => {
-                    return (
-                        <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            <Expensicons.Lightbulb
-                                width={16}
-                                height={16}
-                                fill={styles.colorGreenSuccess.color}
-                            />
-                            <Text style={[styles.ml1, styles.quickActionTooltipSubtitle]}>{translate('search.saveSearchTooltipText')}</Text>
-                        </View>
-                    );
-                },
+                rightComponent: (
+                    <SavedSearchItemThreeDotMenu
+                        menuItems={getOverflowMenu(title, Number(key), item.query)}
+                        isDisabledItem={item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}
+                        hideProductTrainingTooltip={index === 0 && shouldShowProductTrainingTooltip ? hideProductTrainingTooltip : undefined}
+                    />
+                ),
+                styles: [styles.alignItemsCenter],
+                pendingAction: item.pendingAction,
+                disabled: item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                shouldIconUseAutoWidthStyle: true,
             };
-        }
 
-        return baseMenuItem;
-    };
+            if (!isNarrow) {
+                return {
+                    ...baseMenuItem,
+                    shouldRenderTooltip: index === 0 && shouldShowProductTrainingTooltip,
+                    tooltipAnchorAlignment: {
+                        horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
+                        vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
+                    },
+                    tooltipShiftHorizontal: -32,
+                    tooltipShiftVertical: 15,
+                    tooltipWrapperStyle: [styles.bgPaleGreen, styles.mh4, styles.pv2],
+                    renderTooltipContent: renderProductTrainingTooltip,
+                };
+            }
+            return baseMenuItem;
+        },
+        [
+            hash,
+            getOverflowMenu,
+            styles.alignItemsCenter,
+            styles.bgPaleGreen,
+            styles.mh4,
+            styles.pv2,
+            personalDetails,
+            reports,
+            taxRates,
+            shouldShowProductTrainingTooltip,
+            hideProductTrainingTooltip,
+            renderProductTrainingTooltip,
+        ],
+    );
 
     const route = useRoute();
     const scrollViewRef = useRef<RNScrollView>(null);
@@ -181,12 +210,12 @@ function SearchTypeMenu({queryJSON, searchName}: SearchTypeMenuProps) {
         scrollViewRef.current.scrollTo({y: scrollOffset, animated: false});
     }, [getScrollOffset, route]);
 
-    const savedSearchesMenuItems = () => {
+    const savedSearchesMenuItems = useCallback(() => {
         if (!savedSearches) {
             return [];
         }
         return Object.entries(savedSearches).map(([key, item], index) => createSavedSearchMenuItem(item, key, shouldUseNarrowLayout, index));
-    };
+    }, [createSavedSearchMenuItem, savedSearches, shouldUseNarrowLayout]);
 
     const renderSavedSearchesSection = useCallback(
         (menuItems: MenuItemWithLink[]) => (
@@ -204,11 +233,11 @@ function SearchTypeMenu({queryJSON, searchName}: SearchTypeMenuProps) {
         [styles],
     );
 
-    const isCannedQuery = SearchUtils.isCannedSearchQuery(queryJSON);
+    const isCannedQuery = SearchQueryUtils.isCannedSearchQuery(queryJSON);
     const activeItemIndex = isCannedQuery ? typeMenuItems.findIndex((item) => item.type === type) : -1;
 
     if (shouldUseNarrowLayout) {
-        const title = searchName ?? (isCannedQuery ? undefined : SearchUtils.getSearchHeaderTitle(queryJSON, personalDetails, cardList, reports, taxRates));
+        const title = searchName ?? (isCannedQuery ? undefined : SearchQueryUtils.buildUserReadableQueryString(queryJSON, personalDetails, reports, taxRates));
 
         return (
             <SearchTypeMenuNarrow
@@ -222,12 +251,15 @@ function SearchTypeMenu({queryJSON, searchName}: SearchTypeMenuProps) {
     }
 
     return (
-        <>
+        <ScrollView
+            onScroll={onScroll}
+            ref={scrollViewRef}
+        >
             <View style={[styles.pb4, styles.mh3, styles.mt3]}>
                 {typeMenuItems.map((item, index) => {
                     const onPress = singleExecution(() => {
                         SearchActions.clearAllFilters();
-                        Navigation.navigate(item.route);
+                        Navigation.navigate(item.getRoute(queryJSON.policyID));
                     });
 
                     return (
@@ -242,23 +274,19 @@ function SearchTypeMenu({queryJSON, searchName}: SearchTypeMenuProps) {
                             wrapperStyle={styles.sectionMenuItem}
                             focused={index === activeItemIndex}
                             onPress={onPress}
+                            shouldIconUseAutoWidthStyle
                         />
                     );
                 })}
             </View>
-            {savedSearches && Object.keys(savedSearches).length > 0 && (
+            {shouldShowSavedSearchesMenuItemTitle && (
                 <>
                     <Text style={[styles.sectionTitle, styles.pb1, styles.mh3, styles.mt3]}>{translate('search.savedSearchesMenuItemTitle')}</Text>
-                    <ScrollView
-                        onScroll={onScroll}
-                        ref={scrollViewRef}
-                    >
-                        {renderSavedSearchesSection(savedSearchesMenuItems())}
-                    </ScrollView>
+                    {renderSavedSearchesSection(savedSearchesMenuItems())}
                     <DeleteConfirmModal />
                 </>
             )}
-        </>
+        </ScrollView>
     );
 }
 

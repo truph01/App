@@ -54,6 +54,9 @@ type CustomBaseTextInputProps = {
      */
     autoGrow?: boolean;
 
+    /** If autoGrow is enabled, this reserves extra space for incoming characters to prevent flickering on native platforms. */
+    autoGrowExtraSpace?: number;
+
     /**
      * Autogrow input container height based on the entered text
      */
@@ -122,6 +125,9 @@ type CustomBaseTextInputProps = {
     /** Whether the clear button should be displayed */
     shouldShowClearButton?: boolean;
 
+    /** Whether to apply styles when input is disabled */
+    shouldUseDisabledStyles?: boolean;
+
     /** Style for the prefix */
     prefixStyle?: StyleProp<TextStyle>;
 
@@ -133,6 +139,9 @@ type CustomBaseTextInputProps = {
 
     /** Style for the suffix container */
     suffixContainerStyle?: StyleProp<ViewStyle>;
+
+    /** Style for the loading spinner */
+    loadingSpinnerStyle?: StyleProp<ViewStyle>;
 
     /** The width of inner content */
     contentWidth?: number;

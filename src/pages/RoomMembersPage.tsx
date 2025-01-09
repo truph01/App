@@ -1,10 +1,7 @@
-import type {RouteProp} from '@react-navigation/native';
 import {useIsFocused, useRoute} from '@react-navigation/native';
-import type {StackScreenProps} from '@react-navigation/stack';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {View} from 'react-native';
-import {useOnyx, withOnyx} from 'react-native-onyx';
-import type {OnyxEntry} from 'react-native-onyx';
+import {InteractionManager, View} from 'react-native';
+import {useOnyx} from 'react-native-onyx';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
@@ -20,7 +17,6 @@ import SelectionListWithModal from '@components/SelectionListWithModal';
 import Text from '@components/Text';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
-import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -30,6 +26,7 @@ import * as UserSearchPhraseActions from '@libs/actions/RoomMembersUserSearchPhr
 import * as DeviceCapabilities from '@libs/DeviceCapabilities';
 import localeCompare from '@libs/LocaleCompare';
 import Navigation from '@libs/Navigation/Navigation';
+import type {PlatformStackRouteProp, PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {RoomMembersNavigatorParamList} from '@libs/Navigation/types';
 import * as OptionsListUtils from '@libs/OptionsListUtils';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
@@ -41,48 +38,37 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import type {Session} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {WithReportOrNotFoundProps} from './home/report/withReportOrNotFound';
 import withReportOrNotFound from './home/report/withReportOrNotFound';
 
-type RoomMembersPageOnyxProps = {
-    session: OnyxEntry<Session>;
-};
+type RoomMembersPageProps = WithReportOrNotFoundProps & WithCurrentUserPersonalDetailsProps & PlatformStackScreenProps<RoomMembersNavigatorParamList, typeof SCREENS.ROOM_MEMBERS.ROOT>;
 
-type RoomMembersPageProps = WithReportOrNotFoundProps &
-    WithCurrentUserPersonalDetailsProps &
-    RoomMembersPageOnyxProps &
-    StackScreenProps<RoomMembersNavigatorParamList, typeof SCREENS.ROOM_MEMBERS.ROOT>;
-
-function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
-    const route = useRoute<RouteProp<RoomMembersNavigatorParamList, typeof SCREENS.ROOM_MEMBERS.ROOT>>();
+function RoomMembersPage({report, policies}: RoomMembersPageProps) {
+    const route = useRoute<PlatformStackRouteProp<RoomMembersNavigatorParamList, typeof SCREENS.ROOM_MEMBERS.ROOT>>();
     const styles = useThemeStyles();
+    const [session] = useOnyx(ONYXKEYS.SESSION);
+    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${report?.reportID}`);
+    const currentUserAccountID = Number(session?.accountID);
     const {formatPhoneNumber, translate} = useLocalize();
     const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
     const [removeMembersConfirmModalVisible, setRemoveMembersConfirmModalVisible] = useState(false);
     const [userSearchPhrase] = useOnyx(ONYXKEYS.ROOM_MEMBERS_USER_SEARCH_PHRASE);
-    const [searchValue, debouncedSearchTerm, setSearchValue] = useDebouncedState('');
+    const [searchValue, setSearchValue] = useState('');
     const [didLoadRoomMembers, setDidLoadRoomMembers] = useState(false);
-    const personalDetails = usePersonalDetails() || CONST.EMPTY_OBJECT;
-    const policy = useMemo(() => policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID ?? ''}`], [policies, report?.policyID]);
+    const personalDetails = usePersonalDetails();
+    const policy = useMemo(() => policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`], [policies, report?.policyID]);
     const isPolicyExpenseChat = useMemo(() => ReportUtils.isPolicyExpenseChat(report), [report]);
     const backTo = route.params.backTo;
 
     const isFocusedScreen = useIsFocused();
     const {isOffline} = useNetwork();
 
+    // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to use the selection mode only on small screens
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const [selectionMode] = useOnyx(ONYXKEYS.MOBILE_SELECTION_MODE);
     const canSelectMultiple = isSmallScreenWidth ? selectionMode?.isEnabled : true;
-
-    useEffect(() => {
-        setSearchValue(userSearchPhrase ?? '');
-    }, [isFocusedScreen, setSearchValue, userSearchPhrase]);
-
-    useEffect(() => {
-        UserSearchPhraseActions.updateUserSearchPhrase(debouncedSearchTerm);
-    }, [debouncedSearchTerm]);
 
     useEffect(() => {
         if (isFocusedScreen) {
@@ -128,9 +114,11 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
             Report.removeFromRoom(report.reportID, selectedMembers);
         }
         setSearchValue('');
-        UserSearchPhraseActions.clearUserSearchPhrase();
         setSelectedMembers([]);
         setRemoveMembersConfirmModalVisible(false);
+        InteractionManager.runAfterInteractions(() => {
+            UserSearchPhraseActions.clearUserSearchPhrase();
+        });
     };
 
     /**
@@ -166,7 +154,7 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
 
     /** Add or remove all users passed from the selectedMembers list */
     const toggleAllUsers = (memberList: ListItem[]) => {
-        const enabledAccounts = memberList.filter((member) => !member.isDisabled);
+        const enabledAccounts = memberList.filter((member) => !member.isDisabled && !member.isDisabledCheckbox);
         const everyoneSelected = enabledAccounts.every((member) => {
             if (!member.accountID) {
                 return false;
@@ -188,15 +176,26 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
     const shouldShowTextInput = useMemo(() => {
         // Get the active chat members by filtering out the pending members with delete action
         const activeParticipants = participants.filter((accountID) => {
-            const pendingMember = report?.pendingChatMembers?.findLast((member) => member.accountID === accountID.toString());
+            const pendingMember = reportMetadata?.pendingChatMembers?.findLast((member) => member.accountID === accountID.toString());
             if (!personalDetails?.[accountID]) {
                 return false;
             }
             // When offline, we want to include the pending members with delete action as they are displayed in the list as well
             return !pendingMember || isOffline || pendingMember.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
         });
-        return activeParticipants.length >= CONST.SHOULD_SHOW_MEMBERS_SEARCH_INPUT_BREAKPOINT;
-    }, [participants, personalDetails, isOffline, report]);
+        return activeParticipants.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
+    }, [participants, reportMetadata?.pendingChatMembers, personalDetails, isOffline]);
+
+    useEffect(() => {
+        if (!isFocusedScreen || !shouldShowTextInput) {
+            return;
+        }
+        setSearchValue(userSearchPhrase ?? '');
+    }, [isFocusedScreen, shouldShowTextInput, userSearchPhrase]);
+
+    useEffect(() => {
+        UserSearchPhraseActions.updateUserSearchPhrase(searchValue);
+    }, [searchValue]);
 
     useEffect(() => {
         if (!isFocusedScreen) {
@@ -214,26 +213,27 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
         let result: ListItem[] = [];
 
         participants.forEach((accountID) => {
-            const details = personalDetails[accountID];
+            const details = personalDetails?.[accountID];
 
             // If search value is provided, filter out members that don't match the search value
             if (!details || (searchValue.trim() && !OptionsListUtils.isSearchStringMatchUserDetails(details, searchValue))) {
                 return;
             }
-            const pendingChatMember = report?.pendingChatMembers?.findLast((member) => member.accountID === accountID.toString());
-            const isAdmin = !!(policy && policy.employeeList && details.login && policy.employeeList[details.login]?.role === CONST.POLICY.ROLE.ADMIN);
-            const isDisabled =
+            const pendingChatMember = reportMetadata?.pendingChatMembers?.findLast((member) => member.accountID === accountID.toString());
+            const isAdmin = PolicyUtils.isUserPolicyAdmin(policy, details.login);
+            const isDisabled = pendingChatMember?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || details.isOptimisticPersonalDetail;
+            const isDisabledCheckbox =
                 (isPolicyExpenseChat && isAdmin) ||
                 accountID === session?.accountID ||
                 pendingChatMember?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ||
-                details.accountID === report.ownerAccountID ||
-                details.isOptimisticPersonalDetail;
+                details.accountID === report.ownerAccountID;
 
             result.push({
                 keyForList: String(accountID),
                 accountID,
                 isSelected: selectedMembers.includes(accountID),
                 isDisabled,
+                isDisabledCheckbox,
                 text: formatPhoneNumber(PersonalDetailsUtils.getDisplayNameOrDefault(details)),
                 alternateText: details?.login ? formatPhoneNumber(details.login) : '',
                 icons: [
@@ -252,11 +252,22 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
         result = result.sort((value1, value2) => localeCompare(value1.text ?? '', value2.text ?? ''));
 
         return result;
-    }, [formatPhoneNumber, isPolicyExpenseChat, participants, personalDetails, policy, report.ownerAccountID, report?.pendingChatMembers, searchValue, selectedMembers, session?.accountID]);
+    }, [
+        formatPhoneNumber,
+        isPolicyExpenseChat,
+        participants,
+        personalDetails,
+        policy,
+        report.ownerAccountID,
+        reportMetadata?.pendingChatMembers,
+        searchValue,
+        selectedMembers,
+        session?.accountID,
+    ]);
 
     const dismissError = useCallback(
         (item: ListItem) => {
-            Report.clearAddRoomMemberError(report.reportID, String(item.accountID ?? '-1'));
+            Report.clearAddRoomMemberError(report.reportID, String(item.accountID));
         },
         [report.reportID],
     );
@@ -273,14 +284,14 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
     const bulkActionsButtonOptions = useMemo(() => {
         const options: Array<DropdownOption<RoomMemberBulkActionType>> = [
             {
-                text: translate('workspace.people.removeMembersTitle'),
+                text: translate('workspace.people.removeMembersTitle', {count: selectedMembers.length}),
                 value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.REMOVE,
                 icon: Expensicons.RemoveMembers,
                 onSelected: () => setRemoveMembersConfirmModalVisible(true),
             },
         ];
         return options;
-    }, [translate, setRemoveMembersConfirmModalVisible]);
+    }, [translate, selectedMembers.length]);
 
     const headerButtons = useMemo(() => {
         return (
@@ -314,7 +325,11 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
     /** Opens the room member details page */
     const openRoomMemberDetails = useCallback(
         (item: ListItem) => {
-            Navigation.navigate(ROUTES.ROOM_MEMBER_DETAILS.getRoute(report.reportID, item?.accountID ?? -1, backTo));
+            if (!item?.accountID) {
+                return;
+            }
+
+            Navigation.navigate(ROUTES.ROOM_MEMBER_DETAILS.getRoute(report.reportID, item?.accountID, backTo));
         },
         [report, backTo],
     );
@@ -368,11 +383,14 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
                 <View style={[styles.pl5, styles.pr5]}>{headerButtons}</View>
                 <ConfirmModal
                     danger
-                    title={translate('workspace.people.removeMembersTitle')}
+                    title={translate('workspace.people.removeMembersTitle', {count: selectedMembers.length})}
                     isVisible={removeMembersConfirmModalVisible}
                     onConfirm={removeUsers}
                     onCancel={() => setRemoveMembersConfirmModalVisible(false)}
-                    prompt={translate('roomMembersPage.removeMembersPrompt')}
+                    prompt={translate('roomMembersPage.removeMembersPrompt', {
+                        count: selectedMembers.length,
+                        memberName: formatPhoneNumber(PersonalDetailsUtils.getPersonalDetailsByIDs(selectedMembers, currentUserAccountID).at(0)?.displayName ?? ''),
+                    })}
                     confirmText={translate('common.remove')}
                     cancelText={translate('common.cancel')}
                 />
@@ -384,9 +402,7 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
                         textInputLabel={translate('selectionList.findMember')}
                         disableKeyboardShortcuts={removeMembersConfirmModalVisible}
                         textInputValue={searchValue}
-                        onChangeText={(value) => {
-                            setSearchValue(value);
-                        }}
+                        onChangeText={setSearchValue}
                         headerMessage={headerMessage}
                         turnOnSelectionModeOnLongPress
                         onTurnOnSelectionMode={(item) => item && toggleUser(item)}
@@ -409,4 +425,4 @@ function RoomMembersPage({report, session, policies}: RoomMembersPageProps) {
 
 RoomMembersPage.displayName = 'RoomMembersPage';
 
-export default withReportOrNotFound()(withCurrentUserPersonalDetails(withOnyx<RoomMembersPageProps, RoomMembersPageOnyxProps>({session: {key: ONYXKEYS.SESSION}})(RoomMembersPage)));
+export default withReportOrNotFound()(withCurrentUserPersonalDetails(RoomMembersPage));

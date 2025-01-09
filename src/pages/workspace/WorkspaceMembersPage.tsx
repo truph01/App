@@ -1,5 +1,4 @@
 import {useIsFocused} from '@react-navigation/native';
-import type {StackScreenProps} from '@react-navigation/stack';
 import lodashIsEqual from 'lodash/isEqual';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {TextInput} from 'react-native';
@@ -19,6 +18,7 @@ import MessagesRow from '@components/MessagesRow';
 import TableListItem from '@components/SelectionList/TableListItem';
 import type {ListItem, SelectionListHandle} from '@components/SelectionList/types';
 import SelectionListWithModal from '@components/SelectionListWithModal';
+import CustomListHeader from '@components/SelectionListWithModal/CustomListHeader';
 import Text from '@components/Text';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
@@ -27,13 +27,14 @@ import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
 import useNetwork from '@hooks/useNetwork';
 import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import * as DeviceCapabilities from '@libs/DeviceCapabilities';
+import * as LocalePhoneNumber from '@libs/LocalePhoneNumber';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
+import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {FullScreenNavigatorParamList} from '@libs/Navigation/types';
 import * as OptionsListUtils from '@libs/OptionsListUtils';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
@@ -53,7 +54,9 @@ import type {WithPolicyAndFullscreenLoadingProps} from './withPolicyAndFullscree
 import withPolicyAndFullscreenLoading from './withPolicyAndFullscreenLoading';
 import WorkspacePageWithSections from './WorkspacePageWithSections';
 
-type WorkspaceMembersPageProps = WithPolicyAndFullscreenLoadingProps & WithCurrentUserPersonalDetailsProps & StackScreenProps<FullScreenNavigatorParamList, typeof SCREENS.WORKSPACE.MEMBERS>;
+type WorkspaceMembersPageProps = WithPolicyAndFullscreenLoadingProps &
+    WithCurrentUserPersonalDetailsProps &
+    PlatformStackScreenProps<FullScreenNavigatorParamList, typeof SCREENS.WORKSPACE.MEMBERS>;
 
 /**
  * Inverts an object, equivalent of _.invert
@@ -68,7 +71,6 @@ type MemberOption = Omit<ListItem, 'accountID'> & {accountID: number};
 function WorkspaceMembersPage({personalDetails, route, policy, currentUserPersonalDetails}: WorkspaceMembersPageProps) {
     const policyMemberEmailsToAccountIDs = useMemo(() => PolicyUtils.getMemberAccountIDsForWorkspace(policy?.employeeList, true), [policy?.employeeList]);
     const styles = useThemeStyles();
-    const StyleUtils = useStyleUtils();
     const [selectedEmployees, setSelectedEmployees] = useState<number[]>([]);
     const [removeMembersConfirmModalVisible, setRemoveMembersConfirmModalVisible] = useState(false);
     const [errors, setErrors] = useState({});
@@ -83,6 +85,9 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
     const isOfflineAndNoMemberDataAvailable = isEmptyObject(policy?.employeeList) && isOffline;
     const prevPersonalDetails = usePrevious(personalDetails);
     const {translate, formatPhoneNumber, preferredLocale} = useLocalize();
+
+    // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to apply the correct modal type for the decision modal
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const isPolicyAdmin = PolicyUtils.isPolicyAdmin(policy);
     const isLoading = useMemo(
@@ -93,6 +98,7 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
     const [invitedEmailsToAccountIDsDraft] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_INVITE_MEMBERS_DRAFT}${route.params.policyID.toString()}`);
     const {selectionMode} = useMobileSelectionMode();
     const [session] = useOnyx(ONYXKEYS.SESSION);
+    const currentUserAccountID = Number(session?.accountID);
     const selectionListRef = useRef<SelectionListHandle>(null);
     const isFocused = useIsFocused();
     const policyID = route.params.policyID;
@@ -102,13 +108,16 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
     const confirmModalPrompt = useMemo(() => {
         const approverAccountID = selectedEmployees.find((selectedEmployee) => Member.isApprover(policy, selectedEmployee));
         if (!approverAccountID) {
-            return translate('workspace.people.removeMembersPrompt');
+            return translate('workspace.people.removeMembersPrompt', {
+                count: selectedEmployees.length,
+                memberName: LocalePhoneNumber.formatPhoneNumber(PersonalDetailsUtils.getPersonalDetailsByIDs(selectedEmployees, currentUserAccountID).at(0)?.displayName ?? ''),
+            });
         }
         return translate('workspace.people.removeMembersWarningPrompt', {
             memberName: getDisplayNameForParticipant(approverAccountID),
             ownerName: getDisplayNameForParticipant(policy?.ownerAccountID),
         });
-    }, [selectedEmployees, policy, translate]);
+    }, [selectedEmployees, translate, policy, currentUserAccountID]);
     /**
      * Get filtered personalDetails list with current employeeList
      */
@@ -165,7 +174,7 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
             const currentPersonalDetails = filterPersonalDetails(policy?.employeeList ?? {}, personalDetails);
             // We need to filter the previous selected employees by the new personal details, since unknown/new user id's change when transitioning from offline to online
             const prevSelectedElements = prevSelected.map((id) => {
-                const prevItem = prevPersonalDetails?.id;
+                const prevItem = prevPersonalDetails?.[id];
                 const res = Object.values(currentPersonalDetails).find((item) => prevItem?.login === item?.login);
                 return res?.accountID ?? id;
             });
@@ -191,9 +200,10 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
     /**
      * Open the modal to invite a user
      */
-    const inviteUser = () => {
-        Navigation.navigate(ROUTES.WORKSPACE_INVITE.getRoute(route.params.policyID));
-    };
+    const inviteUser = useCallback(() => {
+        Member.clearInviteDraft(route.params.policyID);
+        Navigation.navigate(ROUTES.WORKSPACE_INVITE.getRoute(route.params.policyID, Navigation.getActiveRouteWithoutParams()));
+    }, [route.params.policyID]);
 
     /**
      * Remove selected users from the workspace
@@ -206,10 +216,11 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
 
         // Remove the admin from the list
         const accountIDsToRemove = session?.accountID ? selectedEmployees.filter((id) => id !== session.accountID) : selectedEmployees;
-
-        Member.removeMembers(accountIDsToRemove, route.params.policyID);
         setSelectedEmployees([]);
         setRemoveMembersConfirmModalVisible(false);
+        InteractionManager.runAfterInteractions(() => {
+            Member.removeMembers(accountIDsToRemove, route.params.policyID);
+        });
     };
 
     /**
@@ -350,15 +361,15 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
             } else if (isAuditor) {
                 roleBadge = <Badge text={translate('common.auditor')} />;
             }
+            const isPendingDeleteOrError = isPolicyAdmin && (policyEmployee.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || !isEmptyObject(policyEmployee.errors));
 
             result.push({
                 keyForList: String(accountID),
                 accountID,
                 isSelected,
                 isDisabledCheckbox: !(isPolicyAdmin && accountID !== policy?.ownerAccountID && accountID !== session?.accountID),
-                isDisabled:
-                    !!details.isOptimisticPersonalDetail ||
-                    (isPolicyAdmin && (policyEmployee.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || !isEmptyObject(policyEmployee.errors))),
+                isDisabled: isPendingDeleteOrError,
+                isInteractive: !details.isOptimisticPersonalDetail,
                 cursorStyle: details.isOptimisticPersonalDetail ? styles.cursorDefault : {},
                 text: formatPhoneNumber(PersonalDetailsUtils.getDisplayNameOrDefault(details)),
                 alternateText: formatPhoneNumber(details?.login ?? ''),
@@ -408,9 +419,9 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
             return;
         }
         const invitedEmails = Object.values(invitedEmailsToAccountIDsDraft).map(String);
-        selectionListRef.current?.scrollAndHighlightItem?.(invitedEmails, 1500);
-        Member.setWorkspaceInviteMembersDraft(route.params.policyID, {});
-    }, [invitedEmailsToAccountIDsDraft, route.params.policyID, isFocused, accountIDs, prevAccountIDs]);
+        selectionListRef.current?.scrollAndHighlightItem?.(invitedEmails);
+        Member.clearInviteDraft(route.params.policyID);
+    }, [invitedEmailsToAccountIDsDraft, isFocused, accountIDs, prevAccountIDs, route.params.policyID]);
 
     const getHeaderMessage = () => {
         if (isOfflineAndNoMemberDataAvailable) {
@@ -444,20 +455,13 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
     }, [setSelectedEmployees, selectionMode?.isEnabled]);
 
     const getCustomListHeader = () => {
-        const header = (
-            <View style={[styles.flex1, styles.flexRow, styles.justifyContentBetween]}>
-                <View>
-                    <Text style={[styles.searchInputStyle, canSelectMultiple ? styles.ml3 : styles.ml0]}>{translate('common.member')}</Text>
-                </View>
-                <View style={[StyleUtils.getMinimumWidth(60)]}>
-                    <Text style={[styles.searchInputStyle, styles.textAlignCenter]}>{translate('common.role')}</Text>
-                </View>
-            </View>
+        return (
+            <CustomListHeader
+                canSelectMultiple={canSelectMultiple}
+                leftHeaderText={translate('common.member')}
+                rightHeaderText={translate('common.role')}
+            />
         );
-        if (canSelectMultiple) {
-            return header;
-        }
-        return <View style={[styles.peopleRow, styles.userSelectNone, styles.ph9, styles.pv3, styles.pb5]}>{header}</View>;
     };
 
     const changeUserRole = (role: ValueOf<typeof CONST.POLICY.ROLE>) => {
@@ -477,7 +481,7 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
     const getBulkActionsButtonOptions = () => {
         const options: Array<DropdownOption<WorkspaceMemberBulkActionType>> = [
             {
-                text: translate('workspace.people.removeMembersTitle'),
+                text: translate('workspace.people.removeMembersTitle', {count: selectedEmployees.length}),
                 value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.REMOVE,
                 icon: Expensicons.RemoveMembers,
                 onSelected: askForConfirmationToRemove,
@@ -637,7 +641,7 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
 
                     <ConfirmModal
                         danger
-                        title={translate('workspace.people.removeMembersTitle')}
+                        title={translate('workspace.people.removeMembersTitle', {count: selectedEmployees.length})}
                         isVisible={removeMembersConfirmModalVisible}
                         onConfirm={removeUsers}
                         onCancel={() => setRemoveMembersConfirmModalVisible(false)}

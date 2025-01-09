@@ -1,4 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
+import lodashDebounce from 'lodash/debounce';
 import noop from 'lodash/noop';
 import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {MeasureInWindowOnSuccessCallback, NativeSyntheticEvent, TextInputFocusEventData, TextInputSelectionChangeEventData} from 'react-native';
@@ -11,25 +12,25 @@ import type {FileObject} from '@components/AttachmentModal';
 import AttachmentModal from '@components/AttachmentModal';
 import EmojiPickerButton from '@components/EmojiPicker/EmojiPickerButton';
 import ExceededCommentLength from '@components/ExceededCommentLength';
-import Icon from '@components/Icon';
-import * as Expensicons from '@components/Icon/Expensicons';
+import ImportedStateIndicator from '@components/ImportedStateIndicator';
 import type {Mention} from '@components/MentionSuggestions';
 import OfflineIndicator from '@components/OfflineIndicator';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {usePersonalDetails} from '@components/OnyxProvider';
-import Text from '@components/Text';
+import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import EducationalTooltip from '@components/Tooltip/EducationalTooltip';
-import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
-import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebounce from '@hooks/useDebounce';
 import useHandleExceedMaxCommentLength from '@hooks/useHandleExceedMaxCommentLength';
+import useHandleExceedMaxTaskTitleLength from '@hooks/useHandleExceedMaxTaskTitleLength';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useViewportOffsetTop from '@hooks/useViewportOffsetTop';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
 import * as DeviceCapabilities from '@libs/DeviceCapabilities';
+import DomUtils from '@libs/DomUtils';
 import {getDraftComment} from '@libs/DraftCommentUtils';
 import getModalState from '@libs/getModalState';
 import Performance from '@libs/Performance';
@@ -42,6 +43,7 @@ import ReportTypingIndicator from '@pages/home/report/ReportTypingIndicator';
 import variables from '@styles/variables';
 import * as EmojiPickerActions from '@userActions/EmojiPickerAction';
 import * as Report from '@userActions/Report';
+import Timing from '@userActions/Timing';
 import * as User from '@userActions/User';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -63,32 +65,40 @@ type SuggestionsRef = {
     getIsSuggestionsMenuVisible: () => boolean;
 };
 
-type ReportActionComposeProps = WithCurrentUserPersonalDetailsProps &
-    Pick<ComposerWithSuggestionsProps, 'reportID' | 'isEmptyChat' | 'isComposerFullSize' | 'lastReportAction'> & {
-        /** A method to call when the form is submitted */
-        onSubmit: (newComment: string) => void;
+type ReportActionComposeProps = Pick<ComposerWithSuggestionsProps, 'reportID' | 'isComposerFullSize' | 'lastReportAction'> & {
+    /** A method to call when the form is submitted */
+    onSubmit: (newComment: string) => void;
 
-        /** The report currently being looked at */
-        report: OnyxEntry<OnyxTypes.Report>;
+    /** The report currently being looked at */
+    report: OnyxEntry<OnyxTypes.Report>;
 
-        /** The type of action that's pending  */
-        pendingAction?: OnyxCommon.PendingAction;
+    /** The type of action that's pending  */
+    pendingAction?: OnyxCommon.PendingAction;
 
-        /** Whether the report is ready for display */
-        isReportReadyForDisplay?: boolean;
+    /** Whether the report is ready for display */
+    isReportReadyForDisplay?: boolean;
 
-        /** A method to call when the input is focus */
-        onComposerFocus?: () => void;
+    /** A method to call when the input is focus */
+    onComposerFocus?: () => void;
 
-        /** A method to call when the input is blur */
-        onComposerBlur?: () => void;
+    /** A method to call when the input is blur */
+    onComposerBlur?: () => void;
 
-        /** Should the input be disabled  */
-        disabled?: boolean;
+    /** Should the input be disabled  */
+    disabled?: boolean;
 
-        /** Should show educational tooltip */
-        shouldShowEducationalTooltip?: boolean;
-    };
+    /** Should show educational tooltip */
+    shouldShowEducationalTooltip?: boolean;
+
+    /** Whether to show the keyboard on focus */
+    showSoftInputOnFocus: boolean;
+
+    /** A method to update showSoftInputOnFocus */
+    setShowSoftInputOnFocus: (value: boolean) => void;
+
+    /** Whether the main composer was hidden */
+    didHideComposerInput?: boolean;
+};
 
 // We want consistent auto focus behavior on input between native and mWeb so we have some auto focus management code that will
 // prevent auto focus on existing chat for mobile device
@@ -100,7 +110,6 @@ const willBlurTextInputOnTapOutside = willBlurTextInputOnTapOutsideFunc();
 let onSubmitAction = noop;
 
 function ReportActionCompose({
-    currentUserPersonalDetails,
     disabled = false,
     isComposerFullSize = false,
     onSubmit,
@@ -108,22 +117,32 @@ function ReportActionCompose({
     report,
     reportID,
     isReportReadyForDisplay = true,
-    isEmptyChat,
     lastReportAction,
     shouldShowEducationalTooltip,
+    showSoftInputOnFocus,
     onComposerFocus,
     onComposerBlur,
+    setShowSoftInputOnFocus,
+    didHideComposerInput,
 }: ReportActionComposeProps) {
-    const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth, isMediumScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
+    const offsetTop = useViewportOffsetTop();
     const {isOffline} = useNetwork();
     const actionButtonRef = useRef<View | HTMLDivElement | null>(null);
-    const personalDetails = usePersonalDetails() || CONST.EMPTY_OBJECT;
-    const navigation = useNavigation();
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const personalDetails = usePersonalDetails();
     const [blockedFromConcierge] = useOnyx(ONYXKEYS.NVP_BLOCKED_FROM_CONCIERGE);
     const [shouldShowComposeInput = true] = useOnyx(ONYXKEYS.SHOULD_SHOW_COMPOSE_INPUT);
+    const isScreenFocused = useIsFocused();
+
+    const {renderProductTrainingTooltip, hideProductTrainingTooltip, shouldShowProductTrainingTooltip} = useProductTrainingContext(
+        CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.WORKSAPCE_CHAT_CREATE,
+        shouldShowEducationalTooltip && isScreenFocused,
+    );
+
     /**
      * Updates the Highlight state of the composer
      */
@@ -131,8 +150,6 @@ function ReportActionCompose({
         const initialModalState = getModalState();
         return shouldFocusInputOnScreenFocus && shouldShowComposeInput && !initialModalState?.isVisible && !initialModalState?.willAlertModalBecomeVisible;
     });
-    const [isFullComposerAvailable, setIsFullComposerAvailable] = useState(isComposerFullSize);
-    const [shouldHideEducationalTooltip, setShouldHideEducationalTooltip] = useState(false);
 
     // A flag to indicate whether the onScroll callback is likely triggered by a layout change (caused by text change) or not
     const isScrollLikelyLayoutTriggered = useRef(false);
@@ -169,7 +186,9 @@ function ReportActionCompose({
      * Updates the composer when the comment length is exceeded
      * Shows red borders and prevents the comment from being sent
      */
-    const {hasExceededMaxCommentLength, validateCommentMaxLength} = useHandleExceedMaxCommentLength();
+    const {hasExceededMaxCommentLength, validateCommentMaxLength, setHasExceededMaxCommentLength} = useHandleExceedMaxCommentLength();
+    const {hasExceededMaxTaskTitleLength, validateTaskTitleMaxLength, setHasExceededMaxTitleLength} = useHandleExceedMaxTaskTitleLength();
+    const [exceededMaxLength, setExceededMaxLength] = useState<number | null>(null);
 
     const suggestionsRef = useRef<SuggestionsRef>(null);
     const composerRef = useRef<ComposerRef>();
@@ -222,11 +241,12 @@ function ReportActionCompose({
     );
 
     const onAddActionPressed = useCallback(() => {
+        hideProductTrainingTooltip();
         if (!willBlurTextInputOnTapOutside) {
             isKeyboardVisibleWhenShowingModalRef.current = !!composerRef.current?.isFocused();
         }
         composerRef.current?.blur();
-    }, []);
+    }, [hideProductTrainingTooltip]);
 
     const onItemSelected = useCallback(() => {
         isKeyboardVisibleWhenShowingModalRef.current = false;
@@ -271,7 +291,8 @@ function ReportActionCompose({
                 Report.addAttachment(reportID, attachmentFileRef.current, newCommentTrimmed);
                 attachmentFileRef.current = null;
             } else {
-                Performance.markStart(CONST.TIMING.MESSAGE_SENT, {message: newCommentTrimmed});
+                Performance.markStart(CONST.TIMING.SEND_MESSAGE, {message: newCommentTrimmed});
+                Timing.start(CONST.TIMING.SEND_MESSAGE);
                 onSubmit(newCommentTrimmed);
             }
         },
@@ -303,10 +324,20 @@ function ReportActionCompose({
         onComposerFocus?.();
     }, [onComposerFocus]);
 
+    useEffect(() => {
+        if (hasExceededMaxTaskTitleLength) {
+            setExceededMaxLength(CONST.TITLE_CHARACTER_LIMIT);
+        } else if (hasExceededMaxCommentLength) {
+            setExceededMaxLength(CONST.MAX_COMMENT_LENGTH);
+        } else {
+            setExceededMaxLength(null);
+        }
+    }, [hasExceededMaxTaskTitleLength, hasExceededMaxCommentLength]);
+
     // We are returning a callback here as we want to incoke the method on unmount only
     useEffect(
         () => () => {
-            if (!EmojiPickerActions.isActive(report?.reportID ?? '-1')) {
+            if (!EmojiPickerActions.isActive(report?.reportID)) {
                 return;
             }
             EmojiPickerActions.hideEmojiPicker();
@@ -315,22 +346,15 @@ function ReportActionCompose({
         [],
     );
 
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('blur', () => {
-            setShouldHideEducationalTooltip(true);
-        });
-        return unsubscribe;
-    }, [navigation]);
-
     // When we invite someone to a room they don't have the policy object, but we still want them to be able to mention other reports they are members of, so we only check if the policyID in the report is from a workspace
     const isGroupPolicyReport = useMemo(() => !!report?.policyID && report.policyID !== CONST.POLICY.ID_FAKE, [report]);
     const reportRecipientAcountIDs = ReportUtils.getReportRecipientAccountIDs(report, currentUserPersonalDetails.accountID);
-    const reportRecipient = personalDetails[reportRecipientAcountIDs[0]];
+    const reportRecipient = personalDetails?.[reportRecipientAcountIDs[0]];
     const shouldUseFocusedColor = !isBlockedFromConcierge && !disabled && isFocused;
 
     const hasReportRecipient = !isEmptyObject(reportRecipient);
 
-    const isSendDisabled = isCommentEmpty || isBlockedFromConcierge || !!disabled || hasExceededMaxCommentLength;
+    const isSendDisabled = isCommentEmpty || isBlockedFromConcierge || !!disabled || !!exceededMaxLength;
 
     // Note: using JS refs is not well supported in reanimated, thus we need to store the function in a shared value
     // useSharedValue on web doesn't support functions, so we need to wrap it in an object.
@@ -340,7 +364,7 @@ function ReportActionCompose({
     const handleSendMessage = useCallback(() => {
         'worklet';
 
-        const clearComposer = composerRefShared.value.clear;
+        const clearComposer = composerRefShared.get().clear;
         if (!clearComposer) {
             throw new Error('The composerRefShared.clear function is not set yet. This should never happen, and indicates a developer error.');
         }
@@ -363,32 +387,31 @@ function ReportActionCompose({
         return reportActionComposeHeight - emojiOffsetWithComposeBox - CONST.MENU_POSITION_REPORT_ACTION_COMPOSE_BOTTOM;
     }, [styles]);
 
-    const renderWorkspaceChatTooltip = useCallback(
-        () => (
-            <View style={[styles.alignItemsCenter, styles.flexRow, styles.justifyContentCenter, styles.flexWrap, styles.textAlignCenter, styles.gap1]}>
-                <Icon
-                    src={Expensicons.Lightbulb}
-                    fill={theme.tooltipHighlightText}
-                    medium
-                />
-                <Text>
-                    <Text style={styles.quickActionTooltipTitle}>{translate('reportActionCompose.tooltip.title')}</Text>
-                    <Text style={styles.quickActionTooltipSubtitle}>{translate('reportActionCompose.tooltip.subtitle')}</Text>
-                </Text>
-            </View>
-        ),
-        [
-            styles.alignItemsCenter,
-            styles.flexRow,
-            styles.justifyContentCenter,
-            styles.flexWrap,
-            styles.textAlignCenter,
-            styles.gap1,
-            styles.quickActionTooltipTitle,
-            styles.quickActionTooltipSubtitle,
-            theme.tooltipHighlightText,
-            translate,
-        ],
+    const validateMaxLength = useCallback(
+        (value: string) => {
+            const taskCommentMatch = value?.match(CONST.REGEX.TASK_TITLE_WITH_OPTONAL_SHORT_MENTION);
+            if (taskCommentMatch) {
+                const title = taskCommentMatch?.[3] ? taskCommentMatch[3].trim().replace(/\n/g, ' ') : '';
+                setHasExceededMaxCommentLength(false);
+                validateTaskTitleMaxLength(title);
+            } else {
+                setHasExceededMaxTitleLength(false);
+                validateCommentMaxLength(value, {reportID});
+            }
+        },
+        [setHasExceededMaxCommentLength, setHasExceededMaxTitleLength, validateTaskTitleMaxLength, validateCommentMaxLength, reportID],
+    );
+
+    const debouncedValidate = useMemo(() => lodashDebounce(validateMaxLength, CONST.TIMING.COMMENT_LENGTH_DEBOUNCE_TIME, {leading: true}), [validateMaxLength]);
+
+    const onValueChange = useCallback(
+        (value: string) => {
+            if (value.length === 0 && isComposerFullSize) {
+                Report.setIsComposerFullSize(reportID, false);
+            }
+            debouncedValidate(value);
+        },
+        [isComposerFullSize, reportID, debouncedValidate],
     );
 
     return (
@@ -404,17 +427,15 @@ function ReportActionCompose({
                     contentContainerStyle={isComposerFullSize ? styles.flex1 : {}}
                 >
                     <EducationalTooltip
-                        shouldRender={!shouldHideEducationalTooltip && shouldShowEducationalTooltip}
-                        renderTooltipContent={renderWorkspaceChatTooltip}
-                        shouldUseOverlay
-                        onHideTooltip={() => User.dismissWorkspaceTooltip()}
+                        shouldRender={shouldShowProductTrainingTooltip}
+                        renderTooltipContent={renderProductTrainingTooltip}
                         anchorAlignment={{
                             horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
                             vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
                         }}
                         wrapperStyle={styles.reportActionComposeTooltipWrapper}
                         shiftHorizontal={variables.composerTooltipShiftHorizontal}
-                        shiftVertical={variables.composerTooltipShiftVertical}
+                        shiftVertical={variables.composerTooltipShiftVertical + offsetTop}
                     >
                         <View
                             ref={containerRef}
@@ -423,7 +444,7 @@ function ReportActionCompose({
                                 styles.flexRow,
                                 styles.chatItemComposeBox,
                                 isComposerFullSize && styles.chatItemFullComposeBox,
-                                hasExceededMaxCommentLength && styles.borderColorDanger,
+                                !!exceededMaxLength && styles.borderColorDanger,
                             ]}
                         >
                             <AttachmentModal
@@ -431,6 +452,7 @@ function ReportActionCompose({
                                 onConfirm={addAttachment}
                                 onModalShow={() => setIsAttachmentPreviewActive(true)}
                                 onModalHide={onAttachmentPreviewClose}
+                                shouldDisableSendButton={!!exceededMaxLength}
                             >
                                 {({displayFileInModal}) => (
                                     <>
@@ -439,7 +461,6 @@ function ReportActionCompose({
                                             reportID={reportID}
                                             report={report}
                                             reportParticipantIDs={reportParticipantIDs}
-                                            isFullComposerAvailable={isFullComposerAvailable}
                                             isComposerFullSize={isComposerFullSize}
                                             isBlockedFromConcierge={isBlockedFromConcierge}
                                             disabled={!!disabled}
@@ -449,27 +470,30 @@ function ReportActionCompose({
                                             raiseIsScrollLikelyLayoutTriggered={raiseIsScrollLikelyLayoutTriggered}
                                             onAddActionPressed={onAddActionPressed}
                                             onItemSelected={onItemSelected}
+                                            onCanceledAttachmentPicker={() => {
+                                                if (!shouldFocusInputOnScreenFocus) {
+                                                    return;
+                                                }
+                                                focus();
+                                            }}
                                             actionButtonRef={actionButtonRef}
+                                            shouldDisableAttachmentItem={!!exceededMaxLength}
                                         />
                                         <ComposerWithSuggestions
                                             ref={(ref) => {
                                                 composerRef.current = ref ?? undefined;
-                                                // eslint-disable-next-line react-compiler/react-compiler
-                                                composerRefShared.value = {
+                                                composerRefShared.set({
                                                     clear: ref?.clear,
-                                                };
+                                                });
                                             }}
                                             suggestionsRef={suggestionsRef}
                                             isNextModalWillOpenRef={isNextModalWillOpenRef}
                                             isScrollLikelyLayoutTriggered={isScrollLikelyLayoutTriggered}
                                             raiseIsScrollLikelyLayoutTriggered={raiseIsScrollLikelyLayoutTriggered}
                                             reportID={reportID}
-                                            policyID={report?.policyID ?? '-1'}
-                                            parentReportID={report?.parentReportID}
-                                            parentReportActionID={report?.parentReportActionID}
+                                            policyID={report?.policyID}
                                             includeChronos={ReportUtils.chatIncludesChronos(report)}
                                             isGroupPolicyReport={isGroupPolicyReport}
-                                            isEmptyChat={isEmptyChat}
                                             lastReportAction={lastReportAction}
                                             isMenuVisible={isMenuVisible}
                                             inputPlaceholder={inputPlaceholder}
@@ -478,20 +502,16 @@ function ReportActionCompose({
                                             onCleared={submitForm}
                                             isBlockedFromConcierge={isBlockedFromConcierge}
                                             disabled={!!disabled}
-                                            isFullComposerAvailable={isFullComposerAvailable}
-                                            setIsFullComposerAvailable={setIsFullComposerAvailable}
                                             setIsCommentEmpty={setIsCommentEmpty}
                                             handleSendMessage={handleSendMessage}
                                             shouldShowComposeInput={shouldShowComposeInput}
                                             onFocus={onFocus}
                                             onBlur={onBlur}
                                             measureParentContainer={measureContainer}
-                                            onValueChange={(value) => {
-                                                if (value.length === 0 && isComposerFullSize) {
-                                                    Report.setIsComposerFullSize(reportID, false);
-                                                }
-                                                validateCommentMaxLength(value, {reportID});
-                                            }}
+                                            showSoftInputOnFocus={showSoftInputOnFocus}
+                                            setShowSoftInputOnFocus={setShowSoftInputOnFocus}
+                                            onValueChange={onValueChange}
+                                            didHideComposerInput={didHideComposerInput}
                                         />
                                         <ReportDropUI
                                             onDrop={(event: DragEvent) => {
@@ -513,6 +533,10 @@ function ReportActionCompose({
                                     isDisabled={isBlockedFromConcierge || disabled}
                                     onModalHide={(isNavigating) => {
                                         if (isNavigating) {
+                                            return;
+                                        }
+                                        const activeElementId = DomUtils.getActiveElement()?.id;
+                                        if (activeElementId === CONST.COMPOSER.NATIVE_ID || activeElementId === CONST.EMOJI_PICKER_BUTTON_NATIVE_ID) {
                                             return;
                                         }
                                         focus();
@@ -538,9 +562,19 @@ function ReportActionCompose({
                     >
                         {!shouldUseNarrowLayout && <OfflineIndicator containerStyles={[styles.chatItemComposeSecondaryRow]} />}
                         <ReportTypingIndicator reportID={reportID} />
-                        {hasExceededMaxCommentLength && <ExceededCommentLength />}
+                        {!!exceededMaxLength && (
+                            <ExceededCommentLength
+                                maxCommentLength={exceededMaxLength}
+                                isTaskTitle={hasExceededMaxTaskTitleLength}
+                            />
+                        )}
                     </View>
                 </OfflineWithFeedback>
+                {!isSmallScreenWidth && (
+                    <View style={[styles.mln5, styles.mrn5]}>
+                        <ImportedStateIndicator />
+                    </View>
+                )}
             </View>
         </View>
     );
@@ -548,6 +582,6 @@ function ReportActionCompose({
 
 ReportActionCompose.displayName = 'ReportActionCompose';
 
-export default withCurrentUserPersonalDetails(memo(ReportActionCompose));
+export default memo(ReportActionCompose);
 export {onSubmitAction};
 export type {SuggestionsRef, ComposerRef};

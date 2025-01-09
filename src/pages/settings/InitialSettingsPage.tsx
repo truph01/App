@@ -8,6 +8,7 @@ import type {ValueOf} from 'type-fest';
 import AccountSwitcher from '@components/AccountSwitcher';
 import AccountSwitcherSkeletonView from '@components/AccountSwitcherSkeletonView';
 import ConfirmModal from '@components/ConfirmModal';
+import DelegateNoAccessModal from '@components/DelegateNoAccessModal';
 import Icon from '@components/Icon';
 import * as Expensicons from '@components/Icon/Expensicons';
 import {InitialURLContext} from '@components/InitialURLContextProvider';
@@ -28,6 +29,7 @@ import useSubscriptionPlan from '@hooks/useSubscriptionPlan';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
+import {resetExitSurveyForm} from '@libs/actions/ExitSurvey';
 import * as CurrencyUtils from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import * as SubscriptionUtils from '@libs/SubscriptionUtils';
@@ -35,6 +37,7 @@ import * as UserUtils from '@libs/UserUtils';
 import {hasGlobalWorkspaceSettingsRBR} from '@libs/WorkspacesSettingsUtils';
 import * as ReportActionContextMenu from '@pages/home/report/ContextMenu/ReportActionContextMenu';
 import variables from '@styles/variables';
+import * as App from '@userActions/App';
 import * as Link from '@userActions/Link';
 import * as PaymentMethods from '@userActions/PaymentMethods';
 import * as Session from '@userActions/Session';
@@ -79,6 +82,12 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const [walletTerms] = useOnyx(ONYXKEYS.WALLET_TERMS);
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
+    const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRYNEWDOT);
+
+    const [isActingAsDelegate] = useOnyx(ONYXKEYS.ACCOUNT, {selector: (account) => !!account?.delegatedAccess?.delegate});
+
+    const [isNoDelegateAccessMenuVisible, setIsNoDelegateAccessMenuVisible] = useState(false);
 
     const network = useNetwork();
     const theme = useTheme();
@@ -98,9 +107,11 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const [shouldShowSignoutConfirmModal, setShouldShowSignoutConfirmModal] = useState(false);
 
     const freeTrialText = SubscriptionUtils.getFreeTrialText(policies);
+    const shouldOpenBookACall = tryNewDot?.classicRedirect?.dismissed === false;
 
     useEffect(() => {
         Wallet.openInitialSettingsPage();
+        App.confirmReadyToOpenApp();
     }, []);
 
     const toggleSignoutConfirmModal = (value: boolean) => {
@@ -125,26 +136,12 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
      * @returns object with translationKey, style and items for the account section
      */
     const accountMenuItemsData: Menu = useMemo(() => {
-        const profileBrickRoadIndicator = UserUtils.getLoginListBrickRoadIndicator(loginList);
+        const profileBrickRoadIndicator = UserUtils.getProfilePageBrickRoadIndicator(loginList, privatePersonalDetails);
         const paymentCardList = fundList;
         const defaultMenu: Menu = {
             sectionStyle: styles.accountSettingsSectionContainer,
             sectionTranslationKey: 'initialSettingsPage.account',
             items: [
-                {
-                    translationKey: 'exitSurvey.goToExpensifyClassic',
-                    icon: Expensicons.ExpensifyLogoNew,
-                    ...(NativeModules.HybridAppModule
-                        ? {
-                              action: () => {
-                                  NativeModules.HybridAppModule.closeReactNativeApp(false, true);
-                                  setInitialURL(undefined);
-                              },
-                          }
-                        : {
-                              routeName: ROUTES.SETTINGS_EXIT_SURVEY_REASON,
-                          }),
-                },
                 {
                     translationKey: 'common.profile',
                     icon: Expensicons.Profile,
@@ -174,7 +171,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         };
 
         return defaultMenu;
-    }, [loginList, fundList, styles.accountSettingsSectionContainer, bankAccountList, userWallet?.errors, walletTerms?.errors, setInitialURL]);
+    }, [loginList, fundList, styles.accountSettingsSectionContainer, bankAccountList, userWallet?.errors, walletTerms?.errors, privatePersonalDetails]);
 
     /**
      * Retuns a list of menu items data for workspace section
@@ -184,7 +181,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         const items: MenuData[] = [
             {
                 translationKey: 'common.workspaces',
-                icon: Expensicons.Building,
+                icon: Expensicons.Buildings,
                 routeName: ROUTES.SETTINGS_WORKSPACES,
                 brickRoadIndicator: hasGlobalWorkspaceSettingsRBR(policies, allConnectionSyncProgresses) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
             },
@@ -241,6 +238,32 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                     link: CONST.NEWHELP_URL,
                 },
                 {
+                    translationKey: 'exitSurvey.goToExpensifyClassic',
+                    icon: Expensicons.ExpensifyLogoNew,
+                    ...(NativeModules.HybridAppModule
+                        ? {
+                              action: () => {
+                                  NativeModules.HybridAppModule.closeReactNativeApp(false, true);
+                                  setInitialURL(undefined);
+                              },
+                          }
+                        : {
+                              action() {
+                                  if (isActingAsDelegate) {
+                                      setIsNoDelegateAccessMenuVisible(true);
+                                      return;
+                                  }
+                                  resetExitSurveyForm(() => {
+                                      if (shouldOpenBookACall) {
+                                          Navigation.navigate(ROUTES.SETTINGS_EXIT_SURVERY_BOOK_CALL.route);
+                                          return;
+                                      }
+                                      Navigation.navigate(ROUTES.SETTINGS_EXIT_SURVEY_CONFIRM.route);
+                                  });
+                              },
+                          }),
+                },
+                {
                     translationKey: 'initialSettingsPage.about',
                     icon: Expensicons.Info,
                     routeName: ROUTES.SETTINGS_ABOUT,
@@ -264,7 +287,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                 },
             ],
         };
-    }, [styles.pt4, signOut]);
+    }, [styles.pt4, signOut, setInitialURL, shouldOpenBookACall, isActingAsDelegate]);
 
     /**
      * Retuns JSX.Element with menu items
@@ -329,6 +352,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                                 }
                                 iconRight={item.iconRight}
                                 shouldShowRightIcon={item.shouldShowRightIcon}
+                                shouldIconUseAutoWidthStyle
                             />
                         );
                     })}
@@ -405,6 +429,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             includePaddingTop={false}
             includeSafeAreaPaddingBottom={false}
             testID={InitialSettingsPage.displayName}
+            shouldEnableKeyboardAvoidingView={false}
         >
             {headerContent}
             <ScrollView
@@ -428,6 +453,10 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                     onCancel={() => toggleSignoutConfirmModal(false)}
                 />
             </ScrollView>
+            <DelegateNoAccessModal
+                isNoDelegateAccessMenuVisible={isNoDelegateAccessMenuVisible}
+                onClose={() => setIsNoDelegateAccessMenuVisible(false)}
+            />
         </ScreenWrapper>
     );
 }

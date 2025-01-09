@@ -18,10 +18,10 @@ import useLocalize from '@hooks/useLocalize';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Clipboard from '@libs/Clipboard';
-import getPlatform from '@libs/getPlatform';
 import Navigation from '@libs/Navigation/Navigation';
 import type {BackToParams} from '@libs/Navigation/types';
 import * as ReportUtils from '@libs/ReportUtils';
+import shouldAllowDownloadQRCode from '@libs/shouldAllowDownloadQRCode';
 import * as Url from '@libs/Url';
 import * as UserUtils from '@libs/UserUtils';
 import CONST from '@src/CONST';
@@ -85,11 +85,6 @@ function ShareCodePage({report, policy, backTo}: ShareCodePageProps) {
     }, [report, currentUserPersonalDetails, isReport]);
 
     const title = isReport ? ReportUtils.getReportName(report) : currentUserPersonalDetails.displayName ?? '';
-    // We should remove this logic once https://github.com/Expensify/App/issues/19834 is done
-    // We shouldn't introduce platform specific code in our codebase
-    // This is a temporary solution while Web is not supported for the QR code download feature
-    const platform = getPlatform();
-    const isNative = platform === CONST.PLATFORM.IOS || platform === CONST.PLATFORM.ANDROID;
     const urlWithTrailingSlash = Url.addTrailingForwardSlash(environmentURL);
     const url = isReport
         ? `${urlWithTrailingSlash}${ROUTES.REPORT_WITH_ID.getRoute(report.reportID)}`
@@ -146,7 +141,7 @@ function ShareCodePage({report, policy, backTo}: ShareCodePageProps) {
                     {/* Remove this platform specific condition once https://github.com/Expensify/App/issues/19834 is done. 
                     We shouldn't introduce platform specific code in our codebase. 
                     This is a temporary solution while Web is not supported for the QR code download feature */}
-                    {isNative && (
+                    {shouldAllowDownloadQRCode && (
                         <MenuItem
                             isAnonymousAction
                             title={translate('common.download')}

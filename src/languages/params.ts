@@ -1,6 +1,8 @@
+import type {ValueOf} from 'type-fest';
+import type CONST from '@src/CONST';
 import type {OnyxInputOrEntry, ReportAction} from '@src/types/onyx';
 import type {DelegateRole} from '@src/types/onyx/Account';
-import type {ConnectionName, PolicyConnectionSyncStage, SageIntacctMappingName, Unit} from '@src/types/onyx/Policy';
+import type {AllConnectionName, ConnectionName, PolicyConnectionSyncStage, SageIntacctMappingName} from '@src/types/onyx/Policy';
 import type {ViolationDataType} from '@src/types/onyx/TransactionViolation';
 
 type AddressLineParams = {
@@ -257,6 +259,7 @@ type ViolationsRterParams = {
     email?: string;
     isTransactionOlderThan7Days: boolean;
     member?: string;
+    rterType?: ValueOf<typeof CONST.RTER_VIOLATION_TYPES>;
 };
 
 type ViolationsTagOutOfPolicyParams = {tagName?: string} | undefined;
@@ -278,8 +281,6 @@ type LogSizeParams = {size: number};
 type LogSizeAndDateParams = {size: number; date: string};
 
 type HeldRequestParams = {comment: string};
-
-type ReimbursementRateParams = {unit: Unit};
 
 type ChangeFieldParams = {oldValue?: string; newValue: string; fieldName: string};
 
@@ -316,7 +317,7 @@ type UnshareParams = {to: string};
 
 type StripePaidParams = {amount: string; currency: string};
 
-type UnapprovedParams = {amount: string; currency: string};
+type UnapprovedParams = {amount: string};
 
 type RemoveMembersWarningPrompt = {
     memberName: string;
@@ -338,7 +339,7 @@ type ApprovalWorkflowErrorParams = {
 };
 
 type ConnectionNameParams = {
-    connectionName: ConnectionName;
+    connectionName: AllConnectionName;
 };
 
 type LastSyncDateParams = {
@@ -475,8 +476,9 @@ type SpreadCategoriesParams = {
     categories: number;
 };
 
-type AssignedYouCardParams = {
-    assigner: string;
+type AssignedCardParams = {
+    assignee: string;
+    link: string;
 };
 
 type FeatureNameParams = {
@@ -529,8 +531,79 @@ type ImportMembersSuccessfullDescriptionParams = {
     members: number;
 };
 
+type ImportPerDiemRatesSuccessfullDescriptionParams = {
+    rates: number;
+};
+
 type AuthenticationErrorParams = {
     connectionName: string;
+};
+
+type ImportedTypesParams = {
+    importedTypes: string[];
+};
+
+type WorkspaceYouMayJoin = {
+    domain: string;
+    email: string;
+};
+
+type WorkspaceMemberList = {
+    employeeCount: number;
+    policyOwner: string;
+};
+
+type FileLimitParams = {
+    fileLimit: number;
+};
+
+type LastFourDigitsParams = {
+    lastFourDigits: string;
+};
+
+type CompanyCardBankName = {
+    bankName: string;
+};
+
+type CurrencyCodeParams = {
+    currencyCode: string;
+};
+
+type WorkspaceLockedPlanTypeParams = {
+    count: number;
+    annualSubscriptionEndDate: string;
+};
+
+type CompanyNameParams = {
+    companyName: string;
+};
+
+type CustomUnitRateParams = {
+    rate: number;
+};
+
+type ChatWithAccountManagerParams = {
+    accountManagerDisplayName: string;
+};
+
+type FirstDayTextParams = {
+    hours: string;
+};
+
+type LastDayTextParams = {
+    hours: string;
+};
+
+type TripLengthTextParams = {
+    days: number;
+};
+
+type EditDestinationSubtitleParams = {
+    destination: string;
+};
+
+type FlightLayoverParams = {
+    layover: string;
 };
 
 export type {
@@ -547,9 +620,10 @@ export type {
     DefaultAmountParams,
     AutoPayApprovedReportsLimitErrorParams,
     FeatureNameParams,
+    FileLimitParams,
     SpreadSheetColumnParams,
     SpreadFieldNameParams,
-    AssignedYouCardParams,
+    AssignedCardParams,
     SpreadCategoriesParams,
     DelegateRoleParams,
     DelegatorParams,
@@ -622,6 +696,7 @@ export type {
     HeldRequestParams,
     InstantSummaryParams,
     IssueVirtualCardParams,
+    LastFourDigitsParams,
     LocalTimeParams,
     LogSizeParams,
     LoggedInAsParams,
@@ -644,7 +719,6 @@ export type {
     PayerPaidAmountParams,
     PayerPaidParams,
     PayerSettledParams,
-    ReimbursementRateParams,
     RemovedTheRequestParams,
     RenamedRoomActionParams,
     ReportArchiveReasonsClosedParams,
@@ -725,9 +799,24 @@ export type {
     DateParams,
     FiltersAmountBetweenParams,
     StatementPageTitleParams,
+    CompanyCardBankName,
     DisconnectPromptParams,
     DisconnectTitleParams,
     CharacterLengthLimitParams,
     OptionalParam,
     AssignCardParams,
+    ImportedTypesParams,
+    WorkspaceYouMayJoin,
+    WorkspaceMemberList,
+    ImportPerDiemRatesSuccessfullDescriptionParams,
+    CurrencyCodeParams,
+    WorkspaceLockedPlanTypeParams,
+    CompanyNameParams,
+    CustomUnitRateParams,
+    ChatWithAccountManagerParams,
+    FirstDayTextParams,
+    LastDayTextParams,
+    TripLengthTextParams,
+    EditDestinationSubtitleParams,
+    FlightLayoverParams,
 };

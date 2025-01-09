@@ -8,8 +8,8 @@ import KYCWall from '@components/KYCWall';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import Navigation from '@libs/Navigation/Navigation';
+import getPolicyEmployeeAccountIDs from '@libs/PolicyEmployeeListUtils';
 import * as ReportUtils from '@libs/ReportUtils';
-import playSound, {SOUNDS} from '@libs/Sound';
 import * as SubscriptionUtils from '@libs/SubscriptionUtils';
 import * as BankAccounts from '@userActions/BankAccounts';
 import * as IOU from '@userActions/IOU';
@@ -47,6 +47,7 @@ function SettlementButton({
     onPress,
     pressOnEnter = false,
     policyID = '-1',
+    shouldUseSuccessStyle = true,
     shouldHidePaymentOptions = false,
     shouldShowApproveButton = false,
     shouldDisableApproveButton = false,
@@ -58,16 +59,23 @@ function SettlementButton({
     useKeyboardShortcuts = false,
     onPaymentOptionsShow,
     onPaymentOptionsHide,
+    onlyShowPayElsewhere,
+    wrapperStyle,
 }: SettlementButtonProps) {
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     // The app would crash due to subscribing to the entire report collection if chatReportID is an empty string. So we should have a fallback ID here.
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID || -1}`);
-    const [lastPaymentMethod = '-1', lastPaymentMethodResult] = useOnyx(ONYXKEYS.NVP_LAST_PAYMENT_METHOD, {selector: (paymentMethod) => paymentMethod?.[policyID]});
+    const [isUserValidated] = useOnyx(ONYXKEYS.USER, {selector: (user) => !!user?.validated});
+    const policyEmployeeAccountIDs = policyID ? getPolicyEmployeeAccountIDs(policyID) : [];
+    const reportBelongsToWorkspace = policyID ? ReportUtils.doesReportBelongToWorkspace(chatReport, policyEmployeeAccountIDs, policyID) : false;
+    const policyIDKey = reportBelongsToWorkspace ? policyID : CONST.POLICY.ID_FAKE;
+    const [lastPaymentMethod = '-1', lastPaymentMethodResult] = useOnyx(ONYXKEYS.NVP_LAST_PAYMENT_METHOD, {selector: (paymentMethod) => paymentMethod?.[policyIDKey]});
+
     const isLoadingLastPaymentMethod = isLoadingOnyxValue(lastPaymentMethodResult);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const isInvoiceReport = (!isEmptyObject(iouReport) && ReportUtils.isInvoiceReport(iouReport)) || false;
-    const shouldShowPaywithExpensifyOption = !shouldHidePaymentOptions && policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_MANUAL;
+    const shouldShowPaywithExpensifyOption = !shouldHidePaymentOptions;
     const shouldShowPayElsewhereOption = !shouldHidePaymentOptions && !isInvoiceReport;
     const paymentButtonOptions = useMemo(() => {
         const buttonOptions = [];
@@ -100,6 +108,10 @@ function SettlementButton({
         // Only show the Approve button if the user cannot pay the expense
         if (shouldHidePaymentOptions && shouldShowApproveButton) {
             return [approveButtonOption];
+        }
+
+        if (onlyShowPayElsewhere) {
+            return [paymentMethods[CONST.IOU.PAYMENT_TYPE.ELSEWHERE]];
         }
 
         // To achieve the one tap pay experience we need to choose the correct payment type as default.
@@ -173,6 +185,7 @@ function SettlementButton({
         shouldShowPayElsewhereOption,
         chatReport,
         onPress,
+        onlyShowPayElsewhere,
     ]);
 
     const selectPaymentType = (event: KYCFlowEvent, iouPaymentType: PaymentMethodType, triggerKYCFlow: TriggerKYCFlow) => {
@@ -182,6 +195,10 @@ function SettlementButton({
         }
 
         if (iouPaymentType === CONST.IOU.PAYMENT_TYPE.EXPENSIFY || iouPaymentType === CONST.IOU.PAYMENT_TYPE.VBBA) {
+            if (!isUserValidated) {
+                Navigation.navigate(ROUTES.SETTINGS_WALLET_VERIFY_ACCOUNT.getRoute(Navigation.getActiveRoute()));
+                return;
+            }
             triggerKYCFlow(event, iouPaymentType);
             BankAccounts.setPersonalBankAccountContinueKYCOnSuccess(ROUTES.ENABLE_PAYMENTS);
             return;
@@ -196,7 +213,6 @@ function SettlementButton({
             return;
         }
 
-        playSound(SOUNDS.SUCCESS);
         onPress(iouPaymentType);
     };
 
@@ -219,7 +235,7 @@ function SettlementButton({
         >
             {(triggerKYCFlow, buttonRef) => (
                 <ButtonWithDropdownMenu<PaymentType>
-                    success
+                    success={shouldUseSuccessStyle}
                     onOptionsMenuShow={onPaymentOptionsShow}
                     onOptionsMenuHide={onPaymentOptionsHide}
                     buttonRef={buttonRef}
@@ -236,9 +252,10 @@ function SettlementButton({
                         if (policyID === '-1') {
                             return;
                         }
-                        savePreferredPaymentMethod(policyID, option.value);
+                        savePreferredPaymentMethod(policyIDKey, option.value);
                     }}
                     style={style}
+                    wrapperStyle={wrapperStyle}
                     disabledStyle={disabledStyle}
                     buttonSize={buttonSize}
                     anchorAlignment={paymentMethodDropdownAnchorAlignment}

@@ -11,16 +11,18 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
+import Navigation from '@libs/Navigation/Navigation';
 import variables from '@styles/variables';
 import * as Expensicons from '@src/components/Icon/Expensicons';
 import CONST from '@src/CONST';
 import * as ReportUtils from '@src/libs/ReportUtils';
 import * as TripReservationUtils from '@src/libs/TripReservationUtils';
+import ROUTES from '@src/ROUTES';
 import type {Reservation, ReservationTimeDetails} from '@src/types/onyx/Transaction';
 
 type TripDetailsViewProps = {
     /** The active tripRoomReportID, used for Onyx subscription */
-    tripRoomReportID?: string;
+    tripRoomReportID: string;
 
     /** Whether we should display the horizontal rule below the component */
     shouldShowHorizontalRule: boolean;
@@ -28,9 +30,12 @@ type TripDetailsViewProps = {
 
 type ReservationViewProps = {
     reservation: Reservation;
+    transactionID: string;
+    tripRoomReportID: string;
+    reservationIndex: number;
 };
 
-function ReservationView({reservation}: ReservationViewProps) {
+function ReservationView({reservation, transactionID, tripRoomReportID, reservationIndex}: ReservationViewProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -62,7 +67,7 @@ function ReservationView({reservation}: ReservationViewProps) {
     const formattedDate = getFormattedDate();
 
     const bottomDescription = useMemo(() => {
-        const code = `${reservation.confirmations && reservation.confirmations?.length > 0 ? `${reservation.confirmations[0].value} • ` : ''}`;
+        const code = `${reservation.confirmations && reservation.confirmations?.length > 0 ? `${reservation.confirmations.at(0)?.value} • ` : ''}`;
         if (reservation.type === CONST.RESERVATION_TYPE.FLIGHT) {
             const longName = reservation.company?.longName ? `${reservation.company?.longName} • ` : '';
             const shortName = reservation?.company?.shortName ? `${reservation?.company?.shortName} ` : '';
@@ -75,11 +80,14 @@ function ReservationView({reservation}: ReservationViewProps) {
             const vendor = reservation.vendor ? `${reservation.vendor} • ` : '';
             return `${vendor}${reservation.start.location}`;
         }
+        if (reservation.type === CONST.RESERVATION_TYPE.TRAIN) {
+            return reservation.route?.name;
+        }
         return reservation.start.address ?? reservation.start.location;
     }, [reservation]);
 
     const titleComponent = () => {
-        if (reservation.type === CONST.RESERVATION_TYPE.FLIGHT) {
+        if (reservation.type === CONST.RESERVATION_TYPE.FLIGHT || reservation.type === CONST.RESERVATION_TYPE.TRAIN) {
             return (
                 <View style={styles.gap1}>
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
@@ -92,7 +100,7 @@ function ReservationView({reservation}: ReservationViewProps) {
                         />
                         <Text style={[styles.textStrong, styles.lh20, shouldUseNarrowLayout && styles.flex1]}>{formatAirportInfo(reservation.end)}</Text>
                     </View>
-                    {bottomDescription && <Text style={[styles.textSmall, styles.colorMuted, styles.lh14]}>{bottomDescription}</Text>}
+                    {!!bottomDescription && <Text style={[styles.textSmall, styles.colorMuted, styles.lh14]}>{bottomDescription}</Text>}
                 </View>
             );
         }
@@ -105,7 +113,7 @@ function ReservationView({reservation}: ReservationViewProps) {
                 >
                     {reservation.type === CONST.RESERVATION_TYPE.CAR ? reservation.carInfo?.name : reservation.start.longName}
                 </Text>
-                {bottomDescription && <Text style={[styles.textSmall, styles.colorMuted, styles.lh14]}>{bottomDescription}</Text>}
+                {!!bottomDescription && <Text style={[styles.textSmall, styles.colorMuted, styles.lh14]}>{bottomDescription}</Text>}
             </View>
         );
     };
@@ -129,6 +137,7 @@ function ReservationView({reservation}: ReservationViewProps) {
             iconWidth={20}
             iconStyles={[StyleUtils.getTripReservationIconContainer(false), styles.mr3]}
             secondaryIconFill={theme.icon}
+            onPress={() => Navigation.navigate(ROUTES.TRAVEL_TRIP_DETAILS.getRoute(tripRoomReportID, transactionID, reservationIndex, Navigation.getReportRHPActiveRoute()))}
         />
     );
 }
@@ -138,7 +147,7 @@ function TripDetailsView({tripRoomReportID, shouldShowHorizontalRule}: TripDetai
     const {translate} = useLocalize();
 
     const tripTransactions = ReportUtils.getTripTransactions(tripRoomReportID);
-    const reservations: Reservation[] = TripReservationUtils.getReservationsFromTripTransactions(tripTransactions);
+    const reservationsData: TripReservationUtils.ReservationData[] = TripReservationUtils.getReservationsFromTripTransactions(tripTransactions);
 
     return (
         <View>
@@ -153,11 +162,18 @@ function TripDetailsView({tripRoomReportID, shouldShowHorizontalRule}: TripDetai
                 </View>
             </View>
             <>
-                {reservations.map((reservation) => (
-                    <OfflineWithFeedback>
-                        <ReservationView reservation={reservation} />
-                    </OfflineWithFeedback>
-                ))}
+                {reservationsData.map(({reservation, transactionID, reservationIndex}) => {
+                    return (
+                        <OfflineWithFeedback>
+                            <ReservationView
+                                reservation={reservation}
+                                transactionID={transactionID}
+                                tripRoomReportID={tripRoomReportID}
+                                reservationIndex={reservationIndex}
+                            />
+                        </OfflineWithFeedback>
+                    );
+                })}
                 <SpacerView
                     shouldShow={shouldShowHorizontalRule}
                     style={[shouldShowHorizontalRule && styles.reportHorizontalRule]}
@@ -170,3 +186,4 @@ function TripDetailsView({tripRoomReportID, shouldShowHorizontalRule}: TripDetai
 TripDetailsView.displayName = 'TripDetailsView';
 
 export default TripDetailsView;
+export {ReservationView};

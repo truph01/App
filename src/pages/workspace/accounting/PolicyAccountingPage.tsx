@@ -7,10 +7,12 @@ import CollapsibleSection from '@components/CollapsibleSection';
 import ConfirmModal from '@components/ConfirmModal';
 import FormHelpMessage from '@components/FormHelpMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import Icon from '@components/Icon';
 import * as Expensicons from '@components/Icon/Expensicons';
 import * as Illustrations from '@components/Icon/Illustrations';
 import MenuItem from '@components/MenuItem';
 import MenuItemList from '@components/MenuItemList';
+import type {MenuItemWithLink} from '@components/MenuItemList';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
@@ -27,6 +29,8 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {isAuthenticationError, isConnectionInProgress, isConnectionUnverified, removePolicyConnection, syncConnection} from '@libs/actions/connections';
+import {getAssignedSupportData} from '@libs/actions/Policy/Policy';
+import {getConciergeReportID} from '@libs/actions/Report';
 import * as PolicyUtils from '@libs/PolicyUtils';
 import {
     areSettingsInErrorFields,
@@ -61,6 +65,7 @@ type RouteParams = {
 
 function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policy?.id}`);
+    const [cardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${policy?.workspaceAccountID ?? -1}`);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, datetimeToRelative: getDatetimeToRelative} = useLocalize();
@@ -72,9 +77,9 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
     const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
     const [datetimeToRelative, setDateTimeToRelative] = useState('');
     const threeDotsMenuContainerRef = useRef<View>(null);
-    const {canUseWorkspaceFeeds} = usePermissions();
     const {startIntegrationFlow, popoverAnchorRefs} = useAccountingContext();
-
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const {isLargeScreenWidth} = useResponsiveLayout();
     const route = useRoute();
     const params = route.params as RouteParams | undefined;
     const newConnectionName = params?.newConnectionName;
@@ -83,7 +88,8 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
 
     const isSyncInProgress = isConnectionInProgress(connectionSyncProgress, policy);
 
-    const accountingIntegrations = Object.values(CONST.POLICY.CONNECTIONS.NAME);
+    const connectionNames = CONST.POLICY.CONNECTIONS.NAME;
+    const accountingIntegrations = Object.values(connectionNames);
     const connectedIntegration = getConnectedIntegration(policy, accountingIntegrations) ?? connectionSyncProgress?.connectionName;
     const synchronizationError = connectedIntegration && getSynchronizationErrorMessage(policy, connectedIntegration, isSyncInProgress, translate, styles);
 
@@ -96,15 +102,30 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
         connectedIntegration === connectionSyncProgress?.connectionName ? connectionSyncProgress : undefined,
     );
 
-    const hasSyncError = PolicyUtils.hasSyncError(policy, isSyncInProgress);
-    const hasUnsupportedNDIntegration = PolicyUtils.hasUnsupportedIntegration(policy, accountingIntegrations);
+    const hasSyncError = PolicyUtils.shouldShowSyncError(policy, isSyncInProgress);
+    const hasUnsupportedNDIntegration = !isEmptyObject(policy?.connections) && PolicyUtils.hasUnsupportedIntegration(policy, accountingIntegrations);
 
     const tenants = useMemo(() => getXeroTenants(policy), [policy]);
     const currentXeroOrganization = findCurrentXeroOrganization(tenants, policy?.connections?.xero?.config?.tenantID);
+    const shouldShowSynchronizationError = !!synchronizationError;
+    const shouldShowReinstallConnectorMenuItem = shouldShowSynchronizationError && connectedIntegration === CONST.POLICY.CONNECTIONS.NAME.QBD;
+    const shouldShowCardReconciliationOption = policy?.areExpensifyCardsEnabled && cardSettings?.paymentBankAccountID;
 
     const overflowMenu: ThreeDotsMenuProps['menuItems'] = useMemo(
         () => [
-            ...(shouldShowEnterCredentials && (connectedIntegration === CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT || connectedIntegration === CONST.POLICY.CONNECTIONS.NAME.NETSUITE)
+            ...(shouldShowReinstallConnectorMenuItem
+                ? [
+                      {
+                          icon: Expensicons.CircularArrowBackwards,
+                          text: translate('workspace.accounting.reinstall'),
+                          onSelected: () => startIntegrationFlow({name: CONST.POLICY.CONNECTIONS.NAME.QBD}),
+                          shouldCallAfterModalHide: true,
+                          disabled: isOffline,
+                          iconRight: Expensicons.NewWindow,
+                      },
+                  ]
+                : []),
+            ...(shouldShowEnterCredentials
                 ? [
                       {
                           icon: Expensicons.Key,
@@ -130,7 +151,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                 shouldCallAfterModalHide: true,
             },
         ],
-        [shouldShowEnterCredentials, translate, isOffline, policyID, connectedIntegration, startIntegrationFlow],
+        [shouldShowEnterCredentials, shouldShowReinstallConnectorMenuItem, translate, isOffline, policyID, connectedIntegration, startIntegrationFlow],
     );
 
     useFocusEffect(
@@ -154,6 +175,13 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
         }
         setDateTimeToRelative('');
     }, [getDatetimeToRelative, successfulDate]);
+
+    useEffect(() => {
+        if (!policyID) {
+            return;
+        }
+        getAssignedSupportData(policyID);
+    }, [policyID]);
 
     const integrationSpecificMenuItems = useMemo(() => {
         const sageIntacctEntityList = policy?.connections?.intacct?.data?.entities ?? [];
@@ -228,39 +256,44 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
 
     const connectionsMenuItems: MenuItemData[] = useMemo(() => {
         if (isEmptyObject(policy?.connections) && !isSyncInProgress) {
-            return accountingIntegrations.map((integration) => {
-                const integrationData = getAccountingIntegrationData(integration, policyID, translate);
-                const iconProps = integrationData?.icon ? {icon: integrationData.icon, iconType: CONST.ICON_TYPE_AVATAR} : {};
-                return {
-                    ...iconProps,
-                    interactive: false,
-                    wrapperStyle: [styles.sectionMenuItemTopDescription],
-                    shouldShowRightComponent: true,
-                    title: integrationData?.title,
-                    rightComponent: (
-                        <Button
-                            onPress={() => startIntegrationFlow({name: integration})}
-                            text={translate('workspace.accounting.setup')}
-                            style={styles.justifyContentCenter}
-                            small
-                            isDisabled={isOffline}
-                            ref={(ref) => {
-                                if (!popoverAnchorRefs?.current) {
-                                    return;
-                                }
-                                // eslint-disable-next-line react-compiler/react-compiler
-                                popoverAnchorRefs.current[integration].current = ref;
-                            }}
-                        />
-                    ),
-                };
-            });
+            return accountingIntegrations
+                .map((integration) => {
+                    const integrationData = getAccountingIntegrationData(integration, policyID, translate);
+                    if (!integrationData) {
+                        return undefined;
+                    }
+                    const iconProps = integrationData?.icon ? {icon: integrationData.icon, iconType: CONST.ICON_TYPE_AVATAR} : {};
+
+                    return {
+                        ...iconProps,
+                        interactive: false,
+                        wrapperStyle: [styles.sectionMenuItemTopDescription],
+                        shouldShowRightComponent: true,
+                        title: integrationData?.title,
+                        rightComponent: (
+                            <Button
+                                onPress={() => startIntegrationFlow({name: integration})}
+                                text={translate('workspace.accounting.setup')}
+                                style={styles.justifyContentCenter}
+                                small
+                                isDisabled={isOffline}
+                                ref={(ref) => {
+                                    if (!popoverAnchorRefs?.current) {
+                                        return;
+                                    }
+                                    // eslint-disable-next-line react-compiler/react-compiler
+                                    popoverAnchorRefs.current[integration].current = ref;
+                                }}
+                            />
+                        ),
+                    };
+                })
+                .filter(Boolean) as MenuItemData[];
         }
 
         if (!connectedIntegration) {
             return [];
         }
-        const shouldShowSynchronizationError = !!synchronizationError;
         const shouldHideConfigurationOptions = isConnectionUnverified(policy, connectedIntegration);
         const integrationData = getAccountingIntegrationData(connectedIntegration, policyID, translate, policy, undefined, undefined, undefined, canUseNetSuiteUSATax);
         const iconProps = integrationData?.icon ? {icon: integrationData.icon, iconType: CONST.ICON_TYPE_AVATAR} : {};
@@ -286,14 +319,18 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                 brickRoadIndicator: areSettingsInErrorFields(integrationData?.subscribedExportSettings, integrationData?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
                 pendingAction: settingsPendingAction(integrationData?.subscribedExportSettings, integrationData?.pendingFields),
             },
-            {
-                icon: Expensicons.ExpensifyCard,
-                iconRight: Expensicons.ArrowRight,
-                shouldShowRightIcon: true,
-                title: translate('workspace.accounting.cardReconciliation'),
-                wrapperStyle: [styles.sectionMenuItemTopDescription],
-                onPress: integrationData?.onCardReconciliationPagePress,
-            },
+            ...(shouldShowCardReconciliationOption
+                ? [
+                      {
+                          icon: Expensicons.ExpensifyCard,
+                          iconRight: Expensicons.ArrowRight,
+                          shouldShowRightIcon: true,
+                          title: translate('workspace.accounting.cardReconciliation'),
+                          wrapperStyle: [styles.sectionMenuItemTopDescription],
+                          onPress: integrationData?.onCardReconciliationPagePress,
+                      },
+                  ]
+                : []),
             {
                 icon: Expensicons.Gear,
                 iconRight: Expensicons.ArrowRight,
@@ -305,10 +342,6 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                 pendingAction: settingsPendingAction(integrationData?.subscribedAdvancedSettings, integrationData?.pendingFields),
             },
         ];
-
-        if (!canUseWorkspaceFeeds || !policy?.areExpensifyCardsEnabled) {
-            configurationOptions.splice(2, 1);
-        }
 
         return [
             {
@@ -355,13 +388,13 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
         isSyncInProgress,
         connectedIntegration,
         synchronizationError,
+        shouldShowSynchronizationError,
         policyID,
         translate,
         styles.sectionMenuItemTopDescription,
         styles.pb0,
         styles.mt5,
         styles.popoverMenuIcon,
-        canUseWorkspaceFeeds,
         styles.justifyContentCenter,
         connectionSyncProgress?.stageInProgress,
         datetimeToRelative,
@@ -374,47 +407,54 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
         startIntegrationFlow,
         popoverAnchorRefs,
         canUseNetSuiteUSATax,
+        shouldShowCardReconciliationOption,
     ]);
 
     const otherIntegrationsItems = useMemo(() => {
-        if (isEmptyObject(policy?.connections) && !isSyncInProgress && !(hasUnsupportedNDIntegration && hasSyncError)) {
+        if (isEmptyObject(policy?.connections) && !isSyncInProgress) {
             return;
         }
         const otherIntegrations = accountingIntegrations.filter(
             (integration) => (isSyncInProgress && integration !== connectionSyncProgress?.connectionName) || integration !== connectedIntegration,
         );
-        return otherIntegrations.map((integration) => {
-            const integrationData = getAccountingIntegrationData(integration, policyID, translate);
-            const iconProps = integrationData?.icon ? {icon: integrationData.icon, iconType: CONST.ICON_TYPE_AVATAR} : {};
-            return {
-                ...iconProps,
-                title: integrationData?.title,
-                rightComponent: (
-                    <Button
-                        onPress={() =>
-                            startIntegrationFlow({
-                                name: integration,
-                                integrationToDisconnect: connectedIntegration,
-                                shouldDisconnectIntegrationBeforeConnecting: true,
-                            })
-                        }
-                        text={translate('workspace.accounting.setup')}
-                        style={styles.justifyContentCenter}
-                        small
-                        isDisabled={isOffline}
-                        ref={(r) => {
-                            if (!popoverAnchorRefs?.current) {
-                                return;
+        return otherIntegrations
+            .map((integration) => {
+                const integrationData = getAccountingIntegrationData(integration, policyID, translate);
+                if (!integrationData) {
+                    return undefined;
+                }
+                const iconProps = integrationData?.icon ? {icon: integrationData.icon, iconType: CONST.ICON_TYPE_AVATAR} : {};
+
+                return {
+                    ...iconProps,
+                    title: integrationData?.title,
+                    rightComponent: (
+                        <Button
+                            onPress={() =>
+                                startIntegrationFlow({
+                                    name: integration,
+                                    integrationToDisconnect: connectedIntegration,
+                                    shouldDisconnectIntegrationBeforeConnecting: true,
+                                })
                             }
-                            popoverAnchorRefs.current[integration].current = r;
-                        }}
-                    />
-                ),
-                interactive: false,
-                shouldShowRightComponent: true,
-                wrapperStyle: styles.sectionMenuItemTopDescription,
-            };
-        });
+                            text={translate('workspace.accounting.setup')}
+                            style={styles.justifyContentCenter}
+                            small
+                            isDisabled={isOffline}
+                            ref={(r) => {
+                                if (!popoverAnchorRefs?.current) {
+                                    return;
+                                }
+                                popoverAnchorRefs.current[integration].current = r;
+                            }}
+                        />
+                    ),
+                    interactive: false,
+                    shouldShowRightComponent: true,
+                    wrapperStyle: styles.sectionMenuItemTopDescription,
+                };
+            })
+            .filter(Boolean) as MenuItemWithLink[];
     }, [
         policy?.connections,
         isSyncInProgress,
@@ -428,9 +468,21 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
         isOffline,
         startIntegrationFlow,
         popoverAnchorRefs,
-        hasUnsupportedNDIntegration,
-        hasSyncError,
     ]);
+
+    const [chatTextLink, chatReportID] = useMemo(() => {
+        // If they have an onboarding specialist assigned display the following and link to the #admins room with the setup specialist.
+        if (account?.adminsRoomReportID) {
+            return [translate('workspace.accounting.talkYourOnboardingSpecialist'), account?.adminsRoomReportID];
+        }
+
+        // If not, if they have an account manager assigned display the following and link to the DM with their account manager.
+        if (account?.accountManagerAccountID) {
+            return [translate('workspace.accounting.talkYourAccountManager'), account?.accountManagerReportID];
+        }
+        // Else, display the following and link to their Concierge DM.
+        return [translate('workspace.accounting.talkToConcierge'), getConciergeReportID()];
+    }, [account, translate]);
 
     return (
         <AccessOrNotFoundWrapper
@@ -447,6 +499,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                     title={translate('workspace.common.accounting')}
                     shouldShowBackButton={shouldUseNarrowLayout}
                     icon={Illustrations.Accounting}
+                    shouldUseHeadlineHeader
                     threeDotsAnchorPosition={styles.threeDotsPopoverOffsetNoCloseButton(windowWidth)}
                 />
                 <ScrollView contentContainerStyle={styles.pt3}>
@@ -459,7 +512,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                             titleStyles={styles.accountSettingsSectionTitle}
                             childrenStyles={styles.pt5}
                         >
-                            {!(hasUnsupportedNDIntegration && hasSyncError) &&
+                            {!hasUnsupportedNDIntegration &&
                                 connectionsMenuItems.map((menuItem) => (
                                     <OfflineWithFeedback
                                         pendingAction={menuItem.pendingAction}
@@ -477,7 +530,6 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                             {hasUnsupportedNDIntegration && hasSyncError && (
                                 <FormHelpMessage
                                     isError
-                                    shouldShowRedDotIndicator
                                     style={styles.menuItemError}
                                 >
                                     <Text style={[{color: theme.textError}]}>
@@ -493,7 +545,21 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                                     </Text>
                                 </FormHelpMessage>
                             )}
-                            {otherIntegrationsItems && (
+                            {hasUnsupportedNDIntegration && !hasSyncError && (
+                                <FormHelpMessage shouldShowRedDotIndicator={false}>
+                                    <Text>
+                                        <TextLink
+                                            onPress={() => {
+                                                // Go to Expensify Classic.
+                                                Link.openOldDotLink(CONST.OLDDOT_URLS.POLICY_CONNECTIONS_URL(policyID));
+                                            }}
+                                        >
+                                            {translate('workspace.accounting.goToODToSettings')}
+                                        </TextLink>
+                                    </Text>
+                                </FormHelpMessage>
+                            )}
+                            {!!otherIntegrationsItems && (
                                 <CollapsibleSection
                                     title={translate('workspace.accounting.other')}
                                     wrapperStyle={[styles.pr3, styles.mt5, styles.pv3]}
@@ -505,6 +571,21 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                                         shouldUseSingleExecution
                                     />
                                 </CollapsibleSection>
+                            )}
+                            {!!account?.guideDetails?.email && (
+                                <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt7]}>
+                                    <Icon
+                                        src={Expensicons.QuestionMark}
+                                        width={20}
+                                        height={20}
+                                        fill={theme.icon}
+                                        additionalStyles={styles.mr3}
+                                    />
+                                    <View style={[!isLargeScreenWidth ? styles.flexColumn : styles.flexRow]}>
+                                        <Text style={styles.textSupporting}>{translate('workspace.accounting.needAnotherAccounting')}</Text>
+                                        <TextLink onPress={() => Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(chatReportID ?? ''))}>{chatTextLink}</TextLink>
+                                    </View>
+                                </View>
                             )}
                         </Section>
                     </View>

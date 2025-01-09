@@ -137,12 +137,12 @@ function ConfirmModal({
     restoreFocusType,
 }: ConfirmModalProps) {
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to use the correct modal type
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
     const styles = useThemeStyles();
 
     return (
         <Modal
-            onSubmit={onConfirm}
             onClose={onCancel}
             onBackdropPress={onBackdropPress}
             isVisible={isVisible}
@@ -164,6 +164,7 @@ function ConfirmModal({
                 prompt={prompt}
                 success={success}
                 danger={danger}
+                isVisible={isVisible}
                 shouldDisableConfirmButtonWhenOffline={shouldDisableConfirmButtonWhenOffline}
                 shouldShowCancelButton={shouldShowCancelButton}
                 shouldCenterContent={shouldCenterContent}
