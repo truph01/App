@@ -1,6 +1,7 @@
 import type {ReactNode} from 'react';
 import React, {Fragment, useState} from 'react';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getCurrencySymbol} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -39,11 +40,19 @@ type CurrencyPickerProps = {
     shouldShowFullPageOfflineView?: boolean;
 };
 
-function CurrencyPicker({label, value, errorText, headerContent, excludeCurrencies, interactive, shouldShowFullPageOfflineView = false, onInputChange = () => {}}: CurrencyPickerProps) {
+function CurrencyPicker({
+    label,
+    value,
+    errorText,
+    headerContent,
+    excludeCurrencies,
+    onInputChange = () => {},
+    enabledWhenOffline = true,
+}: CurrencyPickerProps) {
     const {translate} = useLocalize();
     const [isPickerVisible, setIsPickerVisible] = useState(false);
     const styles = useThemeStyles();
-
+    const {isOffline} = useNetwork();
     const hidePickerModal = () => {
         setIsPickerVisible(false);
     };
@@ -53,18 +62,18 @@ function CurrencyPicker({label, value, errorText, headerContent, excludeCurrenci
         hidePickerModal();
     };
 
-    const BlockingComponent = shouldShowFullPageOfflineView ? FullPageOfflineBlockingView : Fragment;
-
+    const BlockingComponent = enabledWhenOffline ? Fragment : FullPageOfflineBlockingView;
+    const editable = enabledWhenOffline || !isOffline;
     return (
         <>
             <MenuItemWithTopDescription
-                shouldShowRightIcon
+                shouldShowRightIcon={editable}
+                disabled={!editable}
                 title={value ? `${value} - ${getCurrencySymbol(value)}` : undefined}
                 description={label}
                 onPress={() => setIsPickerVisible(true)}
                 brickRoadIndicator={errorText ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                 errorText={errorText}
-                interactive={interactive}
             />
             <Modal
                 type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
