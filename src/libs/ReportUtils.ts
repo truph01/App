@@ -802,7 +802,7 @@ Onyx.connect({
             if (!report) {
                 return acc;
             }
-
+            // test code
             handleReportChanged(report);
 
             // Get all reports, which are the ones that are:
