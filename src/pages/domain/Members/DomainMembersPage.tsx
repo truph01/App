@@ -26,6 +26,8 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         canBeMissing: true,
         selector: selectMemberIDs,
     });
+    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {canBeMissing: true});
+    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {canBeMissing: true});
 
     const headerContent = (
         <ButtonWithDropdownMenu
@@ -55,6 +57,10 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             searchPlaceholder={translate('domain.members.findMember')}
             onSelectRow={(item) => Navigation.navigate(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, item.accountID))}
             headerIcon={illustrations.Profile}
+            getCustomRowProps={(accountID: number) => ({
+                errors: domainErrors?.memberErrors?.[accountID],
+                pendingAction: domainPendingActions?.admin?.[accountID]?.pendingAction,
+            })}
         />
     );
 }

@@ -1,3 +1,4 @@
+import {domainMemberSettingsSelector} from '@selectors/Domain';
 import {Str} from 'expensify-common';
 import React from 'react';
 import {View} from 'react-native';
@@ -14,8 +15,11 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getLatestError} from '@libs/ErrorUtils';
 import {getDisplayNameOrDefault, getPhoneNumber} from '@libs/PersonalDetailsUtils';
 import Navigation from '@navigation/Navigation';
+import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
+import {clearTwoFactorAuthExemptEmailsErrors, setTwoFactorAuthExemptEmailForDomain} from '@userActions/Domain';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -46,6 +50,17 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, menuItems
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Info'] as const);
+
+    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        canBeMissing: true,
+    });
+    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        canBeMissing: true,
+    });
+    const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
+        canBeMissing: false,
+        selector: domainMemberSettingsSelector,
+    });
 
     // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
@@ -110,6 +125,23 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, menuItems
                             shouldShowRightIcon={item.shouldShowRightIcon}
                         />
                     ))}
+
+                    <ToggleSettingOptionRow
+                        wrapperStyle={[styles.mv3, styles.ph5]}
+                        switchAccessibilityLabel={translate('domain.members.forceTwoFactorAuth')}
+                        isActive={!!domainSettings?.twoFactorAuthRequired && !domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
+                        disabled={!!domainSettings?.samlEnabled}
+                        onToggle={(value) => {
+                            if (!personalDetails?.login) {
+                                return;
+                            }
+                            setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails?.login, value);
+                        }}
+                        title={translate('domain.members.forceTwoFactorAuth')}
+                        pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
+                        errors={getLatestError(domainErrors?.memberErrors?.[accountID]?.twoFactorAuthExemptEmailsError)}
+                        onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, accountID)}
+                    />
 
                     <MenuItem
                         style={styles.mb5}
