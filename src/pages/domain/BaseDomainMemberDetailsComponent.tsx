@@ -129,8 +129,7 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, menuItems
                     <ToggleSettingOptionRow
                         wrapperStyle={[styles.mv3, styles.ph5]}
                         switchAccessibilityLabel={translate('domain.members.forceTwoFactorAuth')}
-                        isActive={!!domainSettings?.twoFactorAuthRequired && !domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
-                        disabled={!!domainSettings?.samlEnabled}
+                        isActive={!!domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
                         onToggle={(value) => {
                             if (!personalDetails?.login) {
                                 return;
