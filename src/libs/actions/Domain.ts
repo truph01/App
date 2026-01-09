@@ -710,7 +710,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
-                twoFactorAuthRequiredErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
+                twoFactorAuthRequiredErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
             },
         },
         {
@@ -824,7 +824,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             value: {
                 memberErrors: {
                     [accountID]: {
-                        twoFactorAuthExemptEmailsError: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
+                        twoFactorAuthExemptEmailsError: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
                     },
                 },
             },

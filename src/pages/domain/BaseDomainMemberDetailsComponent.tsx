@@ -49,7 +49,7 @@ type BaseDomainMemberDetailsComponentProps = {
 function BaseDomainMemberDetailsComponent({domainAccountID, accountID, menuItems}: BaseDomainMemberDetailsComponentProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Info'] as const);
+    const icons = useMemoizedLazyExpensifyIcons(['Info', 'Flag'] as const);
 
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
         canBeMissing: true,
@@ -128,7 +128,7 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, menuItems
 
                     <ToggleSettingOptionRow
                         wrapperStyle={[styles.mv3, styles.ph5]}
-                        switchAccessibilityLabel={translate('domain.members.forceTwoFactorAuth')}
+                        switchAccessibilityLabel={translate('domain.common.forceTwoFactorAuth')}
                         isActive={!!domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
                         onToggle={(value) => {
                             if (!personalDetails?.login) {
@@ -136,10 +136,18 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, menuItems
                             }
                             setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails?.login, value);
                         }}
-                        title={translate('domain.members.forceTwoFactorAuth')}
+                        title={translate('domain.common.forceTwoFactorAuth')}
                         pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
                         errors={getLatestError(domainErrors?.memberErrors?.[accountID]?.twoFactorAuthExemptEmailsError)}
                         onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, accountID)}
+                    />
+
+                    <MenuItem
+                        style={styles.mb5}
+                        title={translate('domain.common.resetTwoFactorAuth')}
+                        icon={icons.Flag}
+                        onPress={() => Navigation.navigate(ROUTES.PROFILE.getRoute(accountID, Navigation.getActiveRoute()))}
+                        shouldShowRightIcon
                     />
 
                     <MenuItem

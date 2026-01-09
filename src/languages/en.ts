@@ -7879,7 +7879,6 @@ const translations = {
             primaryContact: 'Primary contact',
             addPrimaryContact: 'Add primary contact',
             setPrimaryContactError: 'Unable to set primary contact. Please try again later.',
-            settings: 'Settings',
             consolidatedDomainBilling: 'Consolidated domain billing',
             consolidatedDomainBillingDescription: (domainName: string) =>
                 `<comment><muted-text-label>When enabled, the primary contact will pay for all workspaces owned by <strong>${domainName}</strong> members and receive all billing receipts.</muted-text-label></comment>`,
@@ -7891,9 +7890,13 @@ const translations = {
         members: {
             title: 'Members',
             findMember: 'Find member',
+        },
+        common: {
+            settings: 'Settings',
             forceTwoFactorAuth: 'Force two-factor authentication',
             forceTwoFactorAuthDescription: `<muted-text>Please disable <a href="${CONST.SAML_HELP_URL}">SAML</a> to force two-factor authentication.</muted-text>`,
             forceTwoFactorAuthError: "Force two-factor authentication couldn't be changed. Please try again later.",
+            resetTwoFactorAuth: 'Reset two-factor authentication'
         },
     },
 };
