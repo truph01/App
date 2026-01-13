@@ -1,9 +1,10 @@
-import {selectMemberIDs} from '@selectors/Domain';
+import {memberAccountIDsSelector} from '@selectors/Domain';
 import React from 'react';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
@@ -21,10 +22,11 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const illustrations = useMemoizedLazyIllustrations(['Profile']);
     const icons = useMemoizedLazyExpensifyIcons(['Gear']);
     const styles = useThemeStyles();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const [memberIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         canBeMissing: true,
-        selector: selectMemberIDs,
+        selector: memberAccountIDsSelector,
     });
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {canBeMissing: true});
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {canBeMissing: true});
@@ -38,13 +40,13 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             options={[
                 {
                     value: 'leave',
-                    text: translate('domain.admins.settings'),
+                    text: translate('domain.common.settings'),
                     icon: icons.Gear,
                     onSelected: () => Navigation.navigate(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID)),
                 },
             ]}
             isSplitButton={false}
-            wrapperStyle={styles.flexGrow1}
+            wrapperStyle={shouldUseNarrowLayout && [styles.flexGrow1, styles.mb3]}
         />
     );
 

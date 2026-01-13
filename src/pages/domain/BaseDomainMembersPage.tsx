@@ -14,6 +14,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getLatestError} from '@libs/ErrorUtils';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
@@ -27,7 +28,9 @@ import type IconAsset from '@src/types/utils/IconAsset';
 import DomainNotFoundPageWrapper from './DomainNotFoundPageWrapper';
 
 type MemberOption = Omit<ListItem, 'accountID' | 'login'> & {
+    /** Member accountID */
     accountID: number;
+    /** Member login */
     login: string;
 };
 
@@ -85,6 +88,7 @@ function BaseDomainMembersPage({
         const details = personalDetails?.[accountID];
         const login = details?.login ?? '';
         const customProps = getCustomRowProps?.(accountID);
+        const isPendingActionDelete = customProps?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
 
         return {
             keyForList: String(accountID),
@@ -103,6 +107,8 @@ function BaseDomainMembersPage({
             rightElement: getCustomRightElement?.(accountID),
             errors: customProps?.errors?.errors,
             pendingAction: customProps?.pendingAction,
+            isInteractive: !isPendingActionDelete,
+            isDisabled: isPendingActionDelete,
             brickRoadIndicator: !isEmptyObject(customProps?.errors?.twoFactorAuthExemptEmailsError) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
         };
     });

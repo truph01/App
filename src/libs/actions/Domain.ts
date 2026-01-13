@@ -3,6 +3,7 @@ import type {OnyxUpdate} from 'react-native-onyx';
 import * as API from '@libs/API';
 import type {
     AddAdminToDomainParams,
+    RemoveDomainAdminParams,
     SetTechnicalContactEmailParams,
     SetTwoFactorAuthExemptEmailForDomainParams,
     ToggleConsolidatedDomainBillingParams,
@@ -632,15 +633,9 @@ function addAdminToDomain(domainAccountID: number, accountID: number, targetEmai
 }
 
 /**
- * Removes an error after trying to add admin
+ * Removes an error and pending actions after trying to add admin
  */
-function clearAddAdminError(domainAccountID: number, accountID: number) {
-    const PERMISSION_KEY = `${CONST.DOMAIN.EXPENSIFY_ADMIN_ACCESS_PREFIX}${accountID}`;
-
-    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
-        [PERMISSION_KEY]: null,
-    });
-
+function clearAdminError(domainAccountID: number, accountID: number) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
         adminErrors: {
             [accountID]: null,
@@ -653,8 +648,68 @@ function clearAddAdminError(domainAccountID: number, accountID: number) {
         },
     });
 }
+/**
+ * Removes admin access for a domain member
+ */
+function revokeDomainAdminAccess(domainAccountID: number, accountID: number) {
+    const optimisticData: OnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                admin: {
+                    [accountID]: {
+                        pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                    },
+                },
+            },
+        },
+    ];
+    const successData: OnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                admin: {
+                    [accountID]: {
+                        pendingAction: null,
+                    },
+                },
+            },
+        },
+    ];
+    const failureData: OnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                admin: {
+                    [accountID]: {
+                        pendingAction: null,
+                    },
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                adminErrors: {
+                    [accountID]: {errors: getMicroSecondOnyxErrorWithTranslationKey('domain.admins.error.removeAdmin')},
+                },
+            },
+        },
+    ];
 
-function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainName: string, twoFactorAuthRequired: boolean) {
+    const parameters: RemoveDomainAdminParams = {
+        domainAccountID,
+        targetAccountID: accountID,
+    };
+
+    API.write(WRITE_COMMANDS.REMOVE_DOMAIN_ADMIN, parameters, {optimisticData, successData, failureData});
+}
+
+function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainName: string, twoFactorAuthRequired: boolean, twoFactorAuthCode?: string) {
     const optimisticData: OnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -726,6 +781,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
         domainAccountID,
         domainName,
         enabled: twoFactorAuthRequired,
+        twoFactorAuthCode,
     };
 
     API.write(WRITE_COMMANDS.TOGGLE_TWO_FACTOR_AUTH_REQUIRED_FOR_DOMAIN, params, {optimisticData, failureData, successData});
@@ -869,7 +925,8 @@ export {
     toggleConsolidatedDomainBilling,
     clearToggleConsolidatedDomainBillingErrors,
     addAdminToDomain,
-    clearAddAdminError,
+    clearAdminError,
+    revokeDomainAdminAccess,
     toggleTwoFactorAuthRequiredForDomain,
     clearToggleTwoFactorAuthRequiredForDomainError,
     setTwoFactorAuthExemptEmailForDomain,
