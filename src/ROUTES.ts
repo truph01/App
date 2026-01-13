@@ -1269,6 +1269,11 @@ const ROUTES = {
         getRoute: (action: IOUAction, iouType: IOUType, transactionID: string, reportID: string, backToReport?: string) =>
             `create/${iouType as string}/start/${transactionID}/${reportID}/per-diem/${backToReport ?? ''}` as const,
     },
+    MONEY_REQUEST_CREATE_TAB_TIME: {
+        route: 'time/:backToReport?',
+        getRoute: (action: IOUAction, iouType: IOUType, transactionID: string, reportID: string, backToReport?: string) =>
+            `create/${iouType as string}/start/${transactionID}/${reportID}/time/${backToReport ?? ''}` as const,
+    },
 
     MONEY_REQUEST_RECEIPT_VIEW: {
         route: 'receipt-view/:transactionID',
@@ -2996,6 +3001,10 @@ const ROUTES = {
             }
             return `workspaces/${policyID}/accounting/xero/advanced` as const;
         },
+    },
+    POLICY_ACCOUNTING_CLAIM_OFFER: {
+        route: 'workspaces/:policyID/accounting/claim-offer/:integration',
+        getRoute: (policyID: string, integration: string) => `workspaces/${policyID}/accounting/claim-offer/${integration}` as const,
     },
     POLICY_ACCOUNTING_XERO_AUTO_SYNC: {
         route: 'workspaces/:policyID/accounting/xero/advanced/autosync',
