@@ -1397,6 +1397,10 @@ type SettingsNavigatorParamList = {
     [SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH]: {
         domainAccountID: number;
     };
+    [SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH]: {
+        domainAccountID: number;
+        accountID: number;
+    };
 } & ReimbursementAccountNavigatorParamList;
 
 type DomainCardNavigatorParamList = {

@@ -3651,6 +3651,10 @@ const ROUTES = {
         route: 'domain/:domainAccountID/members/settings/two-factor-auth',
         getRoute: (domainAccountID: number) => `domain/${domainAccountID}/members/settings/two-factor-auth` as const,
     },
+    DOMAIN_MEMBER_TWO_FACTOR_AUTH: {
+        route: 'domain/:domainAccountID/members/:accountID/two-factor-auth',
+        getRoute: (domainAccountID: number, accountID: number) => `domain/${domainAccountID}/members/${accountID}/two-factor-auth` as const,
+    },
 } as const;
 
 /**

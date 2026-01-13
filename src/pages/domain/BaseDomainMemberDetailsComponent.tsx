@@ -18,6 +18,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {getLatestError} from '@libs/ErrorUtils';
 import {getDisplayNameOrDefault, getPhoneNumber} from '@libs/PersonalDetailsUtils';
 import Navigation from '@navigation/Navigation';
+import EnabledPage from '@pages/settings/Security/TwoFactorAuth/EnabledPage';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearTwoFactorAuthExemptEmailsErrors, setTwoFactorAuthExemptEmailForDomain} from '@userActions/Domain';
 import CONST from '@src/CONST';
@@ -52,6 +53,7 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children}
         canBeMissing: false,
         selector: domainMemberSettingsSelector,
     });
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
 
     // The selector depends on the dynamic `accountID`, so it cannot be extracted
     // to a static function outside the component.
@@ -124,13 +126,14 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children}
                                 onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, accountID)}
                             />
 
-                            <MenuItem
-                                style={styles.mb5}
-                                title={translate('domain.common.resetTwoFactorAuth')}
-                                icon={icons.Flag}
-                                onPress={() => Navigation.navigate(ROUTES.PROFILE.getRoute(accountID, Navigation.getActiveRoute()))}
-                                shouldShowRightIcon
-                            />
+                            {!!account?.requiresTwoFactorAuth && (
+                                <MenuItem
+                                    style={styles.mb5}
+                                    title={translate('domain.common.resetTwoFactorAuth')}
+                                    icon={icons.Flag}
+                                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
+                                />
+                            )}
                             <MenuItem
                                 style={styles.mb5}
                                 title={translate('common.profile')}

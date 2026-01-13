@@ -7851,9 +7851,7 @@ const translations = {
             forceTwoFactorAuthError: "Force two-factor authentication couldn't be changed. Please try again later.",
             disableTwoFactorAuth: 'Disable two-factor authentication',
             enterTwoFactorAuthCodeDescription: 'To disable two-factor authentication (2FA), please enter a valid code from your authentication app.',
-        },
-        common: {
-            settings: 'Settings',
+            resetTwoFactorAuth: 'Reset two-factor authentication',
         },
     },
 };

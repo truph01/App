@@ -1165,6 +1165,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH]: {
                             path: ROUTES.DOMAIN_MEMBERS_SETTINGS_TWO_FACTOR_AUTH.route,
                         },
+                        [SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH]: {
+                            path: ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.route,
+                        },
                     },
                 },
                 [SCREENS.RIGHT_MODAL.TWO_FACTOR_AUTH]: {

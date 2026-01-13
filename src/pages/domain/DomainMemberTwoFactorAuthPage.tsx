@@ -4,16 +4,16 @@ import useOnyx from '@hooks/useOnyx';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
-import BaseDomainRequireTwoFactorAuthPage from '@pages/domain/BaseDomainRequireTwoFactorAuthPage';
 import {toggleTwoFactorAuthRequiredForDomain} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import BaseDomainRequireTwoFactorAuthPage from './BaseDomainRequireTwoFactorAuthPage';
 
-type DomainRequireTwoFactorAuthPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH>;
+type DomainMemberTwoFactorAuthPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH>;
 
-function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageProps) {
-    const {domainAccountID} = route.params;
+function DomainMemberTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPageProps) {
+    const {domainAccountID, accountID} = route.params;
 
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
 
@@ -26,15 +26,15 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
                 }
 
                 toggleTwoFactorAuthRequiredForDomain(domainAccountID, domainName, false, code);
-                Navigation.goBack(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID));
+                Navigation.goBack(ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
             }}
             onBackButtonPress={() => {
-                Navigation.goBack(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID));
+                Navigation.goBack(ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
             }}
         />
     );
 }
 
-DomainRequireTwoFactorAuthPage.displayName = 'DomainRequireTwoFactorAuthPage';
+DomainMemberTwoFactorAuthPage.displayName = 'DomainMemberTwoFactorAuthPage';
 
-export default DomainRequireTwoFactorAuthPage;
+export default DomainMemberTwoFactorAuthPage;

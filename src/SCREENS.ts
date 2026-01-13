@@ -879,6 +879,7 @@ const SCREENS = {
         MEMBER_DETAILS: 'Member_Details',
         MEMBERS_SETTINGS: 'Members_Settings',
         MEMBERS_SETTINGS_TWO_FACTOR_AUTH: 'Members_Settings_Two_Factor_Auth',
+        MEMBER_TWO_FACTOR_AUTH: 'Member_Two_Factor_Auth',
     },
 } as const;
 
