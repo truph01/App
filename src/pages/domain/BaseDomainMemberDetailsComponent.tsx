@@ -41,19 +41,7 @@ type BaseDomainMemberDetailsComponentProps = {
 function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children}: BaseDomainMemberDetailsComponentProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Info', 'Flag']);
-
-    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
-    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
-    const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
-        canBeMissing: false,
-        selector: domainMemberSettingsSelector,
-    });
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const icons = useMemoizedLazyExpensifyIcons(['Info']);
 
     // The selector depends on the dynamic `accountID`, so it cannot be extracted
     // to a static function outside the component.
@@ -110,30 +98,6 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children}
                                 copyable
                             />
                             {children}
-                            <ToggleSettingOptionRow
-                                wrapperStyle={[styles.mv3, styles.ph5]}
-                                switchAccessibilityLabel={translate('domain.common.forceTwoFactorAuth')}
-                                isActive={!!domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
-                                onToggle={(value) => {
-                                    if (!personalDetails?.login) {
-                                        return;
-                                    }
-                                    setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails?.login, value);
-                                }}
-                                title={translate('domain.common.forceTwoFactorAuth')}
-                                pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
-                                errors={getLatestError(domainErrors?.memberErrors?.[accountID]?.twoFactorAuthExemptEmailsError)}
-                                onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, accountID)}
-                            />
-
-                            {!!account?.requiresTwoFactorAuth && (
-                                <MenuItem
-                                    style={styles.mb5}
-                                    title={translate('domain.common.resetTwoFactorAuth')}
-                                    icon={icons.Flag}
-                                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
-                                />
-                            )}
                             <MenuItem
                                 style={styles.mb5}
                                 title={translate('common.profile')}

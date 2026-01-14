@@ -36,7 +36,7 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                 enableEdgeToEdgeBottomSafeAreaPadding
             >
                 <HeaderWithBackButton
-                    title={translate('domain.common.disableTwoFactorAuth')}
+                    title={translate('twoFactorAuth.disableTwoFactorAuth')}
                     onBackButtonPress={onBackButtonPress}
                 />
 

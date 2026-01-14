@@ -460,3 +460,4 @@ export type {default as ToggleConsolidatedDomainBillingParams} from './ToggleCon
 export type {default as RemoveDomainAdminParams} from './RemoveDomainAdminParams';
 export type {default as ToggleTwoFactorAuthRequiredForDomainParams} from './ToggleTwoFactorAuthRequiredForDomainParams';
 export type {default as SetTwoFactorAuthExemptEmailForDomainParams} from './SetTwoFactorAuthExemptEmailForDomainParams';
+export type {default as ResetDomainMemberTwoFactorAuthParams} from './ResetDomainMemberTwoFactorAuthParams';

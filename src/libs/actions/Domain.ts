@@ -1,9 +1,10 @@
 import Onyx from 'react-native-onyx';
 import type {OnyxUpdate} from 'react-native-onyx';
 import * as API from '@libs/API';
-import type {
+import {
     AddAdminToDomainParams,
     RemoveDomainAdminParams,
+    ResetDomainMemberTwoFactorAuthParams,
     SetTechnicalContactEmailParams,
     SetTwoFactorAuthExemptEmailForDomainParams,
     ToggleConsolidatedDomainBillingParams,
@@ -790,7 +791,7 @@ function clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID: number)
 }
 
 function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, enabled: boolean) {
-    let newExemptEmails = enabled ? [...new Set([...exemptEmails, targetEmail])] : exemptEmails.filter((email) => email !== targetEmail);
+    const newExemptEmails = enabled ? [...new Set([...exemptEmails, targetEmail])] : exemptEmails.filter((email) => email !== targetEmail);
 
     const optimisticData: OnyxUpdate[] = [
         {
@@ -902,6 +903,19 @@ function clearTwoFactorAuthExemptEmailsErrors(domainAccountID: number, accountID
     });
 }
 
+function resetDomainMemberTwoFactorAuth(targetEmail: string, twoFactorAuthCode: string) {
+    const optimisticData: OnyxUpdate[] = [];
+    const failureData: OnyxUpdate[] = [];
+    const successData: OnyxUpdate[] = [];
+
+    const params: ResetDomainMemberTwoFactorAuthParams = {
+        targetEmail,
+        twoFactorAuthCode,
+    };
+
+    API.write(WRITE_COMMANDS.RESET_DOMAIN_MEMBER_TWO_FACTOR_AUTH, params, {optimisticData, failureData, successData});
+}
+
 export {
     getDomainValidationCode,
     validateDomain,
@@ -927,4 +941,5 @@ export {
     clearToggleTwoFactorAuthRequiredForDomainError,
     setTwoFactorAuthExemptEmailForDomain,
     clearTwoFactorAuthExemptEmailsErrors,
+    resetDomainMemberTwoFactorAuth,
 };

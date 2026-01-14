@@ -811,7 +811,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.DOMAIN.MEMBER_DETAILS]: () => require<ReactComponentModule>('../../../../pages/domain/Members/DomainMemberDetailsPage').default,
     [SCREENS.DOMAIN.MEMBERS_SETTINGS]: () => require<ReactComponentModule>('../../../../pages/domain/Members/DomainMembersSettingsPage').default,
     [SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH]: () => require<ReactComponentModule>('../../../../pages/domain/Members/DomainRequireTwoFactorAuthPage').default,
-    [SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH]: () => require<ReactComponentModule>('../../../../pages/domain/Members/DomainRequireTwoFactorAuthPage').default,
+    [SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH]: () => require<ReactComponentModule>('../../../../pages/domain/Members/DomainMemberTwoFactorAuthPage').default,
 });
 
 const TwoFactorAuthenticatorStackNavigator = createModalStackNavigator<EnablePaymentsNavigatorParamList>({
