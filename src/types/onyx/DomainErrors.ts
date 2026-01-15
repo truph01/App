@@ -43,7 +43,7 @@ type DomainErrors = {
      * Errors related to the 2FA toggle
      */
     twoFactorAuthRequiredErrors?: OnyxCommon.Errors;
-};
+} & GeneralDomainAdminErrors;
 
 export type {GeneralDomainErrors};
 
