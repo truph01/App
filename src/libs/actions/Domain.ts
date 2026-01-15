@@ -984,12 +984,14 @@ function clearTwoFactorAuthExemptEmailsErrors(domainAccountID: number, accountID
     });
 }
 
-function resetDomainMemberTwoFactorAuth(targetEmail: string, twoFactorAuthCode: string) {
+function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID: number, targetEmail: string, twoFactorAuthCode: string) {
     const optimisticData: OnyxUpdate[] = [];
     const failureData: OnyxUpdate[] = [];
     const successData: OnyxUpdate[] = [];
 
     const params: ResetDomainMemberTwoFactorAuthParams = {
+        domainAccountID,
+        targetAccountID,
         targetEmail,
         twoFactorAuthCode,
     };

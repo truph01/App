@@ -32,8 +32,8 @@ function DomainMemberTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPagePro
                     return;
                 }
 
-                resetDomainMemberTwoFactorAuth(personalDetails.login, code);
-                Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
+                resetDomainMemberTwoFactorAuth(domainAccountID, accountID, personalDetails.login, code);
+                Navigation.dismissModal();
             }}
             onBackButtonPress={() => {
                 Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
