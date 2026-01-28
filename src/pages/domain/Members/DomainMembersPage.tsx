@@ -36,8 +36,6 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         canBeMissing: true,
         selector: memberAccountIDsSelector,
     });
-    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {canBeMissing: true});
-    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {canBeMissing: true});
 
     const renderHeaderButtons = (
         <>
@@ -69,7 +67,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     );
 
     const getCustomRowProps = (accountID: number, email?: string) => ({
-        errors: getLatestError(domainErrors?.memberErrors?.[email ?? accountID]?.errors),
+        errors: domainErrors?.memberErrors?.[email ?? accountID],
         pendingAction: domainPendingActions?.member?.[email ?? accountID]?.pendingAction,
     });
 
