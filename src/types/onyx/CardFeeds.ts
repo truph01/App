@@ -247,6 +247,19 @@ type AddNewCompanyCardFeed = {
 /** Card fund ID */
 type FundID = number;
 
+/** Combined card feed type */
+type CombinedCardFeed = CustomCardFeedData &
+    Partial<DirectCardFeedData> & {
+        /** Custom feed name, originally coming from settings.companyCardNicknames */
+        customFeedName?: string;
+
+        /** Feed name */
+        feed: CompanyCardFeedWithNumber;
+    };
+
+/** Card feeds combined by domain ID into one object */
+type CombinedCardFeeds = Record<CompanyCardFeedWithDomainID, CombinedCardFeed>;
+
 export default CardFeeds;
 export type {
     AddNewCardFeedStep,
@@ -266,4 +279,6 @@ export type {
     StatementPeriodEnd,
     StatementPeriodEndDay,
     DomainSettings,
+    CombinedCardFeed,
+    CombinedCardFeeds,
 };
