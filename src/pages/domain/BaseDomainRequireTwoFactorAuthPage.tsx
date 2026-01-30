@@ -10,8 +10,8 @@ import type {BaseTwoFactorAuthFormRef} from '@components/TwoFactorAuthForm/types
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
 import ONYXKEYS from '@src/ONYXKEYS';
+import DomainNotFoundPageWrapper from './DomainNotFoundPageWrapper';
 
 type BaseDomainRequireTwoFactorAuthPageProps = {
     domainAccountID: number;
@@ -38,13 +38,14 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                 <HeaderWithBackButton
                     title={translate('twoFactorAuth.disableTwoFactorAuth')}
                     onBackButtonPress={onBackButtonPress}
+                    shouldDisplayHelpButton={false}
                 />
 
                 <ScrollView
                     keyboardShouldPersistTaps="handled"
                     contentContainerStyle={styles.flexGrow1}
                 >
-                    <View style={[styles.mh5]}>
+                    <View style={[styles.mh5, styles.mb4, styles.mt3]}>
                         <TwoFactorAuthForm
                             ref={baseTwoFactorAuthRef}
                             shouldAllowRecoveryCode
