@@ -471,6 +471,7 @@ export type {default as SetPolicyCodingRuleParams} from './SetPolicyCodingRulePa
 export type {default as RegisterAuthenticationKeyParams} from './RegisterAuthenticationKeyParams';
 export type {default as TroubleshootMultifactorAuthenticationParams} from './TroubleshootMultifactorAuthenticationParams';
 export type {default as RequestAuthenticationChallengeParams} from './RequestAuthenticationChallengeParams';
+export type {default as SetPolicyTimeTrackingDefaultRateParams} from './SetPolicyTimeTrackingDefaultRateParams';
 export type {default as ToggleTwoFactorAuthRequiredForDomainParams} from './ToggleTwoFactorAuthRequiredForDomainParams';
 export type {default as SetTwoFactorAuthExemptEmailForDomainParams} from './SetTwoFactorAuthExemptEmailForDomainParams';
 export type {default as ResetDomainMemberTwoFactorAuthParams} from './ResetDomainMemberTwoFactorAuthParams';
