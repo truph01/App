@@ -14,6 +14,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getLatestError} from '@libs/ErrorUtils';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
@@ -104,7 +105,7 @@ function BaseDomainMembersPage({
                 },
             ],
             rightElement: getCustomRightElement?.(accountID),
-            errors: customProps?.errors?.errors,
+            errors: getLatestError(customProps?.errors?.errors),
             pendingAction: customProps?.pendingAction,
             isInteractive: !isPendingActionDelete && !details?.isOptimisticPersonalDetail,
             isDisabled: isPendingActionDelete,

@@ -1056,7 +1056,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [accountID]: {
+                    [targetEmail]: {
                         twoFactorAuthExemptEmailsError: null,
                     },
                 },
@@ -1080,7 +1080,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [accountID]: {
+                    [targetEmail]: {
                         twoFactorAuthExemptEmailsError: null,
                     },
                 },
@@ -1113,7 +1113,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [accountID]: {
+                    [targetEmail]: {
                         twoFactorAuthExemptEmailsError: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
                     },
                 },
@@ -1130,20 +1130,87 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
     API.write(WRITE_COMMANDS.SET_TWO_FACTOR_AUTH_EXEMPT_EMAIL_FOR_DOMAIN, params, {optimisticData, successData, failureData});
 }
 
-function clearTwoFactorAuthExemptEmailsErrors(domainAccountID: number, accountID: number) {
+function clearTwoFactorAuthExemptEmailsErrors(domainAccountID: number, email: string) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
         memberErrors: {
-            [accountID]: {
-                twoFactorAuthExemptEmailsError: null,
-            },
+            [email]: {twoFactorAuthExemptEmailsError: null},
         },
     });
 }
 
 function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID: number, targetEmail: string, twoFactorAuthCode: string) {
-    const optimisticData: OnyxUpdate[] = [];
-    const failureData: OnyxUpdate[] = [];
-    const successData: OnyxUpdate[] = [];
+    const optimisticData: OnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                member: {
+                    [targetAccountID]: {
+                        pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                    },
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                memberErrors: {
+                    [targetAccountID]: {
+                        errors: null,
+                    },
+                },
+            },
+        },
+    ];
+    const failureData: OnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                member: {
+                    [targetAccountID]: {
+                        pendingAction: null,
+                    },
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                memberErrors: {
+                    [targetAccountID]: {
+                        errors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
+                    },
+                },
+            },
+        },
+    ];
+    const successData: OnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                member: {
+                    [targetAccountID]: {
+                        pendingAction: null,
+                    },
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                memberErrors: {
+                    [targetAccountID]: {
+                        errors: null,
+                    },
+                },
+            },
+        },
+    ];
 
     const params: ResetDomainMemberTwoFactorAuthParams = {
         domainAccountID,

@@ -72,8 +72,8 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 }}
                 title={translate('domain.common.forceTwoFactorAuth')}
                 pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
-                errors={getLatestError(domainErrors?.memberErrors?.[accountID]?.twoFactorAuthExemptEmailsError)}
-                onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, accountID)}
+                errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
+                onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
             />
 
             {!!account?.requiresTwoFactorAuth && (
