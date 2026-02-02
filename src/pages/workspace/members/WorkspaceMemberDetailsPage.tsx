@@ -26,6 +26,7 @@ import usePrevious from '@hooks/usePrevious';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeIllustrations from '@hooks/useThemeIllustrations';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useEnvironment from '@hooks/useEnvironment';
 import {setPolicyPreventSelfApproval} from '@libs/actions/Policy/Policy';
 import {removeApprovalWorkflow as removeApprovalWorkflowAction, updateApprovalWorkflow} from '@libs/actions/Workflow';
 import {
@@ -83,6 +84,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const {environmentURL} = useEnvironment();
     const [cardFeeds] = useCardFeeds(policyID);
     const [cardList] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}`, {canBeMissing: true});
     const [customCardNames] = useOnyx(ONYXKEYS.NVP_EXPENSIFY_COMPANY_CARDS_CUSTOM_NAMES, {canBeMissing: true});
@@ -106,6 +108,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const policyOwnerDisplayName = formatPhoneNumber(getDisplayNameOrDefault(ownerDetails)) ?? policy?.owner ?? '';
     const hasMultipleFeeds = Object.keys(getCompanyFeeds(cardFeeds, false, true)).length > 0;
     const {cardList: assignableCards, ...workspaceCards} = getAllCardsForWorkspace(workspaceAccountID, cardList, cardFeeds, expensifyCardSettings);
+    const workspaceWorkflowsPageURL = `${environmentURL}/${ROUTES.WORKSPACE_WORKFLOWS.getRoute(policyID)}`;
     const isSMSLogin = Str.isSMSLogin(memberLogin);
     const phoneNumber = getPhoneNumber(details);
     const isReimburser = policy?.achAccount?.reimburser === memberLogin;
@@ -303,13 +306,15 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                     />
                                 )
                             ) : (
-                                <Button
-                                    text={translate('workspace.people.removeWorkspaceMemberButtonTitle')}
-                                    onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
-                                    isDisabled={isSelectedMemberOwner || isSelectedMemberCurrentUser}
-                                    icon={icons.RemoveMembers}
-                                    style={styles.mb5}
-                                />
+                                !isReimburser && (
+                                    <Button
+                                        text={translate('workspace.people.removeWorkspaceMemberButtonTitle')}
+                                        onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
+                                        isDisabled={isSelectedMemberOwner || isSelectedMemberCurrentUser}
+                                        icon={icons.RemoveMembers}
+                                        style={styles.mb5}
+                                    />
+                                )
                             )}
                             <ConfirmModal
                                 danger
@@ -344,9 +349,12 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             <MenuItemWithTopDescription
                                 disabled={isSelectedMemberOwner || isSelectedMemberCurrentUser}
                                 title={translate(`workspace.common.roleName`, {role: member?.role})}
+                                interactive={!isReimburser}
                                 description={translate('common.role')}
-                                shouldShowRightIcon
+                                shouldShowRightIcon={!isReimburser}
                                 onPress={() => Navigation.navigate(ROUTES.WORKSPACE_MEMBER_DETAILS_ROLE.getRoute(policyID, accountID))}
+                                hintText={isReimburser ? translate('common.roleCannotBeChanged', workspaceWorkflowsPageURL) : undefined}
+                                shouldRenderHintAsHTML
                             />
                             {isControlPolicy(policy) && (
                                 <>
