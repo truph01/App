@@ -3836,9 +3836,13 @@ const ROUTES = {
         route: 'domain/:domainAccountID/members/settings/two-factor-auth',
         getRoute: (domainAccountID: number) => `domain/${domainAccountID}/members/settings/two-factor-auth` as const,
     },
-    DOMAIN_MEMBER_TWO_FACTOR_AUTH: {
-        route: 'domain/:domainAccountID/members/:accountID/two-factor-auth',
-        getRoute: (domainAccountID: number, accountID: number) => `domain/${domainAccountID}/members/${accountID}/two-factor-auth` as const,
+    DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH: {
+        route: 'domain/:domainAccountID/members/:accountID/force-two-factor-auth',
+        getRoute: (domainAccountID: number, accountID: number) => `domain/${domainAccountID}/members/${accountID}/force-two-factor-auth` as const,
+    },
+    DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH: {
+        route: 'domain/:domainAccountID/members/:accountID/reset-two-factor-auth',
+        getRoute: (domainAccountID: number, accountID: number) => `domain/${domainAccountID}/members/${accountID}/reset-two-factor-auth` as const,
     },
 
     MULTIFACTOR_AUTHENTICATION_MAGIC_CODE: `${MULTIFACTOR_AUTHENTICATION_PROTECTED_ROUTES.FACTOR}/magic-code`,

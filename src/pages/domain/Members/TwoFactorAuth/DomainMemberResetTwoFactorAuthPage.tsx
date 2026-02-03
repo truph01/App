@@ -13,7 +13,7 @@ import type {PersonalDetailsList} from '@src/types/onyx';
 
 type DomainMemberTwoFactorAuthPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH>;
 
-function DomainMemberTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPageProps) {
+function DomainMemberResetTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPageProps) {
     const {domainAccountID, accountID} = route.params;
 
     // The selector depends on the dynamic `accountID`, so it cannot be extracted
@@ -42,6 +42,6 @@ function DomainMemberTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPagePro
     );
 }
 
-DomainMemberTwoFactorAuthPage.displayName = 'DomainMemberTwoFactorAuthPage';
+DomainMemberResetTwoFactorAuthPage.displayName = 'DomainMemberTwoFactorAuthPage';
 
-export default DomainMemberTwoFactorAuthPage;
+export default DomainMemberResetTwoFactorAuthPage;

@@ -1530,7 +1530,11 @@ type SettingsNavigatorParamList = {
     [SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH]: {
         domainAccountID: number;
     };
-    [SCREENS.DOMAIN.MEMBER_TWO_FACTOR_AUTH]: {
+    [SCREENS.DOMAIN.MEMBER_FORCE_TWO_FACTOR_AUTH]: {
+        domainAccountID: number;
+        accountID: number;
+    };
+    [SCREENS.DOMAIN.MEMBER_RESET_TWO_FACTOR_AUTH]: {
         domainAccountID: number;
         accountID: number;
     };

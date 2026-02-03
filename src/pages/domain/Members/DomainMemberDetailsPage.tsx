@@ -65,7 +65,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     }
 
                     if (!value && is2FAEnabled) {
-                        Navigation.navigate(ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
+                        Navigation.navigate(ROUTES.DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
                     } else {
                         setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails.login, value);
                     }
@@ -81,7 +81,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     style={styles.mb5}
                     title={translate('domain.common.resetTwoFactorAuth')}
                     icon={icons.Flag}
-                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
+                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
                 />
             )}
         </BaseDomainMemberDetailsComponent>

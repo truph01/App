@@ -1027,7 +1027,7 @@ function clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID: number)
     });
 }
 
-function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, enabled: boolean) {
+function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, enabled: boolean, twoFactorAuthCode?: string) {
     const newExemptEmails = enabled ? [...new Set([...exemptEmails, targetEmail])] : exemptEmails.filter((email) => email !== targetEmail);
 
     const optimisticData: OnyxUpdate[] = [
@@ -1125,6 +1125,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
         domainAccountID,
         targetEmail,
         enabled,
+        twoFactorAuthCode,
     };
 
     API.write(WRITE_COMMANDS.SET_TWO_FACTOR_AUTH_EXEMPT_EMAIL_FOR_DOMAIN, params, {optimisticData, successData, failureData});
