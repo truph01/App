@@ -859,6 +859,8 @@ function getOptionData({
         });
     }
 
+    lastMessageTextFromReport = Parser.htmlToText(lastMessageTextFromReport);
+
     // We need to remove sms domain in case the last message text has a phone number mention with sms domain.
     let lastMessageText = Str.removeSMSDomain(lastMessageTextFromReport);
 
