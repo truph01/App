@@ -16,4 +16,8 @@ const tracingIntegration = Sentry.reactNativeTracingIntegration({
 
 const browserProfilingIntegration = SentryReact.browserProfilingIntegration();
 
-export {navigationIntegration, tracingIntegration, browserProfilingIntegration};
+const consoleLoggingIntegration = Sentry.consoleLoggingIntegration({
+    levels: [],
+})
+
+export {navigationIntegration, tracingIntegration, browserProfilingIntegration, consoleLoggingIntegration};
