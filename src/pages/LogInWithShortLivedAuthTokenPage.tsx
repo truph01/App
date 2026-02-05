@@ -17,7 +17,7 @@ import SessionExpiredPage from './ErrorPage/SessionExpiredPage';
 type LogInWithShortLivedAuthTokenPageProps = PlatformStackScreenProps<PublicScreensParamList, typeof SCREENS.TRANSITION_BETWEEN_APPS>;
 
 function LogInWithShortLivedAuthTokenPage({route}: LogInWithShortLivedAuthTokenPageProps) {
-    const {shortLivedAuthToken = '', shortLivedToken = '', authTokenType, exitTo, error} = route?.params ?? {};
+    const {shortLivedAuthToken = '', shortLivedToken = '', authTokenType, exitTo, error, isSAML = false} = route?.params ?? {};
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
 
     useEffect(() => {
@@ -42,7 +42,11 @@ function LogInWithShortLivedAuthTokenPage({route}: LogInWithShortLivedAuthTokenP
         // Try to authenticate using the shortLivedToken if we're not already trying to load the accounts
         if (token && !account?.isLoading) {
             Log.info('LogInWithShortLivedAuthTokenPage - Successfully received shortLivedAuthToken. Signing in...');
-            signInWithShortLivedAuthToken(token, true);
+            signInWithShortLivedAuthToken(token, isSAML);
+            Navigation.isNavigationReady().then(() => {
+                // We must replace to remove /transition route from history
+                Navigation.navigate(ROUTES.HOME, {forceReplace: true});
+            });
             return;
         }
 
