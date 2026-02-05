@@ -11,6 +11,15 @@ type ChartDataPoint = {
     onClickQuery?: string;
 };
 
+/**
+ * Y-axis unit can be either:
+ * - A simple string (always displayed as-is)
+ * - An object with value and fallback (chart checks if font can render value, uses fallback if not)
+ */
+type YAxisUnit = string | {value: string; fallback: string};
+
+type YAxisUnitPosition = 'left' | 'right';
+
 type CartesianChartProps = {
     /** Data points to display */
     data: ChartDataPoint[];
@@ -24,13 +33,11 @@ type CartesianChartProps = {
     /** Whether data is loading */
     isLoading?: boolean;
 
-    /** Symbol/unit for Y-axis labels (e.g., '$', '€', 'zł'). Empty string or undefined shows raw numbers. */
-    yAxisUnit?: string;
+    /** Symbol/unit for Y-axis labels. Can be a string or an object with value and fallback for font compatibility. */
+    yAxisUnit?: YAxisUnit;
 
     /** Position of the unit symbol relative to the value. Defaults to 'left'. */
     yAxisUnitPosition?: YAxisUnitPosition;
 };
 
-type YAxisUnitPosition = 'left' | 'right';
-
-export type {ChartDataPoint, CartesianChartProps, YAxisUnitPosition};
+export type {ChartDataPoint, CartesianChartProps, YAxisUnit, YAxisUnitPosition};

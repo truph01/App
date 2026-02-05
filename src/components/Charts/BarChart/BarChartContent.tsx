@@ -85,8 +85,9 @@ function BarChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUni
         return {...BASE_DOMAIN_PADDING, left: horizontalPadding, right: horizontalPadding};
     }, [chartWidth, data.length]);
 
-    const {formatXAxisLabel, formatYAxisLabel} = useChartLabelFormats({
+    const {formatXAxisLabel, formatYAxisLabel, displayUnit} = useChartLabelFormats({
         data,
+        font,
         yAxisUnit,
         yAxisUnitPosition,
         labelSkipInterval,
