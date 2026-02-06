@@ -8,7 +8,6 @@ import useDebouncedState from '@hooks/useDebouncedState';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useViewportOffsetTop from '@hooks/useViewportOffsetTop';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -33,7 +32,6 @@ const ACCESS_VARIANTS = [CONST.POLICY.ACCESS_VARIANTS.ADMIN];
 
 function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingReportData, route}: WorkspaceInviteMessageApproverPageProps) {
     const {translate, localeCompare} = useLocalize();
-    const viewportOffsetTop = useViewportOffsetTop();
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const policyID = route.params.policyID;
@@ -149,8 +147,6 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
         [searchTerm, orderedApprovers.length, setSearchTerm, translate],
     );
 
-    const screenWrapperStyle = useMemo(() => ({marginTop: viewportOffsetTop}), [viewportOffsetTop]);
-
     const accessDeniedViewProps = useMemo(
         () => ({
             subtitleKey: isEmptyObject(policy) ? undefined : ('workspace.common.notAuthorized' as const),
@@ -169,7 +165,6 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
                 testID="WorkspaceInviteMessageApproverPage"
                 enableEdgeToEdgeBottomSafeAreaPadding
                 shouldEnableMaxHeight
-                style={screenWrapperStyle}
             >
                 <HeaderWithBackButton
                     title={translate('workflowsPage.approver')}
