@@ -1,5 +1,5 @@
+import {personalDetailsSelector} from '@selectors/PersonalDetails';
 import React from 'react';
-import type {OnyxEntry} from 'react-native-onyx';
 import useOnyx from '@hooks/useOnyx';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
@@ -9,19 +9,15 @@ import {resetDomainMemberTwoFactorAuth} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import type {PersonalDetailsList} from '@src/types/onyx';
 
 type DomainMemberTwoFactorAuthPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_RESET_TWO_FACTOR_AUTH>;
 
 function DomainMemberResetTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPageProps) {
     const {domainAccountID, accountID} = route.params;
 
-    // The selector depends on the dynamic `accountID`, so it cannot be extracted
-    // to a static function outside the component.
-    // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         canBeMissing: true,
-        selector: (personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsList?.[accountID],
+        selector: personalDetailsSelector(accountID),
     });
 
     return (
