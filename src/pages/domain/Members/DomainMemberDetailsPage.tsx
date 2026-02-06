@@ -1,93 +1,148 @@
-import {domainMemberSettingsSelector} from '@selectors/Domain';
-import React from 'react';
-import type {OnyxEntry} from 'react-native-onyx';
-import MenuItem from '@components/MenuItem';
+import {domainNameSelector, selectSecurityGroupForAccount} from '@selectors/Domain';
+import {personalDetailsSelector} from '@selectors/PersonalDetails';
+import React, {useState} from 'react';
+import Button from '@components/Button';
+import DecisionModal from '@components/DecisionModal';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
+import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getLatestError} from '@libs/ErrorUtils';
+import {closeUserAccount} from '@libs/actions/Domain';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import BaseDomainMemberDetailsComponent from '@pages/domain/BaseDomainMemberDetailsComponent';
-import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
-import {clearTwoFactorAuthExemptEmailsErrors, setTwoFactorAuthExemptEmailForDomain} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import type {PersonalDetailsList} from '@src/types/onyx';
 
 type DomainMemberDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_DETAILS>;
 
 function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     const {domainAccountID, accountID} = route.params;
-
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Flag']);
+    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers']);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [shouldForceCloseAccount, setShouldForceCloseAccount] = useState<boolean>();
+    // We need to use isSmallScreenWidth here because the DecisionModal is opening from RHP and ShouldUseNarrowLayout layout will not work in this place
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth} = useResponsiveLayout();
+    const {showConfirmModal} = useConfirmModal();
 
-    // The selector depends on the dynamic `accountID`, so it cannot be extracted
-    // to a static function outside the component.
-    // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
+    const [userSecurityGroup] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
+        canBeMissing: true,
+        selector: selectSecurityGroupForAccount(accountID),
+    });
+
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         canBeMissing: true,
-        selector: (personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsList?.[accountID],
+        selector: personalDetailsSelector(accountID),
     });
 
-    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
-    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
-    const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
-        canBeMissing: false,
-        selector: domainMemberSettingsSelector,
-    });
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
-    const is2FAEnabled = account?.requiresTwoFactorAuth;
+    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: false, selector: domainNameSelector});
 
     const memberLogin = personalDetails?.login ?? '';
 
+    const handleCloseAccount = async () => {
+        if (!userSecurityGroup || shouldForceCloseAccount === undefined) {
+            return;
+        }
+
+        const result = await showConfirmModal({
+            title: translate('domain.members.closeAccount'),
+            prompt: translate('domain.members.closeAccountPrompt'),
+            confirmText: translate('domain.members.closeAccount'),
+            cancelText: translate('common.cancel'),
+            danger: true,
+            shouldShowCancelButton: true,
+        });
+        if (result.action !== ModalActions.CONFIRM) {
+            setIsModalVisible(true);
+            setShouldForceCloseAccount(undefined);
+            return;
+        }
+        closeUserAccount(domainAccountID, domainName ?? '', memberLogin, userSecurityGroup, shouldForceCloseAccount);
+        setShouldForceCloseAccount(undefined);
+        Navigation.dismissModal();
+    };
+
+    const handleForceCloseAccount = () => {
+        setShouldForceCloseAccount(true);
+        setIsModalVisible(false);
+    };
+
+    const handleSafeCloseAccount = () => {
+        setShouldForceCloseAccount(false);
+        setIsModalVisible(false);
+    };
+
+    const avatarButton = (
+        <Button
+            text={translate('domain.members.closeAccount')}
+            onPress={() => setIsModalVisible(true)}
+            icon={icons.RemoveMembers}
+            style={styles.mb5}
+        />
+    );
+
     return (
-        <BaseDomainMemberDetailsComponent
-            domainAccountID={domainAccountID}
-            accountID={accountID}
-        >
-            <ToggleSettingOptionRow
-                wrapperStyle={[styles.mv3, styles.ph5]}
-                switchAccessibilityLabel={translate('domain.common.forceTwoFactorAuth')}
-                isActive={!!domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
-                onToggle={(value) => {
-                    if (!personalDetails?.login) {
-                        return;
-                    }
+        <>
+            <BaseDomainMemberDetailsComponent
+                domainAccountID={domainAccountID}
+                accountID={accountID}
+                avatarButton={avatarButton}
+            >
+                <ToggleSettingOptionRow
+                    wrapperStyle={[styles.mv3, styles.ph5]}
+                    switchAccessibilityLabel={translate('domain.common.forceTwoFactorAuth')}
+                    isActive={!!domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)}
+                    onToggle={(value) => {
+                        if (!personalDetails?.login) {
+                            return;
+                        }
 
-                    if (!value && is2FAEnabled) {
-                        Navigation.navigate(ROUTES.DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
-                    } else {
-                        setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails.login, value);
-                    }
-                }}
-                title={translate('domain.common.forceTwoFactorAuth')}
-                pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
-                errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
-                onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
-            />
-
-            {!!account?.requiresTwoFactorAuth && (
-                <MenuItem
-                    style={styles.mb5}
-                    title={translate('domain.common.resetTwoFactorAuth')}
-                    icon={icons.Flag}
-                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
+                        if (!value && is2FAEnabled) {
+                            Navigation.navigate(ROUTES.DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
+                        } else {
+                            setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails.login, value);
+                        }
+                    }}
+                    title={translate('domain.common.forceTwoFactorAuth')}
+                    pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
+                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
+                    onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
                 />
-            )}
-        </BaseDomainMemberDetailsComponent>
+
+                {!!account?.requiresTwoFactorAuth && (
+                    <MenuItem
+                        style={styles.mb5}
+                        title={translate('domain.common.resetTwoFactorAuth')}
+                        icon={icons.Flag}
+                        onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
+                    />
+                )}
+            </BaseDomainMemberDetailsComponent>
+            <DecisionModal
+                title={translate('domain.members.closeAccount')}
+                prompt={translate('domain.members.closeAccountInfo')}
+                isSmallScreenWidth={isSmallScreenWidth}
+                onFirstOptionSubmit={handleForceCloseAccount}
+                onSecondOptionSubmit={handleSafeCloseAccount}
+                secondOptionText={translate('domain.members.safeCloseAccount')}
+                firstOptionText={translate('domain.members.forceCloseAccount')}
+                isVisible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                onModalHide={() => {
+                    handleCloseAccount();
+                }}
+                isFirstOptionDanger
+                isSecondOptionSuccess
+            />
+        </>
     );
 }
-
-DomainMemberDetailsPage.displayName = 'DomainMemberDetailsPage';
 
 export default DomainMemberDetailsPage;
