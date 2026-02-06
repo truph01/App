@@ -8,12 +8,12 @@ type GeneralDomainMemberPendingAction = {
     /**
      * Base pending actions
      */
-    pendingAction: OnyxCommon.PendingAction;
+    pendingAction?: OnyxCommon.PendingAction;
 
     /**
      *
      */
-    twoFactorAuthExemptEmails: OnyxCommon.PendingAction;
+    twoFactorAuthExemptEmails?: OnyxCommon.PendingAction;
 };
 
 /**
@@ -51,4 +51,5 @@ type DomainPendingAction = {
     pendingAction?: OnyxCommon.PendingAction;
 };
 
+export type {GeneralDomainMemberPendingAction};
 export default DomainPendingAction;

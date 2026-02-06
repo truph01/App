@@ -1099,7 +1099,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
-                setTwoFactorAuthRequiredError: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
+                setTwoFactorAuthRequiredError: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
             },
         },
         {
@@ -1127,8 +1127,8 @@ function clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID: number)
     });
 }
 
-function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, enabled: boolean, twoFactorAuthCode?: string) {
-    const newExemptEmails = enabled ? [...new Set([...exemptEmails, targetEmail])] : exemptEmails.filter((email) => email !== targetEmail);
+function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, force2FA: boolean, twoFactorAuthCode?: string) {
+    const newExemptEmails = force2FA ? exemptEmails.filter((email) => email !== targetEmail) : [...new Set([...exemptEmails, targetEmail])];
 
     const optimisticData: OnyxUpdate[] = [
         {
@@ -1224,7 +1224,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
     const params: SetTwoFactorAuthExemptEmailForDomainParams = {
         domainAccountID,
         targetEmail,
-        enabled,
+        enabled: !force2FA,
         twoFactorAuthCode,
     };
 
