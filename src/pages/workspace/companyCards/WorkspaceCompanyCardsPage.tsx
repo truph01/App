@@ -45,6 +45,10 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
     const domainOrWorkspaceAccountID = getDomainOrWorkspaceAccountID(workspaceAccountID, selectedFeed);
 
     const loadPolicyCompanyCardsPage = useCallback(() => {
+        if (domainOrWorkspaceAccountID === CONST.DEFAULT_NUMBER_ID) {
+            return;
+        }
+
         openPolicyCompanyCardsPage(policyID, domainOrWorkspaceAccountID, translate);
     }, [domainOrWorkspaceAccountID, policyID, translate]);
 
