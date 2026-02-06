@@ -12691,16 +12691,17 @@ function getReportPersonalDetailsParticipants(report: Report, personalDetailsPar
 }
 
 function canRejectReportAction(currentUserLogin: string, report: Report, policy?: Policy): boolean {
-    const isReportApprover = isApproverUtils(policy, currentUserLogin);
     const isReportBeingProcessed = isProcessingReport(report);
     const isIOU = isIOUReport(report);
     const isInvoice = isInvoiceReport(report);
+    const currentUserAccountID = getCurrentUserAccountID();
     const isCurrentUserManager = report?.managerID === currentUserAccountID;
+    const isApprovalEnabled = !!policy?.approvalMode && policy.approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL;
 
-    const userCanReject = isReportApprover && isCurrentUserManager;
-
-    if (!userCanReject) {
-        return false; // must be approver or payer
+    // Reject is an approval action, so it should be available to the current report manager/approver
+    // (including delegates) as long as approvals are enabled.
+    if (!isCurrentUserManager || !isApprovalEnabled) {
+        return false;
     }
 
     if (isIOU) {
