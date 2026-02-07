@@ -178,7 +178,7 @@ function ScreenWrapper({
         if (!CONFIG.IS_HYBRID_APP) {
             return;
         }
-        closeReactNativeApp({shouldSetNVP: false});
+        closeReactNativeApp({shouldSetNVP: false, isTrackingGPS: false});
     });
 
     useEffect(() => {
