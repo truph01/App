@@ -1819,8 +1819,9 @@ const translations: TranslationDeepObject<typeof en> = {
         contactMethods: 'Kontaktmethoden',
         featureRequiresValidate: 'Für diese Funktion müssen Sie Ihr Konto verifizieren.',
         validateAccount: 'Bestätige dein Konto',
-        helpText: ({email}: {email: string}) =>
-            `Füge weitere Möglichkeiten hinzu, dich anzumelden und Belege an Expensify zu senden.<br/><br/>Füge eine E‑Mail-Adresse hinzu, um Belege an <a href="mailto:${email}">${email}</a> weiterzuleiten, oder füge eine Telefonnummer hinzu, um Belege per SMS an 47777 zu senden (nur US-Nummern).`,
+        helpTextLine1: 'Füge weitere Möglichkeiten hinzu, dich anzumelden und Belege an Expensify zu senden.',
+        helpTextBeforeEmail: 'Füge eine E‑Mail-Adresse hinzu, um Belege an ',
+        helpTextAfterEmail: ' weiterzuleiten, oder füge eine Telefonnummer hinzu, um Belege per SMS an 47777 zu senden (nur US-Nummern).',
         pleaseVerify: 'Bitte bestätige diese Kontaktmethode.',
         getInTouch: 'Wir verwenden diese Methode, um Sie zu kontaktieren.',
         enterMagicCode: (contactMethod: string) => `Bitte gib den magischen Code ein, der an ${contactMethod} gesendet wurde. Er sollte innerhalb einer oder zwei Minuten ankommen.`,

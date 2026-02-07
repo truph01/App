@@ -1,5 +1,6 @@
 import React, {useCallback} from 'react';
 import type {AccessibilityRole, StyleProp, TextStyle} from 'react-native';
+import {AccessibilityInfo} from 'react-native';
 import useLocalize from '@hooks/useLocalize';
 import Clipboard from '@libs/Clipboard';
 import CONST from '@src/CONST';
@@ -36,18 +37,19 @@ function CopyTextToClipboard({
     const copyToClipboard = useCallback(() => {
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- nullish coalescing doesn't achieve the same result in this case
         Clipboard.setString(urlToCopy || text || '');
-    }, [text, urlToCopy]);
+        AccessibilityInfo.announceForAccessibility(translate('common.copied'));
+    }, [text, urlToCopy, translate]);
 
     return (
         <PressableWithDelayToggle
             text={text}
-            tooltipText={translate('common.copyToClipboard')}
+            tooltipText={text ? `${text}, ${translate('common.copyToClipboard')}` : translate('common.copyToClipboard')}
             tooltipTextChecked={translate('common.copied')}
             icon={Expensicons.Copy}
             textStyles={textStyles}
             onPress={copyToClipboard}
             accessible
-            accessibilityLabel={translate('common.copyToClipboard')}
+            accessibilityLabel={text ? `${text}, ${translate('common.copyToClipboard')}` : translate('common.copyToClipboard')}
             accessibilityRole={accessibilityRole}
             sentryLabel="CopyTextToClipboard"
             shouldHaveActiveBackground={shouldHaveActiveBackground}
