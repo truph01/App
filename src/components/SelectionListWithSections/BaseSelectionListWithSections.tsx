@@ -120,6 +120,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     shouldIgnoreFocus = false,
     scrollEventThrottle,
     contentContainerStyle,
+    scrollEnabled: scrollEnabledProp,
     shouldKeepFocusedItemAtTopOfViewableArea = false,
     shouldDebounceScrolling = false,
     shouldPreventActiveCellVirtualization = false,
@@ -159,7 +160,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     const shouldShowSelectAll = !!onSelectAll;
     const activeElementRole = useActiveElementRole();
     const isFocused = useIsFocused();
-    const scrollEnabled = useScrollEnabled();
+    const scrollEnabled = scrollEnabledProp ?? useScrollEnabled();
     const [maxToRenderPerBatch, setMaxToRenderPerBatch] = useState(shouldUseDynamicMaxToRenderPerBatch ? 0 : CONST.MAX_TO_RENDER_PER_BATCH.DEFAULT);
     const [isInitialSectionListRender, setIsInitialSectionListRender] = useState(true);
     const {isKeyboardShown} = useKeyboardState();
