@@ -89,6 +89,25 @@ const OPTIONS_PER_SCREEN: Partial<Record<Screen, PlatformStackNavigationOptions>
     [SCREENS.MISSING_PERSONAL_DETAILS]: {
         animationTypeForReplace: 'push',
     },
+
+    [SCREENS.MULTIFACTOR_AUTHENTICATION.MAGIC_CODE]: {
+        animationTypeForReplace: 'push',
+    },
+    [SCREENS.MULTIFACTOR_AUTHENTICATION.BIOMETRICS_TEST]: {
+        animationTypeForReplace: 'push',
+    },
+    [SCREENS.MULTIFACTOR_AUTHENTICATION.OUTCOME]: {
+        animationTypeForReplace: 'push',
+    },
+    [SCREENS.MULTIFACTOR_AUTHENTICATION.PROMPT]: {
+        animationTypeForReplace: 'push',
+    },
+    [SCREENS.MULTIFACTOR_AUTHENTICATION.REVOKE]: {
+        animationTypeForReplace: 'push',
+    },
+    [SCREENS.MULTIFACTOR_AUTHENTICATION.NOT_FOUND]: {
+        animationTypeForReplace: 'push',
+    },
 };
 
 /**
@@ -468,7 +487,6 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
         require<ReactComponentModule>('../../../../pages/workspace/workflows/approvals/WorkspaceWorkflowsApprovalsOverLimitApproverPage').default,
     [SCREENS.WORKSPACE.INVITE_MESSAGE]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceInviteMessagePage').default,
     [SCREENS.WORKSPACE.INVITE_MESSAGE_ROLE]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceInviteMessageRolePage').default,
-    [SCREENS.WORKSPACE.INVITE_MESSAGE_APPROVER]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceInviteMessageApproverPage').default,
     [SCREENS.WORKSPACE.WORKFLOWS_PAYER]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceWorkflowsPayerPage').default,
     [SCREENS.WORKSPACE.NAME]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceNamePage').default,
     [SCREENS.WORKSPACE.DESCRIPTION]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceOverviewDescriptionPage').default,

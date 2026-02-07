@@ -100,10 +100,14 @@ describe('TravelInvoicing', () => {
         clearTravelInvoicingSettlementAccountErrors(workspaceAccountID, restoredAccountID);
 
         expect(spyOnyxMerge).toHaveBeenCalledWith(cardSettingsKey, {
-            errors: null,
-            pendingAction: null,
             paymentBankAccountID: restoredAccountID,
             previousPaymentBankAccountID: null,
+            pendingFields: {
+                paymentBankAccountID: null,
+            },
+            errorFields: {
+                paymentBankAccountID: null,
+            },
         });
     });
 
@@ -115,13 +119,14 @@ describe('TravelInvoicing', () => {
         clearTravelInvoicingSettlementFrequencyErrors(workspaceAccountID, monthlySettlementDate);
 
         expect(spyOnyxMerge).toHaveBeenCalledWith(cardSettingsKey, {
-            errors: null,
+            monthlySettlementDate: monthlySettlementDate ?? null,
+            previousMonthlySettlementDate: null,
+            pendingFields: {
+                monthlySettlementDate: null,
+            },
             errorFields: {
                 monthlySettlementDate: null,
             },
-            pendingAction: null,
-            monthlySettlementDate: monthlySettlementDate ?? null,
-            previousMonthlySettlementDate: null,
         });
     });
 
@@ -156,7 +161,6 @@ describe('TravelInvoicing', () => {
                             pendingFields: expect.objectContaining({
                                 monthlySettlementDate: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                             }),
-                            errors: null,
                             errorFields: {
                                 monthlySettlementDate: null,
                             },
@@ -172,7 +176,6 @@ describe('TravelInvoicing', () => {
                             pendingFields: expect.objectContaining({
                                 monthlySettlementDate: null,
                             }),
-                            errors: null,
                             errorFields: {
                                 monthlySettlementDate: null,
                             },
@@ -188,7 +191,6 @@ describe('TravelInvoicing', () => {
                             pendingFields: expect.objectContaining({
                                 monthlySettlementDate: null,
                             }),
-                            errors: null,
                             errorFields: {
                                 monthlySettlementDate: expect.anything() as unknown,
                             },
