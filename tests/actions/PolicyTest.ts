@@ -1255,7 +1255,7 @@ describe('actions/Policy', () => {
             // When deleting a workspace fails
             mockFetch?.fail?.();
             Policy.deleteWorkspace({
-                policies: {[fakePolicy.id]: fakePolicy},
+                policies: {[`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`]: fakePolicy},
                 policyID: fakePolicy.id,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
@@ -1407,10 +1407,10 @@ describe('actions/Policy', () => {
 
             Policy.deleteWorkspace({
                 policies: {
-                    [personalPolicy.id]: personalPolicy,
-                    [randomGroupPolicy.id]: randomGroupPolicy,
-                    [randomGroupPolicy2.id]: randomGroupPolicy2,
-                    [mostRecentlyCreatedGroupPolicy.id]: mostRecentlyCreatedGroupPolicy,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${personalPolicy.id}`]: personalPolicy,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${randomGroupPolicy.id}`]: randomGroupPolicy,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${randomGroupPolicy2.id}`]: randomGroupPolicy2,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${mostRecentlyCreatedGroupPolicy.id}`]: mostRecentlyCreatedGroupPolicy,
                 },
                 policyID: randomGroupPolicy.id,
                 personalPolicyID: personalPolicy.id,
@@ -1449,7 +1449,7 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             Policy.deleteWorkspace({
-                policies: {[policyToDelete.id]: policyToDelete},
+                policies: {[`${ONYXKEYS.COLLECTION.POLICY}${policyToDelete.id}`]: policyToDelete},
                 policyID: policyToDelete.id,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
@@ -1489,7 +1489,7 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             Policy.deleteWorkspace({
-                policies: {[policyToDelete.id]: policyToDelete},
+                policies: {[`${ONYXKEYS.COLLECTION.POLICY}${policyToDelete.id}`]: policyToDelete},
                 policyID: policyToDelete.id,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
