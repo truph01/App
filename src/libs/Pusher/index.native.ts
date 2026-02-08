@@ -209,10 +209,12 @@ function subscribe<EventName extends PusherEventName>(
             new Promise((resolve, reject) => {
                 // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.runAfterInteractions(() => {
-                    // We cannot call subscribe() before init(). Prevent any attempt to do this on dev.
+                    // If the socket was disconnected (e.g. during the "Upgrade Required" teardown)
+                    // before this deferred callback ran, skip the subscription gracefully.
                     if (!socket) {
-                        throw new Error(`[Pusher] instance not found. Pusher.subscribe()
-            most likely has been called before Pusher.init()`);
+                        Log.info('[Pusher] Socket disconnected before subscribe could complete, skipping subscription', false, {channelName, eventName});
+                        resolve();
+                        return;
                     }
 
                     Log.info('[Pusher] Attempting to subscribe to channel', false, {channelName, eventName});
