@@ -537,7 +537,7 @@ function clearToggleConsolidatedDomainBillingErrors(domainAccountID: number) {
     });
 }
 
-function addAdminToDomain(domainAccountID: number, accountID: number, targetEmail: string, domainName: string) {
+function addAdminToDomain(domainAccountID: number, accountID: number, targetEmail: string, domainName: string, isOptimisticAccount: boolean) {
     const PERMISSION_KEY = `${CONST.DOMAIN.EXPENSIFY_ADMIN_ACCESS_PREFIX}${accountID}`;
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
@@ -571,6 +571,21 @@ function addAdminToDomain(domainAccountID: number, accountID: number, targetEmai
             },
         },
     ];
+
+    if (isOptimisticAccount) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.PERSONAL_DETAILS_LIST}`,
+            value: {
+                [accountID]: {
+                    accountID,
+                    login: targetEmail,
+                    displayName: targetEmail,
+                    isOptimisticPersonalDetail: true,
+                },
+            },
+        });
+    }
 
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
         {
