@@ -8,15 +8,15 @@ import KeyboardAvoidingView from '@components/KeyboardAvoidingView';
 import ModalContext from '@components/Modal/ModalContext';
 import useBottomSafeSafeAreaPaddingStyle from '@hooks/useBottomSafeSafeAreaPaddingStyle';
 import useInitialDimensions from '@hooks/useInitialWindowDimensions';
-import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
 import useTackInputFocus from '@hooks/useTackInputFocus';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {isMobile, isMobileWebKit, isSafari} from '@libs/Browser';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
-import addViewportResizeListener from '@libs/VisualViewport';
 import getPlatform from '@libs/getPlatform';
+import addViewportResizeListener from '@libs/VisualViewport';
 import toggleTestToolsModal from '@userActions/TestTool';
 import CONST from '@src/CONST';
 
@@ -85,33 +85,34 @@ type ScreenWrapperContainerProps = ForwardedFSClassProps &
          * Whether the screen is focused. (Only passed if wrapped in ScreenWrapper)
          */
         isFocused?: boolean;
+
+        /** Reference to the outer element */
+        ref?: ForwardedRef<View>;
     }>;
 
-const ScreenWrapperContainer = React.forwardRef<View, ScreenWrapperContainerProps>(function ScreenWrapperContainer(
-    {
-        children,
-        style,
-        testID,
-        bottomContent,
-        bottomContentStyle: bottomContentStyleProp,
-        keyboardAvoidingViewBehavior = 'padding',
-        keyboardVerticalOffset,
-        shouldEnableKeyboardAvoidingView = true,
-        shouldEnableMaxHeight = false,
-        shouldEnableMinHeight = false,
-        shouldEnablePickerAvoiding = true,
-        shouldDismissKeyboardBeforeClose = true,
-        shouldAvoidScrollOnVirtualViewport = true,
-        shouldUseCachedViewportHeight = false,
-        shouldKeyboardOffsetBottomSafeAreaPadding: shouldKeyboardOffsetBottomSafeAreaPaddingProp,
-        enableEdgeToEdgeBottomSafeAreaPadding,
-        includePaddingTop = true,
-        includeSafeAreaPaddingBottom = false,
-        isFocused = true,
-        forwardedFSClass,
-    }: ScreenWrapperContainerProps,
-    ref: ForwardedRef<View>,
-) {
+function ScreenWrapperContainer({
+    children,
+    style,
+    testID,
+    bottomContent,
+    bottomContentStyle: bottomContentStyleProp,
+    keyboardAvoidingViewBehavior = 'padding',
+    keyboardVerticalOffset,
+    shouldEnableKeyboardAvoidingView = true,
+    shouldEnableMaxHeight = false,
+    shouldEnableMinHeight = false,
+    shouldEnablePickerAvoiding = true,
+    shouldDismissKeyboardBeforeClose = true,
+    shouldAvoidScrollOnVirtualViewport = true,
+    shouldUseCachedViewportHeight = false,
+    shouldKeyboardOffsetBottomSafeAreaPadding: shouldKeyboardOffsetBottomSafeAreaPaddingProp,
+    enableEdgeToEdgeBottomSafeAreaPadding,
+    includePaddingTop = true,
+    includeSafeAreaPaddingBottom = false,
+    isFocused = true,
+    forwardedFSClass,
+    ref,
+}: ScreenWrapperContainerProps) {
     const {windowHeight} = useWindowDimensions(shouldUseCachedViewportHeight);
     const {initialHeight} = useInitialDimensions();
     const styles = useThemeStyles();
@@ -243,9 +244,7 @@ const ScreenWrapperContainer = React.forwardRef<View, ScreenWrapperContainerProp
             {showBottomContent && <View style={bottomContentStyle}>{bottomContent}</View>}
         </View>
     );
-});
-
-ScreenWrapperContainer.displayName = 'ScreenWrapperContainer';
+}
 
 export default React.memo(ScreenWrapperContainer);
 export type {ScreenWrapperContainerProps};

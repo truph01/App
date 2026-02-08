@@ -19,11 +19,12 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import Accessibility from '@libs/Accessibility';
 import {isMobile} from '@libs/Browser';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
+import getPlatform from '@libs/getPlatform';
+import mergeRefs from '@libs/mergeRefs';
 import NarrowPaneContext from '@libs/Navigation/AppNavigator/Navigators/NarrowPaneContext';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList, RootNavigatorParamList} from '@libs/Navigation/types';
-import getPlatform from '@libs/getPlatform';
 import {closeReactNativeApp} from '@userActions/HybridApp';
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
@@ -94,6 +95,7 @@ function ScreenWrapper({
     shouldKeyboardOffsetBottomSafeAreaPadding: shouldKeyboardOffsetBottomSafeAreaPaddingProp,
     isOfflineIndicatorTranslucent,
     focusTrapSettings,
+    ref,
     ...restContainerProps
 }: ScreenWrapperProps) {
     /**
@@ -107,6 +109,7 @@ function ScreenWrapper({
     const navigation = navigationProp ?? navigationFallback;
     const isFocused = useIsFocused();
     const screenWrapperRef = useRef<View>(null);
+    const mergedScreenWrapperRef = mergeRefs(screenWrapperRef, ref);
 
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout for a case where we want to show the offline indicator only on small screens
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -283,7 +286,7 @@ function ScreenWrapper({
     return (
         <FocusTrapForScreen focusTrapSettings={focusTrapSettings}>
             <ScreenWrapperContainer
-                ref={screenWrapperRef}
+                ref={mergedScreenWrapperRef}
                 style={[styles.flex1, style]}
                 bottomContent={bottomContent}
                 didScreenTransitionEnd={didScreenTransitionEnd}
