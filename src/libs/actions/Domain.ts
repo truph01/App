@@ -541,12 +541,7 @@ function addAdminToDomain(domainAccountID: number, accountID: number, targetEmai
     const PERMISSION_KEY = `${CONST.DOMAIN.EXPENSIFY_ADMIN_ACCESS_PREFIX}${accountID}`;
 
     const optimisticData: Array<
-        OnyxUpdate<
-            | typeof ONYXKEYS.COLLECTION.DOMAIN
-            | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS
-            | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS
-            | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
-        >
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
