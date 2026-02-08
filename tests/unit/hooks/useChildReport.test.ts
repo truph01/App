@@ -1,8 +1,9 @@
 // tests/hooks/useChildReport.test.ts
-import {renderHook} from '@testing-library/react-hooks';
+import {renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import useChildReport from '@hooks/useChildReport';
 import ONYXKEYS from '@src/ONYXKEYS';
+import createRandomReportAction from '../../utils/collections/reportActions';
 
 describe('useChildReport', () => {
     beforeEach(() => {
@@ -15,7 +16,7 @@ describe('useChildReport', () => {
     });
 
     it('returns undefined when childReportID is missing', () => {
-        const {result} = renderHook(() => useChildReport({reportActionID: '123'}));
+        const {result} = renderHook(() => useChildReport(createRandomReportAction(123)));
         expect(result.current).toBeUndefined();
     });
 
@@ -23,7 +24,7 @@ describe('useChildReport', () => {
         const childReport = {reportID: 'child123', reportName: 'Test'};
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}child123`, childReport);
 
-        const {result} = renderHook(() => useChildReport({reportActionID: '123', childReportID: 'child123'}));
+        const {result} = renderHook(() => useChildReport({...createRandomReportAction(123), childReportID: 'child123'}));
 
         expect(result.current).toEqual(childReport);
     });
