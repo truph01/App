@@ -950,17 +950,21 @@ function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMo
         },
     ];
 
-    const params: SetWorkspaceApprovalModeParams = {
-        policyID,
-        value: JSON.stringify({
-            ...value,
-            // This property should now be set to false for all Collect policies
-            isAutoApprovalEnabled: false,
-        }),
-    };
     if (approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL) {
-        API.write(WRITE_COMMANDS.DISABLE_POLICY_APPROVALS, {policyID}, {optimisticData, failureData, successData});
+        const params: DisablePolicyApprovalsParams = {
+            policyID,
+        };
+        API.write(WRITE_COMMANDS.DISABLE_POLICY_APPROVALS, params, {optimisticData, failureData, successData});
     } else {
+        const params: SetWorkspaceApprovalModeParams = {
+            policyID,
+            value: JSON.stringify({
+                ...value,
+                // This property should now be set to false for all Collect policies
+                isAutoApprovalEnabled: false,
+            }),
+        };
+        // eslint-disable-next-line rulesdir/no-multiple-api-calls
         API.write(WRITE_COMMANDS.SET_WORKSPACE_APPROVAL_MODE, params, {optimisticData, failureData, successData});
     }
 }
