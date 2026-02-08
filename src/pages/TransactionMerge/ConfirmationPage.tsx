@@ -93,23 +93,23 @@ function ConfirmationPage({route}: ConfirmationPageProps) {
 
         const reportIDToDismiss = reportID !== CONST.REPORT.UNREPORTED_REPORT_ID ? reportID : undefined;
 
-        // If we're on search, dismiss the modal and stay on search
-        if (!isOnSearch && reportIDToDismiss && reportID !== targetTransaction.reportID) {
-            // Navigate to search money report screen if we're on Reports
-            if (isSearchTopmostFullScreenRoute()) {
-                // Close the current modal screen
-                Navigation.dismissModal();
-                // Ensure the dismiss completes first
-                Navigation.setNavigationActionToMicrotaskQueue(() => {
-                    // Navigate to the money request report in search results
-                    Navigation.navigate(ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID: reportIDToDismiss}));
-                });
-            } else {
-                Navigation.dismissModalWithReport({reportID: reportIDToDismiss});
-            }
-        } else {
-            Navigation.dismissToSuperWideRHP();
+        const searchReportIDToOpen = targetTransactionThreadReportID ?? reportIDToDismiss;
+
+        // If we're in search (or the topmost route is search), dismiss the modal and open the expense in the RHP
+        if ((isOnSearch || isSearchTopmostFullScreenRoute()) && searchReportIDToOpen) {
+            Navigation.dismissModal();
+            Navigation.setNavigationActionToMicrotaskQueue(() => {
+                Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: searchReportIDToOpen}));
+            });
+            return;
         }
+
+        if (reportIDToDismiss && reportID !== targetTransaction.reportID) {
+            Navigation.dismissModalWithReport({reportID: reportIDToDismiss});
+            return;
+        }
+
+        Navigation.dismissToSuperWideRHP();
     };
 
     if (isLoadingOnyxValue(mergeTransactionMetadata)) {
