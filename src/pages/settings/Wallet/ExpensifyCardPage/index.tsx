@@ -138,6 +138,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const shouldShowReportLostCardButton = currentPhysicalCard?.state === CONST.EXPENSIFY_CARD.STATE.NOT_ACTIVATED || currentPhysicalCard?.state === CONST.EXPENSIFY_CARD.STATE.OPEN;
 
     const currency = getCurrencyKeyByCountryCode(currencyList, currentCard?.nameValuePairs?.country ?? currentCard?.nameValuePairs?.feedCountry);
+    const shouldShowPIN = currency !== CONST.CURRENCY.USD;
     const formattedAvailableSpendAmount = convertToDisplayString(currentCard?.availableSpend, currency);
     const {limitNameKey, limitTitleKey} = getLimitTypeTranslationKeys(currentCard?.nameValuePairs?.limitType);
 
@@ -340,12 +341,14 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                     interactive={false}
                                     titleStyle={styles.walletCardNumber}
                                 />
-                                <MenuItemWithTopDescription
-                                    description={translate('cardPage.physicalCardPin')}
-                                    title={maskPin()}
-                                    interactive={false}
-                                    titleStyle={styles.walletCardNumber}
-                                />
+                                {shouldShowPIN && (
+                                    <MenuItemWithTopDescription
+                                        description={translate('cardPage.physicalCardPin')}
+                                        title={maskPin()}
+                                        interactive={false}
+                                        titleStyle={styles.walletCardNumber}
+                                    />
+                                )}
                                 <MenuItem
                                     title={translate('reportCardLostOrDamaged.screenTitle')}
                                     icon={expensifyIcons.Flag}
