@@ -1,5 +1,5 @@
-import Pusher from '@libs/Pusher';
 import Log from '@libs/Log';
+import Pusher from '@libs/Pusher';
 import CONFIG from '@src/CONFIG';
 import PusherConnectionManager from '@src/libs/PusherConnectionManager';
 
@@ -71,11 +71,10 @@ describe('Pusher.subscribe', () => {
         await jest.runAllTimersAsync();
         await subscribePromise;
 
-        expect(logSpy).toHaveBeenCalledWith(
-            '[Pusher] Socket disconnected before subscribe could complete, skipping subscription',
-            false,
-            {channelName: 'private-user-456', eventName: 'multipleEvents'},
-        );
+        expect(logSpy).toHaveBeenCalledWith('[Pusher] Socket disconnected before subscribe could complete, skipping subscription', false, {
+            channelName: 'private-user-456',
+            eventName: 'multipleEvents',
+        });
     });
 
     it('should subscribe successfully when socket is connected', async () => {
