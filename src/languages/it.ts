@@ -1183,6 +1183,7 @@ const translations: TranslationDeepObject<typeof en> = {
         splitExpenseCannotBeEditedModalTitle: 'Questa spesa non può essere modificata',
         splitExpenseCannotBeEditedModalDescription: 'Le spese approvate o pagate non possono essere modificate',
         splitExpenseDistanceErrorModalDescription: 'Correggi l’errore nella tariffa distanza e riprova.',
+        splitExpensePerDiemRateErrorModalDescription: 'Correggi l’errore nella tariffa diaria e riprova.',
         paySomeone: (name?: string) => `Paga ${name ?? 'qualcuno'}`,
         expense: 'Spesa',
         categorize: 'Classifica',
@@ -5197,6 +5198,8 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                             currentTravelLimitLabel: 'Limite di viaggio attuale',
                             settlementAccountLabel: 'Conto di regolamento',
                             settlementFrequencyLabel: 'Frequenza di regolamento',
+                            settlementFrequencyDescription:
+                                'Con quale frequenza Expensify preleverà dal tuo conto bancario aziendale per saldare le recenti transazioni di Expensify Travel.',
                         },
                     },
                 },
