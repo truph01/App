@@ -5219,6 +5219,16 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                             settlementFrequencyDescription: 'Wie oft Expensify Ihr Geschäftskonto belastet, um aktuelle Expensify Travel-Transaktionen zu begleichen.',
                         },
                     },
+                    disableModal: {
+                        title: 'Reiseabrechnung deaktivieren?',
+                        body: 'Hotels und Mietwagen, die bereits gebucht wurden, können mit anderen Karten erneut gebucht werden, um eine Leistungsverweigerung zu vermeiden.',
+                        confirm: 'Ausschalten',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Reiseabrechnung kann nicht deaktiviert werden',
+                        body: 'Sie können die zentrale Rechnungsstellung nicht deaktivieren, solange Sie noch einen offenen Reisebetrag haben. Bitte begleichen Sie zuerst Ihren Betrag.',
+                        confirm: 'Verstanden',
+                    },
                 },
             },
             expensifyCard: {

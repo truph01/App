@@ -4931,6 +4931,16 @@ ${amount} para ${merchant} - ${date}`,
                                 'Con qué frecuencia Expensify retirará fondos de la cuenta bancaria de tu empresa para liquidar transacciones recientes de Expensify Travel.',
                         },
                     },
+                    disableModal: {
+                        title: '¿Desactivar la facturación de viajes?',
+                        body: 'Los hoteles y los alquileres de autos que ya se hayan reservado pueden volver a reservarse con tarjetas diferentes para evitar la denegación del servicio.',
+                        confirm: 'Desactivar',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'No se puede desactivar la facturación de viajes',
+                        body: 'No puedes desactivar la facturación central mientras todavía tengas un saldo de viajes pendiente. Por favor, paga tu saldo primero.',
+                        confirm: 'Entendido',
+                    },
                 },
             },
             expensifyCard: {

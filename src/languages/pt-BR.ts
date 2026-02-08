@@ -5186,6 +5186,16 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                                 'Com que frequência o Expensify vai debitar da sua conta bancária empresarial para liquidar as transações recentes do Expensify Travel.',
                         },
                     },
+                    disableModal: {
+                        title: 'Desativar Faturamento de Viagem?',
+                        body: 'Hotéis e locadoras de veículos que já foram reservados podem ser reservados novamente com cartões diferentes para evitar negativa de serviço.',
+                        confirm: 'Desativar',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Não é possível desativar o faturamento de viagens',
+                        body: 'Você não pode desativar a Faturação Central enquanto ainda tiver um saldo de viagem em aberto. Por favor, pague seu saldo primeiro.',
+                        confirm: 'Entendi',
+                    },
                 },
             },
             expensifyCard: {

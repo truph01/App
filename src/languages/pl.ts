@@ -5181,6 +5181,16 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                             settlementFrequencyDescription: 'Jak często Expensify będzie pobierać środki z firmowego konta bankowego, aby rozliczyć ostatnie transakcje Expensify Travel.',
                         },
                     },
+                    disableModal: {
+                        title: 'Wyłączyć fakturowanie podróży?',
+                        body: 'Hotele i wypożyczenia samochodów, które zostały już zarezerwowane, mogą zostać ponownie zarezerwowane z użyciem innych kart, aby uniknąć odmowy świadczenia usługi.',
+                        confirm: 'Wyłącz',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Nie można wyłączyć fakturowania podróży',
+                        body: 'Nie możesz wyłączyć centralnego fakturowania, dopóki masz nieuregulowane saldo za podróż. Najpierw ureguluj swoje saldo.',
+                        confirm: 'Rozumiem',
+                    },
                 },
             },
             expensifyCard: {

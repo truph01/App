@@ -5228,6 +5228,16 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                                 'Fréquence à laquelle Expensify prélèvera sur votre compte bancaire professionnel pour régler les transactions récentes d’Expensify Travel.',
                         },
                     },
+                    disableModal: {
+                        title: 'Désactiver la facturation voyage?',
+                        body: 'Les hôtels et les locations de voiture déjà réservés peuvent être réservés à nouveau avec d’autres cartes pour éviter un refus de service.',
+                        confirm: 'Désactiver',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Impossible de désactiver la facturation Voyage',
+                        body: "Vous ne pouvez pas désactiver la facturation centrale tant qu'il vous reste un solde de voyage impayé. Veuillez d'abord régler votre solde.",
+                        confirm: 'Compris',
+                    },
                 },
             },
             expensifyCard: {

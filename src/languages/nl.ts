@@ -5193,6 +5193,16 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                             settlementFrequencyDescription: 'Hoe vaak Expensify geld van uw zakelijke bankrekening zal incasseren om recente Expensify Travel-transacties te vereffenen.',
                         },
                     },
+                    disableModal: {
+                        title: 'Reisfacturatie uitschakelen?',
+                        body: 'Hotels en autoverhuur die al zijn geboekt, kunnen opnieuw worden geboekt met andere kaarten om weigering van service te voorkomen.',
+                        confirm: 'Uitschakelen',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Kan Reiskostenfacturatie niet uitschakelen',
+                        body: 'Je kunt Centrale facturatie niet uitschakelen zolang je nog een openstaand reissaldo hebt. Betaal eerst je saldo.',
+                        confirm: 'Begrepen',
+                    },
                 },
             },
             expensifyCard: {

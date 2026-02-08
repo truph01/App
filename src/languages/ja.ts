@@ -5163,6 +5163,16 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                             settlementFrequencyDescription: 'Expensify が直近の Expensify Travel 取引を精算するために、あなたのビジネス銀行口座から資金を引き落とす頻度。',
                         },
                     },
+                    disableModal: {
+                        title: '出張の請求書発行をオフにしますか？',
+                        body: 'サービス拒否を避けるため、すでに予約済みのホテルおよびレンタカーは、別のカードで再予約することができます。',
+                        confirm: 'オフにする',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'トラベル請求書作成をオフにできません',
+                        body: '未払いの出張残高がある間は、集中請求をオフにすることはできません。まず残高をお支払いください。',
+                        confirm: '了解しました',
+                    },
                 },
             },
             expensifyCard: {
