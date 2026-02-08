@@ -164,6 +164,7 @@ describe('ExpensifyCardPage', () => {
         unmount();
         await waitForBatchedUpdatesWithAct();
     });
+
     it('should not show the PIN option on screen', async () => {
         // Sign in as a test user before running the test.
         await TestHelper.signInWithTestUser();
