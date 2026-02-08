@@ -545,6 +545,8 @@ function Search({
         setShouldShowFiltersBarLoading(shouldShowLoadingState && lastSearchType !== type);
     }, [lastSearchType, setShouldShowFiltersBarLoading, shouldShowLoadingState, type]);
 
+    const shouldRetrySearchWithTotalsRef = useRef(false);
+
     useEffect(() => {
         const focusedRoute = findFocusedRoute(navigationRef.getRootState());
         const isMigratedModalDisplayed = focusedRoute?.name === NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR || focusedRoute?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT;
@@ -554,11 +556,33 @@ function Search({
             return;
         }
 
+        if (searchResults?.search?.isLoading) {
+            if (shouldCalculateTotals && searchResults?.search?.count === undefined) {
+                shouldRetrySearchWithTotalsRef.current = true;
+            }
+            return;
+        }
+
         handleSearch({queryJSON, searchKey, offset, shouldCalculateTotals, prevReportsLength: filteredDataLength, isLoading: !!searchResults?.search?.isLoading});
 
         // We don't need to run the effect on change of isFocused.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [handleSearch, isOffline, offset, queryJSON, searchKey, shouldCalculateTotals]);
+
+    useEffect(() => {
+        if (!shouldRetrySearchWithTotalsRef.current || searchResults?.search?.isLoading || !shouldCalculateTotals) {
+            return;
+        }
+
+        // If count is already present, the latest response already contains totals and we can skip the re-query.
+        if (searchResults?.search?.count !== undefined) {
+            shouldRetrySearchWithTotalsRef.current = false;
+            return;
+        }
+
+        shouldRetrySearchWithTotalsRef.current = false;
+        handleSearch({queryJSON, searchKey, offset, shouldCalculateTotals: true, prevReportsLength: filteredDataLength, isLoading: false});
+    }, [filteredDataLength, handleSearch, offset, queryJSON, searchKey, searchResults?.search?.count, searchResults?.search?.isLoading, shouldCalculateTotals]);
 
     // When new data load, selectedTransactions is updated in next effect. We use this flag to whether selection is updated
     const isRefreshingSelection = useRef(false);
