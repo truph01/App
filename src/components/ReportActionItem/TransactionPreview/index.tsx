@@ -89,7 +89,9 @@ function TransactionPreview(props: TransactionPreviewProps) {
 
     const navigateToReviewFields = useCallback(() => {
         const allDuplicateTransactions = [...duplicates, ...(threadDuplicates ?? [])];
-        Navigation.navigate(getReviewNavigationRoute(Navigation.getActiveRoute(), route.params?.threadReportID, transaction, allDuplicateTransactions, policy, policyCategories, transactionReport));
+        Navigation.navigate(
+            getReviewNavigationRoute(Navigation.getActiveRoute(), route.params?.threadReportID, transaction, allDuplicateTransactions, policy, policyCategories, transactionReport),
+        );
     }, [route.params?.threadReportID, transaction, duplicates, threadDuplicates, policy, policyCategories, transactionReport]);
 
     const transactionPreview = transaction;
