@@ -6164,6 +6164,20 @@ describe('ReportUtils', () => {
             const participants = getParticipantsList(report, participantsPersonalDetails);
             expect(participants.length).toBe(2);
         });
+
+        it('should include hidden participants for policy expense chat', async () => {
+            const report: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
+                participants: {
+                    1: {notificationPreference: 'hidden'},
+                    2: {notificationPreference: 'always'},
+                },
+            };
+            const participants = getParticipantsList(report, participantsPersonalDetails);
+            expect(participants.length).toBe(2);
+        });
     });
 
     describe('isReportOutstanding', () => {
