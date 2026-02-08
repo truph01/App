@@ -133,12 +133,15 @@ function getTravelSettlementAccount(cardSettings: OnyxEntry<ExpensifyCardSetting
 
 /**
  * Gets the settlement frequency for Travel Invoicing.
- * Returns 'daily' or 'monthly' based on whether a monthly settlement date is configured.
+ * - If monthlySettlementDate is truthy (a Date), frequency is Monthly.
+ * - If monthlySettlementDate is falsy (null/undefined), frequency is Daily.
+ * - If cardSettings is missing, default to Monthly per design doc.
  */
 function getTravelSettlementFrequency(cardSettings: OnyxEntry<ExpensifyCardSettings>): string {
     const settings = getTravelSettings(cardSettings);
+    // Default to monthly per design doc when no settings exist
     if (!settings) {
-        return CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.DAILY;
+        return CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.MONTHLY;
     }
     return settings.monthlySettlementDate ? CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.MONTHLY : CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.DAILY;
 }

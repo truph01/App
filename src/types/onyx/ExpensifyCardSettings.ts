@@ -17,6 +17,9 @@ type ExpensifyCardSettingsBase = {
     /** Whether monthly option should appear in the settlement frequency settings */
     isMonthlySettlementAllowed?: boolean;
 
+    /** The previous monthly settlement date, used for reverting failed updates */
+    previousMonthlySettlementDate?: Date;
+
     /** The bank account chosen for the card settlement */
     paymentBankAccountID?: number;
 
@@ -49,6 +52,9 @@ type ExpensifyCardSettingsBase = {
 
     /** Number of the bank account used for the card settlement */
     paymentBankAccountNumber?: string;
+
+    /** Collections of form field errors */
+    errorFields?: OnyxCommon.ErrorFields;
 
     /** Credit limit for the card program */
     limit?: number;
