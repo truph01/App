@@ -2,16 +2,21 @@ import {useEffect, useState, useTransition} from 'react';
 import CONST from '@src/CONST';
 import usePrevious from './usePrevious';
 
+function defaultSortData<TValue>(data: TValue[]): TValue[] {
+    return data;
+}
+
 /**
  * This hook filters (and optionally sorts) a dataset based on a search parameter.
  * It utilizes `useTransition` to allow the searchQuery to change rapidly, while more expensive renders that occur using
  * the result of the filtering and sorting are de-prioritized, allowing them to happen in the background.
  */
-function useSearchResults<TValue>(data: TValue[], filterData: (datum: TValue, searchInput: string) => boolean, sortData: (data: TValue[]) => TValue[] = (d) => d) {
+function useSearchResults<TValue>(data: TValue[], filterData: (datum: TValue, searchInput: string) => boolean, sortData: (data: TValue[]) => TValue[] = defaultSortData) {
     const [inputValue, setInputValue] = useState('');
     const [result, setResult] = useState(() => sortData(data));
     const prevData = usePrevious(data);
     const [, startTransition] = useTransition();
+
     useEffect(() => {
         startTransition(() => {
             const normalizedSearchQuery = inputValue.trim().toLowerCase();

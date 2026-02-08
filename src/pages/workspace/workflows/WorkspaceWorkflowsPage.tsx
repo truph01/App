@@ -95,13 +95,15 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: false});
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {canBeMissing: true});
     const [reimbursementAccountDraft] = useOnyx(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM_DRAFT, {canBeMissing: true});
+
     const {approvalWorkflows, availableMembers, usedApproverEmails} = useMemo(
-        () =>
-            convertPolicyEmployeesToApprovalWorkflows({
+        () => {
+            return convertPolicyEmployeesToApprovalWorkflows({
                 policy,
                 personalDetails: personalDetails ?? {},
                 localeCompare,
-            }),
+            });
+        },
         [personalDetails, policy, localeCompare],
     );
 
@@ -324,9 +326,13 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 label={translate('workflowsPage.findWorkflow')}
                                 inputValue={workflowSearchInput}
                                 onChangeText={setWorkflowSearchInput}
-                                shouldShowEmptyState={searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0}
-                                style={[styles.mt6, styles.mbn3]}
+                                style={[styles.mt6, styles.mbn3, {marginHorizontal: 0}]}
                             />
+                        )}
+                        {searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0 && (
+                            <View style={[styles.pt3, styles.pb5]}>
+                                <Text style={[styles.textNormal, styles.colorMuted]}>{translate('common.noResultsFoundMatching', workflowSearchInput)}</Text>
+                            </View>
                         )}
                         {searchFilteredWorkflows.map((workflow) => (
                             <OfflineWithFeedback
