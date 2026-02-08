@@ -216,8 +216,6 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
     const [workflowSearchInput, setWorkflowSearchInput, searchFilteredWorkflows] = useSearchResults(filteredApprovalWorkflows, filterWorkflow);
 
-    // Clear search input when workflows drop below the display threshold to prevent
-    // a stale filter being active while the search bar is hidden
     useEffect(() => {
         if (filteredApprovalWorkflows.length > CONST.STANDARD_LIST_ITEM_LIMIT) {
             return;
