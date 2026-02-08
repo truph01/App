@@ -52,6 +52,7 @@ function TransactionPreview(props: TransactionPreviewProps) {
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`, {canBeMissing: true});
     const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transaction?.comment?.originalTransactionID)}`, {canBeMissing: true});
     const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transaction?.reportID)}`, {canBeMissing: true});
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(transactionReport?.policyID)}`, {canBeMissing: true});
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${getNonEmptyStringOnyxID(transactionReport?.policyID)}`, {canBeMissing: true});
     const violations = useTransactionViolations(transaction?.transactionID);
     const [walletTerms] = useOnyx(ONYXKEYS.WALLET_TERMS, {canBeMissing: true});
@@ -88,8 +89,8 @@ function TransactionPreview(props: TransactionPreviewProps) {
 
     const navigateToReviewFields = useCallback(() => {
         const allDuplicateTransactions = [...duplicates, ...(threadDuplicates ?? [])];
-        Navigation.navigate(getReviewNavigationRoute(Navigation.getActiveRoute(), route.params?.threadReportID, transaction, allDuplicateTransactions, policyCategories, transactionReport));
-    }, [route.params?.threadReportID, transaction, duplicates, threadDuplicates, policyCategories, transactionReport]);
+        Navigation.navigate(getReviewNavigationRoute(Navigation.getActiveRoute(), route.params?.threadReportID, transaction, allDuplicateTransactions, policy, policyCategories, transactionReport));
+    }, [route.params?.threadReportID, transaction, duplicates, threadDuplicates, policy, policyCategories, transactionReport]);
 
     const transactionPreview = transaction;
 
