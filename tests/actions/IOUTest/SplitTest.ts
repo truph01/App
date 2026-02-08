@@ -1620,6 +1620,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
 
         requestMoney({
             report: chatReport,
+            betas: [CONST.BETAS.ALL],
             participantParams: {
                 payeeEmail: RORY_EMAIL,
                 payeeAccountID: RORY_ACCOUNT_ID,
@@ -1698,6 +1699,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
 
         updateSplitTransactionsFromSplitExpensesFlow({
             allTransactionsList: allTransactions,
+            betas: [CONST.BETAS.ALL],
             allReportsList: allReports,
             allReportNameValuePairsList: allReportNameValuePairs,
             transactionData: {
@@ -1753,6 +1755,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
 
         updateSplitTransactionsFromSplitExpensesFlow({
             allTransactionsList: allTransactions,
+            betas: [CONST.BETAS.ALL],
             allReportsList: allReports,
             allReportNameValuePairsList: allReportNameValuePairs,
             transactionData: {

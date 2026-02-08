@@ -1436,6 +1436,35 @@ function updateSplitTransactions({
                     pendingFields: null,
                 },
             });
+            if (expenseReport?.parentReportID && expenseReport?.parentReportActionID) {
+                optimisticData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport?.parentReportID}`,
+                    value: {
+                        [expenseReport?.parentReportActionID]: {
+                            pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                        },
+                    },
+                });
+                successData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport?.parentReportID}`,
+                    value: {
+                        [expenseReport?.parentReportActionID]: {
+                            pendingAction: null,
+                        },
+                    },
+                });
+                failureData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport?.parentReportID}`,
+                    value: {
+                        [expenseReport?.parentReportActionID]: {
+                            pendingAction: null,
+                        },
+                    },
+                });
+            }
         }
     }
 
