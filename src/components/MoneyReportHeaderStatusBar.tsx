@@ -15,21 +15,26 @@ import type IconAsset from '@src/types/utils/IconAsset';
 import Icon from './Icon';
 import RenderHTML from './RenderHTML';
 
+/** Combined type that accepts either the new format or the deprecated format */
+type NextStepData = ReportNextStep | ReportNextStepDeprecated;
+
 type MoneyReportHeaderStatusBarProps = {
-    /** The next step for the report (deprecated old format) */
-    nextStep: ReportNextStepDeprecated | undefined;
-
-    /** The next step for the report (new format with translation support) */
-    nextStepNew?: ReportNextStep;
-
-    /** The current user's account ID, used for translating next step messages */
-    currentUserAccountID?: number;
+    /** The next step for the report (supports both new and deprecated formats) */
+    nextStep: NextStepData | undefined;
 };
 
 type IconName = ValueOf<typeof CONST.NEXT_STEP.ICONS>;
 type IconMap = Record<IconName, IconAsset>;
 
-function MoneyReportHeaderStatusBar({nextStep, nextStepNew, currentUserAccountID}: MoneyReportHeaderStatusBarProps) {
+/**
+ * Type guard to check if the next step is in the deprecated format (has message array)
+ * We prioritize the old format first for backwards compatibility during migration.
+ */
+function isDeprecatedFormatNextStep(step: NextStepData): step is ReportNextStepDeprecated {
+    return 'message' in step && Array.isArray(step.message) && step.message.length > 0;
+}
+
+function MoneyReportHeaderStatusBar({nextStep}: MoneyReportHeaderStatusBarProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -44,25 +49,37 @@ function MoneyReportHeaderStatusBar({nextStep, nextStepNew, currentUserAccountID
         [icons],
     );
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const currentUserAccountID = currentUserPersonalDetails.accountID;
     const currentUserEmail = currentUserPersonalDetails.login ?? '';
+
     const messageContent = useMemo(() => {
-        // Use new format with translation support when available
-        if (nextStepNew?.messageKey && currentUserAccountID !== undefined) {
-            return buildNextStepMessage(nextStepNew, translate, currentUserAccountID);
+        if (!nextStep) {
+            return '';
         }
-        // Fall back to deprecated format
-        const messageArray = nextStep?.message;
-        return parseMessage(messageArray, currentUserEmail);
-    }, [nextStep?.message, nextStepNew, currentUserAccountID, translate, currentUserEmail]);
+
+        // Handle old/deprecated format first (with message array) for backwards compatibility
+        if (isDeprecatedFormatNextStep(nextStep)) {
+            return parseMessage(nextStep.message, currentUserEmail);
+        }
+
+        // Fall back to new format (with messageKey)
+        if ('messageKey' in nextStep && nextStep.messageKey) {
+            return buildNextStepMessage(nextStep, translate, currentUserAccountID);
+        }
+
+        return '';
+    }, [nextStep, translate, currentUserAccountID, currentUserEmail]);
+
+    const iconFill = nextStep?.iconFill ?? theme.icon;
 
     return (
         <View style={[styles.dFlex, styles.flexRow, styles.alignItemsCenter, styles.overflowHidden, styles.w100, styles.headerStatusBarContainer]}>
             <View style={[styles.mr3]}>
                 <Icon
-                    src={(nextStepNew?.icon && iconMap?.[nextStepNew.icon]) ?? (nextStep?.icon && iconMap?.[nextStep.icon]) ?? icons.Hourglass}
+                    src={(nextStep?.icon && iconMap?.[nextStep.icon]) ?? icons.Hourglass}
                     height={variables.iconSizeSmall}
                     width={variables.iconSizeSmall}
-                    fill={nextStep?.iconFill ?? theme.icon}
+                    fill={iconFill}
                 />
             </View>
             <View style={[styles.dFlex, styles.flexRow, styles.flexShrink1]}>
