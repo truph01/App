@@ -2327,6 +2327,7 @@ const translations = {
         addApprovalsTitle: 'Approvals',
         accessibilityLabel: ({members, approvers}: {members: string; approvers: string}) => `expenses from ${members}, and the approver is ${approvers}`,
         addApprovalButton: 'Add approval workflow',
+        findWorkflow: 'Find workflow',
         addApprovalTip: 'This default workflow applies to all members, unless a more specific workflow exists.',
         approver: 'Approver',
         addApprovalsDescription: 'Require additional approval before authorizing a payment.',

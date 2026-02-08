@@ -1,3 +1,4 @@
+import {Str} from 'expensify-common';
 import React, {useCallback, useContext, useEffect, useMemo} from 'react';
 import {InteractionManager, View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
@@ -11,6 +12,7 @@ import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import RenderHTML from '@components/RenderHTML';
+import SearchBar from '@components/SearchBar';
 import Section from '@components/Section';
 import Text from '@components/Text';
 import useCardFeeds from '@hooks/useCardFeeds';
@@ -20,6 +22,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useSearchResults from '@hooks/useSearchResults';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {
@@ -47,6 +50,7 @@ import {
     isPolicyAdmin as isPolicyAdminUtil,
 } from '@libs/PolicyUtils';
 import {hasInProgressVBBA} from '@libs/ReimbursementAccountUtils';
+import tokenizedSearch from '@libs/tokenizedSearch';
 import {convertPolicyEmployeesToApprovalWorkflows, getEligibleExistingBusinessBankAccounts, INITIAL_APPROVAL_WORKFLOW} from '@libs/WorkflowUtils';
 import type {WorkspaceSplitNavigatorParamList} from '@navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -60,6 +64,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import type ApprovalWorkflow from '@src/types/onyx/ApprovalWorkflow';
 import type {ToggleSettingOptionRowProps} from './ToggleSettingsOptionRow';
 import ToggleSettingOptionRow from './ToggleSettingsOptionRow';
 import {getAutoReportingFrequencyDisplayNames} from './WorkspaceAutoReportingFrequencyPage';
@@ -182,6 +187,44 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         return approvalWorkflows.filter((workflow) => workflow.isDefault);
     }, [policy?.approvalMode, approvalWorkflows]);
 
+    const filterWorkflow = useCallback(
+        (workflow: ApprovalWorkflow, searchInput: string) => {
+            const searchableTexts: string[] = [];
+
+            if (workflow.isDefault) {
+                searchableTexts.push(translate('workspace.common.everyone'));
+            }
+
+            for (const member of workflow.members) {
+                searchableTexts.push(member.displayName);
+                searchableTexts.push(Str.removeSMSDomain(member.displayName));
+                searchableTexts.push(member.email);
+                searchableTexts.push(Str.removeSMSDomain(member.email));
+            }
+
+            for (const approver of workflow.approvers) {
+                searchableTexts.push(approver.displayName);
+                searchableTexts.push(Str.removeSMSDomain(approver.displayName));
+                searchableTexts.push(approver.email);
+                searchableTexts.push(Str.removeSMSDomain(approver.email));
+            }
+
+            return tokenizedSearch([workflow], searchInput, () => searchableTexts).length > 0;
+        },
+        [translate],
+    );
+
+    const [workflowSearchInput, setWorkflowSearchInput, searchFilteredWorkflows] = useSearchResults(filteredApprovalWorkflows, filterWorkflow);
+
+    // Clear search input when workflows drop below the display threshold to prevent
+    // a stale filter being active while the search bar is hidden
+    useEffect(() => {
+        if (filteredApprovalWorkflows.length > CONST.STANDARD_LIST_ITEM_LIMIT) {
+            return;
+        }
+        setWorkflowSearchInput('');
+    }, [filteredApprovalWorkflows.length, setWorkflowSearchInput]);
+
     const isDEWEnabled = hasDynamicExternalWorkflow(policy);
 
     const optionItems: ToggleSettingOptionRowProps[] = useMemo(() => {
@@ -278,10 +321,18 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 </View>
                             </View>
                         )}
-                        {filteredApprovalWorkflows.map((workflow, index) => (
+                        {filteredApprovalWorkflows.length > CONST.STANDARD_LIST_ITEM_LIMIT && (
+                            <SearchBar
+                                label={translate('workflowsPage.findWorkflow')}
+                                inputValue={workflowSearchInput}
+                                onChangeText={setWorkflowSearchInput}
+                                shouldShowEmptyState={searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0}
+                                style={[styles.mt6, styles.mbn3]}
+                            />
+                        )}
+                        {searchFilteredWorkflows.map((workflow) => (
                             <OfflineWithFeedback
-                                // eslint-disable-next-line react/no-array-index-key
-                                key={`workflow-${index}`}
+                                key={workflow.approvers.at(0)?.email}
                                 pendingAction={workflow.pendingAction}
                             >
                                 <ApprovalWorkflowSection
@@ -445,7 +496,10 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         expensifyIcons.DotIndicator,
         theme.textSupporting,
         accountManagerReportID,
-        filteredApprovalWorkflows,
+        filteredApprovalWorkflows.length,
+        searchFilteredWorkflows,
+        workflowSearchInput,
+        setWorkflowSearchInput,
         addApprovalAction,
         isOffline,
         isPolicyAdmin,
