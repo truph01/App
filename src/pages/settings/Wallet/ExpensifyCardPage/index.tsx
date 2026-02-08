@@ -24,7 +24,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
-import {formatCardExpiration, getDomainCards, maskCard} from '@libs/CardUtils';
+import {formatCardExpiration, getDomainCards, maskCard, maskPin} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -337,6 +337,12 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 <MenuItemWithTopDescription
                                     description={translate('cardPage.physicalCardNumber')}
                                     title={maskCard(currentPhysicalCard?.lastFourPAN)}
+                                    interactive={false}
+                                    titleStyle={styles.walletCardNumber}
+                                />
+                                <MenuItemWithTopDescription
+                                    description={translate('cardPage.physicalCardPin')}
+                                    title={maskPin()}
                                     interactive={false}
                                     titleStyle={styles.walletCardNumber}
                                 />
