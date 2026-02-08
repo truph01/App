@@ -1,7 +1,12 @@
 import Onyx from 'react-native-onyx';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
-import {buildNextStepMessage, buildNextStepNew, buildOptimisticNextStepForDynamicExternalWorkflowSubmitError, buildOptimisticNextStepForStrictPolicyRuleViolations} from '@libs/NextStepUtils';
+import {
+    buildNextStepMessage,
+    buildNextStepNew,
+    buildOptimisticNextStepForDynamicExternalWorkflowSubmitError,
+    buildOptimisticNextStepForStrictPolicyRuleViolations,
+} from '@libs/NextStepUtils';
 import {buildOptimisticEmptyReport, buildOptimisticExpenseReport} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
