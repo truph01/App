@@ -16,6 +16,7 @@ import type {
     CreateWorkspaceParams,
     DeleteWorkspaceAvatarParams,
     DeleteWorkspaceParams,
+    DisablePolicyApprovalsParams,
     DisablePolicyBillableModeParams,
     DowngradeToTeamParams,
     DuplicateWorkspaceParams,
@@ -957,7 +958,11 @@ function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMo
             isAutoApprovalEnabled: false,
         }),
     };
-    API.write(WRITE_COMMANDS.SET_WORKSPACE_APPROVAL_MODE, params, {optimisticData, failureData, successData});
+    if (approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL) {
+        API.write(WRITE_COMMANDS.DISABLE_POLICY_APPROVALS, {policyID}, {optimisticData, failureData, successData});
+    } else {
+        API.write(WRITE_COMMANDS.SET_WORKSPACE_APPROVAL_MODE, params, {optimisticData, failureData, successData});
+    }
 }
 
 function setWorkspacePayer(policyID: string, reimburserEmail: string) {
