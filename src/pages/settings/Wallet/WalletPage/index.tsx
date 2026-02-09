@@ -274,7 +274,6 @@ function WalletPage() {
     useEffect(() => {
         // If the user was previously offline, skip debouncing showing the loader
         if (!network.isOffline) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             updateShouldShowLoadingSpinner();
         } else {
             debounceSetShouldShowLoadingSpinner();
