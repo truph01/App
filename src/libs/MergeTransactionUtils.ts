@@ -31,6 +31,7 @@ import {
     isMerchantMissing,
     isPerDiemRequest,
     isScanning,
+    isTimeRequest,
     isTransactionPendingDelete,
 } from './TransactionUtils';
 
@@ -434,6 +435,10 @@ function areTransactionsEligibleForMerge(transaction1: OnyxEntry<Transaction>, t
     }
 
     if (isDistanceRequest(transaction1) !== isDistanceRequest(transaction2)) {
+        return false;
+    }
+
+    if (isTimeRequest(transaction1) !== isTimeRequest(transaction2)) {
         return false;
     }
 
