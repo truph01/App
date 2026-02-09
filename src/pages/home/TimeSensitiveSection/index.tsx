@@ -106,13 +106,7 @@ function TimeSensitiveSection() {
     const hasBrokenCompanyCards = brokenCompanyCardConnections.length > 0;
     const hasBrokenAccountingConnections = brokenAccountingConnections.length > 0;
     const hasAnyTimeSensitiveContent =
-        shouldShowReviewCardFraud ||
-        shouldShow50off ||
-        shouldShow25off ||
-        hasBrokenCompanyCards ||
-        hasBrokenAccountingConnections ||
-        shouldShowAddShippingAddress ||
-        shouldShowActivateCard;
+        shouldShowReviewCardFraud || shouldShow50off || shouldShow25off || hasBrokenCompanyCards || hasBrokenAccountingConnections || shouldShowAddShippingAddress || shouldShowActivateCard;
 
     if (!hasAnyTimeSensitiveContent) {
         return null;
