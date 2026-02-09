@@ -9,7 +9,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
-import {detachReceipt, navigateToStartStepIfScanFileCannotBeRead, removeMoneyRequestOdometerReadingImage, replaceReceipt, setMoneyRequestReceipt} from '@libs/actions/IOU';
+import {detachReceipt, navigateToStartStepIfScanFileCannotBeRead, removeMoneyRequestOdometerImage, replaceReceipt, setMoneyRequestReceipt} from '@libs/actions/IOU';
 import {openReport} from '@libs/actions/Report';
 import cropOrRotateImage from '@libs/cropOrRotateImage';
 import fetchImage from '@libs/fetchImage';
@@ -218,7 +218,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         if (!transaction?.transactionID || !imageType) {
             return;
         }
-        removeMoneyRequestOdometerReadingImage(transaction.transactionID, imageType, isDraftTransaction);
+        removeMoneyRequestOdometerImage(transaction.transactionID, imageType, isDraftTransaction);
         navigation.goBack();
     }, [transaction?.transactionID, imageType, isDraftTransaction, navigation]);
 
@@ -303,7 +303,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                             callback: () =>
                                 Navigation.navigate(
                                     isOdometerImage
-                                        ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, imageType)
+                                        ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, imageType)
                                         : ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
                                               action ?? CONST.IOU.ACTION.EDIT,
                                               iouType,

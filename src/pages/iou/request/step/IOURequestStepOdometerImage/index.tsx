@@ -20,7 +20,7 @@ import StepScreenDragAndDropWrapper from '@pages/iou/request/step/StepScreenDrag
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import type {WithFullTransactionOrNotFoundProps} from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import variables from '@styles/variables';
-import {setMoneyRequestOdometerReadingImage} from '@userActions/IOU';
+import {setMoneyRequestOdometerImage} from '@userActions/IOU';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type SCREENS from '@src/SCREENS';
@@ -70,7 +70,7 @@ function IOURequestStepOdometerImage({
 
     const handleImageSelected = useCallback(
         (file: FileObject) => {
-            setMoneyRequestOdometerReadingImage(transactionID, imageType, file as File, isTransactionDraft);
+            setMoneyRequestOdometerImage(transactionID, imageType, file as File, isTransactionDraft);
             shouldRevokeOnUnmountRef.current = false;
             navigateBack();
         },
