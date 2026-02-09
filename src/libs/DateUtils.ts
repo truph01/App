@@ -937,9 +937,17 @@ function formatUTCDateTimeToDateInTimezone(utcDateTime: string, timeZone: Select
             return '';
         }
         return formatInTimeZoneWithFallback(date, timeZone, CONST.DATE.FNS_FORMAT_STRING);
-    } catch {
+    } catch (error) {
+        Log.warn('[DateUtils] Failed to format UTC datetime to timezone', {utcDateTime, timeZone, error});
         return '';
     }
+}
+
+/**
+ * Backend expects datetime format without milliseconds in some cases (yyyy-MM-dd HH:mm:ss)
+ */
+function formatDBTimeWithoutMilliseconds(timestamp: number): string {
+    return getDBTime(timestamp).replace(/\.\d{3}$/, '');
 }
 
 /**
@@ -949,7 +957,7 @@ function formatUTCDateTimeToDateInTimezone(utcDateTime: string, timeZone: Select
 const normalizeDateToStartOfDay = (fromDate: string, timeZone: SelectedTimezone): string => {
     const localDate = parse(fromDate, CONST.DATE.FNS_FORMAT_STRING, new Date());
     const midnightLocal = startOfDay(localDate);
-    return getDBTime(fromZonedTime(midnightLocal, timeZone).valueOf()).replace(/\.\d{3}$/, '');
+    return formatDBTimeWithoutMilliseconds(fromZonedTime(midnightLocal, timeZone).valueOf());
 };
 
 /**
@@ -958,7 +966,7 @@ const normalizeDateToStartOfDay = (fromDate: string, timeZone: SelectedTimezone)
 const normalizeDateToEndOfDay = (thruDate: string, timeZone: SelectedTimezone): string => {
     const localDate = parse(thruDate, CONST.DATE.FNS_FORMAT_STRING, new Date());
     const endOfDayLocal = endOfDay(localDate);
-    return getDBTime(fromZonedTime(endOfDayLocal, timeZone).valueOf()).replace(/\.\d{3}$/, '');
+    return formatDBTimeWithoutMilliseconds(fromZonedTime(endOfDayLocal, timeZone).valueOf());
 };
 
 /**
