@@ -152,6 +152,7 @@ function filterOutRangesWithCorrectValue(
     currencyList: SharedValue<string[]>,
     categoryList: SharedValue<string[]>,
     tagList: SharedValue<string[]>,
+    exportedToList: SharedValue<string[]>,
     currentType: string,
 ) {
     'worklet';
@@ -230,7 +231,7 @@ function filterOutRangesWithCorrectValue(
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE:
             return range.value.length > 0;
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO:
-            return (CONST.SEARCH.PREDEFINED_INTEGRATION_FILTER_VALUES as readonly string[]).includes(range.value) || range.value.length > 0;
+            return exportedToList.get().includes(range.value);
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID:
             return !['', 'null', 'undefined', '0', '-1'].includes(range.value);
@@ -264,6 +265,7 @@ function parseForLiveMarkdown(
     currencyList: SharedValue<string[]>,
     categoryList: SharedValue<string[]>,
     tagList: SharedValue<string[]>,
+    exportedToList: SharedValue<string[]>,
 ): MarkdownRange[] {
     'worklet';
 
@@ -273,7 +275,7 @@ function parseForLiveMarkdown(
     const currentType = typeRange?.value ?? CONST.SEARCH.DATA_TYPES.EXPENSE;
 
     return ranges
-        .filter((range) => filterOutRangesWithCorrectValue(range, map, userLogins, currencyList, categoryList, tagList, currentType))
+        .filter((range) => filterOutRangesWithCorrectValue(range, map, userLogins, currencyList, categoryList, tagList, exportedToList, currentType))
         .map((range) => {
             const isCurrentUserMention = userLogins.get().includes(range.value) || range.value === currentUserName || range.value === CONST.SEARCH.ME;
             const type = isCurrentUserMention ? 'mention-here' : 'mention-user';

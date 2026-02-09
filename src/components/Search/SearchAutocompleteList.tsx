@@ -17,6 +17,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getStandardExportTemplateDisplayName} from '@libs/AccountingUtils';
 import {getExportTemplates} from '@libs/actions/Search';
 import {getCardFeedsForDisplay} from '@libs/CardFeedUtils';
 import {getCardDescription, isCard, isCardHiddenFromSearch} from '@libs/CardUtils';
@@ -344,7 +345,11 @@ function SearchAutocompleteList({
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
     const exportedToAutocompleteList = useMemo(() => {
         const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
-        const customNames = exportTemplates.map((t) => t.templateName).filter(Boolean);
+        const customNames = exportTemplates.flatMap((template) => {
+            const templateDisplayName = getStandardExportTemplateDisplayName(template.templateName!);
+            return [template.templateName, templateDisplayName].filter(Boolean);
+        });
+
         return Array.from(new Set([...CONST.SEARCH.PREDEFINED_INTEGRATION_FILTER_VALUES, ...customNames]));
     }, [integrationsExportTemplates, csvExportLayouts, translate]);
 

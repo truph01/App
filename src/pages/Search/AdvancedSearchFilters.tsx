@@ -501,17 +501,7 @@ function getFilterDisplayTitle(
         if (!filterValue) {
             return undefined;
         }
-        return (Array.isArray(filterValue) ? filterValue : [filterValue])
-            .map((value) => {
-                if (value === CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT) {
-                    return CONST.REPORT.EXPORT_OPTION_LABELS.REPORT_LEVEL_EXPORT;
-                }
-                if (value === CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT) {
-                    return CONST.REPORT.EXPORT_OPTION_LABELS.EXPENSE_LEVEL_EXPORT;
-                }
-                return value;
-            })
-            .join(', ');
+        return (Array.isArray(filterValue) ? filterValue : [filterValue]).join(', ');
     }
 
     const filterValue = filters[key];

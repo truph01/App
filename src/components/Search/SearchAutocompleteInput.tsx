@@ -17,7 +17,8 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {setSearchContext} from '@libs/actions/Search';
+import {getStandardExportTemplateDisplayName} from '@libs/AccountingUtils';
+import {getExportTemplates, setSearchContext} from '@libs/actions/Search';
 import scheduleOnLiveMarkdownRuntime from '@libs/scheduleOnLiveMarkdownRuntime';
 import {getAutocompleteCategories, getAutocompleteTags, parseForLiveMarkdown} from '@libs/SearchAutocompleteUtils';
 import variables from '@styles/variables';
@@ -124,6 +125,19 @@ function SearchAutocompleteInput({
     const emailList = Object.keys(loginList ?? {});
     const emailListSharedValue = useSharedValue(emailList);
 
+    const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
+    const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
+    const exportedToAutocompleteList = useMemo(() => {
+        const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
+        const customNames = exportTemplates.flatMap((template) => {
+            const templateDisplayName = getStandardExportTemplateDisplayName(template.templateName!);
+            return [template.templateName, templateDisplayName].filter(Boolean);
+        });
+
+        return Array.from(new Set([...CONST.SEARCH.PREDEFINED_INTEGRATION_FILTER_VALUES, ...customNames]));
+    }, [integrationsExportTemplates, csvExportLayouts, translate]);
+    const exportedToSharedValue = useSharedValue(exportedToAutocompleteList);
+
     const offlineMessage: string = isOffline && shouldShowOfflineMessage ? `${translate('common.youAppearToBeOffline')} ${translate('search.resultsAreLimited')}` : '';
 
     const {borderColor: focusedBorderColor = theme.border, ...restWrapperFocusedStyle} = wrapperFocusedStyle;
@@ -172,13 +186,30 @@ function SearchAutocompleteInput({
         });
     }, [tagSharedValue, tagAutocompleteList]);
 
+    useEffect(() => {
+        scheduleOnLiveMarkdownRuntime(() => {
+            'worklet';
+
+            exportedToSharedValue.set(exportedToAutocompleteList);
+        });
+    }, [exportedToSharedValue, exportedToAutocompleteList]);
+
     const parser = useCallback(
         (input: string) => {
             'worklet';
 
-            return parseForLiveMarkdown(input, currentUserPersonalDetails.displayName ?? '', substitutionMap, emailListSharedValue, currencySharedValue, categorySharedValue, tagSharedValue);
+            return parseForLiveMarkdown(
+                input,
+                currentUserPersonalDetails.displayName ?? '',
+                substitutionMap,
+                emailListSharedValue,
+                currencySharedValue,
+                categorySharedValue,
+                tagSharedValue,
+                exportedToSharedValue,
+            );
         },
-        [currentUserPersonalDetails.displayName, substitutionMap, currencySharedValue, categorySharedValue, tagSharedValue, emailListSharedValue],
+        [currentUserPersonalDetails.displayName, substitutionMap, currencySharedValue, categorySharedValue, tagSharedValue, emailListSharedValue, exportedToSharedValue],
     );
 
     const clearInput = useCallback(() => {

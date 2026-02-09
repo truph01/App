@@ -20,6 +20,11 @@ const NAME_ROUTE_MAPPING = {
     [CONST.POLICY.CONNECTIONS.NAME.CERTINIA]: CONST.POLICY.CONNECTIONS.ROUTE.CERTINIA,
 };
 
+const STANDARD_EXPORT_TEMPLATE_NAME_MAPPING = {
+    [CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT]: CONST.REPORT.EXPORT_OPTION_LABELS.EXPENSE_LEVEL_EXPORT,
+    [CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT]: CONST.REPORT.EXPORT_OPTION_LABELS.REPORT_LEVEL_EXPORT,
+};
+
 function getConnectionNameFromRouteParam(routeParam: ValueOf<typeof CONST.POLICY.CONNECTIONS.ROUTE>) {
     return ROUTE_NAME_MAPPING[routeParam];
 }
@@ -32,8 +37,8 @@ function getSearchValueForConnection(connectionName: ConnectionName): string {
     return CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName];
 }
 
-function getPredefinedConnectionNamesForSearch(): ConnectionName[] {
-    return Object.values(CONST.POLICY.CONNECTIONS.NAME);
+function getStandardExportTemplateDisplayName(templateName: string): string {
+    return STANDARD_EXPORT_TEMPLATE_NAME_MAPPING[templateName as keyof typeof STANDARD_EXPORT_TEMPLATE_NAME_MAPPING] ?? templateName;
 }
 
-export {getConnectionNameFromRouteParam, getRouteParamForConnection, getSearchValueForConnection, getPredefinedConnectionNamesForSearch};
+export {getConnectionNameFromRouteParam, getRouteParamForConnection, getSearchValueForConnection, getStandardExportTemplateDisplayName};
