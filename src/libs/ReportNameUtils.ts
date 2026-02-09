@@ -139,10 +139,6 @@ let allPersonalDetails: OnyxEntry<PersonalDetailsList>;
 
 const staticReportNameTypes = [
     CONST.REPORT.TYPE.EXPENSE,
-    CONST.REPORT.TYPE.INVOICE,
-    CONST.REPORT.UNSUPPORTED_TYPE.BILL,
-    CONST.REPORT.UNSUPPORTED_TYPE.PAYCHECK,
-    CONST.REPORT.UNSUPPORTED_TYPE.TRIP,
 ] as const;
 type StaticReportNameType = TupleToUnion<typeof staticReportNameTypes>;
 
