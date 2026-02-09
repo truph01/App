@@ -597,11 +597,8 @@ function MoneyReportHeader({
                     currentUserAccountID: accountID,
                     activePolicy,
                     policy,
-<<<<<<< HEAD
                     ownerBillingGraceEndPeriod,
-=======
                     betas,
->>>>>>> main
                 });
                 if (currentSearchQueryJSON && !isOffline) {
                     search({
@@ -900,13 +897,8 @@ function MoneyReportHeader({
     });
 
     const addExpenseDropdownOptions = useMemo(
-<<<<<<< HEAD
-        () => getAddExpenseDropdownOptions(expensifyIcons, moneyRequestReport?.reportID, policy, undefined, undefined, lastDistanceExpenseType, ownerBillingGraceEndPeriod),
-        [moneyRequestReport?.reportID, policy, lastDistanceExpenseType, expensifyIcons, ownerBillingGraceEndPeriod],
-=======
-        () => getAddExpenseDropdownOptions(translate, expensifyIcons, moneyRequestReport?.reportID, policy, undefined, undefined, lastDistanceExpenseType),
-        [moneyRequestReport?.reportID, policy, lastDistanceExpenseType, expensifyIcons, translate],
->>>>>>> main
+        () => getAddExpenseDropdownOptions(translate, expensifyIcons, moneyRequestReport?.reportID, policy, undefined, undefined, lastDistanceExpenseType, ownerBillingGraceEndPeriod),
+        [moneyRequestReport?.reportID, policy, lastDistanceExpenseType, expensifyIcons, translate, ownerBillingGraceEndPeriod],
     );
 
     const exportSubmenuOptions: Record<string, DropdownOption<string>> = useMemo(() => {
@@ -1753,11 +1745,8 @@ function MoneyReportHeader({
             confirmApproval,
             iouReport: moneyRequestReport,
             iouReportNextStep: nextStep,
-<<<<<<< HEAD
             ownerBillingGraceEndPeriod,
-=======
             betas,
->>>>>>> main
         });
 
     const showNextStepBar = shouldShowNextStep && !!(optimisticNextStep?.message?.length ?? (optimisticNextStep && 'messageKey' in optimisticNextStep));

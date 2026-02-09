@@ -179,7 +179,7 @@ const selectPaymentType = (params: SelectPaymentTypeParams) => {
         iouReport,
         iouReportNextStep,
         ownerBillingGraceEndPeriod,
-        betas
+        betas,
     } = params;
     if (policy && shouldRestrictUserBillableActions(policy.id, ownerBillingGraceEndPeriod)) {
         Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
