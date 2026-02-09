@@ -65,14 +65,10 @@ type BaseDomainMembersPageProps = {
     /** Allow multiple members to be selected at the same time. Defaults to false. */
     canSelectMultiple?: boolean;
 
-    /**
-     * Stores list of selected members. Only works with canSelectMultiple === true.
-     */
+    /** Stores list of selected members. Only works with canSelectMultiple === true. */
     selectedMembers?: string[];
 
-    /**
-     * Setter for a list of selected members. Only works with canSelectMultiple === true.
-     */
+    /** Setter for a list of selected members. Only works with canSelectMultiple === true. */
     setSelectedMembers?: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
@@ -134,34 +130,34 @@ function BaseDomainMembersPage({
 
     const [inputValue, setInputValue, filteredData] = useSearchResults(data, filterMember, sortMembers);
 
-    const toggleAllUsers =
-        canSelectMultiple && setSelectedMembers && filteredData.length
-            ? () => {
-                  const enabledAccounts = filteredData.filter((member) => !member.isDisabled && !member.isDisabledCheckbox);
-                  const enabledAccountIDs = enabledAccounts.map((member) => member.keyForList);
-                  const everySelected = enabledAccountIDs.every((accountID) => selectedMembers?.includes(accountID));
+    const canSelectUsers = canSelectMultiple && setSelectedMembers && filteredData.length;
 
-                  if (everySelected) {
-                      setSelectedMembers((prevSelected) => prevSelected.filter((accountID) => !enabledAccountIDs.includes(accountID)));
-                  } else {
-                      setSelectedMembers((prevSelected) => {
-                          const newSelected = new Set([...prevSelected, ...enabledAccountIDs]);
-                          return Array.from(newSelected);
-                      });
-                  }
-              }
-            : undefined;
+    const toggleAllUsers = canSelectUsers
+        ? () => {
+              const enabledAccounts = filteredData.filter((member) => !member.isDisabled && !member.isDisabledCheckbox);
+              const enabledAccountIDs = enabledAccounts.map((member) => member.keyForList);
+              const everySelected = enabledAccountIDs.every((accountID) => selectedMembers?.includes(accountID));
 
-    const toggleUser =
-        canSelectMultiple && setSelectedMembers && filteredData.length
-            ? (member: MemberOption) => {
-                  if (selectedMembers?.includes(member.keyForList)) {
-                      setSelectedMembers((prevSelected) => prevSelected.filter((accountID) => accountID !== member.keyForList));
-                  } else {
-                      setSelectedMembers((prevSelected) => [...prevSelected, member.keyForList]);
-                  }
+              if (everySelected) {
+                  setSelectedMembers((prevSelected) => prevSelected.filter((accountID) => !enabledAccountIDs.includes(accountID)));
+              } else {
+                  setSelectedMembers((prevSelected) => {
+                      const newSelected = new Set([...prevSelected, ...enabledAccountIDs]);
+                      return Array.from(newSelected);
+                  });
               }
-            : undefined;
+          }
+        : undefined;
+
+    const toggleUser = canSelectUsers
+        ? (member: MemberOption) => {
+              if (selectedMembers?.includes(member.keyForList)) {
+                  setSelectedMembers((prevSelected) => prevSelected.filter((accountID) => accountID !== member.keyForList));
+              } else {
+                  setSelectedMembers((prevSelected) => [...prevSelected, member.keyForList]);
+              }
+          }
+        : undefined;
 
     const getCustomListHeader = () => {
         if (filteredData.length === 0) {
