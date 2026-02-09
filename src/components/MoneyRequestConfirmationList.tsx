@@ -836,27 +836,24 @@ function MoneyRequestConfirmationList({
         const options: Array<Section<MoneyRequestConfirmationListItem>> = [];
         if (isTypeSplit) {
             options.push(
-                ...[
-                    {
-                        title: translate('moneyRequestConfirmationList.paidBy'),
-                        data: [getIOUConfirmationOptionsFromPayeePersonalDetail(payeePersonalDetails)],
-                        sectionIndex: 0,
-                    },
-                    {
-                        customHeader: getSplitSectionHeader(),
-                        data: splitParticipants,
-                        sectionIndex: 1,
-                    },
-                ],
+                {
+                    title: translate('moneyRequestConfirmationList.paidBy'),
+                    data: [getIOUConfirmationOptionsFromPayeePersonalDetail(payeePersonalDetails)],
+                    sectionIndex: 0,
+                },
+                {
+                    customHeader: getSplitSectionHeader(),
+                    data: splitParticipants,
+                    sectionIndex: 1,
+                },
             );
-            options.push();
         } else {
             const formattedSelectedParticipants = selectedParticipants.map((participant) => ({
                 ...participant,
                 isSelected: false,
                 keyForList: `${participant.keyForList ?? participant.accountID ?? participant.reportID}`,
                 isInteractive: isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice),
-                shouldShowRightIcon: isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice),
+                shouldShowRightCaret: isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice),
             }));
 
             options.push({
