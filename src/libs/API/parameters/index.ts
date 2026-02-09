@@ -1,4 +1,5 @@
 export type {default as GetTransactionsForMergingParams} from './GetTransactionsForMergingParams';
+export type {default as ImportCSVTransactionsParams} from './ImportCSVTransactionsParams';
 export type {default as ImportMultiLevelTagsParams} from './ImportMultiLevelTagsParams';
 export type {default as CleanPolicyTagsParams} from './CleanPolicyTagsParams';
 export type {default as ActivatePhysicalExpensifyCardParams} from './ActivatePhysicalExpensifyCardParams';
@@ -35,6 +36,7 @@ export type {default as SyncPolicyToQuickbooksDesktopParams} from './SyncPolicyT
 export type {default as DeleteContactMethodParams} from './DeleteContactMethodParams';
 export type {default as DeletePaymentBankAccountParams} from './DeletePaymentBankAccountParams';
 export type {default as DeletePaymentCardParams} from './DeletePaymentCardParams';
+export type {default as DeletePersonalCardParams} from './DeletePersonalCardParams';
 export type {default as TogglePolicyUberAutoInvitePageParams} from './TogglePolicyUberAutoInvitePageParams';
 export type {default as DismissReferralBannerParams} from './DismissReferralBannerParams';
 export type {default as ExpandURLPreviewParams} from './ExpandURLPreviewParams';
@@ -377,6 +379,7 @@ export type {default as ExportTagsSpreadsheetParams} from './ExportTagsSpreadshe
 export type {default as UpdateXeroGenericTypeParams} from './UpdateXeroGenericTypeParams';
 export type {default as UpdateCardSettlementFrequencyParams} from './UpdateCardSettlementFrequencyParams';
 export type {default as UpdateCardSettlementAccountParams} from './UpdateCardSettlementAccountParams';
+export type {default as SetTravelInvoicingSettlementAccountParams} from './SetTravelInvoicingSettlementAccountParams';
 export type {default as SetCompanyCardFeedName} from './SetCompanyCardFeedName';
 export type {default as DeleteCompanyCardFeed} from './DeleteCompanyCardFeed';
 export type {default as SetCompanyCardTransactionLiability} from './SetCompanyCardTransactionLiability';
@@ -466,8 +469,10 @@ export type {default as SetPolicyRequireCompanyCardsEnabledParams} from './SetPo
 export type {default as SetTechnicalContactEmailParams} from './SetTechnicalContactEmailParams';
 export type {default as ToggleConsolidatedDomainBillingParams} from './ToggleConsolidatedDomainBillingParams';
 export type {default as RemoveDomainAdminParams} from './RemoveDomainAdminParams';
+export type {default as DeleteDomainMemberParams} from './DeleteDomainMemberParams';
 export type {default as DeleteDomainParams} from './DeleteDomainParams';
 export type {default as GetDuplicateTransactionDetailsParams} from './GetDuplicateTransactionDetailsParams';
+export type {default as UpdateTravelInvoicingSettlementFrequencyParams} from './UpdateTravelInvoicingSettlementFrequencyParams';
 export type {default as SetPolicyCodingRuleParams} from './SetPolicyCodingRuleParams';
 export type {default as RegisterAuthenticationKeyParams} from './RegisterAuthenticationKeyParams';
 export type {default as TroubleshootMultifactorAuthenticationParams} from './TroubleshootMultifactorAuthenticationParams';

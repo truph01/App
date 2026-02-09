@@ -180,14 +180,14 @@ function PaymentMethodList({
     const isLoadingBankAccountList = isLoadingOnyxValue(bankAccountListResult);
     const [cardList = getEmptyObject<CardList>(), cardListResult] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
     const isLoadingCardList = isLoadingOnyxValue(cardListResult);
-    const nonExpensifyCardDomains = shouldShowAssignedCards
+    const cardDomains = shouldShowAssignedCards
         ? Object.values(isLoadingCardList ? {} : (cardList ?? {}))
-              .filter((card) => !isExpensifyCard(card) && !!card.domainName)
+              .filter((card) => !!card.domainName)
               .map((card) => card.domainName)
         : [];
     const [policiesForAssignedCards] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
         canBeMissing: true,
-        selector: createPoliciesForDomainCardsSelector(nonExpensifyCardDomains),
+        selector: createPoliciesForDomainCardsSelector(cardDomains),
     });
     // Temporarily disabled because P2P debit cards are disabled.
     // const [fundList = getEmptyObject<FundList>()] = useOnyx(ONYXKEYS.FUND_LIST);
@@ -206,11 +206,13 @@ function PaymentMethodList({
                 );
 
             const assignedCardsSorted = lodashSortBy(assignedCards, getAssignedCardSortKey);
-            const assignedCardsGrouped: PaymentMethodItem[] = [];
+            const companyCardsGrouped: PaymentMethodItem[] = [];
+            const personalCardsGrouped: PaymentMethodItem[] = [];
             for (const card of assignedCardsSorted) {
                 const isDisabled = card.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
                 const isUserPersonalCard = isPersonalCard(card);
                 const isCSVCard = card.bank === CONST.COMPANY_CARDS.BANK_NAME.UPLOAD || card.bank.includes(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV);
+                const assignedCardsGrouped = isUserPersonalCard ? personalCardsGrouped : companyCardsGrouped;
 
                 let icon;
                 if (isUserPersonalCard && isCSVCard) {
@@ -223,7 +225,8 @@ function PaymentMethodList({
                 if (card.fundID) {
                     const feedNameWithDomainID = getCompanyCardFeedWithDomainID(card.bank as CompanyCardFeed, card.fundID);
                     shouldShowRBR = shouldShowRbrForFeedNameWithDomainID[feedNameWithDomainID];
-                } else {
+                } else if (card.bank !== CONST.PERSONAL_CARD.BANK_NAME.CSV) {
+                    // Don't show red dot for CSV imported cards without fundID
                     shouldShowRBR = true;
                 }
 
@@ -242,9 +245,8 @@ function PaymentMethodList({
                     const lastFourPAN = lastFourNumbersFromCardName(card.cardName);
                     const plaidUrl = getPlaidInstitutionIconUrl(card.bank);
                     const isCSVImportCard = card.bank === CONST.COMPANY_CARDS.BANK_NAME.UPLOAD;
-                    const cardDisplayName = maskCardNumber(card.cardName, card.bank);
+                    const cardTitle = isCSVImportCard ? (card.nameValuePairs?.cardTitle ?? card.cardName) : maskCardNumber(card.cardName, card.bank);
                     const pressHandler = onPress as CardPressHandler;
-
                     let cardDescription;
                     if (isUserPersonalCard) {
                         cardDescription = lastFourPAN;
@@ -253,32 +255,33 @@ function PaymentMethodList({
                     } else {
                         cardDescription = getDescriptionForPolicyDomainCard(card.domainName, policiesForAssignedCards);
                     }
-                    // Personal cards navigate to personal card details page
+                    // Personal cards navigate to personal card details page (except CSV cards which need 3-dot menu for delete)
                     // Company cards use the pressHandler callback (for 3-dot menu behavior)
-                    const cardOnPress = isUserPersonalCard
-                        ? () => Navigation.navigate(ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(card.cardID)))
-                        : (e: GestureResponderEvent | KeyboardEvent | undefined) =>
-                              pressHandler({
-                                  event: e,
-                                  cardData: card,
-                                  icon: {
-                                      icon,
-                                      iconStyles: [styles.cardIcon],
-                                      iconWidth: variables.cardIconWidth,
-                                      iconHeight: variables.cardIconHeight,
-                                  },
-                                  cardID: card.cardID,
-                              });
+                    const cardOnPress =
+                        isUserPersonalCard && !isCSVCard
+                            ? () => Navigation.navigate(ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(card.cardID)))
+                            : (e: GestureResponderEvent | KeyboardEvent | undefined) =>
+                                  pressHandler({
+                                      event: e,
+                                      cardData: card,
+                                      icon: {
+                                          icon,
+                                          iconStyles: [styles.cardIcon],
+                                          iconWidth: variables.cardIconWidth,
+                                          iconHeight: variables.cardIconHeight,
+                                      },
+                                      cardID: card.cardID,
+                                  });
 
                     assignedCardsGrouped.push({
                         key: card.cardID.toString(),
                         plaidUrl: isUserPersonalCard ? undefined : plaidUrl,
-                        title: cardDisplayName,
+                        title: cardTitle,
                         description: isCSVImportCard ? translate('cardPage.csvCardDescription') : cardDescription,
                         interactive: !isDisabled,
                         disabled: isDisabled,
                         shouldShowRightIcon,
-                        shouldShowThreeDotsMenu: !isUserPersonalCard,
+                        shouldShowThreeDotsMenu: !isUserPersonalCard || isCSVCard,
                         errors: card.errors,
                         canDismissError: false,
                         pendingAction: card.pendingAction,
@@ -353,7 +356,13 @@ function PaymentMethodList({
                     iconHeight: variables.cardIconHeight,
                 });
             }
-            return assignedCardsGrouped;
+
+            const companyCards = [translate('workspace.common.companyCards'), ...companyCardsGrouped];
+            const personalCards = [translate('workspace.common.personalCards'), ...personalCardsGrouped];
+            if (companyCardsGrouped.length > 0 && personalCardsGrouped.length > 0) {
+                return [...companyCards, ...personalCards];
+            }
+            return [...companyCardsGrouped, ...personalCardsGrouped];
         }
 
         // Hide any billing cards that are not P2P debit cards for now because you cannot make them your default method, or delete them
@@ -488,6 +497,8 @@ function PaymentMethodList({
         return filteredPaymentMethods;
     }, [filteredPaymentMethods, shouldShowBankAccountSections, translate]);
 
+    const filteredPaymentMethodsWithoutStrings = useMemo(() => filteredPaymentMethods.filter((method) => typeof method !== 'string'), [filteredPaymentMethods]);
+
     /**
      * Create a menuItem for each passed paymentMethod
      */
@@ -504,7 +515,7 @@ function PaymentMethodList({
                 <PaymentMethodListItem
                     item={item}
                     shouldShowDefaultBadge={shouldShowDefaultBadge(
-                        filteredPaymentMethods,
+                        filteredPaymentMethodsWithoutStrings,
                         invoiceTransferBankAccountID ? invoiceTransferBankAccountID === item.methodID : item.methodID === userWallet?.walletLinkedAccountID,
                         shouldHideDefaultBadge,
                     )}
@@ -514,7 +525,7 @@ function PaymentMethodList({
             );
         },
         [
-            filteredPaymentMethods,
+            filteredPaymentMethodsWithoutStrings,
             invoiceTransferBankAccountID,
             userWallet?.walletLinkedAccountID,
             shouldHideDefaultBadge,

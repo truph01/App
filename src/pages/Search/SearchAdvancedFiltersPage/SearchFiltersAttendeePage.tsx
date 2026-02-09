@@ -40,6 +40,7 @@ function SearchFiltersAttendeePage() {
                             attendee: selectedAccountIDs,
                         });
                     }}
+                    shouldAllowNameOnlyOptions
                 />
             </View>
         </ScreenWrapper>
