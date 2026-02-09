@@ -162,6 +162,7 @@ import Wallet from '@assets/images/wallet.svg';
 import Workflows from '@assets/images/workflows.svg';
 import Workspace from '@assets/images/workspace-default-avatar.svg';
 import Clear from '@assets/images/x-circle.svg';
+import FreezeCard from '@assets/images/freeze-card.svg';
 
 export {
     Android,
@@ -328,4 +329,5 @@ export {
     CertiniaSquare,
     ZenefitsSquare,
     GalleryPlus,
+    FreezeCard,
 };

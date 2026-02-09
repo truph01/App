@@ -240,6 +240,7 @@ import Workflows from '@assets/images/workflows.svg';
 import Workspace from '@assets/images/workspace-default-avatar.svg';
 import Clear from '@assets/images/x-circle.svg';
 import Zoom from '@assets/images/zoom.svg';
+import FreezeCard from '@assets/images/freeze-card.svg';
 
 const Expensicons = {
     ReceiptBody,
@@ -324,6 +325,7 @@ const Expensicons = {
     FlagLevelTwo,
     FlagLevelThree,
     Fingerprint,
+    FreezeCard,
     Fullscreen,
     Folder,
     Tag,

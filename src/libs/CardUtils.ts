@@ -997,6 +997,10 @@ function hasDisplayableAssignedCards(cardList: CardList | undefined): boolean {
     );
 }
 
+function isCardFrozen(card?: OnyxEntry<Card>): boolean {
+    return card?.state === CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED && card?.nameValuePairs?.frozen != null;
+}
+
 export {
     getAssignedCardSortKey,
     getDefaultExpensifyCardLimitType,
@@ -1070,6 +1074,7 @@ export {
     isCardAlreadyAssigned,
     generateCardID,
     hasDisplayableAssignedCards,
+    isCardFrozen,
 };
 
 export type {CompanyCardFeedIcons, CompanyCardBankIcons};

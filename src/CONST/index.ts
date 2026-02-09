@@ -754,6 +754,7 @@ const CONST = {
         SINGLE_USE_AND_EXPIRE_BY_CARDS: 'singleUseAndExpireByCards',
         PERSONAL_CARD_IMPORT: 'personalCardImport',
         SUGGESTED_FOLLOWUPS: 'suggestedFollowups',
+        FREEZE_CARD: 'freezeCard',
     },
     BUTTON_STATES: {
         DEFAULT: 'default',
