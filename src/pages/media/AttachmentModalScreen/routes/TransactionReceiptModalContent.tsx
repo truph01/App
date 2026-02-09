@@ -395,7 +395,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const contentProps = useMemo<AttachmentModalBaseContentProps>(
         () => ({
             source,
-            file: isOdometerImage ? odometerFile : undefined,
             originalFileName,
             report,
             headerTitle,
@@ -409,7 +408,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             onRotateButtonPress: rotateReceipt,
             isRotating,
             onDownloadAttachment: allowDownload ? undefined : onDownloadAttachment,
-            transaction: isOdometerImage ? undefined : transaction,
+            transaction,
             shouldMinimizeMenuButton: false,
         }),
         [
@@ -417,10 +416,8 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             headerTitle,
             isAuthTokenRequired,
             isTrackExpenseActionValue,
-            isOdometerImage,
             onDownloadAttachment,
             originalFileName,
-            odometerFile,
             report,
             reportMetadata?.isLoadingInitialReportActions,
             shouldShowNotFoundPage,
