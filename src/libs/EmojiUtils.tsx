@@ -400,7 +400,7 @@ function replaceEmojis(text: string, preferredSkinTone: OnyxEntry<number | strin
     const emojis: Emoji[] = [];
     const emojiData = text.match(CONST.REGEX.EMOJI_NAME);
     if (!emojiData || emojiData.length === 0) {
-        return {text: revertEmojisInCodeBlocks(newText), emojis};
+        return {text: revertEmojisInCodeBlocks(newText).text, emojis};
     }
 
     const codeBlockRanges = parseExpensiMark(text);
