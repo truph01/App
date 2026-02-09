@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import type {SectionListData} from 'react-native';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -37,8 +36,6 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import AccessOrNotFoundWrapper from './AccessOrNotFoundWrapper';
 import withPolicyAndFullscreenLoading from './withPolicyAndFullscreenLoading';
 import type {WithPolicyAndFullscreenLoadingProps} from './withPolicyAndFullscreenLoading';
-
-type Sections = SectionListData<OptionData, Section<OptionData>>;
 
 type WorkspaceInvitePageProps = WithPolicyAndFullscreenLoadingProps &
     WithNavigationTransitionEndProps &
@@ -122,8 +119,8 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         initialSelected: initiallySelectedOptions,
     });
 
-    const sections: Sections[] = useMemo(() => {
-        const sectionsArr: Sections[] = [];
+    const sections: Array<Section<OptionData>> = useMemo(() => {
+        const sectionsArr = [];
 
         if (!areOptionsInitialized) {
             return [];
@@ -250,6 +247,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         }),
         [searchTerm, setSearchTerm, headerMessage, translate],
     );
+    console.log('sections:', ...sections.map((section) => section.title));
 
     return (
         <AccessOrNotFoundWrapper
@@ -288,6 +286,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
                     isLoadingNewOptions={!!isSearchingForReports}
                     addBottomSafeAreaPadding
                     onEndReached={onListEndReached}
+                    disableMaintainingScrollPosition
                 />
             </ScreenWrapper>
         </AccessOrNotFoundWrapper>
