@@ -750,6 +750,7 @@ const CONST = {
         UBER_FOR_BUSINESS: 'uberForBusiness',
         NEW_DOT_DEW: 'newDotDEW',
         GPS_MILEAGE: 'gpsMileage',
+        ODOMETER_EXPENSES: 'odometerExpenses',
         NEW_DOT_HOME: 'newDotHome',
         SINGLE_USE_AND_EXPIRE_BY_CARDS: 'singleUseAndExpireByCards',
         PERSONAL_CARD_IMPORT: 'personalCardImport',
