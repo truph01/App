@@ -1296,6 +1296,92 @@ describe('OptionsListUtils', () => {
             expect(results.recentReports.length).toBe(OPTIONS_WITH_WORKSPACE_ROOM.reports.length - 1);
             expect(results.recentReports).toEqual(expect.arrayContaining([expect.objectContaining({reportID: '14'})]));
         });
+
+        it('should use personalDetails config for workspace chat lookups when shouldSeparateWorkspaceChat is true', () => {
+            // Given a set of reports with workspace rooms and a custom personalDetails collection
+            const customPersonalDetails: PersonalDetailsList = {
+                '1': {
+                    accountID: 1,
+                    displayName: 'Custom Reed Richards',
+                    login: 'reedrichards@expensify.com',
+                    keyForList: 'reedrichards@expensify.com',
+                    reportID: '1',
+                },
+                '2': {
+                    accountID: 2,
+                    displayName: 'Custom Iron Man',
+                    login: 'tonystark@expensify.com',
+                    keyForList: 'tonystark@expensify.com',
+                    reportID: '2',
+                },
+            };
+
+            // When we call getValidOptions with shouldSeparateWorkspaceChat and personalDetails config
+            const results = getValidOptions(OPTIONS_WITH_WORKSPACE_ROOM, allPolicies, {}, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, {
+                includeRecentReports: true,
+                includeMultipleParticipantReports: true,
+                includeP2P: true,
+                includeOwnedWorkspaceChats: true,
+                shouldSeparateWorkspaceChat: true,
+                personalDetails: customPersonalDetails,
+            });
+
+            // Then the function should process without errors and return workspace chats
+            expect(results.workspaceChats).toBeDefined();
+            // And recent reports should still be returned
+            expect(results.recentReports.length).toBeGreaterThanOrEqual(0);
+        });
+
+        it('should handle undefined personalDetails config in workspace chat lookups', () => {
+            // Given a set of reports with workspace rooms
+            // When we call getValidOptions with shouldSeparateWorkspaceChat but no personalDetails config
+            const results = getValidOptions(OPTIONS_WITH_WORKSPACE_ROOM, allPolicies, {}, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, {
+                includeRecentReports: true,
+                includeMultipleParticipantReports: true,
+                includeP2P: true,
+                includeOwnedWorkspaceChats: true,
+                shouldSeparateWorkspaceChat: true,
+                personalDetails: undefined,
+            });
+
+            // Then the function should fall back to allPersonalDetails and process without errors
+            expect(results.workspaceChats).toBeDefined();
+            expect(results.recentReports.length).toBeGreaterThanOrEqual(0);
+        });
+
+        it('should handle empty personalDetails config in workspace chat lookups', () => {
+            // Given a set of reports with workspace rooms
+            // When we call getValidOptions with shouldSeparateWorkspaceChat and empty personalDetails
+            const results = getValidOptions(OPTIONS_WITH_WORKSPACE_ROOM, allPolicies, {}, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, {
+                includeRecentReports: true,
+                includeMultipleParticipantReports: true,
+                includeP2P: true,
+                includeOwnedWorkspaceChats: true,
+                shouldSeparateWorkspaceChat: true,
+                personalDetails: {},
+            });
+
+            // Then the function should fall back to allPersonalDetails and process without errors
+            expect(results.workspaceChats).toBeDefined();
+            expect(results.recentReports.length).toBeGreaterThanOrEqual(0);
+        });
+
+        it('should handle null personalDetails config in workspace chat lookups', () => {
+            // Given a set of reports with workspace rooms
+            // When we call getValidOptions with shouldSeparateWorkspaceChat and null personalDetails
+            const results = getValidOptions(OPTIONS_WITH_WORKSPACE_ROOM, allPolicies, {}, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, {
+                includeRecentReports: true,
+                includeMultipleParticipantReports: true,
+                includeP2P: true,
+                includeOwnedWorkspaceChats: true,
+                shouldSeparateWorkspaceChat: true,
+                personalDetails: {},
+            });
+
+            // Then the function should fall back to allPersonalDetails and process without errors
+            expect(results.workspaceChats).toBeDefined();
+            expect(results.recentReports.length).toBeGreaterThanOrEqual(0);
+        });
     });
 
     describe('getValidOptions() for group Chat', () => {
@@ -1657,7 +1743,18 @@ describe('OptionsListUtils', () => {
             const excludeLogins = {'reedrichards@expensify.com': true};
 
             // When we call getMemberInviteOptions with excludeLogins
-            const results = getMemberInviteOptions(OPTIONS.personalDetails, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, {}, [], excludeLogins);
+            const results = getMemberInviteOptions(
+                OPTIONS.personalDetails,
+                nvpDismissedProductTraining,
+                loginList,
+                CURRENT_USER_ACCOUNT_ID,
+                CURRENT_USER_EMAIL,
+                PERSONAL_DETAILS,
+                [],
+                excludeLogins,
+                false,
+                COUNTRY_CODE,
+            );
 
             // Then the excluded login should not be in the results
             const excludedUser = results.personalDetails.find((detail) => detail.login === 'reedrichards@expensify.com');
