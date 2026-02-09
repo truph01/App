@@ -96,13 +96,11 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {canBeMissing: true});
     const [reimbursementAccountDraft] = useOnyx(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM_DRAFT, {canBeMissing: true});
 
-    const {approvalWorkflows, availableMembers, usedApproverEmails} = useMemo(() => {
-        return convertPolicyEmployeesToApprovalWorkflows({
-            policy,
-            personalDetails: personalDetails ?? {},
-            localeCompare,
-        });
-    }, [personalDetails, policy, localeCompare]);
+    const {approvalWorkflows, availableMembers, usedApproverEmails} = convertPolicyEmployeesToApprovalWorkflows({
+        policy,
+        personalDetails: personalDetails ?? {},
+        localeCompare,
+    });
 
     const hasValidExistingAccounts = getEligibleExistingBusinessBankAccounts(bankAccountList, policy?.outputCurrency, true).length > 0;
 
@@ -179,39 +177,31 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EXPENSES_FROM.getRoute(route.params.policyID));
     }, [policy, route.params.policyID, availableMembers, usedApproverEmails]);
 
-    const filteredApprovalWorkflows = useMemo(() => {
-        if (policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.ADVANCED) {
-            return approvalWorkflows;
+    const filteredApprovalWorkflows = policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.ADVANCED ? approvalWorkflows : approvalWorkflows.filter((workflow) => workflow.isDefault);
+
+    const filterWorkflow = (workflow: ApprovalWorkflow, searchInput: string) => {
+        const searchableTexts: string[] = [];
+
+        if (workflow.isDefault) {
+            searchableTexts.push(translate('workspace.common.everyone'));
         }
-        return approvalWorkflows.filter((workflow) => workflow.isDefault);
-    }, [policy?.approvalMode, approvalWorkflows]);
 
-    const filterWorkflow = useCallback(
-        (workflow: ApprovalWorkflow, searchInput: string) => {
-            const searchableTexts: string[] = [];
+        for (const member of workflow.members) {
+            searchableTexts.push(member.displayName);
+            searchableTexts.push(Str.removeSMSDomain(member.displayName));
+            searchableTexts.push(member.email);
+            searchableTexts.push(Str.removeSMSDomain(member.email));
+        }
 
-            if (workflow.isDefault) {
-                searchableTexts.push(translate('workspace.common.everyone'));
-            }
+        for (const approver of workflow.approvers) {
+            searchableTexts.push(approver.displayName);
+            searchableTexts.push(Str.removeSMSDomain(approver.displayName));
+            searchableTexts.push(approver.email);
+            searchableTexts.push(Str.removeSMSDomain(approver.email));
+        }
 
-            for (const member of workflow.members) {
-                searchableTexts.push(member.displayName);
-                searchableTexts.push(Str.removeSMSDomain(member.displayName));
-                searchableTexts.push(member.email);
-                searchableTexts.push(Str.removeSMSDomain(member.email));
-            }
-
-            for (const approver of workflow.approvers) {
-                searchableTexts.push(approver.displayName);
-                searchableTexts.push(Str.removeSMSDomain(approver.displayName));
-                searchableTexts.push(approver.email);
-                searchableTexts.push(Str.removeSMSDomain(approver.email));
-            }
-
-            return tokenizedSearch([workflow], searchInput, () => searchableTexts).length > 0;
-        },
-        [translate],
-    );
+        return tokenizedSearch([workflow], searchInput, () => searchableTexts).length > 0;
+    };
 
     const [workflowSearchInput, setWorkflowSearchInput, searchFilteredWorkflows] = useSearchResults(filteredApprovalWorkflows, filterWorkflow);
 
