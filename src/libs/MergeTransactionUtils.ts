@@ -627,6 +627,7 @@ function getMergeFieldUpdatedValues<K extends MergeFieldKey>({
     if (field === 'taxValue') {
         updatedValues.taxCode = transaction?.taxCode;
         updatedValues.taxName = getTaxName(policy, transaction) ?? transaction?.taxValue ?? '';
+        updatedValues.taxPolicyID = policy?.id;
         if (mergeTransaction?.amount) {
             updatedValues.taxAmount = convertToBackendAmount(calculateTaxAmount(transaction?.taxValue, mergeTransaction.amount, mergeTransaction.currency));
         }

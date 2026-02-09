@@ -355,6 +355,7 @@ function mergeTransactionRequest({
         reimbursable: mergeTransaction.reimbursable,
         tag: mergeTransaction.tag,
         taxCode: mergeTransaction.taxCode,
+        taxPolicyID: mergeTransaction.taxPolicyID,
         receiptID: mergeTransaction.receipt?.receiptID,
         reportID: mergeTransaction.reportID,
     };

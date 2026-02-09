@@ -85,6 +85,9 @@ type MergeTransaction = {
 
     /** Tax name to display in merge transaction flow */
     taxName: string;
+
+    /** Policy ID of the selected tax rate for the transaction */
+    taxPolicyID: string;
 };
 
 export default MergeTransaction;
