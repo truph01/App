@@ -6,6 +6,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Parser from '@libs/Parser';
+import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
 import Icon from './Icon';
 import RenderHTML from './RenderHTML';
@@ -38,6 +39,7 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
     const theme = useTheme();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Exclamation']);
+    const isWeb = getPlatform() === CONST.PLATFORM.WEB;
     const shouldAnnounceError = isError && typeof message === 'string' && !!message && !shouldRenderMessageAsHTML && children == null;
 
     const HTMLMessage = useMemo(() => {
@@ -81,8 +83,11 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
                     ) : (
                         <Text
                             style={[isError ? styles.formError : styles.formHelp, styles.mb0]}
-                            accessibilityRole={shouldAnnounceError ? CONST.ROLE.ALERT : undefined}
-                            accessibilityLiveRegion={shouldAnnounceError ? 'assertive' : undefined}
+                            role={shouldAnnounceError ? CONST.ROLE.ALERT : undefined}
+                            // TalkBack on some Android versions skips role-only alert announcements,
+                            // so keep native accessibilityRole/live-region as a platform fallback.
+                            accessibilityRole={!isWeb && shouldAnnounceError ? CONST.ROLE.ALERT : undefined}
+                            accessibilityLiveRegion={!isWeb && shouldAnnounceError ? 'assertive' : undefined}
                         >
                             {message}
                         </Text>
