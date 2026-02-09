@@ -1,5 +1,4 @@
-import React, {useCallback, useLayoutEffect} from 'react';
-import type {LayoutChangeEvent} from 'react-native';
+import React, {useLayoutEffect, useRef} from 'react';
 import {View} from 'react-native';
 import Animated, {useAnimatedStyle, useDerivedValue, useSharedValue} from 'react-native-reanimated';
 import type {SharedValue} from 'react-native-reanimated';
@@ -44,23 +43,16 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
      * This prevents the "old" dimensions from being used to calculate the position
      * of "new" content, avoiding visual jumps or "ghosting" effects.
      */
-    useLayoutEffect(() => {
-        tooltipMeasuredWidth.set(0);
-    }, [content, tooltipMeasuredWidth]);
+    const tooltipWrapperRef = useRef<View>(null);
 
-    /**
-     * Updates the shared width value and makes the tooltip visible.
-     * This is triggered once the layout engine confirms the new dimensions for the content.
-     */
-    const handleTooltipLayout = useCallback(
-        (event: LayoutChangeEvent) => {
-            const {width} = event.nativeEvent.layout;
-            if (width > 0) {
-                tooltipMeasuredWidth.set(width);
+    useLayoutEffect(() => {
+        tooltipWrapperRef.current?.measure((x: number, y: number, width: number) => {
+            if (width <= 0) {
+                return;
             }
-        },
-        [tooltipMeasuredWidth],
-    );
+            tooltipMeasuredWidth.set(width);
+        });
+    }, [content, tooltipMeasuredWidth]);
 
     /** Calculate the center point, ensuring the box doesn't overflow the left or right edges */
     const clampedCenter = useDerivedValue(() => {
@@ -84,6 +76,7 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
             top: y,
             /** Center the wrapper horizontally and lift it entirely above the Y point */
             transform: [{translateX: '-50%'}, {translateY: '-100%'}],
+            opacity: tooltipMeasuredWidth.get() > 0 ? 1 : 0,
         };
     }, [initialTooltipPosition]);
 
@@ -105,8 +98,8 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
     return (
         <Animated.View
             style={tooltipStyle}
-            onLayout={handleTooltipLayout}
             pointerEvents="none"
+            ref={tooltipWrapperRef}
         >
             <View style={styles.chartTooltipWrapper}>
                 <View style={styles.chartTooltipBox}>
