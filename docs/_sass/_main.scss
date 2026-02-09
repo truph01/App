@@ -978,6 +978,24 @@ button {
                 width: 280px;
                 height: auto;
             }
+
+            .illustration-light {
+                display: block;
+            }
+
+            .illustration-dark {
+                display: none;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .illustration-light {
+                    display: none;
+                }
+
+                .illustration-dark {
+                    display: block;
+                }
+            }
         }
     }
 
