@@ -1992,6 +1992,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} perderá el acceso a esta cuenta bancaria comercial. Seguiremos completando los pagos en proceso.`,
         reachOutForHelp: 'Se está usando con la tarjeta Expensify. <concierge-link>Contacte con Concierge</concierge-link> si necesita dejar de compartirla.',
         unshareErrorModalTitle: 'No se puede dejar de compartir la cuenta bancaria',
+        chaseAccountNumberDifferent: '¿Por qué es diferente el número de mi cuenta?',
     },
     cardPage: {
         expensifyCard: 'Tarjeta Expensify',
@@ -2514,7 +2515,6 @@ ${amount} para ${merchant} - ${date}`,
 
                         [Ir a la configuración de categorías del espacio de trabajo](${workspaceCategoriesLink}).
 
-                        ![Configura categorías](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)
                     `),
             },
             combinedTrackSubmitExpenseTask: {
@@ -2609,7 +2609,6 @@ ${amount} para ${merchant} - ${date}`,
 
                         [Ir a miembros del espacio de trabajo](${workspaceMembersLink}).
 
-                        ![Invita a tu equipo](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)
                     `),
             },
             setupCategoriesAndTags: {
@@ -2636,7 +2635,6 @@ ${amount} para ${merchant} - ${date}`,
 
                         [Ir a más funciones](${workspaceMoreFeaturesLink}).
 
-                        ![Configura etiquetas](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)
                     `),
             },
             inviteAccountantTask: {
