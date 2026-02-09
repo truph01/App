@@ -485,6 +485,11 @@ function MoneyRequestReportPreviewContent({
             carouselRef.current?.scrollToIndex({index: 0, animated: true, viewOffset});
             return;
         }
+        if (index === carouselTransactions.length - 1) {
+            setOptimisticIndex(index);
+            carouselRef.current?.scrollToEnd();
+            return;
+        }
         setOptimisticIndex(index);
         carouselRef.current?.scrollToIndex({index, animated: true, viewOffset});
     };
