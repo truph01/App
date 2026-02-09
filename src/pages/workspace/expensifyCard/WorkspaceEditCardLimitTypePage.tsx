@@ -24,6 +24,7 @@ import {updateExpensifyCardLimitType} from '@libs/actions/Card';
 import {openPolicyEditCardLimitTypePage} from '@libs/actions/Policy/Policy';
 import {filterInactiveCards, getDefaultExpensifyCardLimitType} from '@libs/CardUtils';
 import {convertToDisplayString} from '@libs/CurrencyUtils';
+import DateUtils from '@libs/DateUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import {getApprovalWorkflow} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
@@ -81,6 +82,28 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
         }
         return toZonedTime(new Date(), assigneeTimeZone);
     }, [assigneeTimeZone]);
+
+    const validFromDefaultValue = useMemo(() => {
+        const validFrom = card?.nameValuePairs?.validFrom;
+        if (!validFrom) {
+            return undefined;
+        }
+        if (assigneeTimeZone) {
+            return DateUtils.formatUTCDateTimeToDateInTimezone(validFrom, assigneeTimeZone);
+        }
+        return DateUtils.formatWithUTCTimeZone(validFrom, 'yyyy-MM-dd');
+    }, [card?.nameValuePairs?.validFrom, assigneeTimeZone]);
+
+    const validThruDefaultValue = useMemo(() => {
+        const validThru = card?.nameValuePairs?.validThru;
+        if (!validThru) {
+            return undefined;
+        }
+        if (assigneeTimeZone) {
+            return DateUtils.formatUTCDateTimeToDateInTimezone(validThru, assigneeTimeZone);
+        }
+        return DateUtils.formatWithUTCTimeZone(validThru, 'yyyy-MM-dd');
+    }, [card?.nameValuePairs?.validThru, assigneeTimeZone]);
 
     const goBack = () => {
         if (backTo) {
@@ -285,7 +308,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
                                             label={translate('workspace.card.issueNewCard.startDate')}
                                             maxDate={CONST.CALENDAR_PICKER.MAX_DATE}
                                             minDate={minDate}
-                                            defaultValue={card?.nameValuePairs?.validFrom}
+                                            defaultValue={validFromDefaultValue}
                                         />
                                         <InputWrapper
                                             InputComponent={DatePicker}
@@ -293,7 +316,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
                                             label={translate('workspace.card.issueNewCard.endDate')}
                                             maxDate={CONST.CALENDAR_PICKER.MAX_DATE}
                                             minDate={minDate}
-                                            defaultValue={card?.nameValuePairs?.validThru}
+                                            defaultValue={validThruDefaultValue}
                                         />
                                     </>
                                 )}
