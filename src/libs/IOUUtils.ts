@@ -340,13 +340,17 @@ function shouldRequireMerchant(transaction: OnyxInputOrEntry<Transaction> | unde
         return false;
     }
 
-    // Check if merchant is required based on report type and participants
-    const isMerchantRequired = !!(isPolicyExpenseChat(report) || isExpenseReport(report) || transaction?.participants?.some((participant) => !!participant.isPolicyExpenseChat));
-
+     if (!isMerchantMissing(transaction)) {
+         return false;
+     }
+     
     // For scan requests, merchant is not required unless it's a split bill being edited
     if (isScanRequest(transaction) && !isEditingSplitBill) {
         return false;
     }
+    
+     // Check if merchant is required based on report type and participants
+    return !!(isPolicyExpenseChat(report) || isExpenseReport(report) || transaction?.participants?.some((participant) => !!participant.isPolicyExpenseChat));
 
     return isMerchantRequired && isMerchantMissing(transaction);
 }
