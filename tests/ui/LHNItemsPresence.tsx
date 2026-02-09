@@ -302,7 +302,7 @@ describe('SidebarLinksData', () => {
             expect(screen.getByTestId('RBR Icon', {includeHiddenElements: true})).toBeOnTheScreen();
         });
 
-        it('should display the subtask with RBR when a parent task has a waiting subtask', async () => {
+        it('should display the GBR on the parent task when it has an open subtask', async () => {
             // Given the SidebarLinks are rendered.
             LHNTestUtils.getDefaultRenderedSidebarLinks();
 
@@ -314,6 +314,7 @@ describe('SidebarLinksData', () => {
                 stateNum: CONST.REPORT.STATE_NUM.OPEN,
                 statusNum: CONST.REPORT.STATUS_NUM.OPEN,
                 ownerAccountID: TEST_USER_ACCOUNT_ID,
+                hasOutstandingChildTask: true,
             };
 
             const subtaskReportAction: ReportAction = {
@@ -335,11 +336,6 @@ describe('SidebarLinksData', () => {
                 managerID: TEST_USER_ACCOUNT_ID,
                 stateNum: CONST.REPORT.STATE_NUM.OPEN,
                 statusNum: CONST.REPORT.STATUS_NUM.OPEN,
-                errorFields: {
-                    taskTitle: {
-                        error: 'Task title is required.',
-                    },
-                },
             };
 
             // When the Onyx state includes a parent task and an open subtask that is waiting on the assignee.
@@ -356,11 +352,8 @@ describe('SidebarLinksData', () => {
 
             await waitForBatchedUpdatesWithAct();
 
-            // Then the subtask should be shown in the sidebar.
-            expect(getDisplayNames().length).toBeGreaterThan(0);
-
-            // That the RBR icon should be shown on the subtask.
-            expect(screen.getAllByTestId('RBR Icon', {includeHiddenElements: true})).toHaveLength(1);
+            // That the GBR icon should be shown.
+            expect(screen.getAllByTestId('GBR Icon', {includeHiddenElements: true})).toHaveLength(1);
         });
 
         it('should display the report awaiting user action', async () => {
