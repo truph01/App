@@ -124,12 +124,17 @@ function TimeSensitiveSection() {
             <View style={styles.getForYouSectionContainerStyle(shouldUseNarrowLayout)}>
                 {/* Priority 1: Card fraud alerts */}
                 {shouldShowReviewCardFraud &&
-                    cardsWithFraud.map((card) => (
-                        <ReviewCardFraud
-                            key={card.cardID}
-                            card={card}
-                        />
-                    ))}
+                    cardsWithFraud.map((card) => {
+                        if (!card.message?.possibleFraud) {
+                            return null;
+                        }
+                        return (
+                            <ReviewCardFraud
+                                key={card.cardID}
+                                possibleFraud={card.message.possibleFraud}
+                            />
+                        );
+                    })}
 
                 {/* Priority 2: Broken company card connections */}
                 {brokenCompanyCardConnections.map((connection) => {

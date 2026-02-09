@@ -7,23 +7,22 @@ import Navigation from '@libs/Navigation/Navigation';
 import colors from '@styles/theme/colors';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
-import type {Card} from '@src/types/onyx';
+import type {PossibleFraudData} from '@src/types/onyx/Card';
 
 const DEFAULT_CURRENCY = CONST.CURRENCY.USD;
 
 type ReviewCardFraudProps = {
-    /** The card with potential fraud */
-    card: Card;
+    /** Possible fraud data from the card */
+    possibleFraud: PossibleFraudData;
 };
 
-function ReviewCardFraud({card}: ReviewCardFraudProps) {
+function ReviewCardFraud({possibleFraud}: ReviewCardFraudProps) {
     const {translate} = useLocalize();
 
-    const possibleFraud = card.message?.possibleFraud;
-    const fraudAlertReportID = possibleFraud?.fraudAlertReportID;
-    const triggerAmount = possibleFraud?.triggerAmount;
-    const triggerMerchant = possibleFraud?.triggerMerchant;
-    const triggerCurrency = possibleFraud?.triggerCurrency;
+    const fraudAlertReportID = possibleFraud.fraudAlertReportID;
+    const triggerAmount = possibleFraud.triggerAmount;
+    const triggerMerchant = possibleFraud.triggerMerchant;
+    const triggerCurrency = possibleFraud.triggerCurrency;
 
     // Generate the title with amount and merchant if available
     const title = useMemo(() => {
