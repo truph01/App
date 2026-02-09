@@ -12,7 +12,6 @@ type TooltipData = {
  * Computes the display amount using the provided formatter and the percentage relative to all data points.
  */
 function useTooltipData(activeDataIndex: number, data: ChartDataPoint[], formatAmount: (value: number) => string): TooltipData | null {
-    // Memoize totalSum separately - only recalculate when data changes, not on every hover
     const totalSum = useMemo(() => data.reduce((sum, point) => sum + Math.abs(point.total), 0), [data]);
 
     return useMemo(() => {
