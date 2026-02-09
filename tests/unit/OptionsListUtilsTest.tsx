@@ -1772,7 +1772,7 @@ describe('OptionsListUtils', () => {
                 ...PERSONAL_DETAILS,
                 '4': {
                     ...PERSONAL_DETAILS['4'],
-                    displayName: "King T'Challa", // Modified display name
+                    displayName: 'Black Panther Updated', // Modified display name
                 },
             };
 
