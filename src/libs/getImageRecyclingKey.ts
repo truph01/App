@@ -7,9 +7,9 @@ type ImageSourceParam = ImageSource | number | ImageSource[] | Omit<ImageURISour
  * Returns a string key for image recycling in FlashList.
  * Extracts the URI if available, otherwise stringifies the source.
  */
-function getImageRecyclingKey(source: ImageSourceParam): string {
+function getImageRecyclingKey(source: ImageSourceParam): string | undefined {
     if (!source) {
-        return '';
+        return undefined;
     }
 
     if (typeof source === 'number') {
@@ -18,7 +18,7 @@ function getImageRecyclingKey(source: ImageSourceParam): string {
 
     if (Array.isArray(source)) {
         const firstSource = source.at(0);
-        return firstSource ? getImageRecyclingKey(firstSource) : '';
+        return firstSource ? getImageRecyclingKey(firstSource) : undefined;
     }
 
     if (typeof source === 'object' && 'uri' in source && source.uri) {
