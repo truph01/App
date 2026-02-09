@@ -425,8 +425,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 login: details.login ?? '',
                 customField1: policyEmployee.employeeUserID,
                 customField2: policyEmployee.employeePayrollID,
-                isDisabledCheckbox:
-                    !(isPolicyAdmin && accountID !== policy?.ownerAccountID && accountID !== session?.accountID) || email === policy?.achAccount?.reimburser,
+                isDisabledCheckbox: !(isPolicyAdmin && accountID !== policy?.ownerAccountID && accountID !== session?.accountID),
                 isDisabled: isPendingDeleteOrError,
                 isInteractive: !details.isOptimisticPersonalDetail,
                 cursorStyle: details.isOptimisticPersonalDetail ? styles.cursorDefault : {},
