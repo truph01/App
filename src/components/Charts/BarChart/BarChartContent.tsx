@@ -8,7 +8,7 @@ import {Bar, CartesianChart} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
-import {CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, X_AXIS_LINE_WIDTH, Y_AXIS_LABEL_OFFSET, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
+import {CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, X_AXIS_LABEL_OFFSET, X_AXIS_LINE_WIDTH, Y_AXIS_LABEL_OFFSET, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
 import fontSource from '@components/Charts/font';
 import type {HitTestArgs} from '@components/Charts/hooks';
 import {useChartInteractions, useChartLabelFormats, useChartLabelLayout, useDynamicYDomain, useTooltipData} from '@components/Charts/hooks';
@@ -216,6 +216,7 @@ function BarChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUni
                             tickCount: data.length,
                             labelColor: theme.textSupporting,
                             lineWidth: X_AXIS_LINE_WIDTH,
+                            labelOffset: X_AXIS_LABEL_OFFSET,
                             formatXLabel: formatXAxisLabel,
                             labelRotate: labelRotation,
                             labelOverflow: 'visible',
