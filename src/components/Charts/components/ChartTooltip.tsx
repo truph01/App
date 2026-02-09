@@ -1,8 +1,8 @@
-import React, {useCallback, useState} from 'react';
-import type {LayoutChangeEvent} from 'react-native';
-import {View} from 'react-native';
-import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
-import type {SharedValue} from 'react-native-reanimated';
+import React, { useCallback, useState } from 'react';
+import type { LayoutChangeEvent } from 'react-native';
+import { View } from 'react-native';
+import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue } from 'react-native-reanimated';
+import type { SharedValue } from 'react-native-reanimated';
 import Text from '@components/Text';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -27,25 +27,20 @@ type ChartTooltipProps = {
     chartWidth: number;
 
     /** The initial tooltip position */
-    initialTooltipPosition: SharedValue<{x: number; y: number}>;
+    initialTooltipPosition: SharedValue<{ x: number; y: number }>;
 };
 
-function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosition}: ChartTooltipProps) {
+function ChartTooltip({ label, amount, percentage, chartWidth, initialTooltipPosition }: ChartTooltipProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
 
     /** Shared value to store the measured width of the tooltip container */
     const tooltipMeasuredWidth = useSharedValue(0);
 
-    /** React state to track the content string that has been successfully measured */
-    const [measuredContent, setMeasuredContent] = useState<string | null>(null);
-
     const content = percentage ? `${label} • ${amount} (${percentage})` : `${label} • ${amount}`;
 
-    /** * Visibility gate: Only true when the currently rendered text matches
-     * the text we've already received a width measurement for.
-     */
-    const isReady = measuredContent === content;
+    /** * Visibility gate: Only true when the tooltip has been measured */
+    const [hasMeasured, setHasMeasured] = useState(false);
 
     /**
      * Updates the shared width value and sets the measured content key.
@@ -53,37 +48,41 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
      */
     const handleTooltipLayout = useCallback(
         (event: LayoutChangeEvent) => {
-            const {width} = event.nativeEvent.layout;
+            const { width } = event.nativeEvent.layout;
             if (width > 0) {
                 tooltipMeasuredWidth.set(width);
-                setMeasuredContent(content);
+                setHasMeasured(true);
             }
         },
-        [content, tooltipMeasuredWidth],
+        [tooltipMeasuredWidth],
     );
+
+    /** Calculate the center point, ensuring the box doesn't overflow the left or right edges */
+    const clampedCenter = useDerivedValue(() => {
+        const { x } = initialTooltipPosition.get();
+        const width = tooltipMeasuredWidth.get();
+        const halfWidth = width / 2;
+
+        return Math.max(halfWidth, Math.min(chartWidth - halfWidth, x));
+    }, [initialTooltipPosition, tooltipMeasuredWidth, chartWidth]);
 
     /**
      * Animated style for the main tooltip container.
      * Calculates the clamped center to keep the box within chart boundaries.
      */
     const tooltipStyle = useAnimatedStyle(() => {
-        const {x, y} = initialTooltipPosition.get();
-        const width = tooltipMeasuredWidth.get();
-        const halfWidth = width / 2;
-
-        /** Calculate the center point, ensuring the box doesn't overflow the left or right edges */
-        const clampedCenter = Math.max(halfWidth, Math.min(chartWidth - halfWidth, x));
+        const { y } = initialTooltipPosition.get();
 
         return {
             position: 'absolute',
-            left: clampedCenter,
+            left: clampedCenter.get(),
             top: y,
             /** Center the wrapper horizontally and lift it entirely above the Y point */
-            transform: [{translateX: '-50%'}, {translateY: '-100%'}],
+            transform: [{ translateX: '-50%' }, { translateY: '-100%' }],
             /** Keep invisible until measurement for the current bar's content is ready */
-            opacity: isReady ? 1 : 0,
+            opacity: hasMeasured ? 1 : 0,
         };
-    }, [chartWidth, initialTooltipPosition, isReady]);
+    }, [chartWidth, initialTooltipPosition, hasMeasured]);
 
     /**
      * Animated style for the pointer (triangle).
@@ -91,16 +90,12 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
      * even when the main container is clamped to the edges.
      */
     const pointerStyle = useAnimatedStyle(() => {
-        const {x} = initialTooltipPosition.get();
-        const width = tooltipMeasuredWidth.get();
-        const halfWidth = width / 2;
+        const { x } = initialTooltipPosition.get();
 
-        /** Find the distance between the bar's X and the container's clamped center */
-        const clampedCenter = Math.max(halfWidth, Math.min(chartWidth - halfWidth, x));
-        const relativeOffset = x - clampedCenter;
+        const relativeOffset = x - clampedCenter.get();
 
         return {
-            transform: [{translateX: relativeOffset}],
+            transform: [{ translateX: relativeOffset }],
         };
     }, [chartWidth, initialTooltipPosition]);
 
@@ -126,8 +121,8 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
                             borderLeftWidth: TOOLTIP_POINTER_WIDTH / 2,
                             borderRightWidth: TOOLTIP_POINTER_WIDTH / 2,
                             borderTopWidth: TOOLTIP_POINTER_HEIGHT,
-                            borderLeftColor: 'transparent',
-                            borderRightColor: 'transparent',
+                            borderLeftColor: theme.transparent,
+                            borderRightColor: theme.transparent,
                             borderTopColor: theme.heading,
                         },
                         pointerStyle,
