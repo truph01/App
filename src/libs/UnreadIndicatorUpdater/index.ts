@@ -6,6 +6,7 @@ import memoize from '@libs/memoize';
 import {getOneTransactionThreadReportID} from '@libs/ReportActionsUtils';
 import * as ReportUtils from '@libs/ReportUtils';
 import Navigation, {navigationRef} from '@navigation/Navigation';
+import Timing from '@userActions/Timing';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportActions, ReportNameValuePairs} from '@src/types/onyx';
@@ -87,8 +88,10 @@ const memoizedGetUnreadReportsForUnreadIndicator = memoize(getUnreadReportsForUn
 const triggerUnreadUpdate = debounce(() => {
     const currentReportID = navigationRef?.isReady?.() ? Navigation.getTopmostReportId() : undefined;
     const draftComment = allDraftComments?.[`${ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT}${currentReportID}`];
+    Timing.start(CONST.TIMING.GET_UNREAD_REPORTS_FOR_UNREAD_INDICATOR);
     // We want to keep notification count consistent with what can be accessed from the LHN list
     const unreadReports = memoizedGetUnreadReportsForUnreadIndicator(allReports, currentReportID, draftComment);
+    Timing.end(CONST.TIMING.GET_UNREAD_REPORTS_FOR_UNREAD_INDICATOR);
 
     updateUnread(unreadReports.length);
 }, CONST.TIMING.UNREAD_UPDATE_DEBOUNCE_TIME);

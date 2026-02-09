@@ -9572,7 +9572,8 @@ function reasonForReportToBeInOptionList({
     const reportActionKeys = Object.keys(currentReportActions);
 
     const isThreadReport = isThread(report);
-    const parentReportAction = isThreadReport ? allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`]?.[report.parentReportActionID] : undefined;
+    const parentReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`];
+    const parentReportAction = isThreadReport ? parentReportActions?.[report.parentReportActionID] : undefined;
 
     // We used to use the system DM for A/B testing onboarding tasks, but now only create them in the Concierge chat. We
     // still need to allow existing users who have tasks in the system DM to see them, but otherwise we don't need to

@@ -1699,6 +1699,7 @@ const CONST = {
         SUGGESTION_DEBOUNCE_TIME: 100,
         RESIZE_DEBOUNCE_TIME: 100,
         UNREAD_UPDATE_DEBOUNCE_TIME: 300,
+        GET_UNREAD_REPORTS_FOR_UNREAD_INDICATOR: 'get_unread_reports_for_unread_indicator',
         SEARCH_FILTER_OPTIONS: 'search_filter_options',
         USE_DEBOUNCED_STATE_DELAY: 300,
         LIST_SCROLLING_DEBOUNCE_TIME: 200,
