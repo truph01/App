@@ -13,6 +13,7 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {LockedAccountContext} from '@components/LockedAccountModalProvider';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {useSession} from '@components/OnyxListItemProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import useCurrencyList from '@hooks/useCurrencyList';
@@ -22,6 +23,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
 import {formatCardExpiration, getDomainCards, isCardFrozen, maskCard, maskPin} from '@libs/CardUtils';
@@ -43,8 +45,6 @@ import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type {Card, PrivatePersonalDetails} from '@src/types/onyx';
 import {useExpensifyCardActions, useExpensifyCardState} from './ExpensifyCardContextProvider';
-import { useSession } from '@components/OnyxListItemProvider';
-import usePermissions from '@hooks/usePermissions';
 
 type ExpensifyCardPageProps =
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.WALLET.DOMAIN_CARD>
@@ -399,7 +399,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 title={translate('cardPage.freezeCard')}
                                 style={styles.mt3}
                                 disabled={isOffline}
-                                onPress={() => (setIsFreezeModalVisible(true))}
                             />
                         )}
                     </>
