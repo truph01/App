@@ -8128,14 +8128,7 @@ describe('actions/IOU', () => {
             const ancestors = [];
             ancestors.push(...(iouReport && createIOUAction ? [{report: iouReport, reportAction: createIOUAction, shouldDisplayNewMarker: false}] : []));
             ancestors.push(...(chatReport && iouPreview ? [{report: chatReport, reportAction: iouPreview, shouldDisplayNewMarker: false}] : []));
-            addComment({
-                report: thread,
-                notifyReportID: thread.reportID,
-                ancestors,
-                text: 'Testing a comment',
-                timezoneParam: CONST.DEFAULT_TIME_ZONE,
-                currentUserAccountID: TEST_USER_ACCOUNT_ID,
-            });
+            addComment(thread, thread.reportID, ancestors, 'Testing a comment', CONST.DEFAULT_TIME_ZONE);
             await waitForBatchedUpdates();
 
             // Then comment details should match the expected report action
@@ -8244,7 +8237,7 @@ describe('actions/IOU', () => {
 
             // Given a test user is signed in with Onyx setup and some initial data
             await signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
-            subscribeToUserEvents(TEST_USER_ACCOUNT_ID);
+            subscribeToUserEvents();
             await waitForBatchedUpdates();
             await setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID);
 
@@ -8385,14 +8378,7 @@ describe('actions/IOU', () => {
             jest.advanceTimersByTime(10);
 
             // When a comment is added
-            addComment({
-                report: thread,
-                notifyReportID: thread.reportID,
-                ancestors: [],
-                text: 'Testing a comment',
-                timezoneParam: CONST.DEFAULT_TIME_ZONE,
-                currentUserAccountID: TEST_USER_ACCOUNT_ID,
-            });
+            addComment(thread, thread.reportID, [], 'Testing a comment', CONST.DEFAULT_TIME_ZONE);
             await waitForBatchedUpdates();
 
             // Then comment details should match the expected report action
