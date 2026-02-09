@@ -92,6 +92,5 @@ export default function useChartLabelFormats({data, font, yAxisUnit, yAxisUnitPo
     return {
         formatXAxisLabel,
         formatYAxisLabel,
-        displayUnit,
     };
 }

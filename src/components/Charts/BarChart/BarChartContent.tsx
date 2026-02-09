@@ -85,7 +85,7 @@ function BarChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUni
         return {...BASE_DOMAIN_PADDING, left: horizontalPadding, right: horizontalPadding};
     }, [chartWidth, data.length]);
 
-    const {formatXAxisLabel, formatYAxisLabel, displayUnit} = useChartLabelFormats({
+    const {formatXAxisLabel, formatYAxisLabel} = useChartLabelFormats({
         data,
         font,
         yAxisUnit,
