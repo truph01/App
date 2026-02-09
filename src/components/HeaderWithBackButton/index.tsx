@@ -68,7 +68,7 @@ function HeaderWithBackButton({
     shouldOverlayDots = false,
     shouldOverlay = false,
     shouldNavigateToTopMostReport = false,
-    shouldDisplayHelpButton = true,
+    shouldDisplayHelpButton = false,
     shouldDisplaySearchRouter = false,
     progressBarPercentage,
     style,

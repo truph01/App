@@ -1759,6 +1759,7 @@ function MoneyReportHeader({
                 report={moneyRequestReport}
                 shouldShowBackButton={shouldShowBackButton}
                 shouldDisplaySearchRouter={shouldDisplaySearchRouter}
+                shouldDisplayHelpButton
                 onBackButtonPress={onBackButtonPress}
                 shouldShowBorderBottom={false}
                 shouldEnableDetailPageNavigation

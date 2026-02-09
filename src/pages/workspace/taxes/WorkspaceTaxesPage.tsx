@@ -400,6 +400,7 @@ function WorkspaceTaxesPage({
                     shouldUseHeadlineHeader={!selectionModeHeader}
                     title={translate(selectionModeHeader ? 'common.selectMultiple' : 'workspace.common.taxes')}
                     shouldShowBackButton={shouldUseNarrowLayout}
+                    shouldDisplayHelpButton
                     onBackButtonPress={() => {
                         if (isMobileSelectionModeEnabled) {
                             setSelectedTaxesIDs([]);

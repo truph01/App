@@ -104,6 +104,7 @@ function WorkspaceTravelPage({
                     title={translate('workspace.moreFeatures.travel.title')}
                     shouldUseHeadlineHeader
                     shouldShowBackButton={shouldUseNarrowLayout}
+                    shouldDisplayHelpButton
                     onBackButtonPress={Navigation.popToSidebar}
                 />
                 <ScrollViewWithContext addBottomSafeAreaPadding>

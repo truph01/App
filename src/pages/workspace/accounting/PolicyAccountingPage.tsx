@@ -557,6 +557,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                     shouldShowBackButton={shouldUseNarrowLayout}
                     icon={illustrations.Accounting}
                     shouldUseHeadlineHeader
+                    shouldDisplayHelpButton
                     onBackButtonPress={Navigation.popToSidebar}
                 />
                 <ScrollView

@@ -371,6 +371,7 @@ function SecuritySettingsPage() {
                         icon={illustrations.LockClosed}
                         shouldUseHeadlineHeader
                         shouldDisplaySearchRouter
+                        shouldDisplayHelpButton
                     />
                     <ScrollView contentContainerStyle={styles.pt3}>
                         <View style={[styles.flex1, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>

@@ -61,6 +61,7 @@ function PreferencesPage() {
                 shouldUseHeadlineHeader
                 shouldShowBackButton={shouldUseNarrowLayout}
                 shouldDisplaySearchRouter
+                shouldDisplayHelpButton
                 onBackButtonPress={Navigation.popToSidebar}
             />
             <ScrollView contentContainerStyle={styles.pt3}>

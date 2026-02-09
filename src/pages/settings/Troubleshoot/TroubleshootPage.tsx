@@ -180,6 +180,7 @@ function TroubleshootPage() {
                 title={translate('initialSettingsPage.aboutPage.troubleshoot')}
                 shouldShowBackButton={shouldUseNarrowLayout}
                 shouldDisplaySearchRouter
+                shouldDisplayHelpButton
                 onBackButtonPress={Navigation.popToSidebar}
                 icon={illustrations.Lightbulb}
                 shouldUseHeadlineHeader

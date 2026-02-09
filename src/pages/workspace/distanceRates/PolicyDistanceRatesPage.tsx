@@ -476,6 +476,7 @@ function PolicyDistanceRatesPage({
                     shouldUseHeadlineHeader={!selectionModeHeader}
                     title={translate(!selectionModeHeader ? 'workspace.common.distanceRates' : 'common.selectMultiple')}
                     shouldShowBackButton={shouldUseNarrowLayout}
+                    shouldDisplayHelpButton
                     onBackButtonPress={() => {
                         if (isMobileSelectionModeEnabled) {
                             setSelectedDistanceRates([]);
