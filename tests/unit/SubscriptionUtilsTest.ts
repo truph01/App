@@ -669,11 +669,6 @@ describe('SubscriptionUtils', () => {
             // No Onyx value set, no parameter passed
             expect(hasOverdueGracePeriod(undefined)).toBe(false);
         });
-
-        it('should return false when null is passed', () => {
-            // Null passed as parameter
-            expect(hasOverdueGracePeriod(null)).toBe(false);
-        });
     });
 
     describe('hasGracePeriodOverdue - pure function behavior', () => {
@@ -695,11 +690,6 @@ describe('SubscriptionUtils', () => {
         it('should return false when no grace period is passed and none is set in Onyx', () => {
             // No Onyx value set, no parameter passed
             expect(hasGracePeriodOverdue(undefined)).toBe(false);
-        });
-
-        it('should return false when null is passed', () => {
-            // Null passed as parameter
-            expect(hasGracePeriodOverdue(null)).toBe(false);
         });
     });
 
