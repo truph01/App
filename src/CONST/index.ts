@@ -8067,6 +8067,7 @@ const CONST = {
             DOWNLOAD_BUTTON: 'Header-DownloadButton',
             CLOSE_BUTTON: 'Header-CloseButton',
             MORE_BUTTON: 'Header-MoreButton',
+            ROTATE_BUTTON: 'Header-RotateButton',
         },
         VIDEO_PLAYER: {
             PLAY_PAUSE_BUTTON: 'VideoPlayer-PlayPauseButton',
@@ -8097,6 +8098,7 @@ const CONST = {
             USER_SELECTION_CHECKBOX: 'Search-UserSelectionCheckbox',
             TRANSACTION_GROUP_LIST_ITEM: 'Search-TransactionGroupListItem',
             SELECT_ALL_BUTTON: 'Search-SelectAllButton',
+            CANCEL_BUTTON: 'Search-CancelButton',
         },
         REPORT: {
             FLOATING_MESSAGE_COUNTER: 'Report-FloatingMessageCounter',
