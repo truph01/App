@@ -8508,6 +8508,7 @@ ${amount} para ${merchant} - ${date}`,
             disableSamlRequired: 'Deshabilitar requisito de SAML',
             oktaWarningPrompt: '¿Estás seguro? Esto también deshabilitará Okta SCIM.',
             requireWithEmptyMetadataError: 'Por favor, añade los metadatos del Proveedor de Identidad a continuación para habilitar',
+            pleaseDisableTwoFactorAuth: 'Por favor, deshabilita la autenticación de dos factores obligatoria para habilitar el inicio de sesión con SAML.',
         },
         samlConfigurationDetails: {
             title: 'Detalles de configuración de SAML',
