@@ -8299,6 +8299,12 @@ const CONST = {
         ACCOUNT_SWITCHER: {
             SHOW_ACCOUNTS: 'AccountSwitcher-ShowAccounts',
         },
+        SIDE_PANEL: {
+            HELP: 'SidePanel-Help',
+        },
+        PRODUCT_TRAINING: {
+            TOOLTIP: 'ProductTraining-Tooltip',
+        },
     },
 
     DOMAIN: {
