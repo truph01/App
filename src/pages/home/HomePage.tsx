@@ -21,7 +21,7 @@ function HomePage() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    // confirmReadyToOpenApp must be called after HomePage mounts
+    // This hook signals that the app is ready to be opened after HomePage mounts
     // to make sure everything loads properly
     useConfirmReadyToOpenApp();
 
