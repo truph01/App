@@ -58,6 +58,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                         text: translate('domain.common.settings'),
                         icon: icons.Gear,
                         onSelected: () => Navigation.navigate(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID)),
+                        brickRoadIndicator: hasSettingsErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
                     },
                 ]}
                 isSplitButton={false}
