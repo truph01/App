@@ -9,6 +9,7 @@ import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useReportIsArchived from '@hooks/useReportIsArchived';
+import setNavigationActionToMicrotaskQueue from '@libs/Navigation/helpers/setNavigationActionToMicrotaskQueue';
 import type {PlatformStackRouteProp, PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {ReportSettingsNavigatorParamList} from '@libs/Navigation/types';
 import {goBackToDetailsPage, isArchivedNonExpenseReport} from '@libs/ReportUtils';
@@ -52,7 +53,7 @@ function VisibilityPage({report}: VisibilityProps) {
             return;
         }
         updateRoomVisibility(report.reportID, report.visibility, newVisibility);
-        goBack();
+        setNavigationActionToMicrotaskQueue(goBack);
     };
 
     const showPublicVisibilityModal = async () => {
