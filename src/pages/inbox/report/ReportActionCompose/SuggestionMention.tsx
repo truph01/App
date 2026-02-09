@@ -205,11 +205,19 @@ function SuggestionMention({
             const mentionCode = getMentionCode(mentionObject, suggestionValues.prefixType);
             const originalMention = getOriginalMentionText(value, suggestionValues.atSignIndex, StringUtils.countWhiteSpaces(suggestionValues.mentionPrefix));
 
+            let trailingDots = '';
+            let mentionToReplace = originalMention;
+            if (suggestionValues.prefixType === '@' && suggestionValues.mentionPrefix.endsWith('.')) {
+                const match = originalMention.match(/\.{1,}$/);
+                trailingDots = match?.[0] ?? '';
+                mentionToReplace = originalMention.slice(0, originalMention.length - trailingDots.length);
+            }
+
             const commentAfterMention = value.slice(
-                suggestionValues.atSignIndex + Math.max(originalMention.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length),
+                suggestionValues.atSignIndex + Math.max(mentionToReplace.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length),
             );
 
-            updateComment(`${commentBeforeAtSign}${mentionCode} ${trimLeadingSpace(commentAfterMention)}`, true);
+            updateComment(`${commentBeforeAtSign}${mentionCode}${trailingDots}${trimLeadingSpace(commentAfterMention)}`, true);
             const selectionPosition = suggestionValues.atSignIndex + mentionCode.length + CONST.SPACE_LENGTH;
             setSelection({
                 start: selectionPosition,
