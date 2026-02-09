@@ -1714,18 +1714,9 @@ function setMoneyRequestOdometerReading(transactionID: string, startReading: num
  */
 function setMoneyRequestOdometerImage(transactionID: string, imageType: OdometerImageType, file: File | string, isDraft: boolean) {
     const imageKey = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? 'odometerStartImage' : 'odometerEndImage';
-    const normalizedFile: FileObject | string =
-        typeof file === 'string'
-            ? file
-            : {
-                  uri: (file as FileObject).uri ?? (typeof URL !== 'undefined' ? URL.createObjectURL(file) : undefined),
-                  name: file.name,
-                  type: file.type,
-                  size: file.size,
-              };
     Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {
         comment: {
-            [imageKey]: normalizedFile,
+            [imageKey]: file,
         },
     });
 }
