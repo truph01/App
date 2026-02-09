@@ -82,6 +82,7 @@ function ListHeader<TItem extends ListItem>({
                         disabled={allDisabled}
                         dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                         onMouseDown={handleMouseDown}
+                        sentryLabel={CONST.SENTRY_LABEL.SELECTION_LIST.SELECT_ALL}
                     >
                         <Text style={[styles.textStrong, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>
                     </PressableWithFeedback>
