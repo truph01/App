@@ -11,9 +11,10 @@ import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getPredefinedConnectionNamesForSearch, getSearchValueForConnection} from '@libs/AccountingUtils';
+import {getSearchValueForConnection} from '@libs/AccountingUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getIntegrationIcon} from '@libs/ReportUtils';
+import variables from '@styles/variables';
 import {getExportTemplates, updateAdvancedFilters} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -38,17 +39,17 @@ function SearchFiltersExportedToPage() {
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const policy = policyIDs?.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDs.at(0)}`] : undefined;
 
-    const predefinedConnectionNamesList = getPredefinedConnectionNamesForSearch();
+    const predefinedConnectionNamesList = Object.values(CONST.POLICY.CONNECTIONS.NAME);
 
     const items = useMemo((): SearchMultipleSelectionPickerItem[] => {
         const predefinedConnectionNamesSet = new Set<string>(predefinedConnectionNamesList);
         const defaultExportOptionIcon = (
-            <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter]}>
+            <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter, StyleUtils.getWidthAndHeightStyle(variables.w28, variables.h28)]}>
                 <Icon
                     src={expensifyIcons.Table}
                     fill={theme.icon}
-                    width={24}
-                    height={24}
+                    width={variables.iconSizeNormal}
+                    height={variables.iconSizeNormal}
                 />
             </View>
         );
@@ -59,8 +60,8 @@ function SearchFiltersExportedToPage() {
                 <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter]}>
                     <Icon
                         src={icon}
-                        width={24}
-                        height={24}
+                        width={variables.iconSizeXLarge}
+                        height={variables.iconSizeXLarge}
                         additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.ICON_TYPE_AVATAR)]}
                     />
                 </View>
