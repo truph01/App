@@ -187,9 +187,9 @@ async function revokeMultifactorAuthenticationCredentials() {
     }
 }
 
-async function authorizeTransaction({transactionID, signedChallenge}: MultifactorAuthenticationScenarioParameters['AUTHORIZE-TRANSACTION']) {
+async function authorizeTransaction({transactionID, signedChallenge, authenticationMethod}: MultifactorAuthenticationScenarioParameters['AUTHORIZE-TRANSACTION']) {
     try {
-        const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.AUTHORIZE_TRANSACTION, {transactionID, signedChallenge}, {});
+        const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.AUTHORIZE_TRANSACTION, {transactionID, signedChallenge, authenticationMethod}, {});
 
         const {jsonCode, message} = response ?? {};
 

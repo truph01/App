@@ -44,7 +44,6 @@ export default {
             confirmButtonText: 'multifactorAuthentication.reviewTransaction.denyTransaction',
         },
     },
-    nativePromptTitle: 'multifactorAuthentication.letsVerifyItsYou',
 } as const satisfies MultifactorAuthenticationScenarioCustomConfig<Payload>;
 
 export type {Payload};
