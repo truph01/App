@@ -932,9 +932,6 @@ function formatUTCDateTimeToDateInTimezone(utcDateTime: string, timeZone: Select
     }
     try {
         const date = toDate(utcDateTime, {timeZone: 'UTC'});
-        if (!isValid(date)) {
-            return '';
-        }
         return formatInTimeZoneWithFallback(date, timeZone, formatStr);
     } catch (error) {
         Log.warn('[DateUtils] Failed to format UTC datetime to timezone', {utcDateTime, timeZone, error});
