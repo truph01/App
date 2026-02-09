@@ -25,9 +25,11 @@ function CardNameStep() {
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.ADD_NEW_CARD_FEED_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.ADD_NEW_CARD_FEED_FORM> => {
         const errors = getFieldRequiredErrors(values, [INPUT_IDS.CARD_TITLE], translate);
-        const {isValid, byteLength} = isValidInputLength(values.cardTitle, CONST.STANDARD_LENGTH_LIMIT);
-        if (!isValid) {
-            addErrorMessage(errors, INPUT_IDS.CARD_TITLE, translate('common.error.characterLimitExceedCounter', byteLength, CONST.STANDARD_LENGTH_LIMIT));
+        if (values.cardTitle) {
+            const {isValid, byteLength} = isValidInputLength(values.cardTitle, CONST.STANDARD_LENGTH_LIMIT);
+            if (!isValid) {
+                addErrorMessage(errors, INPUT_IDS.CARD_TITLE, translate('common.error.characterLimitExceedCounter', byteLength, CONST.STANDARD_LENGTH_LIMIT));
+            }
         }
         return errors;
     };

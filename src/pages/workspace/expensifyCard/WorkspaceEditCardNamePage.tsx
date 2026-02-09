@@ -54,9 +54,11 @@ function WorkspaceEditCardNamePage({route}: WorkspaceEditCardNamePageProps) {
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_NAME_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_NAME_FORM> => {
         const errors = getFieldRequiredErrors(values, [INPUT_IDS.NAME], translate);
-        const {isValid, byteLength} = isValidInputLength(values.name, CONST.STANDARD_LENGTH_LIMIT);
-        if (!isValid) {
-            addErrorMessage(errors, INPUT_IDS.NAME, translate('common.error.characterLimitExceedCounter', byteLength, CONST.STANDARD_LENGTH_LIMIT));
+        if (values.name) {
+            const {isValid, byteLength} = isValidInputLength(values.name, CONST.STANDARD_LENGTH_LIMIT);
+            if (!isValid) {
+                addErrorMessage(errors, INPUT_IDS.NAME, translate('common.error.characterLimitExceedCounter', byteLength, CONST.STANDARD_LENGTH_LIMIT));
+            }
         }
         return errors;
     };
