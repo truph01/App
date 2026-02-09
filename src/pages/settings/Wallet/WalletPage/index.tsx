@@ -320,15 +320,6 @@ function WalletPage() {
     // Determines whether or not the modal popup is mounted from the bottom of the screen instead of the side mount on Web screen
     const alertTextStyle = [styles.inlineSystemMessage, styles.flexShrink1];
     const alertViewStyle = [styles.flexRow, styles.alignItemsCenter, styles.w100];
-
-    const onBackButtonPress = () => {
-        if (Navigation.getShouldPopToSidebar()) {
-            Navigation.popToSidebar();
-            return;
-        }
-        Navigation.goBack();
-    };
-
     const headerWithBackButton = (
         <HeaderWithBackButton
             title={translate('common.wallet')}
@@ -336,7 +327,6 @@ function WalletPage() {
             shouldUseHeadlineHeader
             shouldShowBackButton={shouldUseNarrowLayout}
             shouldDisplaySearchRouter
-            onBackButtonPress={onBackButtonPress}
         />
     );
 

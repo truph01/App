@@ -194,11 +194,6 @@ function WorkspacePageWithSections({
             return true;
         }
 
-        if (Navigation.getShouldPopToSidebar()) {
-            Navigation.popToSidebar();
-            return true;
-        }
-
         Navigation.goBack();
         return true;
     };

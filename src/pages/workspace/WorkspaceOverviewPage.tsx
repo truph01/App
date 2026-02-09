@@ -341,7 +341,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             return;
         }
 
-        Navigation.popToSidebar();
+        Navigation.goBack();
     };
 
     const startChangeOwnershipFlow = useCallback(() => {
