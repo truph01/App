@@ -8,6 +8,7 @@ import useSidePanelActions from '@hooks/useSidePanelActions';
 import useSidePanelState from '@hooks/useSidePanelState';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import CONST from '@src/CONST';
 import type SidePanelButtonProps from './types';
 
 function SidePanelButtonBase({style}: SidePanelButtonProps) {
@@ -25,6 +26,7 @@ function SidePanelButtonBase({style}: SidePanelButtonProps) {
     return (
         <Tooltip text={translate('common.help')}>
             <PressableWithoutFeedback
+                sentryLabel={CONST.SENTRY_LABEL.SIDE_PANEL.HELP}
                 accessibilityLabel={translate('common.help')}
                 style={[styles.flexRow, styles.touchableButtonImage, style]}
                 onPress={openSidePanel}

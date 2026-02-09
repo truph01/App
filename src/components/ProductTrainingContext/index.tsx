@@ -292,6 +292,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
                     </View>
                     {!tooltip?.shouldRenderActionButtons && (
                         <PressableWithoutFeedback
+                            sentryLabel={CONST.SENTRY_LABEL.PRODUCT_TRAINING.TOOLTIP}
                             shouldUseAutoHitSlop
                             accessibilityLabel={translate('common.noThanks')}
                             role={CONST.ROLE.BUTTON}

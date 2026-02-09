@@ -8263,6 +8263,12 @@ const CONST = {
         WORKSPACE: {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
         },
+        SIDE_PANEL: {
+            HELP: 'SidePanel-Help',
+        },
+        PRODUCT_TRAINING: {
+            TOOLTIP: 'ProductTraining-Tooltip',
+        },
     },
 
     DOMAIN: {
