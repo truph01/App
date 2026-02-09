@@ -1678,6 +1678,73 @@ describe('OptionsListUtils', () => {
             expect(results.personalDetails.at(0)?.text).toBe('Black Panther');
         });
 
+        it('should use personalDetailsCollection when provided with partial data', () => {
+            // Given a subset of personalDetailsCollection with only some users
+            const partialPersonalDetails: PersonalDetailsList = {
+                '4': {
+                    accountID: 4,
+                    displayName: 'Black Panther',
+                    login: 'tchalla@expensify.com',
+                    reportID: '1',
+                },
+                '9': {
+                    accountID: 9,
+                    displayName: 'Black Widow',
+                    login: 'natasharomanoff@expensify.com',
+                    reportID: '',
+                },
+            };
+
+            // When we call getMemberInviteOptions with a partial personalDetailsCollection
+            const results = getMemberInviteOptions(
+                OPTIONS.personalDetails,
+                nvpDismissedProductTraining,
+                loginList,
+                CURRENT_USER_ACCOUNT_ID,
+                CURRENT_USER_EMAIL,
+                partialPersonalDetails,
+                [],
+                {},
+                false,
+                COUNTRY_CODE,
+            );
+
+            // Then results should still include all personal details from OPTIONS.personalDetails
+            // (personalDetailsCollection is used for lookup purposes, not filtering)
+            expect(results.personalDetails.length).toBeGreaterThan(0);
+            expect(results.personalDetails.at(0)?.text).toBe('Black Panther');
+        });
+
+        it('should handle personalDetailsCollection with different display names', () => {
+            // Given a personalDetailsCollection with modified display names
+            const modifiedPersonalDetails: PersonalDetailsList = {
+                ...PERSONAL_DETAILS,
+                '4': {
+                    ...PERSONAL_DETAILS['4'],
+                    displayName: "King T'Challa", // Modified display name
+                },
+            };
+
+            // When we call getMemberInviteOptions with modified personalDetailsCollection
+            const results = getMemberInviteOptions(
+                OPTIONS.personalDetails,
+                nvpDismissedProductTraining,
+                loginList,
+                CURRENT_USER_ACCOUNT_ID,
+                CURRENT_USER_EMAIL,
+                modifiedPersonalDetails,
+                [],
+                {},
+                false,
+                COUNTRY_CODE,
+            );
+
+            // Then personal details should still be returned
+            expect(results.personalDetails.length).toBeGreaterThan(0);
+            // The personalDetails in results come from OPTIONS.personalDetails, not personalDetailsCollection
+            expect(results.personalDetails.at(0)?.text).toBe('Black Panther');
+        });
+
         it('should exclude specified logins', () => {
             // Given a set of personalDetails and logins to exclude
             const excludeLogins = {'tchalla@expensify.com': true};
