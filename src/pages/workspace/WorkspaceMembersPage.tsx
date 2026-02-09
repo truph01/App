@@ -659,6 +659,11 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         const hasAtLeastOneNonAuditorRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.AUDITOR);
         const hasAtLeastOneNonMemberRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.USER);
         const hasAtLeastOneNonAdminRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.ADMIN);
+        const shouldShowChangeRoleAction = policy?.achAccount?.reimburser ? !selectedEmployees.includes(policy?.achAccount?.reimburser) : true;
+
+        if(!shouldShowChangeRoleAction) {
+            return options;
+        }
 
         if (hasAtLeastOneNonMemberRole) {
             options.push(memberOption);
