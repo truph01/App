@@ -4,7 +4,7 @@ import isDynamicRouteSuffix from './isDynamicRouteSuffix';
 
 const combinePathAndSuffix = (path: string, suffix: string): Route => {
     const [basePath, params] = path.split('?');
-    let newPath = path.endsWith('/') ? `${basePath}${suffix}` : `${basePath}/${suffix}`;
+    let newPath = basePath.endsWith('/') ? `${basePath}${suffix}` : `${basePath}/${suffix}`;
 
     if (params) {
         newPath += `?${params}`;
