@@ -14,7 +14,12 @@ import PusherConnectionManager from '@src/libs/PusherConnectionManager';
  * 4. The deferred callback finally runs and finds socket === null
  *
  * Previously, this threw an unhandled error that crashed the app in production.
+ * Now it reports to Sentry via captureException without crashing.
  */
+
+// Store the original __DEV__ value so we can restore it after tests
+// eslint-disable-next-line no-underscore-dangle
+const originalDev = __DEV__;
 
 async function initPusher() {
     PusherConnectionManager.init();
@@ -37,11 +42,18 @@ describe('Pusher.subscribe', () => {
     });
 
     afterEach(() => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-underscore-dangle
+        (global as Record<string, unknown>).__DEV__ = originalDev;
         Pusher.disconnect();
         jest.restoreAllMocks();
     });
 
     it('should resolve gracefully when socket is disconnected before subscribe callback runs', async () => {
+        // Simulate production environment so we hit the Sentry.captureException path
+        // instead of the __DEV__ throw path
+        // eslint-disable-next-line no-underscore-dangle
+        (global as Record<string, unknown>).__DEV__ = false;
+
         // 1. Initialize Pusher and wait for initPromise to resolve
         await initPusher();
 
@@ -61,6 +73,10 @@ describe('Pusher.subscribe', () => {
     });
 
     it('should log a message when skipping subscription due to disconnected socket', async () => {
+        // Simulate production environment
+        // eslint-disable-next-line no-underscore-dangle
+        (global as Record<string, unknown>).__DEV__ = false;
+
         const logSpy = jest.spyOn(Log, 'info');
 
         await initPusher();
@@ -75,6 +91,21 @@ describe('Pusher.subscribe', () => {
             channelName: 'private-user-456',
             eventName: 'multipleEvents',
         });
+    });
+
+    it('should throw in dev when socket is disconnected before subscribe callback runs', async () => {
+        // Ensure __DEV__ is true (the default in Jest)
+        // eslint-disable-next-line no-underscore-dangle
+        (global as Record<string, unknown>).__DEV__ = true;
+
+        await initPusher();
+
+        const subscribePromise = Pusher.subscribe('private-user-dev', 'multipleEvents');
+        Pusher.disconnect();
+
+        await jest.runAllTimersAsync();
+
+        await expect(subscribePromise).rejects.toThrow('[Pusher] instance not found. Pusher.subscribe() most likely has been called before Pusher.init()');
     });
 
     it('should subscribe successfully when socket is connected', async () => {
