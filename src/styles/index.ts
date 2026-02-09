@@ -2963,7 +2963,7 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         transactionsCarouselGap: {
-            width: 8,
+            width: variables.spacing2,
         },
 
         attachmentCarouselContainer: {
