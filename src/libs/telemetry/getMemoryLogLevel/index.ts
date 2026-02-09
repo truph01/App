@@ -1,6 +1,6 @@
 import type * as Sentry from '@sentry/react-native';
-import CONST from '@src/CONST';
 import type {MemoryInfo} from '@libs/telemetry/getMemoryInfo/types';
+import CONST from '@src/CONST';
 
 /**
  * Determine memory log level for web platform based on JS heap percentage
