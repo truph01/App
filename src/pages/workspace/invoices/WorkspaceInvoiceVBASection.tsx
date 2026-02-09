@@ -127,7 +127,7 @@ function WorkspaceInvoiceVBASection({policyID}: WorkspaceInvoiceVBASectionProps)
         const accountPolicyID = accountData?.additionalData?.policyID;
 
         if (accountPolicyID) {
-            navigateToBankAccountRoute(accountPolicyID, ROUTES.WORKSPACE_INVOICES.getRoute(policyID));
+            navigateToBankAccountRoute({policyID: accountPolicyID, backTo: ROUTES.WORKSPACE_INVOICES.getRoute(policyID)});
         }
     };
 
