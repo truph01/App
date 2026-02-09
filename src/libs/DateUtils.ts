@@ -921,6 +921,28 @@ const formatInTimeZoneWithFallback: typeof formatInTimeZone = (date, timeZone, f
 };
 
 /**
+ * Converts a UTC datetime string to a date string (yyyy-MM-dd) in the target timezone.
+ * @param utcDateTime - Datetime string in UTC format (yyyy-MM-dd HH:mm:ss or yyyy-MM-dd HH:mm:ss.SSS)
+ * @param timeZone - Target timezone to display the date in
+ * @returns Date string in yyyy-MM-dd format, or empty string if invalid
+ */
+function formatUTCDateTimeToDateInTimezone(utcDateTime: string, timeZone: SelectedTimezone): string {
+    if (!utcDateTime || !timeZone) {
+        return '';
+    }
+    try {
+        const isoString = utcDateTime.includes(' ') ? utcDateTime.replace(' ', 'T') : utcDateTime;
+        const date = new Date(isoString.endsWith('Z') ? isoString : `${isoString}Z`);
+        if (!isValid(date)) {
+            return '';
+        }
+        return formatInTimeZoneWithFallback(date, timeZone, CONST.DATE.FNS_FORMAT_STRING);
+    } catch {
+        return '';
+    }
+}
+
+/**
  * Convert a date to UTC by taking midnight (00:00:00) in the user's local timezone and expressing it as a UTC timestamp
  */
 
@@ -1083,6 +1105,7 @@ const DateUtils = {
     getFormattedDateRangeForPerDiem,
     getFormattedSplitDateRange,
     formatInTimeZoneWithFallback,
+    formatUTCDateTimeToDateInTimezone,
     normalizeDateToStartOfDay,
     normalizeDateToEndOfDay,
     getMonthDateRange,

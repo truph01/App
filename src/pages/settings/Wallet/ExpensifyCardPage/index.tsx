@@ -13,6 +13,7 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {LockedAccountContext} from '@components/LockedAccountModalProvider';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import useCurrencyList from '@hooks/useCurrencyList';
@@ -26,6 +27,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
 import {formatCardExpiration, getDomainCards, maskCard, maskPin} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
+import DateUtils from '@libs/DateUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {DomainCardNavigatorParamList, SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -42,6 +44,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type {Card, PrivatePersonalDetails} from '@src/types/onyx';
+import type {SelectedTimezone} from '@src/types/onyx/PersonalDetails';
 import {useExpensifyCardActions, useExpensifyCardState} from './ExpensifyCardContextProvider';
 
 type ExpensifyCardPageProps =
@@ -96,6 +99,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const expensifyCardTitle = isTravelCard ? translate('cardPage.expensifyTravelCard') : translate('cardPage.expensifyCard');
     const pageTitle = shouldDisplayCardDomain ? expensifyCardTitle : (cardList?.[cardID]?.nameValuePairs?.cardTitle ?? expensifyCardTitle);
     const {displayName} = useCurrentUserPersonalDetails();
+    const personalDetails = usePersonalDetails();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Flag', 'MoneySearch']);
 
     const [isNotFound, setIsNotFound] = useState(false);
@@ -154,6 +158,22 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const {limitNameKey, limitTitleKey} = getLimitTypeTranslationKeys(currentCard?.nameValuePairs?.limitType);
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
+
+    const getCardHintText = (validFrom: string | undefined, validThru: string | undefined, assigneeTimeZone: SelectedTimezone | undefined) => {
+        if (!validFrom || !validThru) {
+            return;
+        }
+        const formatDateForDisplay = (utcDateTime: string): string => {
+            const dateInTimezone = assigneeTimeZone ? DateUtils.formatUTCDateTimeToDateInTimezone(utcDateTime, assigneeTimeZone) : DateUtils.formatWithUTCTimeZone(utcDateTime, 'yyyy-MM-dd');
+            return dateInTimezone ? DateUtils.formatToReadableString(dateInTimezone) : '';
+        };
+        const startDate = formatDateForDisplay(validFrom);
+        const endDate = formatDateForDisplay(validThru);
+        if (!startDate || !endDate) {
+            return;
+        }
+        return translate('workspace.card.issueNewCard.validFromTo', {startDate, endDate});
+    };
 
     if (isNotFound) {
         return <NotFoundPage onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_WALLET)} />;
@@ -262,6 +282,20 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                                 ) : undefined
                                             }
                                         />
+
+                                        {card?.nameValuePairs?.limitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE && (
+                                            <MenuItemWithTopDescription
+                                                description={translate('workspace.card.issueNewCard.limitType')}
+                                                title={translate('workspace.card.issueNewCard.singleUse')}
+                                                interactive={false}
+                                                hintText={getCardHintText(
+                                                    card?.nameValuePairs?.validFrom,
+                                                    card?.nameValuePairs?.validThru,
+                                                    personalDetails?.[card?.accountID ?? CONST.DEFAULT_NUMBER_ID]?.timezone?.selected,
+                                                )}
+                                            />
+                                        )}
+
                                         {cardsDetailsErrors[card.cardID] === 'cardPage.missingPrivateDetails' ? (
                                             <FormHelpMessage
                                                 isError
