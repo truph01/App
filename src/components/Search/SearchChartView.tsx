@@ -26,9 +26,9 @@ import {buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUti
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import SearchBarChart from './SearchBarChart';
-import SearchPieChart from './SearchPieChart';
 import SearchLineChart from './SearchLineChart';
-import type {ChartView, GroupedItem, SearchGroupBy, SearchQueryJSON} from './types';
+import SearchPieChart from './SearchPieChart';
+import type {ChartView, GroupedItem, SearchChartProps, SearchGroupBy, SearchQueryJSON} from './types';
 
 type ChartGroupByConfig = {
     titleIconName: 'Users' | 'CreditCard' | 'Send' | 'Folder' | 'Basket' | 'Tag' | 'Calendar';
@@ -115,7 +115,7 @@ type SearchChartViewProps = {
     queryJSON: SearchQueryJSON;
 
     /** The view type (bar, etc.) */
-    view: Exclude<ChartView>;
+    view: ChartView;
 
     /** The groupBy parameter */
     groupBy: SearchGroupBy;
@@ -133,7 +133,7 @@ type SearchChartViewProps = {
 /**
  * Map of chart view types to their corresponding chart components.
  */
-const CHART_VIEW_TO_COMPONENT: Record<Exclude<ChartView>, typeof SearchBarChart | typeof SearchLineChart | typeof SearchPieChart> = {
+const CHART_VIEW_TO_COMPONENT: Record<ChartView, React.ComponentType<SearchChartProps>> = {
     [CONST.SEARCH.VIEW.BAR]: SearchBarChart,
     [CONST.SEARCH.VIEW.LINE]: SearchLineChart,
     [CONST.SEARCH.VIEW.PIE]: SearchPieChart,
@@ -162,7 +162,6 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll}: 
                 Log.alert('[SearchChartView] Failed to build search query JSON from filter query');
                 return;
             }
-
             newQueryJSON.groupBy = undefined;
             newQueryJSON.view = CONST.SEARCH.VIEW.TABLE;
 

@@ -4,5 +4,6 @@ import ChartTooltip from './components/ChartTooltip';
 import LineChart from './LineChart';
 import PieChart from './PieChart';
 
-export {BarChart, ChartHeader, ChartTooltip, LineChart, PieChart};
-export type {BarChartDataPoint, BarChartProps} from './types';
+export { BarChart, ChartHeader, ChartTooltip, LineChart, PieChart };
+export type { ChartDataPoint, CartesianChartProps, YAxisUnitPosition } from './types';
+export type { LineChartProps } from './LineChart/LineChartContent';

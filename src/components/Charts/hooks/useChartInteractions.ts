@@ -1,9 +1,9 @@
-import {useMemo, useRef, useState} from 'react';
-import {Gesture} from 'react-native-gesture-handler';
-import type {SharedValue} from 'react-native-reanimated';
-import {useAnimatedReaction, useAnimatedStyle, useDerivedValue} from 'react-native-reanimated';
-import {scheduleOnRN} from 'react-native-worklets';
-import {useChartInteractionState} from './useChartInteractionState';
+import { useMemo, useRef, useState } from 'react';
+import { Gesture } from 'react-native-gesture-handler';
+import type { SharedValue } from 'react-native-reanimated';
+import { useAnimatedReaction, useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+import { useChartInteractionState } from './useChartInteractionState';
 
 /** Gap between bar top and tooltip bottom */
 const TOOLTIP_BAR_GAP = 8;
@@ -36,7 +36,7 @@ type UseChartInteractionsProps = {
      */
     checkIsOver: (args: HitTestArgs) => boolean;
     /** Optional shared value containing bar dimensions used for hit-testing in bar charts */
-    barGeometry?: SharedValue<{barWidth: number; chartBottom: number; yZero: number}>;
+    barGeometry?: SharedValue<{ barWidth: number; chartBottom: number; yZero: number }>;
 };
 
 /**
@@ -76,9 +76,9 @@ type CartesianActionsHandle = {
  * );
  * ```
  */
-function useChartInteractions({handlePress, checkIsOver, barGeometry}: UseChartInteractionsProps) {
+function useChartInteractions({ handlePress, checkIsOver, barGeometry }: UseChartInteractionsProps) {
     /** Interaction state compatible with Victory Native's internal logic */
-    const {state: chartInteractionState, isActive: isTooltipActiveState} = useChartInteractionState({x: 0, y: {y: 0}});
+    const { state: chartInteractionState, isActive: isTooltipActiveState } = useChartInteractionState({ x: 0, y: { y: 0 } });
 
     /** Ref passed to CartesianChart to allow manual touch injection */
     const actionsRef = useRef<CartesianActionsHandle>(null);
@@ -199,7 +199,7 @@ function useChartInteractions({handlePress, checkIsOver, barGeometry}: UseChartI
             position: 'absolute',
             left: chartInteractionState.x.position.get(),
             top: barTopY - TOOLTIP_BAR_GAP,
-            transform: [{translateX: '-50%'}, {translateY: '-100%'}],
+            transform: [{ translateX: '-50%' }, { translateY: '-100%' }],
             opacity: chartInteractionState.isActive.get() ? 1 : 0,
         };
     });
@@ -218,5 +218,5 @@ function useChartInteractions({handlePress, checkIsOver, barGeometry}: UseChartI
     };
 }
 
-export {useChartInteractions};
-export type {HitTestArgs};
+export { useChartInteractions, TOOLTIP_BAR_GAP };
+export type { HitTestArgs };

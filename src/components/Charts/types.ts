@@ -1,4 +1,4 @@
-import type {Color} from '@shopify/react-native-skia';
+import type { Color } from '@shopify/react-native-skia';
 import type IconAsset from '@src/types/utils/IconAsset';
 
 type ChartDataPoint = {
@@ -32,6 +32,36 @@ type CartesianChartProps = {
     yAxisUnitPosition?: YAxisUnitPosition;
 };
 
+type PieChartProps = {
+    /** Data points to display */
+    data: ChartDataPoint[];
+
+    /** Chart title (e.g., "Top Categories", "Spend by Merchant") */
+    title?: string;
+
+    /** Icon displayed next to the title */
+    titleIcon?: IconAsset;
+
+    /** Whether data is loading */
+    isLoading?: boolean;
+
+    /** Callback when a slice is pressed */
+    onSlicePress?: (dataPoint: ChartDataPoint, index: number) => void;
+
+    /** Symbol/unit for value labels in tooltip (e.g., '$', '€'). */
+    valueUnit?: string;
+};
+
+type ProcessedSlice = {
+    label: string;
+    value: number;
+    color: Color;
+    percentage: number;
+    startAngle: number;
+    endAngle: number;
+    originalIndex: number;
+};
+
 type YAxisUnitPosition = 'left' | 'right';
 
-export type {ChartDataPoint, CartesianChartProps, YAxisUnitPosition};
+export type { ChartDataPoint, CartesianChartProps, PieChartProps, ProcessedSlice, YAxisUnitPosition };

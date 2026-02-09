@@ -21,6 +21,7 @@ import type CONST from '@src/CONST';
 import type {Report, ReportAction, SearchResults, Transaction} from '@src/types/onyx';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type { YAxisUnitPosition } from '@components/Charts';
 
 /** Model of the selected transaction */
 type SelectedTransactionInfo = {
@@ -335,6 +336,36 @@ type GroupedItem =
     | TransactionYearGroupListItemType
     | TransactionQuarterGroupListItemType;
 
+
+    type SearchChartProps = {
+        /** Grouped transaction data from search results */
+        data: GroupedItem[];
+    
+        /** Chart title */
+        title: string;
+    
+        /** Chart title icon */
+        titleIcon: IconAsset;
+    
+        /** Function to extract label from grouped item */
+        getLabel: (item: GroupedItem) => string;
+    
+        /** Function to build filter query from grouped item */
+        getFilterQuery: (item: GroupedItem) => string;
+    
+        /** Callback when a chart item is pressed - receives the filter query to apply */
+        onItemPress?: (filterQuery: string) => void;
+    
+        /** Whether data is loading */
+        isLoading?: boolean;
+    
+        /** Currency symbol for Y-axis labels */
+        yAxisUnit?: string;
+    
+        /** Position of currency symbol relative to value */
+        yAxisUnitPosition?: YAxisUnitPosition;
+    };
+
 export type {
     SelectedTransactionInfo,
     SelectedTransactions,
@@ -382,4 +413,5 @@ export type {
     BankAccountMenuItem,
     SearchCustomColumnIds,
     GroupedItem,
+    SearchChartProps,
 };

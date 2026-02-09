@@ -7,26 +7,26 @@ import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimate
 import {scheduleOnRN} from 'react-native-worklets';
 import {Pie, PolarChart} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
-import {getChartColor} from '@components/Charts/chartColors';
-import ChartHeader from '@components/Charts/ChartHeader';
-import ChartTooltip from '@components/Charts/ChartTooltip';
-import {PIE_CHART_MAX_SLICES, PIE_CHART_MIN_SLICE_PERCENTAGE, PIE_CHART_START_ANGLE, TOOLTIP_BAR_GAP} from '@components/Charts/constants';
-import type {PieChartDataPoint, PieChartProps, ProcessedSlice} from '@components/Charts/types';
+import ChartHeader from '@components/Charts/components/ChartHeader';
+import ChartTooltip from '@components/Charts/components/ChartTooltip';
+import {TOOLTIP_BAR_GAP} from '@components/Charts/hooks';
+import type {ChartDataPoint, PieChartProps, ProcessedSlice} from '@components/Charts/types';
+import {getChartColor} from '@components/Charts/utils';
 import Text from '@components/Text';
-import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+/** Starting angle for pie chart (0 = 3 o'clock, -90 = 12 o'clock) */
+const PIE_CHART_START_ANGLE = -90;
+
 /**
- * Process raw data into slices with aggregation logic.
- * - Slices below minPercentage are aggregated into "Other"
- * - If more than maxSlices, smallest are aggregated into "Other"
+ * Process raw data into slices.
  */
-function processDataIntoSlices(data: PieChartDataPoint[], startAngle: number, lastSliceLabel: string): ProcessedSlice[] {
+function processDataIntoSlices(data: ChartDataPoint[], startAngle: number): ProcessedSlice[] {
     if (data.length === 0) {
         return [];
     }
 
-    const total = data.reduce((sum, point) => sum + point.value, 0);
+    const total = data.reduce((sum, point) => sum + point.total, 0);
     if (total === 0) {
         return [];
     }
@@ -34,65 +34,34 @@ function processDataIntoSlices(data: PieChartDataPoint[], startAngle: number, la
     // Calculate percentages and sort by value descending
     const withPercentages = data.map((point, index) => ({
         ...point,
-        percentage: (point.value / total) * 100,
+        percentage: (point.total / total) * 100,
         originalIndex: index,
     }));
 
-    withPercentages.sort((a, b) => b.value - a.value);
-
-    const validSlices = withPercentages.filter((slice) => slice.percentage >= PIE_CHART_MIN_SLICE_PERCENTAGE);
-    const smallSlices = withPercentages.filter((slice) => slice.percentage < PIE_CHART_MIN_SLICE_PERCENTAGE);
-
-    // If we have more than maxSlices, move smallest to "Other"
-    while (validSlices.length > PIE_CHART_MAX_SLICES - (smallSlices.length > 0 ? 1 : 0)) {
-        const smallest = validSlices.pop();
-        if (smallest) {
-            smallSlices.push(smallest);
-        }
-    }
+    withPercentages.sort((a, b) => b.total - a.total);
 
     // Build final slices array
     const finalSlices: ProcessedSlice[] = [];
     let currentAngle = startAngle;
 
     // Add valid slices
-    for (let index = 0; index < validSlices.length; index++) {
-        const slice = validSlices.at(index);
+    for (let index = 0; index < withPercentages.length; index++) {
+        const slice = withPercentages.at(index);
         if (!slice) {
             continue;
         }
-        const sweepAngle = (slice.value / total) * 360;
+        const sweepAngle = (slice.total / total) * 360;
         const color = getChartColor(index);
         finalSlices.push({
             label: slice.label,
-            value: slice.value,
+            value: slice.total,
             color,
             percentage: slice.percentage,
             startAngle: currentAngle,
             endAngle: currentAngle + sweepAngle,
             originalIndex: slice.originalIndex,
-            isOther: false,
         });
         currentAngle += sweepAngle;
-    }
-
-    // Add "Other /" slice if there are small slices
-    if (smallSlices.length > 0) {
-        const otherValue = smallSlices.reduce((sum, s) => sum + s.value, 0);
-        const otherPercentage = (otherValue / total) * 100;
-        const sweepAngle = (otherValue / total) * 360;
-
-        const otherColor = getChartColor(validSlices.length);
-        finalSlices.push({
-            label: lastSliceLabel,
-            value: otherValue,
-            color: otherColor,
-            percentage: otherPercentage,
-            startAngle: currentAngle,
-            endAngle: currentAngle + sweepAngle,
-            originalIndex: -1,
-            isOther: true,
-        });
     }
 
     return finalSlices;
@@ -162,7 +131,6 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     const styles = useThemeStyles();
     const [canvasSize, setCanvasSize] = useState({width: 0, height: 0});
     const [activeSliceIndex, setActiveSliceIndex] = useState(-1);
-    const {translate} = useLocalize();
 
     // Shared values for hover state
     const isHovering = useSharedValue(false);
@@ -174,8 +142,8 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
         setCanvasSize({width, height});
     };
 
-    // Process data into slices with aggregation, make following code react compiler compatible, and use the last slice label from the translation
-    const processedSlices: ProcessedSlice[] = processDataIntoSlices(data, PIE_CHART_START_ANGLE, translate('workspace.accounting.other'));
+    // Process data into slices with aggregation.
+    const processedSlices: ProcessedSlice[] = processDataIntoSlices(data, PIE_CHART_START_ANGLE);
 
     // Calculate pie geometry
     const pieGeometry = {radius: Math.min(canvasSize.width, canvasSize.height) / 2, centerX: canvasSize.width / 2, centerY: canvasSize.height / 2} as const;
@@ -200,8 +168,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
             return;
         }
         const slice = processedSlices.at(sliceIndex);
-        if (!slice || slice.isOther) {
-            // Don't navigate for "Other" slice
+        if (!slice) {
             return;
         }
         const originalDataPoint = data.at(slice.originalIndex);
