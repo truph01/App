@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import ExpensifyCardIcon from '@assets/images/expensify-card-icon.svg';
 import BaseWidgetItem from '@components/BaseWidgetItem';
 import useLocalize from '@hooks/useLocalize';
@@ -25,16 +25,13 @@ function ReviewCardFraud({possibleFraud}: ReviewCardFraudProps) {
     const triggerCurrency = possibleFraud.triggerCurrency;
 
     // Generate the title with amount and merchant if available
-    const title = useMemo(() => {
-        if (triggerAmount !== undefined && triggerMerchant) {
-            const formattedAmount = convertToDisplayString(triggerAmount, triggerCurrency ?? DEFAULT_CURRENCY);
-            return translate('homePage.timeSensitiveSection.reviewCardFraud.titleWithDetails', {
-                amount: formattedAmount,
-                merchant: triggerMerchant,
-            });
-        }
-        return translate('homePage.timeSensitiveSection.reviewCardFraud.title');
-    }, [triggerAmount, triggerMerchant, triggerCurrency, translate]);
+    const title =
+        triggerAmount !== undefined && triggerMerchant
+            ? translate('homePage.timeSensitiveSection.reviewCardFraud.titleWithDetails', {
+                  amount: convertToDisplayString(triggerAmount, triggerCurrency ?? DEFAULT_CURRENCY),
+                  merchant: triggerMerchant,
+              })
+            : translate('homePage.timeSensitiveSection.reviewCardFraud.title');
 
     // Don't render the widget if there's no fraud alert report to navigate to
     if (!fraudAlertReportID) {
