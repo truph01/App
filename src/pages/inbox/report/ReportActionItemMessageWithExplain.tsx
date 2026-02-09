@@ -41,9 +41,9 @@ function ReportActionItemMessageWithExplain({message, action, childReport, origi
                 return;
             }
 
-            explain(childReport, originalReport, action, translate, personalDetail?.timezone);
+            explain(childReport, originalReport, action, translate, personalDetail.accountID, personalDetail?.timezone);
         },
-        [childReport, originalReport, action, translate, personalDetail?.timezone],
+        [childReport, originalReport, action, translate, personalDetail?.timezone, personalDetail.accountID],
     );
 
     return (

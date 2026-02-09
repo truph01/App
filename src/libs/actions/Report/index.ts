@@ -282,6 +282,42 @@ type PregeneratedResponseParams = {
     pregeneratedResponse: string;
 };
 
+type AddCommentParams = {
+    report: OnyxEntry<Report>;
+    notifyReportID: string;
+    ancestors: Ancestor[];
+    text: string;
+    timezoneParam: Timezone;
+    currentUserAccountID: number;
+    shouldPlaySound?: boolean;
+    isInSidePanel?: boolean;
+    pregeneratedResponseParams?: PregeneratedResponseParams;
+};
+
+type AddActionsParams = {
+    report: OnyxEntry<Report>;
+    notifyReportID: string;
+    ancestors: Ancestor[];
+    timezoneParam: Timezone;
+    currentUserAccountID: number;
+    text?: string;
+    file?: FileObject;
+    isInSidePanel?: boolean;
+    pregeneratedResponseParams?: PregeneratedResponseParams;
+};
+
+type AddAttachmentWithCommentParams = {
+    report: OnyxEntry<Report>;
+    notifyReportID: string;
+    ancestors: Ancestor[];
+    attachments: FileObject | FileObject[];
+    currentUserAccountID: number;
+    text?: string;
+    timezone?: Timezone;
+    shouldPlaySound?: boolean;
+    isInSidePanel?: boolean;
+};
+
 const addNewMessageWithText = new Set<string>([WRITE_COMMANDS.ADD_COMMENT, WRITE_COMMANDS.ADD_TEXT_AND_ATTACHMENT]);
 let conciergeReportIDOnyxConnect: string | undefined;
 let deprecatedCurrentUserAccountID = -1;
@@ -531,12 +567,11 @@ function subscribeToNewActionEvent(reportID: string, callback: SubscriberCallbac
 }
 
 /** Notify the ReportActionsView that a new comment has arrived */
-function notifyNewAction(reportID: string | undefined, accountID: number | undefined, reportAction?: ReportAction | undefined) {
+function notifyNewAction(reportID: string | undefined, reportAction: ReportAction | undefined, isFromCurrentUser: boolean) {
     const actionSubscriber = newActionSubscribers.find((subscriber) => subscriber.reportID === reportID);
     if (!actionSubscriber) {
         return;
     }
-    const isFromCurrentUser = accountID === deprecatedCurrentUserAccountID;
     actionSubscriber.callback(isFromCurrentUser, reportAction);
 }
 
@@ -586,16 +621,7 @@ function buildOptimisticResolvedFollowups(reportAction: OnyxEntry<ReportAction>)
  * @param isInSidePanel - Whether the comment is being added from the side panel
  * @param pregeneratedResponseParams - Optional params for pre-generated response (API only, no optimistic action - used when response display is delayed)
  */
-function addActions(
-    report: OnyxEntry<Report>,
-    notifyReportID: string,
-    ancestors: Ancestor[],
-    timezoneParam: Timezone,
-    text = '',
-    file?: FileObject,
-    isInSidePanel = false,
-    pregeneratedResponseParams?: PregeneratedResponseParams,
-) {
+function addActions({report, notifyReportID, ancestors, timezoneParam, currentUserAccountID, text = '', file, isInSidePanel = false, pregeneratedResponseParams}: AddActionsParams) {
     if (!report?.reportID) {
         return;
     }
@@ -637,14 +663,14 @@ function addActions(
         lastVisibleActionCreated: lastAction?.created,
         lastMessageText: lastCommentText,
         lastMessageHtml: lastCommentText,
-        lastActorAccountID: deprecatedCurrentUserAccountID,
+        lastActorAccountID: currentUserAccountID,
         lastReadTime: currentTime,
     };
 
     const shouldUpdateNotificationPreference = !isEmptyObject(report) && isHiddenForCurrentUser(report);
     if (shouldUpdateNotificationPreference) {
         optimisticReport.participants = {
-            [deprecatedCurrentUserAccountID]: {notificationPreference: getDefaultNotificationPreferenceForReport(report)},
+            [currentUserAccountID]: {notificationPreference: getDefaultNotificationPreferenceForReport(report)},
         };
     }
 
@@ -772,13 +798,13 @@ function addActions(
     ];
 
     // Update the timezone if it's been 5 minutes from the last time the user added a comment
-    if (DateUtils.canUpdateTimezone() && deprecatedCurrentUserAccountID) {
+    if (DateUtils.canUpdateTimezone() && currentUserAccountID) {
         const timezone = DateUtils.getCurrentTimezone(timezoneParam);
         parameters.timezone = JSON.stringify(timezone);
         optimisticData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
-            value: {[deprecatedCurrentUserAccountID]: {timezone}},
+            value: {[currentUserAccountID]: {timezone}},
         });
         DateUtils.setTimezoneUpdated();
     }
@@ -788,20 +814,21 @@ function addActions(
         successData,
         failureData,
     });
-    notifyNewAction(notifyReportID, lastAction?.actorAccountID, lastAction);
+    notifyNewAction(notifyReportID, lastAction, lastAction?.actorAccountID === currentUserAccountID);
 }
 
 /** Add an attachment with an optional comment to a report */
-function addAttachmentWithComment(
-    report: OnyxEntry<Report>,
-    notifyReportID: string,
-    ancestors: Ancestor[],
-    attachments: FileObject | FileObject[],
+function addAttachmentWithComment({
+    report,
+    notifyReportID,
+    ancestors,
+    attachments,
+    currentUserAccountID,
     text = '',
-    timezone: Timezone = CONST.DEFAULT_TIME_ZONE,
+    timezone = CONST.DEFAULT_TIME_ZONE,
     shouldPlaySound = false,
     isInSidePanel = false,
-) {
+}: AddAttachmentWithCommentParams) {
     if (!report?.reportID) {
         return;
     }
@@ -815,17 +842,17 @@ function addAttachmentWithComment(
 
     // Single attachment
     if (!Array.isArray(attachments)) {
-        addActions(report, notifyReportID, ancestors, timezone, text, attachments, isInSidePanel);
+        addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text, file: attachments, isInSidePanel});
         handlePlaySound();
         return;
     }
 
     // Multiple attachments - first: combine text + first attachment as a single action
-    addActions(report, notifyReportID, ancestors, timezone, text, attachments?.at(0), isInSidePanel);
+    addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text, file: attachments?.at(0), isInSidePanel});
 
     // Remaining: attachment-only actions (no text duplication)
     for (let i = 1; i < attachments?.length; i += 1) {
-        addActions(report, notifyReportID, ancestors, timezone, '', attachments?.at(i), isInSidePanel);
+        addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text: '', file: attachments?.at(i), isInSidePanel});
     }
 
     // Play sound once
@@ -833,20 +860,11 @@ function addAttachmentWithComment(
 }
 
 /** Add a single comment to a report */
-function addComment(
-    report: OnyxEntry<Report>,
-    notifyReportID: string,
-    ancestors: Ancestor[],
-    text: string,
-    timezoneParam: Timezone,
-    shouldPlaySound?: boolean,
-    isInSidePanel?: boolean,
-    pregeneratedResponseParams?: PregeneratedResponseParams,
-) {
+function addComment({report, notifyReportID, ancestors, text, timezoneParam, currentUserAccountID, shouldPlaySound, isInSidePanel, pregeneratedResponseParams}: AddCommentParams) {
     if (shouldPlaySound) {
         playSound(SOUNDS.DONE);
     }
-    addActions(report, notifyReportID, ancestors, timezoneParam, text, undefined, isInSidePanel, pregeneratedResponseParams);
+    addActions({report, notifyReportID, ancestors, timezoneParam, currentUserAccountID, text, isInSidePanel, pregeneratedResponseParams});
 }
 
 function reportActionsExist(reportID: string): boolean {
@@ -1331,6 +1349,7 @@ function openReport(
         parameters.chatType = CONST.REPORT.CHAT_TYPE.GROUP;
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         parameters.groupChatAdminLogins = deprecatedCurrentUserLogin;
+
         parameters.optimisticAccountIDList = Object.keys(newReportObject?.participants ?? {}).join(',');
         parameters.reportName = newReportObject?.reportName ?? '';
 
@@ -1574,6 +1593,7 @@ function createTransactionThreadReport(
         undefined,
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         deprecatedCurrentUserLogin ? [deprecatedCurrentUserLogin] : [],
+
         optimisticTransactionThread,
         iouReportAction?.reportActionID,
         false,
@@ -1723,6 +1743,7 @@ function explain(
     originalReport: OnyxEntry<Report>,
     reportAction: OnyxEntry<ReportAction>,
     translate: LocalizedTranslate,
+    currentUserAccountID: number,
     timezone: Timezone = CONST.DEFAULT_TIME_ZONE,
 ) {
     if (!originalReport?.reportID || !reportAction) {
@@ -1736,7 +1757,15 @@ function explain(
     // Schedule adding the explanation comment on the next animation frame
     // so it runs immediately after navigation completes.
     requestAnimationFrame(() => {
-        addComment(report, report.reportID, [], translate('reportActionContextMenu.explainMessage'), timezone, true);
+        addComment({
+            report,
+            notifyReportID: report.reportID,
+            ancestors: [],
+            text: translate('reportActionContextMenu.explainMessage'),
+            timezoneParam: timezone,
+            currentUserAccountID,
+            shouldPlaySound: true,
+        });
     });
 }
 
@@ -3274,7 +3303,7 @@ function createNewReport(
         {optimisticData, successData, failureData},
     );
     if (shouldNotifyNewAction) {
-        notifyNewAction(parentReportID, ownerPersonalDetails.accountID, reportPreviewAction);
+        notifyNewAction(parentReportID, reportPreviewAction, true);
     }
 
     return optimisticReportData;
@@ -3565,8 +3594,9 @@ function setIsComposerFullSize(reportID: string, isComposerFullSize: boolean) {
 /**
  * @param action the associated report action (optional)
  * @param isRemote whether or not this notification is a remote push notification
+ * @param currentUserAccountID the current user's account ID
  */
-function shouldShowReportActionNotification(reportID: string, action: ReportAction | null = null, isRemote = false): boolean {
+function shouldShowReportActionNotification(reportID: string, currentUserAccountID: number, action: ReportAction | null = null, isRemote = false): boolean {
     const tag = isRemote ? '[PushNotification]' : '[LocalNotification]';
     const topmostReportID = Navigation.getTopmostReportId();
 
@@ -3590,7 +3620,7 @@ function shouldShowReportActionNotification(reportID: string, action: ReportActi
     }
 
     // If this comment is from the current user we don't want to parrot whatever they wrote back to them.
-    if (action && action.actorAccountID === deprecatedCurrentUserAccountID) {
+    if (action && action.actorAccountID === currentUserAccountID) {
         Log.info(`${tag} No notification because comment is from the currently logged in user`);
         return false;
     }
@@ -3631,8 +3661,8 @@ function shouldShowReportActionNotification(reportID: string, action: ReportActi
     return true;
 }
 
-function showReportActionNotification(reportID: string, reportAction: ReportAction) {
-    if (!shouldShowReportActionNotification(reportID, reportAction)) {
+function showReportActionNotification(reportID: string, reportAction: ReportAction, currentUserAccountID: number) {
+    if (!shouldShowReportActionNotification(reportID, currentUserAccountID, reportAction)) {
         return;
     }
 
@@ -3655,7 +3685,7 @@ function showReportActionNotification(reportID: string, reportAction: ReportActi
         LocalNotification.showCommentNotification(report, reportAction, onClick);
     }
 
-    notifyNewAction(reportID, reportAction.actorAccountID);
+    notifyNewAction(reportID, undefined, reportAction.actorAccountID === currentUserAccountID);
 }
 
 /** Clear the errors associated with the IOUs of a given report. */
@@ -4124,10 +4154,10 @@ function inviteToRoom(report: Report, inviteeEmailsToAccountIDs: InvitedEmailsTo
 }
 
 /** Invites people to a room via concierge whisper */
-function inviteToRoomAction(report: Report, ancestors: Ancestor[], inviteeEmailsToAccountIDs: InvitedEmailsToAccountIDs, timezoneParam: Timezone) {
+function inviteToRoomAction(report: Report, ancestors: Ancestor[], inviteeEmailsToAccountIDs: InvitedEmailsToAccountIDs, timezoneParam: Timezone, currentUserAccountID: number) {
     const inviteeEmails = Object.keys(inviteeEmailsToAccountIDs);
 
-    addComment(report, report.reportID, ancestors, inviteeEmails.map((login) => `@${login}`).join(' '), timezoneParam, false);
+    addComment({report, notifyReportID: report.reportID, ancestors, text: inviteeEmails.map((login) => `@${login}`).join(' '), timezoneParam, currentUserAccountID, shouldPlaySound: false});
 }
 
 function clearAddRoomMemberError(reportID: string, invitedAccountID: string) {
@@ -5092,17 +5122,31 @@ function clearDeleteTransactionNavigateBackUrl() {
 
 /** Deletes a report and un-reports all transactions on the report along with its reportActions, any linked reports and any linked IOU report actions. */
 function deleteAppReport(
-    reportID: string | undefined,
+    report: OnyxEntry<Report>,
+    selfDMReport: OnyxEntry<Report>,
     currentUserEmailParam: string,
     currentUserAccountIDParam: number,
     reportTransactions: Record<string, Transaction>,
     allTransactionViolations: OnyxCollection<TransactionViolations>,
     bankAccountList: OnyxEntry<BankAccountList>,
+    hash?: number,
 ) {
-    if (!reportID) {
-        Log.warn('[Report] deleteReport called with no reportID');
+    if (!report?.reportID) {
+        Log.warn('[Report] deleteAppReport called with no reportID');
         return;
     }
+    const reportID = report.reportID;
+
+    // Update search results to mark report as deleted when called from search
+    if (hash) {
+        Onyx.merge(`${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`, {
+            // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
+            data: {
+                [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE},
+            },
+        });
+    }
+
     const optimisticData: Array<
         OnyxUpdate<
             | typeof ONYXKEYS.COLLECTION.REPORT
@@ -5118,25 +5162,22 @@ function deleteAppReport(
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>
     > = [];
 
-    const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
-
-    let selfDMReportID = findSelfDMReportID();
-    let selfDMReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${selfDMReportID}`];
+    let selfDMReportID = selfDMReport?.reportID;
     let createdAction: ReportAction;
     let selfDMParameters: SelfDMParameters = {};
 
-    if (!selfDMReport) {
+    if (!selfDMReportID) {
         const currentTime = DateUtils.getDBTime();
-        selfDMReport = buildOptimisticSelfDMReport(currentTime);
-        selfDMReportID = selfDMReport.reportID;
+        const optimisticSelfDMReport = buildOptimisticSelfDMReport(currentTime);
+        selfDMReportID = optimisticSelfDMReport.reportID;
         createdAction = buildOptimisticCreatedReportAction(currentUserEmailParam ?? '', currentTime);
-        selfDMParameters = {reportID: selfDMReport.reportID, createdReportActionID: createdAction.reportActionID};
+        selfDMParameters = {reportID: optimisticSelfDMReport.reportID, createdReportActionID: createdAction.reportActionID};
         optimisticData.push(
             {
                 onyxMethod: Onyx.METHOD.SET,
-                key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReport.reportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReportID}`,
                 value: {
-                    ...selfDMReport,
+                    ...optimisticSelfDMReport,
                     pendingFields: {
                         createChat: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                     },
@@ -5149,14 +5190,14 @@ function deleteAppReport(
             },
             {
                 onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReport.reportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReportID}`,
                 value: {
                     isOptimisticReport: true,
                 },
             },
             {
                 onyxMethod: Onyx.METHOD.SET,
-                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReport.reportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReportID}`,
                 value: {
                     [createdAction.reportActionID]: createdAction,
                 },
@@ -5166,7 +5207,7 @@ function deleteAppReport(
         successData.push(
             {
                 onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReport.reportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReportID}`,
                 value: {
                     pendingFields: {
                         createChat: null,
@@ -5175,14 +5216,14 @@ function deleteAppReport(
             },
             {
                 onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReport.reportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReportID}`,
                 value: {
                     isOptimisticReport: false,
                 },
             },
             {
                 onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReport.reportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReportID}`,
                 value: {
                     [createdAction.reportActionID]: {
                         pendingAction: null,
@@ -5391,7 +5432,6 @@ function deleteAppReport(
         value: null,
     });
 
-    // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
     failureData.push({
         onyxMethod: Onyx.METHOD.SET,
         key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
@@ -6540,6 +6580,7 @@ function resolveConciergeOptions(
     selectedValue: string,
     timezoneParam: Timezone,
     selectedField: 'selectedCategory' | 'selectedDescription',
+    currentUserAccountID: number,
     ancestors: Ancestor[] = [],
 ) {
     if (!report?.reportID || !reportActionID) {
@@ -6547,7 +6588,7 @@ function resolveConciergeOptions(
     }
 
     const reportID = report.reportID;
-    addComment(report, notifyReportID ?? reportID, ancestors, selectedValue, timezoneParam);
+    addComment({report, notifyReportID: notifyReportID ?? reportID, ancestors, text: selectedValue, timezoneParam, currentUserAccountID});
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
         [reportActionID]: {
@@ -6573,9 +6614,10 @@ function resolveConciergeCategoryOptions(
     reportActionID: string | undefined,
     selectedCategory: string,
     timezoneParam: Timezone,
+    currentUserAccountID: number,
     ancestors: Ancestor[] = [],
 ) {
-    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedCategory, timezoneParam, 'selectedCategory', ancestors);
+    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedCategory, timezoneParam, 'selectedCategory', currentUserAccountID, ancestors);
 }
 
 /**
@@ -6593,9 +6635,10 @@ function resolveConciergeDescriptionOptions(
     reportActionID: string | undefined,
     selectedDescription: string,
     timezoneParam: Timezone,
+    currentUserAccountID: number,
     ancestors: Ancestor[] = [],
 ) {
-    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedDescription, timezoneParam, 'selectedDescription', ancestors);
+    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedDescription, timezoneParam, 'selectedDescription', currentUserAccountID, ancestors);
 }
 
 /**

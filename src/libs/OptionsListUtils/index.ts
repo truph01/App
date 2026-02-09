@@ -352,7 +352,7 @@ function isPersonalDetailsReady(personalDetails: OnyxEntry<PersonalDetailsList>)
 /**
  * Get the participant option for a report.
  */
-function getParticipantsOption(participant: OptionData | Participant, personalDetails: OnyxEntry<PersonalDetailsList>): Participant {
+function getParticipantsOption(participant: OptionData | Participant, personalDetails: OnyxEntry<PersonalDetailsList>): Participant & {keyForList: string} {
     const detail = participant.accountID ? getPersonalDetailsForAccountIDs([participant.accountID], personalDetails)[participant.accountID] : undefined;
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const login = detail?.login || participant.login || '';
@@ -762,7 +762,7 @@ function getLastMessageTextForReport({
     } else if (lastReportAction?.actionName && isOldDotReportAction(lastReportAction)) {
         lastMessageTextFromReport = getMessageOfOldDotReportAction(translate, lastReportAction, false);
     } else if (isActionableJoinRequest(lastReportAction)) {
-        lastMessageTextFromReport = getJoinRequestMessage(translate, lastReportAction);
+        lastMessageTextFromReport = getJoinRequestMessage(translate, policy, lastReportAction);
     } else if (
         lastReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.ROOM_CHANGE_LOG.LEAVE_ROOM ||
         lastReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.LEAVE_ROOM
@@ -913,7 +913,7 @@ function createOption(
         // Display properties needed for UI rendering
         icons: undefined, // Set below - needed for avatars
         subtitle: undefined, // Set below - needed for display
-        keyForList: undefined, // Set below - needed for React keys
+        keyForList: '', // Set below - needed for React keys
 
         // Legacy property kept for backwards compatibility
         selected: isSelected ?? selected ?? false, // Duplicate of isSelected for backwards compatibility
@@ -2018,7 +2018,7 @@ function isValidReport(option: SearchOption<Report>, policy: OnyxEntry<Policy>, 
     const isCurrentUserOwnedPolicyExpenseChatThatCouldShow =
         option.isPolicyExpenseChat && option.ownerAccountID === currentUserAccountID && includeOwnedWorkspaceChats && !option.private_isArchived;
 
-    const shouldShowInvoiceRoom = includeInvoiceRooms && isInvoiceRoom(option.item) && isPolicyAdmin(policy) && !option.private_isArchived && canSendInvoiceFromWorkspace(option.policyID);
+    const shouldShowInvoiceRoom = includeInvoiceRooms && isInvoiceRoom(option.item) && isPolicyAdmin(policy) && !option.private_isArchived && canSendInvoiceFromWorkspace(policy);
 
     /*
     Exclude the report option if it doesn't meet any of the following conditions:
@@ -2279,6 +2279,9 @@ function getValidOptions(
                 searchText += report.subtitle ?? '';
             } else if (report.isPolicyExpenseChat) {
                 searchText += `${report.subtitle ?? ''}${report.item.policyName ?? ''}`;
+            } else if (report.item.chatType === CONST.REPORT.CHAT_TYPE.GROUP) {
+                const participantsSearchText = report.participantsList?.map((participant) => [participant.displayName, participant.login].filter(Boolean).join(' ')).join(' ') ?? '';
+                searchText += participantsSearchText;
             }
             searchText = deburr(searchText.toLocaleLowerCase());
             return searchTerms.every((term) => searchText.includes(term));
@@ -2596,6 +2599,7 @@ function getFilteredRecentAttendees(
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             login: attendee.email || attendee.displayName,
             ...getPersonalDetailByEmail(attendee.email),
+            keyForList: `${currentUserAccountID}`,
         }))
         .map((attendee) => getParticipantsOption(attendee, personalDetails));
 
@@ -2737,6 +2741,7 @@ function formatSectionsFromSearchTerm(
         return {
             section: {
                 title: undefined,
+                sectionIndex: 0,
                 data: shouldGetOptionDetails
                     ? selectedOptions.map((participant) => {
                           const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
@@ -2745,7 +2750,6 @@ function formatSectionsFromSearchTerm(
                               : getParticipantsOption(participant, personalDetails);
                       })
                     : selectedOptions,
-                shouldShow: selectedOptions.length > 0,
             },
         };
     }
@@ -2765,6 +2769,7 @@ function formatSectionsFromSearchTerm(
     return {
         section: {
             title: undefined,
+            sectionIndex: 0,
             data: shouldGetOptionDetails
                 ? selectedParticipantsWithoutDetails.map((participant) => {
                       const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
@@ -2773,7 +2778,6 @@ function formatSectionsFromSearchTerm(
                           : getParticipantsOption(participant, personalDetails);
                   })
                 : selectedParticipantsWithoutDetails,
-            shouldShow: selectedParticipantsWithoutDetails.length > 0,
         },
     };
 }
@@ -3127,7 +3131,9 @@ function getManagerMcTestParticipant(currentUserAccountID: number, personalDetai
         : getPersonalDetailByEmail(CONST.EMAIL.MANAGER_MCTEST);
     const managerMcTestReport =
         managerMcTestPersonalDetails?.accountID && currentUserAccountID ? getChatByParticipants([managerMcTestPersonalDetails?.accountID, currentUserAccountID]) : undefined;
-    return managerMcTestPersonalDetails ? {...getParticipantsOption(managerMcTestPersonalDetails, allPersonalDetails), reportID: managerMcTestReport?.reportID} : undefined;
+    return managerMcTestPersonalDetails
+        ? {...getParticipantsOption({...managerMcTestPersonalDetails, keyForList: `${managerMcTestPersonalDetails?.accountID}`}, allPersonalDetails), reportID: managerMcTestReport?.reportID}
+        : undefined;
 }
 
 function shallowOptionsListCompare(a: OptionList, b: OptionList): boolean {
