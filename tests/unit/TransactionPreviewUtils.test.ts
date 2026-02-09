@@ -326,7 +326,7 @@ describe('TransactionPreviewUtils', () => {
                     iouReport: {
                         ...basicProps.iouReport,
                         type: CONST.REPORT.TYPE.EXPENSE,
-                        policyID: 'policy1',
+                        policyID: '1',
                     },
                     violations: [
                         {
@@ -616,7 +616,7 @@ describe('TransactionPreviewUtils', () => {
                     iouReport: {
                         ...basicProps.iouReport,
                         type: CONST.REPORT.TYPE.EXPENSE,
-                        policyID: 'policy1',
+                        policyID: '1',
                     },
                     violations: [
                         {
