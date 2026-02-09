@@ -36,8 +36,8 @@ import {
     getYearFromExpirationDateString,
     hasIssuedExpensifyCard,
     hasOnlyOneCardToAssign,
-    isCSVFeedOrExpensifyCard,
     isCardFrozen,
+    isCSVFeedOrExpensifyCard,
     isCustomFeed as isCustomFeedCardUtils,
     isExpensifyCard,
     isExpensifyCardFullySetUp,
@@ -1664,7 +1664,7 @@ describe('CardUtils', () => {
             expect(isCardFrozen(undefined)).toBe(false);
         });
 
-        it('Should return false when card is valid but not suspendedor frozen', () => {
+        it('Should return false when card is valid but not suspended or frozen', () => {
             const card = {
                 state: CONST.EXPENSIFY_CARD.STATE.OPEN,
                 nameValuePairs: {},
