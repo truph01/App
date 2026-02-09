@@ -58,7 +58,7 @@ describe('useTimeSensitiveCards', () => {
         const {result} = renderHook(() => useTimeSensitiveCards());
 
         expect(result.current.cardsNeedingShippingAddress).toHaveLength(1);
-        expect(result.current.cardsNeedingShippingAddress[0].cardID).toBe(1);
+        expect(result.current.cardsNeedingShippingAddress.at(0)?.cardID).toBe(1);
         expect(result.current.shouldShowAddShippingAddress).toBe(true);
         expect(result.current.shouldShowActivateCard).toBe(false);
     });
@@ -73,7 +73,7 @@ describe('useTimeSensitiveCards', () => {
         const {result} = renderHook(() => useTimeSensitiveCards());
 
         expect(result.current.cardsNeedingActivation).toHaveLength(1);
-        expect(result.current.cardsNeedingActivation[0].cardID).toBe(1);
+        expect(result.current.cardsNeedingActivation.at(0)?.cardID).toBe(1);
         expect(result.current.shouldShowActivateCard).toBe(true);
         expect(result.current.shouldShowAddShippingAddress).toBe(false);
     });
@@ -119,7 +119,7 @@ describe('useTimeSensitiveCards', () => {
 
         // Only physical card should be included
         expect(result.current.cardsNeedingActivation).toHaveLength(1);
-        expect(result.current.cardsNeedingActivation[0].cardID).toBe(2);
+        expect(result.current.cardsNeedingActivation.at(0)?.cardID).toBe(2);
     });
 
     it('should exclude non-Expensify cards from time-sensitive results', async () => {
@@ -146,7 +146,7 @@ describe('useTimeSensitiveCards', () => {
 
         // Only Expensify card should be included
         expect(result.current.cardsNeedingShippingAddress).toHaveLength(1);
-        expect(result.current.cardsNeedingShippingAddress[0].cardID).toBe(2);
+        expect(result.current.cardsNeedingShippingAddress.at(0)?.cardID).toBe(2);
     });
 
     it('should update when card list changes', async () => {
@@ -181,7 +181,7 @@ describe('useTimeSensitiveCards', () => {
         const {result} = renderHook(() => useTimeSensitiveCards());
 
         expect(result.current.cardsWithFraud).toHaveLength(1);
-        expect(result.current.cardsWithFraud[0].cardID).toBe(1);
+        expect(result.current.cardsWithFraud.at(0)?.cardID).toBe(1);
         expect(result.current.shouldShowReviewCardFraud).toBe(true);
     });
 

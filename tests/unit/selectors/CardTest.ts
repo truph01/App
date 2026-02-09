@@ -228,7 +228,7 @@ describe('timeSensitiveCardsSelector', () => {
         const result = timeSensitiveCardsSelector(cardList);
 
         expect(result.cardsNeedingShippingAddress).toHaveLength(1);
-        expect(result.cardsNeedingShippingAddress[0].cardID).toBe(1);
+        expect(result.cardsNeedingShippingAddress.at(0)?.cardID).toBe(1);
         expect(result.cardsNeedingActivation).toHaveLength(0);
     });
 
@@ -245,7 +245,7 @@ describe('timeSensitiveCardsSelector', () => {
 
         expect(result.cardsNeedingShippingAddress).toHaveLength(0);
         expect(result.cardsNeedingActivation).toHaveLength(1);
-        expect(result.cardsNeedingActivation[0].cardID).toBe(1);
+        expect(result.cardsNeedingActivation.at(0)?.cardID).toBe(1);
     });
 
     it('identifies multiple cards needing different actions', () => {
@@ -284,7 +284,7 @@ describe('timeSensitiveCardsSelector', () => {
         const result = timeSensitiveCardsSelector(cardList);
 
         expect(result.cardsNeedingActivation).toHaveLength(1);
-        expect(result.cardsNeedingActivation[0].cardID).toBe(2);
+        expect(result.cardsNeedingActivation.at(0)?.cardID).toBe(2);
     });
 
     it('excludes non-Expensify cards (company cards) from time-sensitive results', () => {
@@ -304,7 +304,7 @@ describe('timeSensitiveCardsSelector', () => {
         const result = timeSensitiveCardsSelector(cardList);
 
         expect(result.cardsNeedingShippingAddress).toHaveLength(1);
-        expect(result.cardsNeedingShippingAddress[0].cardID).toBe(2);
+        expect(result.cardsNeedingShippingAddress.at(0)?.cardID).toBe(2);
     });
 
     it('filters out invalid card objects (missing cardID or bank)', () => {
@@ -321,7 +321,7 @@ describe('timeSensitiveCardsSelector', () => {
         const result = timeSensitiveCardsSelector(cardList);
 
         expect(result.cardsNeedingShippingAddress).toHaveLength(1);
-        expect(result.cardsNeedingShippingAddress[0].cardID).toBe(1);
+        expect(result.cardsNeedingShippingAddress.at(0)?.cardID).toBe(1);
     });
 
     it('handles mixed scenarios with various card types and states', () => {
@@ -350,9 +350,9 @@ describe('timeSensitiveCardsSelector', () => {
 
         // Only physical Expensify cards with pending states should be included
         expect(result.cardsNeedingShippingAddress).toHaveLength(1);
-        expect(result.cardsNeedingShippingAddress[0].cardID).toBe(1);
+        expect(result.cardsNeedingShippingAddress.at(0)?.cardID).toBe(1);
         expect(result.cardsNeedingActivation).toHaveLength(1);
-        expect(result.cardsNeedingActivation[0].cardID).toBe(2);
+        expect(result.cardsNeedingActivation.at(0)?.cardID).toBe(2);
     });
 
     it('returns cards in correct arrays based on their state', () => {
@@ -387,8 +387,8 @@ describe('timeSensitiveCardsSelector', () => {
         const result = timeSensitiveCardsSelector(cardList);
 
         expect(result.cardsWithFraud).toHaveLength(1);
-        expect(result.cardsWithFraud[0].cardID).toBe(1);
-        expect(result.cardsWithFraud[0].fraud).toBe(CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN);
+        expect(result.cardsWithFraud.at(0)?.cardID).toBe(1);
+        expect(result.cardsWithFraud.at(0)?.fraud).toBe(CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN);
     });
 
     it('identifies cards with individual fraud', () => {
@@ -403,8 +403,8 @@ describe('timeSensitiveCardsSelector', () => {
         const result = timeSensitiveCardsSelector(cardList);
 
         expect(result.cardsWithFraud).toHaveLength(1);
-        expect(result.cardsWithFraud[0].cardID).toBe(1);
-        expect(result.cardsWithFraud[0].fraud).toBe(CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL);
+        expect(result.cardsWithFraud.at(0)?.cardID).toBe(1);
+        expect(result.cardsWithFraud.at(0)?.fraud).toBe(CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL);
     });
 
     it('detects fraud on both physical and virtual Expensify cards', () => {
@@ -441,7 +441,7 @@ describe('timeSensitiveCardsSelector', () => {
 
         // Only Expensify card should be included
         expect(result.cardsWithFraud).toHaveLength(1);
-        expect(result.cardsWithFraud[0].cardID).toBe(2);
+        expect(result.cardsWithFraud.at(0)?.cardID).toBe(2);
     });
 
     it('does not include cards with fraud type NONE', () => {
