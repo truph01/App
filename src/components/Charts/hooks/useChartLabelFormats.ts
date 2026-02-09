@@ -52,15 +52,7 @@ function resolveDisplayUnit(font: SkFont | null, yAxisUnit: YAxisUnit | undefine
     return yAxisUnit.fallback;
 }
 
-export default function useChartLabelFormats({
-    data,
-    font,
-    yAxisUnit,
-    yAxisUnitPosition = 'left',
-    labelSkipInterval = 1,
-    labelRotation = 0,
-    truncatedLabels,
-}: UseChartLabelFormatsProps) {
+export default function useChartLabelFormats({data, font, yAxisUnit, yAxisUnitPosition = 'left', labelSkipInterval = 1, labelRotation = 0, truncatedLabels}: UseChartLabelFormatsProps) {
     const {numberFormat} = useLocalize();
 
     const displayUnit = resolveDisplayUnit(font, yAxisUnit);

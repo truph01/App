@@ -2,6 +2,7 @@ import React, {useCallback, useMemo} from 'react';
 import type {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {View} from 'react-native';
 import Animated from 'react-native-reanimated';
+import type {YAxisUnit, YAxisUnitPosition} from '@components/Charts';
 import type {
     TransactionCardGroupListItemType,
     TransactionCategoryGroupListItemType,
@@ -18,10 +19,10 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getCurrencyDisplayInfoForCharts} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
+import {formatToParts} from '@libs/NumberFormatUtils';
 import {buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUtils';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -143,7 +144,7 @@ const CHART_VIEW_TO_COMPONENT: Record<Exclude<ChartView, 'pie'>, typeof SearchBa
  */
 function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll}: SearchChartViewProps) {
     const styles = useThemeStyles();
-    const {translate} = useLocalize();
+    const {translate, preferredLocale} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const icons = useMemoizedLazyExpensifyIcons(['Users', 'CreditCard', 'Send', 'Folder', 'Basket', 'Tag', 'Calendar'] as const);
     const {titleIconName, getLabel, getFilterQuery} = CHART_GROUP_BY_CONFIG[groupBy];
@@ -170,16 +171,20 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll}: 
         [queryJSON],
     );
 
-    const {yAxisUnit, yAxisUnitPosition} = useMemo((): {yAxisUnit: string; yAxisUnitPosition: 'left' | 'right'} => {
+    const {yAxisUnit, yAxisUnitPosition} = useMemo((): {yAxisUnit: YAxisUnit; yAxisUnitPosition: YAxisUnitPosition} => {
         const firstItem = data.at(0);
         const currency = firstItem?.currency ?? 'USD';
-        const {symbol, position} = getCurrencyDisplayInfoForCharts(currency);
+
+        const parts = formatToParts(preferredLocale, 0, {style: 'currency', currency});
+        const currencyPart = parts.find((p) => p.type === 'currency');
+        const currencyIndex = parts.findIndex((p) => p.type === 'currency');
+        const integerIndex = parts.findIndex((p) => p.type === 'integer');
 
         return {
-            yAxisUnit: symbol,
-            yAxisUnitPosition: position,
+            yAxisUnit: {value: currencyPart?.value ?? currency, fallback: currency},
+            yAxisUnitPosition: currencyIndex < integerIndex ? 'left' : 'right',
         };
-    }, [data]);
+    }, [data, preferredLocale]);
 
     return (
         <Animated.ScrollView

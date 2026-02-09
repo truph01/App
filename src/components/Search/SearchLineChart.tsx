@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {LineChart} from '@components/Charts';
-import type {ChartDataPoint, YAxisUnitPosition} from '@components/Charts';
+import type {ChartDataPoint, YAxisUnit, YAxisUnitPosition} from '@components/Charts';
 import {convertToFrontendAmountAsInteger} from '@libs/CurrencyUtils';
 import type IconAsset from '@src/types/utils/IconAsset';
 import type {GroupedItem} from './types';
@@ -27,8 +27,8 @@ type SearchLineChartProps = {
     /** Whether data is loading */
     isLoading?: boolean;
 
-    /** Currency symbol for Y-axis labels */
-    yAxisUnit?: string;
+    /** Currency symbol for Y-axis labels. Can be a string or an object with value and fallback for font compatibility. */
+    yAxisUnit?: YAxisUnit;
 
     /** Position of currency symbol relative to value */
     yAxisUnitPosition?: YAxisUnitPosition;
