@@ -96,16 +96,13 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {canBeMissing: true});
     const [reimbursementAccountDraft] = useOnyx(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM_DRAFT, {canBeMissing: true});
 
-    const {approvalWorkflows, availableMembers, usedApproverEmails} = useMemo(
-        () => {
-            return convertPolicyEmployeesToApprovalWorkflows({
-                policy,
-                personalDetails: personalDetails ?? {},
-                localeCompare,
-            });
-        },
-        [personalDetails, policy, localeCompare],
-    );
+    const {approvalWorkflows, availableMembers, usedApproverEmails} = useMemo(() => {
+        return convertPolicyEmployeesToApprovalWorkflows({
+            policy,
+            personalDetails: personalDetails ?? {},
+            localeCompare,
+        });
+    }, [personalDetails, policy, localeCompare]);
 
     const hasValidExistingAccounts = getEligibleExistingBusinessBankAccounts(bankAccountList, policy?.outputCurrency, true).length > 0;
 
@@ -330,8 +327,8 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                             />
                         )}
                         {searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0 && (
-                            <View style={[styles.pt3, styles.pb5]}>
-                                <Text style={[styles.textNormal, styles.colorMuted]}>{translate('common.noResultsFoundMatching', workflowSearchInput)}</Text>
+                            <View style={[styles.pt8, styles.pb5]}>
+                                <Text style={[styles.textLabel, styles.colorMuted, styles.minHeight5]}>{translate('common.noResultsFoundMatching', workflowSearchInput)}</Text>
                             </View>
                         )}
                         {searchFilteredWorkflows.map((workflow) => (
