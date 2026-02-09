@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import isObject from 'lodash/isObject';
 import type {Channel, ChannelAuthorizerGenerator, Options} from 'pusher-js/with-encryption';
 import Pusher from 'pusher-js/with-encryption';
@@ -204,9 +205,21 @@ function subscribe<EventName extends PusherEventName>(
             new Promise((resolve, reject) => {
                 // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.runAfterInteractions(() => {
-                    // If the socket was disconnected (e.g. during the "Upgrade Required" teardown)
-                    // before this deferred callback ran, skip the subscription gracefully.
+                    // We cannot call subscribe() before init(). Prevent any attempt to do this on dev.
                     if (!socket) {
+                        const error = new Error('[Pusher] instance not found. Pusher.subscribe() most likely has been called before Pusher.init()');
+
+                        if (__DEV__) {
+                            throw error;
+                        }
+
+                        // In production, report to Sentry without crashing the app.
+                        // This can happen when disconnect() is called (e.g. during the "Upgrade Required"
+                        // teardown) before this deferred InteractionManager callback runs.
+                        Sentry.captureException(error, {
+                            tags: {source: 'Pusher.subscribe'},
+                            extra: {channelName, eventName},
+                        });
                         Log.info('[Pusher] Socket disconnected before subscribe could complete, skipping subscription', false, {channelName, eventName});
                         resolve();
                         return;
