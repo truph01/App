@@ -409,6 +409,7 @@ function TransactionItemRow({
                             policyID={report?.policyID}
                             hash={transactionItem?.hash}
                             amount={report?.total}
+                            shouldDisablePointerEvents={isDisabled}
                         />
                     )}
                 </View>
@@ -602,6 +603,7 @@ function TransactionItemRow({
             isReportItemChild,
             onButtonPress,
             isActionLoading,
+            isDisabled,
             merchant,
             description,
             cardName,

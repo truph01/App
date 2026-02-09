@@ -205,6 +205,7 @@ function TransactionListItem<TItem extends ListItem>({
                                 handleActionButtonPress={handleActionButtonPress}
                                 shouldShowUserInfo={!!transactionItem?.from}
                                 isInMobileSelectionMode={shouldUseNarrowLayout && !!canSelectMultiple}
+                                isDisabledItem={!!isDisabled}
                             />
                         )}
                         <TransactionItemRow
