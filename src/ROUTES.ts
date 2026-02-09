@@ -3053,9 +3053,7 @@ const ROUTES = {
             if (!transactionID) {
                 Log.warn('Invalid transactionID is used to build the TRANSACTION_RECEIPT route');
             }
-            const actionSegment = action ? `/${action}` : '';
-            const iouTypeSegment = iouType ? `/${iouType}` : '';
-            return `r/${reportID}/transaction/${transactionID}/receipt${actionSegment}${iouTypeSegment}?readonly=${readonly}${mergeTransactionID ? `&mergeTransactionID=${mergeTransactionID}` : ''}${imageType ? `&imageType=${imageType}` : ''}` as const;
+            return `r/${reportID}/transaction/${transactionID}/receipt${action ? `/${action}` : ''}${iouType ? `/${iouType}` : ''}?readonly=${readonly}${mergeTransactionID ? `&mergeTransactionID=${mergeTransactionID}` : ''}${imageType ? `&imageType=${imageType}` : ''}` as const;
         },
     },
 

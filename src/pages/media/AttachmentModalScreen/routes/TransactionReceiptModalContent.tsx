@@ -94,10 +94,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             if (typeof odometerImage === 'string') {
                 return odometerImage;
             }
-            // Fallback: object with uri
-            if (typeof odometerImage === 'object' && 'uri' in odometerImage && typeof odometerImage.uri === 'string') {
-                return odometerImage.uri;
-            }
         }
         return isDraftTransaction ? transactionDraft?.receipt?.source : tryResolveUrlFromApiRoot(receiptURIs.image ?? '');
     };
