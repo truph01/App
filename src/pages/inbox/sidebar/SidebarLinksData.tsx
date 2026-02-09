@@ -10,6 +10,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {endSpan} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import Timing from '../../../libs/actions/Timing';
 import SidebarLinks from './SidebarLinks';
 
 type SidebarLinksDataProps = {
@@ -31,6 +32,7 @@ function SidebarLinksData({insets}: SidebarLinksDataProps) {
     const isActiveReport = useCallback((reportID: string): boolean => currentReportIDRef.current === reportID, []);
 
     const onLayout = useCallback(() => {
+        Timing.end('SpanNavigateToInboxTab');
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
     }, []);
 

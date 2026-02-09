@@ -23,6 +23,7 @@ import useSubscriptionPlan from '@hooks/useSubscriptionPlan';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspacesTabIndicatorStatus from '@hooks/useWorkspacesTabIndicatorStatus';
+import Timing from '@libs/actions/Timing';
 import clearSelectedText from '@libs/clearSelectedText/clearSelectedText';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import {getPreservedNavigatorState} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
@@ -164,6 +165,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
             return;
         }
 
+        Timing.start('SpanNavigateToInboxTab');
         startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB, {
             name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB,
             op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB,
