@@ -247,7 +247,6 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         }),
         [searchTerm, setSearchTerm, headerMessage, translate],
     );
-    console.log('sections:', ...sections.map((section) => section.title));
 
     return (
         <AccessOrNotFoundWrapper
