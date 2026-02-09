@@ -232,20 +232,36 @@ function ScreenWrapper({
             return;
         }
 
+        if (typeof document === 'undefined') {
+            return;
+        }
+
         const element = screenWrapperRef.current as unknown as HTMLElement | null;
         if (!element) {
             return;
         }
 
-        const activeElement = document?.activeElement as HTMLElement | null;
+        const activeElement = document.activeElement as HTMLElement | null;
         if (activeElement && element.contains(activeElement)) {
             return;
         }
 
-        const focusTarget = element.querySelector<HTMLElement>('button, [href], [role="button"], [role="link"], [tabindex]:not([tabindex="-1"])');
-        if (focusTarget && focusTarget !== activeElement) {
+        const focusTargets = element.querySelectorAll<HTMLElement>('button, [href], [role="button"], [role="link"], [tabindex]:not([tabindex="-1"])');
+        for (const focusTarget of focusTargets) {
+            const isDisabledTarget = focusTarget.matches(':disabled') || focusTarget.getAttribute('aria-disabled')?.toLowerCase() === 'true';
+            if (isDisabledTarget || focusTarget.getAttribute('aria-hidden') === 'true') {
+                continue;
+            }
+
+            if (focusTarget === activeElement) {
+                return;
+            }
+
             focusTarget.focus();
-            return;
+            const focusedElement = document.activeElement as HTMLElement | null;
+            if (focusedElement === focusTarget || (focusedElement && focusTarget.contains(focusedElement))) {
+                return;
+            }
         }
 
         Accessibility.moveAccessibilityFocus(screenWrapperRef as unknown as Parameters<typeof Accessibility.moveAccessibilityFocus>[0]);
