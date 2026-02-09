@@ -86,7 +86,11 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     // Get image source - use odometer image if imageType is provided (it's present only when we display odometer image), otherwise use receipt
     const getImageSource = () => {
         if (isOdometerImage && odometerImage) {
-            // Web: File object, create blob URL
+            // Web: plain object with uri
+            if (typeof odometerImage === 'object' && 'uri' in odometerImage && typeof odometerImage.uri === 'string') {
+                return odometerImage.uri;
+            }
+            // Web (Fallback): File instance, create blob URL
             if (typeof odometerImage !== 'string' && odometerImage instanceof File) {
                 return URL.createObjectURL(odometerImage);
             }
