@@ -247,6 +247,7 @@ import type {LastVisibleMessage} from './ReportActionsUtils';
 // eslint-disable-next-line import/no-cycle
 import {
     buildReportNameFromParticipantNames,
+    // eslint-disable-next-line no-restricted-imports -- We plan to refactor this file to remove dependency on computeReportName
     computeReportName,
     computeReportNameBasedOnReportAction,
     generateArchivedReportName,
@@ -5672,8 +5673,6 @@ function getReportActionMessage({
 /**
  * Get the title for a report.
  * @deprecated Moved to src/libs/ReportNameUtils.ts.
- * Use ReportNameUtils.computeReportName for full name generation.
- * For reading a stored name only, use ReportNameUtils.getReportName.
  */
 function getReportName(
     report: OnyxEntry<Report>,
@@ -6534,6 +6533,11 @@ function populateOptimisticReportFormula(formula: string, report: OptimisticExpe
 
     const createdDate = report.lastVisibleActionCreated ? new Date(report.lastVisibleActionCreated) : undefined;
 
+    const totalAmount = report.total !== undefined && !Number.isNaN(report.total) ? Math.abs(report.total) : 0;
+    const nonReimbursableTotal =
+        'nonReimbursableTotal' in report && report.nonReimbursableTotal !== undefined && !Number.isNaN(report.nonReimbursableTotal) ? Math.abs(report.nonReimbursableTotal) : 0;
+    const reimbursableAmount = totalAmount - nonReimbursableTotal;
+
     const result = formula
         // We don't translate because the server response is always in English
         .replaceAll(/\{report:type\}/gi, 'Expense Report')
@@ -6541,6 +6545,7 @@ function populateOptimisticReportFormula(formula: string, report: OptimisticExpe
         .replaceAll(/\{report:enddate\}/gi, createdDate ? format(createdDate, CONST.DATE.FNS_FORMAT_STRING) : '')
         .replaceAll(/\{report:id\}/gi, getBase62ReportID(Number(report.reportID)))
         .replaceAll(/\{report:total\}/gi, report.total !== undefined && !Number.isNaN(report.total) ? convertToDisplayString(Math.abs(report.total), report.currency).toString() : '')
+        .replaceAll(/\{report:reimbursable\}/gi, report.total !== undefined && !Number.isNaN(report.total) ? convertToDisplayString(reimbursableAmount, report.currency).toString() : '')
         .replaceAll(/\{report:currency\}/gi, report.currency ?? '')
         .replaceAll(/\{report:policyname\}/gi, policy?.name ?? '')
         .replaceAll(/\{report:workspacename\}/gi, policy?.name ?? '')
@@ -8494,7 +8499,6 @@ function buildOptimisticTaskReport(
     description?: string,
     policyID: string = CONST.POLICY.OWNER_EMAIL_FAKE,
     notificationPreference: NotificationPreference = CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN,
-    mediaAttributes?: Record<string, string>,
 ): OptimisticTaskReport {
     const participants: Participants = {
         [ownerAccountID]: {
@@ -8509,7 +8513,7 @@ function buildOptimisticTaskReport(
     return {
         reportID: generateReportID(),
         reportName: getParsedComment(title ?? '', undefined, undefined, [...CONST.TASK_TITLE_DISABLED_RULES]),
-        description: getParsedComment(description ?? '', {}, mediaAttributes),
+        description: getParsedComment(description ?? '', {}),
         ownerAccountID,
         participants,
         managerID: assigneeAccountID,
@@ -9707,7 +9711,7 @@ function getMoneyRequestOptions(
     }
 
     if (isInvoiceRoom(report)) {
-        if (canSendInvoiceFromWorkspace(policy?.id) && isPolicyAdmin(allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`])) {
+        if (canSendInvoiceFromWorkspace(policy) && isPolicyAdmin(allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`])) {
             return [CONST.IOU.TYPE.INVOICE];
         }
         return [];
@@ -11467,7 +11471,6 @@ function prepareOnboardingOnyxData({
                 taskDescription,
                 targetChatPolicyID,
                 CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN,
-                task.mediaAttributes,
             );
             const emailCreatingAction =
                 engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM ? (allPersonalDetails?.[actorAccountID]?.login ?? CONST.EMAIL.CONCIERGE) : CONST.EMAIL.CONCIERGE;

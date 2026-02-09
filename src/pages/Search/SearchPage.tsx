@@ -18,7 +18,7 @@ import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import {useSearchContext} from '@components/Search/SearchContext';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {PaymentData, SearchParams} from '@components/Search/types';
-import {usePlaybackContext} from '@components/VideoPlayerContexts/PlaybackContext';
+import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
 import useAllTransactions from '@hooks/useAllTransactions';
 import useBulkPayOptions from '@hooks/useBulkPayOptions';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -516,7 +516,17 @@ function SearchPage({route}: SearchPageProps) {
                 const transactionsViolations = allTransactionViolations
                     ? Object.fromEntries(Object.entries(allTransactionViolations).filter((entry): entry is [string, TransactionViolations] => !!entry[1]))
                     : {};
-                bulkDeleteReports(hash, selectedTransactions, currentUserPersonalDetails.email ?? '', accountID, reportTransactions, transactionsViolations, bankAccountList);
+                bulkDeleteReports(
+                    allReports,
+                    selfDMReport,
+                    hash,
+                    selectedTransactions,
+                    currentUserPersonalDetails.email ?? '',
+                    accountID,
+                    reportTransactions,
+                    transactionsViolations,
+                    bankAccountList,
+                );
                 clearSelectedTransactions();
             });
         });
@@ -534,6 +544,8 @@ function SearchPage({route}: SearchPageProps) {
         currentUserPersonalDetails.email,
         bankAccountList,
         clearSelectedTransactions,
+        allReports,
+        selfDMReport,
     ]);
 
     const onBulkPaySelected = useCallback(
@@ -1172,7 +1184,7 @@ function SearchPage({route}: SearchPageProps) {
         validateFiles(files, Array.from(e.dataTransfer?.items ?? []));
     };
 
-    const {resetVideoPlayerData} = usePlaybackContext();
+    const {resetVideoPlayerData} = usePlaybackActionsContext();
 
     const metadata = searchResults?.search;
     const shouldShowFooter = !!metadata?.count || selectedTransactionsKeys.length > 0;
