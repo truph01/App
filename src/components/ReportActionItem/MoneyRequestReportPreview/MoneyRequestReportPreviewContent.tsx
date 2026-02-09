@@ -687,11 +687,7 @@ function MoneyRequestReportPreviewContent({
 
     const renderSeparator = () => <View style={styles.transactionsCarouselGap} />;
 
-    const snapOffsets = useMemo(() => {
-        const itemWidth = reportPreviewStyles.transactionPreviewCarouselStyle.width;
-        const gap = styles.transactionsCarouselGap.width;
-        return carouselTransactions.map((_, index) => index * (itemWidth + gap));
-    }, [carouselTransactions, reportPreviewStyles.transactionPreviewCarouselStyle.width, styles.transactionsCarouselGap.width]);
+    const snapOffsets = carouselTransactions.map((_, index) => index * (reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.transactionsCarouselGap.width));
 
     return (
         <View
