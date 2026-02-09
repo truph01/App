@@ -1,8 +1,7 @@
 import {useEffect} from 'react';
 import Clipboard from '@libs/Clipboard';
-import getPlatform from '@libs/getPlatform';
+import getClipboardPlainText from '@libs/Clipboard/getClipboardPlainText';
 import KeyboardShortcut from '@libs/KeyboardShortcut';
-import Parser from '@libs/Parser';
 import SelectionScraper from '@libs/SelectionScraper';
 import CONST from '@src/CONST';
 
@@ -11,15 +10,12 @@ function copySelectionToClipboard() {
     if (!selection) {
         return;
     }
-    // Web-only fix: use plain text in text/plain, keep markdown on native to preserve behavior.
-    const isWeb = getPlatform() === CONST.PLATFORM.WEB;
-    const htmlPlainText = Parser.htmlToText(selection);
-    const plainText = isWeb ? htmlPlainText : Parser.htmlToMarkdown(selection);
+    const plainText = getClipboardPlainText(selection);
     if (!Clipboard.canSetHtml()) {
         Clipboard.setString(plainText);
         return;
     }
-    Clipboard.setHtml(selection, htmlPlainText);
+    Clipboard.setHtml(selection, plainText);
 }
 
 export default function useCopySelectionHelper() {
