@@ -45,7 +45,7 @@ function VacationDelegatePage() {
     );
 
     const {showConfirmModal} = useConfirmModal();
-    const showVacationDelegateWarningModal = () => {
+    const showVacationDelegateWarningModal = useCallback(() => {
         return showConfirmModal({
             title: translate('common.headsUp'),
             prompt: translate('statusPage.vacationDelegateWarning', {nameOrEmail: getPersonalDetailByEmail(newVacationDelegate)?.displayName ?? newVacationDelegate}),
@@ -53,7 +53,7 @@ function VacationDelegatePage() {
             cancelText: translate('common.cancel'),
             shouldShowCancelButton: true,
         });
-    };
+    }, [showConfirmModal, translate, newVacationDelegate]);
 
     const {searchTerm, debouncedSearchTerm, setSearchTerm, availableOptions, areOptionsInitialized, onListEndReached} = useSearchSelector({
         selectionMode: CONST.SEARCH_SELECTOR.SELECTION_MODE_SINGLE,
@@ -162,7 +162,7 @@ function VacationDelegatePage() {
                 Navigation.goBack(ROUTES.SETTINGS_STATUS);
             });
         },
-        [currentUserLogin, vacationDelegate, setSearchTerm],
+        [currentUserLogin, vacationDelegate, setSearchTerm, showVacationDelegateWarningModal, newVacationDelegate],
     );
 
     useEffect(() => {
