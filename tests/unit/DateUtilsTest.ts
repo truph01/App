@@ -478,6 +478,60 @@ describe('DateUtils', () => {
         });
     });
 
+    describe('formatUTCDateTimeToDateInTimezone', () => {
+        const originalTZ = process.env.TZ;
+
+        beforeEach(() => {
+            process.env.TZ = 'UTC';
+        });
+
+        afterEach(() => {
+            process.env.TZ = originalTZ;
+        });
+
+        it('should return empty string when utcDateTime is empty', () => {
+            expect(DateUtils.formatUTCDateTimeToDateInTimezone('', UTC as SelectedTimezone)).toBe('');
+        });
+
+        it('should return empty string when timeZone is empty', () => {
+            expect(DateUtils.formatUTCDateTimeToDateInTimezone('2024-01-15 08:00:00', '' as SelectedTimezone)).toBe('');
+        });
+
+        it('should return date in yyyy-MM-dd format when timeZone is UTC', () => {
+            const result = DateUtils.formatUTCDateTimeToDateInTimezone('2024-01-15 08:00:00', UTC as SelectedTimezone);
+            expect(result).toBe('2024-01-15');
+        });
+
+        it('should convert UTC datetime to target timezone date', () => {
+            // America/New_York is UTC-5 in January (EST), so 2024-01-15 08:00:00 UTC = 2024-01-15 03:00:00 EST
+            const americaNewYork = 'America/New_York' as SelectedTimezone;
+            const result = DateUtils.formatUTCDateTimeToDateInTimezone('2024-01-15 08:00:00', americaNewYork);
+            expect(result).toBe('2024-01-15');
+        });
+
+        it('should handle UTC datetime that falls on previous day in target timezone', () => {
+            // America/New_York is UTC-5, so 2024-01-15 02:00:00 UTC = 2024-01-14 21:00:00 EST
+            const americaNewYork = 'America/New_York' as SelectedTimezone;
+            const result = DateUtils.formatUTCDateTimeToDateInTimezone('2024-01-15 02:00:00', americaNewYork);
+            expect(result).toBe('2024-01-14');
+        });
+
+        it('should handle UTC datetime with milliseconds', () => {
+            const result = DateUtils.formatUTCDateTimeToDateInTimezone('2024-01-15 08:00:00.000', UTC as SelectedTimezone);
+            expect(result).toBe('2024-01-15');
+        });
+
+        it('should handle date-only format (parses as midnight UTC)', () => {
+            const result = DateUtils.formatUTCDateTimeToDateInTimezone('2024-01-15', UTC as SelectedTimezone);
+            expect(result).toBe('2024-01-15');
+        });
+
+        it('should return empty string for invalid date', () => {
+            const result = DateUtils.formatUTCDateTimeToDateInTimezone('invalid-date', UTC as SelectedTimezone);
+            expect(result).toBe('');
+        });
+    });
+
     describe('normalizeDateToStartOfDay', () => {
         const originalTZ = process.env.TZ;
 
