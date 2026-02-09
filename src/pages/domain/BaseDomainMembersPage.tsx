@@ -3,9 +3,9 @@ import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SearchBar from '@components/SearchBar';
-import SelectionList from '@components/SelectionList';
 import TableListItem from '@components/SelectionList/ListItem/TableListItem';
 import type {ListItem} from '@components/SelectionList/types';
+import SelectionListWithModal from '@components/SelectionListWithModal';
 import CustomListHeader from '@components/SelectionListWithModal/CustomListHeader';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -70,6 +70,12 @@ type BaseDomainMembersPageProps = {
 
     /** Setter for a list of selected members. Only works with canSelectMultiple === true. */
     setSelectedMembers?: React.Dispatch<React.SetStateAction<string[]>>;
+
+    /** Whether the selection mode header should be shown (changes title and hides icon) */
+    useSelectionModeHeader?: boolean;
+
+    /** Custom back button press handler */
+    onBackButtonPress?: () => void;
 };
 
 function BaseDomainMembersPage({
@@ -86,8 +92,10 @@ function BaseDomainMembersPage({
     selectedMembers,
     setSelectedMembers,
     canSelectMultiple = false,
+    useSelectionModeHeader,
+    onBackButtonPress,
 }: BaseDomainMembersPageProps) {
-    const {formatPhoneNumber, localeCompare} = useLocalize();
+    const {formatPhoneNumber, localeCompare, translate} = useLocalize();
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: true});
@@ -130,9 +138,9 @@ function BaseDomainMembersPage({
 
     const [inputValue, setInputValue, filteredData] = useSearchResults(data, filterMember, sortMembers);
 
-    const canSelectUsers = canSelectMultiple && setSelectedMembers && filteredData.length;
+    const isUserToggleEnabled = canSelectMultiple && setSelectedMembers && filteredData.length > 0;
 
-    const toggleAllUsers = canSelectUsers
+    const toggleAllUsers = isUserToggleEnabled
         ? () => {
               const enabledAccounts = filteredData.filter((member) => !member.isDisabled && !member.isDisabledCheckbox);
               const enabledAccountIDs = enabledAccounts.map((member) => member.keyForList);
@@ -149,7 +157,7 @@ function BaseDomainMembersPage({
           }
         : undefined;
 
-    const toggleUser = canSelectUsers
+    const toggleUser = isUserToggleEnabled
         ? (member: MemberOption) => {
               if (selectedMembers?.includes(member.keyForList)) {
                   setSelectedMembers((prevSelected) => prevSelected.filter((accountID) => accountID !== member.keyForList));
@@ -190,18 +198,18 @@ function BaseDomainMembersPage({
                 testID={BaseDomainMembersPage.displayName}
             >
                 <HeaderWithBackButton
-                    title={headerTitle}
-                    onBackButtonPress={Navigation.popToSidebar}
-                    icon={headerIcon}
+                    title={useSelectionModeHeader ? translate('common.selectMultiple') : headerTitle}
+                    onBackButtonPress={onBackButtonPress ?? Navigation.popToSidebar}
+                    icon={!useSelectionModeHeader ? headerIcon : undefined}
                     shouldShowBackButton={shouldUseNarrowLayout}
-                    shouldUseHeadlineHeader
+                    shouldUseHeadlineHeader={!useSelectionModeHeader}
                 >
                     {!shouldUseNarrowLayout && !!headerContent && <View style={[styles.flexRow, styles.gap2]}>{headerContent}</View>}
                 </HeaderWithBackButton>
 
                 {shouldUseNarrowLayout && !!headerContent && <View style={[styles.pl5, styles.pr5, styles.flexRow, styles.gap2]}>{headerContent}</View>}
 
-                <SelectionList
+                <SelectionListWithModal
                     data={filteredData}
                     shouldShowRightCaret
                     style={{
@@ -214,15 +222,15 @@ function BaseDomainMembersPage({
                     onDismissError={onDismissError}
                     showListEmptyContent={false}
                     showScrollIndicator={false}
-                    addBottomSafeAreaPadding
                     shouldHeaderBeInsideList
                     customListHeader={getCustomListHeader()}
                     customListHeaderContent={listHeaderContent}
-                    disableMaintainingScrollPosition
                     canSelectMultiple={canSelectMultiple}
                     onSelectAll={toggleAllUsers}
                     onCheckboxPress={toggleUser}
                     selectedItems={selectedMembers}
+                    turnOnSelectionModeOnLongPress
+                    onTurnOnSelectionMode={(item) => item && toggleUser?.(item)}
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
