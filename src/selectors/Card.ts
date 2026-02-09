@@ -1,7 +1,7 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import {getCardFeedsForDisplay} from '@libs/CardFeedUtils';
-import {isCard, isCardHiddenFromSearch, isCardPendingActivate, isCardPendingIssue, isExpensifyCard, isPersonalCard} from '@libs/CardUtils';
+import {isCard, isCardHiddenFromSearch, isCardPendingActivate, isCardPendingIssue, isCardWithPotentialFraud, isExpensifyCard, isPersonalCard} from '@libs/CardUtils';
 import {filterObject} from '@libs/ObjectUtils';
 import CONST from '@src/CONST';
 import type {Card, CardList, NonPersonalAndWorkspaceCardListDerivedValue} from '@src/types/onyx';
@@ -47,17 +47,6 @@ type TimeSensitiveCardsResult = {
     cardsNeedingShippingAddress: Card[];
     cardsNeedingActivation: Card[];
     cardsWithFraud: Card[];
-};
-
-const FRAUD_TYPE_DOMAIN = CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN;
-const FRAUD_TYPE_INDIVIDUAL = CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL;
-
-/**
- * Check if a card has potential fraud that needs review.
- * Returns true if the card has fraud type 'domain' or 'individual'.
- */
-const isCardWithPotentialFraud = (card: Card): boolean => {
-    return card.fraud === FRAUD_TYPE_DOMAIN || card.fraud === FRAUD_TYPE_INDIVIDUAL;
 };
 
 /**
