@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useLayoutEffect} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import {View} from 'react-native';
 import Animated, {useAnimatedStyle, useDerivedValue, useSharedValue} from 'react-native-reanimated';
@@ -39,19 +39,24 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
 
     const content = percentage ? `${label} • ${amount} (${percentage})` : `${label} • ${amount}`;
 
-    /** * Visibility gate: Only true when the tooltip has been measured */
-    const [hasMeasured, setHasMeasured] = useState(false);
+    /**
+     * Synchronously reset the width and hide the tooltip whenever the content changes.
+     * This prevents the "old" dimensions from being used to calculate the position
+     * of "new" content, avoiding visual jumps or "ghosting" effects.
+     */
+    useLayoutEffect(() => {
+        tooltipMeasuredWidth.set(0);
+    }, [content, tooltipMeasuredWidth]);
 
     /**
-     * Updates the shared width value and sets the measured content key.
-     * This triggers the opacity flip once the layout engine confirms dimensions.
+     * Updates the shared width value and makes the tooltip visible.
+     * This is triggered once the layout engine confirms the new dimensions for the content.
      */
     const handleTooltipLayout = useCallback(
         (event: LayoutChangeEvent) => {
             const {width} = event.nativeEvent.layout;
             if (width > 0) {
                 tooltipMeasuredWidth.set(width);
-                setHasMeasured(true);
             }
         },
         [tooltipMeasuredWidth],
@@ -79,14 +84,12 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
             top: y,
             /** Center the wrapper horizontally and lift it entirely above the Y point */
             transform: [{translateX: '-50%'}, {translateY: '-100%'}],
-            /** Keep invisible until measurement for the current bar's content is ready */
-            opacity: hasMeasured ? 1 : 0,
         };
-    }, [chartWidth, initialTooltipPosition, hasMeasured]);
+    }, [initialTooltipPosition]);
 
     /**
      * Animated style for the pointer (triangle).
-     * Calculates the relative offset to keep the pointer pinned to the bar (initialX)
+     * Calculates the relative offset to keep the pointer pinned to the data point (initialX)
      * even when the main container is clamped to the edges.
      */
     const pointerStyle = useAnimatedStyle(() => {
@@ -97,7 +100,7 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
         return {
             transform: [{translateX: relativeOffset}],
         };
-    }, [chartWidth, initialTooltipPosition]);
+    }, [initialTooltipPosition]);
 
     return (
         <Animated.View
