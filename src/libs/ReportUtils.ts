@@ -169,6 +169,7 @@ import {
     isPolicyMember,
     isPolicyMemberWithoutPendingDelete,
     isPolicyOwner,
+    isPolicyFieldListEmpty,
     isSubmitAndClose,
     shouldShowPolicy,
 } from './PolicyUtils';
@@ -990,6 +991,24 @@ Onyx.connectWithoutView({
 // to prevent unnecessary parsing when the report action is not changed/modified.
 // Example case: when we need to get a report name of a thread which is dependent on a report action message.
 const parsedReportActionMessageCache: Record<string, string> = {};
+
+/**
+ * Fallback title field used when a policy has an empty fieldList (matches OldDot behavior).
+ */
+const FALLBACK_TITLE_FIELD: PolicyReportField = {
+    fieldID: CONST.REPORT_FIELD_TITLE_FIELD_ID,
+    name: CONST.POLICY.DEFAULT_FIELD_LIST_NAME,
+    type: CONST.REPORT_FIELD_TYPES.TEXT,
+    defaultValue: CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME,
+    deletable: true,
+    target: CONST.POLICY.DEFAULT_FIELD_LIST_TARGET,
+    values: [],
+    keys: [],
+    externalIDs: [],
+    disabledOptions: [],
+    orderWeight: 0,
+    isTax: false,
+};
 
 let conciergeReportIDOnyxConnect: OnyxEntry<string>;
 Onyx.connect({
@@ -4455,22 +4474,8 @@ function getTitleFieldWithFallback(policy: OnyxEntry<Policy>): PolicyReportField
         return policyTitleField;
     }
 
-    const isPolicyFieldListEmpty = !policy?.fieldList || Object.keys(policy.fieldList).length === 0;
-    if (isPolicyFieldListEmpty) {
-        return {
-            fieldID: CONST.REPORT_FIELD_TITLE_FIELD_ID,
-            name: 'title',
-            type: CONST.REPORT_FIELD_TYPES.TEXT,
-            defaultValue: CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME,
-            deletable: true,
-            target: 'expense',
-            values: [],
-            keys: [],
-            externalIDs: [],
-            disabledOptions: [],
-            orderWeight: 0,
-            isTax: false,
-        };
+    if (isPolicyFieldListEmpty(policy)) {
+        return FALLBACK_TITLE_FIELD;
     }
 
     return undefined;

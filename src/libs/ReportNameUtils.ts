@@ -29,7 +29,7 @@ import {translateLocal} from './Localize';
 import {getForReportAction, getMovedReportID} from './ModifiedExpenseMessage';
 import Parser from './Parser';
 import {getDisplayNameOrDefault} from './PersonalDetailsUtils';
-import {getCleanedTagName, getPolicy, isPolicyAdmin} from './PolicyUtils';
+import {getCleanedTagName, getPolicy, isPolicyAdmin, isPolicyFieldListEmpty} from './PolicyUtils';
 import {
     getActionableCardFraudAlertResolutionMessage,
     getAutoPayApprovedReportsEnabledMessage,
@@ -327,8 +327,7 @@ function getInvoicePayerName(report: OnyxEntry<Report>, invoiceReceiverPolicy?: 
 function getMoneyRequestReportName({report, policy, invoiceReceiverPolicy}: {report: OnyxEntry<Report>; policy?: OnyxEntry<Policy>; invoiceReceiverPolicy?: OnyxEntry<Policy>}): string {
     // For expense reports with empty fieldList and empty reportName, return "New Report" (matches OldDot behavior)
     if (isExpenseReport(report)) {
-        const isPolicyFieldListEmpty = !policy?.fieldList || Object.keys(policy.fieldList).length === 0;
-        if (report?.reportName === '' && isPolicyFieldListEmpty) {
+        if (report?.reportName === '' && isPolicyFieldListEmpty(policy)) {
             return CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME;
         }
     }
