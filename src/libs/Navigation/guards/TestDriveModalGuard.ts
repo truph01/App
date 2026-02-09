@@ -52,7 +52,6 @@ Onyx.connectWithoutView({
     },
 });
 
-
 /**
  * Check if we're already on or navigating to the test drive modal
  * This prevents redirect loops where our redirect creates new navigation actions

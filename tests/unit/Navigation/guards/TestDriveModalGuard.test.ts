@@ -48,7 +48,9 @@ describe('TestDriveModalGuard', () => {
 
         const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
         expect(result.type).toBe('REDIRECT');
-        expect(result.route).toBe(ROUTES.TEST_DRIVE_MODAL_ROOT.route);
+        if (result.type === 'REDIRECT') {
+            expect(result.route).toBe(ROUTES.TEST_DRIVE_MODAL_ROOT.route);
+        }
     });
 
     it('should allow when modal dismissed', async () => {
@@ -118,6 +120,8 @@ describe('TestDriveModalGuard', () => {
 
         const result = TestDriveModalGuard.evaluate(testDriveModalState, mockAction, defaultContext);
         expect(result.type).toBe('REDIRECT');
-        expect(result.route).toBe(ROUTES.HOME);
+        if (result.type === 'REDIRECT') {
+            expect(result.route).toBe(ROUTES.HOME);
+        }
     });
 });

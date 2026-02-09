@@ -1,4 +1,3 @@
-import {waitFor} from '@testing-library/react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import {navigateAfterOnboarding} from '@libs/navigateAfterOnboarding';
@@ -133,13 +132,5 @@ describe('navigateAfterOnboarding', () => {
 
         navigateAfterOnboarding(true, true, ONBOARDING_POLICY_ID, ONBOARDING_ADMINS_CHAT_REPORT_ID, (testSession?.email ?? '').includes('+'));
         expect(navigate).toHaveBeenCalledWith(ROUTES.REPORT_WITH_ID.getRoute(REPORT_ID));
-    });
-
-    it('should navigate to Test Drive Modal if user wants to manage a small team', async () => {
-        const navigate = jest.spyOn(Navigation, 'navigate');
-        jest.spyOn(Navigation, 'isNavigationReady').mockReturnValue(Promise.resolve());
-
-        navigateAfterOnboarding(true, true);
-        await waitFor(() => expect(navigate).toHaveBeenCalledWith(ROUTES.TEST_DRIVE_MODAL_ROOT.route));
     });
 });
