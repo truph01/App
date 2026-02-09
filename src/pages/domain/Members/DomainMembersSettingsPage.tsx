@@ -38,7 +38,6 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
     });
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
-    const is2FAEnabled = account?.requiresTwoFactorAuth;
 
     return (
         <BaseDomainSettingsPage domainAccountID={domainAccountID}>
@@ -52,7 +51,8 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
                         return;
                     }
 
-                    if (!value && is2FAEnabled) {
+                    if (!value && account?.requiresTwoFactorAuth) {
+                        clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID);
                         Navigation.navigate(ROUTES.DOMAIN_MEMBERS_SETTINGS_TWO_FACTOR_AUTH.getRoute(domainAccountID));
                     } else {
                         toggleTwoFactorAuthRequiredForDomain(domainAccountID, domainName, value);
@@ -68,7 +68,7 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
                 }
                 shouldPlaceSubtitleBelowSwitch
                 pendingAction={domainPendingActions?.twoFactorAuthRequired}
-                errors={getLatestError(domainErrors?.setTwoFactorAuthRequiredError)}
+                errors={!account?.requiresTwoFactorAuth || !domainSettings?.twoFactorAuthRequired ? getLatestError(domainErrors?.setTwoFactorAuthRequiredError) : undefined}
                 onCloseError={() => clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID)}
             />
         </BaseDomainSettingsPage>
