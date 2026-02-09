@@ -5281,8 +5281,12 @@ function getReportPreviewMessage(
 
             const amount = getTransactionAmount(linkedTransaction, !isEmptyObject(report) && isExpenseReport(report), linkedTransaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) ?? 0;
             const formattedAmount = convertToDisplayString(amount, getCurrency(linkedTransaction)) ?? '';
+
+            const originalMessage = getOriginalMessage(iouReportAction);
+            const merchantOrComment = originalMessage?.comment ?? getMerchantOrDescription(linkedTransaction);
+
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            return translateLocal('iou.trackedAmount', formattedAmount, getMerchantOrDescription(linkedTransaction));
+            return translateLocal('iou.trackedAmount', formattedAmount, merchantOrComment);
         }
     }
 
