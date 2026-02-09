@@ -10,6 +10,8 @@ import CONFIG from '@src/CONFIG';
 import hideKeyboardOnSwipe from './hideKeyboardOnSwipe';
 import useModalCardStyleInterpolator from './useModalCardStyleInterpolator';
 
+const IS_MOBILE_SAFARI = isMobileSafari();
+
 type SplitNavigatorScreenOptions = {
     sidebarScreen: PlatformStackNavigationOptions;
     centralScreen: PlatformStackNavigationOptions;
@@ -52,11 +54,11 @@ const useSplitNavigatorScreenOptions = () => {
             ...hideKeyboardOnSwipe,
             headerShown: false,
             title: CONFIG.SITE_TITLE,
-            animation: shouldUseNarrowLayout && !isMobileSafari() ? Animations.SLIDE_FROM_RIGHT : Animations.NONE,
+            animation: shouldUseNarrowLayout && !IS_MOBILE_SAFARI ? Animations.SLIDE_FROM_RIGHT : Animations.NONE,
             animationTypeForReplace: 'pop',
             web: {
                 cardStyleInterpolator: (props: StackCardInterpolationProps) =>
-                    modalCardStyleInterpolator({props, isFullScreenModal: true, shouldAnimateSidePanel: true, animationEnabled: !isMobileSafari()}),
+                    modalCardStyleInterpolator({props, isFullScreenModal: true, shouldAnimateSidePanel: true, animationEnabled: !IS_MOBILE_SAFARI}),
                 cardStyle: shouldUseNarrowLayout ? StyleUtils.getNavigationModalCardStyle() : themeStyles.h100,
             },
         },
