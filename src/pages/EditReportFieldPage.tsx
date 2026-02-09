@@ -111,10 +111,11 @@ function EditReportFieldPage({route}: EditReportFieldPageProps) {
     };
 
     // Provide a default when the report name and the policy field list are empty
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
     const fieldValue = isReportFieldTitle
         ? report.reportName || (isPolicyFieldListEmpty(policy) ? CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME : '')
         : (reportField.value ?? reportField.defaultValue);
+    /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
     const handleReportFieldChange = (form: FormOnyxValues<typeof ONYXKEYS.FORMS.REPORT_FIELDS_EDIT_FORM>) => {
         const value = form[fieldKey];
