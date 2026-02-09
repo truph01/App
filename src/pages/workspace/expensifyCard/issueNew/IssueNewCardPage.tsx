@@ -1,4 +1,4 @@
-import {isActingAsDelegateSelector} from '@selectors/Account';
+import {isDelegateAccessRestrictedSelector} from '@selectors/Account';
 import React, {useEffect, useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import DelegateNoAccessWrapper from '@components/DelegateNoAccessWrapper';
@@ -50,7 +50,7 @@ function IssueNewCardPage({policy, route}: IssueNewCardPageProps) {
     const [issueNewCard] = useOnyx(`${ONYXKEYS.COLLECTION.ISSUE_NEW_EXPENSIFY_CARD}${policyID}`, {canBeMissing: true, initWithStoredValues: false});
     const {currentStep} = issueNewCard ?? {};
     const backTo = route?.params?.backTo;
-    const [isActingAsDelegate] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isActingAsDelegateSelector, canBeMissing: true});
+    const [isDelegateAccessRestricted] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isDelegateAccessRestrictedSelector, canBeMissing: true});
     const {isBetaEnabled} = usePermissions();
     const isSingleUseEnabled = isBetaEnabled(CONST.BETAS.SINGLE_USE_AND_EXPIRE_BY_CARDS);
 
@@ -132,7 +132,7 @@ function IssueNewCardPage({policy, route}: IssueNewCardPageProps) {
         }
     };
 
-    if (isActingAsDelegate) {
+    if (isDelegateAccessRestricted) {
         return (
             <ScreenWrapper
                 testID="IssueNewCardPage"
@@ -140,7 +140,7 @@ function IssueNewCardPage({policy, route}: IssueNewCardPageProps) {
                 shouldEnablePickerAvoiding={false}
             >
                 <DelegateNoAccessWrapper
-                    accessDeniedVariants={[CONST.DELEGATE.DENIED_ACCESS_VARIANTS.DELEGATE]}
+                    accessDeniedVariants={[CONST.DELEGATE.DENIED_ACCESS_VARIANTS.SUBMITTER]}
                     onBackButtonPress={() => Navigation.goBack(backTo)}
                 />
             </ScreenWrapper>
