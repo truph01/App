@@ -7,7 +7,7 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 // eslint-disable-next-line no-restricted-imports
 import SelectionList from '@components/SelectionListWithSections';
-import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
+import SingleSelectWithAvatarListItem from '@components/SelectionListWithSections/SingleSelectWithAvatarListItem';
 import type {Section} from '@components/SelectionListWithSections/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -145,7 +145,8 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
                 <SelectionList
                     sections={sections}
                     headerMessage={headerMessage()}
-                    ListItem={InviteMemberListItem}
+                    ListItem={SingleSelectWithAvatarListItem}
+                    shouldSingleExecuteRowSelect
                     textInputLabel={translate('selectionList.nameEmailOrPhoneNumber')}
                     textInputValue={searchTerm}
                     onChangeText={(value) => setSearchTerm(value)}
