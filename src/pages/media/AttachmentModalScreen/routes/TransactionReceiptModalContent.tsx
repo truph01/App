@@ -80,10 +80,10 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const isOdometerImage = !!imageType;
     let odometerImage: FileObject | string | undefined;
     if (isOdometerImage) {
-        odometerImage = imageType === 'start' ? transaction?.comment?.odometerStartImage : transaction?.comment?.odometerEndImage;
+        odometerImage = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? transaction?.comment?.odometerStartImage : transaction?.comment?.odometerEndImage;
     }
     const odometerFile = typeof odometerImage !== 'string' ? odometerImage : undefined;
-    // Get image source - use odometer image if imageType is provided, otherwise use receipt
+    // Get image source - use odometer image if imageType is provided (it's present only when we display odometer image), otherwise use receipt
     const getImageSource = () => {
         if (isOdometerImage && odometerImage) {
             // Web: File object, create blob URL
@@ -198,7 +198,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     }
     let headerTitle: string;
     if (isOdometerImage) {
-        headerTitle = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
+        headerTitle = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
     } else {
         headerTitle = translate('common.receipt');
     }
