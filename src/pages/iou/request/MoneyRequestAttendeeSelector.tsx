@@ -6,10 +6,9 @@ import Button from '@components/Button';
 import EmptySelectionListContent from '@components/EmptySelectionListContent';
 import FormHelpMessage from '@components/FormHelpMessage';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
-// eslint-disable-next-line no-restricted-imports
-import SelectionList from '@components/SelectionListWithSections';
-import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
-import type {SectionListDataType} from '@components/SelectionListWithSections/types';
+import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
+import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
+import {Section} from '@components/SelectionList/SelectionListWithSections/types';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -37,6 +36,7 @@ import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Attendee} from '@src/types/onyx/IOU';
+import getEmptyArray from '@src/types/utils/getEmptyArray';
 import SafeString from '@src/utils/SafeString';
 
 type MoneyRequestAttendeesSelectorProps = {
@@ -206,7 +206,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
      * Returns the sections needed for the OptionsSelector
      */
     const [sections, header] = useMemo(() => {
-        const newSections: Array<SectionListDataType<OptionData>> = [];
+        const newSections: Array<Section<OptionData>> = [];
         if (!areOptionsInitialized || !didScreenTransitionEnd) {
             return [newSections, ''];
         }
@@ -226,6 +226,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
 
         newSections.push({
             ...formatResults.section,
+            sectionIndex: 0,
             data: formatResults.section.data as OptionData[],
         });
 
@@ -233,6 +234,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
             newSections.push({
                 title: translate('common.recents'),
                 data: orderedAvailableOptions.recentReports,
+                sectionIndex: 1,
             });
         }
 
@@ -240,6 +242,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
             newSections.push({
                 title: translate('common.contacts'),
                 data: orderedAvailableOptions.personalDetails,
+                sectionIndex: 2,
             });
         }
 
@@ -263,7 +266,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
                         ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, reportAttributesDerived)
                         : getParticipantsOption(participant, personalDetails);
                 }) as OptionData[],
-                shouldShow: true,
+                sectionIndex: 3,
             });
         }
 
@@ -303,27 +306,34 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
 
     const shouldShowListEmptyContent = useMemo(() => optionLength === 0 && !showLoadingPlaceholder, [optionLength, showLoadingPlaceholder]);
 
+    const textInputOptions = {
+        label: translate('selectionList.nameEmailOrPhoneNumber'),
+        hint: offlineMessage,
+        value: searchTerm,
+        onChangeText: setSearchTerm,
+        headerMessage: header,
+        disableAutoCorrect: true,
+    };
+
     return (
-        <SelectionList
-            onConfirm={handleConfirmSelection}
-            sections={areOptionsInitialized ? sections : CONST.EMPTY_ARRAY}
+        <SelectionListWithSections
+            sections={areOptionsInitialized ? sections : getEmptyArray<Section<OptionData>>()}
             ListItem={InviteMemberListItem}
-            textInputValue={searchTerm}
-            textInputLabel={translate('selectionList.nameEmailOrPhoneNumber')}
-            textInputHint={offlineMessage}
-            onChangeText={setSearchTerm}
-            shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
             onSelectRow={toggleSelection}
-            shouldSingleExecuteRowSelect
+            textInputOptions={textInputOptions}
+            confirmButtonOptions={{
+                onConfirm: handleConfirmSelection,
+            }}
             footerContent={footerContent}
-            autoCorrect={false}
-            listEmptyContent={<EmptySelectionListContent contentType={iouType} />}
-            headerMessage={header}
-            showLoadingPlaceholder={showLoadingPlaceholder}
-            canSelectMultiple
             isLoadingNewOptions={!!isSearchingForReports}
-            shouldShowListEmptyContent={shouldShowListEmptyContent}
+            showLoadingPlaceholder={showLoadingPlaceholder}
+            showListEmptyContent={shouldShowListEmptyContent}
+            listEmptyContent={<EmptySelectionListContent contentType={iouType} />}
+            shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
             onEndReached={onListEndReached}
+            shouldSingleExecuteRowSelect
+            shouldShowTextInput
+            canSelectMultiple
         />
     );
 }

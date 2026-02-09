@@ -283,6 +283,9 @@ function BaseTextInput({
         shouldAddPaddingBottom && styles.pb1,
     ]);
 
+    console.log('inputProps.secureTextEntry', inputProps.secureTextEntry);
+    console.log('autoCorrect', autoCorrect);
+
     const verticalPaddingDiff = StyleUtils.getVerticalPaddingDiffFromStyle(newTextInputContainerStyles);
     const inputPaddingLeft = !!prefixCharacter && StyleUtils.getPaddingLeft(prefixCharacterPadding + styles.pl1.paddingLeft);
     const inputPaddingRight = !!suffixCharacter && StyleUtils.getPaddingRight(StyleUtils.getCharacterPadding(suffixCharacter) + styles.pr1.paddingRight);
