@@ -51,6 +51,7 @@ import SCREENS from '@src/SCREENS';
 import type {ReportAttributesDerivedValue} from '@src/types/onyx/DerivedValues';
 import type Transaction from '@src/types/onyx/Transaction';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+import type {FileObject} from '@src/types/utils/Attachment';
 import DiscardChangesConfirmation from './DiscardChangesConfirmation';
 import StepScreenWrapper from './StepScreenWrapper';
 import withFullTransactionOrNotFound from './withFullTransactionOrNotFound';
@@ -94,8 +95,8 @@ function IOURequestStepDistanceOdometer({
     // Track local state via refs to avoid including them in useEffect dependencies
     const startReadingRef = useRef<string>('');
     const endReadingRef = useRef<string>('');
-    const initialStartImageRef = useRef<File | string | undefined>(undefined);
-    const initialEndImageRef = useRef<File | string | undefined>(undefined);
+    const initialStartImageRef = useRef<FileObject | string | undefined>(undefined);
+    const initialEndImageRef = useRef<FileObject | string | undefined>(undefined);
     const prevSelectedTabRef = useRef<string | undefined>(undefined);
 
     const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`, {canBeMissing: true});
@@ -228,7 +229,7 @@ function IOURequestStepDistanceOdometer({
     })();
 
     // Get image source for web (blob URL) or native (URI string)
-    const getImageSource = useCallback((image: File | string | {uri?: string} | undefined): string | undefined => {
+    const getImageSource = useCallback((image: FileObject | string | {uri?: string} | undefined): string | undefined => {
         if (!image) {
             return undefined;
         }
