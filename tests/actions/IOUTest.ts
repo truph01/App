@@ -8128,7 +8128,14 @@ describe('actions/IOU', () => {
             const ancestors = [];
             ancestors.push(...(iouReport && createIOUAction ? [{report: iouReport, reportAction: createIOUAction, shouldDisplayNewMarker: false}] : []));
             ancestors.push(...(chatReport && iouPreview ? [{report: chatReport, reportAction: iouPreview, shouldDisplayNewMarker: false}] : []));
-            addComment({report: thread, notifyReportID: thread.reportID, ancestors, text: 'Testing a comment', timezoneParam: CONST.DEFAULT_TIME_ZONE, currentUserAccountID: TEST_USER_ACCOUNT_ID});
+            addComment({
+                report: thread,
+                notifyReportID: thread.reportID,
+                ancestors,
+                text: 'Testing a comment',
+                timezoneParam: CONST.DEFAULT_TIME_ZONE,
+                currentUserAccountID: TEST_USER_ACCOUNT_ID,
+            });
             await waitForBatchedUpdates();
 
             // Then comment details should match the expected report action
@@ -8378,7 +8385,14 @@ describe('actions/IOU', () => {
             jest.advanceTimersByTime(10);
 
             // When a comment is added
-            addComment({report: thread, notifyReportID: thread.reportID, ancestors: [], text: 'Testing a comment', timezoneParam: CONST.DEFAULT_TIME_ZONE, currentUserAccountID: TEST_USER_ACCOUNT_ID});
+            addComment({
+                report: thread,
+                notifyReportID: thread.reportID,
+                ancestors: [],
+                text: 'Testing a comment',
+                timezoneParam: CONST.DEFAULT_TIME_ZONE,
+                currentUserAccountID: TEST_USER_ACCOUNT_ID,
+            });
             await waitForBatchedUpdates();
 
             // Then comment details should match the expected report action
