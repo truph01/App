@@ -2514,7 +2514,6 @@ ${amount} para ${merchant} - ${date}`,
 
                         [Ir a la configuración de categorías del espacio de trabajo](${workspaceCategoriesLink}).
 
-                        ![Configura categorías](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)
                     `),
             },
             combinedTrackSubmitExpenseTask: {
@@ -2609,7 +2608,6 @@ ${amount} para ${merchant} - ${date}`,
 
                         [Ir a miembros del espacio de trabajo](${workspaceMembersLink}).
 
-                        ![Invita a tu equipo](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)
                     `),
             },
             setupCategoriesAndTags: {
@@ -2636,7 +2634,6 @@ ${amount} para ${merchant} - ${date}`,
 
                         [Ir a más funciones](${workspaceMoreFeaturesLink}).
 
-                        ![Configura etiquetas](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)
                     `),
             },
             inviteAccountantTask: {
