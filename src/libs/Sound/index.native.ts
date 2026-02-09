@@ -11,7 +11,8 @@ const SOUND_ASSETS: Record<ValueOf<typeof SOUNDS>, AudioSource> = {
     [SOUNDS.RECEIVE]: require('@assets/sounds/receive.mp3') as AudioSource,
 };
 
-setAudioModeAsync({playsInSilentMode: true, shouldPlayInBackground: true});
+// The push notification sounds are played by the system, so we don't need to allow them to play in the background
+setAudioModeAsync({shouldPlayInBackground: false});
 
 const playSound = (soundFile: ValueOf<typeof SOUNDS>) => {
     if (getIsMuted()) {
