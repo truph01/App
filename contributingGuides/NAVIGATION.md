@@ -24,6 +24,7 @@ The navigation in the app is built on top of the `react-navigation` library. To 
     - [When to use dynamic routes](#when-to-use-dynamic-routes)
     - [Dynamic routes configuration](#dynamic-routes-configuration)
     - [Entry screens (access control)](#entry-screens-access-control)
+    - [Current limitations (work in progress)](#current-limitations-work-in-progress)
     - [How to add a new dynamic route](#how-to-add-a-new-dynamic-route)
     - [Migrating from backTo to dynamic routes](#migrating-from-backto-to-dynamic-routes)
   - [How to remove backTo from URL (Legacy)](#how-to-remove-backto-from-url)
@@ -721,10 +722,16 @@ When parsing a URL, `src/libs/Navigation/helpers/getStateFromPath.ts` resolves t
 
 When adding or extending a dynamic route, list every screen that should be able to open it (e.g. `SCREENS.SETTINGS.WALLET.ROOT` for Verify Account from Wallet).
 
+### Current limitations (work in progress)
+
+- **Stacking:** Multiple dynamic route suffixes on top of each other (e.g. `/a/verify-account/another-flow`) are not supported. Only one dynamic suffix per path is allowed.
+- **Suffix shape:** Suffixes must be a single path segment. Compound suffixes with extra path segments (e.g. `a/b`) are not supported.
+- **Parameters:** Suffixes must not include path params (e.g. `a/:reportID`) or query params (e.g. `a?foo=bar`). Use a single literal segment like `verify-account` only.
+
 ### How to add a new dynamic route
 
 1. Add to `DYNAMIC_ROUTES` in `src/ROUTES.ts`: define `path` and `entryScreens` (screen names that may open this route).
-2. Add screen constant in `src/SCREENS.ts` (e.g. `SETTINGS.DYNAMIC_VERIFY_ACCOUNT`).
+2. Add a screen constant in `src/SCREENS.ts`. The name must start with the `DYNAMIC_` prefix (e.g. `SETTINGS.DYNAMIC_VERIFY_ACCOUNT`) so dynamic screens can be distinguished from static ones.
 3. Register in linking config in `src/libs/Navigation/linkingConfig/config.ts`: map the new screen to `DYNAMIC_ROUTES.<KEY>.path`.
 4. Implement the page component: Use `createDynamicRoute(DYNAMIC_ROUTES.<KEY>.path)` to navigate to the flow and `useDynamicBackPath(DYNAMIC_ROUTES.<KEY>.path)` to get the back path. Pass these into your base UI (e.g. `VerifyAccountPageBase` with `navigateBackTo` / `navigateForwardTo`).
 5. Register the screen in the appropriate modal/stack navigator (e.g. `src/libs/Navigation/AppNavigator/ModalStackNavigators/index.tsx`).
