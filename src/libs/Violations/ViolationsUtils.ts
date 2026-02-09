@@ -242,7 +242,7 @@ function extractErrorMessages(errors: Errors | ReceiptErrors, errorActions: Repo
  * Returns true if the violation should be cleared, false if it should persist.
  */
 function getIsViolationFixed(violationError: string, params: ViolationFixParams): boolean {
-    const {category, tag, taxCode, policyCategories, policyTagLists, policyTaxRates, iouAttendees, currentUserPersonalDetails, isAttendeeTrackingEnabled, isControlPolicy} = params;
+    const {category, tag, taxCode, taxValue, policyCategories, policyTagLists, policyTaxRates, iouAttendees, currentUserPersonalDetails, isAttendeeTrackingEnabled, isControlPolicy} = params;
 
     const violationValidators: Record<string, () => boolean> = {
         [`${CONST.VIOLATIONS_PREFIX}${CONST.VIOLATIONS.CATEGORY_OUT_OF_POLICY}`]: () => {
@@ -262,8 +262,12 @@ function getIsViolationFixed(violationError: string, params: ViolationFixParams)
             return hasEnabledTags && hasMatchingTag;
         },
         [`${CONST.VIOLATIONS_PREFIX}${CONST.VIOLATIONS.TAX_OUT_OF_POLICY}`]: () => {
-            // Tax is fixed if it's empty or exists in policy tax rates
-            return !taxCode || Object.keys(policyTaxRates ?? {}).some((key) => key === taxCode);
+            if (!taxCode || !policyTaxRates) {
+                return !taxCode;
+            }
+            const matchingTaxRate = policyTaxRates[taxCode];
+            // If taxValue is provided, check that it matches the policy tax rate. If taxValue is not provided, just check that the tax code exists in the policy.
+            return taxValue !== undefined ? matchingTaxRate?.value === taxValue : !!matchingTaxRate;
         },
         [`${CONST.VIOLATIONS_PREFIX}${CONST.VIOLATIONS.MISSING_ATTENDEES}`]: () => {
             // Attendees violation is fixed if getIsMissingAttendeesViolation returns false

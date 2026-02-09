@@ -11801,6 +11801,16 @@ function setMoneyRequestTaxAmount(transactionID: string, taxAmount: number | nul
     Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {taxAmount});
 }
 
+type TaxRateValues = {
+    taxCode: string | null;
+    taxAmount: number | null;
+    taxValue: string | null;
+};
+
+function setMoneyRequestTaxRateValues(transactionID: string, taxRateValues: TaxRateValues, isDraft = true) {
+    Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {...taxRateValues});
+}
+
 /**
  * Sets the `splitShares` map that holds individual shares of a split bill
  */
@@ -13664,6 +13674,7 @@ export {
     setMoneyRequestTag,
     setMoneyRequestTaxAmount,
     setMoneyRequestTaxRate,
+    setMoneyRequestTaxRateValues,
     setSplitShares,
     startMoneyRequest,
     submitReport,

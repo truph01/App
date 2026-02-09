@@ -2151,6 +2151,43 @@ function getTaxName(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transactio
     return taxRate?.modifiedName;
 }
 
+/**
+ * Checks if the transaction has a tax rate with a matching value to the transaction's tax value
+ */
+
+function hasTaxRateWithMatchingValue(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>) {
+    const transactionTaxCode = getTaxCode(transaction);
+    const taxRate = Object.values(transformedTaxRates(policy, transaction)).find((rate) => rate.code === transactionTaxCode);
+
+    if (!transaction?.taxValue) {
+        return !!taxRate;
+    }
+
+    return taxRate?.value === transaction?.taxValue;
+}
+
+/**
+ * Gets the tax rate title for display, handling the case when moving expenses from track to submit
+ */
+function getTaxRateTitle(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>, isMovingFromTrackExpense: boolean, policyForMovingExpenses?: OnyxEntry<Policy>): string {
+    const currentTaxName = getTaxName(policy, transaction);
+
+    if (currentTaxName) {
+        // If moving from track expense show the tax name from the moving policy
+        if (isMovingFromTrackExpense && !hasTaxRateWithMatchingValue(policy, transaction)) {
+            return getTaxName(policyForMovingExpenses, transaction) ?? '';
+        }
+        return getTaxName(policy, transaction, true) ?? '';
+    }
+
+    // If no tax name on current policy but moving from track expense, use the moving policy
+    if (isMovingFromTrackExpense) {
+        return getTaxName(policyForMovingExpenses, transaction, true) ?? '';
+    }
+
+    return '';
+}
+
 type FieldsToCompare = Record<string, Array<keyof Transaction>>;
 type FieldsToChange = {
     category?: Array<string | undefined>;
@@ -2720,6 +2757,8 @@ export {
     transformedTaxRates,
     getTaxValue,
     getTaxName,
+    getTaxRateTitle,
+    hasTaxRateWithMatchingValue,
     getEnabledTaxRateCount,
     getUpdatedTransaction,
     getClearedPendingFields,

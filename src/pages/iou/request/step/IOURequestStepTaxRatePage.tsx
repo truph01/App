@@ -5,14 +5,16 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
+import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useRestartOnReceiptFailure from '@hooks/useRestartOnReceiptFailure';
 import {convertToBackendAmount} from '@libs/CurrencyUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import {isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {TaxRatesOption} from '@libs/TaxOptionsListUtils';
-import {calculateTaxAmount, getAmount, getCurrency, getTaxName, getTaxValue} from '@libs/TransactionUtils';
-import {setDraftSplitTransaction, setMoneyRequestTaxAmount, setMoneyRequestTaxRate, updateMoneyRequestTaxRate} from '@userActions/IOU';
+import {calculateTaxAmount, getAmount, getCurrency, getTaxRateTitle, getTaxValue} from '@libs/TransactionUtils';
+import {setDraftSplitTransaction, setMoneyRequestTaxRateValues, updateMoneyRequestTaxRate} from '@userActions/IOU';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -59,6 +61,7 @@ function IOURequestStepTaxRatePage({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountIDParam = currentUserPersonalDetails.accountID;
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
+    const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
 
@@ -66,7 +69,7 @@ function IOURequestStepTaxRatePage({
         Navigation.goBack(backTo);
     };
 
-    const taxRateTitle = getTaxName(policy, currentTransaction);
+    const taxRateTitle = getTaxRateTitle(policy, transaction, isMovingTransactionFromTrackExpense(action), policyForMovingExpenses);
 
     const updateTaxRates = (taxes: TaxRatesOption) => {
         if (!currentTransaction || !taxes.code || !taxRates) {
@@ -112,8 +115,8 @@ function IOURequestStepTaxRatePage({
             return;
         }
         const amountInSmallestCurrencyUnits = convertToBackendAmount(taxAmount);
-        setMoneyRequestTaxRate(currentTransaction?.transactionID, taxes?.code ?? '');
-        setMoneyRequestTaxAmount(currentTransaction.transactionID, amountInSmallestCurrencyUnits);
+
+        setMoneyRequestTaxRateValues(currentTransaction.transactionID, {taxCode: taxes?.code ?? '', taxAmount: amountInSmallestCurrencyUnits, taxValue});
 
         navigateBack();
     };
