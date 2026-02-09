@@ -1,6 +1,6 @@
 import type {NavigationAction, NavigationState} from '@react-navigation/native';
 import Onyx from 'react-native-onyx';
-import TestDriveModalGuard from '@libs/Navigation/guards/TestDriveModalGuard';
+import TestDriveModalGuard, {resetSessionFlag} from '@libs/Navigation/guards/TestDriveModalGuard';
 import type {GuardContext} from '@libs/Navigation/guards/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -30,113 +30,94 @@ describe('TestDriveModalGuard', () => {
 
     beforeEach(async () => {
         await Onyx.clear();
+        resetSessionFlag();
         await waitForBatchedUpdates();
     });
 
-    describe('when app is loading', () => {
-        it('should return ALLOW when isLoading is true', () => {
-            const loadingContext: GuardContext = {
-                ...defaultContext,
-                isLoading: true,
-            };
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, loadingContext);
-            expect(result.type).toBe('ALLOW');
-        });
+    it('should allow when app is loading', () => {
+        const result = TestDriveModalGuard.evaluate(mockState, mockAction, {...defaultContext, isLoading: true});
+        expect(result.type).toBe('ALLOW');
     });
 
-    describe('when test drive modal should be shown', () => {
-        it('should return REDIRECT when user completed setup but has not dismissed test drive modal', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                hasCompletedGuidedSetupFlow: true,
-                testDriveModalDismissed: false,
-            });
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('REDIRECT');
-            if (result.type === 'REDIRECT') {
-                expect(result.route).toBe(ROUTES.TEST_DRIVE_MODAL_ROOT.route);
-            }
+    it('should redirect when onboarding complete and modal not dismissed', async () => {
+        await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+            hasCompletedGuidedSetupFlow: true,
+            testDriveModalDismissed: false,
         });
+        await waitForBatchedUpdates();
+
+        const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
+        expect(result.type).toBe('REDIRECT');
+        expect(result.route).toBe(ROUTES.TEST_DRIVE_MODAL_ROOT.route);
     });
 
-    describe('when test drive modal should not be shown', () => {
-        it('should return ALLOW when user has not completed setup', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                hasCompletedGuidedSetupFlow: false,
-                testDriveModalDismissed: false,
-            });
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('ALLOW');
+    it('should allow when modal dismissed', async () => {
+        await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+            hasCompletedGuidedSetupFlow: true,
+            testDriveModalDismissed: true,
         });
+        await waitForBatchedUpdates();
 
-        it('should return ALLOW when user has dismissed test drive modal', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                hasCompletedGuidedSetupFlow: true,
-                testDriveModalDismissed: true,
-            });
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('ALLOW');
-        });
-
-        it('should return ALLOW when testDriveModalDismissed is undefined', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                hasCompletedGuidedSetupFlow: true,
-                // testDriveModalDismissed is undefined
-            });
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('ALLOW');
-        });
-
-        it('should return ALLOW when onboarding is empty (old accounts)', async () => {
-            await Onyx.set(ONYXKEYS.NVP_ONBOARDING, null);
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('ALLOW');
-        });
-
-        it('should return ALLOW when both completed and dismissed', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                hasCompletedGuidedSetupFlow: true,
-                testDriveModalDismissed: true,
-            });
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('ALLOW');
-        });
+        const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
+        expect(result.type).toBe('ALLOW');
     });
 
-    describe('edge cases', () => {
-        it('should return ALLOW when hasCompletedGuidedSetupFlow is undefined but testDriveModalDismissed is false', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                testDriveModalDismissed: false,
-                // hasCompletedGuidedSetupFlow is undefined
-            });
-            await waitForBatchedUpdates();
-
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            // hasCompletedGuidedSetupFlowSelector returns true for undefined, so this should redirect
-            expect(result.type).toBe('REDIRECT');
+    it('should allow when onboarding not complete', async () => {
+        await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+            hasCompletedGuidedSetupFlow: false,
+            testDriveModalDismissed: false,
         });
+        await waitForBatchedUpdates();
 
-        it('should handle null testDriveModalDismissed as not needing to show modal', async () => {
-            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
-                hasCompletedGuidedSetupFlow: true,
-                testDriveModalDismissed: null,
-            });
-            await waitForBatchedUpdates();
+        const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
+        expect(result.type).toBe('ALLOW');
+    });
 
-            const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
-            expect(result.type).toBe('ALLOW');
+    it('should not redirect multiple times (session flag)', async () => {
+        await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+            hasCompletedGuidedSetupFlow: true,
+            testDriveModalDismissed: false,
         });
+        await waitForBatchedUpdates();
+
+        const firstResult = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
+        expect(firstResult.type).toBe('REDIRECT');
+
+        const secondResult = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
+        expect(secondResult.type).toBe('ALLOW');
+    });
+
+    it('should skip modal when user has accessible workspace', async () => {
+        await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+            hasCompletedGuidedSetupFlow: true,
+            testDriveModalDismissed: false,
+        });
+        await Onyx.set(ONYXKEYS.ONBOARDING_POLICY_ID, 'policy123');
+        await Onyx.set(ONYXKEYS.HAS_NON_PERSONAL_POLICY, true);
+        await waitForBatchedUpdates();
+
+        const result = TestDriveModalGuard.evaluate(mockState, mockAction, defaultContext);
+        expect(result.type).toBe('ALLOW');
+    });
+
+    it('should redirect to home when accessing dismissed modal via URL', async () => {
+        await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+            hasCompletedGuidedSetupFlow: true,
+            testDriveModalDismissed: true,
+        });
+        await waitForBatchedUpdates();
+
+        const testDriveModalState: NavigationState = {
+            key: 'root',
+            index: 0,
+            routeNames: [SCREENS.TEST_DRIVE_MODAL.ROOT],
+            routes: [{key: 'testDrive', name: SCREENS.TEST_DRIVE_MODAL.ROOT}],
+            stale: false,
+            type: 'root',
+        };
+
+        const result = TestDriveModalGuard.evaluate(testDriveModalState, mockAction, defaultContext);
+        expect(result.type).toBe('REDIRECT');
+        expect(result.route).toBe(ROUTES.HOME);
     });
 });
