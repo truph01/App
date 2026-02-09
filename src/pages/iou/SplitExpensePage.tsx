@@ -78,9 +78,9 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const [selectedTab] = useOnyx(`${ONYXKEYS.COLLECTION.SELECTED_TAB}${CONST.TAB.SPLIT_EXPENSE_TAB_TYPE}`, {canBeMissing: true});
     const [draftTransaction, draftTransactionMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`, {canBeMissing: false});
     const isLoadingDraftTransaction = isLoadingOnyxValue(draftTransactionMetadata);
-    const transactionReport = getReportOrDraftReport(draftTransaction?.reportID);
-    const parentTransactionReport = getReportOrDraftReport(transactionReport?.parentReportID);
-    const expenseReport = transactionReport?.type === CONST.REPORT.TYPE.EXPENSE ? transactionReport : parentTransactionReport;
+    const draftTransactionReport = getReportOrDraftReport(draftTransaction?.reportID);
+    const parentTransactionReport = getReportOrDraftReport(draftTransactionReport?.parentReportID);
+    const expenseReport = draftTransactionReport?.type === CONST.REPORT.TYPE.EXPENSE ? draftTransactionReport : parentTransactionReport;
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${getNonEmptyStringOnyxID(expenseReport?.policyID)}`, {canBeMissing: true});
     const [expenseReportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(expenseReport?.policyID)}`, {canBeMissing: true});
     const allTransactions = useAllTransactions();
@@ -95,7 +95,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const currentReport = report ?? searchContext?.currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`];
     const [policyRecentlyUsedCurrencies] = useOnyx(ONYXKEYS.RECENTLY_USED_CURRENCIES, {canBeMissing: true});
     const [policyRecentlyUsedCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES}${getIOURequestPolicyID(transaction, currentReport)}`, {canBeMissing: true});
-
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
     const policy = usePolicy(currentReport?.policyID);
     const currentPolicy = Object.keys(policy?.employeeList ?? {}).length
         ? policy
@@ -124,13 +124,21 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const isPercentageMode = (selectedTab as string) === CONST.TAB.SPLIT.PERCENTAGE;
     const isDateMode = (selectedTab as string) === CONST.TAB.SPLIT.DATE;
     const childTransactions = getChildTransactions(allTransactions, allReports, transactionID);
-    const splitFieldDataFromChildTransactions = childTransactions.map((currentTransaction) => initSplitExpenseItemData(currentTransaction));
-    const splitFieldDataFromOriginalTransaction = initSplitExpenseItemData(transaction);
+    const splitFieldDataFromChildTransactions = childTransactions.map((childTransaction) => {
+        const childTransactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${childTransaction?.reportID}`];
+        return initSplitExpenseItemData(childTransaction, childTransactionReport);
+    });
+    const transactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`];
+    const splitFieldDataFromOriginalTransaction = initSplitExpenseItemData(transaction, transactionReport);
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE, {canBeMissing: true});
     const icons = useMemoizedLazyExpensifyIcons(['ArrowsLeftRight', 'Plus'] as const);
 
     const {isBetaEnabled} = usePermissions();
+
+    // Check if the transaction has customUnitOutOfPolicy violation (distance rate error)
+    const currentTransactionViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`] ?? [];
+    const hasCustomUnitOutOfPolicyViolation = currentTransactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY);
 
     useEffect(() => {
         const errorString = getLatestErrorMessage(draftTransaction ?? {});
@@ -148,7 +156,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         if (draftTransaction?.errors) {
             clearSplitTransactionDraftErrors(transactionID);
         }
-        addSplitExpenseField(transaction, draftTransaction, currentPolicy);
+        addSplitExpenseField(transaction, draftTransaction, transactionReport, currentPolicy);
     };
 
     const onMakeSplitsEven = () => {
@@ -159,6 +167,16 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     };
 
     const onSaveSplitExpense = () => {
+        if (hasCustomUnitOutOfPolicyViolation) {
+            showConfirmModal({
+                title: translate('iou.splitExpense'),
+                prompt: isPerDiemRequest(transaction) ? translate('iou.splitExpensePerDiemRateErrorModalDescription') : translate('iou.splitExpenseDistanceErrorModalDescription'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
+            return;
+        }
+
         if (splitExpenses.length > CONST.IOU.SPLITS_LIMIT) {
             setErrorMessage(translate('iou.error.manySplitsProvided'));
             return;
@@ -227,6 +245,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             policyRecentlyUsedCurrencies: policyRecentlyUsedCurrencies ?? [],
             quickAction,
             iouReportNextStep,
+            betas,
         });
     };
 
@@ -318,17 +337,21 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         </View>
     );
 
-    const shouldShowWarningMessage = sumOfSplitExpenses < transactionDetailsAmount;
-    const warningMessage = shouldShowWarningMessage
-        ? translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(transactionDetailsAmount - sumOfSplitExpenses, transactionDetails.currency)})
-        : '';
+    const difference = sumOfSplitExpenses - transactionDetailsAmount;
+    let warningMessage = '';
+    if (difference < 0) {
+        warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-difference, transactionDetails.currency)});
+    } else if (difference > 0) {
+        warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(difference, transactionDetails?.currency)});
+    }
+
     const footerContent = (
         <View style={[styles.ph5, styles.pb5]}>
             {(!!errorMessage || !!warningMessage) && (
                 <FormHelpMessage
                     style={[styles.ph1, styles.mb2]}
                     isError={!!errorMessage}
-                    isInfo={!errorMessage && shouldShowWarningMessage}
+                    isInfo={!errorMessage && !!warningMessage}
                     message={errorMessage || warningMessage}
                 />
             )}
@@ -405,7 +428,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         <ScreenWrapper
             testID="SplitExpensePage"
             shouldEnableMaxHeight={canUseTouchScreen()}
-            keyboardAvoidingViewBehavior="height"
             shouldDismissKeyboardBeforeClose={false}
         >
             <FullPageNotFoundView shouldShow={!reportID || isEmptyObject(draftTransaction) || !isSplitAvailable}>
@@ -467,7 +489,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
                                                     data={options}
                                                     initiallyFocusedOptionKey={initiallyFocusedOptionKey ?? undefined}
                                                     onSelectRow={onSelectRow}
-                                                    listFooterContent={<View style={[shouldUseNarrowLayout && styles.mb3]} />}
+                                                    listFooterContent={listFooterContent}
                                                     mode={CONST.TAB.SPLIT.DATE}
                                                 />
                                                 {footerContent}

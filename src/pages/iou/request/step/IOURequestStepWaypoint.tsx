@@ -6,14 +6,12 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import AddressSearch from '@components/AddressSearch';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
+import Button from '@components/Button';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapperWithRef from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ScreenWrapper from '@components/ScreenWrapper';
-import useConfirmModal from '@hooks/useConfirmModal';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useLocationBias from '@hooks/useLocationBias';
 import useNetwork from '@hooks/useNetwork';
@@ -86,8 +84,6 @@ function IOURequestStepWaypoint({
     const waypointCount = Object.keys(allWaypoints).length;
     const filledWaypointCount = Object.values(allWaypoints).filter((waypoint) => !isEmptyObject(waypoint)).length;
     const [caretHidden, setCaretHidden] = useState(false);
-    const {showConfirmModal} = useConfirmModal();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
 
     const [userLocation] = useOnyx(ONYXKEYS.USER_LOCATION, {canBeMissing: true});
     const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS, {selector: recentWaypointsSelector, canBeMissing: true});
@@ -104,8 +100,6 @@ function IOURequestStepWaypoint({
 
     const locationBias = useLocationBias(allWaypoints, userLocation);
     const waypointAddress = currentWaypoint.address ?? '';
-    // Hide the menu when there is only start and finish waypoint
-    const shouldShowThreeDotsButton = waypointCount > 2 && !!waypointAddress;
     const shouldDisableEditor =
         isFocused &&
         (Number.isNaN(parsedWaypointIndex) || parsedWaypointIndex < 0 || parsedWaypointIndex > waypointCount || (filledWaypointCount < 2 && parsedWaypointIndex >= waypointCount));
@@ -169,26 +163,6 @@ function IOURequestStepWaypoint({
         goBack();
     };
 
-    const deleteStopAndHideModal = () => {
-        removeWaypoint(currentTransaction, pageIndex, shouldUseTransactionDraft(action), shouldPassSplitDraft ? splitDraftTransaction : undefined);
-        goBack();
-    };
-
-    const handleDeleteWaypoint = async () => {
-        const result = await showConfirmModal({
-            title: translate('distance.deleteWaypoint'),
-            prompt: translate('distance.deleteWaypointConfirmation'),
-            confirmText: translate('common.delete'),
-            cancelText: translate('common.cancel'),
-            shouldEnableNewFocusManagement: true,
-            danger: true,
-        });
-        if (result.action !== ModalActions.CONFIRM) {
-            return;
-        }
-        deleteStopAndHideModal();
-    };
-
     const selectWaypoint = (values: Waypoint) => {
         const waypoint = {
             lat: values.lat,
@@ -238,18 +212,7 @@ function IOURequestStepWaypoint({
                     title={translate(waypointDescriptionKey)}
                     shouldShowBackButton
                     onBackButtonPress={goBack}
-                    shouldShowThreeDotsButton={shouldShowThreeDotsButton}
                     shouldSetModalVisibility={false}
-                    threeDotsMenuItems={[
-                        {
-                            icon: expensifyIcons.Trashcan,
-                            text: translate('distance.deleteWaypoint'),
-                            onSelected: () => {
-                                handleDeleteWaypoint();
-                            },
-                            shouldCallAfterModalHide: true,
-                        },
-                    ]}
                 />
                 <FormProvider
                     style={[styles.flexGrow1, styles.mh5]}
@@ -262,6 +225,20 @@ function IOURequestStepWaypoint({
                     submitButtonText={translate('common.save')}
                     shouldHideFixErrorsAlert
                     onScroll={onScroll}
+                    shouldRenderFooterAboveSubmit
+                    footerContent={
+                        !!waypointAddress && (
+                            <Button
+                                text={translate('common.remove')}
+                                style={[styles.mb3]}
+                                onPress={() => {
+                                    removeWaypoint(transaction, pageIndex, shouldUseTransactionDraft(action));
+                                    goBack();
+                                }}
+                                large
+                            />
+                        )
+                    }
                 >
                     <View>
                         <InputWrapperWithRef
