@@ -537,6 +537,10 @@ function MoneyReportHeader({
         optimisticNextStep = buildOptimisticNextStepForStrictPolicyRuleViolations();
     }
 
+    // Check if we have a local optimistic override (e.g., error states, offline submission)
+    // When there's an override, we should NOT use the new translated format as the override takes precedence
+    const hasOptimisticOverride = optimisticNextStep !== nextStep;
+
     const shouldShowNextStep = isFromPaidPolicy && !isInvoiceReport && !shouldShowStatusBar;
     const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(moneyRequestReport, shouldShowPayButton);
     const isAnyTransactionOnHold = hasHeldExpensesReportUtils(moneyRequestReport?.reportID);
@@ -895,8 +899,8 @@ function MoneyReportHeader({
     });
 
     const addExpenseDropdownOptions = useMemo(
-        () => getAddExpenseDropdownOptions(expensifyIcons, moneyRequestReport?.reportID, policy, undefined, undefined, lastDistanceExpenseType),
-        [moneyRequestReport?.reportID, policy, lastDistanceExpenseType, expensifyIcons],
+        () => getAddExpenseDropdownOptions(translate, expensifyIcons, moneyRequestReport?.reportID, policy, undefined, undefined, lastDistanceExpenseType),
+        [moneyRequestReport?.reportID, policy, lastDistanceExpenseType, expensifyIcons, translate],
     );
 
     const exportSubmenuOptions: Record<string, DropdownOption<string>> = useMemo(() => {
@@ -1495,8 +1499,8 @@ function MoneyReportHeader({
                 }
 
                 const result = await showConfirmModal({
-                    title: translate('iou.deleteReport'),
-                    prompt: translate('iou.deleteReportConfirmation'),
+                    title: translate('iou.deleteReport', {count: 1}),
+                    prompt: translate('iou.deleteReportConfirmation', {count: 1}),
                     confirmText: translate('common.delete'),
                     cancelText: translate('common.cancel'),
                     danger: true,
@@ -1510,7 +1514,7 @@ function MoneyReportHeader({
                     Navigation.goBack(backToRoute);
                     // eslint-disable-next-line @typescript-eslint/no-deprecated
                     InteractionManager.runAfterInteractions(() => {
-                        deleteAppReport(moneyRequestReport?.reportID, email ?? '', accountID, reportTransactions, allTransactionViolations, bankAccountList);
+                        deleteAppReport(moneyRequestReport?.reportID, email ?? '', accountID, reportTransactions, allTransactionViolations, bankAccountList, currentSearchHash);
                     });
                 });
             },
@@ -1542,10 +1546,10 @@ function MoneyReportHeader({
                     if (result.action !== ModalActions.CONFIRM) {
                         return;
                     }
-                    reopenReport(moneyRequestReport, policy, accountID, email ?? '', hasViolations, isASAPSubmitBetaEnabled, nextStep);
+                    reopenReport(moneyRequestReport, policy, accountID, email ?? '', hasViolations, isASAPSubmitBetaEnabled, nextStep, chatReport);
                     return;
                 }
-                reopenReport(moneyRequestReport, policy, accountID, email ?? '', hasViolations, isASAPSubmitBetaEnabled, nextStep);
+                reopenReport(moneyRequestReport, policy, accountID, email ?? '', hasViolations, isASAPSubmitBetaEnabled, nextStep, chatReport);
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.REJECT]: {
@@ -1746,8 +1750,14 @@ function MoneyReportHeader({
             betas,
         });
 
-    const showNextStepBar = shouldShowNextStep && !!optimisticNextStep?.message?.length;
-    const showNextStepSkeleton = shouldShowNextStep && !optimisticNextStep && !!isLoadingInitialReportActions && !isOffline;
+    const effectiveNextStep = hasOptimisticOverride ? optimisticNextStep : (moneyRequestReport?.nextStep ?? optimisticNextStep);
+    const hasNextStepContent = !!(
+        effectiveNextStep &&
+        (('message' in effectiveNextStep && Array.isArray(effectiveNextStep.message) && effectiveNextStep.message.length > 0) ||
+            ('messageKey' in effectiveNextStep && effectiveNextStep.messageKey))
+    );
+    const showNextStepBar = shouldShowNextStep && hasNextStepContent;
+    const showNextStepSkeleton = shouldShowNextStep && !effectiveNextStep && !!isLoadingInitialReportActions && !isOffline;
     const shouldShowMoreContent = showNextStepBar || showNextStepSkeleton || !!statusBarProps || isReportInSearch;
 
     return (
@@ -1824,7 +1834,7 @@ function MoneyReportHeader({
             {shouldShowMoreContent && (
                 <View style={[styles.flexRow, styles.gap2, styles.justifyContentStart, styles.flexNoWrap, styles.ph5, styles.pb3]}>
                     <View style={[styles.flexShrink1, styles.flexGrow1, styles.mnw0, styles.flexWrap, styles.justifyContentCenter]}>
-                        {showNextStepBar && <MoneyReportHeaderStatusBar nextStep={optimisticNextStep} />}
+                        {showNextStepBar && <MoneyReportHeaderStatusBar nextStep={effectiveNextStep} />}
                         {showNextStepSkeleton && <MoneyReportHeaderStatusBarSkeleton />}
                         {!!statusBarProps && (
                             <MoneyRequestHeaderStatusBar
