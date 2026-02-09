@@ -35,7 +35,7 @@ function BaseImage({onLoad, source, ...props}: BaseImageProps) {
             // Only subscribe to onLoad when a handler is provided to avoid unnecessary event registrations, optimizing performance.
             onLoad={onLoad ? imageLoadedSuccessfully : undefined}
             source={source as ImageSourcePropType}
-            // TODO: Consider better recycling logic
+            // TODO: Replace with recyclingKey when the component is migrated to expo-image
             key={getImageRecyclingKey(source)}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
