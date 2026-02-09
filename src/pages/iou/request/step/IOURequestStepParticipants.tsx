@@ -90,7 +90,9 @@ function IOURequestStepParticipants({
     const transactionIDs = useMemo(() => transactions?.map((transaction) => transaction.transactionID), [transactions.length]);
 
     // We need to set selectedReportID if user has navigated back from confirmation page and navigates to confirmation page with already selected participant
-    const selectedReportID = useRef<string>(participants?.length === 1 ? (participants.at(0)?.reportID ?? reportID) : reportID);
+    // We need to disable the eslint rule here because the reportID from the first participant can be an empty string
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    const selectedReportID = useRef<string>(participants?.length === 1 ? participants.at(0)?.reportID || reportID : reportID);
     const numberOfParticipants = useRef(participants?.length ?? 0);
     const iouRequestType = getRequestType(initialTransaction);
     const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseIOUUtils(action);

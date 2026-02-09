@@ -2258,6 +2258,7 @@ function getValidOptions(
 
             if (option.reportID) {
                 loginsToExclude[option.reportID] = true;
+                loginsToExcludeFromSuggestions[option.reportID] = true;
             }
         }
     }

@@ -414,9 +414,15 @@ function MoneyRequestParticipantsSelector({
                 return;
             }
 
+            // If the selected option is self DM, we need to recall onParticipantsAdded to handle navigation correctly
+            if (!option && selectedOptions.length === 1 && selectedOptions.at(0)?.isSelfDM) {
+                onParticipantsAdded(selectedOptions.map((selectedOption) => sanitizedSelectedParticipant(selectedOption, iouType)));
+                return;
+            }
+
             onFinish(CONST.IOU.TYPE.SPLIT);
         },
-        [shouldShowSplitBillErrorMessage, onFinish, addSingleParticipant, selectedOptions.length],
+        [shouldShowSplitBillErrorMessage, onFinish, addSingleParticipant, onParticipantsAdded, selectedOptions, iouType],
     );
 
     const showLoadingPlaceholder = useMemo(() => !areOptionsInitialized || !didScreenTransitionEnd, [areOptionsInitialized, didScreenTransitionEnd]);
@@ -510,7 +516,8 @@ function MoneyRequestParticipantsSelector({
                 return;
             }
 
-            setSelectedOptions([{...option, isSelected: true, reportID: option.reportID ?? CONST.REPORT.UNREPORTED_REPORT_ID}]);
+            const reportID = option.reportID ?? CONST.REPORT.UNREPORTED_REPORT_ID;
+            setSelectedOptions([{...option, isSelected: true, reportID, keyForList: reportID}]);
             addSingleParticipant(option);
         },
         [isIOUSplit, addParticipantToSelection, addSingleParticipant, setSelectedOptions],
