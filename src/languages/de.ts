@@ -2201,6 +2201,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} wird den Zugriff auf dieses Geschäftskonto verlieren. Wir schließen dennoch alle laufenden Zahlungen ab.`,
         reachOutForHelp: 'Sie wird mit der Expensify Card verwendet. <concierge-link>Wende dich an Concierge</concierge-link>, wenn du sie nicht mehr teilen möchtest.',
         unshareErrorModalTitle: 'Bankkonto kann nicht freigegeben werden',
+        chaseAccountNumberDifferent: 'Warum ist meine Kontonummer anders?',
     },
     cardPage: {
         expensifyCard: 'Expensify Card',
