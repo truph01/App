@@ -15,6 +15,7 @@ import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
 import {getCompanyCardFeed, getCompanyFeeds, getDomainOrWorkspaceAccountID} from '@libs/CardUtils';
 import {addErrorMessage} from '@libs/ErrorUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
+import {getCommentLength} from '@libs/ReportUtils';
 import {getFieldRequiredErrors} from '@libs/ValidationUtils';
 import Navigation from '@navigation/Navigation';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -50,7 +51,7 @@ function WorkspaceCompanyCardEditCardNamePage({route}: WorkspaceCompanyCardEditC
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_WORKSPACE_COMPANY_CARD_NAME_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.EDIT_WORKSPACE_COMPANY_CARD_NAME_FORM> => {
         const errors = getFieldRequiredErrors(values, [INPUT_IDS.NAME], translate);
-        const length = values.name.length;
+        const length = getCommentLength(values.name);
         if (length > CONST.STANDARD_LENGTH_LIMIT) {
             addErrorMessage(errors, INPUT_IDS.NAME, translate('common.error.characterLimitExceedCounter', length, CONST.STANDARD_LENGTH_LIMIT));
         }
