@@ -7,6 +7,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import Timing from '@libs/actions/Timing';
 import {isMobile} from '@libs/Browser';
 import Performance from '@libs/Performance';
 import CONST from '@src/CONST';

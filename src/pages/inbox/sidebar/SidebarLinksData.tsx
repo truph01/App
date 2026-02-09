@@ -1,6 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import type {EdgeInsets} from 'react-native-safe-area-context';
 import useLocalize from '@hooks/useLocalize';
