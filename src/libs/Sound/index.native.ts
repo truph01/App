@@ -11,7 +11,7 @@ const SOUND_ASSETS: Record<ValueOf<typeof SOUNDS>, AudioSource> = {
     [SOUNDS.RECEIVE]: require('@assets/sounds/receive.mp3') as AudioSource,
 };
 
-setAudioModeAsync({playsInSilentMode: false});
+setAudioModeAsync({playsInSilentMode: true, shouldPlayInBackground: true});
 
 const playSound = (soundFile: ValueOf<typeof SOUNDS>) => {
     if (getIsMuted()) {
