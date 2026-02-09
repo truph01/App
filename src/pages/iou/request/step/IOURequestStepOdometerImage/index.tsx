@@ -25,12 +25,13 @@ import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type SCREENS from '@src/SCREENS';
 import type {FileObject} from '@src/types/utils/Attachment';
+import ROUTES from '@src/ROUTES';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
 function IOURequestStepOdometerImage({
     route: {
-        params: {action, iouType, transactionID, imageType},
+        params: {action, iouType, transactionID, reportID, imageType},
     },
 }: IOURequestStepOdometerImageProps) {
     const {translate} = useLocalize();
@@ -52,9 +53,11 @@ function IOURequestStepOdometerImage({
     const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? lazyIcons.OdometerStart : lazyIcons.OdometerEnd;
     const messageHTML = `<centered-text><muted-text-label>${message}</muted-text-label></centered-text>`;
 
+    const odometerRoute = ROUTES.DISTANCE_REQUEST_CREATE_TAB_ODOMETER.getRoute(action, iouType, transactionID, reportID);
+
     const navigateBack = useCallback(() => {
-        Navigation.goBack();
-    }, []);
+        Navigation.goBack(odometerRoute);
+    }, [odometerRoute]);
 
     const revokeDropBlobUrls = useCallback(() => {
         for (const url of dropBlobUrlsRef.current) {
