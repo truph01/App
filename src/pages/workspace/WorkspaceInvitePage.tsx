@@ -3,10 +3,9 @@ import type {SectionListData} from 'react-native';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
-// eslint-disable-next-line no-restricted-imports
-import SelectionList from '@components/SelectionListWithSections';
-import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
-import type {Section} from '@components/SelectionListWithSections/types';
+import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
+import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
+import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
 import withNavigationTransitionEnd from '@components/withNavigationTransitionEnd';
 import type {WithNavigationTransitionEndProps} from '@components/withNavigationTransitionEnd';
 import useLocalize from '@hooks/useLocalize';
@@ -135,6 +134,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             sectionsArr.push({
                 title: undefined,
                 data: selectedOptionsForDisplay,
+                sectionIndex: 0,
             });
         }
 
@@ -143,6 +143,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             sectionsArr.push({
                 title: translate('common.contacts'),
                 data: availableOptions.personalDetails,
+                sectionIndex: 1,
             });
         }
 
@@ -151,6 +152,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             sectionsArr.push({
                 title: undefined,
                 data: [availableOptions.userToInvite],
+                sectionIndex: 2,
             });
         }
 
@@ -239,6 +241,16 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         searchInServer(debouncedSearchTerm);
     }, [debouncedSearchTerm]);
 
+    const textInputOptions = useMemo(
+        () => ({
+            label: translate('selectionList.nameEmailOrPhoneNumber'),
+            value: searchTerm,
+            onChangeText: setSearchTerm,
+            headerMessage,
+        }),
+        [searchTerm, setSearchTerm, headerMessage, translate],
+    );
+
     return (
         <AccessOrNotFoundWrapper
             policyID={route.params.policyID}
@@ -260,19 +272,16 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
                         Navigation.goBack(route.params.backTo);
                     }}
                 />
-                <SelectionList
+                <SelectionListWithSections
                     canSelectMultiple
                     sections={sections}
                     ListItem={InviteMemberListItem}
-                    textInputLabel={translate('selectionList.nameEmailOrPhoneNumber')}
-                    textInputValue={searchTerm}
-                    onChangeText={(value) => {
-                        setSearchTerm(value);
-                    }}
-                    headerMessage={headerMessage}
                     onSelectRow={handleToggleSelection}
-                    onConfirm={inviteUser}
-                    showScrollIndicator
+                    shouldShowTextInput
+                    textInputOptions={textInputOptions}
+                    confirmButtonOptions={{
+                        onConfirm: inviteUser,
+                    }}
                     showLoadingPlaceholder={!areOptionsInitialized || !didScreenTransitionEnd}
                     shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                     footerContent={footerContent}
