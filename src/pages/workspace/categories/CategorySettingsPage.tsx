@@ -354,7 +354,6 @@ function CategorySettingsPage({
                             shouldShowRightIcon
                         />
                     </OfflineWithFeedback>
-
                     {!isThereAnyAccountingConnection && (
                         <MenuItem
                             icon={expensifyIcons.Trashcan}
