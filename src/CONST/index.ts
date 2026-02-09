@@ -7787,6 +7787,7 @@ const CONST = {
         HAS_PARTIALLY_SETUP_BANK_ACCOUNT_INFO: 'hasPartiallySetupBankAccountInfo',
         HAS_EMPLOYEE_CARD_FEED_ERRORS: 'hasEmployeeCardFeedErrors',
         HAS_POLICY_ADMIN_CARD_FEED_ERRORS: 'hasPolicyAdminCardFeedErrors',
+        HAS_DOMAIN_ERRORS: 'hasDomainErrors',
     },
 
     DEBUG: {
@@ -8273,6 +8274,9 @@ const CONST = {
         REANIMATED_MODAL: {
             BACKDROP: 'ReanimatedModal-Backdrop',
         },
+        SHARE_DETAIL: {
+            DISMISS_KEYBOARD_BUTTON: 'ShareDetail-DismissKeyboardButton',
+        },
         REQUEST_STEP: {
             SCAN: {
                 MULTI_SCAN: 'Scan-MultiScan',
@@ -8291,6 +8295,9 @@ const CONST = {
         WORKSPACE: {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
+        },
+        ACCOUNT_SWITCHER: {
+            SHOW_ACCOUNTS: 'AccountSwitcher-ShowAccounts',
         },
     },
 
