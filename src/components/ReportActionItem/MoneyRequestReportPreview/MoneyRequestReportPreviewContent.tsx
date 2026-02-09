@@ -861,6 +861,7 @@ function MoneyRequestReportPreviewContent({
                                                 viewabilityConfig={viewabilityConfig}
                                                 ListFooterComponent={<View style={styles.pl2} />}
                                                 ListHeaderComponent={<View style={styles.pr2} />}
+                                                drawDistance={1000}
                                             />
                                             {shouldShowAccessPlaceHolder && <AccessMoneyRequestReportPreviewPlaceHolder />}
                                             {shouldShowEmptyPlaceholder && !shouldShowAccessPlaceHolder && <EmptyMoneyRequestReportPreview />}
