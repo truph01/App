@@ -1016,10 +1016,10 @@ const translations: TranslationDeepObject<typeof en> = {
                 cta: 'Activer',
             },
             reviewCardFraud: {
-                title: 'Review potential fraud on your Expensify Card',
-                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Review ${amount} in potential fraud at ${merchant}`,
-                subtitle: 'Expensify Card',
-                cta: 'Review',
+                title: 'Examiner un risque potentiel de fraude sur votre carte Expensify',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Examiner ${amount} de fraude potentielle chez ${merchant}`,
+                subtitle: 'Carte Expensify',
+                cta: 'Examiner',
             },
             ctaFix: 'Corriger',
             fixCompanyCardConnection: {
