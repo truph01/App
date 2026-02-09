@@ -9,6 +9,8 @@ import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Card} from '@src/types/onyx';
 
+const DEFAULT_CURRENCY = CONST.CURRENCY.USD;
+
 type ReviewCardFraudProps = {
     /** The card with potential fraud */
     card: Card;
@@ -22,19 +24,10 @@ function ReviewCardFraud({card}: ReviewCardFraudProps) {
     const triggerAmount = possibleFraud?.triggerAmount;
     const triggerMerchant = possibleFraud?.triggerMerchant;
 
-    const handleReviewPress = () => {
-        if (!fraudAlertReportID) {
-            return;
-        }
-
-        // Navigate to the report containing the fraud alert action
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(String(fraudAlertReportID)));
-    };
-
     // Generate the title with amount and merchant if available
     const title = useMemo(() => {
         if (triggerAmount !== undefined && triggerMerchant) {
-            const formattedAmount = convertToDisplayString(triggerAmount, CONST.CURRENCY.USD);
+            const formattedAmount = convertToDisplayString(triggerAmount, DEFAULT_CURRENCY);
             return translate('homePage.timeSensitiveSection.reviewCardFraud.titleWithDetails', {
                 amount: formattedAmount,
                 merchant: triggerMerchant,
@@ -42,6 +35,16 @@ function ReviewCardFraud({card}: ReviewCardFraudProps) {
         }
         return translate('homePage.timeSensitiveSection.reviewCardFraud.title');
     }, [triggerAmount, triggerMerchant, translate]);
+
+    // Don't render the widget if there's no fraud alert report to navigate to
+    if (!fraudAlertReportID) {
+        return null;
+    }
+
+    const handleReviewPress = () => {
+        // Navigate to the report containing the fraud alert action
+        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(String(fraudAlertReportID)));
+    };
 
     return (
         <BaseWidgetItem

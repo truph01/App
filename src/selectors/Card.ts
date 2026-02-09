@@ -49,12 +49,15 @@ type TimeSensitiveCardsResult = {
     cardsWithFraud: Card[];
 };
 
+const FRAUD_TYPE_DOMAIN = CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN;
+const FRAUD_TYPE_INDIVIDUAL = CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL;
+
 /**
  * Check if a card has potential fraud that needs review.
  * Returns true if the card has fraud type 'domain' or 'individual'.
  */
 const isCardWithPotentialFraud = (card: Card): boolean => {
-    return card.fraud === CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN || card.fraud === CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL;
+    return card.fraud === FRAUD_TYPE_DOMAIN || card.fraud === FRAUD_TYPE_INDIVIDUAL;
 };
 
 /**
