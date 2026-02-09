@@ -1066,9 +1066,6 @@ type SelectionListProps<TItem extends ListItem> = Partial<ChildrenProps> & {
     /** Additional styles to apply to scrollable content */
     contentContainerStyle?: StyleProp<ViewStyle>;
 
-    /** Override the list's scrollEnabled value */
-    scrollEnabled?: boolean;
-
     /** Determines if the focused item should remain at the top of the viewable area when navigating with arrow keys */
     shouldKeepFocusedItemAtTopOfViewableArea?: boolean;
 

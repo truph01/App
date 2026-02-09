@@ -1,6 +1,6 @@
 import type GetImageCompactModeStyle from './types';
 
-const getImageCompactModeStyle: GetImageCompactModeStyle = (maxWidth, _availableWidth, _aspectRatio, imageHeight) => {
+const getImageCompactModeStyle: GetImageCompactModeStyle = (maxWidth) => {
     return {
         maxWidth,
         minHeight: 180,
@@ -8,8 +8,7 @@ const getImageCompactModeStyle: GetImageCompactModeStyle = (maxWidth, _available
         alignSelf: 'center',
         width: '100%',
         marginHorizontal: 0,
-        height: imageHeight ?? 'auto',
-        maxHeight: imageHeight,
+        height: 'auto',
     };
 };
 

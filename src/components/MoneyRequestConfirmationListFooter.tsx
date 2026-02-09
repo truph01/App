@@ -2,9 +2,9 @@ import {emailSelector} from '@selectors/Session';
 import {format} from 'date-fns';
 import {Str} from 'expensify-common';
 import {deepEqual} from 'fast-equals';
-import React, {memo, useCallback, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useMemo, useState} from 'react';
 import {View} from 'react-native';
-import type {ImageResizeMode, LayoutChangeEvent, ViewStyle} from 'react-native';
+import type {ImageResizeMode, ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import useCurrencyList from '@hooks/useCurrencyList';
@@ -22,7 +22,6 @@ import useWindowDimensions from '@hooks/useWindowDimensions';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
 import {convertToDisplayString} from '@libs/CurrencyUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
-import getPlatform from '@libs/getPlatform';
 import {isMovingTransactionFromTrackExpense, shouldShowReceiptEmptyState} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getDestinationForDisplay, getSubratesFields, getSubratesForDisplay, getTimeDifferenceIntervals, getTimeForDisplay} from '@libs/PerDiemRequestUtils';
@@ -244,9 +243,6 @@ type MoneyRequestConfirmationListFooterProps = {
 
     /** Function to set the show more fields */
     setShowMoreFields: (showMoreFields: boolean) => void;
-
-    /** Measured height of the fixed footer content (e.g. confirm button) */
-    footerContentHeight?: number;
 };
 
 function MoneyRequestConfirmationListFooter({
@@ -308,7 +304,6 @@ function MoneyRequestConfirmationListFooter({
     isDescriptionRequired = false,
     showMoreFields,
     setShowMoreFields,
-    footerContentHeight = 0,
 }: MoneyRequestConfirmationListFooterProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Stopwatch', 'CalendarSolid', 'Sparkles', 'DownArrow'] as const);
     const styles = useThemeStyles();
@@ -1001,15 +996,9 @@ function MoneyRequestConfirmationListFooter({
         return badges;
     }, [firstDay, lastDay, translate, tripDays, icons]);
 
-    const {windowWidth, windowHeight} = useWindowDimensions();
+    const {windowWidth} = useWindowDimensions();
     const isCompactMode = useMemo(() => !showMoreFields && isScan, [isScan, showMoreFields]);
-    const platform = getPlatform(true);
-    const isWeb = platform === CONST.PLATFORM.WEB || platform === CONST.PLATFORM.MOBILE_WEB;
     const [receiptAspectRatio, setReceiptAspectRatio] = useState<number | null>(null);
-    const [compactFieldsHeight, setCompactFieldsHeight] = useState(0);
-    const [receiptTop, setReceiptTop] = useState<number | null>(null);
-    const [receiptContainerWidth, setReceiptContainerWidth] = useState<number | null>(null);
-    const receiptContainerRef = useRef<View>(null);
 
     const handleReceiptLoad = useCallback((event?: {nativeEvent: {width: number; height: number}}) => {
         const width = event?.nativeEvent.width ?? 0;
@@ -1020,58 +1009,20 @@ function MoneyRequestConfirmationListFooter({
         const ratio = width / height;
         setReceiptAspectRatio((previousRatio) => (ratio === previousRatio ? previousRatio : ratio));
     }, []);
-    const handleCompactFieldsLayout = useCallback(
-        (event: LayoutChangeEvent) => {
-            const height = event?.nativeEvent?.layout?.height;
-            if (!isCompactMode || height === undefined || height === null) {
-                return;
-            }
-            setCompactFieldsHeight((previousHeight) => (height === previousHeight ? previousHeight : height));
-        },
-        [isCompactMode],
-    );
-    const handleReceiptContainerLayout = useCallback(
-        (event: LayoutChangeEvent) => {
-            const width = event?.nativeEvent?.layout?.width;
-            if (width === undefined || width === null) {
-                return;
-            }
-            setReceiptContainerWidth((previousWidth) => (width === previousWidth ? previousWidth : width));
-            if (!isCompactMode) {
-                return;
-            }
-            receiptContainerRef.current?.measureInWindow((_x, y) => {
-                setReceiptTop((previousTop) => (y === previousTop ? previousTop : y));
-            });
-        },
-        [isCompactMode],
-    );
 
     const receiptSizeStyle = styles.expenseViewImageSmall;
     let receiptHeightStyle: ViewStyle | undefined;
     let receiptResizeMode: ImageResizeMode | undefined;
     const horizontalMargin = typeof styles.moneyRequestImage.marginHorizontal === 'number' ? styles.moneyRequestImage.marginHorizontal : 0;
     if (isCompactMode) {
-        const availableWidth = receiptContainerWidth ?? windowWidth - horizontalMargin * 2;
-        const footerPadding = typeof styles.pb5.paddingBottom === 'number' ? styles.pb5.paddingBottom : 0;
-        const receiptVerticalMargin = typeof styles.mv3.marginVertical === 'number' ? styles.mv3.marginVertical : 0;
-        const fieldsTopMargin = typeof styles.mt2.marginTop === 'number' ? styles.mt2.marginTop : 0;
-        const fieldsBottomMargin = typeof styles.mb5.marginBottom === 'number' ? styles.mb5.marginBottom : 0;
-        const compactReceiptMaxHeight =
-            receiptTop !== null && compactFieldsHeight
-                ? Math.max(180, windowHeight - receiptTop - compactFieldsHeight - footerContentHeight - footerPadding - receiptVerticalMargin - fieldsTopMargin - fieldsBottomMargin)
-                : variables.receiptPreviewMaxHeight;
-        receiptHeightStyle = getImageCompactModeStyle(variables.receiptPreviewMaxWidth, availableWidth, receiptAspectRatio, compactReceiptMaxHeight);
+        const availableWidth = windowWidth - horizontalMargin * 2;
+        receiptHeightStyle = getImageCompactModeStyle(variables.receiptPreviewMaxWidth, availableWidth, receiptAspectRatio);
         receiptResizeMode = 'cover';
     }
 
     const receiptThumbnailContent = useMemo(() => {
         return (
-            <View
-                ref={isCompactMode ? receiptContainerRef : undefined}
-                onLayout={isCompactMode ? handleReceiptContainerLayout : undefined}
-                style={[styles.moneyRequestImage, isCompactMode ? receiptHeightStyle : receiptSizeStyle]}
-            >
+            <View style={[styles.moneyRequestImage, isCompactMode ? receiptHeightStyle : receiptSizeStyle]}>
                 {isLocalFile && Str.isPDF(receiptFilename) ? (
                     <PressableWithoutFocus
                         onPress={() => {
@@ -1131,7 +1082,6 @@ function MoneyRequestConfirmationListFooter({
                             fileExtension={fileExtension}
                             shouldUseThumbnailImage
                             shouldUseInitialObjectPosition={isDistanceRequest}
-                            shouldUseFullHeight={isCompactMode}
                             onLoad={handleReceiptLoad}
                             resizeMode={receiptResizeMode}
                         />
@@ -1147,7 +1097,6 @@ function MoneyRequestConfirmationListFooter({
         styles.expenseViewImageSmall,
         receiptSizeStyle,
         receiptHeightStyle,
-        handleReceiptContainerLayout,
         handleReceiptLoad,
         isCompactMode,
         isLocalFile,
@@ -1244,13 +1193,7 @@ function MoneyRequestConfirmationListFooter({
                 </>
             )}
             {(!shouldShowMap || isManualDistanceRequest || isOdometerDistanceRequest) && (
-                <View
-                    style={[
-                        !hasReceiptImageOrThumbnail && !showReceiptEmptyState ? undefined : styles.mv3,
-                        isCompactMode && {flexShrink: 1, minHeight: variables.receiptPreviewMinHeight},
-                        isCompactMode && styles.mh5,
-                    ]}
-                >
+                <View style={[!hasReceiptImageOrThumbnail && !showReceiptEmptyState ? undefined : styles.mv3, isCompactMode && {flexShrink: 1, minHeight: 180}, isCompactMode && styles.mh5]}>
                     {hasReceiptImageOrThumbnail
                         ? receiptThumbnailContent
                         : showReceiptEmptyState && (
@@ -1268,10 +1211,7 @@ function MoneyRequestConfirmationListFooter({
                 </View>
             )}
 
-            <View
-                style={[styles.mb5, styles.mt2]}
-                onLayout={isCompactMode ? handleCompactFieldsLayout : undefined}
-            >
+            <View style={[styles.mb5, styles.mt2]}>
                 {isCompactMode && (
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.pl5, styles.gap2, styles.mb2, styles.mr8]}>
                         <Icon
@@ -1289,7 +1229,7 @@ function MoneyRequestConfirmationListFooter({
                 {!isCompactMode && fields.filter((field) => field.shouldShow && !(field.shouldShowAboveShowMore ?? false)).map((field) => <View key={field.item.key}>{field.item}</View>)}
 
                 {isCompactMode && fields.some((field) => field.shouldShow && !(field.shouldShowAboveShowMore ?? false)) && (
-                    <View style={[styles.mt3, styles.alignItemsCenter, styles.pRelative, styles.mh5, styles.mb4, !isWeb && styles.mb5]}>
+                    <View style={[styles.mt3, styles.alignItemsCenter, styles.pRelative, styles.mh5]}>
                         <View style={[styles.dividerLine, styles.pAbsolute, styles.w100, styles.justifyContentCenter, {transform: [{translateY: -0.5}]}]} />
                         <Button
                             text={translate('common.showMore')}
@@ -1353,6 +1293,5 @@ export default memo(
         prevProps.isTimeRequest === nextProps.isTimeRequest &&
         prevProps.iouTimeCount === nextProps.iouTimeCount &&
         prevProps.iouTimeRate === nextProps.iouTimeRate &&
-        prevProps.showMoreFields === nextProps.showMoreFields &&
-        prevProps.footerContentHeight === nextProps.footerContentHeight,
+        prevProps.showMoreFields === nextProps.showMoreFields,
 );

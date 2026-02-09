@@ -2,7 +2,6 @@ import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {deepEqual} from 'fast-equals';
 import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
-import type {LayoutChangeEvent} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import useCurrencyList from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -14,7 +13,6 @@ import usePermissions from '@hooks/usePermissions';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import usePrevious from '@hooks/usePrevious';
-import useScrollEnabled from '@hooks/useScrollEnabled';
 import useThemeStyles from '@hooks/useThemeStyles';
 import blurActiveElement from '@libs/Accessibility/blurActiveElement';
 import {
@@ -1142,12 +1140,6 @@ function MoneyRequestConfirmationList({
         return formError && translate(formError);
     }, [routeError, isTypeSplit, shouldShowReadOnlySplits, debouncedFormError, formError, translate]);
 
-    const [footerContentHeight, setFooterContentHeight] = useState(0);
-    const handleFooterLayout = useCallback((event: LayoutChangeEvent) => {
-        const height = event.nativeEvent.layout.height;
-        setFooterContentHeight((previousHeight) => (height === previousHeight ? previousHeight : height));
-    }, []);
-
     const footerContent = useMemo(() => {
         if (isReadOnly) {
             return;
@@ -1216,7 +1208,7 @@ function MoneyRequestConfirmationList({
         );
 
         return (
-            <View onLayout={handleFooterLayout}>
+            <>
                 {!!errorMessage && (
                     <FormHelpMessage
                         style={[styles.ph1, styles.mb2]}
@@ -1225,7 +1217,7 @@ function MoneyRequestConfirmationList({
                     />
                 )}
                 <View>{button}</View>
-            </View>
+            </>
         );
     }, [
         isReadOnly,
@@ -1247,12 +1239,9 @@ function MoneyRequestConfirmationList({
         renderProductTrainingTooltip,
         isConfirming,
         reportID,
-        handleFooterLayout,
     ]);
 
     const isCompactMode = useMemo(() => !showMoreFields && isScanRequest, [isScanRequest, showMoreFields]);
-    const scrollEnabled = useScrollEnabled();
-    const isCompactNonScrollable = isCompactMode && scrollEnabled === undefined;
 
     const listFooterContent = (
         <MoneyRequestConfirmationListFooter
@@ -1314,7 +1303,6 @@ function MoneyRequestConfirmationList({
             isDescriptionRequired={isDescriptionRequired}
             showMoreFields={showMoreFields}
             setShowMoreFields={setShowMoreFields}
-            footerContentHeight={footerContentHeight}
         />
     );
 
@@ -1333,9 +1321,8 @@ function MoneyRequestConfirmationList({
                 containerStyle={[styles.flexBasisAuto]}
                 removeClippedSubviews={false}
                 disableKeyboardShortcuts
-                scrollEnabled={isCompactNonScrollable ? false : undefined}
-                contentContainerStyle={isCompactNonScrollable ? styles.flexGrow1 : getContentContainerStyle(isCompactMode, styles.flex1).contentContainerStyle}
-                ListFooterComponentStyle={isCompactNonScrollable ? styles.flexGrow1 : undefined}
+                contentContainerStyle={getContentContainerStyle(isCompactMode, styles.flex1).contentContainerStyle}
+                ListFooterComponentStyle={isCompactMode ? [styles.flex1] : undefined}
             />
         </MouseProvider>
     );
