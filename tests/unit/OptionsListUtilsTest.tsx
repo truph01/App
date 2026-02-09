@@ -1657,7 +1657,7 @@ describe('OptionsListUtils', () => {
             const excludeLogins = {'reedrichards@expensify.com': true};
 
             // When we call getMemberInviteOptions with excludeLogins
-            const results = getMemberInviteOptions(OPTIONS.personalDetails, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, [], excludeLogins);
+            const results = getMemberInviteOptions(OPTIONS.personalDetails, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL, {}, [], excludeLogins);
 
             // Then the excluded login should not be in the results
             const excludedUser = results.personalDetails.find((detail) => detail.login === 'reedrichards@expensify.com');
@@ -1734,12 +1734,14 @@ describe('OptionsListUtils', () => {
                     accountID: 4,
                     displayName: 'Black Panther',
                     login: 'tchalla@expensify.com',
+                    keyForList: 'tchalla@expensify.com',
                     reportID: '1',
                 },
                 '9': {
                     accountID: 9,
                     displayName: 'Black Widow',
                     login: 'natasharomanoff@expensify.com',
+                    keyForList: 'natasharomanoff@expensify.com',
                     reportID: '',
                 },
             };
