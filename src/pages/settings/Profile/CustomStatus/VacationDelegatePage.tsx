@@ -3,12 +3,9 @@ import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ScreenWrapper from '@components/ScreenWrapper';
-// eslint-disable-next-line no-restricted-imports
-import SelectionList from '@components/SelectionListWithSections';
-import UserListItem from '@components/SelectionListWithSections/UserListItem';
-import useConfirmModal from '@hooks/useConfirmModal';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
 import SelectionList from '@components/SelectionList/SelectionListWithSections';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -187,28 +184,28 @@ function VacationDelegatePage() {
 
     return (
         <ScreenWrapper
-        includeSafeAreaPaddingBottom={false}
-        testID="VacationDelegatePage"
-    >
-        <HeaderWithBackButton
-            title={translate('statusPage.vacationDelegate')}
-            onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
-        />
-        <View style={[styles.flex1, styles.w100, styles.pRelative]}>
-            <SelectionList
-                sections={areOptionsInitialized ? sections : []}
-                ListItem={UserListItem}
-                onSelectRow={onSelectRow}
-                textInputOptions={textInputOptions}
-                showLoadingPlaceholder={!areOptionsInitialized}
-                isLoadingNewOptions={!!isSearchingForReports}
-                onEndReached={onListEndReached}
-                disableMaintainingScrollPosition
-                shouldSingleExecuteRowSelect
-                shouldShowTextInput
+            includeSafeAreaPaddingBottom={false}
+            testID="VacationDelegatePage"
+        >
+            <HeaderWithBackButton
+                title={translate('statusPage.vacationDelegate')}
+                onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
             />
-        </View>
-    </ScreenWrapper>
+            <View style={[styles.flex1, styles.w100, styles.pRelative]}>
+                <SelectionList
+                    sections={areOptionsInitialized ? sections : []}
+                    ListItem={UserListItem}
+                    onSelectRow={onSelectRow}
+                    textInputOptions={textInputOptions}
+                    showLoadingPlaceholder={!areOptionsInitialized}
+                    isLoadingNewOptions={!!isSearchingForReports}
+                    onEndReached={onListEndReached}
+                    disableMaintainingScrollPosition
+                    shouldSingleExecuteRowSelect
+                    shouldShowTextInput
+                />
+            </View>
+        </ScreenWrapper>
     );
 }
 
