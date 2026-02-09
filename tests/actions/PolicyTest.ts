@@ -920,18 +920,19 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             // Extract the guidedSetupData from the API call
-            const apiCallArgs = apiWriteSpy.mock.calls.find((call) => call[0] === WRITE_COMMANDS.CREATE_WORKSPACE);
+            const apiCallArgs = apiWriteSpy.mock.calls.find((call) => call.at(0) === WRITE_COMMANDS.CREATE_WORKSPACE);
             expect(apiCallArgs).toBeDefined();
             const params = apiCallArgs?.[1] as {guidedSetupData?: string};
             expect(params.guidedSetupData).toBeDefined();
 
             // Parse the guidedSetupData and find the VIEW_TOUR task
-            const guidedSetupData = JSON.parse(params.guidedSetupData ?? '[]');
-            const viewTourTask = guidedSetupData.find((item: {task?: string}) => item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
+            type GuidedSetupItem = {task?: string; completedTaskReportActionID?: string};
+            const guidedSetupData = JSON.parse(params.guidedSetupData ?? '[]') as GuidedSetupItem[];
+            const viewTourTask = guidedSetupData.find((item) => item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
 
             // VIEW_TOUR task should have completedTaskReportActionID set when isSelfTourViewed is true
             expect(viewTourTask).toBeDefined();
-            expect(viewTourTask.completedTaskReportActionID).toBeDefined();
+            expect(viewTourTask?.completedTaskReportActionID).toBeDefined();
 
             apiWriteSpy.mockRestore();
         });
@@ -959,18 +960,19 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             // Extract the guidedSetupData from the API call
-            const apiCallArgs = apiWriteSpy.mock.calls.find((call) => call[0] === WRITE_COMMANDS.CREATE_WORKSPACE);
+            const apiCallArgs = apiWriteSpy.mock.calls.find((call) => call.at(0) === WRITE_COMMANDS.CREATE_WORKSPACE);
             expect(apiCallArgs).toBeDefined();
             const params = apiCallArgs?.[1] as {guidedSetupData?: string};
             expect(params.guidedSetupData).toBeDefined();
 
             // Parse the guidedSetupData and find the VIEW_TOUR task
-            const guidedSetupData = JSON.parse(params.guidedSetupData ?? '[]');
-            const viewTourTask = guidedSetupData.find((item: {task?: string}) => item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
+            type GuidedSetupItem = {task?: string; completedTaskReportActionID?: string};
+            const guidedSetupData = JSON.parse(params.guidedSetupData ?? '[]') as GuidedSetupItem[];
+            const viewTourTask = guidedSetupData.find((item) => item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
 
             // VIEW_TOUR task should NOT have completedTaskReportActionID set when isSelfTourViewed is false
             expect(viewTourTask).toBeDefined();
-            expect(viewTourTask.completedTaskReportActionID).toBeUndefined();
+            expect(viewTourTask?.completedTaskReportActionID).toBeUndefined();
 
             apiWriteSpy.mockRestore();
         });

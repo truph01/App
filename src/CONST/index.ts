@@ -8275,6 +8275,9 @@ const CONST = {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
         },
+        ONBOARDING: {
+            FEATURE_ITEM: 'Onboarding-FeatureItem',
+        },
     },
 
     DOMAIN: {

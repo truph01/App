@@ -311,6 +311,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                     }}
                     accessibilityLabel={item.title}
                     accessible={false}
+                    sentryLabel={CONST.SENTRY_LABEL.ONBOARDING.FEATURE_ITEM}
                     hoverStyle={!isSelected ? styles.hoveredComponentBG : undefined}
                     style={[styles.onboardingInterestedFeaturesItem, isSmallScreenWidth ? styles.flexBasis100 : {maxWidth: (width - gap) / 2}, isSelected && styles.activeComponentBG]}
                 >
