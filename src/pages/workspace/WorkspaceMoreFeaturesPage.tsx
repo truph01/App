@@ -97,6 +97,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         selector: filterInactiveCards,
         canBeMissing: true,
     });
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
     const [isOrganizeWarningModalOpen, setIsOrganizeWarningModalOpen] = useState(false);
@@ -183,6 +184,12 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                 }
                 enablePolicyTravel(policyID, isEnabled);
             },
+            onPress: () => {
+                if (!policyID) {
+                    return;
+                }
+                Navigation.navigate(ROUTES.WORKSPACE_TRAVEL.getRoute(policyID));
+            },
         },
         {
             icon: illustrations.HandCard,
@@ -257,24 +264,25 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         },
     });
 
-    if (isBetaEnabled(CONST.BETAS.TIME_TRACKING)) {
-        spendItems.push({
-            icon: illustrations.Clock,
-            titleTranslationKey: 'workspace.moreFeatures.timeTracking.title',
-            subtitleTranslationKey: 'workspace.moreFeatures.timeTracking.subtitle',
-            isActive: isTimeTrackingEnabled(policy),
-            pendingAction: policy?.pendingFields?.isTimeTrackingEnabled,
-            action: (isEnabled: boolean) => {
-                if (!policyID) {
-                    return;
-                }
-                enablePolicyTimeTracking(policyID, isEnabled);
-            },
-            onPress: () => {
-                // TODO: Navigate to the Time Tracking settings page when implemented.
-            },
-        });
-    }
+    spendItems.push({
+        icon: illustrations.Clock,
+        titleTranslationKey: 'workspace.moreFeatures.timeTracking.title',
+        subtitleTranslationKey: 'workspace.moreFeatures.timeTracking.subtitle',
+        isActive: isTimeTrackingEnabled(policy),
+        pendingAction: policy?.pendingFields?.isTimeTrackingEnabled,
+        action: (isEnabled: boolean) => {
+            if (!policyID) {
+                return;
+            }
+            enablePolicyTimeTracking(policyID, isEnabled);
+        },
+        onPress: () => {
+            if (!policyID) {
+                return;
+            }
+            Navigation.navigate(ROUTES.WORKSPACE_TIME_TRACKING.getRoute(policyID));
+        },
+    });
 
     const manageItems: Item[] = [
         {
@@ -313,7 +321,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(policyID, CONST.UPGRADE_FEATURE_INTRO_MAPPING.rules.alias, ROUTES.WORKSPACE_MORE_FEATURES.getRoute(policyID)));
                     return;
                 }
-                enablePolicyRules(policyID, isEnabled);
+                enablePolicyRules(policyID, isEnabled, undefined, policyData);
             },
             onPress: () => {
                 if (!policyID) {
@@ -680,7 +688,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     isVisible={isDisableExpensifyCardWarningModalOpen}
                     onConfirm={() => {
                         setIsDisableExpensifyCardWarningModalOpen(false);
-                        navigateToConciergeChat();
+                        navigateToConciergeChat(conciergeReportID, false);
                     }}
                     onCancel={() => setIsDisableExpensifyCardWarningModalOpen(false)}
                     prompt={translate('workspace.moreFeatures.expensifyCard.disableCardPrompt')}
@@ -692,7 +700,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     isVisible={isDisableCompanyCardsWarningModalOpen}
                     onConfirm={() => {
                         setIsDisableCompanyCardsWarningModalOpen(false);
-                        navigateToConciergeChat();
+                        navigateToConciergeChat(conciergeReportID, false);
                     }}
                     onCancel={() => setIsDisableCompanyCardsWarningModalOpen(false)}
                     prompt={translate('workspace.moreFeatures.companyCards.disableCardPrompt')}
