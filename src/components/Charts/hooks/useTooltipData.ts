@@ -12,6 +12,9 @@ type TooltipData = {
  * Computes the display amount using the provided formatter and the percentage relative to all data points.
  */
 function useTooltipData(activeDataIndex: number, data: ChartDataPoint[], formatAmount: (value: number) => string): TooltipData | null {
+    // Memoize totalSum separately - only recalculate when data changes, not on every hover
+    const totalSum = useMemo(() => data.reduce((sum, point) => sum + Math.abs(point.total), 0), [data]);
+
     return useMemo(() => {
         if (activeDataIndex < 0 || activeDataIndex >= data.length) {
             return null;
@@ -20,14 +23,13 @@ function useTooltipData(activeDataIndex: number, data: ChartDataPoint[], formatA
         if (!dataPoint) {
             return null;
         }
-        const totalSum = data.reduce((sum, point) => sum + Math.abs(point.total), 0);
         const percent = totalSum > 0 ? Math.round((Math.abs(dataPoint.total) / totalSum) * 100) : 0;
         return {
             label: dataPoint.label,
             amount: formatAmount(dataPoint.total),
             percentage: percent < 1 ? '<1%' : `${percent}%`,
         };
-    }, [activeDataIndex, data, formatAmount]);
+    }, [activeDataIndex, data, formatAmount, totalSum]);
 }
 
 export {useTooltipData};
