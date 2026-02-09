@@ -23,18 +23,19 @@ function ReviewCardFraud({card}: ReviewCardFraudProps) {
     const fraudAlertReportID = possibleFraud?.fraudAlertReportID;
     const triggerAmount = possibleFraud?.triggerAmount;
     const triggerMerchant = possibleFraud?.triggerMerchant;
+    const triggerCurrency = possibleFraud?.triggerCurrency;
 
     // Generate the title with amount and merchant if available
     const title = useMemo(() => {
         if (triggerAmount !== undefined && triggerMerchant) {
-            const formattedAmount = convertToDisplayString(triggerAmount, DEFAULT_CURRENCY);
+            const formattedAmount = convertToDisplayString(triggerAmount, triggerCurrency ?? DEFAULT_CURRENCY);
             return translate('homePage.timeSensitiveSection.reviewCardFraud.titleWithDetails', {
                 amount: formattedAmount,
                 merchant: triggerMerchant,
             });
         }
         return translate('homePage.timeSensitiveSection.reviewCardFraud.title');
-    }, [triggerAmount, triggerMerchant, translate]);
+    }, [triggerAmount, triggerMerchant, triggerCurrency, translate]);
 
     // Don't render the widget if there's no fraud alert report to navigate to
     if (!fraudAlertReportID) {
