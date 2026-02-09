@@ -1,3 +1,5 @@
+// We use Date.now() and Math.random() for performance measurements
+/* eslint-disable react-hooks/purity */
 import type {ForwardedRef, RefObject} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
