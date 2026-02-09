@@ -62,17 +62,19 @@ function getEmojiCodeForInsertion(emoji: Emoji, preferredSkinTone: number, isIns
 
 /**
  * Revert emojis to shortcodes inside code blocks.
+ * Optionally adjusts a cursor position to account for length changes before it.
  */
-function revertEmojisInCodeBlocks(text: string): string {
+function revertEmojisInCodeBlocks(text: string, cursorPosition?: number): {text: string; cursorPosition?: number} {
     const codeRanges = getCodeRanges(text);
     if (codeRanges.length === 0) {
-        return text;
+        return {text, cursorPosition};
     }
 
     // Process ranges in reverse order to preserve positions when text length changes
     codeRanges.sort((a, b) => b.start - a.start);
 
     let result = text;
+    let cursorShift = 0;
     for (const range of codeRanges) {
         const codeContent = text.slice(range.start, range.start + range.length);
         // ALL_EMOJIS matches skin-toned variants as single units (e.g., 👍🏽 not 👍 + 🏽)
@@ -88,10 +90,14 @@ function revertEmojisInCodeBlocks(text: string): string {
 
         if (revertedContent !== codeContent) {
             result = result.slice(0, range.start) + revertedContent + result.slice(range.start + range.length);
+            if (cursorPosition !== undefined && range.start + range.length <= cursorPosition) {
+                cursorShift += revertedContent.length - codeContent.length;
+            }
         }
     }
 
-    return result;
+    const adjustedCursorPosition = cursorPosition !== undefined ? cursorPosition + cursorShift : undefined;
+    return {text: result, cursorPosition: adjustedCursorPosition};
 }
 
 const sortByName = (emoji: Emoji, emojiData: RegExpMatchArray) => !emoji.name.includes(emojiData[0].toLowerCase().slice(1));
@@ -458,8 +464,8 @@ function replaceEmojis(text: string, preferredSkinTone: OnyxEntry<number | strin
         cursorPosition += space.length;
     }
 
-    newText = revertEmojisInCodeBlocks(newText);
-    return {text: newText, emojis, cursorPosition};
+    const reverted = revertEmojisInCodeBlocks(newText, cursorPosition);
+    return {text: reverted.text, emojis, cursorPosition: reverted.cursorPosition};
 }
 
 /**
