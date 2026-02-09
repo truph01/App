@@ -926,17 +926,16 @@ const formatInTimeZoneWithFallback: typeof formatInTimeZone = (date, timeZone, f
  * @param timeZone - Target timezone to display the date in
  * @returns Date string in yyyy-MM-dd format, or empty string if invalid
  */
-function formatUTCDateTimeToDateInTimezone(utcDateTime: string, timeZone: SelectedTimezone): string {
+function formatUTCDateTimeToDateInTimezone(utcDateTime: string, timeZone: SelectedTimezone | undefined, formatStr = CONST.DATE.FNS_FORMAT_STRING): string {
     if (!utcDateTime || !timeZone) {
         return '';
     }
     try {
-        const isoString = utcDateTime.includes(' ') ? utcDateTime.replace(' ', 'T') : utcDateTime;
-        const date = new Date(isoString.endsWith('Z') ? isoString : `${isoString}Z`);
+        const date = toDate(utcDateTime, {timeZone: 'UTC'});
         if (!isValid(date)) {
             return '';
         }
-        return formatInTimeZoneWithFallback(date, timeZone, CONST.DATE.FNS_FORMAT_STRING);
+        return formatInTimeZoneWithFallback(date, timeZone, formatStr);
     } catch (error) {
         Log.warn('[DateUtils] Failed to format UTC datetime to timezone', {utcDateTime, timeZone, error});
         return '';
@@ -954,19 +953,19 @@ function formatDBTimeWithoutMilliseconds(timestamp: number): string {
  * Convert a date to UTC by taking midnight (00:00:00) in the user's local timezone and expressing it as a UTC timestamp
  */
 
-const normalizeDateToStartOfDay = (fromDate: string, timeZone: SelectedTimezone): string => {
+const normalizeDateToStartOfDay = (fromDate: string, timeZone: SelectedTimezone | undefined): string => {
     const localDate = parse(fromDate, CONST.DATE.FNS_FORMAT_STRING, new Date());
     const midnightLocal = startOfDay(localDate);
-    return formatDBTimeWithoutMilliseconds(fromZonedTime(midnightLocal, timeZone).valueOf());
+    return formatDBTimeWithoutMilliseconds(fromZonedTime(midnightLocal, timeZone ?? 'UTC').valueOf());
 };
 
 /**
  * Convert a date to UTC by taking end of day (23:59:59) in the user's local timezone and expressing it as a UTC timestamp
  */
-const normalizeDateToEndOfDay = (thruDate: string, timeZone: SelectedTimezone): string => {
+const normalizeDateToEndOfDay = (thruDate: string, timeZone: SelectedTimezone | undefined): string => {
     const localDate = parse(thruDate, CONST.DATE.FNS_FORMAT_STRING, new Date());
     const endOfDayLocal = endOfDay(localDate);
-    return formatDBTimeWithoutMilliseconds(fromZonedTime(endOfDayLocal, timeZone).valueOf());
+    return formatDBTimeWithoutMilliseconds(fromZonedTime(endOfDayLocal, timeZone ?? 'UTC').valueOf());
 };
 
 /**

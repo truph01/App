@@ -88,10 +88,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
         if (!validFrom) {
             return undefined;
         }
-        if (assigneeTimeZone) {
-            return DateUtils.formatUTCDateTimeToDateInTimezone(validFrom, assigneeTimeZone);
-        }
-        return DateUtils.formatWithUTCTimeZone(validFrom, 'yyyy-MM-dd');
+        return DateUtils.formatUTCDateTimeToDateInTimezone(validFrom, assigneeTimeZone);
     }, [card?.nameValuePairs?.validFrom, assigneeTimeZone]);
 
     const validThruDefaultValue = useMemo(() => {
@@ -99,10 +96,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
         if (!validThru) {
             return undefined;
         }
-        if (assigneeTimeZone) {
-            return DateUtils.formatUTCDateTimeToDateInTimezone(validThru, assigneeTimeZone);
-        }
-        return DateUtils.formatWithUTCTimeZone(validThru, 'yyyy-MM-dd');
+        return DateUtils.formatUTCDateTimeToDateInTimezone(validThru, assigneeTimeZone);
     }, [card?.nameValuePairs?.validThru, assigneeTimeZone]);
 
     const goBack = () => {
@@ -121,9 +115,6 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
 
     const updateCardLimitType = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_LIMIT_TYPE_FORM>) => {
         setIsConfirmModalVisible(false);
-        if (!assigneeTimeZone) {
-            return;
-        }
         updateExpensifyCardLimitType(
             defaultFundID,
             Number(cardID),

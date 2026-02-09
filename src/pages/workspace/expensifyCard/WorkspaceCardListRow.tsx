@@ -1,6 +1,5 @@
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
-import type {ValueOf} from 'type-fest';
 import Avatar from '@components/Avatar';
 import Icon from '@components/Icon';
 import Text from '@components/Text';
@@ -14,6 +13,7 @@ import {convertToShortDisplayString} from '@libs/CurrencyUtils';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import CONST from '@src/CONST';
 import type {PersonalDetails} from '@src/types/onyx';
+import type {CardLimitType} from '@src/types/onyx/Card';
 
 type WorkspacesListRowProps = {
     /** The last four digits of the card */
@@ -38,7 +38,7 @@ type WorkspacesListRowProps = {
     isHovered?: boolean;
 
     /** Card limit type */
-    limitType: ValueOf<typeof CONST.EXPENSIFY_CARD.LIMIT_TYPES> | undefined;
+    limitType: CardLimitType | undefined;
 };
 
 function WorkspaceCardListRow({limit, cardholder, lastFourPAN, name, currency, isVirtual, isHovered, limitType}: WorkspacesListRowProps) {

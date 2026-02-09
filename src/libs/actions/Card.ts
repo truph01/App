@@ -916,7 +916,7 @@ function updateExpensifyCardLimitType(
     workspaceAccountID: number,
     cardID: number,
     newLimitType: CardLimitType,
-    timeZone: SelectedTimezone,
+    timeZone: SelectedTimezone | undefined,
     oldCardNameValuePairs?: Card['nameValuePairs'],
     validFrom?: string,
     validThru?: string,
@@ -1194,7 +1194,14 @@ function configureExpensifyCardsForPolicy(policyID: string, workspaceAccountID: 
     });
 }
 
-function issueExpensifyCard(domainAccountID: number, policyID: string | undefined, feedCountry: string, validateCode: string, timeZone: SelectedTimezone, data?: IssueNewCardData) {
+function issueExpensifyCard(
+    domainAccountID: number,
+    policyID: string | undefined,
+    feedCountry: string,
+    validateCode: string,
+    timeZone: SelectedTimezone | undefined,
+    data?: IssueNewCardData,
+) {
     if (!data) {
         return;
     }
