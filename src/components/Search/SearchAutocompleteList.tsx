@@ -313,11 +313,9 @@ function SearchAutocompleteList({
     })();
 
     const cardAutocompleteList = Object.values(allCards);
-    const feedAutoCompleteList = (() => {
-        // We don't want to show the "Expensify Card" feeds in the autocomplete suggestion list as they don't have real "Statements"
-        // Thus passing an empty object to the `allCards` parameter.
-        return Object.values(getCardFeedsForDisplay(allFeeds, {}, translate));
-    })();
+    // We don't want to show the "Expensify Card" feeds in the autocomplete suggestion list as they don't have real "Statements"
+    // Thus passing an empty object to the `allCards` parameter.
+    const feedAutoCompleteList = Object.values(getCardFeedsForDisplay(allFeeds, {}, translate));
 
     const [allPolicyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES, {canBeMissing: false});
     const [allRecentCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES, {canBeMissing: true});
@@ -330,9 +328,18 @@ function SearchAutocompleteList({
 
     const taxAutocompleteList = getAutocompleteTaxList(taxRates);
 
-    const workspaceList = Object.values(policies)
-        .filter((singlePolicy) => !!singlePolicy && shouldShowPolicy(singlePolicy, false, currentUserEmail) && !singlePolicy?.isJoinRequestPending)
-        .map((singlePolicy) => ({id: singlePolicy?.id, name: singlePolicy?.name ?? ''}));
+    const workspaceList = (() => {
+        const result = [];
+        for (const singlePolicy of Object.values(policies)) {
+            if (!singlePolicy || singlePolicy.isJoinRequestPending || !shouldShowPolicy(singlePolicy, false, currentUserEmail)) {
+                continue;
+            }
+
+            result.push({id: singlePolicy.id, name: singlePolicy.name ?? ''});
+        }
+
+        return result;
+    })();
 
     const {currencyList} = useCurrencyList();
     const currencyAutocompleteList = Object.keys(currencyList).filter((currency) => !currencyList[currency]?.retired);

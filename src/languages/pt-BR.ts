@@ -735,6 +735,8 @@ const translations: TranslationDeepObject<typeof en> = {
         looksLikeYouRanOutOfTime: 'Parece que o tempo acabou! Tente novamente no estabelecimento.',
         youRanOutOfTime: 'Seu tempo acabou',
         letsVerifyItsYou: 'Vamos verificar se é você',
+        nowLetsAuthenticateYou: 'Agora, vamos autenticar você...',
+        letsAuthenticateYou: 'Vamos autenticar você...',
         verifyYourself: {
             biometrics: 'Verifique sua identidade com seu rosto ou impressão digital',
         },
@@ -751,6 +753,10 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: 'Você não tem nenhum dispositivo registrado para verificação por rosto/digital ou passkey. Se você registrar algum, poderá revogar esse acesso aqui.',
             dismiss: 'Entendi',
             error: 'Falha na solicitação. Tente novamente mais tarde.',
+        },
+        unsupportedDevice: {
+            unsupportedDevice: 'Dispositivo não compatível',
+            pleaseDownloadMobileApp: `<centered-text><muted-text> Esta ação não é compatível com seu dispositivo. Baixe o app do Expensify na <a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> ou na <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> e tente novamente.</muted-text></centered-text>`,
         },
     },
     validateCodeModal: {
@@ -1176,6 +1182,7 @@ const translations: TranslationDeepObject<typeof en> = {
         splitExpenseCannotBeEditedModalTitle: 'Esta despesa não pode ser editada',
         splitExpenseCannotBeEditedModalDescription: 'Despesas aprovadas ou pagas não podem ser editadas',
         splitExpenseDistanceErrorModalDescription: 'Corrija o erro na tarifa de distância e tente novamente.',
+        splitExpensePerDiemRateErrorModalDescription: 'Corrija o erro na taxa de diária e tente novamente.',
         paySomeone: (name?: string) => `Pagar ${name ?? 'alguém'}`,
         expense: 'Despesa',
         categorize: 'Categorizar',
@@ -3873,6 +3880,7 @@ ${
             card: 'Cartões',
             expensifyCard: 'Cartão Expensify',
             companyCards: 'Cartões corporativos',
+            personalCards: 'Cartões pessoais',
             workflows: 'Fluxos de trabalho',
             workspace: 'Espaço de trabalho',
             findWorkspace: 'Encontrar espaço de trabalho',
@@ -5175,6 +5183,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                             currentTravelLimitLabel: 'Limite de viagem atual',
                             settlementAccountLabel: 'Conta de liquidação',
                             settlementFrequencyLabel: 'Frequência de liquidação',
+                            settlementFrequencyDescription:
+                                'Com que frequência o Expensify vai debitar da sua conta bancária empresarial para liquidar as transações recentes do Expensify Travel.',
                         },
                     },
                 },
