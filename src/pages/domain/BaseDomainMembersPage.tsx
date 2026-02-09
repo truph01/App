@@ -138,7 +138,7 @@ function BaseDomainMembersPage({
 
     const [inputValue, setInputValue, filteredData] = useSearchResults(data, filterMember, sortMembers);
 
-    const isUserToggleEnabled = canSelectMultiple && setSelectedMembers && filteredData.length > 0;
+    const isUserToggleEnabled = setSelectedMembers && filteredData.length > 0;
 
     const toggleAllUsers = isUserToggleEnabled
         ? () => {
