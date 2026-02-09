@@ -469,10 +469,6 @@ function createTopSearchMenuItem(
     limit?: number,
     view?: ValueOf<typeof CONST.SEARCH.VIEW>,
 ): SearchTypeMenuItem {
-    const isCategory = groupBy === CONST.SEARCH.GROUP_BY.CATEGORY;
-    const defaultSortBy = isCategory ? CONST.SEARCH.TABLE_COLUMNS.GROUP_CATEGORY : CONST.SEARCH.TABLE_COLUMNS.GROUP_TOTAL;
-    const defaultSortOrder = isCategory ? CONST.SEARCH.SORT_ORDER.ASC : CONST.SEARCH.SORT_ORDER.DESC;
-
     const searchQuery = buildQueryStringFromFilterFormValues(
         {
             type: CONST.SEARCH.DATA_TYPES.EXPENSE,
@@ -481,8 +477,8 @@ function createTopSearchMenuItem(
             ...(view && {view}),
         },
         {
-            sortBy: defaultSortBy,
-            sortOrder: defaultSortOrder,
+            sortBy: CONST.SEARCH.TABLE_COLUMNS.GROUP_TOTAL,
+            sortOrder: CONST.SEARCH.SORT_ORDER.DESC,
             ...(limit && {limit}),
         },
     );
