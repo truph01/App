@@ -110,11 +110,10 @@ jobs:
         with:
           ref: ${{ needs.prep.outputs.APP_REF }}
 
-      - name: Create .env.adhoc file based on staging and add PULL_REQUEST_NUMBER env to it
+      - name: Create .env.adhoc file based on staging
         run: |
           cp .env.staging .env.adhoc
           sed -i 's/ENVIRONMENT=staging/ENVIRONMENT=adhoc/' .env.adhoc
-          echo "PULL_REQUEST_NUMBER=$PULL_REQUEST_NUMBER" >> .env.adhoc
 
       - name: Inject CI data into JS bundle
         run: ./.github/scripts/inject-ci-data.sh PULL_REQUEST_NUMBER="$PULL_REQUEST_NUMBER"
@@ -170,11 +169,10 @@ jobs:
             cd Mobile-Expensify
             npm run grunt:build:shared
 
-      - name: Setup dotenv
+      - name: Create .env.adhoc file based on staging
         run: |
-            cp .env.staging .env.adhoc
-            sed -i 's/ENVIRONMENT=staging/ENVIRONMENT=adhoc/' .env.adhoc
-            echo "APP_PULL_REQUEST_NUMBER=$PULL_REQUEST_NUMBER" >> .env.adhoc
+          cp .env.staging .env.adhoc
+          sed -i 's/ENVIRONMENT=staging/ENVIRONMENT=adhoc/' .env.adhoc
 
       - name: Inject CI data into JS bundle
         run: ./.github/scripts/inject-ci-data.sh PULL_REQUEST_NUMBER="$PULL_REQUEST_NUMBER"
@@ -269,11 +267,10 @@ jobs:
         with:
           IS_HYBRID_BUILD: 'true'
 
-      - name: Create .env.adhoc file based on staging and add PULL_REQUEST_NUMBER env to it
+      - name: Create .env.adhoc file based on staging
         run: |
           cp .env.staging .env.adhoc
           sed -i '' 's/ENVIRONMENT=staging/ENVIRONMENT=adhoc/' .env.adhoc
-          echo "PULL_REQUEST_NUMBER=$PULL_REQUEST_NUMBER" >> .env.adhoc
 
       - name: Inject CI data into JS bundle
         run: ./.github/scripts/inject-ci-data.sh PULL_REQUEST_NUMBER="$PULL_REQUEST_NUMBER"
