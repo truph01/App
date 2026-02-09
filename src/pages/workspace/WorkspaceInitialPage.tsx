@@ -426,7 +426,6 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
         shouldShowEnterCredentialsError,
         hasPolicyCategoryError,
         shouldShowRBR,
-        isBetaEnabled,
     ]);
 
     // We only update feature states if they aren't pending.
