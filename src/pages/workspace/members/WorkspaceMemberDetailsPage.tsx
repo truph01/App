@@ -323,15 +323,13 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                     />
                                 )
                             ) : (
-                                !isReimburser && (
-                                    <Button
-                                        text={translate('workspace.people.removeWorkspaceMemberButtonTitle')}
-                                        onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
-                                        isDisabled={isSelectedMemberOwner || isSelectedMemberCurrentUser}
-                                        icon={icons.RemoveMembers}
-                                        style={styles.mb5}
-                                    />
-                                )
+                                <Button
+                                    text={translate('workspace.people.removeWorkspaceMemberButtonTitle')}
+                                    onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
+                                    isDisabled={isSelectedMemberOwner || isSelectedMemberCurrentUser}
+                                    icon={icons.RemoveMembers}
+                                    style={styles.mb5}
+                                />
                             )}
                         </View>
                         <View style={styles.w100}>
