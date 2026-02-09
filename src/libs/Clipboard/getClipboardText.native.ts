@@ -1,5 +1,5 @@
 import Parser from '@libs/Parser';
 
-export default function getClipboardPlainText(selection: string): string {
+export default function getClipboardText(selection: string): string {
     return Parser.htmlToMarkdown(selection);
 }

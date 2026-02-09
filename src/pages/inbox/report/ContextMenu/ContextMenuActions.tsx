@@ -14,7 +14,7 @@ import type useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDet
 import addEncryptedAuthTokenToURL from '@libs/addEncryptedAuthTokenToURL';
 import {isMobileSafari} from '@libs/Browser';
 import Clipboard from '@libs/Clipboard';
-import getClipboardPlainText from '@libs/Clipboard/getClipboardPlainText';
+import getClipboardText from '@libs/Clipboard/getClipboardText';
 import EmailUtils from '@libs/EmailUtils';
 import {getEnvironmentURL} from '@libs/Environment/Environment';
 import fileDownload from '@libs/fileDownload';
@@ -201,11 +201,11 @@ function setClipboardMessage(content: string | undefined) {
     if (!content) {
         return;
     }
-    const plainText = getClipboardPlainText(content);
+    const clipboardText = getClipboardText(content);
     if (!Clipboard.canSetHtml()) {
-        Clipboard.setString(plainText);
+        Clipboard.setString(clipboardText);
     } else {
-        Clipboard.setHtml(content, plainText);
+        Clipboard.setHtml(content, clipboardText);
     }
 }
 
