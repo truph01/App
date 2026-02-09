@@ -34,8 +34,12 @@ type ButtonProps = Partial<ChildrenProps> &
         /** The fill color to pass into the icon. */
         iconFill?: string;
 
+        iconRightFill?: string;
+
         /** The fill color to pass into the icon when the button is hovered. */
         iconHoverFill?: string;
+
+        iconRightHoverFill?: string;
 
         /** Any additional styles to pass to the left icon container. */
         iconStyles?: StyleProp<ViewStyle>;
@@ -232,7 +236,9 @@ function Button({
 
     iconRight,
     iconFill,
+    iconRightFill,
     iconHoverFill,
+    iconRightHoverFill,
     icon = null,
     iconStyles = [],
     iconRightStyles = [],
@@ -379,7 +385,7 @@ function Button({
                             {!isSplitButton ? (
                                 <Icon
                                     src={iconRight ?? icons.ArrowRight}
-                                    fill={isHovered ? (iconHoverFill ?? defaultFill) : (iconFill ?? defaultFill)}
+                                    fill={isHovered ? (iconRightHoverFill ?? iconHoverFill ?? defaultFill) : (iconRightFill ?? iconFill ?? defaultFill)}
                                     extraSmall={extraSmall}
                                     small={small}
                                     medium={medium}

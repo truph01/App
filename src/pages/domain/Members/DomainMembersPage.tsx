@@ -6,8 +6,10 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDomainMemberError} from '@libs/actions/Domain';
+import {hasDomainMembersSettingsErrors} from '@libs/DomainUtils';
 import {getLatestError} from '@libs/ErrorUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
@@ -24,9 +26,10 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const {domainAccountID} = route.params;
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['Profile']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Gear']);
+    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Gear', 'DotIndicator']);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
+    const theme = useTheme();
 
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {canBeMissing: true});
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {canBeMissing: true, selector: memberPendingActionSelector});
@@ -37,6 +40,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         selector: memberAccountIDsSelector,
     });
 
+    const hasSettingsErrors = hasDomainMembersSettingsErrors(domainErrors);
     const renderHeaderButtons = (
         <>
             <Button
@@ -52,6 +56,11 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 onPress={() => {}}
                 shouldAlwaysShowDropdownMenu
                 customText={translate('common.more')}
+                icon={hasSettingsErrors ? icons.DotIndicator : undefined}
+                iconFill={hasSettingsErrors ? theme.danger : undefined}
+                iconRightFill={hasSettingsErrors ? theme.icon : undefined}
+                iconHoverFill={hasSettingsErrors ? theme.dangerHover : undefined}
+                iconRightHoverFill={hasSettingsErrors ? theme.icon : undefined}
                 options={[
                     {
                         value: CONST.DOMAIN.MEMBERS.SECONDARY_ACTIONS.SETTINGS,

@@ -54,6 +54,10 @@ function ButtonWithDropdownMenu<IValueType>({ref, ...props}: ButtonWithDropdownM
         testID,
         secondLineText = '',
         icon,
+        iconFill,
+        iconRightFill,
+        iconHoverFill,
+        iconRightHoverFill,
         shouldPopoverUseScrollView = false,
         containerStyles,
         shouldUseModalPaddingStyle = true,
@@ -182,12 +186,16 @@ function ButtonWithDropdownMenu<IValueType>({ref, ...props}: ButtonWithDropdownM
                         innerStyles={[innerStyleDropButton, !isSplitButton && styles.dropDownButtonCartIconView, isTextTooLong && shouldUseShortForm && {...styles.pl2, ...styles.pr1}]}
                         enterKeyEventListenerPriority={enterKeyEventListenerPriority}
                         iconRight={icons.DownArrow}
+                        iconRightFill={iconRightFill}
+                        iconRightHoverFill={iconRightHoverFill}
                         shouldShowRightIcon={!isSplitButton && !isLoading && options?.length > 0}
                         isSplitButton={isSplitButton}
                         testID={testID}
                         textStyles={[isTextTooLong && shouldUseShortForm ? {...styles.textExtraSmall, ...styles.textBold} : {}]}
                         secondLineText={secondLineText}
                         icon={icon}
+                        iconFill={iconFill}
+                        iconHoverFill={iconHoverFill}
                         sentryLabel={sentryLabel}
                     />
 
