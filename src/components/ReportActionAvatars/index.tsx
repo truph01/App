@@ -1,5 +1,5 @@
 import React from 'react';
-import type {ColorValue, StyleProp, ViewStyle} from 'react-native';
+import {type ColorValue, type StyleProp, View, type ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import useOnyx from '@hooks/useOnyx';
@@ -153,6 +153,8 @@ function ReportActionAvatars({
     }
 
     const [primaryAvatar, secondaryAvatar] = icons;
+
+    return <View />;
 
     if (avatarType === CONST.REPORT_ACTION_AVATARS.TYPE.SUBSCRIPT && (!!secondaryAvatar?.name || !!subscriptCardFeed)) {
         return (
