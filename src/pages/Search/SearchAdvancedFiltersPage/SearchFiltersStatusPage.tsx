@@ -89,7 +89,6 @@ function SearchFiltersStatusPage() {
                 onBackButtonPress={() => {
                     Navigation.goBack(ROUTES.SEARCH_ADVANCED_FILTERS.getRoute());
                 }}
-                shouldDisplayHelpButton={false}
             />
             <View style={[styles.flex1]}>
                 <SelectionList

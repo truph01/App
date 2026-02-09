@@ -53,10 +53,7 @@ function SavedSearchRenamePage({route}: {route: {params: {q: string; name: strin
             offlineIndicatorStyle={styles.mtAuto}
             includeSafeAreaPaddingBottom
         >
-            <HeaderWithBackButton
-                title={translate('common.rename')}
-                shouldDisplayHelpButton={false}
-            />
+            <HeaderWithBackButton title={translate('common.rename')} />
             <FormProvider
                 formID={ONYXKEYS.FORMS.SEARCH_SAVED_SEARCH_RENAME_FORM}
                 submitButtonText={translate('common.save')}

@@ -161,7 +161,6 @@ function SearchFiltersAmountBase({title, filterKey, testID}: {title: Translation
                 <HeaderWithBackButton
                     title={fieldTitle}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.SEARCH_ADVANCED_FILTERS.getRoute())}
-                    shouldDisplayHelpButton={false}
                 />
                 <View style={styles.flex1}>
                     <View style={styles.flexGrow1}>
@@ -204,7 +203,6 @@ function SearchFiltersAmountBase({title, filterKey, testID}: {title: Translation
             <HeaderWithBackButton
                 onBackButtonPress={goBack}
                 title={fieldTitle}
-                shouldDisplayHelpButton={false}
             />
             <FormProvider
                 style={[styles.flex1, styles.ph4]}

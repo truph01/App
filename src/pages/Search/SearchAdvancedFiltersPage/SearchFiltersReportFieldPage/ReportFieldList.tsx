@@ -65,7 +65,6 @@ function ReportFieldList({field, close}: ReportFieldListProps) {
             <HeaderWithBackButton
                 title={field.name}
                 onBackButtonPress={close}
-                shouldDisplayHelpButton={false}
             />
             <View style={[styles.flex1]}>
                 <SelectionList

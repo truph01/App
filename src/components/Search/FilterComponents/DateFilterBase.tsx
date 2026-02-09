@@ -117,7 +117,6 @@ function DateFilterBase({title, dateKey, back, onSubmit}: DateFilterBaseProps) {
             <HeaderWithBackButton
                 title={computedTitle}
                 onBackButtonPress={goBack}
-                shouldDisplayHelpButton={false}
             />
             <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                 <DatePresetFilterBase
