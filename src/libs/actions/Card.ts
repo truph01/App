@@ -920,7 +920,7 @@ function updateExpensifyCardLimitType(
     oldCardNameValuePairs?: Card['nameValuePairs'],
     validFrom?: string,
     validThru?: string,
-    shoudClearValidityDates?: boolean,
+    shouldClearValidityDates?: boolean,
 ) {
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST>> = [
         {
@@ -935,8 +935,8 @@ function updateExpensifyCardLimitType(
                             validFrom: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                             validThru: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                         },
-                        validFrom: shoudClearValidityDates ? null : validFrom,
-                        validThru: shoudClearValidityDates ? null : validThru,
+                        validFrom: shouldClearValidityDates ? null : validFrom,
+                        validThru: shouldClearValidityDates ? null : validThru,
                     },
                     pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                     pendingFields: {availableSpend: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE},
@@ -990,7 +990,7 @@ function updateExpensifyCardLimitType(
         limitType: newLimitType,
         validFrom: validFrom ? DateUtils.normalizeDateToStartOfDay(validFrom, timeZone) : undefined,
         validThru: validThru ? DateUtils.normalizeDateToEndOfDay(validThru, timeZone) : undefined,
-        clearValidityDates: shoudClearValidityDates,
+        clearValidityDates: shouldClearValidityDates,
     };
 
     API.write(WRITE_COMMANDS.UPDATE_EXPENSIFY_CARD_LIMIT_TYPE, parameters, {optimisticData, successData, failureData});
