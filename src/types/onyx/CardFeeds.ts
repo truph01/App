@@ -37,6 +37,11 @@ type BankName = ValueOf<typeof CONST.COMPANY_CARDS.BANKS>;
  */
 type CardType = ValueOf<typeof CONST.COMPANY_CARDS.CARD_TYPE>;
 
+/**
+ * Card type name
+ */
+type CardTypeName = ValueOf<typeof CONST.COMPANY_CARDS.CARD_TYPE_NAMES>;
+
 /** Statement period end */
 type StatementPeriodEnd = Exclude<ValueOf<typeof CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE>, typeof CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.CUSTOM_DAY_OF_MONTH>;
 
@@ -314,6 +319,7 @@ export type {
     CardFeedWithDomainID,
     BankName,
     CardType,
+    CardTypeName,
     CompanyCardFeed,
     CompanyCardFeedWithNumber,
     CompanyCardFeedWithDomainID,
