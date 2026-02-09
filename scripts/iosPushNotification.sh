@@ -78,7 +78,7 @@ if [ -z "$placeholders" ]; then
 fi
 
 # Check if correct number of replacements were provided
-if [ $(($# - 1)) -lt $(echo "$placeholders" | wc -l) ]; then
+if [ $(($# - 1)) -lt "$(echo "$placeholders" | wc -l)" ]; then
     echo "Insufficient parameters provided."
     echo "Proper usage: ios-push-notification [-s] $1 $(echo "$placeholders" | sed 's/^/</' | sed 's/$/>/' | tr '\n' ' ')"
     echo ""
