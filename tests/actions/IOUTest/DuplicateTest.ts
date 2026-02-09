@@ -708,6 +708,8 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 existingTransactionDraft: undefined,
                 draftTransactionIDs: [],
+                betas: [CONST.BETAS.ALL],
+                personalDetails: {},
             });
 
             await waitForBatchedUpdates();
@@ -767,6 +769,8 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 existingTransactionDraft: undefined,
                 draftTransactionIDs: [],
+                betas: [CONST.BETAS.ALL],
+                personalDetails: {},
             });
 
             await waitForBatchedUpdates();
@@ -819,6 +823,8 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 existingTransactionDraft: undefined,
                 draftTransactionIDs: [],
+                betas: [CONST.BETAS.ALL],
+                personalDetails: {},
             });
 
             await waitForBatchedUpdates();
@@ -867,6 +873,8 @@ describe('actions/Duplicate', () => {
                 isSelfTourViewed: false,
                 existingTransactionDraft: undefined,
                 draftTransactionIDs: [],
+                betas: [CONST.BETAS.ALL],
+                personalDetails: {},
             });
 
             await waitForBatchedUpdates();
@@ -924,6 +932,8 @@ describe('actions/Duplicate', () => {
                 isSelfTourViewed: false,
                 existingTransactionDraft: undefined,
                 draftTransactionIDs: [],
+                betas: [CONST.BETAS.ALL],
+                personalDetails: {},
             });
 
             await waitForBatchedUpdates();

@@ -76,6 +76,7 @@ function SubmitDetailsPage({
     const [transactionDrafts] = useOptimisticDraftTransactions(undefined);
     const draftTransactionIDs = transactionDrafts?.map((item) => item.transactionID);
 
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalPolicy = usePersonalPolicy();
     const [startLocationPermissionFlow, setStartLocationPermissionFlow] = useState(false);
@@ -170,6 +171,7 @@ function SubmitDetailsPage({
                 introSelected,
                 quickAction,
                 recentWaypoints,
+                betas,
             });
         } else {
             const existingTransactionID = getExistingTransactionID(transaction.linkedTrackedExpenseReportAction);
@@ -210,6 +212,8 @@ function SubmitDetailsPage({
                 existingTransactionDraft,
                 draftTransactionIDs,
                 isSelfTourViewed,
+                betas,
+                personalDetails,
             });
         }
     };
