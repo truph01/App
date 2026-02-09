@@ -170,15 +170,13 @@ function initSearchPage() {
         const query = input.value.trim();
         if (query) {
             const url = '/search?q=' + encodeURIComponent(query) + (platform ? '&platform=' + encodeURIComponent(platform) : '');
-            history.pushState(null, '', url);
+            history.replaceState(null, '', url);
             title.textContent = 'Search results';
             searchPageQuery(query);
         }
     });
 
     document.getElementById('search-page-clear').addEventListener('click', clearSearchPage);
-
-    window.addEventListener('popstate', initSearchPage);
 }
 
 const FIXED_HEADER_HEIGHT = 80;
