@@ -1047,7 +1047,7 @@ Onyx.connect({
     callback: (value) => {
         allPolicies = value;
         hasPolicies = !isEmptyObject(value);
-        policiesArray = Object.values(value);
+        policiesArray = Object.values(value ?? {}).filter((policy): policy is Policy => !!policy);
     },
 });
 
@@ -4852,11 +4852,7 @@ function canEditFieldOfMoneyRequest(
         // Check if there are multiple outstanding reports across policies
         let outstandingReportsCount = 0;
         for (const currentPolicy of policiesArray) {
-            const reports = getOutstandingReportsForUser(
-                currentPolicy?.id,
-                moneyRequestReport?.ownerAccountID,
-                outstandingReportsByPolicyID?.[currentPolicy?.id ?? CONST.DEFAULT_NUMBER_ID] ?? {},
-            );
+            const reports = getOutstandingReportsForUser(currentPolicy.id, moneyRequestReport?.ownerAccountID, outstandingReportsByPolicyID?.[currentPolicy?.id] ?? {});
             outstandingReportsCount += reports.length;
 
             // Short-circuit once we find more than 1
@@ -5935,7 +5931,7 @@ function getReportSubtitlePrefix(report: OnyxEntry<Report>): string {
 
     let policyCount = 0;
     for (const policy of policiesArray) {
-        if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
+        if (!shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
 
