@@ -47,7 +47,7 @@ function ReportActionItemMessageWithExplain({message, action, childReport, origi
 
         // For all other links, use the default link handler
         openLink(href, environmentURL);
-    }
+    };
 
     return (
         <ReportActionItemBasicMessage>
