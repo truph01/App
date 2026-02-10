@@ -1,5 +1,5 @@
 import type {ValueOf} from 'type-fest';
-import type {AuthTypeName} from '@components/MultifactorAuthentication/types';
+import type {AuthTypeName} from '@libs/MultifactorAuthentication/Biometrics/types';
 import type CONST from '@src/CONST';
 import type {OnyxInputOrEntry, ReportAction} from '@src/types/onyx';
 import type {DelegateRole} from '@src/types/onyx/Account';
@@ -19,11 +19,6 @@ type WelcomeEnterMagicCodeParams = {
     login: string;
 };
 
-type LocalTimeParams = {
-    user: string;
-    time: string;
-};
-
 type EditActionParams = {
     action: OnyxInputOrEntry<ReportAction>;
 };
@@ -34,12 +29,6 @@ type DeleteActionParams = {
 
 type DeleteConfirmationParams = {
     action: OnyxInputOrEntry<ReportAction>;
-};
-
-type LearnMoreRouteParams = {
-    learnMoreMethodsRoute: string;
-    formattedPrice: string;
-    hasTeam2025Pricing: boolean;
 };
 
 type BeginningOfChatHistoryAnnounceRoomPartTwo = {
@@ -78,22 +67,6 @@ type CreatedReportForUnapprovedTransactionsParams = {
     reportName: string;
 };
 
-type MovedTransactionParams = {
-    reportUrl: string;
-    reportName?: string;
-};
-
-type MovedActionParams = {
-    shouldHideMovedReportUrl: boolean;
-    movedReportUrl: string;
-    newParentReportUrl: string;
-    toPolicyName: string;
-};
-
-type MovedFromReportParams = {
-    reportName: string;
-};
-
 type WorkspacesListRouteParams = {
     workspacesListRoute: string;
 };
@@ -105,10 +78,6 @@ type WorkspaceRouteParams = {
 type SplitAmountParams = {amount: string};
 
 type UserSplitParams = {amount: string};
-
-type ManagerApprovedParams = {manager: string};
-
-type ManagerApprovedAmountParams = {manager: string; amount: number | string};
 
 type PaidElsewhereParams = {payer?: string; comment?: string};
 
@@ -132,15 +101,11 @@ type WeSentYouMagicSignInLinkParams = {login: string; loginType: string};
 
 type ToValidateLoginParams = {primaryLogin: string; secondaryLogin: string};
 
-type NoLongerHaveAccessParams = {primaryLogin: string};
-
 type UntilTimeParams = {time: string};
 
 type StepCounterParams = {step: number; total?: number; text?: string};
 
 type UserIsAlreadyMemberParams = {login: string; name: string};
-
-type NewWorkspaceNameParams = {userName: string; workspaceNumber?: number};
 
 type ParentNavigationSummaryParams = {reportName?: string; workspaceName?: string};
 
@@ -195,11 +160,7 @@ type OptionalParam<T> = Partial<T>;
 
 type TermsParams = {amount: string};
 
-type LogSizeParams = {size: number};
-
 type LogSizeAndDateParams = {size: number; date: string};
-
-type HeldRequestParams = {comment: string};
 
 type ChangeFieldParams = {oldValue?: string; newValue: string; fieldName: string};
 
@@ -344,8 +305,6 @@ type IntegrationsMessageParams = {
     };
 };
 
-type MarkedReimbursedParams = {amount: string; currency: string};
-
 type MarkReimbursedFromIntegrationParams = {amount: string; currency: string};
 
 type ShareParams = {to: string};
@@ -354,18 +313,8 @@ type UnshareParams = {to: string};
 
 type StripePaidParams = {amount: string; currency: string};
 
-type IssueVirtualCardParams = {
-    assignee: string;
-    link: string;
-};
-
 type ConnectionNameParams = {
     connectionName: AllConnectionName;
-};
-
-type LastSyncDateParams = {
-    connectionName: string;
-    formattedDate: string;
 };
 
 type ExportAgainModalDescriptionParams = {
@@ -373,13 +322,9 @@ type ExportAgainModalDescriptionParams = {
     connectionName: ConnectionName;
 };
 
-type IntegrationSyncFailedParams = {label: string; errorMessage: string; linkText?: string; linkURL?: string; workspaceAccountingLink?: string};
-
 type UpdateRoleParams = {email: string; currentRole: string; newRole: string};
 
 type UpdatedCustomFieldParams = {email: string; previousValue: string; newValue: string};
-
-type LeftWorkspaceParams = {nameOrEmail: string};
 
 type RemoveMemberParams = {email: string; role: string};
 
@@ -393,11 +338,7 @@ type AmountWithCurrencyParams = {amountWithCurrency: string};
 
 type LowerUpperParams = {lower: string; upper: string};
 
-type CategoryNameParams = {categoryName: string};
-
 type UpdatedPolicyCategoriesParams = {count: number};
-
-type NeedCategoryForExportToIntegrationParams = {connectionName: string};
 
 type TaxAmountParams = {taxAmount: number};
 
@@ -431,8 +372,6 @@ type ExportIntegrationSelectedParams = {connectionName: ConnectionName};
 
 type IntacctMappingTitleParams = {mappingName: SageIntacctMappingName};
 
-type LastSyncAccountingParams = {relativeDate: string};
-
 type SyncStageNameConnectionsParams = {stage: PolicyConnectionSyncStage};
 
 type DelegateRoleParams = {role: DelegateRole};
@@ -443,12 +382,6 @@ type SubmittedToVacationDelegateParams = {submittedToName: string; vacationDeleg
 
 type RemovedFromApprovalWorkflowParams = {
     submittersNames: string[];
-};
-
-type IntegrationExportParams = {
-    integration: string;
-    type?: string;
-    exportPageLink?: string;
 };
 
 type MissingPropertyParams = {
@@ -520,20 +453,6 @@ type TravelTypeParams = {
     id?: string;
 };
 
-type MergeSuccessDescriptionParams = {
-    from: string;
-    to: string;
-};
-
-type MergeFailureUncreatedAccountDescriptionParams = {
-    email: string;
-    contactMethodLink: string;
-};
-
-type MergeFailureDescriptionGenericParams = {
-    email: string;
-};
-
 type WorkspaceUpgradeNoteParams = {
     subscriptionLink: string;
 };
@@ -557,10 +476,6 @@ type WalletAgreementParams = {
     walletAgreementUrl: string;
 };
 
-type MergeAccountIntoParams = {
-    login: string;
-};
-
 type NextStepParams = {
     actor: string;
     actorType: ValueOf<typeof CONST.NEXT_STEP.ACTOR_TYPE>;
@@ -581,11 +496,9 @@ export type {
     MissingPropertyParams,
     InvalidPropertyParams,
     InvalidValueParams,
-    IntegrationExportParams,
     RemovedFromApprovalWorkflowParams,
     DelegateRoleParams,
     VacationDelegateParams,
-    LastSyncAccountingParams,
     SyncStageNameConnectionsParams,
     IntacctMappingTitleParams,
     ExportIntegrationSelectedParams,
@@ -599,7 +512,6 @@ export type {
     StatementTitleParams,
     WorkspaceOwnerWillNeedToAddOrUpdatePaymentCardParams,
     TaxAmountParams,
-    CategoryNameParams,
     UpdatedPolicyCategoriesParams,
     AmountWithCurrencyParams,
     LowerUpperParams,
@@ -608,26 +520,16 @@ export type {
     DeleteActionParams,
     DeleteConfirmationParams,
     EditActionParams,
-    SubmittedToVacationDelegateParams,
-    LearnMoreRouteParams,
-    HeldRequestParams,
-    IssueVirtualCardParams,
-    LocalTimeParams,
-    LogSizeParams,
-    ManagerApprovedAmountParams,
-    ManagerApprovedParams,
     MovedFromPersonalSpaceParams,
-    NoLongerHaveAccessParams,
+    SubmittedToVacationDelegateParams,
     NotAllowedExtensionParams,
     ParentNavigationSummaryParams,
     PaidElsewhereParams,
-    MovedFromReportParams,
     ReportArchiveReasonsClosedParams,
     ReportArchiveReasonsMergedParams,
     ReportArchiveReasonsInvoiceReceiverPolicyDeletedParams,
     CreatedReportForUnapprovedTransactionsParams,
     ReportArchiveReasonsRemovedFromPolicyParams,
-    MovedTransactionParams,
     ResolutionConstraintsParams,
     SizeExceededParams,
     SplitAmountParams,
@@ -669,19 +571,15 @@ export type {
     ChangeFieldParams,
     ExportedToIntegrationParams,
     IntegrationsMessageParams,
-    MarkedReimbursedParams,
     MarkReimbursedFromIntegrationParams,
     ShareParams,
     UpdatedPolicyFieldWithValueParams,
     UnshareParams,
     StripePaidParams,
     ConnectionNameParams,
-    LastSyncDateParams,
     ExportAgainModalDescriptionParams,
-    IntegrationSyncFailedParams,
     UpdateRoleParams,
     UpdatedCustomFieldParams,
-    LeftWorkspaceParams,
     RemoveMemberParams,
     StatementPageTitleParams,
     DisconnectPromptParams,
@@ -705,7 +603,6 @@ export type {
     UpdatedPolicyDescriptionParams,
     WorkEmailResendCodeParams,
     WorkEmailMergingBlockedParams,
-    NewWorkspaceNameParams,
     UpdatedPolicyCustomUnitRateParams,
     UpdatedPolicyCustomUnitTaxRateExternalIDParams,
     UpdatedPolicyCustomUnitTaxClaimablePercentageParams,
@@ -719,7 +616,6 @@ export type {
     UpdatedPolicyCustomUnitSubRateParams,
     YourPlanPriceValueParams,
     AddedOrDeletedPolicyReportFieldParams,
-    NeedCategoryForExportToIntegrationParams,
     UpdatedPolicyAuditRateParams,
     UpdatedPolicyManualApprovalThresholdParams,
     UpdatedPolicyReimbursementEnabledParams,
@@ -742,18 +638,13 @@ export type {
     UpdatedBudgetParams,
     DeleteBudgetParams,
     AddOrDeletePolicyCustomUnitRateParams,
-    MergeSuccessDescriptionParams,
-    MergeFailureUncreatedAccountDescriptionParams,
-    MergeFailureDescriptionGenericParams,
     WorkspaceUpgradeNoteParams,
     WorkflowSettingsParam,
-    MovedActionParams,
     WorkspaceShareNoteParams,
     UpgradeSuccessMessageParams,
     SubmittedWithMemoParams,
     WalletAgreementParams,
     SubscriptionSettingsLearnMoreParams,
-    MergeAccountIntoParams,
     NextStepParams,
     UpdatedPolicyOwnershipParams,
     UpdatedPolicyAutoHarvestingParams,
