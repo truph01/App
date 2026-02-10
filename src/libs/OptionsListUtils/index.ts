@@ -936,8 +936,10 @@ function getLastMessageTextForReport({
         return lastVisibleMessage?.lastMessageText ?? '';
     }
 
-    // If lastMessageTextFromReport is empty, it means there's no meaningful last action to show.
-    if (visibleReportActionsDataParam) {
+    // If the derived visibility cache has been hydrated for this report, trust the computed value
+    // (even if empty — it means there are genuinely no visible actions). When the cache entry
+    // doesn't exist yet (e.g. cold start, partial Onyx hydration), fall through to lastMessageText.
+    if (reportID && visibleReportActionsDataParam?.[reportID]) {
         return lastMessageTextFromReport;
     }
 
