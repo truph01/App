@@ -2490,7 +2490,7 @@ function getTagSections(data: OnyxTypes.SearchResults['data'], queryJSON: Search
  */
 function getMonthSections(data: OnyxTypes.SearchResults['data'], queryJSON: SearchQueryJSON | undefined): [TransactionMonthGroupListItemType[], number] {
     const monthSections: Record<string, TransactionMonthGroupListItemType> = {};
-    const dateFilters = queryJSON?.flatFilters.find((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
+    const dateFilters = queryJSON?.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
     for (const key in data) {
         if (isGroupEntry(key)) {
             const monthGroup = data[key];
@@ -2539,7 +2539,7 @@ function getMonthSections(data: OnyxTypes.SearchResults['data'], queryJSON: Sear
  */
 function getWeekSections(data: OnyxTypes.SearchResults['data'], queryJSON: SearchQueryJSON | undefined): [TransactionWeekGroupListItemType[], number] {
     const weekSections: Record<string, TransactionWeekGroupListItemType> = {};
-    const dateFilters = queryJSON?.flatFilters.find((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
+    const dateFilters = queryJSON?.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
     for (const key in data) {
         if (isGroupEntry(key)) {
             const weekGroup = data[key];
@@ -2626,7 +2626,7 @@ function getYearSections(data: OnyxTypes.SearchResults['data'], queryJSON: Searc
 
 function getQuarterSections(data: OnyxTypes.SearchResults['data'], queryJSON: SearchQueryJSON | undefined): [TransactionQuarterGroupListItemType[], number] {
     const quarterSections: Record<string, TransactionQuarterGroupListItemType> = {};
-    const dateFilters = queryJSON?.flatFilters.find((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
+    const dateFilters = queryJSON?.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
     for (const key in data) {
         if (isGroupEntry(key)) {
             const quarterGroup = data[key];
@@ -3909,16 +3909,22 @@ function isDatePreset(value: string | number | undefined): value is SearchDatePr
  * takes the intersection to narrow the range rather than overwriting it.
  *
  * @param timeRange - The base time range to adjust (e.g., a year/month/quarter range)
- * @param dateFilter - Optional date filter containing preset and/or constraint filters
+ * @param flatFilters - Optional array of date filter objects from the search query
  * @returns Adjusted time range that respects all date filters (intersected, not overwritten)
  */
-function adjustTimeRangeToDateFilters(timeRange: {start: string; end: string}, dateFilter: QueryFilters[0] | undefined): {start: string; end: string} {
-    if (!dateFilter?.filters) {
+function adjustTimeRangeToDateFilters(
+    timeRange: {start: string; end: string},
+    dateFilters: QueryFilters | undefined,
+): {start: string; end: string} {
+    if (!dateFilters || dateFilters.length === 0) {
         return timeRange;
     }
+    // Merge all date filters into a single object
+    const flattenFilters = dateFilters.flatMap((filter) => filter.filters);
+
 
     const {start: timeRangeStart, end: timeRangeEnd} = timeRange;
-    const equalToFilter = dateFilter.filters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO);
+    const equalToFilter = flattenFilters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO);
 
     let limitsStart: string | undefined;
     let limitsEnd: string | undefined;
@@ -3935,7 +3941,7 @@ function adjustTimeRangeToDateFilters(timeRange: {start: string; end: string}, d
         }
     }
 
-    let startLimitFilter = dateFilter.filters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN_OR_EQUAL_TO);
+    let startLimitFilter = flattenFilters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN_OR_EQUAL_TO);
     if (startLimitFilter?.value) {
         const constraintStart = String(startLimitFilter.value);
         if (limitsStart) {
@@ -3945,7 +3951,7 @@ function adjustTimeRangeToDateFilters(timeRange: {start: string; end: string}, d
         }
     }
 
-    startLimitFilter = dateFilter.filters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN);
+    startLimitFilter = flattenFilters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN);
     if (startLimitFilter?.value) {
         const date = parse(String(startLimitFilter.value), 'yyyy-MM-dd', new Date());
         const constraintStart = format(addDays(date, 1), 'yyyy-MM-dd');
@@ -3956,7 +3962,7 @@ function adjustTimeRangeToDateFilters(timeRange: {start: string; end: string}, d
         }
     }
 
-    let endLimitFilter = dateFilter.filters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN_OR_EQUAL_TO);
+    let endLimitFilter = flattenFilters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN_OR_EQUAL_TO);
     if (endLimitFilter?.value) {
         const constraintEnd = String(endLimitFilter.value);
         if (limitsEnd) {
@@ -3966,7 +3972,7 @@ function adjustTimeRangeToDateFilters(timeRange: {start: string; end: string}, d
         }
     }
 
-    endLimitFilter = dateFilter.filters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN);
+    endLimitFilter = flattenFilters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN);
     if (endLimitFilter?.value) {
         const date = parse(String(endLimitFilter.value), 'yyyy-MM-dd', new Date());
         const constraintEnd = format(subDays(date, 1), 'yyyy-MM-dd');
