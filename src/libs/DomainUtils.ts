@@ -30,7 +30,7 @@ function hasDomainAdminsSettingsErrors(domainErrors?: DomainErrors): boolean {
  * Checks if domain has any member-related errors.
  */
 function hasDomainMembersErrors(domainErrors?: DomainErrors): boolean {
-    return Object.values(domainErrors?.memberErrors ?? {}).some((member) => !isEmptyObject(member?.errors));
+    return Object.values(domainErrors?.memberErrors ?? {}).some((member) => !isEmptyObject(member?.errors) || !isEmptyObject(member?.vacationDelegateErrors));
 }
 
 export {hasDomainErrors, hasDomainAdminsSettingsErrors, hasDomainAdminsErrors, hasDomainMembersErrors};

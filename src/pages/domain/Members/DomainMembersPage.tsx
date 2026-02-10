@@ -46,15 +46,6 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         />
     );
 
-    const getCustomRowProps = (accountID: number, email?: string) => {
-        const emailError = email ? getLatestError(domainErrors?.memberErrors?.[email]?.errors) : undefined;
-        const accountIDError = getLatestError(domainErrors?.memberErrors?.[accountID]?.errors);
-        const emailPendingAction = email ? domainPendingActions?.[email]?.pendingAction : undefined;
-        const accountIDPendingAction = domainPendingActions?.[accountID]?.pendingAction;
-
-        return {errors: emailError ?? accountIDError, pendingAction: emailPendingAction ?? accountIDPendingAction};
-    };
-
     return (
         <BaseDomainMembersPage
             domainAccountID={domainAccountID}
@@ -63,7 +54,8 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             searchPlaceholder={translate('domain.members.findMember')}
             onSelectRow={(item) => Navigation.navigate(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, item.accountID))}
             headerIcon={illustrations.Profile}
-            getCustomRowProps={getCustomRowProps}
+            memberErrors={domainErrors?.memberErrors}
+            memberPendingActions={domainPendingActions}
             headerContent={renderHeaderButtons}
             onDismissError={(item) => {
                 if (!defaultSecurityGroupID) {

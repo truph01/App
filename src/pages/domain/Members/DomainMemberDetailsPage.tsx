@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -11,16 +12,11 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {closeUserAccount} from '@libs/actions/Domain';
-import Navigation from '@navigation/Navigation';
-import React from 'react';
-import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
-import useOnyx from '@hooks/useOnyx';
 import {getLatestError} from '@libs/ErrorUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import BaseDomainMemberDetailsComponent from '@pages/domain/BaseDomainMemberDetailsComponent';
-import ONYXKEYS from '@src/ONYXKEYS';
 import {clearVacationDelegateError} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -58,7 +54,6 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
         canBeMissing: true,
     });
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {canBeMissing: true});
-
 
     const memberLogin = personalDetails?.login ?? '';
 
@@ -114,9 +109,9 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 <VacationDelegateMenuItem
                     vacationDelegate={vacationDelegate}
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
-                    pendingAction={domainPendingActions?.member?.[accountID]?.vacationDelegate}
-                    errors={getLatestError(domainErrors?.memberErrors?.[accountID]?.vacationDelegateErrors)}
-                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, domainPendingActions?.member?.[accountID]?.vacationDelegate)}
+                    pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
+                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
+                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, domainPendingActions?.member?.[memberLogin]?.vacationDelegate)}
                 />
             </BaseDomainMemberDetailsComponent>
             <DecisionModal
