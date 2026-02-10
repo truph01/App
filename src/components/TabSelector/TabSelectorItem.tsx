@@ -43,6 +43,9 @@ type TabSelectorItemProps = {
     /** Test identifier used to find elements in unit and e2e tests */
     testID?: string;
 
+    /** Sentry label for INP attribution */
+    sentryLabel?: string;
+
     /** Determines whether the product training tooltip should be displayed to the user. */
     shouldShowProductTrainingTooltip?: boolean;
 
@@ -69,6 +72,7 @@ function TabSelectorItem({
     isActive = false,
     shouldShowLabelWhenInactive = true,
     testID,
+    sentryLabel,
     shouldShowProductTrainingTooltip = false,
     renderProductTrainingTooltip,
     parentX = 0,
@@ -127,6 +131,7 @@ function TabSelectorItem({
             role={CONST.ROLE.TAB}
             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
             testID={testID}
+            sentryLabel={sentryLabel}
             ref={childRef}
         >
             <TabIcon

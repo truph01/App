@@ -475,6 +475,7 @@ function MoneyRequestConfirmationListFooter({
                     disabled={didConfirm}
                     brickRoadIndicator={shouldDisplayFieldError && isAmountMissing(transaction) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     errorText={shouldDisplayFieldError && isAmountMissing(transaction) ? translate('common.error.enterAmount') : ''}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.AMOUNT_FIELD}
                 />
             ),
             shouldShow: shouldShowSmartScanFields && shouldShowAmountField,
@@ -505,6 +506,7 @@ function MoneyRequestConfirmationListFooter({
                                 interactive={!isReadOnly}
                                 numberOfLinesTitle={2}
                                 rightLabel={isDescriptionRequired ? translate('common.required') : ''}
+                                sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.DESCRIPTION_FIELD}
                             />
                         </MentionReportContext.Provider>
                     </ShowContextMenuContext.Provider>
@@ -540,6 +542,7 @@ function MoneyRequestConfirmationListFooter({
                     }}
                     disabled={didConfirm}
                     interactive={!isReadOnly && !isGPSDistanceRequest}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.DISTANCE_FIELD}
                 />
             ),
             shouldShow: isDistanceRequest,
@@ -577,6 +580,7 @@ function MoneyRequestConfirmationListFooter({
                     brickRoadIndicator={shouldDisplayDistanceRateError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     disabled={didConfirm}
                     interactive={!!rate && !isReadOnly && iouType !== CONST.IOU.TYPE.SPLIT && !isUnreported}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.RATE_FIELD}
                 />
             ),
             shouldShow: isDistanceRequest,
@@ -603,6 +607,7 @@ function MoneyRequestConfirmationListFooter({
                     errorText={shouldDisplayMerchantError ? translate('common.error.fieldRequired') : ''}
                     rightLabel={isMerchantRequired && !shouldDisplayMerchantError ? translate('common.required') : ''}
                     numberOfLinesTitle={2}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.MERCHANT_FIELD}
                 />
             ),
             shouldShow: shouldShowMerchant,
@@ -624,6 +629,7 @@ function MoneyRequestConfirmationListFooter({
                     }}
                     disabled={didConfirm}
                     interactive={!isReadOnly}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.HOURS_FIELD}
                 />
             ),
             shouldShow: shouldShowTimeRequestFields,
@@ -645,6 +651,7 @@ function MoneyRequestConfirmationListFooter({
                     }}
                     disabled={didConfirm}
                     interactive={!isReadOnly}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TIME_RATE_FIELD}
                 />
             ),
             shouldShow: shouldShowTimeRequestFields,
@@ -690,6 +697,7 @@ function MoneyRequestConfirmationListFooter({
                     rightLabel={isCategoryRequired ? translate('common.required') : ''}
                     brickRoadIndicator={shouldDisplayCategoryError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     errorText={shouldDisplayCategoryError ? translate(formError) : ''}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.CATEGORY_FIELD}
                 />
             ),
             shouldShow: shouldShowCategories,
@@ -715,6 +723,7 @@ function MoneyRequestConfirmationListFooter({
                     interactive={!isReadOnly}
                     brickRoadIndicator={shouldDisplayFieldError && isCreatedMissing(transaction) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     errorText={shouldDisplayFieldError && isCreatedMissing(transaction) ? translate('common.error.enterDate') : ''}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.DATE_FIELD}
                 />
             ),
             shouldShow: shouldShowDate,
@@ -748,6 +757,7 @@ function MoneyRequestConfirmationListFooter({
                         disabled={didConfirm}
                         interactive={!isReadOnly}
                         rightLabel={isTagRequired ? translate('common.required') : ''}
+                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TAG_FIELD}
                     />
                 ),
                 shouldShow,
@@ -773,6 +783,7 @@ function MoneyRequestConfirmationListFooter({
                     interactive={canModifyTaxFields}
                     brickRoadIndicator={shouldDisplayTaxRateError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     errorText={shouldDisplayTaxRateError ? translate(formError) : ''}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TAX_RATE_FIELD}
                 />
             ),
             shouldShow: shouldShowTax,
@@ -795,6 +806,7 @@ function MoneyRequestConfirmationListFooter({
                     }}
                     disabled={didConfirm}
                     interactive={canModifyTaxFields}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TAX_AMOUNT_FIELD}
                 />
             ),
             shouldShow: shouldShowTax,
@@ -821,6 +833,7 @@ function MoneyRequestConfirmationListFooter({
                     shouldRenderAsHTML
                     brickRoadIndicator={shouldDisplayAttendeesError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     errorText={shouldDisplayAttendeesError ? translate(formError) : ''}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.ATTENDEES_FIELD}
                 />
             ),
             shouldShow: shouldShowAttendees,
@@ -879,6 +892,7 @@ function MoneyRequestConfirmationListFooter({
                     }}
                     interactive={shouldReportBeEditable}
                     shouldRenderAsHTML
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.REPORT_FIELD}
                 />
             ),
             shouldShow: isPolicyExpenseChat,
@@ -907,6 +921,7 @@ function MoneyRequestConfirmationListFooter({
             interactive={!isReadOnly}
             brickRoadIndicator={index === 0 && shouldDisplaySubrateError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
             errorText={index === 0 && shouldDisplaySubrateError ? translate('common.error.fieldRequired') : ''}
+            sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.SUBRATE_FIELD}
         />
     ));
 
@@ -1064,6 +1079,7 @@ function MoneyRequestConfirmationListFooter({
                     labelStyle={styles.mt2}
                     titleStyle={styles.flex1}
                     disabled={didConfirm}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.SEND_FROM_FIELD}
                 />
             )}
             {shouldShowMap && (
@@ -1087,6 +1103,7 @@ function MoneyRequestConfirmationListFooter({
                         }}
                         disabled={didConfirm}
                         interactive={!isReadOnly}
+                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.DESTINATION_FIELD}
                     />
                     <View style={styles.dividerLine} />
                     <MenuItemWithTopDescription
@@ -1104,6 +1121,7 @@ function MoneyRequestConfirmationListFooter({
                         disabled={didConfirm}
                         interactive={!isReadOnly}
                         numberOfLinesTitle={2}
+                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TIME_FIELD}
                     />
                     <View style={[styles.flexRow, styles.gap1, styles.justifyContentStart, styles.mh3, styles.flexWrap, styles.pt1]}>{badgeElements}</View>
                     <View style={styles.dividerLine} />

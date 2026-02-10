@@ -77,6 +77,9 @@ type FormAlertWithSubmitButtonProps = {
 
     /** Prevents the button from triggering blur on mouse down. */
     shouldPreventDefaultFocusOnPress?: boolean;
+
+    /** Sentry label for INP attribution */
+    sentryLabel?: string;
 };
 
 function FormAlertWithSubmitButton({
@@ -102,6 +105,7 @@ function FormAlertWithSubmitButton({
     shouldBlendOpacity = false,
     addButtonBottomPadding = true,
     shouldPreventDefaultFocusOnPress = false,
+    sentryLabel,
 }: FormAlertWithSubmitButtonProps) {
     const styles = useThemeStyles();
     const style = [!shouldRenderFooterAboveSubmit && footerContent && addButtonBottomPadding ? styles.mb3 : {}, buttonStyles];
@@ -135,6 +139,7 @@ function FormAlertWithSubmitButton({
                             medium={useSmallerSubmitButtonSize}
                             large={!useSmallerSubmitButtonSize}
                             onMouseDown={shouldPreventDefaultFocusOnPress ? (e) => e.preventDefault() : undefined}
+                            sentryLabel={sentryLabel}
                         />
                     ) : (
                         <Button
@@ -152,6 +157,7 @@ function FormAlertWithSubmitButton({
                             medium={useSmallerSubmitButtonSize}
                             large={!useSmallerSubmitButtonSize}
                             onMouseDown={shouldPreventDefaultFocusOnPress ? (e) => e.preventDefault() : undefined}
+                            sentryLabel={sentryLabel}
                         />
                     )}
                     {!shouldRenderFooterAboveSubmit && footerContent}

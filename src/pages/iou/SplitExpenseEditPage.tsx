@@ -261,6 +261,7 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
                                 }}
                                 pressOnEnter
                                 enterKeyEventListenerPriority={1}
+                                sentryLabel={CONST.SENTRY_LABEL.SPLIT_EXPENSE.REMOVE_SPLIT_BUTTON}
                             />
                         )}
                         <Button
@@ -274,6 +275,7 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
                             }}
                             pressOnEnter
                             enterKeyEventListenerPriority={1}
+                            sentryLabel={CONST.SENTRY_LABEL.SPLIT_EXPENSE.EDIT_SAVE_BUTTON}
                         />
                     </FixedFooter>
                 </View>

@@ -23,6 +23,9 @@ type TabSelectorBaseItem = {
 
     /** Test identifier used to find elements in tests. */
     testID?: string;
+
+    /** Sentry label for INP attribution. */
+    sentryLabel?: string;
 };
 
 type TabSelectorBaseProps = {
@@ -168,6 +171,7 @@ function TabSelectorBase({
                         backgroundColor={backgroundColor}
                         isActive={isActive}
                         testID={tab.testID}
+                        sentryLabel={tab.sentryLabel}
                         shouldShowLabelWhenInactive={shouldShowLabelWhenInactive}
                         shouldShowProductTrainingTooltip={shouldShowProductTrainingTooltip}
                         renderProductTrainingTooltip={renderProductTrainingTooltip}

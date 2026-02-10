@@ -193,6 +193,7 @@ function IOURequestStepTag({
                                 }
                                 text={translate('workspace.tags.editTags')}
                                 pressOnEnter
+                                sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.EDIT_TAGS_BUTTON}
                             />
                         </FixedFooter>
                     )}

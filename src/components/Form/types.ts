@@ -180,6 +180,9 @@ type FormProps<TFormID extends OnyxFormKey = OnyxFormKey> = ForwardedFSClassProp
      * If `true`, the form will smoothly scroll to the bottom after interactions have completed.
      */
     shouldScrollToEnd?: boolean;
+
+    /** Sentry label for INP attribution on the submit button */
+    sentryLabel?: string;
 };
 
 type FormRef<TFormID extends OnyxFormKey = OnyxFormKey> = {
