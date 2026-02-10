@@ -8317,7 +8317,7 @@ const CONST = {
         },
         REPORT_HEADER_SKELETON: {
             GO_BACK: 'ReportHeaderSkeleton-GoBack',
-        }
+        },
     },
 
     DOMAIN: {
