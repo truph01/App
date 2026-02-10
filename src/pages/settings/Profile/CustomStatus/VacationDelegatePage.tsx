@@ -57,7 +57,7 @@ function VacationDelegatePage() {
                 <BaseVacationDelegateSelectionComponent
                     currentVacationDelegate={currentVacationDelegate}
                     onSelectRow={onSelectRow}
-                    headerTitle={translate('statusPage.vacationDelegate')}
+                    headerTitle={translate('common.vacationDelegate')}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
                 />
             </ScreenWrapper>

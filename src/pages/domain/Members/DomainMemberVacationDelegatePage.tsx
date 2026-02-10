@@ -50,7 +50,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
             >
                 <BaseVacationDelegateSelectionComponent
                     currentVacationDelegate={vacationDelegate?.delegate}
-                    headerTitle={translate('domain.members.vacationDelegate')}
+                    headerTitle={translate('domain.common.vacationDelegate')}
                     onSelectRow={onSelectRow}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID))}
                 />

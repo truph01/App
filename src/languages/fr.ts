@@ -598,6 +598,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Semaine',
         year: 'Année',
         quarter: 'Trimestre',
+        vacationDelegate: 'Délégué de vacances',
     },
     supportalNoAccess: {
         title: 'Pas si vite',
@@ -3126,7 +3127,6 @@ ${
         time: 'Heure',
         clearAfter: 'Effacer après',
         whenClearStatus: 'Quand devons-nous effacer votre statut ?',
-        vacationDelegate: 'Délégué de vacances',
         setVacationDelegate: `Définissez un délégué de vacances pour approuver les notes de frais en votre nom pendant votre absence du bureau.`,
         vacationDelegateError: 'Une erreur s’est produite lors de la mise à jour de votre remplaçant de congés.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `en tant que délégué de vacances de ${nameOrEmail}`,

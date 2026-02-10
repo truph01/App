@@ -617,6 +617,7 @@ const translations = {
         week: 'Week',
         year: 'Year',
         quarter: 'Quarter',
+        vacationDelegate: 'Vacation delegate',
     },
     supportalNoAccess: {
         title: 'Not so fast',
@@ -3145,7 +3146,6 @@ const translations = {
         time: 'Time',
         clearAfter: 'Clear after',
         whenClearStatus: 'When should we clear your status?',
-        vacationDelegate: 'Vacation delegate',
         setVacationDelegate: `Set a vacation delegate to approve reports on your behalf while you're out of office.`,
         vacationDelegateError: 'There was an error updating your vacation delegate.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `as ${nameOrEmail}'s vacation delegate`,
@@ -8407,7 +8407,6 @@ const translations = {
                 removeMember: 'Unable to remove this user. Please try again.',
                 vacationDelegate: 'Unable to set this user as an vacation delegate. Please try again.',
             },
-            vacationDelegate: 'Vacation delegate',
         },
     },
 };

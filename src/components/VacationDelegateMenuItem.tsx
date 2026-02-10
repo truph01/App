@@ -44,7 +44,7 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
 
     return hasVacationDelegate ? (
         <>
-            <Text style={[styles.mh5, styles.mt5, styles.mutedTextLabel]}>{translate('statusPage.vacationDelegate')}</Text>
+            <Text style={[styles.mh5, styles.mt5, styles.mutedTextLabel]}>{translate('common.vacationDelegate')}</Text>
             <OfflineWithFeedback
                 pendingAction={pendingAction}
                 errors={errors}
@@ -66,7 +66,7 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
         </>
     ) : (
         <MenuItem
-            description={translate('statusPage.vacationDelegate')}
+            description={translate('common.vacationDelegate')}
             shouldShowRightIcon
             onPress={onPress}
             containerStyle={styles.pr2}

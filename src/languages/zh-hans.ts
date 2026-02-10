@@ -593,6 +593,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: '周',
         year: '年份',
         quarter: '季度',
+        vacationDelegate: '休假代理',
     },
     supportalNoAccess: {
         title: '先别急',
@@ -3060,7 +3061,6 @@ ${
         time: '时间',
         clearAfter: '多久后清除',
         whenClearStatus: '我们应在何时清除你的状态？',
-        vacationDelegate: '休假代理',
         setVacationDelegate: `设置一个休假代理人在你不在办公室时代你审批报销报告。`,
         vacationDelegateError: '更新你的休假代理时出错。',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `作为 ${nameOrEmail} 的休假代理`,

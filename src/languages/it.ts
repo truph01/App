@@ -597,6 +597,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Settimana',
         year: 'Anno',
         quarter: 'Trimestre',
+        vacationDelegate: 'Delegato ferie',
     },
     supportalNoAccess: {
         title: 'Non così in fretta',
@@ -3111,7 +3112,6 @@ ${
         time: 'Ora',
         clearAfter: 'Cancella dopo',
         whenClearStatus: 'Quando dovremmo cancellare il tuo stato?',
-        vacationDelegate: 'Delegato ferie',
         setVacationDelegate: `Imposta un delegato per le ferie per approvare i report per tuo conto mentre sei fuori ufficio.`,
         vacationDelegateError: 'Si è verificato un errore durante l’aggiornamento del tuo delegato per le ferie.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `come delegato per le ferie di ${nameOrEmail}`,

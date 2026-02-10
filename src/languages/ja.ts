@@ -597,6 +597,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: '週',
         year: '年',
         quarter: '四半期',
+        vacationDelegate: '休暇代理人',
     },
     supportalNoAccess: {
         title: 'ちょっと待ってください',
@@ -3098,7 +3099,6 @@ ${
         time: '時間',
         clearAfter: 'クリアまでの時間',
         whenClearStatus: 'ステータスをいつクリアしますか？',
-        vacationDelegate: '休暇代理人',
         setVacationDelegate: `休暇中に不在の間、あなたに代わってレポートを承認する代理人を設定しましょう。`,
         vacationDelegateError: '休暇の代理人を更新中にエラーが発生しました。',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `${nameOrEmail} さんの休暇代理として`,

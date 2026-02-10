@@ -597,6 +597,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Week',
         year: 'Jaar',
         quarter: 'Kwartaal',
+        vacationDelegate: 'Vertegenwoordiger tijdens vakantie',
     },
     supportalNoAccess: {
         title: 'Niet zo snel',
@@ -3112,7 +3113,6 @@ ${
         time: 'Tijd',
         clearAfter: 'Wissen na',
         whenClearStatus: 'Wanneer moeten we je status wissen?',
-        vacationDelegate: 'Vertegenwoordiger tijdens vakantie',
         setVacationDelegate: `Stel een vervangende fiatteur in om rapporten namens jou goed te keuren terwijl je afwezig bent.`,
         vacationDelegateError: 'Er is een fout opgetreden bij het bijwerken van je vervanger tijdens vakantie.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `als vakantiewaarnemer van ${nameOrEmail}`,

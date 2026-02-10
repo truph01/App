@@ -597,6 +597,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Woche',
         year: 'Jahr',
         quarter: 'Quartal',
+        vacationDelegate: 'Urlaubsvertretung',
     },
     supportalNoAccess: {
         title: 'Nicht so schnell',
@@ -3119,7 +3120,6 @@ ${
         time: 'Zeit',
         clearAfter: 'Nach Ablauf löschen',
         whenClearStatus: 'Wann sollen wir deinen Status zurücksetzen?',
-        vacationDelegate: 'Urlaubsvertretung',
         setVacationDelegate: `Lege eine Vertretung für den Urlaub fest, die Berichte in deiner Abwesenheit in deinem Namen genehmigt.`,
         vacationDelegateError: 'Beim Aktualisieren Ihrer Vertretung im Urlaub ist ein Fehler aufgetreten.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `als Urlaubsvertretung von ${nameOrEmail}`,
