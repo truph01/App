@@ -17,7 +17,10 @@ function useDynamicBackPath(dynamicRouteSuffix: DynamicRouteSuffix): Route {
         return ROUTES.HOME;
     }
 
-    const [normalizedPath, query] = splitPathAndQuery(path);
+    // Remove leading slashes for consistent processing
+    const pathWithoutLeadingSlash = path.replace(/^\/+/, '');
+
+    const [normalizedPath, query] = splitPathAndQuery(pathWithoutLeadingSlash);
 
     if (normalizedPath?.endsWith(`/${dynamicRouteSuffix}`)) {
         const backPathWithoutQuery = normalizedPath.slice(0, -(dynamicRouteSuffix.length + 1));
@@ -27,7 +30,7 @@ function useDynamicBackPath(dynamicRouteSuffix: DynamicRouteSuffix): Route {
     }
 
     // If suffix is not the last segment, return the original path
-    return path as Route;
+    return pathWithoutLeadingSlash as Route;
 }
 
 export default useDynamicBackPath;

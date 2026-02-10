@@ -5,6 +5,12 @@ import splitPathAndQuery from './splitPathAndQuery';
 
 const combinePathAndSuffix = (path: string, suffix: string): Route => {
     const [normalizedPath, query] = splitPathAndQuery(path);
+
+    // This should never happen as the path should always be defined
+    if (!normalizedPath) {
+        throw new Error('Path is undefined or empty');
+    }
+
     let newPath = `${normalizedPath}/${suffix}`;
 
     if (query) {
