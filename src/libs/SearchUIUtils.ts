@@ -429,8 +429,9 @@ type SearchTypeMenuSection = {
 };
 
 type SearchTypeMenuItem = {
-    key: SearchKey;
-    translationPath: TranslationPaths;
+    key: string;
+    translationPath?: TranslationPaths;
+    title?: string;
     type: SearchDataTypes;
     icon?: IconAsset | Extract<ExpensifyIconName, 'Receipt' | 'ChatBubbles' | 'MoneyBag' | 'CreditCard' | 'MoneyHourglass' | 'CreditCardHourglass' | 'Bank' | 'User' | 'Folder' | 'Basket'>;
     searchQuery: string;
@@ -805,6 +806,136 @@ function getSuggestedSearches(
             CONST.SEARCH.GROUP_BY.MERCHANT,
             CONST.SEARCH.TOP_SEARCH_LIMIT,
         ),
+    };
+}
+
+function createCardStatementsMenuItem(cardFeed: CardFeedForDisplay): SearchTypeMenuItem {
+    const searchQuery = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        feed: [cardFeed.id],
+        groupBy: CONST.SEARCH.GROUP_BY.CARD,
+        postedOn: CONST.SEARCH.DATE_PRESETS.LAST_STATEMENT,
+    });
+
+    return {
+        key: `${CONST.SEARCH.SEARCH_KEYS.STATEMENTS}_${cardFeed.id}`,
+        title: cardFeed.name,
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        icon: 'CreditCard',
+        searchQuery,
+        get searchQueryJSON() {
+            return buildSearchQueryJSON(this.searchQuery);
+        },
+        get hash() {
+            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+        get similarSearchHash() {
+            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+    };
+}
+
+function createUnapprovedCashMenuItem(): SearchTypeMenuItem {
+    const searchQuery = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        status: [CONST.SEARCH.STATUS.EXPENSE.DRAFTS, CONST.SEARCH.STATUS.EXPENSE.OUTSTANDING],
+        groupBy: CONST.SEARCH.GROUP_BY.FROM,
+        reimbursable: CONST.SEARCH.BOOLEAN.YES,
+    });
+
+    return {
+        key: CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH,
+        translationPath: 'workspace.qbo.accountingMethods.values.CASH',
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        icon: 'MoneyHourglass',
+        searchQuery,
+        get searchQueryJSON() {
+            return buildSearchQueryJSON(this.searchQuery);
+        },
+        get hash() {
+            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+        get similarSearchHash() {
+            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+    };
+}
+
+function createUnapprovedCardMenuItem(cardFeed: CardFeedForDisplay): SearchTypeMenuItem {
+    const searchQuery = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        feed: [cardFeed.id],
+        groupBy: CONST.SEARCH.GROUP_BY.CARD,
+        status: [CONST.SEARCH.STATUS.EXPENSE.DRAFTS, CONST.SEARCH.STATUS.EXPENSE.OUTSTANDING],
+    });
+
+    return {
+        key: `${CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD}_${cardFeed.id}`,
+        title: cardFeed.name,
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        icon: 'CreditCardHourglass',
+        searchQuery,
+        get searchQueryJSON() {
+            return buildSearchQueryJSON(this.searchQuery);
+        },
+        get hash() {
+            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+        get similarSearchHash() {
+            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+    };
+}
+
+function createReimbursementReconciliationMenuItem(): SearchTypeMenuItem {
+    const searchQuery = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        withdrawalType: CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT,
+        withdrawnOn: CONST.SEARCH.DATE_PRESETS.LAST_MONTH,
+        groupBy: CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID,
+    });
+
+    return {
+        key: `${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT}`,
+        translationPath: 'workspace.common.reimburse',
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        icon: 'Bank',
+        searchQuery,
+        get searchQueryJSON() {
+            return buildSearchQueryJSON(this.searchQuery);
+        },
+        get hash() {
+            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+        get similarSearchHash() {
+            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+    };
+}
+
+function createExpensifyCardReconciliationMenuItem(): SearchTypeMenuItem {
+    const searchQuery = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        withdrawalType: CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD,
+        withdrawnOn: CONST.SEARCH.DATE_PRESETS.LAST_MONTH,
+        groupBy: CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID,
+    });
+
+    return {
+        key: `${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD}`,
+        translationPath: 'workspace.common.expensifyCard',
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        icon: 'Bank',
+        searchQuery,
+        get searchQueryJSON() {
+            return buildSearchQueryJSON(this.searchQuery);
+        },
+        get hash() {
+            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
+        },
+        get similarSearchHash() {
+            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+        },
     };
 }
 
@@ -3514,9 +3645,9 @@ function isCorrectSearchUserName(displayName?: string) {
 }
 
 function isTodoSearch(hash: number, suggestedSearches: Record<string, SearchTypeMenuItem>) {
-    const TODO_KEYS: SearchKey[] = [CONST.SEARCH.SEARCH_KEYS.SUBMIT, CONST.SEARCH.SEARCH_KEYS.APPROVE, CONST.SEARCH.SEARCH_KEYS.PAY, CONST.SEARCH.SEARCH_KEYS.EXPORT];
+    const TODO_KEYS = [CONST.SEARCH.SEARCH_KEYS.SUBMIT, CONST.SEARCH.SEARCH_KEYS.APPROVE, CONST.SEARCH.SEARCH_KEYS.PAY, CONST.SEARCH.SEARCH_KEYS.EXPORT];
     const matchedSearchKey = Object.values(suggestedSearches).find((search) => search.hash === hash)?.key;
-    return !!matchedSearchKey && TODO_KEYS.includes(matchedSearchKey);
+    return !!matchedSearchKey && TODO_KEYS.includes(matchedSearchKey as SearchKey);
 }
 
 // eslint-disable-next-line @typescript-eslint/max-params
@@ -3535,9 +3666,46 @@ function createTypeMenuSections(
     reportCounts: {[CONST.SEARCH.SEARCH_KEYS.SUBMIT]: number; [CONST.SEARCH.SEARCH_KEYS.APPROVE]: number; [CONST.SEARCH.SEARCH_KEYS.PAY]: number; [CONST.SEARCH.SEARCH_KEYS.EXPORT]: number},
 ): SearchTypeMenuSection[] {
     const typeMenuSections: SearchTypeMenuSection[] = [];
+    const cardFeedsForAccounting = [
+        ...Object.values(
+            Object.values(cardFeedsByPolicy ?? {})
+                .flat()
+                .reduce<Record<string, CardFeedForDisplay>>((acc, feed) => {
+                    acc[feed.id] = feed;
+                    return acc;
+                }, {}),
+        ),
+        ...(defaultExpensifyCard ? [defaultExpensifyCard] : []),
+    ];
 
     const suggestedSearches = getSuggestedSearches(currentUserAccountID, defaultCardFeed?.id, icons);
     const suggestedSearchesVisibility = getSuggestedSearchesVisibility(currentUserEmail, cardFeedsByPolicy, policies, defaultExpensifyCard);
+    let shouldShowReimbursementsReconciliation = false;
+    let shouldShowExpensifyCardReconciliation = false;
+
+    for (const policy of Object.values(policies ?? {})) {
+        if (!policy) {
+            continue;
+        }
+
+        const isPaidPolicy = isPaidGroupPolicy(policy);
+        const isAdmin = policy.role === CONST.POLICY.ROLE.ADMIN;
+        if (!isPaidPolicy || !isAdmin) {
+            continue;
+        }
+
+        const isPaymentEnabled = arePaymentsEnabled(policy);
+        const hasVBBA = !!policy.achAccount?.bankAccountID && policy.achAccount.state === CONST.BANK_ACCOUNT.STATE.OPEN;
+        const hasReimburser = !!policy.achAccount?.reimburser;
+        const isECardEnabled = !!policy.areExpensifyCardsEnabled;
+
+        shouldShowReimbursementsReconciliation ||= isPaymentEnabled && hasVBBA && hasReimburser;
+        shouldShowExpensifyCardReconciliation ||= isECardEnabled;
+
+        if (shouldShowReimbursementsReconciliation && shouldShowExpensifyCardReconciliation) {
+            break;
+        }
+    }
 
     // Todo section
     {
@@ -3612,53 +3780,86 @@ function createTypeMenuSections(
         }
     }
 
-    // Accounting section
+    // Accounting sections
     {
-        const accountingSection: SearchTypeMenuSection = {
-            translationPath: 'workspace.common.accounting',
-            menuItems: [],
-        };
+        const accountingMenuSections: SearchTypeMenuSection[] = [];
 
-        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.STATEMENTS]) {
-            accountingSection.menuItems.push({
-                ...suggestedSearches[CONST.SEARCH.SEARCH_KEYS.STATEMENTS],
-                emptyState: {
-                    title: 'search.searchResults.emptyStatementsResults.title',
-                    subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
-                },
-            });
-        }
-        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH]) {
-            accountingSection.menuItems.push({
-                ...suggestedSearches[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH],
-                emptyState: {
-                    title: 'search.searchResults.emptyUnapprovedResults.title',
-                    subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle',
-                },
-            });
-        }
-        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD]) {
-            accountingSection.menuItems.push({
-                ...suggestedSearches[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD],
-                emptyState: {
-                    title: 'search.searchResults.emptyUnapprovedResults.title',
-                    subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle',
-                },
-            });
-        }
-        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.RECONCILIATION]) {
-            accountingSection.menuItems.push({
-                ...suggestedSearches[CONST.SEARCH.SEARCH_KEYS.RECONCILIATION],
-                emptyState: {
-                    title: 'search.searchResults.emptyStatementsResults.title',
-                    subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
-                },
+        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.STATEMENTS] && cardFeedsForAccounting.length > 0) {
+            accountingMenuSections.push({
+                translationPath: 'search.cardStatements',
+                menuItems: cardFeedsForAccounting.map<SearchTypeMenuItem>((feed) => ({
+                    ...createCardStatementsMenuItem(feed),
+                    emptyState: {
+                        title: 'search.searchResults.emptyStatementsResults.title',
+                        subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
+                    },
+                })),
             });
         }
 
-        if (accountingSection.menuItems.length > 0) {
-            typeMenuSections.push(accountingSection);
+        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH] || suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD]) {
+            const unapprovedAccrualsMenuItems: SearchTypeMenuItem[] = [];
+
+            if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH]) {
+                unapprovedAccrualsMenuItems.push({
+                    ...createUnapprovedCashMenuItem(),
+                    emptyState: {
+                        title: 'search.searchResults.emptyUnapprovedResults.title',
+                        subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle',
+                    },
+                });
+            }
+
+            if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD] && cardFeedsForAccounting.length > 0) {
+                unapprovedAccrualsMenuItems.push(
+                    ...cardFeedsForAccounting.map<SearchTypeMenuItem>((feed) => ({
+                        ...createUnapprovedCardMenuItem(feed),
+                        emptyState: {
+                            title: 'search.searchResults.emptyUnapprovedResults.title',
+                            subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle',
+                        },
+                    })),
+                );
+            }
+
+            if (unapprovedAccrualsMenuItems.length > 0) {
+                accountingMenuSections.push({
+                    translationPath: 'search.unapprovedAccruals',
+                    menuItems: unapprovedAccrualsMenuItems,
+                });
+            }
         }
+
+        if (shouldShowReimbursementsReconciliation || shouldShowExpensifyCardReconciliation) {
+            const reconciliationMenuItems: SearchTypeMenuItem[] = [];
+
+            if (shouldShowReimbursementsReconciliation) {
+                reconciliationMenuItems.push({
+                    ...createReimbursementReconciliationMenuItem(),
+                    emptyState: {
+                        title: 'search.searchResults.emptyStatementsResults.title',
+                        subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
+                    },
+                });
+            }
+
+            if (shouldShowExpensifyCardReconciliation) {
+                reconciliationMenuItems.push({
+                    ...createExpensifyCardReconciliationMenuItem(),
+                    emptyState: {
+                        title: 'search.searchResults.emptyStatementsResults.title',
+                        subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
+                    },
+                });
+            }
+
+            accountingMenuSections.push({
+                translationPath: 'search.bankReconciliation',
+                menuItems: reconciliationMenuItems,
+            });
+        }
+
+        typeMenuSections.push(...accountingMenuSections);
     }
 
     // Saved section

@@ -230,8 +230,13 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
             return -1;
         }
 
+        const exactMatchIndex = flattenedMenuItems.findIndex((item) => item.hash === hash);
+        if (exactMatchIndex !== -1) {
+            return exactMatchIndex;
+        }
+
         return flattenedMenuItems.findIndex((item) => item.similarSearchHash === similarSearchHash);
-    }, [similarSearchHash, isSavedSearchActive, flattenedMenuItems]);
+    }, [hash, similarSearchHash, isSavedSearchActive, flattenedMenuItems]);
 
     return (
         <>
@@ -272,7 +277,7 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
                                                     key={item.key}
                                                     disabled={false}
                                                     interactive
-                                                    title={translate(item.translationPath)}
+                                                    title={item.title ?? (item.translationPath ? translate(item.translationPath) : '')}
                                                     badgeStyle={styles.todoBadge}
                                                     icon={icon}
                                                     iconWidth={variables.iconSizeNormal}
