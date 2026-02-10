@@ -810,19 +810,9 @@ function getSuggestedSearches(
     };
 }
 
-function createCardStatementsMenuItem(cardFeed: CardFeedForDisplay): SearchTypeMenuItem {
-    const searchQuery = buildQueryStringFromFilterFormValues({
-        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-        feed: [cardFeed.id],
-        groupBy: CONST.SEARCH.GROUP_BY.CARD,
-        postedOn: CONST.SEARCH.DATE_PRESETS.LAST_STATEMENT,
-    });
-
+function createBaseSearchTypeMenuItem(searchQuery: string, overrides: Omit<SearchTypeMenuItem, 'searchQuery' | 'searchQueryJSON' | 'hash' | 'similarSearchHash'>): SearchTypeMenuItem {
     return {
-        key: `${CONST.SEARCH.SEARCH_KEYS.STATEMENTS}_${cardFeed.id}`,
-        title: cardFeed.name,
-        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-        icon: 'CreditCard',
+        ...overrides,
         searchQuery,
         get searchQueryJSON() {
             return buildSearchQueryJSON(this.searchQuery);
@@ -834,6 +824,22 @@ function createCardStatementsMenuItem(cardFeed: CardFeedForDisplay): SearchTypeM
             return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
         },
     };
+}
+
+function createCardStatementsMenuItem(cardFeed: CardFeedForDisplay): SearchTypeMenuItem {
+    const searchQuery = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        feed: [cardFeed.id],
+        groupBy: CONST.SEARCH.GROUP_BY.CARD,
+        postedOn: CONST.SEARCH.DATE_PRESETS.LAST_STATEMENT,
+    });
+
+    return createBaseSearchTypeMenuItem(searchQuery, {
+        key: `${CONST.SEARCH.SEARCH_KEYS.STATEMENTS}_${cardFeed.id}`,
+        title: cardFeed.name,
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        icon: 'CreditCard',
+    });
 }
 
 function createUnapprovedCashMenuItem(): SearchTypeMenuItem {
@@ -844,22 +850,12 @@ function createUnapprovedCashMenuItem(): SearchTypeMenuItem {
         reimbursable: CONST.SEARCH.BOOLEAN.YES,
     });
 
-    return {
+    return createBaseSearchTypeMenuItem(searchQuery, {
         key: CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH,
         translationPath: 'workspace.qbo.accountingMethods.values.CASH',
         type: CONST.SEARCH.DATA_TYPES.EXPENSE,
         icon: 'MoneyHourglass',
-        searchQuery,
-        get searchQueryJSON() {
-            return buildSearchQueryJSON(this.searchQuery);
-        },
-        get hash() {
-            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-        get similarSearchHash() {
-            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-    };
+    });
 }
 
 function createUnapprovedCardMenuItem(cardFeed: CardFeedForDisplay): SearchTypeMenuItem {
@@ -870,22 +866,12 @@ function createUnapprovedCardMenuItem(cardFeed: CardFeedForDisplay): SearchTypeM
         status: [CONST.SEARCH.STATUS.EXPENSE.DRAFTS, CONST.SEARCH.STATUS.EXPENSE.OUTSTANDING],
     });
 
-    return {
+    return createBaseSearchTypeMenuItem(searchQuery, {
         key: `${CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD}_${cardFeed.id}`,
         title: cardFeed.name,
         type: CONST.SEARCH.DATA_TYPES.EXPENSE,
         icon: 'CreditCardHourglass',
-        searchQuery,
-        get searchQueryJSON() {
-            return buildSearchQueryJSON(this.searchQuery);
-        },
-        get hash() {
-            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-        get similarSearchHash() {
-            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-    };
+    });
 }
 
 function createReimbursementReconciliationMenuItem(): SearchTypeMenuItem {
@@ -896,22 +882,12 @@ function createReimbursementReconciliationMenuItem(): SearchTypeMenuItem {
         groupBy: CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID,
     });
 
-    return {
+    return createBaseSearchTypeMenuItem(searchQuery, {
         key: `${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT}`,
         translationPath: 'workspace.common.reimburse',
         type: CONST.SEARCH.DATA_TYPES.EXPENSE,
         icon: 'Bank',
-        searchQuery,
-        get searchQueryJSON() {
-            return buildSearchQueryJSON(this.searchQuery);
-        },
-        get hash() {
-            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-        get similarSearchHash() {
-            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-    };
+    });
 }
 
 function createExpensifyCardReconciliationMenuItem(): SearchTypeMenuItem {
@@ -922,22 +898,12 @@ function createExpensifyCardReconciliationMenuItem(): SearchTypeMenuItem {
         groupBy: CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID,
     });
 
-    return {
+    return createBaseSearchTypeMenuItem(searchQuery, {
         key: `${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD}`,
         translationPath: 'workspace.common.expensifyCard',
         type: CONST.SEARCH.DATA_TYPES.EXPENSE,
         icon: 'Bank',
-        searchQuery,
-        get searchQueryJSON() {
-            return buildSearchQueryJSON(this.searchQuery);
-        },
-        get hash() {
-            return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-        get similarSearchHash() {
-            return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
-        },
-    };
+    });
 }
 
 function getDefaultActionableSearchMenuItem(menuItems: SearchTypeMenuItem[]) {
@@ -3784,16 +3750,21 @@ function createTypeMenuSections(
     // Accounting sections
     {
         const accountingMenuSections: SearchTypeMenuSection[] = [];
+        const statementsEmptyState = {
+            title: 'search.searchResults.emptyStatementsResults.title' as const,
+            subtitle: 'search.searchResults.emptyStatementsResults.subtitle' as const,
+        };
+        const unapprovedEmptyState = {
+            title: 'search.searchResults.emptyUnapprovedResults.title' as const,
+            subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle' as const,
+        };
 
         if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.STATEMENTS] && cardFeedsForAccounting.length > 0) {
             accountingMenuSections.push({
                 translationPath: 'search.cardStatements',
                 menuItems: cardFeedsForAccounting.map<SearchTypeMenuItem>((feed) => ({
                     ...createCardStatementsMenuItem(feed),
-                    emptyState: {
-                        title: 'search.searchResults.emptyStatementsResults.title',
-                        subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
-                    },
+                    emptyState: statementsEmptyState,
                 })),
             });
         }
@@ -3804,10 +3775,7 @@ function createTypeMenuSections(
             if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH]) {
                 unapprovedAccrualsMenuItems.push({
                     ...createUnapprovedCashMenuItem(),
-                    emptyState: {
-                        title: 'search.searchResults.emptyUnapprovedResults.title',
-                        subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle',
-                    },
+                    emptyState: unapprovedEmptyState,
                 });
             }
 
@@ -3815,10 +3783,7 @@ function createTypeMenuSections(
                 unapprovedAccrualsMenuItems.push(
                     ...cardFeedsForAccounting.map<SearchTypeMenuItem>((feed) => ({
                         ...createUnapprovedCardMenuItem(feed),
-                        emptyState: {
-                            title: 'search.searchResults.emptyUnapprovedResults.title',
-                            subtitle: 'search.searchResults.emptyUnapprovedResults.subtitle',
-                        },
+                        emptyState: unapprovedEmptyState,
                     })),
                 );
             }
@@ -3837,20 +3802,14 @@ function createTypeMenuSections(
             if (shouldShowReimbursementsReconciliation) {
                 reconciliationMenuItems.push({
                     ...createReimbursementReconciliationMenuItem(),
-                    emptyState: {
-                        title: 'search.searchResults.emptyStatementsResults.title',
-                        subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
-                    },
+                    emptyState: statementsEmptyState,
                 });
             }
 
             if (shouldShowExpensifyCardReconciliation) {
                 reconciliationMenuItems.push({
                     ...createExpensifyCardReconciliationMenuItem(),
-                    emptyState: {
-                        title: 'search.searchResults.emptyStatementsResults.title',
-                        subtitle: 'search.searchResults.emptyStatementsResults.subtitle',
-                    },
+                    emptyState: statementsEmptyState,
                 });
             }
 
