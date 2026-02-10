@@ -83,7 +83,7 @@ function IOURequestStepTime({
             return;
         }
 
-        if (transaction?.isFromGlobalCreate) {
+        if (transaction?.isFromGlobalCreate || iouType === CONST.IOU.TYPE.TRACK) {
             if (hasMoreThanOnePolicyWithPerDiemEnabled) {
                 Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_DESTINATION.getRoute(action, iouType, transactionID, reportID));
                 return;

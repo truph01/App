@@ -12,7 +12,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useSearchResults from '@hooks/useSearchResults';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {sortWorkspacesBySelected} from '@libs/PolicyUtils';
+import {getPolicyByCustomUnitID, sortWorkspacesBySelected} from '@libs/PolicyUtils';
 import {getDefaultWorkspaceAvatar} from '@libs/ReportUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
 import CONST from '@src/CONST';
@@ -42,13 +42,16 @@ function BaseRequestStepWorkspace({transaction, getPolicies, onSelectWorkspace}:
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const selectedWorkspace = transaction?.participants?.[0];
+    const customUnitPolicy = getPolicyByCustomUnitID(transaction, allPolicies);
+    const initiallyFocusedKey = selectedWorkspace?.policyID ?? customUnitPolicy?.id;
+
     const availableWorkspaces = getPolicies(allPolicies, currentUserLogin);
     const workspaceOptions: WorkspaceListItem[] = availableWorkspaces
         .sort((policy1, policy2) =>
             sortWorkspacesBySelected(
                 {policyID: policy1.id, name: policy1.name},
                 {policyID: policy2.id, name: policy2.name},
-                selectedWorkspace?.policyID ? [selectedWorkspace?.policyID] : [],
+                initiallyFocusedKey ? [initiallyFocusedKey] : [],
                 localeCompare,
             ),
         )
@@ -65,7 +68,7 @@ function BaseRequestStepWorkspace({transaction, getPolicies, onSelectWorkspace}:
                     type: CONST.ICON_TYPE_WORKSPACE,
                 },
             ],
-            isSelected: selectedWorkspace?.policyID === policy.id,
+            isSelected: initiallyFocusedKey === policy.id,
         }));
 
     const filterWorkspace = (workspaceOption: WorkspaceListItem, searchInput: string) => {
@@ -92,12 +95,12 @@ function BaseRequestStepWorkspace({transaction, getPolicies, onSelectWorkspace}:
                 </View>
             )}
             <SelectionList
-                key={selectedWorkspace?.policyID}
+                key={initiallyFocusedKey}
                 data={filteredWorkspaceOptions}
                 onSelectRow={selectWorkspace}
                 shouldSingleExecuteRowSelect
                 ListItem={UserListItem}
-                initiallyFocusedItemKey={selectedWorkspace?.policyID}
+                initiallyFocusedItemKey={initiallyFocusedKey}
             />
         </>
     );
