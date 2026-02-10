@@ -467,16 +467,15 @@ function ReportActionCompose({
         setIsComposerFullSize(reportID, false);
 
         scheduleOnUI(() => {
-            const {clearWorklet: clearComposer} = composerRefShared.get();
+            const {clearWorklet} = composerRefShared.get();
 
-            if (!clearComposer) {
-                throw new Error('The composerRefShared.clear function is not set yet. This should never happen, and indicates a developer error.');
+            if (!clearWorklet) {
+                throw new Error('The composerRef.clearWorklet function is not set yet. This should never happen, and indicates a developer error.');
             }
 
-            // This will cause onCleared to be triggered where we actually send the message
-            clearComposer?.();
+            clearWorklet?.();
         });
-    }, [isSendDisabled, debouncedValidate, composerRefShared, reportID]);
+    }, [isSendDisabled, debouncedValidate, reportID, composerRefShared]);
 
     onSubmitAction = handleSendMessage;
 
