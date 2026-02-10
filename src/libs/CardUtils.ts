@@ -274,8 +274,46 @@ function lastFourNumbersFromCardName(cardName: string | undefined): string {
     return match[1];
 }
 
+/**
+ * Checks if a card matches a given card identifier (encrypted card number or card name).
+ * Uses exact match for encrypted card numbers, and normalized string comparison
+ * for card names to handle special character differences from OAuth providers (e.g., ® vs no ®).
+ *
+ * @param card - The card to check
+ * @param encryptedCardNumber - The encrypted card number to match against
+ * @param cardName - The card name to match against
+ * @returns true if the card matches either identifier
+ */
+function isMatchingCard(card: Card, encryptedCardNumber: string, cardName: string): boolean {
+    if (card.encryptedCardNumber === encryptedCardNumber) {
+        return true;
+    }
+
+    if (!card.cardName || !cardName) {
+        return false;
+    }
+
+    // Normalize both strings to remove special characters (®, ™, ©, etc.)
+    // This handles differences between OAuth provider card names and stored card names
+    const normalize = (str: string) => str.replaceAll(/[^\w\s-]/g, '').trim();
+    return normalize(card.cardName) === normalize(cardName);
+}
+
 function getMCardNumberString(cardNumber: string): string {
     return cardNumber.replaceAll(/\s/g, '');
+}
+
+/**
+ * Returns the default Expensify Card limit type based on policy approval workflow.
+ * When approvals are configured (not optional), defaults to SMART; otherwise MONTHLY.
+ */
+function getDefaultExpensifyCardLimitType(policy?: OnyxEntry<Policy>): ValueOf<typeof CONST.EXPENSIFY_CARD.LIMIT_TYPES> {
+    let approvalMode = policy?.approvalMode ?? CONST.POLICY.APPROVAL_MODE.ADVANCED;
+    if (policy?.type === CONST.POLICY.TYPE.PERSONAL) {
+        approvalMode = CONST.POLICY.APPROVAL_MODE.OPTIONAL;
+    }
+    const areApprovalsConfigured = approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL;
+    return areApprovalsConfigured ? CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART : CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY;
 }
 
 function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY_CARD.LIMIT_TYPES> | undefined): TranslationPaths | '' {
@@ -286,6 +324,8 @@ function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY
             return 'workspace.card.issueNewCard.fixedAmount';
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY:
             return 'workspace.card.issueNewCard.monthly';
+        case CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE:
+            return 'workspace.card.issueNewCard.singleUse';
         default:
             return '';
     }
@@ -364,6 +404,7 @@ function getCardFeedIcon(cardFeed: CompanyCardFeed | typeof CONST.EXPENSIFY_CARD
         [CONST.COMPANY_CARD.FEED_BANK_NAME.STRIPE]: companyCardIllustrations.StripeCompanyCardDetailLarge,
         [CONST.COMPANY_CARD.FEED_BANK_NAME.CSV]: illustrations.GenericCSVCompanyCardLarge,
         [CONST.COMPANY_CARD.FEED_BANK_NAME.PEX]: illustrations.GenericCompanyCardLarge,
+        [CONST.COMPANY_CARD.FEED_BANK_NAME.MOCK_BANK]: illustrations.GenericCompanyCardLarge,
         [CONST.EXPENSIFY_CARD.BANK]: Illustrations.ExpensifyCardImage,
     };
 
@@ -451,6 +492,7 @@ function getBankName(feedType: CompanyCardFeed): string {
         [CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_1205]: 'American Express',
         [CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_FILE_DOWNLOAD]: 'American Express',
         [CONST.COMPANY_CARD.FEED_BANK_NAME.PEX]: 'PEX',
+        [CONST.COMPANY_CARD.FEED_BANK_NAME.MOCK_BANK]: CONST.COMPANY_CARDS.BANKS.MOCK_BANK,
     };
 
     // In existing OldDot setups other variations of feeds could exist, ex: vcf2, vcf3, oauth.americanexpressfdx.com 2003
@@ -477,6 +519,7 @@ const getBankCardDetailsImage = (bank: ValueOf<typeof CONST.COMPANY_CARDS.BANKS>
         [CONST.COMPANY_CARDS.BANKS.WELLS_FARGO]: companyCardIllustrations.WellsFargoCompanyCardDetail,
         [CONST.COMPANY_CARDS.BANKS.BREX]: companyCardIllustrations.BrexCompanyCardDetail,
         [CONST.COMPANY_CARDS.BANKS.STRIPE]: companyCardIllustrations.StripeCompanyCardDetail,
+        [CONST.COMPANY_CARDS.BANKS.MOCK_BANK]: illustrations.GenericCompanyCard,
         [CONST.COMPANY_CARDS.BANKS.OTHER]: illustrations.GenericCompanyCard,
     };
     return iconMap[bank];
@@ -947,7 +990,7 @@ function isCardAlreadyAssigned(cardNumberToCheck: string, workspaceCardFeeds: On
         }
         const {cardList, ...assignedCards} = workspaceCards;
         return Object.values(assignedCards).some(
-            (card) => card?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && (card?.encryptedCardNumber === cardNumberToCheck || card?.cardName === cardNumberToCheck),
+            (card) => card && card.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && isMatchingCard(card, cardNumberToCheck, cardNumberToCheck),
         );
     });
 }
@@ -981,6 +1024,7 @@ function hasDisplayableAssignedCards(cardList: CardList | undefined): boolean {
 
 export {
     getAssignedCardSortKey,
+    getDefaultExpensifyCardLimitType,
     isExpensifyCard,
     getDomainCards,
     formatCardExpiration,
@@ -1024,6 +1068,7 @@ export {
     isCardConnectionBroken,
     isSmartLimitEnabled,
     lastFourNumbersFromCardName,
+    isMatchingCard,
     hasIssuedExpensifyCard,
     isExpensifyCardFullySetUp,
     filterInactiveCards,

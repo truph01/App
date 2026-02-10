@@ -60,7 +60,6 @@ import {
     getAllReportActionsErrorsAndReportActionThatRequiresAttention,
     getApprovalChain,
     getAvailableReportFields,
-    getBillableAndTaxTotal,
     getChatByParticipants,
     getChatRoomSubtitle,
     getDefaultWorkspaceAvatar,
@@ -86,6 +85,7 @@ import {
     getReportOrDraftReport,
     getReportPreviewMessage,
     getReportStatusTranslation,
+    getReportSubtitlePrefix,
     getWorkspaceIcon,
     getWorkspaceNameUpdatedMessage,
     hasActionWithErrorsForTransaction,
@@ -483,7 +483,6 @@ describe('ReportUtils', () => {
                             title,
                             description: () => '',
                             autoCompleted: false,
-                            mediaAttributes: {},
                         },
                     ],
                 },
@@ -513,7 +512,6 @@ describe('ReportUtils', () => {
                             title: () => '',
                             description,
                             autoCompleted: false,
-                            mediaAttributes: {},
                         },
                     ],
                 },
@@ -542,7 +540,7 @@ describe('ReportUtils', () => {
                 engagementChoice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
                 onboardingMessage: {
                     message: 'This is a test',
-                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false, mediaAttributes: {}}],
+                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false}],
                 },
                 adminsChatReportID,
                 selectedInterestedFeatures: ['areCompanyCardsEnabled'],
@@ -565,7 +563,7 @@ describe('ReportUtils', () => {
                 engagementChoice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
                 onboardingMessage: {
                     message: 'This is a test',
-                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false, mediaAttributes: {}}],
+                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false}],
                 },
                 adminsChatReportID,
                 selectedInterestedFeatures: ['areCompanyCardsEnabled'],
@@ -584,7 +582,7 @@ describe('ReportUtils', () => {
                 engagementChoice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
                 onboardingMessage: {
                     message: 'This is a test',
-                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false, mediaAttributes: {}}],
+                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false}],
                 },
                 adminsChatReportID,
                 selectedInterestedFeatures: ['areCompanyCardsEnabled'],
@@ -600,7 +598,7 @@ describe('ReportUtils', () => {
                 engagementChoice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
                 onboardingMessage: {
                     message: 'This is a test',
-                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false, mediaAttributes: {}}],
+                    tasks: [{type: CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD, title: () => '', description: () => '', autoCompleted: false}],
                 },
                 adminsChatReportID: '1',
                 selectedInterestedFeatures: ['categories', 'accounting', 'tags'],
@@ -650,7 +648,6 @@ describe('ReportUtils', () => {
                             title,
                             description,
                             autoCompleted: false,
-                            mediaAttributes: {},
                         },
                     ],
                 },
@@ -3789,7 +3786,7 @@ describe('ReportUtils', () => {
         });
 
         it('should return false if the report is neither the system or concierge chat', () => {
-            expect(isChatUsedForOnboarding(LHNTestUtils.getFakeReport(), undefined)).toBeFalsy();
+            expect(isChatUsedForOnboarding(LHNTestUtils.getFakeReport(), undefined, undefined)).toBeFalsy();
         });
 
         it('should return false if the user account ID is odd and report is the system chat - only the Concierge chat chat should be the onboarding chat for users without the onboarding NVP', async () => {
@@ -3809,7 +3806,7 @@ describe('ReportUtils', () => {
                 chatType: CONST.REPORT.CHAT_TYPE.SYSTEM,
             };
 
-            expect(isChatUsedForOnboarding(report, undefined)).toBeFalsy();
+            expect(isChatUsedForOnboarding(report, undefined, undefined)).toBeFalsy();
         });
 
         it('should return true if the user account ID is even and report is the concierge chat', async () => {
@@ -3843,13 +3840,13 @@ describe('ReportUtils', () => {
                 ...LHNTestUtils.getFakeReport(),
                 reportID,
             };
-            expect(isChatUsedForOnboarding(report1, onboardingValue)).toBeTruthy();
+            expect(isChatUsedForOnboarding(report1, onboardingValue, undefined)).toBeTruthy();
 
             const report2: Report = {
                 ...LHNTestUtils.getFakeReport(),
                 reportID: '8011',
             };
-            expect(isChatUsedForOnboarding(report2, onboardingValue)).toBeFalsy();
+            expect(isChatUsedForOnboarding(report2, onboardingValue, undefined)).toBeFalsy();
         });
 
         it('should return true for admins rooms chat when posting tasks in admins room', async () => {
@@ -3863,7 +3860,31 @@ describe('ReportUtils', () => {
                 ...LHNTestUtils.getFakeReport(),
                 chatType: CONST.REPORT.CHAT_TYPE.POLICY_ADMINS,
             };
-            expect(isChatUsedForOnboarding(report, onboardingValue, CONST.ONBOARDING_CHOICES.MANAGE_TEAM)).toBeTruthy();
+            expect(isChatUsedForOnboarding(report, onboardingValue, undefined, CONST.ONBOARDING_CHOICES.MANAGE_TEAM)).toBeTruthy();
+        });
+
+        it('should return true for concierge chat when conciergeReportID matches report ID', async () => {
+            const conciergeReportID = '12345';
+            const report: Report = {
+                ...LHNTestUtils.getFakeReport(),
+                reportID: conciergeReportID,
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`, report);
+
+            expect(isChatUsedForOnboarding(report, undefined, conciergeReportID)).toBeTruthy();
+        });
+
+        it('should return false when conciergeReportID does not match report ID and no onboarding NVP', async () => {
+            const conciergeReportID = '12345';
+            const report: Report = {
+                ...LHNTestUtils.getFakeReport(),
+                reportID: '99999',
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`, report);
+
+            expect(isChatUsedForOnboarding(report, undefined, conciergeReportID)).toBeFalsy();
         });
     });
 
@@ -5859,6 +5880,11 @@ describe('ReportUtils', () => {
                 ...policyTest,
                 role: CONST.POLICY.ROLE.ADMIN,
                 reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES,
+                employeeList: {
+                    [adminEmail]: {
+                        role: CONST.POLICY.ROLE.ADMIN,
+                    },
+                },
                 achAccount: {
                     reimburser: reimburserEmail,
                     bankAccountID,
@@ -5899,6 +5925,11 @@ describe('ReportUtils', () => {
                 ...policyTest,
                 role: CONST.POLICY.ROLE.ADMIN,
                 reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES,
+                employeeList: {
+                    [adminEmail]: {
+                        role: CONST.POLICY.ROLE.ADMIN,
+                    },
+                },
                 achAccount: {
                     reimburser: reimburserEmail,
                     bankAccountID,
@@ -5926,6 +5957,52 @@ describe('ReportUtils', () => {
             };
 
             expect(isPayer(adminAccountID, adminEmail, report, bankAccountList, policyWithAch, false)).toBe(false);
+        });
+
+        it('should return false when user left workspace and policy is not available', async () => {
+            // Clear the policy to simulate user leaving workspace
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}left-workspace`, null);
+
+            const reportWithMissingPolicy: Report = {
+                ...createRandomReport(6, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+                policyID: 'left-workspace',
+                managerID: currentUserAccountID,
+            };
+
+            // User should not be a payer when policy is not available (they likely left the workspace)
+            expect(isPayer(currentUserAccountID, currentUserEmail, reportWithMissingPolicy, undefined, undefined, false)).toBe(false);
+        });
+
+        it('should return false when user is not in employeeList of a paid group policy', async () => {
+            const otherUserEmail = 'other@test.com';
+            const policyWithoutCurrentUser: Policy = {
+                ...createRandomPolicy(2),
+                id: 'policy-without-user',
+                type: CONST.POLICY.TYPE.CORPORATE,
+                role: CONST.POLICY.ROLE.ADMIN, // Role might be stale
+                employeeList: {
+                    [otherUserEmail]: {
+                        role: CONST.POLICY.ROLE.ADMIN,
+                    },
+                },
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}policy-without-user`, policyWithoutCurrentUser);
+
+            const reportForNonMember: Report = {
+                ...createRandomReport(7, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+                policyID: 'policy-without-user',
+                managerID: currentUserAccountID,
+            };
+
+            // User should not be a payer even if role says admin, because they're not in employeeList
+            expect(isPayer(currentUserAccountID, currentUserEmail, reportForNonMember, undefined, policyWithoutCurrentUser, false)).toBe(false);
         });
     });
     describe('buildReportNameFromParticipantNames', () => {
@@ -7698,19 +7775,19 @@ describe('ReportUtils', () => {
             });
 
             it('should return true for an archived expense report with an action that can be flagged', () => {
-                expect(shouldShowFlagComment(reportActionThatCanBeFlagged, expenseReport, true)).toBe(true);
+                expect(shouldShowFlagComment(reportActionThatCanBeFlagged, expenseReport, undefined, true)).toBe(true);
             });
 
             it('should return true for a non-archived expense report with an action that can be flagged', () => {
-                expect(shouldShowFlagComment(reportActionThatCanBeFlagged, expenseReport, false)).toBe(true);
+                expect(shouldShowFlagComment(reportActionThatCanBeFlagged, expenseReport, undefined, false)).toBe(true);
             });
 
             it('should return false for an archived expense report with an action that cannot be flagged', () => {
-                expect(shouldShowFlagComment(reportActionThatCannotBeFlagged, expenseReport, true)).toBe(false);
+                expect(shouldShowFlagComment(reportActionThatCannotBeFlagged, expenseReport, undefined, true)).toBe(false);
             });
 
             it('should return false for a non-archived expense report with an action that cannot be flagged', () => {
-                expect(shouldShowFlagComment(reportActionThatCannotBeFlagged, expenseReport, false)).toBe(false);
+                expect(shouldShowFlagComment(reportActionThatCannotBeFlagged, expenseReport, undefined, false)).toBe(false);
             });
         });
 
@@ -7731,11 +7808,11 @@ describe('ReportUtils', () => {
             });
 
             it('should return false for an archived chat report', () => {
-                expect(shouldShowFlagComment(validReportAction, chatReport, true)).toBe(false);
+                expect(shouldShowFlagComment(validReportAction, chatReport, undefined, true)).toBe(false);
             });
 
             it('should return false for a non-archived chat report', () => {
-                expect(shouldShowFlagComment(validReportAction, chatReport, false)).toBe(false);
+                expect(shouldShowFlagComment(validReportAction, chatReport, undefined, false)).toBe(false);
             });
         });
 
@@ -7758,11 +7835,11 @@ describe('ReportUtils', () => {
             });
 
             it('should return false for an archived chat report', () => {
-                expect(shouldShowFlagComment(validReportAction, chatReport, true)).toBe(false);
+                expect(shouldShowFlagComment(validReportAction, chatReport, chatReport.reportID, true)).toBe(false);
             });
 
             it('should return false for a non-archived chat report', () => {
-                expect(shouldShowFlagComment(validReportAction, chatReport, false)).toBe(false);
+                expect(shouldShowFlagComment(validReportAction, chatReport, chatReport.reportID, false)).toBe(false);
             });
         });
 
@@ -7787,11 +7864,36 @@ describe('ReportUtils', () => {
             });
 
             it('should return false for an archived chat report', () => {
-                expect(shouldShowFlagComment(actionFromConcierge, chatReport, true)).toBe(false);
+                expect(shouldShowFlagComment(actionFromConcierge, chatReport, undefined, true)).toBe(false);
             });
 
             it('should return false for a non-archived chat report', () => {
-                expect(shouldShowFlagComment(actionFromConcierge, chatReport, false)).toBe(false);
+                expect(shouldShowFlagComment(actionFromConcierge, chatReport, undefined, false)).toBe(false);
+            });
+        });
+
+        describe('Regular chat with conciergeReportID specified', () => {
+            let chatReport: Report;
+            const conciergeReportID = '999999';
+
+            beforeAll(async () => {
+                chatReport = {
+                    ...createRandomReport(60000, undefined),
+                    type: CONST.REPORT.TYPE.CHAT,
+                };
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReport.reportID}`, chatReport);
+            });
+
+            afterAll(async () => {
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReport.reportID}`, null);
+            });
+
+            it('should return true for a regular chat when conciergeReportID does not match', () => {
+                expect(shouldShowFlagComment(validReportAction, chatReport, conciergeReportID, false)).toBe(true);
+            });
+
+            it('should return false for a chat when conciergeReportID matches the report', () => {
+                expect(shouldShowFlagComment(validReportAction, chatReport, chatReport.reportID, false)).toBe(false);
             });
         });
     });
@@ -11776,6 +11878,60 @@ describe('ReportUtils', () => {
         });
     });
 
+    describe('getReportSubtitlePrefix', () => {
+        it('should return empty string if it is not a chat room', () => {
+            const report = createExpenseReport(1);
+            const result = getReportSubtitlePrefix(report);
+
+            expect(result).toBe('');
+        });
+
+        it('should return empty string if it is not a policy expense chat', () => {
+            const report = createRegularChat(1, [currentUserAccountID, 2]);
+            const result = getReportSubtitlePrefix(report);
+
+            expect(result).toBe('');
+        });
+
+        it('should return empty string if it is a chat thread', () => {
+            const report = createWorkspaceThread(1);
+            const result = getReportSubtitlePrefix(report);
+
+            expect(result).toBe('');
+        });
+
+        it('should return empty string if there are less than two policies', () => {
+            const report = createAdminRoom(1);
+            const result = getReportSubtitlePrefix(report);
+
+            expect(result).toBe('');
+        });
+
+        it('should return the policy name if there are two policies', async () => {
+            const report = createInvoiceRoom(1);
+
+            const policy1 = createRandomPolicy(1, CONST.POLICY.TYPE.TEAM, 'Invoice Policy');
+            policy1.isJoinRequestPending = true;
+            policy1.pendingAction = undefined;
+            // Remove role to simulate join request pending state
+            // @ts-expect-error Deleting required property for test
+            delete policy1.role;
+
+            const policy2 = createRandomPolicy(2, CONST.POLICY.TYPE.TEAM, 'Other Policy');
+            policy2.role = CONST.POLICY.ROLE.ADMIN;
+            policy2.pendingAction = undefined;
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policy1.id}`, policy1);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policy2.id}`, policy2);
+
+            await waitForBatchedUpdates();
+
+            const result = getReportSubtitlePrefix(report);
+
+            expect(result).toBe(`Invoice Policy ${CONST.DOT_SEPARATOR} `);
+        });
+    });
+
     describe('hasActionWithErrorsForTransaction', () => {
         it('should return false when reportID is undefined', () => {
             const transaction = createRandomTransaction(1);
@@ -12019,148 +12175,6 @@ describe('ReportUtils', () => {
                 policies: [],
             });
             expect(result).toBe('Report Fallback Name');
-        });
-    });
-
-    describe('getBillableAndTaxTotal', () => {
-        const expenseReport: Report = {
-            ...createExpenseReport(1),
-            reportID: 'expense-1',
-            currency: CONST.CURRENCY.USD,
-        };
-
-        const chatReport: Report = {
-            ...createRandomReport(2, undefined),
-            type: CONST.REPORT.TYPE.CHAT,
-            reportID: 'chat-1',
-        };
-
-        it('should return zeros when report is undefined', () => {
-            expect(getBillableAndTaxTotal(undefined, [])).toEqual({
-                billableTotal: 0,
-                taxTotal: 0,
-            });
-        });
-
-        it('should return zeros when report is not an expense report', () => {
-            const transaction = createRandomTransaction(1);
-            expect(getBillableAndTaxTotal(chatReport, [transaction])).toEqual({
-                billableTotal: 0,
-                taxTotal: 0,
-            });
-        });
-
-        it('should return zeros when expense report has no transactions', () => {
-            expect(getBillableAndTaxTotal(expenseReport, [])).toEqual({
-                billableTotal: 0,
-                taxTotal: 0,
-            });
-        });
-
-        it('should sum billable amount and tax when transaction currency matches report currency', async () => {
-            const transaction = {
-                ...createRandomTransaction(1),
-                reportID: expenseReport.reportID,
-                amount: -100,
-                taxAmount: -10,
-                currency: CONST.CURRENCY.USD,
-                billable: true,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
-            await waitForBatchedUpdates();
-
-            expect(getBillableAndTaxTotal(expenseReport, [transaction])).toEqual({
-                billableTotal: 100,
-                taxTotal: 10,
-            });
-        });
-
-        it('should use convertedAmount and convertedTaxAmount when transaction currency differs from report', async () => {
-            const transaction = {
-                ...createRandomTransaction(1),
-                reportID: expenseReport.reportID,
-                amount: -100,
-                taxAmount: -10,
-                currency: CONST.CURRENCY.EUR,
-                billable: true,
-                convertedAmount: -80,
-                convertedTaxAmount: -8,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
-            await waitForBatchedUpdates();
-
-            expect(getBillableAndTaxTotal(expenseReport, [transaction])).toEqual({
-                billableTotal: 80,
-                taxTotal: 8,
-            });
-        });
-
-        it('should not add to billableTotal when billable is false', async () => {
-            const transaction = {
-                ...createRandomTransaction(1),
-                reportID: expenseReport.reportID,
-                amount: -100,
-                taxAmount: 0,
-                currency: CONST.CURRENCY.USD,
-                billable: false,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
-            await waitForBatchedUpdates();
-
-            expect(getBillableAndTaxTotal(expenseReport, [transaction])).toEqual({
-                billableTotal: 0,
-                taxTotal: 0,
-            });
-        });
-
-        it('should not add to taxTotal when taxAmount is zero', async () => {
-            const transaction = {
-                ...createRandomTransaction(1),
-                reportID: expenseReport.reportID,
-                amount: -100,
-                taxAmount: 0,
-                currency: CONST.CURRENCY.USD,
-                billable: true,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
-            await waitForBatchedUpdates();
-
-            expect(getBillableAndTaxTotal(expenseReport, [transaction])).toEqual({
-                billableTotal: 100,
-                taxTotal: 0,
-            });
-        });
-
-        it('should sum multiple transactions with same currency', async () => {
-            const transaction1 = {
-                ...createRandomTransaction(1),
-                reportID: expenseReport.reportID,
-                amount: -50,
-                taxAmount: -5,
-                currency: CONST.CURRENCY.USD,
-                billable: true,
-            };
-            const transaction2 = {
-                ...createRandomTransaction(2),
-                reportID: expenseReport.reportID,
-                amount: -75,
-                taxAmount: -7,
-                currency: CONST.CURRENCY.USD,
-                billable: true,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction1.transactionID}`, transaction1);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction2.transactionID}`, transaction2);
-            await waitForBatchedUpdates();
-
-            expect(getBillableAndTaxTotal(expenseReport, [transaction1, transaction2])).toEqual({
-                billableTotal: 125,
-                taxTotal: 12,
-            });
         });
     });
 });
