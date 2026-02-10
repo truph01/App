@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import com.expensify.chat.R;
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -30,7 +31,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @ReactModule(name = BootSplashModule.NAME)
-public class BootSplashModule extends ReactContextBaseJavaModule {
+public class BootSplashModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
   public static final String NAME = "BootSplash";
   private static final BootSplashQueue<Promise> mPromiseQueue = new BootSplashQueue<>();
@@ -41,6 +42,26 @@ public class BootSplashModule extends ReactContextBaseJavaModule {
 
   public BootSplashModule(ReactApplicationContext reactContext) {
     super(reactContext);
+    reactContext.addLifecycleEventListener(this);
+  }
+
+  @Override
+  public void onHostResume() {}
+
+  @Override
+  public void onHostPause() {}
+
+  @Override
+  public void onHostDestroy() {
+    mShouldKeepOnScreen = false;
+    clearPromiseQueue();
+
+    if (mDialog != null) {
+      try {
+        mDialog.dismiss();
+      } catch (Exception ignored) {}
+      mDialog = null;
+    }
   }
 
   @Override
