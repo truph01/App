@@ -29,9 +29,12 @@ type DistanceRequestProps = {
 
     /** Whether the item is disabled */
     disabled?: boolean;
+
+    /** Label used for Sentry INP attribution */
+    sentryLabel?: string;
 };
 
-function DistanceRequestRenderItem({waypoints, item = '', onSecondaryInteraction, getIndex, isActive = false, onPress = () => {}, disabled = false}: DistanceRequestProps) {
+function DistanceRequestRenderItem({waypoints, item = '', onSecondaryInteraction, getIndex, isActive = false, onPress = () => {}, disabled = false, sentryLabel}: DistanceRequestProps) {
     const theme = useTheme();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Location', 'DotIndicatorUnfilled', 'DotIndicator', 'DragHandles']);
     const {translate} = useLocalize();
@@ -73,6 +76,7 @@ function DistanceRequestRenderItem({waypoints, item = '', onSecondaryInteraction
             disabled={disabled}
             errorText={errorText}
             brickRoadIndicator={errorText ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+            sentryLabel={sentryLabel}
         />
     );
 }

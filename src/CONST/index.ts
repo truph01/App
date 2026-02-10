@@ -8337,6 +8337,8 @@ const CONST = {
             GPS_NEXT_BUTTON: 'IOURequestStep-GPSNextButton',
             GPS_OPEN_MOBILE_BUTTON: 'IOURequestStep-GPSOpenMobileButton',
             WAYPOINT_REMOVE_BUTTON: 'IOURequestStep-WaypointRemoveButton',
+            WAYPOINT_START_MENU_ITEM: 'IOURequestStep-WaypointStartMenuItem',
+            WAYPOINT_STOP_MENU_ITEM: 'IOURequestStep-WaypointStopMenuItem',
             EDIT_CATEGORIES_BUTTON: 'IOURequestStep-CategoryEditButton',
             EDIT_TAGS_BUTTON: 'IOURequestStep-TagEditButton',
             EDIT_PER_DIEM_RATES_BUTTON: 'IOURequestStep-EditPerDiemRatesButton',
