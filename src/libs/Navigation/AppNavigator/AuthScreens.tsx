@@ -216,6 +216,8 @@ function AuthScreens() {
     }, [theme]);
 
     useEffect(() => {
+        console.log('Timing Fully refetching');
+
         const shortcutsOverviewShortcutConfig = CONST.KEYBOARD_SHORTCUTS.SHORTCUTS;
         const searchShortcutConfig = CONST.KEYBOARD_SHORTCUTS.SEARCH;
         const chatShortcutConfig = CONST.KEYBOARD_SHORTCUTS.NEW_CHAT;

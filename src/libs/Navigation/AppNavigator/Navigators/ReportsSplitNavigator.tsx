@@ -28,8 +28,6 @@ function ReportsSplitNavigator({route}: PlatformStackScreenProps<AuthScreensPara
     const {isBetaEnabled} = usePermissions();
     const splitNavigatorScreenOptions = useSplitNavigatorScreenOptions();
 
-    console.log('Timing Rerendered');
-
     const [initialReportID] = useState(() => {
         const currentURL = getCurrentUrl();
         // Determine if the current URL indicates a transition.
@@ -52,7 +50,8 @@ function ReportsSplitNavigator({route}: PlatformStackScreenProps<AuthScreensPara
     });
 
     // This hook preloads the screens of adjacent tabs to make changing tabs faster.
-    usePreloadFullScreenNavigators();
+    // usePreloadFullScreenNavigators();
+    console.log('Timing RERENDER');
 
     const isOpenOnAdminRoom = shouldOpenOnAdminRoom();
 

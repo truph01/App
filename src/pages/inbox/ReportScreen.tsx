@@ -598,7 +598,7 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
             }
         }
 
-        openReport(reportIDFromRoute, reportActionIDFromRoute);
+        // openReport(reportIDFromRoute, reportActionIDFromRoute);
     }, [
         reportMetadata.isOptimisticReport,
         report,
