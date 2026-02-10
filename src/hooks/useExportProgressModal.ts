@@ -1,7 +1,6 @@
 import {useCallback} from 'react';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import {useSearchContext} from '@components/Search/SearchContext';
-import type {SearchQueryString} from '@components/Search/types';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -29,7 +28,6 @@ function useExportProgressModal() {
             cancelText: translate('export.openConcierge'),
             shouldShowCancelButton: !shouldUseNarrowLayout,
         });
-        console.log('>>>>>>>>>>>>>>', result);
         if (result.action === ModalActions.CLOSE) {
             openSidePanel();
         }
