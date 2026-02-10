@@ -132,21 +132,26 @@ Expensify will learn how you use tags and apply them automatically for recurring
 
 # FAQ
 
-## Can I Edit Tags on a Submitted Expense Report?
+## Can I edit Tags on a submitted expense report?
 
 Yes. You can edit tags until the expense is approved or reimbursed.
 
 Approvers can also edit tags, even post-approval, by taking control of the report.
 
-## Can I See an Audit Trail of Tag Changes?
+## Can I see an audit trail of Tag changes?
 
 Yes. When a tag is manually changed, the update is logged in the associated expense chat.
 
-## What Happens if a Tag Is Disabled in My Accounting System?
+## What happens if a Tag is disabled in my accounting system?
 
 It will be removed from the workspace’s tag list. However, it will still appear on any expenses or reports where it was already applied.
 
 ## Why can’t I see a multi-level tags option on my workspace?
 
 If you are connected to an accounting integration, you will not see this feature. You will need to add those tags in your accounting system first, then sync the connection.
+
+## How can my Employees see the GL Codes?
+
+GL codes are visible to Workspace Admins in the Tags table but are not visible to workspace members. If you need members to see GL codes, consider including the GL code in the tag
+name itself.
 
