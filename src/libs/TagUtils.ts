@@ -15,7 +15,8 @@ function isTagMissing(tag: string | undefined): boolean {
  * Removes ":" from the end of a tag string, which is used as a delimiter for multilevel tags in a rule
  */
 function trimTag(tag: string): string {
-    return tag.replace(/:*$/, '');
+    const tagWithoutEscapedColons = tag.replaceAll('\\:', '☢');
+    return tagWithoutEscapedColons.replace(/:*$/, '').replaceAll('☢', '\\:');
 }
 
 export {isTagMissing, trimTag};

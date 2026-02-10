@@ -138,7 +138,7 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
         if (!policy?.areTagsEnabled) {
             return false;
         }
-        return policyTags.length > 0;
+        return policyTags.some(({tags}) => Object.values(tags).some(({enabled}) => enabled));
     };
     const formTags = getTagArrayFromName(form?.tag ?? '');
 

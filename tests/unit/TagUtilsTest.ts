@@ -27,6 +27,10 @@ describe('TagUtils', () => {
             expect(isTagMissing(' none')).toBe(false);
             expect(isTagMissing('none ')).toBe(false);
         });
+
+        it('returns false for tag with colons', () => {
+            expect(isTagMissing('tag:with:colons')).toBe(false);
+        });
     });
 
     describe('trimTag', () => {
@@ -56,6 +60,12 @@ describe('TagUtils', () => {
 
         it('returns empty string when input is only colons', () => {
             expect(trimTag('::::')).toBe('');
+        });
+
+        it('handles escaped colons correctly', () => {
+            expect(trimTag('tag\\:name:')).toBe('tag\\:name');
+            expect(trimTag('tag\\:name\\:')).toBe('tag\\:name\\:');
+            expect(trimTag('tag\\:name\\\\::')).toBe('tag\\:name\\\\:');
         });
     });
 });
