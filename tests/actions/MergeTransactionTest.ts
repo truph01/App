@@ -1,6 +1,8 @@
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection} from 'react-native-onyx';
 import {areTransactionsEligibleForMerge, mergeTransactionRequest, setMergeTransactionKey, setupMergeTransactionData} from '@libs/actions/MergeTransaction';
+import * as API from '@libs/API';
+import {WRITE_COMMANDS} from '@libs/API/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {MergeTransaction as MergeTransactionType, Report, Transaction, TransactionViolation, TransactionViolations} from '@src/types/onyx';
@@ -207,6 +209,174 @@ describe('mergeTransactionRequest', () => {
 
         // Verify merge transaction is cleaned up
         expect(updatedMergeTransaction).toBeNull();
+    });
+
+    it('should call MERGE_TRANSACTION with correct params and delete only the chosen source expense in Merge Expense flow', async () => {
+        // Given:
+        // - Two expenses on different reports
+        // - User chooses which report the merged expense should belong to via mergeTransaction.reportID
+        const targetExpenseReport = {
+            ...createExpenseReport(1),
+            reportID: 'target-expense-report-001',
+        };
+        const sourceExpenseReport = {
+            ...createExpenseReport(2),
+            reportID: 'source-expense-report-002',
+        };
+
+        const targetTransaction: Transaction = {
+            ...createRandomTransaction(1),
+            transactionID: 'target-txn-001',
+            amount: 1000,
+            currency: CONST.CURRENCY.USD,
+            merchant: 'Target Merchant',
+            category: 'Target Category',
+            reportID: targetExpenseReport.reportID,
+        };
+
+        const sourceTransaction: Transaction = {
+            ...createRandomTransaction(2),
+            transactionID: 'source-txn-002',
+            amount: 2000,
+            currency: CONST.CURRENCY.USD,
+            merchant: 'Source Merchant',
+            category: 'Source Category',
+            reportID: sourceExpenseReport.reportID,
+        };
+
+        // User chooses to keep the target report; backend will create/update the merged expense in this report
+        const mergeTransaction: MergeTransactionType = {
+            ...createRandomMergeTransaction(1),
+            amount: 3000,
+            currency: CONST.CURRENCY.USD,
+            targetTransactionID: targetTransaction.transactionID,
+            sourceTransactionID: sourceTransaction.transactionID,
+            merchant: 'Merged Merchant',
+            category: 'Merged Category',
+            tag: 'Merged Tag',
+            description: 'Merged Description',
+            reportID: targetExpenseReport.reportID,
+        };
+        const mergeTransactionID = 'merge-expense-flow-001';
+
+        // Violations are not the focus of this test; we just need a minimal structure
+        const targetViolations = createMockViolations();
+        const sourceViolations = createMockViolations();
+
+        await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${targetExpenseReport.reportID}`, targetExpenseReport);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${sourceExpenseReport.reportID}`, sourceExpenseReport);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${targetTransaction.transactionID}`, targetTransaction);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${sourceTransaction.transactionID}`, sourceTransaction);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${mergeTransactionID}`, mergeTransaction);
+
+        const writeSpy = jest.spyOn(API, 'write');
+
+        mockFetch?.pause?.();
+
+        // When: The Merge Expense flow is executed
+        mergeTransactionRequest({
+            mergeTransactionID,
+            mergeTransaction,
+            targetTransaction,
+            sourceTransaction,
+            targetTransactionThreadReport: {reportID: targetExpenseReport.reportID},
+            targetTransactionThreadParentReport: undefined,
+            targetTransactionThreadParentReportNextStep: undefined,
+            allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, targetViolations, sourceViolations),
+            policy: undefined,
+            policyTags: undefined,
+            policyCategories: undefined,
+            currentUserAccountIDParam: 123,
+            currentUserEmailParam: 'user@example.com',
+            isASAPSubmitBetaEnabled: false,
+        });
+
+        await mockFetch?.resume?.();
+        await waitForBatchedUpdates();
+
+        // Then: Verify we called MERGE_TRANSACTION with correct parameters
+        expect(writeSpy).toHaveBeenCalled();
+        const [firstCall] = writeSpy.mock.calls;
+        const [calledCommand, calledParams] = firstCall;
+
+        expect(calledCommand).toBe(WRITE_COMMANDS.MERGE_TRANSACTION);
+        expect(calledParams).toEqual(
+            expect.objectContaining({
+                transactionID: mergeTransaction.targetTransactionID,
+                transactionIDList: [mergeTransaction.sourceTransactionID],
+                created: mergeTransaction.created,
+                merchant: mergeTransaction.merchant,
+                amount: -mergeTransaction.amount, // amount is negated before sending to the server
+                currency: mergeTransaction.currency,
+                category: mergeTransaction.category,
+                billable: mergeTransaction.billable,
+                reimbursable: mergeTransaction.reimbursable,
+                tag: mergeTransaction.tag,
+                receiptID: mergeTransaction.receipt?.receiptID,
+                reportID: targetExpenseReport.reportID, // merged expense should belong to the chosen target report
+            }),
+        );
+
+        // And: The comment payload sent to the API should reflect the merged details
+        const parsedComment = JSON.parse((calledParams as any).comment as string);
+        expect(parsedComment.comment).toBe(mergeTransaction.description);
+        expect(parsedComment.customUnit).toBe(mergeTransaction.customUnit);
+        expect(parsedComment.waypoints).toBe(mergeTransaction.waypoints ?? null);
+        expect(parsedComment.attendees).toBe(mergeTransaction.attendees);
+        expect(parsedComment.originalTransactionID).toBe(mergeTransaction.originalTransactionID);
+
+        // And: The correct (source) expense is deleted, while the target expense and its report remain
+        const updatedTargetTransaction = await new Promise<Transaction | null>((resolve) => {
+            const connection = Onyx.connect({
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION}${targetTransaction.transactionID}`,
+                callback: (transaction) => {
+                    Onyx.disconnect(connection);
+                    resolve(transaction ?? null);
+                },
+            });
+        });
+
+        const updatedSourceTransaction = await new Promise<Transaction | null>((resolve) => {
+            const connection = Onyx.connect({
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION}${sourceTransaction.transactionID}`,
+                callback: (transaction) => {
+                    Onyx.disconnect(connection);
+                    resolve(transaction ?? null);
+                },
+            });
+        });
+
+        const updatedTargetReport = await new Promise<Report | null>((resolve) => {
+            const connection = Onyx.connect({
+                key: `${ONYXKEYS.COLLECTION.REPORT}${targetExpenseReport.reportID}`,
+                callback: (report) => {
+                    Onyx.disconnect(connection);
+                    resolve(report ?? null);
+                },
+            });
+        });
+
+        const updatedSourceReport = await new Promise<Report | null>((resolve) => {
+            const connection = Onyx.connect({
+                key: `${ONYXKEYS.COLLECTION.REPORT}${sourceExpenseReport.reportID}`,
+                callback: (report) => {
+                    Onyx.disconnect(connection);
+                    resolve(report ?? null);
+                },
+            });
+        });
+
+        expect(updatedTargetTransaction).not.toBeNull();
+        expect(updatedTargetTransaction?.reportID).toBe(targetExpenseReport.reportID);
+
+        // Source expense should be deleted from Onyx
+        expect(updatedSourceTransaction).toBeNull();
+
+        // The chosen target report should remain; the source report should be deleted since it only had one expense
+        expect(updatedTargetReport?.reportID).toBe(targetExpenseReport.reportID);
+        expect(updatedSourceReport).toBeNull();
+
+        writeSpy.mockRestore();
     });
 
     it('should restore original state when API returns error', async () => {
