@@ -892,7 +892,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'あなたのスペース',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `${roomName} へようこそ！`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `+ ボタンを使って経費を${additionalText}します。`,
-        askConcierge: '何でも聞いてください！',
+        askConcierge: 'こちらはあなた専属のAIエージェント、Conciergeとのチャットです。ほぼ何でもできますので、お試しください！',
         conciergeSupport: 'あなた専用のAIエージェント',
         create: '作成',
         iouTypes: {
@@ -2195,6 +2195,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} はこのビジネス銀行口座へのアクセス権を失います。処理中の支払いは引き続き完了します。`,
         reachOutForHelp: 'そのレポートは Expensify Card と一緒に使用されています。共有を解除する必要がある場合は、<concierge-link>Concierge に連絡してください</concierge-link>。',
         unshareErrorModalTitle: '銀行口座の共有を解除できません',
+        chaseAccountNumberDifferent: '口座番号が異なるのはなぜですか？',
     },
     cardPage: {
         expensifyCard: 'Expensify カード',
@@ -2721,8 +2722,7 @@ ${date} の ${merchant} への ${amount}`,
                         5. 右上で独自のカテゴリを追加します。
 
                         [ワークスペースのカテゴリ設定に移動](${workspaceCategoriesLink})。
-
-                        ![カテゴリを設定](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: '経費を送信',
@@ -2813,8 +2813,7 @@ ${
                         5. 必要に応じて、招待メッセージを追加します。
 
                         [ワークスペースのメンバー画面へ移動](${workspaceMembersLink})。
-
-                        ![チームを招待](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `[カテゴリ](${workspaceCategoriesLink})と[タグ](${workspaceTagsLink})を設定する`,
@@ -2839,7 +2838,7 @@ ${
 
                         [その他の機能に移動](${workspaceMoreFeaturesLink})。
 
-                        ![タグを設定](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `[会計士](${workspaceMembersLink})を招待する`,
@@ -7473,8 +7472,8 @@ ${reportName}
     },
     cardTransactions: {
         notActivated: '未有効化',
-        outOfPocket: '返金可能',
-        companySpend: '返金不可',
+        outOfPocket: '立替経費支出',
+        companySpend: '会社の支出',
     },
     distance: {
         addStop: '経由地を追加',

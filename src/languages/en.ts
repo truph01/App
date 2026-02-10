@@ -910,7 +910,7 @@ const translations = {
         yourSpace: 'Your space',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Welcome to ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => ` Use the + button to ${additionalText} an expense.`,
-        askConcierge: ' Ask me anything!',
+        askConcierge: 'This is your chat with Concierge, your personal AI agent. I can do almost anything, try me!',
         conciergeSupport: 'Your personal AI agent',
         create: 'create',
         iouTypes: {
@@ -2242,7 +2242,8 @@ const translations = {
         unshareBankAccountDescription: 'Everyone below has access to this bank account. You can remove access at any point. We’ll still complete any payments in process.',
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} will lose access to this business bank account. We’ll still complete any payments in process.`,
         reachOutForHelp: 'It’s being used with the Expensify Card. <concierge-link>Reach out to Concierge</concierge-link> if you need to unshare it.',
-        unshareErrorModalTitle: 'Can’t unshare bank account',
+        unshareErrorModalTitle: `Can't unshare bank account`,
+        chaseAccountNumberDifferent: 'Why is my account number different?',
     },
     cardPage: {
         expensifyCard: 'Expensify Card',
@@ -2762,7 +2763,6 @@ const translations = {
 
                         [Take me to workspace category settings](${workspaceCategoriesLink}).
 
-                        ![Set up categories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)
                     `),
             },
             combinedTrackSubmitExpenseTask: {
@@ -2857,7 +2857,6 @@ const translations = {
 
                         [Take me to workspace members](${workspaceMembersLink}).
 
-                        ![Invite your team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)
                     `),
             },
 
@@ -2885,7 +2884,6 @@ const translations = {
 
                         [Take me to more features](${workspaceMoreFeaturesLink}).
 
-                        ![Set up tags](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)
                     `),
             },
 
@@ -7493,8 +7491,8 @@ const translations = {
     },
     cardTransactions: {
         notActivated: 'Not activated',
-        outOfPocket: 'Reimbursable',
-        companySpend: 'Non-reimbursable',
+        outOfPocket: 'Out-of-pocket spend',
+        companySpend: 'Company spend',
     },
     distance: {
         addStop: 'Add stop',

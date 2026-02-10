@@ -900,7 +900,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Votre espace',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Bienvenue dans ${roomName} !`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Utilisez le bouton + pour ${additionalText} une dépense.`,
-        askConcierge: 'Posez-moi vos questions !',
+        askConcierge: 'Ceci est votre chat avec Concierge, votre agent IA personnel. Je peux faire presque tout, essayez-moi !',
         conciergeSupport: 'Votre agent IA personnel',
         create: 'créer',
         iouTypes: {
@@ -2215,6 +2215,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} perdra l’accès à ce compte bancaire professionnel. Nous terminerons tout de même les paiements en cours.`,
         reachOutForHelp: 'Elle est utilisée avec la carte Expensify. <concierge-link>Contactez Concierge</concierge-link> si vous devez arrêter de la partager.',
         unshareErrorModalTitle: 'Impossible d’annuler le partage du compte bancaire',
+        chaseAccountNumberDifferent: 'Pourquoi mon numéro de compte est-il différent ?',
     },
     cardPage: {
         expensifyCard: 'Carte Expensify',
@@ -2748,8 +2749,7 @@ ${amount} pour ${merchant} - ${date}`,
                         5. Ajoutez vos propres catégories en haut à droite.
 
                         [Accéder aux paramètres des catégories de l’espace de travail](${workspaceCategoriesLink}).
-
-                        ![Configurer des catégories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Soumettre une dépense',
@@ -2840,8 +2840,7 @@ ${
                         5. Ajoutez un message d’invitation personnalisé si vous le souhaitez !
 
                         [Aller aux membres de l’espace de travail](${workspaceMembersLink}).
-
-                        ![Invitez votre équipe](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Configurer les [catégories](${workspaceCategoriesLink}) et les [tags](${workspaceTagsLink})`,
@@ -2866,7 +2865,7 @@ ${
 
                         [Afficher plus de fonctionnalités](${workspaceMoreFeaturesLink}).
 
-                        ![Configurer les tags](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `Invitez votre [comptable](${workspaceMembersLink})`,
@@ -7568,8 +7567,8 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
     },
     cardTransactions: {
         notActivated: 'Non activé',
-        outOfPocket: 'Remboursable',
-        companySpend: 'Non remboursable',
+        outOfPocket: 'Dépenses personnelles',
+        companySpend: 'Dépenses de l’entreprise',
     },
     distance: {
         addStop: 'Ajouter un arrêt',

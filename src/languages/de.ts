@@ -896,7 +896,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Dein Bereich',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Willkommen in ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Verwende die +‑Taste, um eine Ausgabe zu ${additionalText}.`,
-        askConcierge: 'Frag mich alles!',
+        askConcierge: 'Dies ist dein Chat mit Concierge, deinem persönlichen KI-Agenten. Ich kann fast alles, probier es aus!',
         conciergeSupport: 'Dein persönlicher KI-Agent',
         create: 'erstellen',
         iouTypes: {
@@ -2207,6 +2207,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} wird den Zugriff auf dieses Geschäftskonto verlieren. Wir schließen dennoch alle laufenden Zahlungen ab.`,
         reachOutForHelp: 'Sie wird mit der Expensify Card verwendet. <concierge-link>Wende dich an Concierge</concierge-link>, wenn du sie nicht mehr teilen möchtest.',
         unshareErrorModalTitle: 'Bankkonto kann nicht freigegeben werden',
+        chaseAccountNumberDifferent: 'Warum ist meine Kontonummer anders?',
     },
     cardPage: {
         expensifyCard: 'Expensify Card',
@@ -2741,8 +2742,7 @@ ${amount} für ${merchant} – ${date}`,
                         5. Füge oben rechts deine eigenen Kategorien hinzu.
 
                         [Zu den Workspace-Kategorieneinstellungen](${workspaceCategoriesLink}).
-
-                        ![Kategorien einrichten](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Ausgabe einreichen',
@@ -2833,8 +2833,7 @@ ${
                         5. Füge eine eigene Einladung hinzu, wenn du möchtest!
 
                         [Zu den Workspace-Mitgliedern](${workspaceMembersLink}).
-
-                        ![Invite your team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+        `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Richte [Kategorien](${workspaceCategoriesLink}) und [Tags](${workspaceTagsLink}) ein`,
@@ -2858,8 +2857,7 @@ ${
                         6. Klicke auf *+ Add tag*, um eigene zu erstellen.
 
                         [Zu den zusätzlichen Funktionen](${workspaceMoreFeaturesLink}).
-
-                        ![Tags einrichten](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `Laden Sie Ihre(n) [Buchhalter(in)](${workspaceMembersLink}) ein`,
@@ -7554,8 +7552,8 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
     },
     cardTransactions: {
         notActivated: 'Nicht aktiviert',
-        outOfPocket: 'Erstattungsfähig',
-        companySpend: 'Nicht erstattungsfähig',
+        outOfPocket: 'Auslagen-Spend',
+        companySpend: 'Unternehmensausgaben',
     },
     distance: {
         addStop: 'Stopp hinzufügen',
