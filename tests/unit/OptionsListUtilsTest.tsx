@@ -3986,7 +3986,7 @@ describe('OptionsListUtils', () => {
             expect(lastMessage).toBe(translateLocal('report.noActivityYet'));
         });
         it('should return "Receipt scanning..." for MoneyRequestReport with scanning transactions', async () => {
-            const report = {
+            const report: Report = {
                 ...createRandomReport(0, undefined),
                 type: Math.floor(Math.random() * 2) === 1 ? CONST.REPORT.TYPE.IOU : CONST.REPORT.TYPE.EXPENSE,
                 transactionCount: 1,
@@ -4016,14 +4016,13 @@ describe('OptionsListUtils', () => {
             expect(result).toBe(translateLocal('iou.receiptScanning', {count: scanningTransactions.length}));
         });
         it('should NOT leak fraud alert text when user cannot perform write actions', async () => {
-            const report = {
+            const report: Report = {
                 ...createRandomReport(1, undefined),
                 type: CONST.REPORT.TYPE.EXPENSE,
                 permissions: [CONST.REPORT.PERMISSIONS.READ],
-                isReportArchived: false,
                 lastMessageText: 'Fraud alert: Sensitive transaction details',
             };
-            const fraudAction = {
+            const fraudAction: ReportAction = {
                 ...createRandomReportAction(2),
                 actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_FRAUD_ALERT,
                 message: [
@@ -4037,10 +4036,9 @@ describe('OptionsListUtils', () => {
                     whisperedTo: [],
                 },
             };
-
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, report);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
-                [fraudActionID]: fraudAction,
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`, report);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.reportID}`, {
+                [fraudAction.reportActionID]: fraudAction,
             });
             await waitForBatchedUpdates();
 
