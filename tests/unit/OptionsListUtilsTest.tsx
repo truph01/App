@@ -954,15 +954,7 @@ describe('OptionsListUtils', () => {
         it('should return empty options when no reports or personal details are provided', () => {
             // Given empty arrays of reports and personalDetails
             // When we call getValidOptions()
-            const results = getValidOptions(
-                {reports: [], personalDetails: []},
-                allPolicies,
-                {},
-                nvpDismissedProductTraining,
-                loginList,
-                CURRENT_USER_ACCOUNT_ID,
-                CURRENT_USER_EMAIL,
-            );
+            const results = getValidOptions({reports: [], personalDetails: []}, allPolicies, {}, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL);
 
             // Then the result should be empty
             expect(results.personalDetails).toEqual([]);
@@ -2599,15 +2591,7 @@ describe('OptionsListUtils', () => {
                 COUNTRY_CODE,
             );
             // When we call filterAndOrderOptions with a search value that matches an email
-            const filteredOptions = filterAndOrderOptions(
-                options,
-                'peterparker@expensify.com',
-                COUNTRY_CODE,
-                loginList,
-                CURRENT_USER_EMAIL,
-                CURRENT_USER_ACCOUNT_ID,
-                PERSONAL_DETAILS,
-            );
+            const filteredOptions = filterAndOrderOptions(options, 'peterparker@expensify.com', COUNTRY_CODE, loginList, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, PERSONAL_DETAILS);
 
             // Then one personal detail should be returned
             expect(filteredOptions.personalDetails.length).toBe(1);
@@ -2957,15 +2941,7 @@ describe('OptionsListUtils', () => {
             });
 
             // When we pass the returned options to filterAndOrderOptions with any search value
-            const filteredOptions = filterAndOrderOptions(
-                options,
-                'Unknown',
-                COUNTRY_CODE,
-                loginList,
-                CURRENT_USER_EMAIL,
-                CURRENT_USER_ACCOUNT_ID,
-                PERSONAL_DETAILS,
-            );
+            const filteredOptions = filterAndOrderOptions(options, 'Unknown', COUNTRY_CODE, loginList, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, PERSONAL_DETAILS);
 
             // Then the report should still be found by its reportName even if participantsList is empty
             expect(filteredOptions.recentReports.length).toBe(1);
@@ -3026,15 +3002,7 @@ describe('OptionsListUtils', () => {
                 CURRENT_USER_EMAIL,
             );
             // When we call filterAndOrderOptions with a search value that does not match any personal details or reports but matches user to invite
-            const filteredOptions = filterAndOrderOptions(
-                options,
-                'peter.parker@expensify.com',
-                COUNTRY_CODE,
-                loginList,
-                CURRENT_USER_EMAIL,
-                CURRENT_USER_ACCOUNT_ID,
-                PERSONAL_DETAILS,
-            );
+            const filteredOptions = filterAndOrderOptions(options, 'peter.parker@expensify.com', COUNTRY_CODE, loginList, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, PERSONAL_DETAILS);
 
             // Then no recent reports should be returned
             expect(filteredOptions.recentReports.length).toBe(0);
@@ -3228,18 +3196,9 @@ describe('OptionsListUtils', () => {
                 CURRENT_USER_EMAIL,
             );
             // When we call filterAndOrderOptions with a search value that matches an email
-            const filteredOptions = filterAndOrderOptions(
-                options,
-                'peterparker@expensify.com',
-                COUNTRY_CODE,
-                loginList,
-                CURRENT_USER_EMAIL,
-                CURRENT_USER_ACCOUNT_ID,
-                PERSONAL_DETAILS,
-                {
-                    sortByReportTypeInSearch: true,
-                },
-            );
+            const filteredOptions = filterAndOrderOptions(options, 'peterparker@expensify.com', COUNTRY_CODE, loginList, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, PERSONAL_DETAILS, {
+                sortByReportTypeInSearch: true,
+            });
 
             // Then one recent report should be returned
             expect(filteredOptions.recentReports.length).toBe(1);
@@ -4843,15 +4802,7 @@ describe('OptionsListUtils', () => {
             const policies = {[`${ONYXKEYS.COLLECTION.POLICY}${policy.id}`]: policy};
 
             // Test that getValidOptions accepts policies collection as second parameter
-            const results = getValidOptions(
-                {reports: [], personalDetails: []},
-                policies,
-                undefined,
-                nvpDismissedProductTraining,
-                loginList,
-                CURRENT_USER_ACCOUNT_ID,
-                CURRENT_USER_EMAIL,
-            );
+            const results = getValidOptions({reports: [], personalDetails: []}, policies, undefined, nvpDismissedProductTraining, loginList, CURRENT_USER_ACCOUNT_ID, CURRENT_USER_EMAIL);
 
             expect(results).toBeDefined();
             expect(results.recentReports).toBeDefined();

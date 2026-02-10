@@ -116,18 +116,7 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
             },
             countryCode,
         );
-    }, [
-        options.reports,
-        options.personalDetails,
-        allPolicies,
-        draftComments,
-        nvpDismissedProductTraining,
-        loginList,
-        countryCode,
-        personalDetails,
-        currentUserAccountID,
-        currentUserEmail,
-    ]);
+    }, [options.reports, options.personalDetails, allPolicies, draftComments, nvpDismissedProductTraining, loginList, countryCode, personalDetails, currentUserAccountID, currentUserEmail]);
 
     const filteredOptions = useMemo(() => {
         return filterAndOrderOptions(optionsList, cleanSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, personalDetails, {

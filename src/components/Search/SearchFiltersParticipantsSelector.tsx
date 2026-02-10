@@ -190,18 +190,7 @@ function SearchFiltersParticipantsSelector({initialAccountIDs, onFiltersUpdate, 
         }
 
         return filteredOptions;
-    }, [
-        unselectedOptions,
-        cleanSearchTerm,
-        countryCode,
-        loginList,
-        selectedOptions,
-        shouldAllowNameOnlyOptions,
-        searchTerm,
-        currentUserEmail,
-        currentUserAccountID,
-        personalDetails,
-    ]);
+    }, [unselectedOptions, cleanSearchTerm, countryCode, loginList, selectedOptions, shouldAllowNameOnlyOptions, searchTerm, currentUserEmail, currentUserAccountID, personalDetails]);
 
     const {sections, headerMessage} = useMemo(() => {
         const newSections: SelectionListSections = [];

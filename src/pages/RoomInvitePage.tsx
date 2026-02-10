@@ -73,7 +73,6 @@ function RoomInvitePage({
     const isReportArchived = useReportIsArchived(report.reportID);
     const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {canBeMissing: true});
 
-
     const {options, areOptionsInitialized} = useOptionsList();
     const allPersonalDetails = usePersonalDetails();
 

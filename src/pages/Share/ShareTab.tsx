@@ -87,19 +87,7 @@ function ShareTab({ref}: ShareTabProps) {
             currentUserEmail,
             personalDetails,
         });
-    }, [
-        areOptionsInitialized,
-        options,
-        draftComments,
-        nvpDismissedProductTraining,
-        betas,
-        textInputValue,
-        countryCode,
-        loginList,
-        currentUserAccountID,
-        currentUserEmail,
-        personalDetails,
-    ]);
+    }, [areOptionsInitialized, options, draftComments, nvpDismissedProductTraining, betas, textInputValue, countryCode, loginList, currentUserAccountID, currentUserEmail, personalDetails]);
 
     const recentReportsOptions = useMemo(() => {
         if (textInputValue.trim() === '') {
