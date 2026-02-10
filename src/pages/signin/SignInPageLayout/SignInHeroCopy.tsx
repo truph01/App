@@ -24,6 +24,7 @@ function SignInHeroCopy({customHeadline, customHeroBody}: SignInHeroCopyProps) {
                     isMediumScreenWidth && StyleUtils.getFontSizeStyle(variables.fontSizeSignInHeroMedium),
                     isLargeScreenWidth && StyleUtils.getFontSizeStyle(variables.fontSizeSignInHeroLarge),
                 ]}
+                accessibilityRole="header"
             >
                 {customHeadline ?? translate('login.hero.header')}
             </Text>
