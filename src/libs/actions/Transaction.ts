@@ -811,7 +811,7 @@ type ChangeTransactionsReportProps = {
     accountID: number;
     email: string;
     newReport?: OnyxEntry<Report>;
-    policy?: OnyxEntry<Policy>;
+    policy: OnyxEntry<Policy>;
     reportNextStep?: OnyxEntry<ReportNextStepDeprecated>;
     policyCategories?: OnyxEntry<PolicyCategories>;
     allTransactions: OnyxCollection<Transaction>;
