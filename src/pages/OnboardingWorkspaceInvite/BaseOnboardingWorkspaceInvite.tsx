@@ -229,6 +229,7 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
                 sections={sections}
                 ListItem={InviteMemberListItem}
                 onSelectRow={toggleSelection}
+                shouldShowTextInput
                 showLoadingPlaceholder={!areOptionsInitialized || !didScreenTransitionEnd}
                 shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                 style={{
