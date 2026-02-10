@@ -1040,7 +1040,7 @@ Onyx.connect({
 
 let allPolicies: OnyxCollection<Policy>;
 let hasPolicies: boolean;
-let policiesArray: Policy[];
+let policiesArray: Policy[] = [];
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.POLICY,
     waitForCollectionCallback: true,
@@ -11050,7 +11050,7 @@ function createDraftTransactionAndNavigateToParticipantSelector(
     let firstPolicy: Policy | undefined;
     let filteredPoliciesCount = 0;
     for (const policy of policiesArray) {
-        if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
+        if (!shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
 
