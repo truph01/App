@@ -5,7 +5,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {parsePhoneNumber} from './PhoneNumber';
 
 let countryCodeByIPOnyx: number;
-Onyx.connectWithoutView({
+// eslint-disable-next-line rulesdir/prefer-onyx-connect-in-libs -- may refactor to useOnyx/connectWithoutView later
+Onyx.connect({
     key: ONYXKEYS.COUNTRY_CODE,
     callback: (val) => (countryCodeByIPOnyx = val ?? 1),
 });
