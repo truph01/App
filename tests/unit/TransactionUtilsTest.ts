@@ -1800,4 +1800,250 @@ describe('TransactionUtils', () => {
             expect(TransactionUtils.getConvertedAmount(transaction, true, false, false, true)).toBe(-100);
         });
     });
+
+    describe('compareDuplicateTransactionFields', () => {
+        const fakeReportID = 'fakeReportID';
+        const fakeReport = {
+            reportID: fakeReportID,
+            policyID: 'fakePolicyID',
+            ownerAccountID: CURRENT_USER_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            stateNum: CONST.REPORT.STATE_NUM.OPEN,
+            statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+        };
+
+        it('should return empty keep and change when reviewingTransaction or reportID is missing', () => {
+            const result = TransactionUtils.compareDuplicateTransactionFields({}, undefined, [], undefined);
+            expect(result.keep).toEqual({});
+            expect(result.change).toEqual({});
+        });
+
+        it('should keep fields when all transactions have the same values', () => {
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                merchant: 'Merchant A',
+                category: 'Food',
+                tag: 'Tag1',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                merchant: 'Merchant A',
+                category: 'Food',
+                tag: 'Tag1',
+                reportID: fakeReportID,
+            });
+
+            const result = TransactionUtils.compareDuplicateTransactionFields({}, transaction1, [transaction2], fakeReport);
+
+            expect(result.keep.merchant).toBe('Merchant A');
+            expect(result.keep.category).toBe('Food');
+            expect(result.keep.tag).toBe('Tag1');
+            expect(result.change.merchant).toBeUndefined();
+            expect(result.change.category).toBeUndefined();
+            expect(result.change.tag).toBeUndefined();
+        });
+
+        it('should detect changes in merchant field when transactions differ', () => {
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                merchant: 'Merchant A',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                merchant: 'Merchant B',
+                reportID: fakeReportID,
+            });
+
+            const result = TransactionUtils.compareDuplicateTransactionFields({}, transaction1, [transaction2], fakeReport);
+
+            expect(result.change.merchant).toContain('Merchant A');
+            expect(result.change.merchant).toContain('Merchant B');
+        });
+
+        it('should use policyTags to filter available tags for single-level tags', () => {
+            const singleLevelPolicyTags = {
+                tagList1: {
+                    name: 'Department',
+                    required: false,
+                    orderWeight: 0,
+                    tags: {
+                        tag1: {name: 'Engineering', enabled: true},
+                        tag2: {name: 'Marketing', enabled: true},
+                        tag3: {name: 'Disabled Tag', enabled: false},
+                    },
+                },
+            };
+
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                tag: 'Engineering',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                tag: 'Marketing',
+                reportID: fakeReportID,
+            });
+
+            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
+                id: 'fakePolicyID',
+                areTagsEnabled: true,
+            }).then(() => {
+                const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport);
+
+                expect(result.change.tag).toContain('Engineering');
+                expect(result.change.tag).toContain('Marketing');
+            });
+        });
+
+        it('should not include disabled tags in change options', () => {
+            const singleLevelPolicyTags = {
+                tagList1: {
+                    name: 'Department',
+                    required: false,
+                    orderWeight: 0,
+                    tags: {
+                        tag1: {name: 'Engineering', enabled: true},
+                        tag2: {name: 'Disabled Tag', enabled: false},
+                    },
+                },
+            };
+
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                tag: 'Engineering',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                tag: 'Disabled Tag',
+                reportID: fakeReportID,
+            });
+
+            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
+                id: 'fakePolicyID',
+                areTagsEnabled: true,
+            }).then(() => {
+                const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport);
+
+                // Since only one enabled tag is available and empty is not included, tag should not be in change
+                expect(result.change.tag).toBeUndefined();
+            });
+        });
+
+        it('should handle multi-level tags by processing all different tag values', () => {
+            const multiLevelPolicyTags = {
+                tagList1: {
+                    name: 'Department',
+                    required: false,
+                    orderWeight: 0,
+                    tags: {
+                        tag1: {name: 'Engineering', enabled: true},
+                    },
+                },
+                tagList2: {
+                    name: 'Project',
+                    required: false,
+                    orderWeight: 1,
+                    tags: {
+                        tag2: {name: 'Project A', enabled: true},
+                    },
+                },
+            };
+
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                tag: 'Engineering:Project A',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                tag: 'Engineering:Project B',
+                reportID: fakeReportID,
+            });
+
+            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
+                id: 'fakePolicyID',
+                areTagsEnabled: true,
+            }).then(() => {
+                const result = TransactionUtils.compareDuplicateTransactionFields(multiLevelPolicyTags, transaction1, [transaction2], fakeReport);
+
+                expect(result.change.tag).toContain('Engineering:Project A');
+                expect(result.change.tag).toContain('Engineering:Project B');
+            });
+        });
+
+        it('should keep tag when all transactions have same tag in multi-level tags mode', () => {
+            const multiLevelPolicyTags = {
+                tagList1: {
+                    name: 'Department',
+                    required: false,
+                    orderWeight: 0,
+                    tags: {
+                        tag1: {name: 'Engineering', enabled: true},
+                    },
+                },
+                tagList2: {
+                    name: 'Project',
+                    required: false,
+                    orderWeight: 1,
+                    tags: {
+                        tag2: {name: 'Project A', enabled: true},
+                    },
+                },
+            };
+
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                tag: 'Engineering:Project A',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                tag: 'Engineering:Project A',
+                reportID: fakeReportID,
+            });
+
+            const result = TransactionUtils.compareDuplicateTransactionFields(multiLevelPolicyTags, transaction1, [transaction2], fakeReport);
+
+            expect(result.keep.tag).toBe('Engineering:Project A');
+            expect(result.change.tag).toBeUndefined();
+        });
+
+        it('should include empty tag in change options when one transaction has no tag', () => {
+            const singleLevelPolicyTags = {
+                tagList1: {
+                    name: 'Department',
+                    required: false,
+                    orderWeight: 0,
+                    tags: {
+                        tag1: {name: 'Engineering', enabled: true},
+                    },
+                },
+            };
+
+            const transaction1 = generateTransaction({
+                transactionID: 'tx1',
+                tag: 'Engineering',
+                reportID: fakeReportID,
+            });
+            const transaction2 = generateTransaction({
+                transactionID: 'tx2',
+                tag: '',
+                reportID: fakeReportID,
+            });
+
+            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
+                id: 'fakePolicyID',
+                areTagsEnabled: true,
+            }).then(() => {
+                const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport);
+
+                expect(result.change.tag).toContain('Engineering');
+                expect(result.change.tag).toContain('');
+            });
+        });
+    });
 });
