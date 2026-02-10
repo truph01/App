@@ -464,7 +464,9 @@ function ReportActionCompose({
         }
 
         composerRef.current?.resetHeight();
-        setIsComposerFullSize(reportID, false);
+        if (isComposerFullSize) {
+            setIsComposerFullSize(reportID, false);
+        }
 
         scheduleOnUI(() => {
             const {clearWorklet} = composerRefShared.get();
@@ -475,7 +477,7 @@ function ReportActionCompose({
 
             clearWorklet?.();
         });
-    }, [isSendDisabled, debouncedValidate, reportID, composerRefShared]);
+    }, [isSendDisabled, debouncedValidate, isComposerFullSize, reportID, composerRefShared]);
 
     onSubmitAction = handleSendMessage;
 
