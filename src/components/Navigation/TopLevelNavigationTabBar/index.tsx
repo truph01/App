@@ -39,6 +39,8 @@ function TopLevelNavigationTabBar({state}: TopLevelNavigationTabBarProps) {
     const isScreenWithNavigationTabFocused = getIsScreenWithNavigationTabBarFocused(state);
     const selectedTab = getSelectedTab(state);
 
+    console.log('Timing selected Tab', selectedTab);
+
     const shouldDisplayBottomBar = shouldUseNarrowLayout ? isScreenWithNavigationTabFocused : isNavigationTabVisibleDirectly;
     const isReadyToDisplayBottomBar = isAfterClosingTransition && shouldDisplayBottomBar && !isBlockingViewVisible;
     const shouldDisplayLHB = !shouldUseNarrowLayout;
