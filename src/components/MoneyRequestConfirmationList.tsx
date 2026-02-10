@@ -279,7 +279,6 @@ function MoneyRequestConfirmationList({
         selector: mileageRateSelector,
         canBeMissing: true,
     });
-    const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseUtil(action);
     const [defaultMileageRateReal] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
         selector: mileageRateSelector,
@@ -309,6 +308,8 @@ function MoneyRequestConfirmationList({
     );
 
     const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
+    const isTrackDistanceRequest = isTrackExpense && isDistanceRequest;
+    const {policyForMovingExpenses} = usePolicyForMovingExpenses(undefined, undefined, isTrackDistanceRequest, isMovingTransactionFromTrackExpense);
     const policy = isTrackExpense ? policyForMovingExpenses : (policyReal ?? policyDraft);
     const policyCategories = policyCategoriesReal ?? policyCategoriesDraft;
     const defaultMileageRate = defaultMileageRateDraft ?? defaultMileageRateReal;
