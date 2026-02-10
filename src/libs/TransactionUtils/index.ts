@@ -2365,11 +2365,12 @@ function removeSettledAndApprovedTransactions(transactions: Array<OnyxEntry<Tran
  */
 
 function compareDuplicateTransactionFields(
-    reviewingTransaction?: OnyxEntry<Transaction>,
-    duplicates?: Array<OnyxEntry<Transaction>>,
-    report?: OnyxEntry<Report>,
-    selectedTransactionID?: string,
-    policyCategories?: PolicyCategories,
+    reviewingTransaction: OnyxEntry<Transaction>,
+    duplicates: Array<OnyxEntry<Transaction>> | undefined,
+    report: OnyxEntry<Report>,
+    selectedTransactionID: string | undefined,
+    policy: OnyxEntry<Policy>,
+    policyCategories: OnyxEntry<PolicyCategories>,
 ): {keep: Partial<ReviewDuplicates>; change: FieldsToChange} {
     const reportID = report?.reportID;
     const reviewingTransactionID = reviewingTransaction?.transactionID;
@@ -2446,9 +2447,6 @@ function compareDuplicateTransactionFields(
             const keys = fieldsToCompare[fieldName];
             const firstTransaction = transactions.at(0);
             const isFirstTransactionCommentEmptyObject = typeof firstTransaction?.comment === 'object' && firstTransaction?.comment?.comment === '';
-            // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            const policy = getPolicy(report?.policyID);
 
             const areAllFieldsEqualForKey = areAllFieldsEqual(transactions, (item) => keys.map((key) => SafeString(item?.[key])).join('|'));
             if (fieldName === 'description') {
