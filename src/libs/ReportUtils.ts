@@ -1040,12 +1040,14 @@ Onyx.connect({
 
 let allPolicies: OnyxCollection<Policy>;
 let hasPolicies: boolean;
+let policiesArray: Policy[];
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.POLICY,
     waitForCollectionCallback: true,
     callback: (value) => {
         allPolicies = value;
         hasPolicies = !isEmptyObject(value);
+        policiesArray = Object.values(value);
     },
 });
 
@@ -4849,7 +4851,7 @@ function canEditFieldOfMoneyRequest(
 
         // Check if there are multiple outstanding reports across policies
         let outstandingReportsCount = 0;
-        for (const currentPolicy of Object.values(allPolicies ?? {})) {
+        for (const currentPolicy of policiesArray) {
             const reports = getOutstandingReportsForUser(
                 currentPolicy?.id,
                 moneyRequestReport?.ownerAccountID,
@@ -5932,7 +5934,7 @@ function getReportSubtitlePrefix(report: OnyxEntry<Report>): string {
     }
 
     let policyCount = 0;
-    for (const policy of Object.values(allPolicies ?? {})) {
+    for (const policy of policiesArray) {
         if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
@@ -11051,7 +11053,7 @@ function createDraftTransactionAndNavigateToParticipantSelector(
 
     let firstPolicy: Policy | undefined;
     let filteredPoliciesCount = 0;
-    for (const policy of Object.values(allPolicies ?? {})) {
+    for (const policy of policiesArray) {
         if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
