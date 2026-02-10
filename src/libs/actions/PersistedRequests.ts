@@ -34,15 +34,15 @@ Onyx.connectWithoutView({
         Log.info('[PersistedRequests] DISK vs MEMORY comparison', false, {
             diskRequestsLength: diskRequests.length,
             previousMemoryRequestsLength: previousInMemoryRequests.length,
-            diskCommands: diskRequests.map((r) => r.command),
-            previousMemoryCommands: previousInMemoryRequests.map((r) => r.command),
+            diskCommands: getCommands(diskRequests),
+            previousMemoryCommands: getCommands(previousInMemoryRequests),
             mismatch: diskRequests.length !== previousInMemoryRequests.length,
         });
 
         // Process any pending save operations that were queued before initialization
         if (pendingSaveOperations.length > 0) {
             Log.info(`[PersistedRequests] Processing pending save operations, size: ${pendingSaveOperations.length}`, false, {
-                pendingCommands: pendingSaveOperations.map((r) => r.command),
+                pendingCommands: getCommands(pendingSaveOperations),
             });
             const requests = [...persistedRequests, ...pendingSaveOperations];
             persistedRequests = requests;
@@ -129,7 +129,7 @@ function save<TKey extends OnyxKey>(requestToPersist: Request<TKey>) {
         command: requestToPersist.command,
         previousQueueLength: previousLength,
         newQueueLength: requests.length,
-        allCommands: requests.map((r) => r.command),
+        allCommands: getCommands(requests as AnyRequest[]),
     });
 
     Onyx.set(ONYXKEYS.PERSISTED_REQUESTS, requests as AnyRequest[])
@@ -152,7 +152,7 @@ function endRequestAndRemoveFromQueue<TKey extends OnyxKey>(requestToRemove: Req
         commandToRemove: requestToRemove.command,
         currentOngoingCommand: ongoingRequest?.command ?? 'null',
         currentQueueLength: persistedRequests.length,
-        currentQueueCommands: persistedRequests.map((r) => r.command),
+        currentQueueCommands: getCommands(persistedRequests),
     });
 
     const previousOngoingRequest = ongoingRequest;
@@ -191,7 +191,7 @@ function endRequestAndRemoveFromQueue<TKey extends OnyxKey>(requestToRemove: Req
 
     Log.info('[PersistedRequests] Persisting updated queue and clearing ongoingRequest to disk', false, {
         newQueueLength: persistedRequests.length,
-        newQueueCommands: persistedRequests.map((r) => r.command),
+        newQueueCommands: getCommands(persistedRequests),
     });
 
     Onyx.multiSet({
@@ -237,13 +237,6 @@ function updateOngoingRequest<TKey extends OnyxKey>(newRequest: Request<TKey>) {
 }
 
 function processNextRequest(): AnyRequest | null {
-    Log.info('[PersistedRequests] processNextRequest called', false, {
-        hasOngoingRequest: !!ongoingRequest,
-        ongoingCommand: ongoingRequest?.command ?? 'null',
-        queueLength: persistedRequests.length,
-        queueCommands: persistedRequests.map((r) => r.command),
-    });
-
     if (ongoingRequest) {
         Log.info('[PersistedRequests] Ongoing Request already set, returning same one', false, {
             command: ongoingRequest.command,
@@ -251,6 +244,11 @@ function processNextRequest(): AnyRequest | null {
         });
         return ongoingRequest;
     }
+
+    Log.info('[PersistedRequests] processNextRequest called', false, {
+        queueLength: persistedRequests.length,
+        queueCommands: getCommands(persistedRequests),
+    });
 
     // You must handle the case where there are no requests to process
     if (persistedRequests.length === 0) {
@@ -274,7 +272,7 @@ function processNextRequest(): AnyRequest | null {
     Log.info('[PersistedRequests] Queue updated after moving request to ongoing', false, {
         ongoingCommand: ongoingRequest?.command ?? 'null',
         newQueueLength: persistedRequests.length,
-        newQueueCommands: persistedRequests.map((r) => r.command),
+        newQueueCommands: getCommands(persistedRequests),
     });
 
     if (ongoingRequest && ongoingRequest.persistWhenOngoing) {
@@ -319,13 +317,17 @@ function rollbackOngoingRequest() {
     Log.info('[PersistedRequests] Rollback complete', false, {
         rolledBackCommand: requestToRollback.command,
         newQueueLength: persistedRequests.length,
-        newQueueCommands: persistedRequests.map((r) => r.command),
+        newQueueCommands: getCommands(persistedRequests),
         ongoingRequestCleared: true,
     });
 }
 
 function getAll(): AnyRequest[] {
     return persistedRequests;
+}
+
+function getCommands(requests: AnyRequest[]): string[] {
+    return requests.map((r) => r.command);
 }
 
 function getOngoingRequest(): AnyRequest | null {
@@ -336,6 +338,7 @@ export {
     clear,
     save,
     getAll,
+    getCommands,
     endRequestAndRemoveFromQueue,
     update,
     getLength,

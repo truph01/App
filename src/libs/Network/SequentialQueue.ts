@@ -5,6 +5,7 @@ import {
     deleteRequestsByIndices as deletePersistedRequestsByIndices,
     endRequestAndRemoveFromQueue as endPersistedRequestAndRemoveFromQueue,
     getAll as getAllPersistedRequests,
+    getCommands,
     onInitialization as onPersistedRequestsInitialization,
     processNextRequest as processNextPersistedRequest,
     rollbackOngoingRequest as rollbackOngoingPersistedRequest,
@@ -121,13 +122,6 @@ function getQueueFlushedData() {
  * requests to our backend is evenly distributed and it gradually decreases with time, which helps the servers catch up.
  */
 function process(): Promise<void> {
-    Log.info('[SequentialQueue] process() called', false, {
-        isQueuePaused,
-        isOffline: isOffline(),
-        persistedRequestsLength: getAllPersistedRequests().length,
-        isSequentialQueueRunning,
-    });
-
     // When the queue is paused, return early. This prevents any new requests from happening. The queue will be flushed again when the queue is unpaused.
     if (isQueuePaused) {
         Log.info('[SequentialQueue] Unable to process. Queue is paused.');
@@ -139,6 +133,11 @@ function process(): Promise<void> {
         return Promise.resolve();
     }
 
+    Log.info('[SequentialQueue] process() called', false, {
+        persistedRequestsLength: getAllPersistedRequests().length,
+        isSequentialQueueRunning,
+    });
+
     const persistedRequests = getAllPersistedRequests();
     if (persistedRequests.length === 0) {
         Log.info('[SequentialQueue] Unable to process. No requests to process.');
@@ -147,7 +146,7 @@ function process(): Promise<void> {
 
     Log.info('[SequentialQueue] Processing queue', false, {
         queueLength: persistedRequests.length,
-        queueCommands: persistedRequests.map((r) => r.command),
+        queueCommands: getCommands(persistedRequests),
     });
 
     const requestToProcess = processNextPersistedRequest();
@@ -275,32 +274,26 @@ function process(): Promise<void> {
  * so some cases (e.g., unpausing) require skipping the reset to maintain proper behavior.
  */
 function flush(shouldResetPromise = true) {
-    Log.info('[SequentialQueue] flush() called', false, {
-        shouldResetPromise,
-        isQueuePaused,
-        isSequentialQueueRunning,
-        persistedRequestsLength: getAllPersistedRequests().length,
-        hasQueuedOnyxUpdates: !isEmpty(),
-        isClientTheLeader: isClientTheLeader(),
-    });
-
     // When the queue is paused, return early. This will keep an requests in the queue and they will get flushed again when the queue is unpaused
     if (isQueuePaused) {
-        Log.info('[SequentialQueue] Unable to flush. Queue is paused.', false, {
-            persistedRequestsLength: getAllPersistedRequests().length,
-        });
+        Log.info('[SequentialQueue] Unable to flush. Queue is paused.');
         return;
     }
 
     if (isSequentialQueueRunning) {
-        Log.info('[SequentialQueue] Unable to flush. Queue is already running.', false, {
-            persistedRequestsLength: getAllPersistedRequests().length,
-        });
+        Log.info('[SequentialQueue] Unable to flush. Queue is already running.');
         return;
     }
 
     const persistedRequestsLength = getAllPersistedRequests().length;
     const hasOnyxUpdates = !isEmpty();
+
+    Log.info('[SequentialQueue] flush() called', false, {
+        shouldResetPromise,
+        persistedRequestsLength,
+        hasQueuedOnyxUpdates: hasOnyxUpdates,
+        isClientTheLeader: isClientTheLeader(),
+    });
 
     if (persistedRequestsLength === 0 && !hasOnyxUpdates) {
         Log.info('[SequentialQueue] Unable to flush. No requests or queued Onyx updates to process.');
@@ -323,7 +316,7 @@ function flush(shouldResetPromise = true) {
 
     Log.info('[SequentialQueue] Starting queue processing', false, {
         persistedRequestsLength,
-        persistedCommands: getAllPersistedRequests().map((r) => r.command),
+        persistedCommands: getCommands(getAllPersistedRequests()),
     });
 
     isSequentialQueueRunning = true;
@@ -397,18 +390,14 @@ function flush(shouldResetPromise = true) {
  * Unpauses the queue and flushes all the requests that were in it or were added to it while paused
  */
 function unpause() {
-    Log.info('[SequentialQueue] unpause() called', false, {
-        isQueuePaused,
-        persistedRequestsLength: getAllPersistedRequests().length,
-    });
-
     if (!isQueuePaused) {
         Log.info('[SequentialQueue] Unable to unpause queue. We are already processing.');
         return;
     }
 
-    const numberOfPersistedRequests = getAllPersistedRequests().length || 0;
-    const persistedCommands = getAllPersistedRequests().map((r) => r.command);
+    const currentPersistedRequests = getAllPersistedRequests();
+    const numberOfPersistedRequests = currentPersistedRequests.length;
+    const persistedCommands = getCommands(currentPersistedRequests);
 
     Log.info('[SequentialQueue] Unpausing the queue', false, {
         numberOfPersistedRequests,
@@ -500,16 +489,17 @@ function handleConflictActions<TKey extends OnyxKey>(conflictAction: ConflictDat
 }
 
 function push<TKey extends OnyxKey>(newRequest: OnyxRequest<TKey>) {
+    const currentRequests = getAllPersistedRequests();
     Log.info('[SequentialQueue] push() called', false, {
         command: newRequest.command,
         hasConflictChecker: !!newRequest.checkAndFixConflictingRequest,
-        currentQueueLength: getAllPersistedRequests().length,
+        currentQueueLength: currentRequests.length,
         isOffline: isOffline(),
         isSequentialQueueRunning,
     });
 
     if (newRequest.checkAndFixConflictingRequest) {
-        const requests = getAllPersistedRequests();
+        const requests = currentRequests;
         Log.info('[SequentialQueue] Checking for conflicts', false, {
             command: newRequest.command,
             existingRequestsCount: requests.length,
