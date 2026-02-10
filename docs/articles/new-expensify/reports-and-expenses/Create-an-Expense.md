@@ -23,6 +23,8 @@ If you're submitting expenses for a personal payment, you can send them directly
 
 You can create an expense by scanning a receipt, entering details manually, or tracking distance. The steps below walk you through each method so you can quickly capture and submit expenses for reimbursement or record-keeping.
 
+**Note:** When creating an expense, Workspace Merchant Rules set by your workspace may automatically apply categories, tags, descriptions, reimbursable status, billable status, and other fields based on the merchant name.
+
 ## How to use SmartScan to create an expense
 
 **On mobile:**
@@ -43,9 +45,6 @@ You can create an expense by scanning a receipt, entering details manually, or t
 - Forward your digital receipts to receipts@expensify.com.
 - Text a receipt photo to 47777 (US numbers only). Make sure you [add your phone number as a contact method to Expensify](https://new.expensify.com/settings/profile/contact-methods).
 
-**Note:** When submitting expenses to a workspace, Workspace Merchant Rules set by your workspace may automatically apply categories, tags, descriptions, reimbursable status, billable status, and other fields based on the merchant name.
-
-
 ---
 
 ## How to manually create an expense
@@ -56,8 +55,6 @@ You can create an expense by scanning a receipt, entering details manually, or t
 4. Choose a workspace or an individual.
 5. Add details like description, category, tags, tax, and set whether the expense is reimbursable or billable.
 6. Click **Create expense**.
-
-**Note:** If submitting to a workspace with [Workspace Merchant Rules](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) configured, some fields may be automatically filled based on the merchant name.
 
 ---
 
