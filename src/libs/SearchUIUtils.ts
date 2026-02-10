@@ -4726,12 +4726,13 @@ function navigateToSearchRHP(route: {route: string; getRoute: (backTo?: string) 
 }
 
 /**
- * Returns the index of the active item in flattenedMenuItems by comparing similarSearchHash.
+ * Returns the index of the active item in flattenedMenuItems by comparing hash first, then similarSearchHash.
  *
  * Also returns a value indicating whether the item in the Explore section is active
  */
 function getActiveSearchItemIndex(
     flattenedMenuItems: SearchTypeMenuItem[],
+    hash: number | undefined,
     similarSearchHash: number | undefined,
     isSavedSearchActive: boolean,
     queryType: string | undefined,
@@ -4741,7 +4742,10 @@ function getActiveSearchItemIndex(
         return [-1, false];
     }
 
-    let activeItemIndex = flattenedMenuItems.findIndex((item) => item.similarSearchHash === similarSearchHash);
+    let activeItemIndex = flattenedMenuItems.findIndex((item) => item.hash === hash);
+    if (activeItemIndex === -1) {
+        activeItemIndex = flattenedMenuItems.findIndex((item) => item.similarSearchHash === similarSearchHash);
+    }
     if (activeItemIndex === -1) {
         activeItemIndex = flattenedMenuItems.findIndex((item) => {
             if (queryType === CONST.SEARCH.DATA_TYPES.EXPENSE) {

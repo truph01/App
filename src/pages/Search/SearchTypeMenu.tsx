@@ -227,8 +227,8 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
     );
 
     const [activeItemIndex, isExploreSectionActive] = useMemo(
-        () => getActiveSearchItemIndex(flattenedMenuItems, similarSearchHash, isSavedSearchActive, queryJSON?.type),
-        [similarSearchHash, isSavedSearchActive, flattenedMenuItems, queryJSON?.type],
+        () => getActiveSearchItemIndex(flattenedMenuItems, hash, similarSearchHash, isSavedSearchActive, queryJSON?.type),
+        [hash, similarSearchHash, isSavedSearchActive, flattenedMenuItems, queryJSON?.type],
     );
 
     const allSearchAdvancedFilters = useStickySearchFilters(isExploreSectionActive && !shouldShowSuggestedSearchSkeleton);
