@@ -1629,4 +1629,83 @@ describe('CardUtils', () => {
             });
         });
     });
+
+    describe('isMatchingCard', () => {
+        it('should match by encryptedCardNumber for exact match', () => {
+            const card: Card = {
+                encryptedCardNumber: 'encrypted123',
+                cardName: 'Test Card - 1234',
+            } as Card;
+
+            expect(isMatchingCard(card, 'encrypted123', 'Different Name')).toBe(true);
+        });
+
+        it('should match by normalized card name when encryptedCardNumber does not match', () => {
+            const card: Card = {
+                encryptedCardNumber: 'encrypted123',
+                cardName: 'Business Platinum Card® - JOHN SMITH - 1234',
+            } as Card;
+
+            // Name without ® should still match
+            expect(isMatchingCard(card, 'wrongEncrypted', 'Business Platinum Card - JOHN SMITH - 1234')).toBe(true);
+        });
+
+        it('should handle special characters (®, ™, ©) in card names', () => {
+            const card: Card = {
+                cardName: 'Business Platinum Card® - JOHN SMITH™ - 1234©',
+            } as Card;
+
+            // All special characters should be normalized
+            expect(isMatchingCard(card, '', 'Business Platinum Card - JOHN SMITH - 1234')).toBe(true);
+        });
+
+        it('should not match cards with different names after normalization', () => {
+            const card: Card = {
+                cardName: 'Business Platinum Card® - JOHN SMITH - 1234',
+            } as Card;
+
+            expect(isMatchingCard(card, '', 'Business Gold Card - JANE DOE - 5678')).toBe(false);
+        });
+
+        it('should return false when card.cardName is undefined', () => {
+            const card: Card = {
+                encryptedCardNumber: 'encrypted123',
+            } as Card;
+
+            expect(isMatchingCard(card, 'wrongEncrypted', 'Some Card Name')).toBe(false);
+        });
+
+        it('should return false when cardName parameter is empty', () => {
+            const card: Card = {
+                cardName: 'Test Card - 1234',
+            } as Card;
+
+            expect(isMatchingCard(card, '', '')).toBe(false);
+        });
+
+        it('should handle cards with only numbers and dashes', () => {
+            const card: Card = {
+                cardName: 'Card - 1234',
+            } as Card;
+
+            expect(isMatchingCard(card, '', 'Card - 1234')).toBe(true);
+        });
+
+        it('should trim whitespace when comparing', () => {
+            const card: Card = {
+                cardName: '  Business Card - 1234  ',
+            } as Card;
+
+            expect(isMatchingCard(card, '', 'Business Card - 1234')).toBe(true);
+        });
+
+        it('should not match cards with same last 4 digits but different names', () => {
+            const card: Card = {
+                cardName: 'Business Platinum Card® - JOHN SMITH - 1234',
+            } as Card;
+
+            // Different card name but same last 4 digits - should NOT match
+            expect(isMatchingCard(card, '', 'Business Gold Card - JANE DOE - 1234')).toBe(false);
+        });
+    });
 });
