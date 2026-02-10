@@ -101,8 +101,11 @@ function RoomInvitePage({
             currentUserAccountID,
             currentUserEmail,
             reports,
+            allPersonalDetails,
             betas ?? [],
             excludedUsers,
+            false,
+            countryCode,
         );
         // Update selectedOptions with the latest personalDetails information
         const detailsMap: Record<string, MemberForList> = {};
