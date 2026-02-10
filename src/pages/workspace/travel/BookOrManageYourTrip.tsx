@@ -40,6 +40,7 @@ function GetStartedTravel({policyID}: GetStartedTravelProps) {
     };
 
     return (
+        <>
         <Section
             title={translate('workspace.moreFeatures.travel.bookOrManageYourTrip.title')}
             subtitle={translate('workspace.moreFeatures.travel.bookOrManageYourTrip.subtitle')}
@@ -65,8 +66,9 @@ function GetStartedTravel({policyID}: GetStartedTravelProps) {
                 pendingAction={policy?.pendingFields?.travelSettings}
                 wrapperStyle={styles.mt3}
             />
-            {isTravelInvoicingEnabled && <WorkspaceTravelInvoicingSection policyID={policyID} />}
         </Section>
+        {isTravelInvoicingEnabled && <WorkspaceTravelInvoicingSection policyID={policyID} />}
+        </>
     );
 }
 
