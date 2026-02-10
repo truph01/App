@@ -3912,16 +3912,12 @@ function isDatePreset(value: string | number | undefined): value is SearchDatePr
  * @param flatFilters - Optional array of date filter objects from the search query
  * @returns Adjusted time range that respects all date filters (intersected, not overwritten)
  */
-function adjustTimeRangeToDateFilters(
-    timeRange: {start: string; end: string},
-    dateFilters: QueryFilters | undefined,
-): {start: string; end: string} {
+function adjustTimeRangeToDateFilters(timeRange: {start: string; end: string}, dateFilters: QueryFilters | undefined): {start: string; end: string} {
     if (!dateFilters || dateFilters.length === 0) {
         return timeRange;
     }
-    // Merge all date filters into a single object
-    const flattenFilters = dateFilters.flatMap((filter) => filter.filters);
 
+    const flattenFilters = dateFilters.flatMap((filter) => filter.filters || []);
 
     const {start: timeRangeStart, end: timeRangeEnd} = timeRange;
     const equalToFilter = flattenFilters.find((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO);
