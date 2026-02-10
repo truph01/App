@@ -28,6 +28,8 @@ function ReportsSplitNavigator({route}: PlatformStackScreenProps<AuthScreensPara
     const {isBetaEnabled} = usePermissions();
     const splitNavigatorScreenOptions = useSplitNavigatorScreenOptions();
 
+    console.log('Timing Rerendered');
+
     const [initialReportID] = useState(() => {
         const currentURL = getCurrentUrl();
         // Determine if the current URL indicates a transition.

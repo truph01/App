@@ -181,8 +181,8 @@ function GenericPressable({
             onPress={!isDisabled ? singleExecution(onPressHandler) : undefined}
             onLongPress={!isDisabled && onLongPress ? onLongPressHandler : undefined}
             onKeyDown={!isDisabled ? handleKeyDown : undefined}
-            onPressIn={!isDisabled ? onPressIn : undefined}
-            onPressOut={!isDisabled ? onPressOut : undefined}
+            // onPressIn={!isDisabled ? onPressIn : undefined}
+            // onPressOut={!isDisabled ? onPressOut : undefined}
             dataSet={{...(isRoleButton ? {[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true} : {}), ...(dataSet ?? {})}}
             style={(state) => [
                 cursorStyle,
@@ -210,21 +210,21 @@ function GenericPressable({
             fsClass={forwardedFSClass}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...rest}
-            onHoverOut={(event) => {
-                if (event?.type === 'pointerenter' || event?.type === 'mouseenter') {
-                    return;
-                }
-                setIsHovered(false);
-                if (rest.onHoverOut) {
-                    rest.onHoverOut(event);
-                }
-            }}
-            onHoverIn={(event) => {
-                setIsHovered(true);
-                if (rest.onHoverIn) {
-                    rest.onHoverIn(event);
-                }
-            }}
+            // onHoverOut={(event) => {
+            //     if (event?.type === 'pointerenter' || event?.type === 'mouseenter') {
+            //         return;
+            //     }
+            //     setIsHovered(false);
+            //     if (rest.onHoverOut) {
+            //         rest.onHoverOut(event);
+            //     }
+            // }}
+            // onHoverIn={(event) => {
+            //     setIsHovered(true);
+            //     if (rest.onHoverIn) {
+            //         rest.onHoverIn(event);
+            //     }
+            // }}
         >
             {(state) => (typeof children === 'function' ? children({...state, isScreenReaderActive, hovered: state.hovered || isHovered, isDisabled}) : children)}
         </Pressable>
