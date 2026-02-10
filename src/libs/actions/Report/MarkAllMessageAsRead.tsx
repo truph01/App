@@ -9,7 +9,7 @@ import {isUnread} from '@libs/ReportUtils';
 import type {ArchivedReportsIDSet} from '@libs/SearchUIUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportActions} from '@src/types/onyx';
-import {isAnonymousUser} from '../Session';
+import {isAnonymousUser} from '@libs/actions/Session';
 
 // We use connectWithoutView because markAllMessagesAsRead doesn't affect the UI rendering
 // and this avoids unnecessary re-rendering in AuthScreen whenever any report or report action is updated
