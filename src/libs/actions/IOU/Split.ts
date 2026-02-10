@@ -224,7 +224,7 @@ function splitBill({
 
     dismissModalAndOpenReportInInboxTab(existingSplitChatReportID);
 
-    notifyNewAction(splitData.chatReportID, currentUserAccountID);
+    notifyNewAction(splitData.chatReportID, undefined, true);
 }
 
 /**
@@ -314,7 +314,7 @@ function splitBillAndOpenReport({
     InteractionManager.runAfterInteractions(() => removeDraftTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID));
 
     dismissModalAndOpenReportInInboxTab(splitData.chatReportID);
-    notifyNewAction(splitData.chatReportID, currentUserAccountID);
+    notifyNewAction(splitData.chatReportID, undefined, true);
 }
 
 /**
@@ -685,7 +685,7 @@ function startSplitBill({
     API.write(WRITE_COMMANDS.START_SPLIT_BILL, parameters, {optimisticData, successData, failureData});
 
     Navigation.dismissModalWithReport({reportID: splitChatReport.reportID});
-    notifyNewAction(splitChatReport.reportID, currentUserAccountID);
+    notifyNewAction(splitChatReport.reportID, undefined, true);
 
     // Return the split transactionID for testing purpose
     return {splitTransactionID: splitTransaction.transactionID};
@@ -997,7 +997,7 @@ function completeSplitBill(
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     InteractionManager.runAfterInteractions(() => removeDraftTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID));
     dismissModalAndOpenReportInInboxTab(chatReportID);
-    notifyNewAction(chatReportID, sessionAccountID);
+    notifyNewAction(chatReportID, undefined, true);
 }
 
 function updateSplitTransactions({
