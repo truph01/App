@@ -274,6 +274,31 @@ function lastFourNumbersFromCardName(cardName: string | undefined): string {
     return match[1];
 }
 
+/**
+ * Checks if a card matches a given card identifier (encrypted card number or card name).
+ * Uses exact match for encrypted card numbers, and normalized string comparison
+ * for card names to handle special character differences from OAuth providers (e.g., ® vs no ®).
+ *
+ * @param card - The card to check
+ * @param encryptedCardNumber - The encrypted card number to match against
+ * @param cardName - The card name to match against
+ * @returns true if the card matches either identifier
+ */
+function isMatchingCard(card: Card, encryptedCardNumber: string, cardName: string): boolean {
+    if (card.encryptedCardNumber === encryptedCardNumber) {
+        return true;
+    }
+
+    if (!card.cardName || !cardName) {
+        return false;
+    }
+
+    // Normalize both strings to remove special characters (®, ™, ©, etc.)
+    // This handles differences between OAuth provider card names and stored card names
+    const normalize = (str: string) => str.replace(/[^\w\s-]/g, '').trim();
+    return normalize(card.cardName) === normalize(cardName);
+}
+
 function getMCardNumberString(cardNumber: string): string {
     return cardNumber.replaceAll(/\s/g, '');
 }
@@ -965,7 +990,7 @@ function isCardAlreadyAssigned(cardNumberToCheck: string, workspaceCardFeeds: On
         }
         const {cardList, ...assignedCards} = workspaceCards;
         return Object.values(assignedCards).some(
-            (card) => card?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && (card?.encryptedCardNumber === cardNumberToCheck || card?.cardName === cardNumberToCheck),
+            (card) => card && card.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && isMatchingCard(card, cardNumberToCheck, cardNumberToCheck),
         );
     });
 }
@@ -1043,6 +1068,7 @@ export {
     isCardConnectionBroken,
     isSmartLimitEnabled,
     lastFourNumbersFromCardName,
+    isMatchingCard,
     hasIssuedExpensifyCard,
     isExpensifyCardFullySetUp,
     filterInactiveCards,
