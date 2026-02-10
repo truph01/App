@@ -201,7 +201,10 @@ function askHelpsiteAI(query) {
                 });
             }
         })
-        .catch(() => {
+        .catch((error) => {
+            if (error.name === 'AbortError') {
+                return;
+            }
             aiContainer.innerHTML = '';
             aiContainer.appendChild(cloneTemplate('ai-error-template'));
         });
