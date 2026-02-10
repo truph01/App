@@ -90,7 +90,6 @@ function useOptions(reportAttributesDerived: ReportAttributesDerivedValue['repor
 
     const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {canBeMissing: true});
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
 
     const reports = listOptions?.reports ?? [];
     const personalDetails = listOptions?.personalDetails ?? [];
@@ -106,7 +105,6 @@ function useOptions(reportAttributesDerived: ReportAttributesDerivedValue['repor
         loginList,
         currentUserAccountID,
         currentUserEmail,
-        allReports,
         {
             betas: betas ?? [],
             includeSelfDM: true,
@@ -121,7 +119,7 @@ function useOptions(reportAttributesDerived: ReportAttributesDerivedValue['repor
 
     const areOptionsInitialized = !isLoading;
 
-    const options = filterAndOrderOptions(unselectedOptions, debouncedSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, allReports, allPersonalDetails, {
+    const options = filterAndOrderOptions(unselectedOptions, debouncedSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, allPersonalDetails, {
         selectedOptions,
         maxRecentReportsToShow: CONST.IOU.MAX_RECENT_REPORTS_TO_SHOW,
     });
@@ -168,7 +166,6 @@ function useOptions(reportAttributesDerived: ReportAttributesDerivedValue['repor
                           loginList,
                           currentUserEmail: personalData.email ?? '',
                           currentUserAccountID: personalData.accountID,
-                          reports: allReports,
                       });
                   if (participantOption) {
                       result.push({

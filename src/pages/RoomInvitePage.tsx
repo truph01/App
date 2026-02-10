@@ -72,7 +72,7 @@ function RoomInvitePage({
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {initWithStoredValues: false, canBeMissing: true});
     const isReportArchived = useReportIsArchived(report.reportID);
     const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {canBeMissing: true});
-    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
+
 
     const {options, areOptionsInitialized} = useOptionsList();
     const allPersonalDetails = usePersonalDetails();
@@ -100,7 +100,6 @@ function RoomInvitePage({
             loginList,
             currentUserAccountID,
             currentUserEmail,
-            reports,
             allPersonalDetails,
             betas ?? [],
             excludedUsers,
@@ -133,7 +132,7 @@ function RoomInvitePage({
     const inviteOptions =
         debouncedSearchTerm.trim() === ''
             ? defaultOptions
-            : filterAndOrderOptions(defaultOptions, debouncedSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, reports, allPersonalDetails, {
+            : filterAndOrderOptions(defaultOptions, debouncedSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, allPersonalDetails, {
                   excludeLogins: excludedUsers,
               });
 

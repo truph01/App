@@ -66,12 +66,14 @@ function SearchFiltersChatsSelector({initialReportIDs, onFiltersUpdate, isScreen
 
     const selectedOptions: OptionData[] = selectedReportIDs.map((id) => {
         const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${id}`];
+        const reportData = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${id}`];
+        const chatReport = reportData?.chatReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportData.chatReportID}`] : undefined;
         const report = getSelectedOptionData(
             createOptionFromReport(
-                {...reports?.[`${ONYXKEYS.COLLECTION.REPORT}${id}`], reportID: id},
+                {...reportData, reportID: id},
                 personalDetails,
                 currentUserAccountID,
-                reports,
+                chatReport,
                 privateIsArchived,
                 reportAttributesDerived,
             ),
@@ -94,11 +96,10 @@ function SearchFiltersChatsSelector({initialReportIDs, onFiltersUpdate, isScreen
                   loginList,
                   currentUserAccountID,
                   currentUserEmail,
-                  reports,
                   personalDetails,
               });
 
-    const chatOptions = filterAndOrderOptions(defaultOptions, cleanSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, reports, personalDetails, {
+    const chatOptions = filterAndOrderOptions(defaultOptions, cleanSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, personalDetails, {
         selectedOptions,
         excludeLogins: CONST.EXPENSIFY_EMAILS_OBJECT,
     });
@@ -116,7 +117,6 @@ function SearchFiltersChatsSelector({initialReportIDs, onFiltersUpdate, isScreen
             false,
             undefined,
             reportAttributesDerived,
-            reports,
         );
 
         sections.push(formattedResults.section);

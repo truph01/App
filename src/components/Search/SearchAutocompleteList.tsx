@@ -222,7 +222,6 @@ function SearchAutocompleteList({
             loginList,
             currentUserAccountID,
             currentUserEmail,
-            reports,
             personalDetails,
         });
     }, [
@@ -236,7 +235,6 @@ function SearchAutocompleteList({
         loginList,
         currentUserAccountID,
         currentUserEmail,
-        reports,
         personalDetails,
     ]);
 
@@ -456,7 +454,6 @@ function SearchAutocompleteList({
                     shouldShowGBR: true,
                     currentUserAccountID,
                     currentUserEmail,
-                    reports,
                     personalDetails,
                 }).personalDetails.filter((participant) => participant.text && !alreadyAutocompletedKeys.has(participant.text.toLowerCase()));
 
@@ -491,7 +488,6 @@ function SearchAutocompleteList({
                     shouldShowGBR: true,
                     currentUserAccountID,
                     currentUserEmail,
-                    reports,
                     personalDetails,
                 }).recentReports.filter((chat) => {
                     if (!chat.text) {
@@ -680,7 +676,6 @@ function SearchAutocompleteList({
         hasAutocompleteList,
         isAutocompleteList,
         personalDetails,
-        reports,
     ]);
 
     const sortedRecentSearches = useMemo(() => {
