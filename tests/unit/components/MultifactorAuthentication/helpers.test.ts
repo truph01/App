@@ -82,6 +82,19 @@ describe('MultifactorAuthentication helpers', () => {
             });
         });
 
+        // Given a registration request without a challenge
+        // When processRegistration is called with an empty challenge string
+        // Then it should return failure because a challenge is required to prove the registration request is legitimate and came from the server
+        it('should return failure when challenge is missing', async () => {
+            const result = await processRegistration({
+                publicKey: 'public-key-123',
+                authenticationMethod: 'BIOMETRIC_FACE',
+                challenge: '',
+            });
+
+            expect(result.success).toBe(false);
+        });
+
         // Given all required registration parameters including a valid challenge
         // When processRegistration is called with these parameters
         // Then it should pass the correct keyInfo object and metadata to registerAuthenticationKey because the backend needs specific formatting for the public key and challenge to properly register the credential

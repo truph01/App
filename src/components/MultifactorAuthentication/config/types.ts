@@ -139,7 +139,7 @@ type MultifactorAuthenticationOutcomeSuffixes<T extends MultifactorAuthenticatio
  * Response from a multifactor authentication scenario action.
  */
 type MultifactorAuthenticationScenarioResponse = {
-    httpCode: number;
+    httpCode?: number;
     reason: MultifactorAuthenticationReason;
     /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
     body?: Record<string, unknown>;
