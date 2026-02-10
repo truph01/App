@@ -2,11 +2,13 @@ import {domainMemberSettingsSelector, domainNameSelector} from '@selectors/Domai
 import React from 'react';
 import {View} from 'react-native';
 import RenderHTML from '@components/RenderHTML';
+import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getLatestError} from '@libs/ErrorUtils';
+import {addLeadingForwardSlash} from '@libs/Url';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -39,6 +41,9 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
 
+    const {environmentURL} = useEnvironment();
+    const samlPageUrl = `${environmentURL}${addLeadingForwardSlash(ROUTES.DOMAIN_SAML.getRoute(domainAccountID))}`;
+
     return (
         <BaseDomainSettingsPage domainAccountID={domainAccountID}>
             <ToggleSettingOptionRow
@@ -62,7 +67,11 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
                 subtitle={
                     <View style={[styles.flexRow, styles.renderHTML, styles.mt1]}>
                         <RenderHTML
-                            html={translate(domainSettings?.samlEnabled ? 'domain.members.forceTwoFactorAuthSAMLEnabledDescription' : 'domain.members.forceTwoFactorAuthDescription')}
+                            html={
+                                domainSettings?.samlEnabled
+                                    ? translate('domain.members.forceTwoFactorAuthSAMLEnabledDescription', samlPageUrl)
+                                    : translate('domain.members.forceTwoFactorAuthDescription')
+                            }
                         />
                     </View>
                 }

@@ -2827,7 +2827,8 @@ ${
                         5. Füge eine eigene Einladung hinzu, wenn du möchtest!
 
                         [Zu den Workspace-Mitgliedern](${workspaceMembersLink}).
-        `),
+
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Richte [Kategorien](${workspaceCategoriesLink}) und [Tags](${workspaceTagsLink}) ein`,
@@ -8388,6 +8389,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             disableSamlRequired: 'Deaktivierung von SAML erforderlich',
             oktaWarningPrompt: 'Bist du sicher? Dadurch wird auch Okta SCIM deaktiviert.',
             requireWithEmptyMetadataError: 'Bitte fügen Sie unten die Metadaten des Identitätsanbieters hinzu, um dies zu aktivieren',
+            pleaseDisableTwoFactorAuth: 'Bitte deaktivieren Sie die erzwungene Zwei-Faktor-Authentifizierung, um die SAML-Anmeldung zu ermöglichen.',
         },
         samlConfigurationDetails: {
             title: 'SAML-Konfigurationsdetails',
@@ -8473,8 +8475,8 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             },
             forceTwoFactorAuth: 'Zwei-Faktor-Authentifizierung erzwingen',
             forceTwoFactorAuthSAMLEnabledDescription: `<muted-text>Bitte deaktiviere <a href="${CONST.SAML_HELP_URL}">SAML</a>, um die Zwei-Faktor-Authentifizierung zu erzwingen.</muted-text>`,
-            forceTwoFactorAuthDescription: `<muted-text>Zwei-Faktor-Authentifizierung für alle Mitglieder dieser Domain erzwingen. Domain-Mitglieder werden beim Anmelden aufgefordert, Zwei-Faktor-Authentifizierung für ihr Konto einzurichten.</muted-text>`,
-            forceTwoFactorAuthError: 'Die Erzwingung der Zwei-Faktor-Authentifizierung konnte nicht geändert werden. Bitte versuchen Sie es später erneut.',
+            forceTwoFactorAuthDescription: `<muted-text>Für alle Mitglieder dieser Domäne die Zwei-Faktor-Authentifizierung verlangen. Mitglieder der Domäne werden beim Anmelden dazu aufgefordert, die Zwei-Faktor-Authentifizierung für ihr Konto einzurichten.</muted-text>`,
+            forceTwoFactorAuthError: 'Die Erzwingung der Zwei-Faktor-Authentifizierung konnte nicht geändert werden. Bitte versuche es später noch einmal.',
         },
         common: {settings: 'Einstellungen'},
     },

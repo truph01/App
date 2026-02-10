@@ -8323,7 +8323,8 @@ const translations = {
             disableSamlRequired: 'Disable SAML required',
             oktaWarningPrompt: 'Are you sure? This will also disable Okta SCIM.',
             requireWithEmptyMetadataError: 'Please add Identity Provider metadata below to enable',
-            pleaseDisableTwoFactorAuth: 'Please disable enforced two-factor authentication to enable SAML login.',
+            pleaseDisableTwoFactorAuth: (twoFactorAuthSettingsUrl: string) =>
+                `<muted-text>Please disable <a href="${twoFactorAuthSettingsUrl}">force two-factor authentication</a> to enable SAML login.</muted-text>`,
         },
         samlConfigurationDetails: {
             title: 'SAML configuration details',
@@ -8407,8 +8408,9 @@ const translations = {
                 removeMember: 'Unable to remove this user. Please try again.',
             },
             forceTwoFactorAuth: 'Force two-factor authentication',
-            forceTwoFactorAuthSAMLEnabledDescription: `<muted-text>Please disable <a href="${CONST.SAML_HELP_URL}">SAML</a> to force two-factor authentication.</muted-text>`,
-            forceTwoFactorAuthDescription: `<muted-text>Require Two-Factor Authentication for all members of this domain. Domain members will be prompted to set up Two-Factor Authentication on their account when they sign in.</muted-text>`,
+            forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
+                `<muted-text>Please disable <a href="${samlPageUrl}">SAML</a> to force two-factor authentication.</muted-text>`,
+            forceTwoFactorAuthDescription: `<muted-text>Require two-factor authentication for all members of this domain. Domain members will be prompted to set up two-factor authentication on their account when they sign in.</muted-text>`,
             forceTwoFactorAuthError: "Force two-factor authentication couldn't be changed. Please try again later.",
         },
         common: {
