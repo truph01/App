@@ -5147,16 +5147,14 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                     ctaText: 'Verzoek verzonden',
                 },
                 bookOrManageYourTrip: {
-                    title: 'Boek of beheer je reis',
-                    subtitle: 'Gebruik Expensify Travel om de beste reisaanbiedingen te krijgen en al je zakelijke uitgaven op één plek te beheren.',
-                    ctaText: 'Boeken of beheren',
+                    title: 'Boeking van reizen',
+                    subtitle: 'Gefeliciteerd! Je bent helemaal klaar om reizen in deze workspace te boeken en te beheren.',
+                    ctaText: 'Reizen beheren',
+                },
+                settings: {
+                    autoAddTripName: {title: 'Reisnamen aan uitgaven toevoegen', subtitle: 'Voeg automatisch reisnamen toe aan onkostomemo’s voor reizen die in Expensify zijn geboekt.'},
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Reisboeking',
-                        subtitle: 'Gefeliciteerd! Je bent helemaal klaar om reizen in deze workspace te boeken en te beheren.',
-                        manageTravelLabel: 'Reizen beheren',
-                    },
                     centralInvoicingSection: {
                         title: 'Gecentraliseerde facturatie',
                         subtitle: 'Centraliseer alle reiskosten op één maandelijkse factuur in plaats van bij aankoop te betalen.',
