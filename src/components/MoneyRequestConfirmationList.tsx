@@ -33,7 +33,7 @@ import {
 } from '@libs/actions/IOU';
 import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {isCategoryDescriptionRequired} from '@libs/CategoryUtils';
-import {convertToBackendAmount, convertToDisplayString, convertToDisplayStringWithoutCurrency, getCurrencyDecimals} from '@libs/CurrencyUtils';
+import {convertToBackendAmount, convertToDisplayString, convertToDisplayStringWithoutCurrency} from '@libs/CurrencyUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {calculateAmount, insertTagIntoTransactionTagsString, isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseUtil} from '@libs/IOUUtils';
 import Log from '@libs/Log';
@@ -287,7 +287,7 @@ function MoneyRequestConfirmationList({
     });
     const [policyCategoriesDraft] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES_DRAFT}${policyID}`, {canBeMissing: true});
     const [lastSelectedDistanceRates] = useOnyx(ONYXKEYS.NVP_LAST_SELECTED_DISTANCE_RATES, {canBeMissing: true});
-    const {getCurrencySymbol} = useCurrencyList();
+    const {getCurrencySymbol, getCurrencyDecimals} = useCurrencyList();
     const {isBetaEnabled} = usePermissions();
     const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
 
@@ -309,12 +309,7 @@ function MoneyRequestConfirmationList({
     );
 
     const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
-    let policy;
-    if (isTrackExpense) {
-        policy = isPolicyExpenseChat ? policyForMovingExpenses : undefined;
-    } else {
-        policy = policyReal ?? policyDraft;
-    }
+    const policy = isTrackExpense ? policyForMovingExpenses : (policyReal ?? policyDraft);
     const policyCategories = policyCategoriesReal ?? policyCategoriesDraft;
     const defaultMileageRate = defaultMileageRateDraft ?? defaultMileageRateReal;
 
@@ -563,10 +558,8 @@ function MoneyRequestConfirmationList({
     const taxPercentage =
         getTaxValue(policy, transaction, transaction?.taxCode ?? defaultTaxCode) ??
         (isMovingTransactionFromTrackExpense ? getTaxValue(policyForMovingExpenses, transaction, transaction?.taxCode ?? defaultTaxCode) : '');
-    const taxAmount =
-        isMovingTransactionFromTrackExpense && transaction?.taxAmount
-            ? Math.abs(transaction?.taxAmount ?? 0)
-            : calculateTaxAmount(taxPercentage, taxableAmount, transaction?.currency ?? CONST.CURRENCY.USD);
+    const taxDecimals = getCurrencyDecimals(transaction?.currency ?? CONST.CURRENCY.USD);
+    const taxAmount = isMovingTransactionFromTrackExpense && transaction?.taxAmount ? Math.abs(transaction?.taxAmount ?? 0) : calculateTaxAmount(taxPercentage, taxableAmount, taxDecimals);
 
     const taxAmountInSmallestCurrencyUnits = convertToBackendAmount(Number.parseFloat(taxAmount.toString()));
     useEffect(() => {
@@ -877,7 +870,17 @@ function MoneyRequestConfirmationList({
         */
         setMoneyRequestPendingFields(transactionID, {waypoints: isDistanceRequestWithPendingRoute ? CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD : null});
 
-        const distanceMerchant = DistanceRequestUtils.getDistanceMerchant(hasRoute, distance, unit, rate ?? 0, currency ?? CONST.CURRENCY.USD, translate, toLocaleDigit, getCurrencySymbol);
+        const distanceMerchant = DistanceRequestUtils.getDistanceMerchant(
+            hasRoute,
+            distance,
+            unit,
+            rate ?? 0,
+            currency ?? CONST.CURRENCY.USD,
+            translate,
+            toLocaleDigit,
+            getCurrencySymbol,
+            isManualDistanceRequest,
+        );
         setMoneyRequestMerchant(transactionID, distanceMerchant, true);
     }, [
         isDistanceRequestWithPendingRoute,
@@ -896,6 +899,7 @@ function MoneyRequestConfirmationList({
         isReadOnly,
         isMovingTransactionFromTrackExpense,
         getCurrencySymbol,
+        isManualDistanceRequest,
     ]);
 
     // Auto select the category if there is only one enabled category and it is required
@@ -1022,13 +1026,13 @@ function MoneyRequestConfirmationList({
                     return;
                 }
 
-                if (isTimeRequest && !isValidTimeExpenseAmount(iouAmount, iouCurrencyCode)) {
+                if (isTimeRequest && !isValidTimeExpenseAmount(iouAmount, iouCurrencyCode, decimals)) {
                     setFormError('iou.timeTracking.amountTooLargeError');
                     return;
                 }
 
                 if (isPerDiemRequest) {
-                    if (!isValidPerDiemExpenseAmount(transaction.comment?.customUnit ?? {}, iouCurrencyCode)) {
+                    if (!isValidPerDiemExpenseAmount(transaction.comment?.customUnit ?? {}, iouCurrencyCode, decimals)) {
                         setFormError('iou.error.invalidQuantity');
                         return;
                     }
@@ -1097,6 +1101,7 @@ function MoneyRequestConfirmationList({
             iouAttendees,
             currentUserPersonalDetails,
             isTimeRequest,
+            getCurrencyDecimals,
         ],
     );
 
