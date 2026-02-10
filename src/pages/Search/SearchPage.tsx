@@ -766,7 +766,7 @@ function SearchPage({route}: SearchPageProps) {
                 }
 
                 const reportExportOptions = getSecondaryExportReportActions(
-                    currentUserPersonalDetails?.accountID ?? 0,
+                    currentUserPersonalDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                     currentUserPersonalDetails?.login ?? '',
                     completeReport,
                     bankAccountList,
