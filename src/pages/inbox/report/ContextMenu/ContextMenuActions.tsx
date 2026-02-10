@@ -22,7 +22,7 @@ import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from '@libs/LocalePhon
 import {getForReportActionTemp} from '@libs/ModifiedExpenseMessage';
 import Navigation from '@libs/Navigation/Navigation';
 import Parser from '@libs/Parser';
-import {getCleanedTagName} from '@libs/PolicyUtils';
+import {getCleanedTagName, isPolicyAdmin} from '@libs/PolicyUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
 import {
     getActionableCardFraudAlertMessage,
@@ -482,13 +482,13 @@ const ContextMenuActions: ContextMenuAction[] = [
             if (closePopover) {
                 hideContextMenu(false, () => {
                     KeyboardUtils.dismiss().then(() => {
-                        explain(reportAction, originalReportID, translate, currentUserPersonalDetails?.timezone);
+                        explain(reportAction, originalReportID, translate, currentUserPersonalDetails.accountID, currentUserPersonalDetails.timezone);
                     });
                 });
                 return;
             }
 
-            explain(reportAction, originalReportID, translate, currentUserPersonalDetails?.timezone);
+            explain(reportAction, originalReportID, translate, currentUserPersonalDetails.accountID, currentUserPersonalDetails.timezone);
         },
         getDescription: () => {},
         sentryLabel: CONST.SENTRY_LABEL.CONTEXT_MENU.EXPLAIN,
@@ -757,6 +757,7 @@ const ContextMenuActions: ContextMenuAction[] = [
                 policyTags,
                 translate,
                 harvestReport,
+                currentUserPersonalDetails,
             },
         ) => {
             const isReportPreviewAction = isReportPreviewActionReportActionsUtils(reportAction);
@@ -991,7 +992,10 @@ const ContextMenuActions: ContextMenuAction[] = [
                 } else if (isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.PLAID_BALANCE_FAILURE)) {
                     setClipboardMessage(getPlaidBalanceFailureMessage(translate, reportAction));
                 } else if (isCardIssuedAction(reportAction)) {
-                    setClipboardMessage(getCardIssuedMessage({reportAction, shouldRenderHTML: true, policyID: report?.policyID, expensifyCard: card, translate}));
+                    const shouldNavigateToCardDetails = isPolicyAdmin(policy, currentUserPersonalDetails.login);
+                    setClipboardMessage(
+                        getCardIssuedMessage({reportAction, shouldRenderHTML: true, shouldNavigateToCardDetails, policyID: report?.policyID, expensifyCard: card, translate}),
+                    );
                 } else if (isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.ADD_INTEGRATION)) {
                     setClipboardMessage(getAddedConnectionMessage(translate, reportAction));
                 } else if (isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.DELETE_INTEGRATION)) {
@@ -1044,7 +1048,7 @@ const ContextMenuActions: ContextMenuAction[] = [
                     const displayMessage = getPolicyChangeMessage(translate, reportAction);
                     Clipboard.setString(displayMessage);
                 } else if (isActionableJoinRequest(reportAction)) {
-                    const displayMessage = getJoinRequestMessage(translate, reportAction);
+                    const displayMessage = getJoinRequestMessage(translate, policy, reportAction);
                     Clipboard.setString(displayMessage);
                 } else if (
                     reportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.ROOM_CHANGE_LOG.LEAVE_ROOM ||

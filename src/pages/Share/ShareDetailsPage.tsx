@@ -134,7 +134,14 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
         }
 
         if (isTextShared) {
-            addComment(report, report.reportID, ancestors, message, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE);
+            addComment({
+                report,
+                notifyReportID: report.reportID,
+                ancestors,
+                text: message,
+                timezoneParam: personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE,
+                currentUserAccountID: personalDetail.accountID,
+            });
             const routeToNavigate = ROUTES.REPORT_WITH_ID.getRoute(reportOrAccountID);
             Navigation.navigate(routeToNavigate, {forceReplace: true});
             return;
@@ -157,7 +164,15 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
                     );
                 }
                 if (report.reportID) {
-                    addAttachmentWithComment(report, report.reportID, ancestors, file, message, personalDetail.timezone);
+                    addAttachmentWithComment({
+                        report,
+                        notifyReportID: report.reportID,
+                        ancestors,
+                        attachments: file,
+                        currentUserAccountID: personalDetail.accountID,
+                        text: message,
+                        timezone: personalDetail.timezone,
+                    });
                 }
 
                 const routeToNavigate = ROUTES.REPORT_WITH_ID.getRoute(reportOrAccountID);
@@ -177,11 +192,11 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
         >
             <View style={[styles.flex1, styles.flexColumn, styles.h100, styles.appBG]}>
                 <PressableWithoutFeedback
-                    sentryLabel={CONST.SENTRY_LABEL.SHARE_DETAILS.DISMISS_KEYBOARD_HEADER}
                     onPress={() => {
                         KeyboardUtils.dismiss();
                     }}
                     accessible={false}
+                    sentryLabel={CONST.SENTRY_LABEL.SHARE_DETAIL.DISMISS_KEYBOARD_BUTTON}
                 >
                     <HeaderWithBackButton
                         title={translate('share.shareToExpensify')}
@@ -223,11 +238,11 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
                         </ScrollView>
                     </View>
                     <PressableWithoutFeedback
-                        sentryLabel={CONST.SENTRY_LABEL.SHARE_DETAILS.DISMISS_KEYBOARD_ATTACHMENT}
                         onPress={() => {
                             KeyboardUtils.dismiss();
                         }}
                         accessible={false}
+                        sentryLabel={CONST.SENTRY_LABEL.SHARE_DETAIL.DISMISS_KEYBOARD_BUTTON}
                     >
                         {shouldShowAttachment && (
                             <>
