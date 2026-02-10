@@ -4426,8 +4426,8 @@ function getUpdatedMoneyRequestReportData(
                 updatedMoneyRequestReport.unheldNonReimbursableTotal += updatedTransaction.reimbursable ? -updatedTransaction.amount : updatedTransaction.amount;
             }
         }
-         // Only recalculate reportName when reimbursable status changes and the report uses a formula title
-         if (transactionChanges && 'reimbursable' in transactionChanges) {
+        // Only recalculate reportName when reimbursable status changes and the report uses a formula title
+        if (transactionChanges && 'reimbursable' in transactionChanges) {
             updatedMoneyRequestReport = maybeUpdateReportNameForFormulaTitle(updatedMoneyRequestReport, policy);
         }
     } else {
