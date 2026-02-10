@@ -6,6 +6,7 @@ import Onyx from 'react-native-onyx';
 import type {TupleToUnion, ValueOf} from 'type-fest';
 import type {ReportExportType} from '@components/ButtonWithDropdownMenu/types';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
+import type PolicyData from '@hooks/usePolicyData/types';
 import * as API from '@libs/API';
 import type {
     AddBillingCardAndRequestWorkspaceOwnerChangeParams,
@@ -82,7 +83,9 @@ import GoogleTagManager from '@libs/GoogleTagManager';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {translate, translateLocal} from '@libs/Localize';
 import Log from '@libs/Log';
+import {buildNextStepNew} from '@libs/NextStepUtils';
 import * as NumberUtils from '@libs/NumberUtils';
+import Permissions from '@libs/Permissions';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
 import * as PhoneNumber from '@libs/PhoneNumber';
 import * as PolicyUtils from '@libs/PolicyUtils';
@@ -101,6 +104,7 @@ import type {OnboardingAccounting} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
     BankAccountList,
+    Beta,
     CardFeeds,
     DuplicateWorkspace,
     IntroSelected,
@@ -114,7 +118,6 @@ import type {
     Report,
     ReportAction,
     ReportActions,
-    Request,
     TaxRatesWithDefault,
     Transaction,
     TransactionViolations,
@@ -124,6 +127,7 @@ import type {ErrorFields, Errors, PendingAction} from '@src/types/onyx/OnyxCommo
 import type {Attributes, CompanyAddress, CustomUnit, NetSuiteCustomList, NetSuiteCustomSegment, ProhibitedExpenses, Rate, TaxRate, UberReceiptPartner} from '@src/types/onyx/Policy';
 import type {CustomFieldType} from '@src/types/onyx/PolicyEmployee';
 import type {NotificationPreference} from '@src/types/onyx/Report';
+import type ReportNextStepDeprecated from '@src/types/onyx/ReportNextStepDeprecated';
 import type {OnyxData} from '@src/types/onyx/Request';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {buildOptimisticMccGroup, buildOptimisticPolicyCategories, buildOptimisticPolicyWithExistingCategories} from './Category';
@@ -186,6 +190,7 @@ type BuildPolicyDataOptions = {
     allReportsParam?: OnyxCollection<Report>;
     onboardingPurposeSelected?: OnboardingPurpose;
     shouldAddGuideWelcomeMessage?: boolean;
+    shouldCreateControlPolicy?: boolean;
 };
 
 type DuplicatePolicyDataOptions = {
@@ -204,8 +209,18 @@ type SetWorkspaceReimbursementActionParams = {
     reimbursementChoice: ValueOf<typeof CONST.POLICY.REIMBURSEMENT_CHOICES>;
     bankAccountID?: number;
     reimburserEmail: string;
+    accountNumber?: string;
+    addressName?: string;
+    bankName?: string;
+    state?: string;
     lastPaymentMethod?: LastPaymentMethodType | string;
     shouldUpdateLastPaymentMethod?: boolean;
+};
+
+type SetWorkspaceApprovalModeAdditionalData = {
+    reportNextSteps?: OnyxCollection<ReportNextStepDeprecated>;
+    transactionViolations?: OnyxCollection<TransactionViolations>;
+    betas?: Beta[];
 };
 
 const deprecatedAllPolicies: OnyxCollection<Policy> = {};
@@ -291,10 +306,10 @@ function hasInvoicingDetails(policy: OnyxEntry<Policy>): boolean {
  * Returns a primary invoice workspace for the user
  */
 function getInvoicePrimaryWorkspace(activePolicy: OnyxEntry<Policy>, activeAdminWorkspaces: Policy[]): Policy | undefined {
-    if (PolicyUtils.canSendInvoiceFromWorkspace(activePolicy?.id) && PolicyUtils.isPolicyAdmin(activePolicy)) {
+    if (PolicyUtils.canSendInvoiceFromWorkspace(activePolicy) && PolicyUtils.isPolicyAdmin(activePolicy)) {
         return activePolicy;
     }
-    return activeAdminWorkspaces.find((policy) => PolicyUtils.canSendInvoiceFromWorkspace(policy.id));
+    return activeAdminWorkspaces.find((policy) => PolicyUtils.canSendInvoiceFromWorkspace(policy));
 }
 
 /**
@@ -327,6 +342,7 @@ function hasActiveChatEnabledPolicies(policies: Array<OnyxEntry<PolicySelector>>
 }
 
 type DeleteWorkspaceActionParams = {
+    policies: OnyxCollection<Policy>;
     policyID: string;
     personalPolicyID: string | undefined;
     activePolicyID: string | undefined;
@@ -345,11 +361,8 @@ type DeleteWorkspaceActionParams = {
  * Delete the workspace
  */
 function deleteWorkspace(params: DeleteWorkspaceActionParams) {
-    if (!deprecatedAllPolicies) {
-        return;
-    }
-
     const {
+        policies,
         policyID,
         activePolicyID,
         policyName,
@@ -364,10 +377,8 @@ function deleteWorkspace(params: DeleteWorkspaceActionParams) {
         personalPolicyID,
     } = params;
 
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const policy = getPolicy(policyID);
-    const filteredPolicies = Object.values(deprecatedAllPolicies).filter((p): p is Policy => p?.id !== policyID);
+    const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
+    const filteredPolicies = Object.values(policies ?? {}).filter((p): p is Policy => p?.id !== policyID);
     const workspaceAccountID = policy?.workspaceAccountID;
 
     // Filter out bank accounts associated with the policy being deleted
@@ -477,7 +488,7 @@ function deleteWorkspace(params: DeleteWorkspaceActionParams) {
     ];
 
     if (policyID === activePolicyID) {
-        const mostRecentlyCreatedGroupPolicy = Object.values(deprecatedAllPolicies ?? {})
+        const mostRecentlyCreatedGroupPolicy = Object.values(policies ?? {})
             .filter((p) => p && p.id !== activePolicyID && p.type !== CONST.POLICY.TYPE.PERSONAL && p.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
             .sort((policyA, policyB) => localeCompare(policyB?.created ?? '', policyA?.created ?? ''))
             .at(0);
@@ -509,7 +520,7 @@ function deleteWorkspace(params: DeleteWorkspaceActionParams) {
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
             value: {
                 ...(!isInvoiceReceiverReport && {
-                    oldPolicyName: deprecatedAllPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`]?.name,
+                    oldPolicyName: policy?.name,
                     policyName: '',
                 }),
                 isPinned: false,
@@ -803,7 +814,7 @@ function setWorkspaceAutoReportingMonthlyOffset(policyID: string | undefined, au
     API.write(WRITE_COMMANDS.SET_WORKSPACE_AUTO_REPORTING_MONTHLY_OFFSET, params, {optimisticData, failureData, successData});
 }
 
-function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMode: ValueOf<typeof CONST.POLICY.APPROVAL_MODE>) {
+function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMode: ValueOf<typeof CONST.POLICY.APPROVAL_MODE>, additionalData?: SetWorkspaceApprovalModeAdditionalData) {
     // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policy = getPolicy(policyID);
@@ -812,8 +823,63 @@ function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMo
         approver,
         approvalMode,
     };
+    const updatedPolicy = {
+        ...(policy ?? {}),
+        ...value,
+    } as OnyxEntry<Policy>;
 
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+    const currentUserAccountID = deprecatedSessionAccountID ?? CONST.DEFAULT_NUMBER_ID;
+    const currentUserEmail = deprecatedSessionEmail ?? '';
+
+    const nextStepOptimisticData: OnyxUpdate[] = [];
+    const nextStepFailureData: OnyxUpdate[] = [];
+    const shouldUpdateNextSteps = additionalData?.reportNextSteps != null && additionalData?.transactionViolations != null && additionalData?.betas != null;
+    if (shouldUpdateNextSteps) {
+        const {reportNextSteps, transactionViolations, betas} = additionalData;
+        const resolvedTransactionViolations: OnyxCollection<TransactionViolations> = transactionViolations ?? {};
+        const resolvedReportNextSteps: NonNullable<OnyxCollection<ReportNextStepDeprecated>> = reportNextSteps ?? {};
+        const resolvedBetas: Beta[] = betas ?? [];
+        const isASAPSubmitBetaEnabled = Permissions.isBetaEnabled(CONST.BETAS.ASAP_SUBMIT, resolvedBetas);
+        const affectedReports = ReportUtils.getAllPolicyReports(policyID).filter(
+            (report) => !!report && ReportUtils.isExpenseReport(report) && report?.statusNum === CONST.REPORT.STATUS_NUM.SUBMITTED,
+        );
+
+        for (const report of affectedReports) {
+            const reportID = report?.reportID;
+
+            if (!reportID) {
+                continue;
+            }
+
+            const nextStepKey: `${typeof ONYXKEYS.COLLECTION.NEXT_STEP}${string}` = `${ONYXKEYS.COLLECTION.NEXT_STEP}${reportID}`;
+            const currentNextStep: OnyxEntry<ReportNextStepDeprecated> | null = resolvedReportNextSteps[nextStepKey] ?? null;
+            const hasViolations = ReportUtils.hasViolations(reportID, resolvedTransactionViolations, currentUserAccountID, currentUserEmail, undefined, undefined, report, updatedPolicy);
+            // eslint-disable-next-line @typescript-eslint/no-deprecated -- Next step generation uses deprecated "ReportNextStepDeprecated" types (still in active use).
+            const optimisticNextStep = buildNextStepNew({
+                report,
+                policy: updatedPolicy,
+                currentUserAccountIDParam: currentUserAccountID,
+                currentUserEmailParam: currentUserEmail,
+                hasViolations,
+                isASAPSubmitBetaEnabled,
+                predictedNextStatus: report?.statusNum ?? CONST.REPORT.STATUS_NUM.SUBMITTED,
+            });
+
+            nextStepOptimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: nextStepKey,
+                value: optimisticNextStep,
+            });
+
+            nextStepFailureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: nextStepKey,
+                value: currentNextStep ?? null,
+            });
+        }
+    }
+
+    const optimisticData: OnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
@@ -823,8 +889,11 @@ function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMo
             },
         },
     ];
+    if (nextStepOptimisticData.length > 0) {
+        optimisticData.push(...nextStepOptimisticData);
+    }
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+    const failureData: OnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
@@ -837,6 +906,9 @@ function setWorkspaceApprovalMode(policyID: string, approver: string, approvalMo
             },
         },
     ];
+    if (nextStepFailureData.length > 0) {
+        failureData.push(...nextStepFailureData);
+    }
 
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
         {
@@ -977,7 +1049,18 @@ function clearQuickbooksOnlineAutoSyncErrorField(policyID: string | undefined) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {connections: {quickbooksOnline: {config: {errorFields: {autoSync: null}}}}});
 }
 
-function setWorkspaceReimbursement({policyID, reimbursementChoice, bankAccountID, reimburserEmail, lastPaymentMethod, shouldUpdateLastPaymentMethod}: SetWorkspaceReimbursementActionParams) {
+function setWorkspaceReimbursement({
+    policyID,
+    reimbursementChoice,
+    bankAccountID,
+    reimburserEmail,
+    accountNumber,
+    addressName,
+    bankName,
+    state,
+    lastPaymentMethod,
+    shouldUpdateLastPaymentMethod,
+}: SetWorkspaceReimbursementActionParams) {
     // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policy = getPolicy(policyID);
@@ -991,7 +1074,7 @@ function setWorkspaceReimbursement({policyID, reimbursementChoice, bankAccountID
                 reimbursementChoice,
                 isLoadingWorkspaceReimbursement: true,
                 reimburser: reimburserEmail,
-                achAccount: {reimburser: reimburserEmail, bankAccountID},
+                achAccount: {reimburser: reimburserEmail, bankAccountID, accountNumber, addressName, bankName, state},
                 errorFields: {reimbursementChoice: null},
                 pendingFields: {reimbursementChoice: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE},
             },
@@ -1037,7 +1120,14 @@ function setWorkspaceReimbursement({policyID, reimbursementChoice, bankAccountID
             value: {
                 isLoadingWorkspaceReimbursement: false,
                 reimbursementChoice: policy?.reimbursementChoice ?? null,
-                achAccount: {reimburser: policy?.achAccount?.reimburser ?? null, bankAccountID: null},
+                achAccount: {
+                    reimburser: policy?.achAccount?.reimburser ?? null,
+                    bankAccountID: null,
+                    accountNumber: policy?.achAccount?.accountNumber ?? null,
+                    addressName: policy?.achAccount?.addressName ?? null,
+                    bankName: policy?.achAccount?.bankName ?? null,
+                    state: policy?.achAccount?.state ?? null,
+                },
                 errorFields: {reimbursementChoice: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
                 pendingFields: {reimbursementChoice: null},
             },
@@ -1725,7 +1815,7 @@ function updateGeneralSettings(policyID: string | undefined, name: string, curre
 
     const createWorkspaceRequest = persistedRequests.at(createWorkspaceRequestChangedIndex);
     if (createWorkspaceRequest && createWorkspaceRequestChangedIndex !== -1) {
-        const workspaceRequest: Request = {
+        const workspaceRequest = {
             ...createWorkspaceRequest,
             data: {
                 ...createWorkspaceRequest.data,
@@ -1930,7 +2020,7 @@ function generateDefaultWorkspaceName(email = ''): string {
 
     if (isEmptyObject(deprecatedAllPolicies)) {
         // eslint-disable-next-line @typescript-eslint/no-deprecated
-        return isSMSDomain ? translateLocal('workspace.new.myGroupWorkspace', {}) : translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace});
+        return isSMSDomain ? translateLocal('workspace.new.myGroupWorkspace', {}) : translateLocal('workspace.new.workspaceName', displayNameForWorkspace);
     }
 
     // find default named workspaces and increment the last number
@@ -1952,7 +2042,7 @@ function generateDefaultWorkspaceName(email = ''): string {
         return translateLocal('workspace.new.myGroupWorkspace', {workspaceNumber: lastWorkspaceNumber !== undefined ? lastWorkspaceNumber + 1 : undefined});
     }
     // eslint-disable-next-line @typescript-eslint/no-deprecated
-    return translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace, workspaceNumber: lastWorkspaceNumber !== undefined ? lastWorkspaceNumber + 1 : undefined});
+    return translateLocal('workspace.new.workspaceName', displayNameForWorkspace, lastWorkspaceNumber !== undefined ? lastWorkspaceNumber + 1 : undefined);
 }
 
 /**
@@ -2079,6 +2169,22 @@ function createDraftInitialWorkspace(
     Onyx.update(optimisticData);
 }
 
+type BuildPolicyDataKeys =
+    | typeof ONYXKEYS.COLLECTION.POLICY
+    | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
+    | typeof ONYXKEYS.COLLECTION.REPORT
+    | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+    | typeof ONYXKEYS.COLLECTION.POLICY_DRAFTS
+    | typeof ONYXKEYS.NVP_ACTIVE_POLICY_ID
+    | typeof ONYXKEYS.NVP_INTRO_SELECTED
+    | typeof ONYXKEYS.NVP_ONBOARDING
+    | typeof ONYXKEYS.COLLECTION.REPORT_DRAFT
+    | typeof ONYXKEYS.COLLECTION.POLICY_CATEGORIES
+    | typeof ONYXKEYS.COLLECTION.POLICY_CATEGORIES_DRAFT
+    | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
+    | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD
+    | typeof ONYXKEYS.PERSONAL_DETAILS_LIST;
+
 /**
  * Generates onyx data for creating a new workspace
  *
@@ -2092,7 +2198,7 @@ function createDraftInitialWorkspace(
  * @param [file] Optional, avatar file for workspace
  * @param [shouldAddOnboardingTasks] whether to add onboarding tasks to the workspace
  */
-function buildPolicyData(options: BuildPolicyDataOptions) {
+function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyDataKeys> & {params: CreateWorkspaceParams} {
     const {
         policyOwnerEmail = '',
         makeMeAdmin = false,
@@ -2116,6 +2222,7 @@ function buildPolicyData(options: BuildPolicyDataOptions) {
         allReportsParam,
         shouldAddGuideWelcomeMessage = true,
         onboardingPurposeSelected,
+        shouldCreateControlPolicy = false,
     } = options;
     const workspaceName = policyName || generateDefaultWorkspaceName(policyOwnerEmail);
 
@@ -2147,7 +2254,7 @@ function buildPolicyData(options: BuildPolicyDataOptions) {
     // Determine workspace type based on selected features or user reported integration
     const isCorporateFeature = featuresMap?.some((feature) => !feature.enabledByDefault && feature.enabled && feature.requiresUpdate) ?? false;
     const isCorporateIntegration = userReportedIntegration && (CONST.POLICY.CONNECTIONS.CORPORATE as readonly string[]).includes(userReportedIntegration);
-    const workspaceType = isCorporateFeature || isCorporateIntegration ? CONST.POLICY.TYPE.CORPORATE : CONST.POLICY.TYPE.TEAM;
+    const workspaceType = isCorporateFeature || isCorporateIntegration || shouldCreateControlPolicy ? CONST.POLICY.TYPE.CORPORATE : CONST.POLICY.TYPE.TEAM;
 
     const areDistanceRatesEnabled = !!featuresMap?.find((feature) => feature.id === CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED && feature.enabled);
 
@@ -2324,7 +2431,6 @@ function buildPolicyData(options: BuildPolicyDataOptions) {
             | typeof ONYXKEYS.COLLECTION.POLICY
             | typeof ONYXKEYS.COLLECTION.REPORT
             | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
-            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
             | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
             | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD
             | typeof ONYXKEYS.NVP_ONBOARDING
@@ -2764,7 +2870,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const isTaxesOptionSelected = parts?.taxes;
     const isTagsOptionSelected = parts?.tags;
     const isInvoicesOptionSelected = parts?.invoices;
-    const isCustomUnitsOptionSelected = parts?.customUnits;
+    const isDistanceRatesOptionSelected = parts?.distance;
     const isRulesOptionSelected = parts?.expenses;
     const isWorkflowsOptionSelected = parts?.exportLayouts;
     const isPerDiemOptionSelected = parts?.perDiem;
@@ -2794,7 +2900,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
                 ...policy,
                 areCategoriesEnabled: true,
                 areTagsEnabled: isTagsOptionSelected,
-                areDistanceRatesEnabled: isCustomUnitsOptionSelected,
+                areDistanceRatesEnabled: isDistanceRatesOptionSelected,
                 areInvoicesEnabled: isInvoicesOptionSelected,
                 areRulesEnabled: isRulesOptionSelected,
                 areWorkflowsEnabled: isWorkflowsOptionSelected,
@@ -2810,7 +2916,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
                 name: policyName,
                 fieldList: isReportsOptionSelected ? policy?.fieldList : undefined,
                 connections: isConnectionsOptionSelected ? policy?.connections : undefined,
-                customUnits: getCustomUnitsForDuplication(policy, isCustomUnitsOptionSelected, isPerDiemOptionSelected),
+                customUnits: getCustomUnitsForDuplication(policy, isDistanceRatesOptionSelected, isPerDiemOptionSelected),
                 taxRates: isTaxesOptionSelected ? policy?.taxRates : undefined,
                 pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                 pendingFields: {
@@ -4498,7 +4604,7 @@ const DISABLED_MAX_EXPENSE_VALUES: Pick<Policy, 'maxExpenseAmountNoReceipt' | 'm
     maxExpenseAge: CONST.DISABLED_MAX_EXPENSE_VALUE,
 };
 
-function enablePolicyRules(policyID: string, enabled: boolean, shouldGoBack = true) {
+function enablePolicyRules(policyID: string, enabled: boolean, shouldGoBack = true, policyData?: PolicyData) {
     // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policy = getPolicy(policyID);
@@ -4548,6 +4654,16 @@ function enablePolicyRules(policyID: string, enabled: boolean, shouldGoBack = tr
             },
         ],
     };
+    if (policyData) {
+        ReportUtils.pushTransactionViolationsOnyxData(onyxData, policyData, {
+            areRulesEnabled: enabled,
+            preventSelfApproval: false,
+            ...(!enabled ? DISABLED_MAX_EXPENSE_VALUES : {}),
+            pendingFields: {
+                areRulesEnabled: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+            },
+        });
+    }
 
     if (enabled && isControlPolicy(policy) && policy?.outputCurrency === CONST.CURRENCY.USD) {
         const eReceiptsOnyxData = getWorkspaceEReceiptsEnabledOnyxData(policyID, enabled);
@@ -4734,6 +4850,44 @@ function enablePolicyTimeTracking(policyID: string, enabled: boolean) {
     if (enabled && getIsNarrowLayout()) {
         goBackWhenEnableFeature(policyID);
     }
+}
+
+/**
+ * Update policy's time tracking default hourly rate.
+ * The rate should be passed in currency units, not subunits.
+ */
+function setPolicyTimeTrackingDefaultRate(policyID: string, rate: number) {
+    const onyxData: OnyxData<typeof ONYXKEYS.COLLECTION.POLICY> = {
+        optimisticData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+                value: {
+                    units: {
+                        time: {
+                            rate,
+                        },
+                    },
+                    pendingFields: {
+                        timeTrackingDefaultRate: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                    },
+                },
+            },
+        ],
+        finallyData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+                value: {
+                    pendingFields: {
+                        timeTrackingDefaultRate: null,
+                    },
+                },
+            },
+        ],
+    };
+
+    API.write(WRITE_COMMANDS.SET_POLICY_TIME_TRACKING_DEFAULT_RATE, {policyID, defaultRate: rate}, onyxData);
 }
 
 function openPolicyMoreFeaturesPage(policyID: string) {
@@ -6819,4 +6973,6 @@ export {
     inviteWorkspaceEmployeesToUber,
     setWorkspaceConfirmationCurrency,
     setPolicyRequireCompanyCardsEnabled,
+    setPolicyTimeTrackingDefaultRate,
 };
+export type {BuildPolicyDataKeys};

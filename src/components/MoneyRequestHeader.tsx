@@ -21,8 +21,9 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useThrottledButtonState from '@hooks/useThrottledButtonState';
 import useTransactionViolations from '@hooks/useTransactionViolations';
-import {deleteTrackExpense, initSplitExpense, markRejectViolationAsResolved} from '@libs/actions/IOU';
+import {deleteTrackExpense, markRejectViolationAsResolved} from '@libs/actions/IOU';
 import {duplicateExpenseTransaction as duplicateTransactionAction} from '@libs/actions/IOU/Duplicate';
+import {initSplitExpense} from '@libs/actions/IOU/Split';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {setNameValuePair} from '@libs/actions/User';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -81,8 +82,9 @@ import LoadingBar from './LoadingBar';
 import type {MoneyRequestHeaderStatusBarProps} from './MoneyRequestHeaderStatusBar';
 import MoneyRequestHeaderStatusBar from './MoneyRequestHeaderStatusBar';
 import MoneyRequestReportTransactionsNavigation from './MoneyRequestReportView/MoneyRequestReportTransactionsNavigation';
+import {usePersonalDetails} from './OnyxListItemProvider';
 import {useSearchContext} from './Search/SearchContext';
-import {WideRHPContext} from './WideRHPContextProvider';
+import {useWideRHPState} from './WideRHPContextProvider';
 
 type MoneyRequestHeaderProps = {
     /** The report currently being looked at */
@@ -134,6 +136,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
     const [dismissedRejectUseExplanation] = useOnyx(ONYXKEYS.NVP_DISMISSED_REJECT_USE_EXPLANATION, {canBeMissing: true});
     const [dismissedHoldUseExplanation] = useOnyx(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION, {canBeMissing: true});
     const shouldShowLoadingBar = useLoadingBarVisibility();
+    const personalDetails = usePersonalDetails();
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate, localeCompare} = useLocalize();
@@ -171,11 +174,11 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
     // If the parent report is a selfDM, it should always be opened in the Inbox tab
     const shouldOpenParentReportInCurrentTab = !isSelfDM(parentReport);
 
-    const {wideRHPRouteKeys} = useContext(WideRHPContext);
+    const {wideRHPRouteKeys} = useWideRHPState();
     const [network] = useOnyx(ONYXKEYS.NETWORK, {canBeMissing: true});
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE, {canBeMissing: true});
     const [isSelfTourViewed = false] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {canBeMissing: true, selector: hasSeenTourSelector});
-
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
     const markAsCash = useCallback(() => {
         markAsCashAction(transaction?.transactionID, reportID, transactionViolations);
     }, [reportID, transaction?.transactionID, transactionViolations]);
@@ -206,6 +209,8 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                     targetPolicy: defaultExpensePolicy ?? undefined,
                     targetPolicyCategories: activePolicyCategories,
                     targetReport: activePolicyExpenseChat,
+                    betas,
+                    personalDetails,
                 });
             }
         },
@@ -220,6 +225,8 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
             policyRecentlyUsedCurrencies,
             policy?.id,
             isSelfTourViewed,
+            betas,
+            personalDetails,
         ],
     );
 
@@ -329,6 +336,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                             reportID,
                             transaction,
                             removeSettledAndApprovedTransactions(Object.values(duplicateTransactions ?? {}).filter((t) => t?.transactionID !== transaction?.transactionID)),
+                            policy,
                             policyCategories,
                             transactionReport,
                         ),
@@ -424,7 +432,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
             icon: expensifyIcons.ArrowSplit,
             value: CONST.REPORT.SECONDARY_ACTIONS.SPLIT,
             onSelected: () => {
-                initSplitExpense(allTransactions, allReports, transaction);
+                initSplitExpense(allTransactions, allReports, transaction, policy);
             },
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MERGE]: {
