@@ -295,7 +295,7 @@ function isMatchingCard(card: Card, encryptedCardNumber: string, cardName: strin
 
     // Normalize both strings to remove special characters (®, ™, ©, etc.)
     // This handles differences between OAuth provider card names and stored card names
-    const normalize = (str: string) => str.replace(/[^\w\s-]/g, '').trim();
+    const normalize = (str: string) => str.replaceAll(/[^\w\s-]/g, '').trim();
     return normalize(card.cardName) === normalize(cardName);
 }
 
