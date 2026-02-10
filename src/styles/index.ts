@@ -5794,6 +5794,14 @@ const staticStyles = (theme: ThemeColors) =>
         barChartChartContainer: {
             minHeight: 250,
         },
+        lineChartContainer: {
+            borderRadius: variables.componentBorderRadiusLarge,
+            paddingTop: variables.qrShareHorizontalPadding,
+            paddingHorizontal: variables.qrShareHorizontalPadding,
+        },
+        lineChartChartContainer: {
+            minHeight: 250,
+        },
         discoverSectionImage: {
             width: '100%',
             height: undefined,
@@ -6320,12 +6328,6 @@ const plainStyles = (theme: ThemeColors) =>
                 marginHorizontal: shouldUseNarrowLayout ? 20 : 32,
                 marginTop: shouldUseNarrowLayout ? 20 : 32,
             }) satisfies ViewStyle,
-
-        widgetContainerIconWrapper: {
-            flexGrow: 0,
-            flexShrink: 0,
-            marginRight: 11,
-        },
 
         getWidgetItemIconContainerStyle: (backgroundColor: string) =>
             ({
