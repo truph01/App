@@ -7,6 +7,7 @@ import type {MoneyRequestNavigatorParamList} from '@libs/Navigation/types';
 import {getActivePoliciesWithExpenseChatAndPerDiemEnabled, getPerDiemCustomUnit} from '@libs/PolicyUtils';
 import {findSelfDMReportID, getPolicyExpenseChat} from '@libs/ReportUtils';
 import {setCustomUnitID, setMoneyRequestCategory, setMoneyRequestParticipants, setMoneyRequestParticipantsFromReport} from '@userActions/IOU';
+import {setTransactionReport} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -33,6 +34,7 @@ function IOURequestStepPerDiemWorkspace({route, navigation}: IOURequestStepPerDi
                     return;
                 }
                 const perDiemUnit = getPerDiemCustomUnit(policy);
+                setTransactionReport(transactionID, {reportID: policyExpenseReportID}, true);
                 if (iouType === CONST.IOU.TYPE.TRACK) {
                     setMoneyRequestParticipantsFromReport(transactionID, selfDMReport, accountID, false);
                 } else {
