@@ -896,7 +896,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Dein Bereich',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Willkommen in ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Verwende die +‑Taste, um eine Ausgabe zu ${additionalText}.`,
-        askConcierge: 'Frag mich alles!',
+        askConcierge: 'Dies ist dein Chat mit Concierge, deinem persönlichen KI-Agenten. Ich kann fast alles, probier es aus!',
         conciergeSupport: 'Dein persönlicher KI-Agent',
         create: 'erstellen',
         iouTypes: {
@@ -2736,8 +2736,7 @@ ${amount} für ${merchant} – ${date}`,
                         5. Füge oben rechts deine eigenen Kategorien hinzu.
 
                         [Zu den Workspace-Kategorieneinstellungen](${workspaceCategoriesLink}).
-
-                        ![Kategorien einrichten](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Ausgabe einreichen',
@@ -2828,8 +2827,7 @@ ${
                         5. Füge eine eigene Einladung hinzu, wenn du möchtest!
 
                         [Zu den Workspace-Mitgliedern](${workspaceMembersLink}).
-
-                        ![Invite your team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+        `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Richte [Kategorien](${workspaceCategoriesLink}) und [Tags](${workspaceTagsLink}) ein`,
@@ -2853,8 +2851,7 @@ ${
                         6. Klicke auf *+ Add tag*, um eigene zu erstellen.
 
                         [Zu den zusätzlichen Funktionen](${workspaceMoreFeaturesLink}).
-
-                        ![Tags einrichten](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `Laden Sie Ihre(n) [Buchhalter(in)](${workspaceMembersLink}) ein`,
@@ -6391,8 +6388,8 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
                 preventSelfApprovalsSubtitle: 'Verhindere, dass Workspace-Mitglieder ihre eigenen Spesenabrechnungen genehmigen.',
                 autoApproveCompliantReportsTitle: 'Konforme Berichte automatisch genehmigen',
                 autoApproveCompliantReportsSubtitle: 'Konfiguriere, welche Spesenabrechnungen für die automatische Genehmigung infrage kommen.',
-                autoApproveReportsUnderTitle: 'Berichte automatisch genehmigen unter',
-                autoApproveReportsUnderDescription: 'Vollständig konforme Spesenabrechnungen unter diesem Betrag werden automatisch genehmigt.',
+                autoApproveReportsUnderTitle: 'Berichte automatisch genehmigen, wenn alle Ausgaben unter',
+                autoApproveReportsUnderDescription: 'Vollständig konforme Spesenabrechnungen, bei denen alle Ausgaben unter diesem Betrag liegen, werden automatisch genehmigt.',
                 randomReportAuditTitle: 'Stichprobenprüfung von Berichten',
                 randomReportAuditDescription: 'Verlange, dass einige Berichte manuell genehmigt werden, selbst wenn sie für die automatische Genehmigung infrage kommen.',
                 autoPayApprovedReportsTitle: 'Genehmigte Berichte automatisch bezahlen',
@@ -7549,8 +7546,8 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
     },
     cardTransactions: {
         notActivated: 'Nicht aktiviert',
-        outOfPocket: 'Erstattungsfähig',
-        companySpend: 'Nicht erstattungsfähig',
+        outOfPocket: 'Auslagen-Spend',
+        companySpend: 'Unternehmensausgaben',
     },
     distance: {
         addStop: 'Stopp hinzufügen',

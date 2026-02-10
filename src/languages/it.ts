@@ -896,7 +896,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Il tuo spazio',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Benvenuto in ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Usa il pulsante + per ${additionalText} una spesa.`,
-        askConcierge: 'Chiedimi qualsiasi cosa!',
+        askConcierge: 'Questa è la tua chat con Concierge, il tuo agente IA personale. Posso fare quasi tutto, mettimi alla prova!',
         conciergeSupport: 'Il tuo agente IA personale',
         create: 'crea',
         iouTypes: {
@@ -2729,8 +2729,7 @@ ${amount} per ${merchant} - ${date}`,
                         5. Aggiungi le tue categorie in alto a destra.
 
                         [Portami alle impostazioni delle categorie del workspace](${workspaceCategoriesLink}).
-
-                        ![Configura le categorie](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Invia una spesa',
@@ -2821,8 +2820,7 @@ ${
                         5. Aggiungi un messaggio di invito personalizzato, se vuoi!
 
                         [Portami ai membri dello spazio di lavoro](${workspaceMembersLink}).
-
-                        ![Invita il tuo team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Configura [categorie](${workspaceCategoriesLink}) e [tag](${workspaceTagsLink})`,
@@ -2847,7 +2845,7 @@ ${
 
                         [Portami a More features](${workspaceMoreFeaturesLink}).
 
-                        ![Configura i tag](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `Invita il tuo [commercialista](${workspaceMembersLink})`,
@@ -6368,8 +6366,8 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 preventSelfApprovalsSubtitle: 'Impedisci ai membri dello spazio di lavoro di approvare i propri report spese.',
                 autoApproveCompliantReportsTitle: 'Approva automaticamente i report conformi',
                 autoApproveCompliantReportsSubtitle: 'Configura quali note spese sono idonee per l’approvazione automatica.',
-                autoApproveReportsUnderTitle: 'Approva automaticamente i report inferiori a',
-                autoApproveReportsUnderDescription: 'Le note spese completamente conformi inferiori a questo importo verranno approvate automaticamente.',
+                autoApproveReportsUnderTitle: 'Approva automaticamente i report con tutte le spese inferiori a',
+                autoApproveReportsUnderDescription: 'Le note spese completamente conformi in cui tutte le spese sono inferiori a questo importo verranno approvate automaticamente.',
                 randomReportAuditTitle: 'Revisione casuale dei report',
                 randomReportAuditDescription: 'Richiedi che alcuni report siano approvati manualmente, anche se idonei per l’approvazione automatica.',
                 autoPayApprovedReportsTitle: 'Pagare automaticamente i resoconti approvati',
@@ -7529,8 +7527,8 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
     },
     cardTransactions: {
         notActivated: 'Non attivato',
-        outOfPocket: 'Rimborsabile',
-        companySpend: 'Non rimborsabile',
+        outOfPocket: 'Spesa personale',
+        companySpend: 'Spese aziendali',
     },
     distance: {
         addStop: 'Aggiungi fermata',

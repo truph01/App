@@ -910,7 +910,7 @@ const translations = {
         yourSpace: 'Your space',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Welcome to ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => ` Use the + button to ${additionalText} an expense.`,
-        askConcierge: ' Ask me anything!',
+        askConcierge: 'This is your chat with Concierge, your personal AI agent. I can do almost anything, try me!',
         conciergeSupport: 'Your personal AI agent',
         create: 'create',
         iouTypes: {
@@ -2757,7 +2757,6 @@ const translations = {
 
                         [Take me to workspace category settings](${workspaceCategoriesLink}).
 
-                        ![Set up categories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)
                     `),
             },
             combinedTrackSubmitExpenseTask: {
@@ -2852,7 +2851,6 @@ const translations = {
 
                         [Take me to workspace members](${workspaceMembersLink}).
 
-                        ![Invite your team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)
                     `),
             },
 
@@ -2880,7 +2878,6 @@ const translations = {
 
                         [Take me to more features](${workspaceMoreFeaturesLink}).
 
-                        ![Set up tags](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)
                     `),
             },
 
@@ -6325,8 +6322,8 @@ const translations = {
                 preventSelfApprovalsSubtitle: 'Prevent workspace members from approving their own expense reports.',
                 autoApproveCompliantReportsTitle: 'Auto-approve compliant reports',
                 autoApproveCompliantReportsSubtitle: 'Configure which expense reports are eligible for auto-approval.',
-                autoApproveReportsUnderTitle: 'Auto-approve reports under',
-                autoApproveReportsUnderDescription: 'Fully compliant expense reports under this amount will be automatically approved.',
+                autoApproveReportsUnderTitle: 'Auto-approve reports with all expenses under',
+                autoApproveReportsUnderDescription: 'Fully compliant expense reports where all expenses are under this amount will be automatically approved.',
                 randomReportAuditTitle: 'Random report audit',
                 randomReportAuditDescription: 'Require that some reports be manually approved, even if eligible for auto-approval.',
                 autoPayApprovedReportsTitle: 'Auto-pay approved reports',
@@ -7488,8 +7485,8 @@ const translations = {
     },
     cardTransactions: {
         notActivated: 'Not activated',
-        outOfPocket: 'Reimbursable',
-        companySpend: 'Non-reimbursable',
+        outOfPocket: 'Out-of-pocket spend',
+        companySpend: 'Company spend',
     },
     distance: {
         addStop: 'Add stop',

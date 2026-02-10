@@ -896,7 +896,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Twoja przestrzeń',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Witaj w ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Użyj przycisku +, aby ${additionalText} wydatek.`,
-        askConcierge: 'Zapytaj mnie o cokolwiek!',
+        askConcierge: 'To Twój czat z Concierge, Twoim osobistym agentem AI. Mogę zrobić prawie wszystko, wypróbuj mnie!',
         conciergeSupport: 'Twój osobisty agent AI',
         create: 'utwórz',
         iouTypes: {
@@ -2722,8 +2722,7 @@ ${amount} dla ${merchant} - ${date}`,
                         5. Dodaj własne kategorie w prawym górnym rogu.
 
                         [Przejdź do ustawień kategorii w środowisku pracy](${workspaceCategoriesLink}).
-
-                        ![Skonfiguruj kategorie](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Wyślij wydatek',
@@ -2814,8 +2813,7 @@ ${
                         5. Dodaj własną wiadomość z zaproszeniem, jeśli chcesz!
 
                         [Przejdź do członków workspace](${workspaceMembersLink}).
-
-                        ![Zaproś swój zespół](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Skonfiguruj [kategorie](${workspaceCategoriesLink}) i [tagi](${workspaceTagsLink})`,
@@ -2840,7 +2838,7 @@ ${
 
                         [Przejdź do dodatkowych funkcji](${workspaceMoreFeaturesLink}).
 
-                        ![Skonfiguruj tagi](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `Zaproś swojego [księgowego](${workspaceMembersLink})`,
@@ -6349,8 +6347,8 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 preventSelfApprovalsSubtitle: 'Uniemożliwij członkom przestrzeni roboczej zatwierdzanie własnych raportów wydatków.',
                 autoApproveCompliantReportsTitle: 'Automatycznie zatwierdzaj zgodne raporty',
                 autoApproveCompliantReportsSubtitle: 'Skonfiguruj, które raporty wydatków kwalifikują się do automatycznego zatwierdzania.',
-                autoApproveReportsUnderTitle: 'Automatycznie zatwierdzaj raporty poniżej',
-                autoApproveReportsUnderDescription: 'W pełni zgodne raporty wydatków poniżej tej kwoty zostaną zatwierdzone automatycznie.',
+                autoApproveReportsUnderTitle: 'Automatycznie zatwierdzaj raporty, gdy wszystkie wydatki są poniżej',
+                autoApproveReportsUnderDescription: 'W pełni zgodne raporty wydatków, w których wszystkie wydatki są poniżej tej kwoty, zostaną zatwierdzone automatycznie.',
                 randomReportAuditTitle: 'Losowa kontrola raportów',
                 randomReportAuditDescription: 'Wymagaj ręcznego zatwierdzania niektórych raportów, nawet jeśli kwalifikują się do automatycznego zatwierdzenia.',
                 autoPayApprovedReportsTitle: 'Automatycznie opłacaj zatwierdzone raporty',
@@ -7499,8 +7497,8 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
     },
     cardTransactions: {
         notActivated: 'Nieaktywne',
-        outOfPocket: 'Zwrotne',
-        companySpend: 'Niezgodne z refundacją',
+        outOfPocket: 'Wydatki z własnej kieszeni',
+        companySpend: 'Wydatki firmowe',
     },
     distance: {
         addStop: 'Dodaj przystanek',
