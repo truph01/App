@@ -892,7 +892,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'あなたのスペース',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `${roomName} へようこそ！`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `+ ボタンを使って経費を${additionalText}します。`,
-        askConcierge: '何でも聞いてください！',
+        askConcierge: 'こちらはあなた専属のAIエージェント、Conciergeとのチャットです。ほぼ何でもできますので、お試しください！',
         conciergeSupport: 'あなた専用のAIエージェント',
         create: '作成',
         iouTypes: {
@@ -5116,17 +5116,9 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                     subtitle: '現在、Expensify Travel の有効化リクエストを確認中です。準備が整い次第、お知らせしますのでご安心ください。',
                     ctaText: 'リクエストを送信しました',
                 },
-                bookOrManageYourTrip: {
-                    title: '出張を予約または管理',
-                    subtitle: 'Expensify Travel を使って、最高の旅行プランを入手し、すべてのビジネス経費を一括管理しましょう。',
-                    ctaText: '予約または管理',
-                },
+                bookOrManageYourTrip: {title: '出張予約', subtitle: 'おめでとうございます！このワークスペースで旅行の予約と管理を行う準備が整いました。', ctaText: '出張を管理'},
+                settings: {autoAddTripName: {title: '経費に出張名を追加', subtitle: 'Expensifyで予約した出張について、経費の説明に出張名を自動的に追加します。'}},
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: '出張予約',
-                        subtitle: 'おめでとうございます！このワークスペースで旅行の予約と管理を行う準備ができました。',
-                        manageTravelLabel: '出張を管理',
-                    },
                     centralInvoicingSection: {
                         title: '集中請求',
                         subtitle: '購入時に支払うのではなく、すべての出張費を月次請求書に集約しましょう。',
@@ -6323,8 +6315,8 @@ ${reportName}
                 preventSelfApprovalsSubtitle: 'ワークスペースメンバーが自分自身の経費レポートを承認できないようにする。',
                 autoApproveCompliantReportsTitle: 'コンプライアンス準拠レポートを自動承認',
                 autoApproveCompliantReportsSubtitle: '自動承認の対象とする経費レポートを設定します。',
-                autoApproveReportsUnderTitle: '自動承認するレポートの上限額',
-                autoApproveReportsUnderDescription: 'この金額以下で完全準拠している経費精算書は、自動的に承認されます。',
+                autoApproveReportsUnderTitle: 'すべての経費がこの金額以下のレポートを自動承認',
+                autoApproveReportsUnderDescription: 'すべての経費がこの金額以下で完全準拠している経費精算書は、自動的に承認されます。',
                 randomReportAuditTitle: 'ランダムレポート監査',
                 randomReportAuditDescription: '一部のレポートについては、自動承認の対象であっても手動承認を必須にする',
                 autoPayApprovedReportsTitle: '自動支払い対象の承認済みレポート',
@@ -7466,8 +7458,8 @@ ${reportName}
     },
     cardTransactions: {
         notActivated: '未有効化',
-        outOfPocket: '返金可能',
-        companySpend: '返金不可',
+        outOfPocket: '立替経費支出',
+        companySpend: '会社の支出',
     },
     distance: {
         addStop: '経由地を追加',
