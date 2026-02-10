@@ -23,6 +23,7 @@ import {setTransactionReport} from '@libs/actions/Transaction';
 import Navigation from '@libs/Navigation/Navigation';
 import {getPerDiemCustomUnit, isPolicyAdmin} from '@libs/PolicyUtils';
 import {getPolicyExpenseChat} from '@libs/ReportUtils';
+import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import variables from '@styles/variables';
 import {
     clearSubrates,
@@ -105,6 +106,9 @@ function IOURequestStepDestination({
             if (openedFromStartPage) {
                 if (iouType === CONST.IOU.TYPE.CREATE && transaction?.isFromGlobalCreate) {
                     targetReport = getPolicyExpenseChat(accountID, defaultExpensePolicy?.id);
+                }
+                if (targetReport?.policyID && shouldRestrictUserBillableActions(targetReport.policyID)) {
+                    return Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(targetReport.policyID));
                 }
                 setTransactionReport(transactionID, {reportID: targetReport?.reportID}, true);
                 setMoneyRequestParticipantsFromReport(transactionID, targetReport, accountID);
