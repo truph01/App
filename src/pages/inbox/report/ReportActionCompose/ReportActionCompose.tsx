@@ -453,9 +453,9 @@ function ReportActionCompose({
         composerRef.current?.resetHeight();
         setIsComposerFullSize(reportID, false);
 
-        scheduleOnUI(() => {
-            const {clearWorklet: clearComposer} = composerRefShared.get();
+        const {clearWorklet: clearComposer} = composerRefShared.get();
 
+        scheduleOnUI(() => {
             if (!clearComposer) {
                 throw new Error('The composerRefShared.clear function is not set yet. This should never happen, and indicates a developer error.');
             }
