@@ -11,8 +11,15 @@ type State = NavigationState | Omit<PartialState<NavigationState>, 'stale'>;
  * Checks if a screen name is a dynamic route screen
  */
 function isDynamicRouteScreen(screenName: Screen): boolean {
-    for (const {path} of Object.values(DYNAMIC_ROUTES)) {
-        if (normalizedConfigs[screenName]?.path === path) {
+    const dynamicRouteEntries = Object.values(DYNAMIC_ROUTES);
+    const screenPath = normalizedConfigs[screenName]?.path;
+
+    if (!screenPath) {
+        return false;
+    }
+
+    for (const {path} of dynamicRouteEntries) {
+        if (screenPath === path) {
             return true;
         }
     }
