@@ -130,7 +130,7 @@ function SearchAutocompleteInput({
     const exportedToAutocompleteList = useMemo(() => {
         const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
         const customNames = exportTemplates.flatMap((template) => {
-            const templateDisplayName = getStandardExportTemplateDisplayName(template.templateName!);
+            const templateDisplayName = getStandardExportTemplateDisplayName(template.templateName);
             return [template.templateName, templateDisplayName].filter(Boolean);
         });
 

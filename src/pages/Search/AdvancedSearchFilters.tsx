@@ -29,6 +29,7 @@ import {convertToDisplayStringWithoutCurrency} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {createDisplayName} from '@libs/PersonalDetailsUtils';
 import {getAllTaxRates, getCleanedTagName} from '@libs/PolicyUtils';
+// eslint-disable-next-line no-restricted-imports
 import {computeReportName} from '@libs/ReportNameUtils';
 import {
     buildCannedSearchQuery,
