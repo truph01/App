@@ -5119,11 +5119,6 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 bookOrManageYourTrip: {title: '出張予約', subtitle: 'おめでとうございます！このワークスペースで旅行の予約と管理を行う準備が整いました。', ctaText: '出張を管理'},
                 settings: {autoAddTripName: {title: '経費に出張名を追加', subtitle: 'Expensifyで予約した出張について、経費の説明に出張名を自動的に追加します。'}},
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: '出張予約',
-                        subtitle: 'おめでとうございます！このワークスペースで旅行の予約と管理を行う準備ができました。',
-                        manageTravelLabel: '出張を管理',
-                    },
                     centralInvoicingSection: {
                         title: '集中請求',
                         subtitle: '購入時に支払うのではなく、すべての出張費を月次請求書に集約しましょう。',

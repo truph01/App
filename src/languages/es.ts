@@ -4917,11 +4917,6 @@ ${amount} para ${merchant} - ${date}`,
                     },
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Reserva de viajes',
-                        subtitle: '¡Felicidades! Todo está listo para reservar y gestionar viajes en este espacio de trabajo.',
-                        manageTravelLabel: 'Gestionar viajes',
-                    },
                     centralInvoicingSection: {
                         title: 'Facturación centralizada',
                         subtitle: 'Centraliza todos los gastos de viaje en una factura mensual en lugar de pagar en el momento de la compra.',
