@@ -157,12 +157,19 @@ function WorkspaceCompanyCardsTable({
                       return true;
                   }
 
-                  // For OAuth feeds: Match by last 4 digits instead of full name
-                  // This is immune to name format changes (®, ™, etc.) and cardholder name changes
-                  const cardLast4 = card.lastFourPAN ?? card.cardName?.match(/(\d{4})$/)?.[1];
-                  const searchLast4 = cardName?.match(/(\d{4})$/)?.[1];
+                  // For OAuth feeds: Normalize strings to handle special characters (®, ™, ©)
+                  // This removes special characters while preserving the full card name for matching
+                  const normalize = (str: string | undefined) =>
+                      str
+                          ?.normalize('NFKD')
+                          .replace(/[^\w\s-]/g, '')
+                          .trim()
+                          .toLowerCase();
 
-                  return cardLast4 && searchLast4 && cardLast4 === searchLast4;
+                  const normalizedCardName = normalize(card.cardName);
+                  const normalizedSearchName = normalize(cardName);
+
+                  return normalizedCardName && normalizedSearchName && normalizedCardName === normalizedSearchName;
               });
               const cardholder = assignedCard?.accountID ? personalDetails?.[assignedCard.accountID] : undefined;
 
