@@ -3,13 +3,17 @@ import ConfirmationPage from '@components/ConfirmationPage';
 import LottieAnimations from '@components/LottieAnimations';
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {TwoFactorAuthNavigatorParamList} from '@libs/Navigation/types';
+import {closeReactNativeApp} from '@userActions/HybridApp';
 import {openLink} from '@userActions/Link';
 import {quitAndNavigateBack} from '@userActions/TwoFactorAuthActions';
+import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import TwoFactorAuthWrapper from './TwoFactorAuthWrapper';
@@ -20,6 +24,8 @@ function SuccessPage({route}: SuccessPageProps) {
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
     const styles = useThemeStyles();
+
+    const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {canBeMissing: true});
 
     const goBack = useCallback(() => {
         quitAndNavigateBack(route.params?.backTo ?? ROUTES.SETTINGS_2FA_ROOT.getRoute());
@@ -49,6 +55,10 @@ function SuccessPage({route}: SuccessPageProps) {
                 shouldShowButton
                 buttonText={translate('common.buttonConfirm')}
                 onButtonPress={() => {
+                    if (CONFIG.IS_HYBRID_APP && tryNewDot?.classicRedirect?.dismissed) {
+                        closeReactNativeApp({shouldSetNVP: false, isTrackingGPS: false});
+                        return;
+                    }
                     goBack();
                     if (route.params?.forwardTo) {
                         openLink(route.params.forwardTo, environmentURL);
