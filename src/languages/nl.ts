@@ -1148,6 +1148,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: 'Je hebt geen toegang meer tot je vorige snelkoppelingsbestemming. Kies hieronder een nieuwe.',
         updateDestination: 'Bestemming bijwerken',
         createReport: 'Rapport maken',
+        createTimeExpense: 'Tijdkosten aanmaken',
     },
     iou: {
         amount: 'Bedrag',

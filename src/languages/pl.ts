@@ -1148,6 +1148,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: 'Nie masz już dostępu do swojego poprzedniego szybkiego działania. Wybierz poniżej nowe.',
         updateDestination: 'Zaktualizuj miejsce docelowe',
         createReport: 'Utwórz raport',
+        createTimeExpense: 'Utwórz wydatek czasowy',
     },
     iou: {
         amount: 'Kwota',

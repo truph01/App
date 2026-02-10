@@ -1144,6 +1144,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: '以前のクイック操作の宛先にはアクセスできなくなりました。下から新しい宛先を選択してください。',
         updateDestination: '送信先を更新',
         createReport: 'レポートを作成',
+        createTimeExpense: '時間経費を作成',
     },
     iou: {
         amount: '金額',
