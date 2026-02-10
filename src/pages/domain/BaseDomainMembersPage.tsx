@@ -168,7 +168,7 @@ function BaseDomainMembersPage({
             >
                 <HeaderWithBackButton
                     title={headerTitle}
-                    onBackButtonPress={Navigation.popToSidebar}
+                    onBackButtonPress={Navigation.goBack}
                     icon={headerIcon}
                     shouldShowBackButton={shouldUseNarrowLayout}
                 >

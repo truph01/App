@@ -897,7 +897,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Twoja przestrzeń',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Witaj w ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Użyj przycisku +, aby ${additionalText} wydatek.`,
-        askConcierge: 'Zapytaj mnie o cokolwiek!',
+        askConcierge: 'To Twój czat z Concierge, Twoim osobistym agentem AI. Mogę zrobić prawie wszystko, wypróbuj mnie!',
         conciergeSupport: 'Twój osobisty agent AI',
         create: 'utwórz',
         iouTypes: {
@@ -6347,8 +6347,8 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 preventSelfApprovalsSubtitle: 'Uniemożliwij członkom przestrzeni roboczej zatwierdzanie własnych raportów wydatków.',
                 autoApproveCompliantReportsTitle: 'Automatycznie zatwierdzaj zgodne raporty',
                 autoApproveCompliantReportsSubtitle: 'Skonfiguruj, które raporty wydatków kwalifikują się do automatycznego zatwierdzania.',
-                autoApproveReportsUnderTitle: 'Automatycznie zatwierdzaj raporty poniżej',
-                autoApproveReportsUnderDescription: 'W pełni zgodne raporty wydatków poniżej tej kwoty zostaną zatwierdzone automatycznie.',
+                autoApproveReportsUnderTitle: 'Automatycznie zatwierdzaj raporty, gdy wszystkie wydatki są poniżej',
+                autoApproveReportsUnderDescription: 'W pełni zgodne raporty wydatków, w których wszystkie wydatki są poniżej tej kwoty, zostaną zatwierdzone automatycznie.',
                 randomReportAuditTitle: 'Losowa kontrola raportów',
                 randomReportAuditDescription: 'Wymagaj ręcznego zatwierdzania niektórych raportów, nawet jeśli kwalifikują się do automatycznego zatwierdzenia.',
                 autoPayApprovedReportsTitle: 'Automatycznie opłacaj zatwierdzone raporty',
@@ -7495,7 +7495,11 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             tryDifferentEmail: 'Spróbuj użyć innego adresu e-mail',
         },
     },
-    cardTransactions: {notActivated: 'Nieaktywne', outOfPocket: 'Podlegające zwrotowi', companySpend: 'Niepodlegające zwrotowi'},
+    cardTransactions: {
+        notActivated: 'Nieaktywne',
+        outOfPocket: 'Wydatki z własnej kieszeni',
+        companySpend: 'Wydatki firmowe',
+    },
     distance: {
         addStop: 'Dodaj przystanek',
         address: 'Adres',
