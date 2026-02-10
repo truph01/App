@@ -291,8 +291,8 @@ describe('mergeTransactionRequest', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${mergeTransactionID}`, mergeTransaction);
 
         type ApiModule = {write: (...args: unknown[]) => unknown};
-        const apiModule = jest.requireActual('@libs/API') as ApiModule;
-        const writeSpy = jest.spyOn(apiModule, 'write');
+        const getApiModule = (): ApiModule => jest.requireActual('@libs/API');
+        const writeSpy = jest.spyOn(getApiModule(), 'write');
 
         mockFetch?.pause?.();
 
