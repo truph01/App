@@ -148,11 +148,18 @@ function clearSearchInput() {
     input.focus();
 }
 
+let aiAbortController = null;
+
 function askHelpsiteAI(query) {
     const aiContainer = document.getElementById('ai-answer-container');
     if (!aiContainer) {
         return;
     }
+
+    if (aiAbortController) {
+        aiAbortController.abort();
+    }
+    aiAbortController = new AbortController();
 
     aiContainer.innerHTML = '';
     aiContainer.appendChild(cloneTemplate('ai-thinking-template'));
@@ -166,7 +173,7 @@ function askHelpsiteAI(query) {
         formData.append('platform', platform);
     }
 
-    fetch(ASK_AI_API_URL, {method: 'POST', body: formData})
+    fetch(ASK_AI_API_URL, {method: 'POST', body: formData, signal: aiAbortController.signal})
         .then((response) => response.json())
         .then((data) => {
             const answer = data.answer || '';
