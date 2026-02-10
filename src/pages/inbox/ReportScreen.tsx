@@ -429,10 +429,6 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
                 Navigation.goBack(backTo as Route);
                 return;
             }
-            if (Navigation.getShouldPopToSidebar()) {
-                Navigation.popToSidebar();
-                return;
-            }
             Navigation.goBack();
         },
         [isInSidePanel, backTo, isInNarrowPaneModal, closeSidePanel],

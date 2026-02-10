@@ -8096,6 +8096,7 @@ const CONST = {
         HEADER: {
             BACK_BUTTON: 'Header-BackButton',
             DOWNLOAD_BUTTON: 'Header-DownloadButton',
+            ROTATE_BUTTON: 'Header-RotateButton',
             CLOSE_BUTTON: 'Header-CloseButton',
             MORE_BUTTON: 'Header-MoreButton',
         },
