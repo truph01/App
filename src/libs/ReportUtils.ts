@@ -9541,17 +9541,6 @@ function reasonForReportToBeInOptionList({
         return CONST.REPORT_IN_LHN_REASONS.IS_FOCUSED;
     }
 
-    // Include reports that are relevant to the user in any view mode. Criteria include having a draft or having a GBR showing.
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    if (draftComment) {
-        return CONST.REPORT_IN_LHN_REASONS.HAS_DRAFT_COMMENT;
-    }
-
-    // Include reports if they are pinned
-    if (report?.isPinned) {
-        return CONST.REPORT_IN_LHN_REASONS.PINNED_BY_USER;
-    }
-
     const isChatThreadReport = isChatThread(report);
     const isSelfDMReport = isSelfDM(report);
     const isSystemChatReport = isSystemChat(report);
@@ -9616,6 +9605,12 @@ function reasonForReportToBeInOptionList({
         return null;
     }
 
+    // Include reports that are relevant to the user in any view mode. Criteria include having a draft or having a GBR showing.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    if (draftComment) {
+        return CONST.REPORT_IN_LHN_REASONS.HAS_DRAFT_COMMENT;
+    }
+
     if (requiresAttentionFromCurrentUser(report, undefined, isReportArchived)) {
         return CONST.REPORT_IN_LHN_REASONS.HAS_GBR;
     }
@@ -9632,6 +9627,11 @@ function reasonForReportToBeInOptionList({
         if ((isParentDeleted || isParentPendingDelete) && !hasReplies) {
             return null;
         }
+    }
+
+    // Include reports if they are pinned
+    if (report.isPinned) {
+        return CONST.REPORT_IN_LHN_REASONS.PINNED_BY_USER;
     }
 
     const reportIsSettled = report.statusNum === CONST.REPORT.STATUS_NUM.REIMBURSED;
