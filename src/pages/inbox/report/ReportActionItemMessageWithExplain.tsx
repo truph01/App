@@ -4,13 +4,10 @@ import type {OnyxEntry} from 'react-native-onyx';
 import RenderHTML from '@components/RenderHTML';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import {explain} from '@libs/actions/Report';
 import {hasReasoning} from '@libs/ReportActionsUtils';
-import {getOriginalReportID} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
-import type {ReportAction} from '@src/types/onyx';
+import type {Report, ReportAction} from '@src/types/onyx';
 import ReportActionItemBasicMessage from './ReportActionItemBasicMessage';
 
 type ReportActionItemMessageWithExplainProps = {
@@ -20,18 +17,20 @@ type ReportActionItemMessageWithExplainProps = {
     /** All the data of the action item */
     action: OnyxEntry<ReportAction>;
 
-    /** The report ID of linked report */
-    reportID: string | undefined;
+    /** The child report of the action item */
+    childReport: OnyxEntry<Report>;
+
+    /** Original report from which the given reportAction is first created */
+    originalReport: OnyxEntry<Report>;
 };
 
 /**
  * Wrapper component that renders a message and automatically appends the "Explain" link
  * if the action has reasoning.
  */
-function ReportActionItemMessageWithExplain({message, action, reportID}: ReportActionItemMessageWithExplainProps) {
+function ReportActionItemMessageWithExplain({message, action, childReport, originalReport}: ReportActionItemMessageWithExplainProps) {
     const {translate} = useLocalize();
     const personalDetail = useCurrentUserPersonalDetails();
-    const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {canBeMissing: true});
 
     const actionHasReasoning = hasReasoning(action);
     const computedMessage = actionHasReasoning ? `${message}${translate('iou.AskToExplain')}` : message;
@@ -42,10 +41,9 @@ function ReportActionItemMessageWithExplain({message, action, reportID}: ReportA
                 return;
             }
 
-            const actionOriginalReportID = getOriginalReportID(reportID, action, reportActions);
-            explain(action, actionOriginalReportID, translate, personalDetail?.timezone);
+            explain(childReport, originalReport, action, translate, personalDetail.accountID, personalDetail?.timezone);
         },
-        [action, reportID, reportActions, translate, personalDetail?.timezone],
+        [childReport, originalReport, action, translate, personalDetail?.timezone, personalDetail.accountID],
     );
 
     return (
