@@ -61,6 +61,7 @@ function applyHTTPSOnyxUpdates<TKey extends OnyxKey>(request: Request<TKey>, res
                     command: request.command,
                     jsonCode: Number(response.jsonCode),
                     message: response.message,
+                    requestData: request.data,
                 });
 
                 return updateHandler(request.failureData);
