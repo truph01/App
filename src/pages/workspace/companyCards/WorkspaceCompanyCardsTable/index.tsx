@@ -151,7 +151,19 @@ function WorkspaceCompanyCardsTable({
     const cardsData: WorkspaceCompanyCardTableItemData[] = isLoadingCards
         ? []
         : (Object.entries(cardNamesToEncryptedCardNumberMapping ?? {}).map(([cardName, encryptedCardNumber]) => {
-              const assignedCard = Object.values(assignedCards ?? {}).find((card: Card) => card.encryptedCardNumber === encryptedCardNumber || card.cardName === cardName);
+              const assignedCard = Object.values(assignedCards ?? {}).find((card: Card) => {
+                  // Match by encrypted card number (for commercial feeds)
+                  if (card.encryptedCardNumber === encryptedCardNumber) {
+                      return true;
+                  }
+
+                  // For OAuth feeds: Match by last 4 digits instead of full name
+                  // This is immune to name format changes (®, ™, etc.) and cardholder name changes
+                  const cardLast4 = card.lastFourPAN || card.cardName?.match(/(\d{4})$/)?.[1];
+                  const searchLast4 = cardName?.match(/(\d{4})$/)?.[1];
+
+                  return cardLast4 && searchLast4 && cardLast4 === searchLast4;
+              });
               const cardholder = assignedCard?.accountID ? personalDetails?.[assignedCard.accountID] : undefined;
 
               return {
