@@ -1403,7 +1403,7 @@ function isFromCreditCardImport(transaction: OnyxEntry<Transaction>): boolean {
         return true;
     }
 
-    if (transaction?.bank === CONST.COMPANY_CARDS.BANK_NAME.UPLOAD) {
+    if (transaction?.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD) {
         return false;
     }
 
@@ -2877,6 +2877,7 @@ export {
     shouldShowExpenseBreakdown,
     isTimeRequest,
     getExpenseTypeTranslationKey,
+    isDistanceTypeRequest,
 };
 
 export type {TransactionChanges};
