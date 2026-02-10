@@ -19,7 +19,10 @@ function CustomStatusBarAndBackgroundContextProvider({children}: React.PropsWith
     );
 
     return (
-        <CustomStatusBarAndBackgroundProvider state={stateValue} actions={actionsValue}>
+        <CustomStatusBarAndBackgroundProvider
+            state={stateValue}
+            actions={actionsValue}
+        >
             {children}
         </CustomStatusBarAndBackgroundProvider>
     );

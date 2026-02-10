@@ -8,14 +8,8 @@ import Animated, {scrollTo, useAnimatedRef, useSharedValue} from 'react-native-r
 import CarouselActions from '@components/Attachments/AttachmentCarousel/CarouselActions';
 import CarouselButtons from '@components/Attachments/AttachmentCarousel/CarouselButtons';
 import CarouselItem from '@components/Attachments/AttachmentCarousel/CarouselItem';
-import {
-    AttachmentCarouselPagerActionsContext,
-    AttachmentCarouselPagerStateContext,
-} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
-import type {
-    AttachmentCarouselPagerActionsContextType,
-    AttachmentCarouselPagerStateContextType,
-} from '@components/Attachments/AttachmentCarousel/Pager/types';
+import {AttachmentCarouselPagerActionsContext, AttachmentCarouselPagerStateContext} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
+import type {AttachmentCarouselPagerActionsContextType, AttachmentCarouselPagerStateContextType} from '@components/Attachments/AttachmentCarousel/Pager/types';
 import type {UpdatePageProps} from '@components/Attachments/AttachmentCarousel/types';
 import useCarouselContextEvents from '@components/Attachments/AttachmentCarousel/useCarouselContextEvents';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';

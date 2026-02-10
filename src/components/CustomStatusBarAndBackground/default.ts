@@ -1,7 +1,4 @@
-import type {
-    CustomStatusBarAndBackgroundActionsContextType,
-    CustomStatusBarAndBackgroundStateContextType,
-} from './types';
+import type {CustomStatusBarAndBackgroundActionsContextType, CustomStatusBarAndBackgroundStateContextType} from './types';
 
 const defaultCustomStatusBarAndBackgroundStateContextValue: CustomStatusBarAndBackgroundStateContextType = {
     isRootStatusBarEnabled: true,
@@ -11,7 +8,4 @@ const defaultCustomStatusBarAndBackgroundActionsContextValue: CustomStatusBarAnd
     setRootStatusBarEnabled: () => undefined,
 };
 
-export {
-    defaultCustomStatusBarAndBackgroundActionsContextValue,
-    defaultCustomStatusBarAndBackgroundStateContextValue,
-};
+export {defaultCustomStatusBarAndBackgroundActionsContextValue, defaultCustomStatusBarAndBackgroundStateContextValue};

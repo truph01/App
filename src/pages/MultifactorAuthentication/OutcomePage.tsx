@@ -29,7 +29,7 @@ type MultifactorAuthenticationLocalize = LocaleContextProps & {
 function MultifactorAuthenticationOutcomePage({route}: MultifactorAuthenticationOutcomePageProps) {
     const {translate} = useLocalize() as MultifactorAuthenticationLocalize;
     const styles = useThemeStyles();
-    const {state} = useMultifactorAuthenticationState();
+    const state = useMultifactorAuthenticationState();
     const onGoBackPress = () => {
         Navigation.closeRHPFlow();
     };

@@ -1,9 +1,6 @@
 import React, {memo, useCallback, useEffect} from 'react';
 import type {GestureResponderEvent} from 'react-native';
-import {
-    useAttachmentCarouselPagerActions,
-    useAttachmentCarouselPagerState,
-} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
+import {useAttachmentCarouselPagerActions, useAttachmentCarouselPagerState} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
 import PDFView from '@components/PDFView';
 import type AttachmentViewPdfProps from './types';
 

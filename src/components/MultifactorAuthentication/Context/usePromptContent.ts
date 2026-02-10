@@ -36,7 +36,7 @@ function serverHasRegisteredCredentials(data: OnyxEntry<Account>) {
  * timing issues with optimistic updates.
  */
 function usePromptContent(promptType: MultifactorAuthenticationPromptType): PromptContent {
-    const {state} = useMultifactorAuthenticationState();
+    const state = useMultifactorAuthenticationState();
     const [serverHasCredentials = false] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true, selector: serverHasRegisteredCredentials});
     const [deviceBiometricsState] = useOnyx(ONYXKEYS.DEVICE_BIOMETRICS, {canBeMissing: true});
     const hasEverAcceptedSoftPrompt = deviceBiometricsState?.hasAcceptedSoftPrompt ?? false;

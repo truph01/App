@@ -12,14 +12,5 @@ function useAttachmentCarouselPagerActions(): AttachmentCarouselPagerActionsCont
     return useContext(AttachmentCarouselPagerActionsContext);
 }
 
-export {
-    AttachmentCarouselPagerActionsContext,
-    AttachmentCarouselPagerStateContext,
-    useAttachmentCarouselPagerActions,
-    useAttachmentCarouselPagerState,
-};
-export type {
-    AttachmentCarouselPagerActionsContextType,
-    AttachmentCarouselPagerItems,
-    AttachmentCarouselPagerStateContextType,
-} from './types';
+export {AttachmentCarouselPagerActionsContext, AttachmentCarouselPagerStateContext, useAttachmentCarouselPagerActions, useAttachmentCarouselPagerState};
+export type {AttachmentCarouselPagerActionsContextType, AttachmentCarouselPagerItems, AttachmentCarouselPagerStateContextType} from './types';
