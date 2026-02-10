@@ -196,6 +196,7 @@ function askHelpsiteAI(query) {
         })
         .catch(() => {
             aiContainer.innerHTML = '';
+            aiContainer.appendChild(cloneTemplate('ai-error-template'));
         });
 }
 
