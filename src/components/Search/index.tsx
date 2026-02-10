@@ -37,7 +37,6 @@ import {openOldDotLink} from '@libs/actions/Link';
 import {turnOffMobileSelectionMode, turnOnMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import {openSearch, setOptimisticDataForTransactionThreadPreview} from '@libs/actions/Search';
-import Timing from '@libs/actions/Timing';
 import DateUtils from '@libs/DateUtils';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import Log from '@libs/Log';
@@ -1078,8 +1077,8 @@ function Search({
                 return;
             }
 
-            // After handling all group types, item should be TransactionListItemType, ReportActionListItemType, or TransactionGroupListItemType
-            if (!isTransactionItem && !isReportActionListItemType(item) && !isTransactionGroupListItemType(item)) {
+            // After handling all group types, item should be TransactionListItemType, ReportActionListItemType, TaskListItemType, or TransactionGroupListItemType
+            if (!isTransactionItem && !isReportActionListItemType(item) && !isTaskListItemType(item) && !isTransactionGroupListItemType(item)) {
                 return;
             }
 
@@ -1101,16 +1100,14 @@ function Search({
             }
 
             Performance.markStart(CONST.TIMING.OPEN_REPORT_SEARCH);
-            Timing.start(CONST.TIMING.OPEN_REPORT_SEARCH);
             startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
                 name: 'Search',
                 op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
             });
 
             if (isTransactionGroupListItemType(item)) {
-                const groupItem = item as TransactionGroupListItemType;
-                const firstTransaction = groupItem.transactions.at(0);
-                if (groupItem.isOneTransactionReport && firstTransaction && transactionPreviewData) {
+                const firstTransaction = item.transactions.at(0);
+                if (item.isOneTransactionReport && firstTransaction && transactionPreviewData) {
                     if (!firstTransaction?.reportAction?.childReportID) {
                         createAndOpenSearchTransactionThread(firstTransaction, backTo, firstTransaction?.reportAction?.childReportID, transactionPreviewData, false);
                     } else {
@@ -1118,7 +1115,7 @@ function Search({
                     }
                 }
 
-                if (groupItem.transactions.length > 1) {
+                if (item.transactions.length > 1) {
                     markReportIDAsMultiTransactionExpense(reportID);
                 } else {
                     unmarkReportIDAsMultiTransactionExpense(reportID);
@@ -1131,6 +1128,11 @@ function Search({
             if (isReportActionListItemType(item)) {
                 const reportActionID = reportActionItem.reportActionID;
                 Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID, reportActionID, backTo}));
+                return;
+            }
+
+            if (isTaskListItemType(item)) {
+                requestAnimationFrame(() => Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID, backTo})));
                 return;
             }
 
