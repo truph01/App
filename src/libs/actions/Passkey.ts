@@ -33,14 +33,14 @@ type AddLocalPasskeyCredentialParams = {
 };
 
 function addLocalPasskeyCredential({userId, rpId, credential, existingEntry}: AddLocalPasskeyCredentialParams): void {
-    const existingCredentials = existingEntry?.credentialIds ?? [];
+    const existingCredentials = existingEntry?.credentials ?? [];
     const credentialExists = existingCredentials.some((c) => c.id === credential.id);
 
     if (credentialExists) {
         const updatedCredentials = existingCredentials.map((c) => (c.id === credential.id ? credential : c));
-        setLocalPasskeyCredentials({userId, rpId, entry: {credentialIds: updatedCredentials}});
+        setLocalPasskeyCredentials({userId, rpId, entry: {credentials: updatedCredentials}});
     } else {
-        setLocalPasskeyCredentials({userId, rpId, entry: {credentialIds: [...existingCredentials, credential]}});
+        setLocalPasskeyCredentials({userId, rpId, entry: {credentials: [...existingCredentials, credential]}});
     }
 }
 
@@ -70,18 +70,18 @@ function reconcileLocalPasskeysWithBackend({userId, rpId, backendPasskeyCredenti
     if (!userId || !rpId) {
         throw new Error('userId and rpId are required to reconcile passkey credentials');
     }
-    if (!localEntry || localEntry.credentialIds.length === 0) {
+    if (!localEntry || localEntry.credentials.length === 0) {
         return [];
     }
 
     const backendCredentialIds = new Set(backendPasskeyCredentials.map((c) => c.id));
-    const matchedCredentials = localEntry.credentialIds.filter((c) => backendCredentialIds.has(c.id));
+    const matchedCredentials = localEntry.credentials.filter((c) => backendCredentialIds.has(c.id));
 
-    if (matchedCredentials.length !== localEntry.credentialIds.length) {
+    if (matchedCredentials.length !== localEntry.credentials.length) {
         if (matchedCredentials.length === 0) {
             deleteLocalPasskeyCredentials(userId, rpId);
         } else {
-            setLocalPasskeyCredentials({userId, rpId, entry: {credentialIds: matchedCredentials}});
+            setLocalPasskeyCredentials({userId, rpId, entry: {credentials: matchedCredentials}});
         }
     }
 
