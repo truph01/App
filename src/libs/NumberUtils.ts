@@ -9,7 +9,6 @@ function rand64(): string {
     // Max 64-bit signed:
     // 9,223,372,036,854,775,807
     // The left part of the max 64-bit number *+1* because we're flooring it.
-    const left = Math.floor(Math.random() * (CONST.MAX_64BIT_LEFT_PART + 1));
     const left = Math.floor(Math.random() * CONST.MAX_64BIT_LEFT_PART) + 1;
 
     let middle;
