@@ -83,25 +83,40 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         odometerImage = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? transaction?.comment?.odometerStartImage : transaction?.comment?.odometerEndImage;
     }
     const odometerFile = typeof odometerImage !== 'string' ? odometerImage : undefined;
-    // Get image source - use odometer image if imageType is provided (it's present only when we display odometer image), otherwise use receipt
-    const getImageSource = () => {
-        if (isOdometerImage && odometerImage) {
-            // Web: plain object with uri
-            if (typeof odometerImage === 'object' && 'uri' in odometerImage && typeof odometerImage.uri === 'string') {
-                return odometerImage.uri;
-            }
-            // Web (Fallback): File instance, create blob URL
-            if (typeof odometerImage !== 'string' && odometerImage instanceof File) {
-                return URL.createObjectURL(odometerImage);
-            }
-            // Native: URI string, use directly
-            if (typeof odometerImage === 'string') {
-                return odometerImage;
-            }
+    const [odometerImageSource, setOdometerImageSource] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (!isOdometerImage || !odometerImage) {
+            setOdometerImageSource(undefined);
+            return;
         }
-        return isDraftTransaction ? transactionDraft?.receipt?.source : tryResolveUrlFromApiRoot(receiptURIs.image ?? '');
-    };
-    const source = getImageSource();
+
+        if (typeof odometerImage === 'string') {
+            setOdometerImageSource(odometerImage);
+            return;
+        }
+
+        if ('uri' in odometerImage && typeof odometerImage.uri === 'string' && odometerImage.uri.length > 0) {
+            setOdometerImageSource(odometerImage.uri);
+            return;
+        }
+
+        if (!(odometerImage instanceof File)) {
+            setOdometerImageSource(undefined);
+            return;
+        }
+
+        const blobUrl = URL.createObjectURL(odometerImage);
+        setOdometerImageSource(blobUrl);
+
+        return () => {
+            URL.revokeObjectURL(blobUrl);
+        };
+    }, [isOdometerImage, odometerImage]);
+
+    // Use odometer image if imageType is provided (it's present only when we display odometer image) otherwise use receipt
+    const receiptSource = isDraftTransaction ? transactionDraft?.receipt?.source : tryResolveUrlFromApiRoot(receiptURIs.image ?? '');
+    const source = isOdometerImage && odometerImage ? (odometerImageSource ?? receiptSource) : receiptSource;
     const [sourceUri, setSourceUri] = useState<ReceiptSource>('');
 
     const parentReportAction = getReportAction(report?.parentReportID, report?.parentReportActionID);
