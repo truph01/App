@@ -898,7 +898,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Jouw ruimte',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Welkom bij ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Gebruik de +-knop om een uitgave te ${additionalText}.`,
-        askConcierge: 'Vraag me alles!',
+        askConcierge: 'Dit is je chat met Concierge, je persoonlijke AI-agent. Ik kan bijna alles, probeer het maar!',
         conciergeSupport: 'Jouw persoonlijke AI-agent',
         create: 'maken',
         iouTypes: {
@@ -6361,8 +6361,8 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 preventSelfApprovalsSubtitle: 'Voorkom dat werkruimteleden hun eigen onkostendeclaraties goedkeuren.',
                 autoApproveCompliantReportsTitle: 'Rapporten die voldoen automatisch goedkeuren',
                 autoApproveCompliantReportsSubtitle: 'Configureren welke onkostendeclaraties in aanmerking komen voor automatische goedkeuring.',
-                autoApproveReportsUnderTitle: 'Rapporten automatisch goedkeuren onder',
-                autoApproveReportsUnderDescription: 'Volledig conforme onkostendeclaraties onder dit bedrag worden automatisch goedgekeurd.',
+                autoApproveReportsUnderTitle: 'Rapporten automatisch goedkeuren als alle onkosten onder',
+                autoApproveReportsUnderDescription: 'Volledig conforme onkostendeclaraties waarvan alle onkosten onder dit bedrag liggen, worden automatisch goedgekeurd.',
                 randomReportAuditTitle: 'Willekeurige rapportcontrole',
                 randomReportAuditDescription: 'Vereisen dat sommige rapporten handmatig worden goedgekeurd, zelfs als ze in aanmerking komen voor automatische goedkeuring.',
                 autoPayApprovedReportsTitle: 'Automatisch betalen van goedgekeurde rapporten',
@@ -7524,8 +7524,8 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
     },
     cardTransactions: {
         notActivated: 'Niet geactiveerd',
-        outOfPocket: 'Vergoedbaar',
-        companySpend: 'Niet vergoedbaar',
+        outOfPocket: 'Uitgaven uit eigen zak',
+        companySpend: 'Uitgaven van het bedrijf',
     },
     distance: {
         addStop: 'Stop toevoegen',

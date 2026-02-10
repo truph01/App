@@ -898,7 +898,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Seu espaço',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Bem-vindo(a) a ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Use o botão + para ${additionalText} uma despesa.`,
-        askConcierge: 'Pergunte-me qualquer coisa!',
+        askConcierge: 'Este é o seu chat com o Concierge, seu agente pessoal de IA. Posso fazer quase tudo, experimente!',
         conciergeSupport: 'Seu agente de IA pessoal',
         create: 'criar',
         iouTypes: {
@@ -6352,8 +6352,8 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
                 preventSelfApprovalsSubtitle: 'Impedir que membros do workspace aprovem seus próprios relatórios de despesas.',
                 autoApproveCompliantReportsTitle: 'Aprovar automaticamente relatórios em conformidade',
                 autoApproveCompliantReportsSubtitle: 'Configure quais relatórios de despesas são elegíveis para aprovação automática.',
-                autoApproveReportsUnderTitle: 'Aprovar automaticamente relatórios abaixo de',
-                autoApproveReportsUnderDescription: 'Relatórios de despesas totalmente conformes abaixo deste valor serão aprovados automaticamente.',
+                autoApproveReportsUnderTitle: 'Aprovar automaticamente relatórios com todas as despesas abaixo de',
+                autoApproveReportsUnderDescription: 'Relatórios de despesas totalmente conformes em que todas as despesas estejam abaixo deste valor serão aprovados automaticamente.',
                 randomReportAuditTitle: 'Auditoria aleatória de relatórios',
                 randomReportAuditDescription: 'Exigir que alguns relatórios sejam aprovados manualmente, mesmo que sejam elegíveis para aprovação automática.',
                 autoPayApprovedReportsTitle: 'Pagar automaticamente relatórios aprovados',
@@ -7506,8 +7506,8 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
     },
     cardTransactions: {
         notActivated: 'Não ativado',
-        outOfPocket: 'Reembolsável',
-        companySpend: 'Não reembolsável',
+        outOfPocket: 'Gasto presencial',
+        companySpend: 'Gastos da empresa',
     },
     distance: {
         addStop: 'Adicionar parada',
