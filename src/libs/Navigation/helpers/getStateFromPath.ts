@@ -41,6 +41,18 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
                 return verifyAccountState;
             }
 
+            // Fallback to root parsing so users can't land on /verify-account directly.
+            // This ensures navigation redirects back to the previous screen (root handles that).
+            if (pathWithoutDynamicSuffix === '/' || pathWithoutDynamicSuffix === '') {
+                const state = RNGetStateFromPath(pathWithoutDynamicSuffix, linkingConfig.config);
+
+                if (!state) {
+                    throw new Error('Failed to parse the path to a navigation state.');
+                }
+
+                return state;
+            }
+
             // Log an error to quickly identify and add forgotten screens to the Dynamic Routes configuration
             Log.warn(`[getStateFromPath.ts][DynamicRoute] Focused route ${focusedRoute.name} is not allowed to access dynamic route with suffix ${dynamicRouteSuffix}`);
         }
