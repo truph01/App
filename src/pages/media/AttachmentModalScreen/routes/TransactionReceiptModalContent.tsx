@@ -327,14 +327,13 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             }
 
             const hasOnlyEReceipt = hasEReceipt(transaction) && !hasReceiptSource(transaction);
-            if (
-                (shouldShowDeleteReceiptButton &&
+            const isDeletableReceipt = shouldShowDeleteReceiptButton &&
                     !hasOnlyEReceipt &&
                     hasReceipt(transaction) &&
                     !isReceiptBeingScanned(transaction) &&
-                    !hasMissingSmartscanFields(transaction, transactionReport)) ||
-                (isOdometerImage && isDraftTransaction)
-            ) {
+                    !hasMissingSmartscanFields(transaction, transactionReport);
+            const isDraftOdometer = isOdometerImage && isDraftTransaction;
+            if (isDeletableReceipt || isDraftOdometer) {
                 menuItems.push({
                     icon: Expensicons.Trashcan,
                     text: isOdometerImage ? translate('distance.odometer.deleteOdometerPhoto') : translate('receipt.deleteReceipt'),
