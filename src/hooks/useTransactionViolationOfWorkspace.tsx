@@ -29,6 +29,8 @@ function useTransactionViolationOfWorkspace(policyID?: string) {
             }
         }
         return set;
+        // allTransactions required so set updates when report transactions change (getReportTransactions reads from Onyx)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reportsToArchive, allTransactions]);
 
     const transactionViolationSelector = useCallback(
