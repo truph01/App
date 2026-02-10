@@ -7257,7 +7257,7 @@ function submitPerDiemExpenseForSelfDM(submitPerDiemExpenseInformation: PerDiemE
     InteractionManager.runAfterInteractions(() => removeDraftTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID));
     dismissModalAndOpenReportInInboxTab(chatReport.reportID);
 
-    notifyNewAction(chatReport.reportID, currentUserAccountIDParam);
+    notifyNewAction(chatReport.reportID, currentUserAccountIDParam, true);
 }
 
 /**
