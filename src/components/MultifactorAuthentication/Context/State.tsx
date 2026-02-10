@@ -1,6 +1,10 @@
 import React, {createContext, useContext, useMemo, useReducer} from 'react';
 import type {ReactNode} from 'react';
-import type {MultifactorAuthenticationScenario, MultifactorAuthenticationScenarioAdditionalParams, MultifactorAuthenticationScenarioResponse} from '@components/MultifactorAuthentication/config/types';
+import type {
+    MultifactorAuthenticationScenario,
+    MultifactorAuthenticationScenarioAdditionalParams,
+    MultifactorAuthenticationScenarioResponse,
+} from '@components/MultifactorAuthentication/config/types';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/Biometrics/ED25519/types';
 import type {AuthTypeInfo, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
 import CONST from '@src/CONST';
