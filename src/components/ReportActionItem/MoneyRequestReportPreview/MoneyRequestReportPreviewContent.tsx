@@ -339,7 +339,7 @@ function MoneyRequestReportPreviewContent({
         }
 
         if (isApproved) {
-            return translate('iou.managerApproved', {manager: payerOrApproverName});
+            return translate('iou.managerApproved', payerOrApproverName);
         }
         let paymentVerb: TranslationPaths = 'iou.payerOwes';
         if (iouSettled || iouReport?.isWaitingOnBankAccount) {
@@ -348,7 +348,7 @@ function MoneyRequestReportPreviewContent({
             paymentVerb = 'iou.payerSpent';
             payerOrApproverName = getDisplayNameForParticipant({accountID: chatReport?.ownerAccountID, shouldUseShortForm: true, formatPhoneNumber});
         }
-        return translate(paymentVerb, {payer: payerOrApproverName});
+        return translate(paymentVerb, payerOrApproverName);
     }, [
         isScanning,
         numberOfPendingRequests,
