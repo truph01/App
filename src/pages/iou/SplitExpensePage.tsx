@@ -110,7 +110,12 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const transactionDetailsAmount = transactionDetails?.amount ?? 0;
     const sumOfSplitExpenses = (draftTransaction?.comment?.splitExpenses ?? []).reduce((acc, item) => acc + (item.amount ?? 0), 0);
     const splitExpenses = draftTransaction?.comment?.splitExpenses ?? [];
-    const invalidSplit = splitExpenses.find((split) => Math.abs(split.amount) > Math.abs(transactionDetailsAmount));
+    const invalidSplit = splitExpenses.find((split) => {
+        // A split is only invalid if it has the same sign as the total and its magnitude exceeds the total
+        const sameSign = (split.amount >= 0 && transactionDetailsAmount >= 0) || (split.amount < 0 && transactionDetailsAmount < 0);
+        return sameSign && Math.abs(split.amount) > Math.abs(transactionDetailsAmount);
+    });
+    const absDifference = Math.abs(sumOfSplitExpenses) - Math.abs(transactionDetailsAmount);
 
     const currencySymbol = getCurrencySymbol(transactionDetails.currency ?? '') ?? transactionDetails.currency ?? CONST.CURRENCY.USD;
 
@@ -202,9 +207,12 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             clearSplitTransactionDraftErrors(transactionID);
         }
 
-        if (invalidSplit) {
-            const difference = Math.abs(invalidSplit.amount) - Math.abs(transactionDetailsAmount);
-            setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(difference, transactionDetails?.currency)}));
+        if (invalidSplit && Math.abs(sumOfSplitExpenses) !== Math.abs(transactionDetailsAmount)) {
+            if (absDifference > 0) {
+                setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(absDifference, transactionDetails?.currency)}));
+            } else if (absDifference < 0) {
+                setErrorMessage(translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-absDifference, transactionDetails?.currency)}));
+            }
             return;
         }
 
@@ -347,9 +355,10 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const difference = sumOfSplitExpenses - transactionDetailsAmount;
     let warningMessage = '';
 
-    if (invalidSplit) {
-        const absDifference = Math.abs(invalidSplit.amount) - Math.abs(transactionDetailsAmount);
+    if (invalidSplit && absDifference > 0) {
         warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(absDifference, transactionDetails?.currency)});
+    } else if (invalidSplit && absDifference < 0) {
+        warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-absDifference, transactionDetails?.currency)});
     } else if (difference < 0) {
         warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-difference, transactionDetails.currency)});
     } else if (difference > 0) {
