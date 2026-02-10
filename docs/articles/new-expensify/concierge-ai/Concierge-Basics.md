@@ -50,6 +50,7 @@ Concierge can help you:
 - Create or edit expenses  
 - Submit, approve, reimburse, or export reports  
 - Schedule a call with a human (when available)
+- Proactively reach out to assist when company card, business bank account, or accounting integration connections break
 
 New features are added regularly.
 
