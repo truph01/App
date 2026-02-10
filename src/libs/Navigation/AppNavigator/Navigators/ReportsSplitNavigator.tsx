@@ -50,8 +50,7 @@ function ReportsSplitNavigator({route}: PlatformStackScreenProps<AuthScreensPara
     });
 
     // This hook preloads the screens of adjacent tabs to make changing tabs faster.
-    // usePreloadFullScreenNavigators();
-    console.log('Timing RERENDER');
+    usePreloadFullScreenNavigators();
 
     const isOpenOnAdminRoom = shouldOpenOnAdminRoom();
 
