@@ -699,34 +699,15 @@ function getForReportActionTemp({
     if (hasModifiedBillable) {
         const oldBillable = reportActionOriginalMessage?.oldBillable === 'billable' ? translate('common.billable').toLowerCase() : translate('common.nonBillable').toLowerCase();
         const newBillable = reportActionOriginalMessage?.billable === 'billable' ? translate('common.billable').toLowerCase() : translate('common.nonBillable').toLowerCase();
-        buildMessageFragmentForValue(
-            translate,
-            newBillable,
-            oldBillable,
-            translate('iou.expense'),
-            true,
-            setFragments,
-            removalFragments,
-            changeFragments,
-        );
+        buildMessageFragmentForValue(translate, newBillable, oldBillable, translate('iou.expense'), true, setFragments, removalFragments, changeFragments);
     }
 
     const hasModifiedReimbursable = isReportActionOriginalMessageAnObject && 'oldReimbursable' in reportActionOriginalMessage && 'reimbursable' in reportActionOriginalMessage;
     if (hasModifiedReimbursable) {
         const oldReimbursable =
             reportActionOriginalMessage?.oldReimbursable === 'reimbursable' ? translate('iou.reimbursable').toLowerCase() : translate('iou.nonReimbursable').toLowerCase();
-        const newReimbursable =
-            reportActionOriginalMessage?.reimbursable === 'reimbursable' ? translate('iou.reimbursable').toLowerCase() : translate('iou.nonReimbursable').toLowerCase();
-        buildMessageFragmentForValue(
-            translate,
-            newReimbursable,
-            oldReimbursable,
-            translate('iou.expense'),
-            true,
-            setFragments,
-            removalFragments,
-            changeFragments,
-        );
+        const newReimbursable = reportActionOriginalMessage?.reimbursable === 'reimbursable' ? translate('iou.reimbursable').toLowerCase() : translate('iou.nonReimbursable').toLowerCase();
+        buildMessageFragmentForValue(translate, newReimbursable, oldReimbursable, translate('iou.expense'), true, setFragments, removalFragments, changeFragments);
     }
 
     const hasModifiedAttendees = isReportActionOriginalMessageAnObject && 'oldAttendees' in reportActionOriginalMessage && 'newAttendees' in reportActionOriginalMessage;
