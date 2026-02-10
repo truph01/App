@@ -141,6 +141,7 @@ function SearchPage({route}: SearchPageProps) {
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
+    const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
     const {accountID} = useCurrentUserPersonalDetails();
 
@@ -494,11 +495,6 @@ function SearchPage({route}: SearchPageProps) {
     const deleteModalPrompt = isDeletingOnlyExpenses ? translate('iou.deleteConfirmation', {count: expenseCount}) : translate('iou.deleteReportConfirmation', {count: deleteCount});
 
     const handleDeleteSelectedTransactions = useCallback(async () => {
-        if (isOffline) {
-            setIsOfflineModalVisible(true);
-            return;
-        }
-
         if (!hash) {
             return;
         }
@@ -534,12 +530,12 @@ function SearchPage({route}: SearchPageProps) {
                     reportTransactions,
                     transactionsViolations,
                     bankAccountList,
+                    transactions,
                 );
                 clearSelectedTransactions();
             });
         });
     }, [
-        isOffline,
         hash,
         showConfirmModal,
         deleteModalTitle,
@@ -552,6 +548,7 @@ function SearchPage({route}: SearchPageProps) {
         currentUserPersonalDetails.email,
         bankAccountList,
         clearSelectedTransactions,
+        transactions,
         allReports,
         selfDMReport,
     ]);
@@ -963,16 +960,16 @@ function SearchPage({route}: SearchPageProps) {
         }
 
         if (selectedTransactionsKeys.length < 3 && searchResults?.search.type !== CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT && searchResults?.data) {
-            const {transactions, reports, policies: transactionPolicies} = getTransactionsAndReportsFromSearch(searchResults, selectedTransactionsKeys);
+            const {transactions: searchedTransactions, reports, policies: transactionPolicies} = getTransactionsAndReportsFromSearch(searchResults, selectedTransactionsKeys);
 
-            if (isMergeActionForSelectedTransactions(transactions, reports, transactionPolicies, currentUserPersonalDetails.accountID)) {
-                const transactionID = transactions.at(0)?.transactionID;
+            if (isMergeActionForSelectedTransactions(searchedTransactions, reports, transactionPolicies, currentUserPersonalDetails.accountID)) {
+                const transactionID = searchedTransactions.at(0)?.transactionID;
                 if (transactionID) {
                     options.push({
                         text: translate('common.merge'),
                         icon: expensifyIcons.ArrowCollapse,
                         value: CONST.SEARCH.BULK_ACTION_TYPES.MERGE,
-                        onSelected: () => setupMergeTransactionDataAndNavigate(transactionID, transactions, localeCompare, reports, false, true),
+                        onSelected: () => setupMergeTransactionDataAndNavigate(transactionID, searchedTransactions, localeCompare, reports, false, true),
                     });
                 }
             }
@@ -1031,7 +1028,7 @@ function SearchPage({route}: SearchPageProps) {
             });
         }
 
-        if (shouldShowDeleteOption(selectedTransactions, currentSearchResults?.data, isOffline, selectedReports, queryJSON?.type)) {
+        if (shouldShowDeleteOption(selectedTransactions, currentSearchResults?.data, selectedReports, queryJSON?.type)) {
             options.push({
                 icon: expensifyIcons.Trashcan,
                 text: translate('search.bulkActions.delete'),
