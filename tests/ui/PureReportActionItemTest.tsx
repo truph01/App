@@ -9,7 +9,6 @@ import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import OptionsListContextProvider from '@components/OptionListContextProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
-import type * as LinkModule from '@libs/actions/Link';
 import {openLink} from '@libs/actions/Link';
 import Parser from '@libs/Parser';
 import {getIOUActionForReportID} from '@libs/ReportActionsUtils';
@@ -27,8 +26,10 @@ import wrapOnyxWithWaitForBatchedUpdates from '../utils/wrapOnyxWithWaitForBatch
 
 jest.mock('@react-navigation/native');
 
+type LinkModuleMock = {openLink: typeof openLink} & Record<string, unknown>;
+
 jest.mock('@libs/actions/Link', () => {
-    const actual = jest.requireActual<typeof LinkModule>('@libs/actions/Link');
+    const actual = jest.requireActual<LinkModuleMock>('@libs/actions/Link');
     return {
         ...actual,
         openLink: jest.fn(),
