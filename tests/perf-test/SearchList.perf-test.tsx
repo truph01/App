@@ -1,5 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
+import Text from '@components/Text';
 import Onyx from 'react-native-onyx';
 import {measureRenders} from 'reassure';
 import ComposeProviders from '@components/ComposeProviders';
@@ -7,10 +8,10 @@ import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import ScrollOffsetContextProvider from '@components/ScrollOffsetContextProvider';
 import SearchList from '@components/Search/SearchList';
-import ThemeProvider from '@components/ThemeProvider';
-import ThemeStylesProvider from '@components/ThemeStylesProvider';
 import type {SearchColumnType, SearchQueryJSON} from '@components/Search/types';
 import type {SearchListItem} from '@components/SelectionListWithSections/types';
+import ThemeProvider from '@components/ThemeProvider';
+import ThemeStylesProvider from '@components/ThemeStylesProvider';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import * as TestHelper from '../utils/TestHelper';
@@ -83,6 +84,11 @@ jest.mock('@react-navigation/native', () => ({
 
 jest.mock('@src/components/ConfirmedRoute.tsx');
 
+function ThemeProviderWithLight({children}: {children: React.ReactNode}) {
+    return <ThemeProvider theme="light">{children}</ThemeProvider>;
+}
+ThemeProviderWithLight.displayName = 'ThemeProviderWithLight';
+
 /** Minimal list item component to avoid heavy TransactionListItem dependencies */
 function MockListItem({item}: {item: SearchListItem}) {
     return (
@@ -91,25 +97,28 @@ function MockListItem({item}: {item: SearchListItem}) {
         </View>
     );
 }
+MockListItem.displayName = 'MockListItem';
 
 const STABLE_QUERY_JSON: SearchQueryJSON = {
-    hash: 'perf-test-hash',
+    hash: 0,
+    recentSearchHash: 0,
+    similarSearchHash: 0,
     groupBy: undefined,
     type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-    status: undefined,
+    status: CONST.SEARCH.STATUS.EXPENSE.ALL,
     sortBy: CONST.SEARCH.TABLE_COLUMNS.DATE,
     sortOrder: 'desc',
-    view: undefined,
+    view: CONST.SEARCH.VIEW.TABLE,
     flatFilters: [],
     inputQuery: '',
+    filters: {operator: CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO, left: CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS, right: ''},
+    policyID: undefined,
+    columns: undefined,
+    limit: undefined,
+    rawFilterList: undefined,
 };
 
-const STABLE_COLUMNS: SearchColumnType[] = [
-    CONST.SEARCH.TABLE_COLUMNS.DATE,
-    CONST.SEARCH.TABLE_COLUMNS.MERCHANT,
-    CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
-    CONST.SEARCH.TABLE_COLUMNS.ACTION,
-];
+const STABLE_COLUMNS: SearchColumnType[] = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.MERCHANT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, CONST.SEARCH.TABLE_COLUMNS.ACTION];
 
 function createMockData(length: number): SearchListItem[] {
     return Array.from({length}, (_, i) => ({
@@ -139,7 +148,7 @@ function createMockData(length: number): SearchListItem[] {
         shouldShowYearApproved: false,
         shouldShowYearPosted: false,
         shouldShowYearExported: false,
-    })) as SearchListItem[];
+    })) as unknown as SearchListItem[];
 }
 
 const MOCK_DATA = createMockData(100);
@@ -180,7 +189,7 @@ function SearchListWrapper() {
     return (
         <SearchList
             data={data}
-            ListItem={MockListItem as React.ComponentType<unknown>}
+            ListItem={MockListItem as never}
             onSelectRow={onSelectRow}
             onCheckboxPress={onCheckboxPress}
             onAllCheckboxPress={onAllCheckboxPress}
@@ -200,13 +209,7 @@ function SearchListWrapper() {
 function SearchListWrapperWithProviders() {
     return (
         <ComposeProviders
-            components={[
-                (props: {children: React.ReactNode}) => <ThemeProvider theme="light" {...props} />,
-                ThemeStylesProvider,
-                OnyxListItemProvider,
-                LocaleContextProvider,
-                ScrollOffsetContextProvider,
-            ]}
+            components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}
         >
             <SearchListWrapper />
         </ComposeProviders>
@@ -214,10 +217,9 @@ function SearchListWrapperWithProviders() {
 }
 
 test('[SearchList] should render with stable props on initial mount', async () => {
-    const scenario = async () => {
-        // No user interaction - measure initial mount and any subsequent re-renders
-        // with a wrapper that passes stable props (useCallback/useMemo)
-    };
+    // No user interaction: measure render count when parent passes stable props
+    // (useCallback/useMemo). Used to detect regressions when optimizing SearchList re-renders.
+    const scenario = async (): Promise<void> => {};
 
     return waitForBatchedUpdates().then(() => measureRenders(<SearchListWrapperWithProviders />, {scenario}));
 });
