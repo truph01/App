@@ -748,13 +748,7 @@ function computeReportName(
     }
     const privateIsArchivedValue = privateIsArchived ?? allReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report.reportID}`]?.private_isArchived;
     const isArchivedNonExpense = isArchivedNonExpenseReport(report, !!privateIsArchivedValue);
-
-    if (report?.reportName && shouldReturnStaticReportName(report)) {
-        return isArchivedNonExpense ? generateArchivedReportName(report?.reportName) : report?.reportName;
-    }
-
     const reportPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
-
     const parentReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`];
     const parentReportAction = isThread(report) ? reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.parentReportID}`]?.[report.parentReportActionID] : undefined;
 
@@ -764,6 +758,12 @@ function computeReportName(
     if (parentReportActionBasedName) {
         return parentReportActionBasedName;
     }
+
+    if (report?.reportName && shouldReturnStaticReportName(report)) {
+        return isArchivedNonExpense ? generateArchivedReportName(report?.reportName) : report?.reportName;
+    }
+
+
 
     if (isTaskReport(report)) {
         return Parser.htmlToText(report?.reportName ?? '').trim();
