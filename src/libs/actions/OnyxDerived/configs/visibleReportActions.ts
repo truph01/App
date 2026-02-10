@@ -65,6 +65,9 @@ export default createOnyxDerivedValueConfig({
 
                 for (const [actionID, action] of Object.entries(reportActions)) {
                     if (action) {
+                        if (actionID !== action.reportActionID) {
+                            continue;
+                        }
                         if (shouldSkipCachingAction(action)) {
                             continue;
                         }
@@ -93,16 +96,19 @@ export default createOnyxDerivedValueConfig({
                         continue;
                     }
 
+                    // Skip deprecated keys (e.g. sequenceNumber-keyed duplicates) so they
+                    // cannot overwrite the canonical entry's visibility with false.
+                    if (actionID !== action.reportActionID) {
+                        delete reportVisibility[actionID];
+                        continue;
+                    }
+
                     if (doesActionDependOnReportExistence(action)) {
                         if (shouldSkipCachingAction(action)) {
-                            delete reportVisibility[actionID];
                             delete reportVisibility[action.reportActionID];
                             continue;
                         }
                         reportVisibility[action.reportActionID] = shouldReportActionBeVisible(action, actionID, undefined, allReports);
-                        if (actionID !== action.reportActionID) {
-                            delete reportVisibility[actionID];
-                        }
                     }
                 }
             }
@@ -140,16 +146,19 @@ export default createOnyxDerivedValueConfig({
                     continue;
                 }
 
-                if (shouldSkipCachingAction(action)) {
+                // Skip deprecated keys (e.g. sequenceNumber-keyed duplicates) so they
+                // cannot overwrite the canonical entry's visibility with false.
+                if (actionID !== action.reportActionID) {
                     delete reportVisibility[actionID];
+                    continue;
+                }
+
+                if (shouldSkipCachingAction(action)) {
                     delete reportVisibility[action.reportActionID];
                     continue;
                 }
 
                 reportVisibility[action.reportActionID] = shouldReportActionBeVisible(action, actionID, undefined, allReports);
-                if (actionID !== action.reportActionID) {
-                    delete reportVisibility[actionID];
-                }
             }
         }
 
