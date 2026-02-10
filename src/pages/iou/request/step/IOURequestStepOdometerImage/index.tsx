@@ -126,7 +126,7 @@ function IOURequestStepOdometerImage({
                 height={variables.iconSection}
                 additionalStyles={[styles.mb5]}
             />
-            <Text style={[styles.textFileUpload, styles.mb2]}>{translate('receipt.upload')}</Text>
+            <Text style={[styles.textFileUpload, styles.mb2]}>{title}</Text>
             <View style={styles.renderHTML}>
                 <RenderHTML html={messageHTML} />
             </View>
