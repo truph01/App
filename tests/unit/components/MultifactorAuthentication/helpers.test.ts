@@ -92,7 +92,7 @@ describe('MultifactorAuthentication helpers', () => {
                 challenge: '',
             });
 
-            expect(result.success).toBe(false);
+            expect(result.isSuccess).toBe(false);
         });
 
         // Given all required registration parameters including a valid challenge
@@ -129,7 +129,7 @@ describe('MultifactorAuthentication helpers', () => {
                 challenge: 'challenge-123',
             });
 
-            expect(result.success).toBe(true);
+            expect(result.isSuccess).toBe(true);
         });
 
         // Given a failed backend response with HTTP code 400
@@ -147,7 +147,7 @@ describe('MultifactorAuthentication helpers', () => {
                 challenge: 'challenge-123',
             });
 
-            expect(result.success).toBe(false);
+            expect(result.isSuccess).toBe(false);
         });
     });
 });
