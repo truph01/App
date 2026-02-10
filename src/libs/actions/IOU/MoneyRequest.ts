@@ -109,7 +109,6 @@ type MoneyRequestStepScanParticipantsFlowParams = {
 type MoneyRequestStepDistanceNavigationParams = {
     iouType: IOUType;
     policy: OnyxEntry<Policy>;
-    policyForMovingExpenses?: OnyxEntry<Policy>;
     report: OnyxEntry<Report>;
     reportID: string;
     transactionID: string;
@@ -493,7 +492,6 @@ function handleMoneyRequestStepDistanceNavigation({
     iouType,
     report,
     policy,
-    policyForMovingExpenses,
     transaction,
     reportID,
     transactionID,
