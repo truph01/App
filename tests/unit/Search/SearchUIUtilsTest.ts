@@ -5357,7 +5357,7 @@ describe('SearchUIUtils', () => {
             expect(spendOverTimeSearch.key).toBe(CONST.SEARCH.SEARCH_KEYS.SPEND_OVER_TIME);
             expect(spendOverTimeSearch.translationPath).toBe('search.spendOverTime');
             expect(spendOverTimeSearch.type).toBe(CONST.SEARCH.DATA_TYPES.EXPENSE);
-            expect(spendOverTimeSearch.icon).toBe('Receipt');
+            expect(spendOverTimeSearch.icon).toBe('CalendarSolid');
         });
 
         test('Should return Spend Over Time search query with correct parameters', () => {
