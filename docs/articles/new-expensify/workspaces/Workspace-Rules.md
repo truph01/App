@@ -59,7 +59,7 @@ Workspace Merchant Rules:
 - Don’t change how employees submit expenses
 
 To learn how to set up and manage Workspace Merchant Rules, see:
-**Workspace Merchant Rules**
+[**Workspace Merchant Rules**](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules)
 
 ---
 

@@ -122,11 +122,23 @@ To add or edit a GL code:
 
 # Apply Tags to Expenses Automatically
 
-Expensify will learn how you use tags and apply them automatically for recurring merchants or patterns.
+Expensify offers two ways to automatically apply tags based on merchant:
+
+## Learned Tag Suggestions
+
+Expensify will learn how you use tags and suggest them automatically for recurring merchants or patterns.
 
 - Manual corrections are remembered over time.
 - Existing tags on an expense will not be overwritten automatically.
-- Workspace-level Expense Rules take priority over automated tag suggestions.
+- These suggestions are based on patterns and may vary by user.
+
+## Workspace Merchant Rules
+
+Workspace Admins can create explicit [**Workspace Merchant Rules**](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) to apply consistent tags based on merchant name across all workspace members.
+
+- These rules provide deterministic, merchant-specific outcomes.
+- They apply workspace-wide and take precedence over learned suggestions.
+- They ensure standardized tagging for common merchants across the team.
 
 ---
 

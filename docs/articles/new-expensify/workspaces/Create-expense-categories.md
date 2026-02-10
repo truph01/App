@@ -111,11 +111,23 @@ To edit these fields:
 
 # Apply Categories Automatically
 
-Expensify will learn your category preferences over time and apply them automatically based on the merchant.
+Expensify offers two ways to automatically apply categories based on merchant:
+
+## Learned Categorization
+
+Expensify will learn your category preferences over time and suggest them automatically based on the merchant.
 
 - If you manually change a category, Expensify remembers the update.
 - Existing category assignments are not retroactively changed.
-- Workspace-level expense rules override automatic category assignments.
+- These suggestions are based on patterns and may vary by user.
+
+## Workspace Merchant Rules
+
+Workspace Admins can create explicit [**Workspace Merchant Rules**](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) to apply consistent categories based on merchant name across all workspace members.
+
+- These rules provide deterministic, merchant-specific outcomes.
+- They apply workspace-wide and take precedence over learned suggestions.
+- They ensure standardized coding for common merchants across the team.
 - If a category is already set manually, Expensify won’t override it.
 
 ---

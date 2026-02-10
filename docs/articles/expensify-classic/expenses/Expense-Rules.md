@@ -6,6 +6,8 @@ keywords: [Expense Rules, individual automation, expense rule setup, personal ru
 
 Expense rules in Expensify help automate the categorization, tagging, and reporting of expenses based on merchant names, reducing manual work. By setting up these rules at the account level, employees can streamline expense management and ensure consistency across reports.
 
+**Note:** These are **personal expense rules** that apply per individual user. Workspace Admins who need to enforce merchant-based coding consistently across all workspace members should use [**Workspace Merchant Rules**](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) instead. Workspace Merchant Rules apply to all expenses in both New Expensify and Expensify Classic, but can only be configured in New Expensify.
+
 ---
 
 # Create an Expense Rule  
