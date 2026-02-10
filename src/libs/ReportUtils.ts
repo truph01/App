@@ -12169,7 +12169,7 @@ function isExported(reportActions: OnyxEntry<ReportActions> | ReportAction[], re
         if (isExportIntegrationAction(action)) {
             const originalMessage = getOriginalMessage(action);
             const label = originalMessage?.label;
-            const isValidExport = originalMessage?.markedManually ?? (label && validExportLabels.has(label) && originalMessage?.type !== CONST.EXPORT_TEMPLATE);
+            const isValidExport = originalMessage?.markedManually || (label && validExportLabels.has(label) && originalMessage?.type !== CONST.EXPORT_TEMPLATE);
             if (isValidExport && action.created > lastSuccessfulExportCreated) {
                 lastSuccessfulExportCreated = action.created;
             }
