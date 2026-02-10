@@ -7,7 +7,6 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import {openWorkspaceMembersPage} from '@libs/actions/Policy/Member';
 import {getDomainOrWorkspaceAccountID} from '@libs/CardUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
@@ -58,8 +57,7 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         }
 
         const clientMemberEmails = Object.keys(getMemberAccountIDsForWorkspace(policy?.employeeList));
-        openWorkspaceMembersPage(policyID, clientMemberEmails);
-        openPolicyCompanyCardsFeed(domainOrWorkspaceAccountID, policyID, bankName);
+        openPolicyCompanyCardsFeed(domainOrWorkspaceAccountID, policyID, bankName, clientMemberEmails);
     }, [bankName, isLoading, policyID, isFeedPending, domainOrWorkspaceAccountID, policy?.employeeList]);
 
     const [shouldShowOfflineModal, setShouldShowOfflineModal] = useState(false);
