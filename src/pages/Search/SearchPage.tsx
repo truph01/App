@@ -778,65 +778,71 @@ function SearchPage({route}: SearchPageProps) {
 
             const canExportAllReports = isReportsTab && selectedReportIDs.length > 0 && includeReportLevelExport && selectedReports.every(canReportBeExported);
 
-            // Add accounting integration export options if conditions are met
             if (canExportAllReports && connectedIntegration) {
                 const connectionNameFriendly = CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectedIntegration];
                 const integrationIcon = getIntegrationIcon(connectedIntegration, expensifyIcons);
+
+                const handleExportAction = (exportAction: () => void, shouldShowAccountingModal = false) => {
+                    if (isOffline) {
+                        setIsOfflineModalVisible(true);
+                        return;
+                    }
+
+                    let exportedReportName = '';
+                    const areAnyReportsExported = selectedReportIDs.some((reportID) => {
+                        const unfilteredReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
+                        if (!unfilteredReportActions) {
+                            return false;
+                        }
+
+                        const reportActions = getFilteredReportActionsForReportView(Object.values(unfilteredReportActions));
+                        const isExported = isExportedUtils(reportActions);
+                        if (isExported && !exportedReportName) {
+                            exportedReportName = getReportOrDraftReport(reportID)?.reportName ?? '';
+                        }
+                        return isExported;
+                    });
+
+                    if (areAnyReportsExported) {
+                        showConfirmModal({
+                            title: translate('workspace.exportAgainModal.title'),
+                            prompt: translate('workspace.exportAgainModal.description', {
+                                connectionName: connectedIntegration,
+                                reportName: exportedReportName,
+                            }),
+                            confirmText: translate('workspace.exportAgainModal.confirmText'),
+                            cancelText: translate('workspace.exportAgainModal.cancelText'),
+                        }).then((result) => {
+                            if (result.action !== ModalActions.CONFIRM) {
+                                return;
+                            }
+
+                            if (hash) {
+                                clearSelectedTransactions();
+                                exportAction();
+                            }
+                        });
+                    } else if (hash) {
+                        if (shouldShowAccountingModal) {
+                            setAccountingExportModalVisible(true);
+                        }
+                        exportAction();
+                        clearSelectedTransactions();
+                    }
+                };
 
                 exportOptions.push(
                     {
                         text: connectionNameFriendly,
                         icon: integrationIcon,
-                        onSelected: () => {
-                            let exportedReportName = '';
-                            const areAnyReportsExported = selectedReportIDs.some((reportID) => {
-                                const unfilteredReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
-                                if (!unfilteredReportActions) {
-                                    return false;
-                                }
-
-                                const reportActions = getFilteredReportActionsForReportView(Object.values(unfilteredReportActions));
-                                const isExported = isExportedUtils(reportActions);
-                                if (isExported && !exportedReportName) {
-                                    exportedReportName = getReportOrDraftReport(reportID)?.reportName ?? '';
-                                }
-                                return isExported;
-                            });
-
-                            if (areAnyReportsExported) {
-                                showConfirmModal({
-                                    title: translate('workspace.exportAgainModal.title'),
-                                    prompt: translate('workspace.exportAgainModal.description', {
-                                        connectionName: connectedIntegration,
-                                        reportName: exportedReportName,
-                                    }),
-                                    confirmText: translate('workspace.exportAgainModal.confirmText'),
-                                    cancelText: translate('workspace.exportAgainModal.cancelText'),
-                                }).then((result) => {
-                                    if (result.action !== ModalActions.CONFIRM) {
-                                        return;
-                                    }
-
-                                    if (hash) {
-                                        clearSelectedTransactions();
-                                        exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
-                                    }
-                                });
-                            } else if (hash) {
-                                setAccountingExportModalVisible(true);
-                                exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
-                                clearSelectedTransactions();
-                            }
-                        },
+                        onSelected: () => handleExportAction(() => exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration), true),
                         shouldCloseModalOnSelect: true,
                         shouldCallAfterModalHide: true,
                     },
                     {
                         text: translate('workspace.common.markAsExported'),
                         icon: integrationIcon,
-                        onSelected: () => {
-                            markAsManuallyExportedMultipleReports(selectedReportIDs, connectedIntegration);
-                        },
+                        onSelected: () => handleExportAction(() => markAsManuallyExportedMultipleReports(selectedReportIDs, connectedIntegration)),
                         shouldCloseModalOnSelect: true,
                         shouldCallAfterModalHide: true,
                     },
