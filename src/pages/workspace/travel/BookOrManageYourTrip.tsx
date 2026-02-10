@@ -3,12 +3,12 @@ import MenuItem from '@components/MenuItem';
 import Section from '@components/Section';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setPolicyTravelSettings} from '@libs/actions/Policy/Travel';
 import {openTravelDotLink} from '@libs/openTravelDotLink';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
-import usePermissions from '@hooks/usePermissions';
 import CONST from '@src/CONST';
 import WorkspaceTravelInvoicingSection from './WorkspaceTravelInvoicingSection';
 
