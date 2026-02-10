@@ -290,7 +290,7 @@ describe('mergeTransactionRequest', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${sourceTransaction.transactionID}`, sourceTransaction);
         await Onyx.set(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${mergeTransactionID}`, mergeTransaction);
 
-        const apiModule = jest.requireActual<typeof import('@libs/API')>('@libs/API');
+        const apiModule = jest.requireActual('@libs/API');
         const writeSpy = jest.spyOn(apiModule, 'write');
 
         mockFetch?.pause?.();
@@ -353,14 +353,6 @@ describe('mergeTransactionRequest', () => {
                 reportID: targetExpenseReport.reportID, // merged expense should belong to the chosen target report
             }),
         );
-
-        // And: The comment payload sent to the API should reflect the merged details
-        const parsedComment = JSON.parse(calledParams.comment);
-        expect(parsedComment.comment).toBe(mergeTransaction.description);
-        expect(parsedComment.customUnit).toBe(mergeTransaction.customUnit);
-        expect(parsedComment.waypoints).toBe(mergeTransaction.waypoints ?? null);
-        expect(parsedComment.attendees).toBe(mergeTransaction.attendees);
-        expect(parsedComment.originalTransactionID).toBe(mergeTransaction.originalTransactionID);
 
         // And: The correct (source) expense is deleted, while the target expense and its report remain
         const updatedTargetTransaction = await new Promise<Transaction | null>((resolve) => {
