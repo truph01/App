@@ -1,9 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-3
 title: Design context-free component contracts
-category: clean-react
-impact: HIGH
-tags: callback, contract, interface, ref, useImperativeHandle, coupling
 searchPatterns:
   - "index: number"
   - "useImperativeHandle"

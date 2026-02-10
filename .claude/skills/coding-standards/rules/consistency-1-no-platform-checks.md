@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-1
 title: Avoid platform-specific checks within components
-category: consistency
-impact: MEDIUM
-tags: Platform.OS, isAndroid, isIOS, Platform.select, platform-specific
 searchPatterns:
   - "Platform.OS"
   - "isAndroid"

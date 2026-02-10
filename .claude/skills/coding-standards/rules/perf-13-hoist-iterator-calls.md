@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-13
 title: Avoid iterator-independent function calls in array methods
-category: perf
-impact: MEDIUM
-tags: map, reduce, filter, some, every, find, forEach, iterator, hoist
 searchPatterns:
   - "\\.map\\("
   - "\\.reduce\\("

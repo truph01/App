@@ -17,7 +17,7 @@ Your job is to scan through changed files and create **inline comments** for vio
 Coding standards are defined as individual files in `.claude/skills/coding-standards/rules/`.
 
 Each rule file contains:
-- **YAML frontmatter**: `ruleId`, `title`, `category`, `impact`, `tags`, `searchPatterns`
+- **YAML frontmatter**: `ruleId`, `title`, `searchPatterns`
 - **Reasoning**: Why the rule matters
 - **Incorrect/Correct**: Code examples
 - **Review Metadata**: Conditions for flagging and "DO NOT flag" exceptions

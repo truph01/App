@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-3
 title: Eliminate code duplication
-category: consistency
-impact: MEDIUM
-tags: duplication, DRY, reuse, abstraction
 searchPatterns:
   - "similar code patterns"
 ---

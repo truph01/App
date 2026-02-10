@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-7
 title: Control component resets via key prop
-category: perf
-impact: MEDIUM
-tags: key, useEffect, reset, state
 searchPatterns:
   - "useEffect"
   - "useState"

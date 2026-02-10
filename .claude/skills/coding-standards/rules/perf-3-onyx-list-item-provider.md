@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-3
 title: Use OnyxListItemProvider hooks instead of useOnyx in renderItem
-category: perf
-impact: HIGH
-tags: useOnyx, renderItem, OnyxListItemProvider, subscriptions
 searchPatterns:
   - "useOnyx"
   - "renderItem"

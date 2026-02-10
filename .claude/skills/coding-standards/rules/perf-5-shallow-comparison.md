@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-5
 title: Use shallow comparisons instead of deep comparisons
-category: perf
-impact: HIGH
-tags: React.memo, deepEqual, shallow, comparison
 searchPatterns:
   - "React.memo"
   - "deepEqual"

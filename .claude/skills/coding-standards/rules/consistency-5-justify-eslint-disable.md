@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-5
 title: Justify ESLint rule disables
-category: consistency
-impact: MEDIUM
-tags: eslint-disable, eslint-disable-next-line, eslint-disable-line, justification
 searchPatterns:
   - "eslint-disable"
   - "eslint-disable-next-line"

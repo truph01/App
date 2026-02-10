@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-11
 title: Optimize data selection and handling
-category: perf
-impact: HIGH
-tags: useOnyx, selector, filter, map, data-selection
 searchPatterns:
   - "useOnyx"
   - "selector"

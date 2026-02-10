@@ -1,9 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-2
 title: Let components own their behavior and effects
-category: clean-react
-impact: HIGH
-tags: props, data-flow, useOnyx, context, pass-through, coupling
 searchPatterns:
   - "Report"
   - "Policy"

@@ -1,9 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-5
 title: Keep state and subscriptions narrow
-category: clean-react
-impact: HIGH
-tags: context, hooks, store, useOnyx, state-structure, re-render, subscription
 searchPatterns:
   - "Context"
   - "Provider"

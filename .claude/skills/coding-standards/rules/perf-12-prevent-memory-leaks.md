@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-12
 title: Prevent memory leaks in components and plugins
-category: perf
-impact: CRITICAL
-tags: setInterval, setTimeout, addEventListener, subscribe, useEffect, cleanup, memory-leak
 searchPatterns:
   - "setInterval"
   - "setTimeout"

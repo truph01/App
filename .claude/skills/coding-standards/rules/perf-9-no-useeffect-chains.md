@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-9
 title: Avoid useEffect chains
-category: perf
-impact: HIGH
-tags: useEffect, chain, derived-state, render-cascade
 searchPatterns:
   - "useEffect"
   - "useState"

@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-16
 title: Guard initialization logic against double-execution
-category: perf
-impact: HIGH
-tags: useEffect, initialization, StrictMode, double-execution, guard
 searchPatterns:
   - "useEffect"
   - "\\[\\]"

@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-8
 title: Handle events in event handlers
-category: perf
-impact: MEDIUM
-tags: useEffect, event-handler, user-events
 searchPatterns:
   - "useEffect"
   - "useState"

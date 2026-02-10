@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-14
 title: Use useSyncExternalStore for external store subscriptions
-category: perf
-impact: MEDIUM
-tags: addEventListener, subscribe, useEffect, useState, useSyncExternalStore
 searchPatterns:
   - "addEventListener"
   - "subscribe"

@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-10
 title: Communicate with parent components without useEffect
-category: perf
-impact: MEDIUM
-tags: useEffect, parent-child, state-lifting, data-flow
 searchPatterns:
   - "useEffect"
   - "onChange"

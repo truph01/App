@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-2
 title: Return early before expensive work
-category: perf
-impact: MEDIUM
-tags: early-return, optimization, validation
 searchPatterns:
   - "if (!param)"
   - "if (param === undefined)"

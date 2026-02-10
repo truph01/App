@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-15
 title: Clean up async Effects to prevent race conditions
-category: perf
-impact: CRITICAL
-tags: useEffect, fetch, async, await, then, setState, eslint-disable, race-condition
 searchPatterns:
   - "useEffect"
   - "fetch\\("

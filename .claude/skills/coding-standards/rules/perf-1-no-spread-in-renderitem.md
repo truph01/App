@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-1
 title: No spread in list item's renderItem
-category: perf
-impact: HIGH
-tags: renderItem, spread, FlatList, SectionList, performance
 searchPatterns:
   - "renderItem"
   - "\\.\\.\\."

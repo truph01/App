@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-6
 title: Derive state from props
-category: perf
-impact: MEDIUM
-tags: useEffect, useState, derived-state, props
 searchPatterns:
   - "useEffect"
   - "useState"

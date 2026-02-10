@@ -1,9 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-1
 title: Favor composition over configuration
-category: clean-react
-impact: HIGH
-tags: shouldShow, shouldEnable, canSelect, configuration, composition, props
 searchPatterns:
   - "shouldShow"
   - "shouldEnable"

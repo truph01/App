@@ -1,9 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-4
 title: Avoid side-effect spaghetti
-category: clean-react
-impact: HIGH
-tags: useEffect, multiple-effects, separation-of-concerns, single-responsibility, hooks
 searchPatterns:
   - "useEffect"
   - "useOnyx"

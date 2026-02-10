@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-4
 title: Eliminate unused and redundant props
-category: consistency
-impact: MEDIUM
-tags: props, unused, redundant, interface, component-api
 searchPatterns:
   - "type.*Props"
   - "interface.*Props"

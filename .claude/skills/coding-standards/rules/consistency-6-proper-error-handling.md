@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-6
 title: Ensure proper error handling
-category: consistency
-impact: HIGH
-tags: try, catch, async, await, Promise, then, error-handling
 searchPatterns:
   - "try"
   - "catch"

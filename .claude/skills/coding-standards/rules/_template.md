@@ -1,9 +1,6 @@
 ---
 ruleId: CATEGORY-N
 title: Human readable title
-category: perf | consistency | clean-react
-impact: CRITICAL | HIGH | MEDIUM
-tags: comma, separated, tags
 searchPatterns:
   - "grepPattern1"
   - "grepPattern2"

@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-2
 title: Avoid magic numbers and strings
-category: consistency
-impact: MEDIUM
-tags: magic-numbers, magic-strings, constants, readability
 searchPatterns:
   - "hardcoded numbers/strings"
 ---
