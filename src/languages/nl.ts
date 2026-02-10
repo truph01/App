@@ -1360,7 +1360,7 @@ const translations: TranslationDeepObject<typeof en> = {
         invoiceReportName: ({linkedReportID}: OriginalMessage<typeof CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW>) => `Factuurrapport nr. ${linkedReportID}`,
         threadPaySomeoneReportName: ({formattedAmount, comment}: ThreadSentMoneyReportNameParams) => `${formattedAmount} verzonden${comment ? `voor ${comment}` : ''}`,
         movedFromPersonalSpace: ({workspaceName, reportName}: MovedFromPersonalSpaceParams) =>
-            `heeft uitgave verplaatst van persoonlijke ruimte naar ${workspaceName ?? `chat met ${reportName}`}`,
+            `heeft onkostendeclaratie verplaatst van persoonlijke ruimte naar ${workspaceName ?? `chatten met ${reportName}`}`,
         movedToPersonalSpace: 'heeft uitgave verplaatst naar persoonlijke ruimte',
         error: {
             invalidCategoryLength: 'De categorienaam is langer dan 255 tekens. Verkort deze of kies een andere categorie.',
@@ -1938,7 +1938,7 @@ const translations: TranslationDeepObject<typeof en> = {
             enterCommand: 'Voer opdracht in',
             execute: 'Uitvoeren',
             noLogsAvailable: 'Geen logs beschikbaar',
-            logSizeTooLarge: ({size}: LogSizeParams) => `Loggrootte overschrijdt de limiet van ${size} MB. Gebruik alstublieft "Log opslaan" om het logbestand te downloaden.`,
+            logSizeTooLarge: ({size}: LogSizeParams) => `Loggrootte overschrijdt de limiet van ${size} MB. Gebruik "Log opslaan" om het logbestand te downloaden.`,
             logs: 'Logboeken',
             viewConsole: 'Console bekijken',
         },
@@ -1974,8 +1974,8 @@ const translations: TranslationDeepObject<typeof en> = {
         accountValidate: {
             confirmMerge: 'Weet je zeker dat je accounts wilt samenvoegen?',
             lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) =>
-                `Het samenvoegen van je accounts is onomkeerbaar en zal leiden tot het verlies van alle niet-ingediende uitgaven voor <strong>${login}</strong>.`,
-            enterMagicCode: ({login}: MergeAccountIntoParams) => `Om door te gaan, voer de magische code in die is verzonden naar <strong>${login}</strong>.`,
+                `Het samenvoegen van je accounts kan niet ongedaan worden gemaakt en zal ervoor zorgen dat niet-ingediende uitgaven voor <strong>${login}</strong> verloren gaan.`,
+            enterMagicCode: ({login}: MergeAccountIntoParams) => `Voer om door te gaan de magische code in die is verzonden naar <strong>${login}</strong>.`,
             errors: {
                 incorrectMagicCode: 'Onjuiste of ongeldige magische code. Probeer het opnieuw of vraag een nieuwe code aan.',
                 fallback: 'Er is iets misgegaan. Probeer het later opnieuw.',
@@ -2220,7 +2220,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) =>
             `${admin} verliest de toegang tot deze zakelijke bankrekening. We verwerken nog steeds alle betalingen die al in behandeling zijn.`,
         reachOutForHelp: 'Het wordt gebruikt met de Expensify Card. <concierge-link>Neem contact op met Concierge</concierge-link> als je het moet stoppen met delen.',
-        unshareErrorModalTitle: 'Kan betaalrekening niet meer ontkoppelen',
+        unshareErrorModalTitle: 'Kan bankrekening niet meer delen',
     },
     cardPage: {
         expensifyCard: 'Expensify Card',
@@ -2743,17 +2743,17 @@ ${amount} voor ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `[categorieën instellen](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Stel categorieën in* zodat je team onkosten kan coderen voor eenvoudige rapportage.
+                        *Stel categorieën in* zodat je team uitgaven kan coderen voor eenvoudige rapportage.
 
                         1. Klik op *Workspaces*.
                         2. Selecteer je workspace.
                         3. Klik op *Categories*.
-                        4. Schakel categorieën uit die je niet nodig hebt.
-                        5. Voeg je eigen categorieën toe rechtsboven.
+                        4. Schakel alle categorieën uit die je niet nodig hebt.
+                        5. Voeg rechtsboven je eigen categorieën toe.
 
-                        [Breng me naar de categorie-instellingen van de workspace](${workspaceCategoriesLink}).
+                        [Ga naar de instellingen voor workspacecategorieën](${workspaceCategoriesLink}).
 
-                        ![Categorieën instellen](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                        ![Stel categorieën in](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Dien een uitgave in',
@@ -2840,10 +2840,10 @@ ${
                         1. Klik op *Workspaces*.
                         2. Selecteer je workspace.
                         3. Klik op *Members* > *Invite member*.
-                        4. Voer e-mailadressen of telefoonnummers in.
+                        4. Voer e-mails of telefoonnummers in.
                         5. Voeg een aangepast uitnodigingsbericht toe als je wilt!
 
-                        [Breng me naar workspaceleden](${workspaceMembersLink}).
+                        [Breng me naar workspace-leden](${workspaceMembersLink}).
 
                         ![Nodig je team uit](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
             },
@@ -2859,13 +2859,13 @@ ${
                 title: ({workspaceTagsLink}) => `[Tags](${workspaceTagsLink}) instellen`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Gebruik labels om extra details aan je uitgaven toe te voegen, zoals projecten, klanten, locaties en afdelingen. Als je meerdere niveaus van labels nodig hebt, kun je upgraden naar het Control-abonnement.
+                        Gebruik labels om extra details aan uitgaven toe te voegen, zoals projecten, klanten, locaties en afdelingen. Als je meerdere niveaus van labels nodig hebt, kun je upgraden naar het Control-abonnement.
 
                         1. Klik op *Workspaces*.
                         2. Selecteer je workspace.
                         3. Klik op *More features*.
                         4. Schakel *Tags* in.
-                        5. Ga in de workspace-editor naar *Tags*.
+                        5. Ga naar *Tags* in de workspace-editor.
                         6. Klik op *+ Add tag* om je eigen labels te maken.
 
                         [Breng me naar more features](${workspaceMoreFeaturesLink}).
@@ -5099,7 +5099,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             categoryName: 'Categorienaam',
             requiresCategory: 'Leden moeten alle uitgaven categoriseren',
             needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) =>
-                `Alle onkosten moeten worden gecategoriseerd om te kunnen exporteren naar ${connectionName}.`,
+                `Alle uitgaven moeten worden gecategoriseerd om te kunnen exporteren naar ${connectionName}.`,
             subtitle: 'Krijg beter inzicht in waar geld wordt uitgegeven. Gebruik onze standaardcategorieën of voeg je eigen categorieën toe.',
             emptyCategories: {
                 title: 'Je hebt nog geen categorieën aangemaakt',
@@ -7565,10 +7565,14 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             endReading: 'Lezen beëindigen',
             saveForLater: 'Bewaren voor later',
             totalDistance: 'Totale afstand',
-            startPhotoTitle: 'Foto beginstand kilometerteller',
+            startPhotoTitle: 'Kilometerstand beginfoto',
             endPhotoTitle: 'Eindfoto kilometerteller',
             startMessageWeb: 'Voeg een foto toe van de kilometerteller aan het <strong>begin</strong> van je reis. Sleep een bestand hierheen of kies er een om te uploaden.',
             endMessageWeb: 'Voeg een foto toe van je kilometerteller aan het <strong>einde</strong> van je reis. Sleep hier een bestand naartoe of kies er één om te uploaden.',
+            startTitle: 'Beginstand kilometerteller',
+            endTitle: 'Eindstand kilometerteller',
+            deleteOdometerPhoto: 'Kilometerstandfoto verwijderen',
+            deleteOdometerPhotoConfirmation: 'Weet je zeker dat je deze kilometertellerfoto wilt verwijderen?',
         },
     },
     gps: {

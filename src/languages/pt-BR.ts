@@ -1357,7 +1357,7 @@ const translations: TranslationDeepObject<typeof en> = {
         threadExpenseReportName: ({formattedAmount, comment}: ThreadRequestReportNameParams) => `${formattedAmount} ${comment ? `para ${comment}` : 'despesa'}`,
         invoiceReportName: ({linkedReportID}: OriginalMessage<typeof CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW>) => `Relatório de fatura nº ${linkedReportID}`,
         threadPaySomeoneReportName: ({formattedAmount, comment}: ThreadSentMoneyReportNameParams) => `${formattedAmount} enviado${comment ? `para ${comment}` : ''}`,
-        movedFromPersonalSpace: ({workspaceName, reportName}: MovedFromPersonalSpaceParams) => `moveu despesa do espaço pessoal para ${workspaceName ?? `conversar com ${reportName}`}`,
+        movedFromPersonalSpace: ({workspaceName, reportName}: MovedFromPersonalSpaceParams) => `moveu a despesa do espaço pessoal para ${workspaceName ?? `conversar com ${reportName}`}`,
         movedToPersonalSpace: 'moveu a despesa para o espaço pessoal',
         error: {
             invalidCategoryLength: 'O nome da categoria excede 255 caracteres. Reduza-o ou escolha uma categoria diferente.',
@@ -1964,13 +1964,13 @@ const translations: TranslationDeepObject<typeof en> = {
     mergeAccountsPage: {
         mergeAccount: 'Mesclar contas',
         accountDetails: {
-            accountToMergeInto: ({login}: MergeAccountIntoParams) => `Insira a conta que você quer mesclar em <strong>${login}</strong>.`,
+            accountToMergeInto: ({login}: MergeAccountIntoParams) => `Insira a conta que você deseja mesclar em <strong>${login}</strong>.`,
             notReversibleConsent: 'Entendo que isso não é reversível',
         },
         accountValidate: {
             confirmMerge: 'Tem certeza de que deseja mesclar as contas?',
             lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) =>
-                `A fusão das suas contas é irreversível e resultará na perda de quaisquer despesas não enviadas para <strong>${login}</strong>.`,
+                `Mesclar suas contas é irreversível e resultará na perda de quaisquer despesas não enviadas para <strong>${login}</strong>.`,
             enterMagicCode: ({login}: MergeAccountIntoParams) => `Para continuar, insira o código mágico enviado para <strong>${login}</strong>.`,
             errors: {
                 incorrectMagicCode: 'Código mágico incorreto ou inválido. Tente novamente ou solicite um novo código.',
@@ -2745,9 +2745,9 @@ ${amount} para ${merchant} - ${date}`,
                         4. Desative as categorias de que você não precisa.
                         5. Adicione suas próprias categorias no canto superior direito.
 
-                        [Ir para as configurações de categorias do espaço de trabalho](${workspaceCategoriesLink}).
+                        [Leve-me para as configurações de categorias do espaço de trabalho](${workspaceCategoriesLink}).
 
-                        ![Configurar categorias](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                        ![Configure categorias](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Enviar uma despesa',
@@ -2832,10 +2832,10 @@ ${
                         *Convide sua equipe* para o Expensify para que possam começar a registrar despesas hoje.
 
                         1. Clique em *Workspaces*.
-                        2. Selecione o seu workspace.
+                        2. Selecione seu workspace.
                         3. Clique em *Members* > *Invite member*.
                         4. Insira e-mails ou números de telefone.
-                        5. Adicione uma mensagem personalizada ao convite, se quiser!
+                        5. Adicione uma mensagem de convite personalizada, se quiser!
 
                         [Leve-me para os membros do workspace](${workspaceMembersLink}).
 
@@ -2853,16 +2853,16 @@ ${
                 title: ({workspaceTagsLink}) => `Configurar [tags](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Use tags para adicionar mais detalhes às despesas, como projetos, clientes, locais e departamentos. Se você precisar de vários níveis de tags, poderá fazer upgrade para o plano Control.
+                        Use tags para adicionar detalhes extras de despesas, como projetos, clientes, locais e departamentos. Se você precisar de vários níveis de tags, é possível fazer upgrade para o plano Control.
 
-                        1. Clique em *Workspaces*.
-                        2. Selecione seu workspace.
-                        3. Clique em *More features*.
+                        1. Clique em *Espaços de trabalho*.
+                        2. Selecione seu espaço de trabalho.
+                        3. Clique em *Mais recursos*.
                         4. Ative *Tags*.
-                        5. Acesse *Tags* no editor do workspace.
-                        6. Clique em *+ Add tag* para criar suas próprias tags.
+                        5. Vá até *Tags* no editor do espaço de trabalho.
+                        6. Clique em *+ Adicionar tag* para criar as suas.
 
-                        [Leve-me para more features](${workspaceMoreFeaturesLink}).
+                        [Levar-me para Mais recursos](${workspaceMoreFeaturesLink}).
 
                         ![Configurar tags](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
             },
@@ -5059,10 +5059,10 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             addShippingDetails: 'Adicionar detalhes de envio',
             issuedCard: (assignee: string) => `emitiu um Cartão Expensify para ${assignee}! O cartão chegará em 2–3 dias úteis.`,
             issuedCardNoShippingDetails: (assignee: string) => `emitiu um Cartão Expensify para ${assignee}! O cartão será enviado assim que os dados de envio forem confirmados.`,
-            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `emitiu um Cartão Expensify virtual para ${assignee}! O ${link} pode ser usado imediatamente.`,
+            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `emitiu um Cartão Expensify virtual para ${assignee}! O ${link} já pode ser usado.`,
             addedShippingDetails: (assignee: string) => `${assignee} adicionou os detalhes de envio. O Expensify Card chegará em 2–3 dias úteis.`,
             replacedCard: (assignee: string) => `${assignee} substituiu o cartão Expensify. O novo cartão chegará em 2–3 dias úteis.`,
-            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} substituiu o cartão virtual Expensify! O ${link} já pode ser usado.`,
+            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} substituiu o cartão virtual Expensify! O ${link} já pode ser usado imediatamente.`,
             card: 'cartão',
             replacementCard: 'cartão de substituição',
             verifyingHeader: 'Verificando',
@@ -5233,8 +5233,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 assignedCards: 'Atribuído',
                 unassignedCards: 'Não atribuído',
                 integrationExport: ({integration, type}: IntegrationExportParams) =>
-                    integration && type ? `exportação ${integration} ${type.toLowerCase()}` : `Exportação do ${integration}`,
-                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `Escolha a conta do ${integration} para onde as transações devem ser exportadas.`,
+                    integration && type ? `exportação de ${integration} ${type.toLowerCase()}` : `Exportação ${integration}`,
+                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `Escolha a conta do ${integration} para a qual as transações devem ser exportadas.`,
                 integrationExportTitle: ({integration, exportPageLink}: IntegrationExportParams) =>
                     `Escolha a conta do ${integration} para a qual as transações devem ser exportadas. Selecione uma <a href="${exportPageLink}">opção de exportação</a> diferente para alterar as contas disponíveis.`,
                 lastUpdated: 'Última atualização',
@@ -7379,7 +7379,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
                         ? `adicionou "${newValue}" ao campo personalizado 2 de ${email}`
                         : `alterou o campo personalizado 2 de ${email} para "${newValue}" (antes "${previousValue}")`;
                 },
-                leftWorkspace: ({nameOrEmail}: LeftWorkspaceParams) => `${nameOrEmail} saiu do espaço de trabalho`,
+                leftWorkspace: ({nameOrEmail}: LeftWorkspaceParams) => `${nameOrEmail} saiu do workspace`,
                 removeMember: (email: string, role: string) => `removeu ${role} ${email}`,
                 removedConnection: ({connectionName}: ConnectionNameParams) => `removeu a conexão com ${CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName]}`,
                 addedConnection: ({connectionName}: ConnectionNameParams) => `conectado a ${CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName]}`,
@@ -7550,9 +7550,13 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             saveForLater: 'Salvar para depois',
             totalDistance: 'Distância total',
             startPhotoTitle: 'Foto inicial do hodômetro',
-            endPhotoTitle: 'Foto do hodômetro final',
+            endPhotoTitle: 'Foto final do hodômetro',
             startMessageWeb: 'Adicione uma foto do hodômetro do <strong>início</strong> da sua viagem. Arraste um arquivo aqui ou escolha um para enviar.',
             endMessageWeb: 'Adicione uma foto do hodômetro do <strong>final</strong> da sua viagem. Arraste um arquivo aqui ou escolha um para enviar.',
+            startTitle: 'Início do hodômetro',
+            endTitle: 'Quilometragem final',
+            deleteOdometerPhoto: 'Excluir foto do odômetro',
+            deleteOdometerPhotoConfirmation: 'Tem certeza de que deseja excluir esta foto do odômetro?',
         },
     },
     gps: {

@@ -844,7 +844,7 @@ const translations: TranslationDeepObject<typeof en> = {
         writeSomething: '何か書いてください…',
         blockedFromConcierge: '通信は禁止されています',
         fileUploadFailed: 'アップロードに失敗しました。ファイルはサポートされていません。',
-        localTime: ({user, time}: LocalTimeParams) => `${user} の${time}です`,
+        localTime: ({user, time}: LocalTimeParams) => `${user} の時刻は ${time} です`,
         edited: '（編集済み）',
         emoji: '絵文字',
         collapse: '折りたたむ',
@@ -1206,9 +1206,9 @@ const translations: TranslationDeepObject<typeof en> = {
         findExpense: '経費を検索',
         deletedTransaction: (amount: string, merchant: string) => `経費を削除しました（${merchant} に ${amount}）`,
         movedFromReport: ({reportName}: MovedFromReportParams) => `経費${reportName ? `${reportName} から` : ''}を移動しました`,
-        movedTransactionTo: ({reportUrl, reportName}: MovedTransactionParams) => `この経費を移動しました${reportName ? `<a href="${reportUrl}">${reportName}</a>へ` : ''}`,
-        movedTransactionFrom: ({reportUrl, reportName}: MovedTransactionParams) => `この経費を移動しました${reportName ? `<a href="${reportUrl}">${reportName}</a> から` : ''}`,
-        unreportedTransaction: ({reportUrl}: MovedTransactionParams) => `この経費をあなたの<a href="${reportUrl}">個人スペース</a>に移動しました`,
+        movedTransactionTo: ({reportUrl, reportName}: MovedTransactionParams) => `この経費を移動しました${reportName ? `を <a href="${reportUrl}">${reportName}</a> に` : ''}`,
+        movedTransactionFrom: ({reportUrl, reportName}: MovedTransactionParams) => `この経費を移動しました${reportName ? `発信元：<a href="${reportUrl}">${reportName}</a>` : ''}`,
+        unreportedTransaction: ({reportUrl}: MovedTransactionParams) => `この経費を<a href="${reportUrl}">あなたのパーソナルスペース</a>に移動しました`,
         movedAction: ({shouldHideMovedReportUrl, movedReportUrl, newParentReportUrl, toPolicyName}: MovedActionParams) => {
             if (shouldHideMovedReportUrl) {
                 return `このレポートを<a href="${newParentReportUrl}">${toPolicyName}</a>ワークスペースに移動しました`;
@@ -1967,7 +1967,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         accountValidate: {
             confirmMerge: '本当にアカウントを統合してもよろしいですか？',
-            lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) => `アカウントの統合は元に戻せず、<strong>${login}</strong> の未提出経費はすべて失われます。`,
+            lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) => `アカウントの統合は元に戻せず、<strong>${login}</strong> の未提出の経費はすべて失われます。`,
             enterMagicCode: ({login}: MergeAccountIntoParams) => `続行するには、<strong>${login}</strong> に送信されたマジックコードを入力してください。`,
             errors: {
                 incorrectMagicCode: '魔法コードが間違っているか無効です。もう一度お試しいただくか、新しいコードをリクエストしてください。',
@@ -2728,15 +2728,15 @@ ${date} の ${merchant} への ${amount}`,
                 title: ({workspaceCategoriesLink}) => `[カテゴリ](${workspaceCategoriesLink})を設定`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        経費を簡単にレポートできるようにするため、チームが仕訳できるよう*カテゴリを設定*しましょう。
+                        経費をかんたんにレポートできるよう、チームが仕訳に使う*カテゴリを設定*しましょう。
 
                         1. *ワークスペース*をクリックします。
                         2. 自分のワークスペースを選択します。
                         3. *カテゴリ*をクリックします。
                         4. 不要なカテゴリを無効にします。
-                        5. 右上で独自のカテゴリを追加します。
+                        5. 右上から独自のカテゴリを追加します。
 
-                        [ワークスペースのカテゴリ設定に移動](${workspaceCategoriesLink})。
+                        [ワークスペースのカテゴリ設定を開く](${workspaceCategoriesLink})。
 
                         ![カテゴリを設定](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
@@ -2820,15 +2820,15 @@ ${
                 title: ({workspaceMembersLink}) => `[チームを招待する](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *チームを招待*して、今日から経費の記録を始めましょう。
+                        *チームを招待*して、今すぐ経費の記録を始めてもらいましょう。
 
                         1. *ワークスペース*をクリックします。
-                        2. 自分のワークスペースを選択します。
+                        2. ワークスペースを選択します。
                         3. *メンバー* > *メンバーを招待* をクリックします。
                         4. メールアドレスまたは電話番号を入力します。
-                        5. 必要に応じて、招待メッセージを追加します。
+                        5. 必要に応じて、招待メッセージをカスタマイズしてください。
 
-                        [ワークスペースのメンバー画面へ移動](${workspaceMembersLink})。
+                        [ワークスペースのメンバーへ移動](${workspaceMembersLink})。
 
                         ![チームを招待](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
             },
@@ -2844,18 +2844,18 @@ ${
                 title: ({workspaceTagsLink}) => `[tag](${workspaceTagsLink})を設定`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        タグを使用して、プロジェクト、クライアント、所在地、部門などの経費の詳細を追加できます。タグを複数階層で使いたい場合は、Control プランにアップグレードできます。
+                        タグを使って、プロジェクト、クライアント、所在地、部署などの追加経費情報を管理しましょう。タグを複数階層で使いたい場合は、Control プランにアップグレードできます。
 
-                        1. 「ワークスペース」をクリックします。
+                        1. *Workspaces* をクリックします。
                         2. ワークスペースを選択します。
-                        3. 「その他の機能」をクリックします。
-                        4. 「タグ」を有効にします。
-                        5. ワークスペースエディタで「タグ」に移動します。
-                        6. 「+ タグを追加」をクリックして独自のタグを作成します。
+                        3. *More features* をクリックします。
+                        4. *Tags* を有効にします。
+                        5. ワークスペースエディタ内の *Tags* に移動します。
+                        6. *+ Add tag* をクリックして、独自のタグを作成します。
 
                         [その他の機能に移動](${workspaceMoreFeaturesLink})。
 
-                        ![タグを設定](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                        ![タグを設定する](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `[会計士](${workspaceMembersLink})を招待する`,
@@ -3010,7 +3010,7 @@ ${
     unlinkLoginForm: {
         toValidateLogin: ({primaryLogin, secondaryLogin}: ToValidateLoginParams) =>
             `${secondaryLogin} を確認するには、${primaryLogin} のアカウント設定からマジックコードを再送してください。`,
-        noLongerHaveAccess: ({primaryLogin}: NoLongerHaveAccessParams) => `${primaryLogin} にアクセスできなくなった場合は、アカウントの連携を解除してください。`,
+        noLongerHaveAccess: ({primaryLogin}: NoLongerHaveAccessParams) => `${primaryLogin} にアクセスできなくなった場合は、アカウントのリンクを解除してください。`,
         unlink: 'リンク解除',
         linkSent: 'リンクを送信しました！',
         successfullyUnlinkedLogin: 'セカンダリログインを正常に連携解除しました！',
@@ -5037,10 +5037,10 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             addShippingDetails: '配送先の詳細を追加',
             issuedCard: (assignee: string) => `${assignee} に Expensify カードを発行しました！カードは 2～3 営業日以内に到着します。`,
             issuedCardNoShippingDetails: (assignee: string) => `${assignee}にExpensify Cardを発行しました！配送先の詳細が確認され次第、カードを発送します。`,
-            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `${assignee} にバーチャル Expensify Card を発行しました！${link} はすぐに使用できます。`,
+            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `${assignee} にバーチャル Expensify Card を発行しました！${link} はすぐに利用できます。`,
             addedShippingDetails: (assignee: string) => `${assignee} が配送先の詳細を追加しました。Expensify Card は 2～3 営業日で届きます。`,
             replacedCard: (assignee: string) => `${assignee} は Expensify Card を再発行しました。新しいカードは 2〜3 営業日で到着します。`,
-            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee}さんがバーチャル Expensify Card を再発行しました！${link}はすぐにご利用いただけます。`,
+            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} はバーチャル Expensify カードを再発行しました！${link} はすぐに使用できます。`,
             card: 'カード',
             replacementCard: '再発行カード',
             verifyingHeader: '確認中',
@@ -5069,7 +5069,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             categoryName: 'カテゴリ名',
             requiresCategory: 'メンバーはすべての経費を分類する必要があります',
             needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) =>
-                `${connectionName} にエクスポートするには、すべての経費にカテゴリを指定する必要があります。`,
+                `${connectionName} にエクスポートするには、すべての経費にカテゴリを割り当てる必要があります。`,
             subtitle: 'お金がどこで使われているかを、より分かりやすく把握しましょう。デフォルトのカテゴリを使うか、自分用のカテゴリを追加できます。',
             emptyCategories: {
                 title: 'カテゴリがまだ作成されていません',
@@ -5211,7 +5211,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 unassignedCards: '未割り当て',
                 integrationExport: ({integration, type}: IntegrationExportParams) =>
                     integration && type ? `${integration} ${type.toLowerCase()} エクスポート` : `${integration} エクスポート`,
-                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `取引のエクスポート先となる${integration}の口座を選択してください。`,
+                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `取引のエクスポート先となる${integration}アカウントを選択してください。`,
                 integrationExportTitle: ({integration, exportPageLink}: IntegrationExportParams) =>
                     `取引をエクスポートする${integration}アカウントを選択してください。利用可能なアカウントを変更するには、別の<a href="${exportPageLink}">エクスポートオプション</a>を選択してください。`,
                 lastUpdated: '最終更新日時',
@@ -7310,7 +7310,7 @@ ${reportName}
                     `このレポートを${label}にエクスポートできませんでした（"${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}"）`,
                 managerAttachReceipt: `レシートを追加しました`,
                 managerDetachReceipt: `領収書を削除しました`,
-                markedReimbursed: ({amount, currency}: MarkedReimbursedParams) => `他の場所で${currency}${amount}を支払いました`,
+                markedReimbursed: ({amount, currency}: MarkedReimbursedParams) => `他所で${currency}${amount}を支払いました`,
                 markedReimbursedFromIntegration: ({amount, currency}: MarkReimbursedFromIntegrationParams) => `連携経由で${currency}${amount}を支払いました`,
                 outdatedBankAccount: `支払元の銀行口座に問題があるため、支払いを処理できませんでした`,
                 reimbursementACHBounce: `銀行口座の問題により支払いを処理できませんでした`,
@@ -7354,7 +7354,7 @@ ${reportName}
                 leftTheChat: 'チャットを退出しました',
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `Reimbursement または Expensify Card の清算に問題が発生したため、ビジネス銀行口座 ${maskedBankAccountNumber} は自動的にロックされました。問題を解決するには、<a href="${linkURL}">ワークスペース設定</a>で修正してください。`,
-                leftTheChatWithName: ({nameOrEmail}: LeftWorkspaceParams) => `${nameOrEmail ? `${nameOrEmail}: ` : ''}がチャットから退出しました`,
+                leftTheChatWithName: ({nameOrEmail}: LeftWorkspaceParams) => `${nameOrEmail ? `${nameOrEmail}: ` : ''}がチャットを退出しました`,
             },
             error: {
                 invalidCredentials: '認証情報が無効です。接続の設定を確認してください。',
@@ -7516,10 +7516,14 @@ ${reportName}
             endReading: '読み終える',
             saveForLater: '後で保存',
             totalDistance: '合計距離',
-            startPhotoTitle: '走行距離計の開始写真',
-            endPhotoTitle: '走行距離計終了時の写真',
+            startPhotoTitle: '走行距離計の開始時の写真',
+            endPhotoTitle: '走行距離計（終了時）の写真',
             startMessageWeb: '旅行の<strong>開始時</strong>のオドメーターの写真を追加してください。ここにファイルをドラッグするか、またはアップロードするファイルを選択してください。',
             endMessageWeb: '旅行の<strong>終了時</strong>の走行距離計の写真を追加してください。ここにファイルをドラッグするか、アップロードするファイルを選択してください。',
+            startTitle: '走行距離計の開始',
+            endTitle: '走行距離計（終了）',
+            deleteOdometerPhoto: '走行距離計の写真を削除',
+            deleteOdometerPhotoConfirmation: 'この走行距離計の写真を削除してもよろしいですか？',
         },
     },
     gps: {

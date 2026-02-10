@@ -1985,7 +1985,7 @@ const translations: TranslationDeepObject<typeof en> = {
         accountValidate: {
             confirmMerge: 'Voulez-vous vraiment fusionner les comptes ?',
             lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) =>
-                `La fusion de vos comptes est irréversible et entraînera la perte de toutes les dépenses non soumises pour <strong>${login}</strong>.`,
+                `Fusionner vos comptes est irréversible et entraînera la perte de toutes les dépenses non soumises pour <strong>${login}</strong>.`,
             enterMagicCode: ({login}: MergeAccountIntoParams) => `Pour continuer, veuillez saisir le code magique envoyé à <strong>${login}</strong>.`,
             errors: {
                 incorrectMagicCode: 'Code magique incorrect ou non valide. Veuillez réessayer ou demander un nouveau code.',
@@ -2756,7 +2756,7 @@ ${amount} pour ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `Configurer les [catégories](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Configurez des catégories* pour que votre équipe puisse coder les dépenses afin de faciliter les rapports.
+                        *Configurez les catégories* pour que votre équipe puisse coder les dépenses et faciliter le reporting.
 
                         1. Cliquez sur *Espaces de travail*.
                         2. Sélectionnez votre espace de travail.
@@ -2764,9 +2764,9 @@ ${amount} pour ${merchant} - ${date}`,
                         4. Désactivez les catégories dont vous n’avez pas besoin.
                         5. Ajoutez vos propres catégories en haut à droite.
 
-                        [Accéder aux paramètres des catégories de l’espace de travail](${workspaceCategoriesLink}).
+                        [Accéder aux paramètres de catégories de l’espace de travail](${workspaceCategoriesLink}).
 
-                        ![Configurer des catégories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                        ![Configurer les catégories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Soumettre une dépense',
@@ -2848,15 +2848,15 @@ ${
                 title: ({workspaceMembersLink}) => `Invitez [votre équipe](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *Invitez votre équipe* sur Expensify pour qu’elle puisse commencer à suivre ses dépenses dès aujourd’hui.
+                        *Invitez votre équipe* sur Expensify afin qu’elle puisse commencer à suivre ses dépenses dès aujourd’hui.
 
                         1. Cliquez sur *Espaces de travail*.
                         2. Sélectionnez votre espace de travail.
                         3. Cliquez sur *Membres* > *Inviter un membre*.
-                        4. Saisissez des adresses e-mail ou des numéros de téléphone.
+                        4. Saisissez des e-mails ou des numéros de téléphone.
                         5. Ajoutez un message d’invitation personnalisé si vous le souhaitez !
 
-                        [Aller aux membres de l’espace de travail](${workspaceMembersLink}).
+                        [Accéder aux membres de l’espace de travail](${workspaceMembersLink}).
 
                         ![Invitez votre équipe](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
             },
@@ -2872,7 +2872,7 @@ ${
                 title: ({workspaceTagsLink}) => `Configurer les [tags](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Utilisez des tags pour ajouter des détails supplémentaires à vos dépenses, comme les projets, clients, lieux et services. Si vous avez besoin de plusieurs niveaux de tags, vous pouvez passer au plan Contrôle.
+                        Utilisez les tags pour ajouter des détails supplémentaires sur les dépenses, comme les projets, les clients, les lieux et les services. Si vous avez besoin de plusieurs niveaux de tags, vous pouvez passer au plan Control.
 
                         1. Cliquez sur *Espaces de travail*.
                         2. Sélectionnez votre espace de travail.
@@ -3039,7 +3039,7 @@ ${
     unlinkLoginForm: {
         toValidateLogin: ({primaryLogin, secondaryLogin}: ToValidateLoginParams) =>
             `Pour valider ${secondaryLogin}, veuillez renvoyer le code magique depuis les paramètres de compte de ${primaryLogin}.`,
-        noLongerHaveAccess: ({primaryLogin}: NoLongerHaveAccessParams) => `Si vous n'avez plus accès à ${primaryLogin}, veuillez dissocier vos comptes.`,
+        noLongerHaveAccess: ({primaryLogin}: NoLongerHaveAccessParams) => `Si vous n’avez plus accès à ${primaryLogin}, veuillez dissocier vos comptes.`,
         unlink: 'Dissocier',
         linkSent: 'Lien envoyé !',
         successfullyUnlinkedLogin: 'Connexion secondaire dissociée avec succès !',
@@ -5103,7 +5103,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `a émis une carte Expensify virtuelle à ${assignee} ! Le ${link} peut être utilisé immédiatement.`,
             addedShippingDetails: (assignee: string) => `${assignee} a ajouté les détails de livraison. La carte Expensify arrivera dans 2 à 3 jours ouvrables.`,
             replacedCard: (assignee: string) => `${assignee} a remplacé sa carte Expensify. La nouvelle carte arrivera sous 2 à 3 jours ouvrables.`,
-            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} a remplacé sa carte Expensify virtuelle ! Le ${link} peut être utilisé immédiatement.`,
+            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} a remplacé sa carte Expensify virtuelle ! Le ${link} peut être utilisé immédiatement.`,
             card: 'carte',
             replacementCard: 'carte de remplacement',
             verifyingHeader: 'Vérification',
@@ -5132,7 +5132,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             categoryName: 'Nom de la catégorie',
             requiresCategory: 'Les membres doivent catégoriser toutes les dépenses',
             needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) =>
-                `Toutes les dépenses doivent être catégorisées afin de pouvoir être exportées vers ${connectionName}.`,
+                `Toutes les dépenses doivent être catégorisées afin d’être exportées vers ${connectionName}.`,
             subtitle: 'Obtenez une meilleure vue d’ensemble de l’endroit où l’argent est dépensé. Utilisez nos catégories par défaut ou ajoutez les vôtres.',
             emptyCategories: {
                 title: "Vous n'avez créé aucune catégorie",
@@ -5275,7 +5275,8 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                 allCards: 'Toutes les cartes',
                 assignedCards: 'Assigné',
                 unassignedCards: 'Non assigné',
-                integrationExport: ({integration, type}: IntegrationExportParams) => (integration && type ? `exportation ${integration} ${type.toLowerCase()}` : `Export ${integration}`),
+                integrationExport: ({integration, type}: IntegrationExportParams) =>
+                    integration && type ? `exportation ${integration} ${type.toLowerCase()}` : `Exportation ${integration}`,
                 integrationExportTitleXero: ({integration}: IntegrationExportParams) => `Choisissez le compte ${integration} vers lequel les transactions doivent être exportées.`,
                 integrationExportTitle: ({integration, exportPageLink}: IntegrationExportParams) =>
                     `Choisissez le compte ${integration} vers lequel les transactions doivent être exportées. Sélectionnez une autre <a href="${exportPageLink}">option d’exportation</a> pour modifier les comptes disponibles.`,
@@ -7611,11 +7612,15 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             endReading: 'Fin de lecture',
             saveForLater: 'Enregistrer pour plus tard',
             totalDistance: 'Distance totale',
-            startPhotoTitle: 'Photo du compteur au départ',
-            endPhotoTitle: 'Photo de fin d’odomètre',
+            startPhotoTitle: 'Photo du compteur de départ',
+            endPhotoTitle: 'Photo du compteur (arrivée)',
             startMessageWeb:
                 'Ajoutez une photo de votre compteur kilométrique prise au <strong>début</strong> de votre trajet. Faites glisser un fichier ici ou choisissez-en un à télécharger.',
             endMessageWeb: 'Ajoutez une photo du compteur kilométrique prise à la <strong>fin</strong> de votre trajet. Faites glisser un fichier ici ou choisissez-en un à télécharger.',
+            startTitle: 'Début du kilométrage',
+            endTitle: 'Fin du compteur kilométrique',
+            deleteOdometerPhoto: 'Supprimer la photo du compteur kilométrique',
+            deleteOdometerPhotoConfirmation: 'Voulez-vous vraiment supprimer cette photo de l’odomètre ?',
         },
     },
     gps: {

@@ -1938,7 +1938,7 @@ const translations: TranslationDeepObject<typeof en> = {
             enterCommand: 'Inserisci comando',
             execute: 'Esegui',
             noLogsAvailable: 'Nessun registro disponibile',
-            logSizeTooLarge: ({size}: LogSizeParams) => `La dimensione del registro supera il limite di ${size} MB. Usa “Salva registro” per scaricare il file di registro.`,
+            logSizeTooLarge: ({size}: LogSizeParams) => `La dimensione del log supera il limite di ${size} MB. Usa “Salva log” per scaricare il file di log.`,
             logs: 'Registri',
             viewConsole: 'Visualizza console',
         },
@@ -1968,13 +1968,13 @@ const translations: TranslationDeepObject<typeof en> = {
     mergeAccountsPage: {
         mergeAccount: 'Unisci account',
         accountDetails: {
-            accountToMergeInto: ({login}: MergeAccountIntoParams) => `Inserisci l’account che vuoi unire a <strong>${login}</strong>.`,
+            accountToMergeInto: ({login}: MergeAccountIntoParams) => `Inserisci l’account che vuoi unire in <strong>${login}</strong>.`,
             notReversibleConsent: 'Capisco che questa operazione non è reversibile',
         },
         accountValidate: {
             confirmMerge: 'Sei sicuro di voler unire gli account?',
             lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) =>
-                `L’unione dei tuoi account è irreversibile e comporterà la perdita di tutte le spese non inviate per <strong>${login}</strong>.`,
+                `Unire i tuoi account è irreversibile e comporterà la perdita di tutte le spese non inviate per <strong>${login}</strong>.`,
             enterMagicCode: ({login}: MergeAccountIntoParams) => `Per continuare, inserisci il codice magico inviato a <strong>${login}</strong>.`,
             errors: {
                 incorrectMagicCode: 'Codice magico errato o non valido. Riprova o richiedi un nuovo codice.',
@@ -2742,15 +2742,15 @@ ${amount} per ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `Configura le [categorie](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Configura le categorie* in modo che il tuo team possa classificare le spese per una rendicontazione più semplice.
+                        *Configura le categorie* in modo che il tuo team possa codificare le spese per creare report facilmente.
 
-                        1. Fai clic su *Workspaces*.
-                        2. Seleziona il tuo workspace.
-                        3. Fai clic su *Categories*.
+                        1. Fai clic su *Spazi di lavoro*.
+                        2. Seleziona il tuo spazio di lavoro.
+                        3. Fai clic su *Categorie*.
                         4. Disattiva le categorie di cui non hai bisogno.
                         5. Aggiungi le tue categorie in alto a destra.
 
-                        [Portami alle impostazioni delle categorie del workspace](${workspaceCategoriesLink}).
+                        [Portami alle impostazioni delle categorie dello spazio di lavoro](${workspaceCategoriesLink}).
 
                         ![Configura le categorie](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
@@ -2836,13 +2836,13 @@ ${
                     dedent(`
                         *Invita il tuo team* su Expensify così potrà iniziare a tracciare le spese oggi stesso.
 
-                        1. Fai clic su *Spazi di lavoro*.
-                        2. Seleziona il tuo spazio di lavoro.
-                        3. Fai clic su *Membri* > *Invita membro*.
+                        1. Fai clic su *Workspaces*.
+                        2. Seleziona il tuo workspace.
+                        3. Fai clic su *Members* > *Invite member*.
                         4. Inserisci email o numeri di telefono.
-                        5. Aggiungi un messaggio di invito personalizzato, se vuoi!
+                        5. Aggiungi un messaggio di invito personalizzato se vuoi!
 
-                        [Portami ai membri dello spazio di lavoro](${workspaceMembersLink}).
+                        [Portami ai membri del workspace](${workspaceMembersLink}).
 
                         ![Invita il tuo team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
             },
@@ -2858,16 +2858,16 @@ ${
                 title: ({workspaceTagsLink}) => `Configura i [tag](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Usa i tag per aggiungere dettagli extra alle spese, come progetti, clienti, sedi e reparti. Se ti servono più livelli di tag, puoi eseguire l’upgrade al piano Control.
+                        Usa i tag per aggiungere dettagli extra alle spese, come progetti, clienti, sedi e reparti. Se ti servono più livelli di tag, puoi passare al piano Control.
 
-                        1. Fai clic su *Workspaces*.
-                        2. Seleziona il tuo workspace.
-                        3. Fai clic su *More features*.
-                        4. Attiva *Tags*.
-                        5. Vai a *Tags* nell’editor del workspace.
-                        6. Fai clic su *+ Add tag* per crearne uno personalizzato.
+                        1. Fai clic su *Spazi di lavoro*.
+                        2. Seleziona il tuo spazio di lavoro.
+                        3. Fai clic su *Altre funzionalità*.
+                        4. Attiva *Tag*.
+                        5. Vai su *Tag* nell’editor dello spazio di lavoro.
+                        6. Fai clic su *+ Aggiungi tag* per creare i tuoi.
 
-                        [Portami a More features](${workspaceMoreFeaturesLink}).
+                        [Portami alle altre funzionalità](${workspaceMoreFeaturesLink}).
 
                         ![Configura i tag](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
             },
@@ -5073,10 +5073,10 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             addShippingDetails: 'Aggiungi dettagli di spedizione',
             issuedCard: (assignee: string) => `ha emesso una Expensify Card per ${assignee}! La carta arriverà tra 2-3 giorni lavorativi.`,
             issuedCardNoShippingDetails: (assignee: string) => `ha emesso una Expensify Card per ${assignee}! La carta verrà spedita una volta confermati i dettagli di spedizione.`,
-            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `ha emesso a ${assignee} una carta virtuale Expensify! Il/la ${link} può essere usato/a subito.`,
+            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `ha emesso a ${assignee} una Expensify Card virtuale! Il/la ${link} può essere usato/a subito.`,
             addedShippingDetails: (assignee: string) => `${assignee} ha aggiunto i dettagli di spedizione. La Expensify Card arriverà tra 2-3 giorni lavorativi.`,
             replacedCard: (assignee: string) => `${assignee} ha sostituito la sua Expensify Card. La nuova carta arriverà tra 2-3 giorni lavorativi.`,
-            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} ha sostituito la sua Expensify Card virtuale! La ${link} può essere usata subito.`,
+            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} ha sostituito la sua carta virtuale Expensify! Il ${link} può essere usato subito.`,
             card: 'carta',
             replacementCard: 'carta sostitutiva',
             verifyingHeader: 'Verifica in corso',
@@ -5105,7 +5105,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             categoryName: 'Nome categoria',
             requiresCategory: 'I membri devono categorizzare tutte le spese',
             needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) =>
-                `Tutte le spese devono essere categorizzate per poterle esportare su ${connectionName}.`,
+                `Tutte le spese devono essere categorizzate per poter esportare su ${connectionName}.`,
             subtitle: 'Ottieni una panoramica migliore di dove viene speso il denaro. Usa le nostre categorie predefinite oppure aggiungi le tue.',
             emptyCategories: {
                 title: 'Non hai creato alcuna categoria',
@@ -7579,9 +7579,13 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             saveForLater: 'Salva per dopo',
             totalDistance: 'Distanza totale',
             startPhotoTitle: 'Foto iniziale del contachilometri',
-            endPhotoTitle: 'Foto del contachilometri finale',
+            endPhotoTitle: 'Foto contachilometri finale',
             startMessageWeb: 'Aggiungi una foto del contachilometri all’<strong>inizio</strong> del tuo viaggio. Trascina qui un file oppure scegli un file da caricare.',
             endMessageWeb: 'Aggiungi una foto del contachilometri scattata alla <strong>fine</strong> del viaggio. Trascina qui un file oppure scegli un file da caricare.',
+            startTitle: 'Inizio contachilometri',
+            endTitle: 'Fine contachilometri',
+            deleteOdometerPhoto: 'Elimina foto del contachilometri',
+            deleteOdometerPhotoConfirmation: 'Sei sicuro di voler eliminare questa foto del contachilometri?',
         },
     },
     gps: {

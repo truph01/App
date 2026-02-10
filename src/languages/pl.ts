@@ -1209,9 +1209,9 @@ const translations: TranslationDeepObject<typeof en> = {
         deleteReceipt: 'Usuń paragon',
         findExpense: 'Znajdź wydatek',
         deletedTransaction: (amount: string, merchant: string) => `usunął(-ę) wydatek (${amount} dla ${merchant})`,
-        movedFromReport: ({reportName}: MovedFromReportParams) => `przeniesiono wydatek${reportName ? `z ${reportName}` : ''}`,
+        movedFromReport: ({reportName}: MovedFromReportParams) => `przeniesiono wydatek${reportName ? `z raportu ${reportName}` : ''}`,
         movedTransactionTo: ({reportUrl, reportName}: MovedTransactionParams) => `przeniósł ten wydatek${reportName ? `do <a href="${reportUrl}">${reportName}</a>` : ''}`,
-        movedTransactionFrom: ({reportUrl, reportName}: MovedTransactionParams) => `przeniósł(-ę) ten wydatek${reportName ? `z <a href="${reportUrl}">${reportName}</a>` : ''}`,
+        movedTransactionFrom: ({reportUrl, reportName}: MovedTransactionParams) => `przeniesiono ten wydatek${reportName ? `z <a href="${reportUrl}">${reportName}</a>` : ''}`,
         unreportedTransaction: ({reportUrl}: MovedTransactionParams) => `przeniósł ten wydatek do Twojej <a href="${reportUrl}">przestrzeni osobistej</a>`,
         movedAction: ({shouldHideMovedReportUrl, movedReportUrl, newParentReportUrl, toPolicyName}: MovedActionParams) => {
             if (shouldHideMovedReportUrl) {
@@ -1323,7 +1323,7 @@ const translations: TranslationDeepObject<typeof en> = {
         payerPaid: (payer: string) => `${payer} zapłacił(a):`,
         payerSpentAmount: (amount: number | string, payer?: string) => `${payer} wydał(-a) ${amount}`,
         payerSpent: (payer: string) => `${payer} wydał:`,
-        managerApproved: ({manager}: ManagerApprovedParams) => `${manager} zatwierdził(a):`,
+        managerApproved: ({manager}: ManagerApprovedParams) => `${manager} zatwierdził(-a):`,
         managerApprovedAmount: ({manager, amount}: ManagerApprovedAmountParams) => `${manager} zatwierdził(a) ${amount}`,
         payerSettled: (amount: number | string) => `zapłacono ${amount}`,
         payerSettledWithMissingBankAccount: (amount: number | string) => `zapłacono ${amount}. Dodaj konto bankowe, aby otrzymać płatność.`,
@@ -1966,13 +1966,13 @@ const translations: TranslationDeepObject<typeof en> = {
     mergeAccountsPage: {
         mergeAccount: 'Połącz konta',
         accountDetails: {
-            accountToMergeInto: ({login}: MergeAccountIntoParams) => `Wpisz konto, które chcesz połączyć z kontem <strong>${login}</strong>.`,
+            accountToMergeInto: ({login}: MergeAccountIntoParams) => `Wprowadź konto, które chcesz scalić z <strong>${login}</strong>.`,
             notReversibleConsent: 'Rozumiem, że tego nie da się cofnąć',
         },
         accountValidate: {
             confirmMerge: 'Czy na pewno chcesz scalić konta?',
             lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) =>
-                `Połączenie Twoich kont jest nieodwracalne i spowoduje utratę wszystkich niewysłanych wydatków dla użytkownika <strong>${login}</strong>.`,
+                `Scalanie Twoich kont jest nieodwracalne i spowoduje utratę wszystkich niewysłanych wydatków dla użytkownika <strong>${login}</strong>.`,
             enterMagicCode: ({login}: MergeAccountIntoParams) => `Aby kontynuować, wprowadź magiczny kod wysłany na adres <strong>${login}</strong>.`,
             errors: {
                 incorrectMagicCode: 'Nieprawidłowy lub niepoprawny kod magiczny. Spróbuj ponownie lub poproś o nowy kod.',
@@ -2734,15 +2734,15 @@ ${amount} dla ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `Skonfiguruj [kategorie](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Skonfiguruj kategorie*, aby Twój zespół mógł kategoryzować wydatki dla łatwiejszego raportowania.
+                        *Skonfiguruj kategorie*, aby Twój zespół mógł kategoryzować wydatki i ułatwić raportowanie.
 
                         1. Kliknij *Workspaces*.
-                        2. Wybierz swoje środowisko pracy.
+                        2. Wybierz swoją przestrzeń roboczą.
                         3. Kliknij *Categories*.
                         4. Wyłącz wszystkie kategorie, których nie potrzebujesz.
                         5. Dodaj własne kategorie w prawym górnym rogu.
 
-                        [Przejdź do ustawień kategorii w środowisku pracy](${workspaceCategoriesLink}).
+                        [Przejdź do ustawień kategorii przestrzeni roboczej](${workspaceCategoriesLink}).
 
                         ![Skonfiguruj kategorie](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
@@ -2828,13 +2828,13 @@ ${
                     dedent(`
                         *Zaproś swój zespół* do Expensify, aby mógł zacząć śledzić wydatki już dziś.
 
-                        1. Kliknij *Workspace*.
-                        2. Wybierz swój workspace.
+                        1. Kliknij *Workspaces*.
+                        2. Wybierz swoją przestrzeń roboczą.
                         3. Kliknij *Members* > *Invite member*.
                         4. Wpisz adresy e-mail lub numery telefonów.
                         5. Dodaj własną wiadomość z zaproszeniem, jeśli chcesz!
 
-                        [Przejdź do członków workspace](${workspaceMembersLink}).
+                        [Przejdź do członków przestrzeni roboczej](${workspaceMembersLink}).
 
                         ![Zaproś swój zespół](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
             },
@@ -2850,16 +2850,16 @@ ${
                 title: ({workspaceTagsLink}) => `Skonfiguruj [tagi](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Użyj tagów, aby dodać dodatkowe szczegóły wydatków, takie jak projekty, klienci, lokalizacje i działy. Jeśli potrzebujesz wielu poziomów tagów, możesz uaktualnić do planu Control.
+                        Używaj tagów, aby dodać dodatkowe szczegóły wydatków, takie jak projekty, klienci, lokalizacje i działy. Jeśli potrzebujesz wielu poziomów tagów, możesz przejść na plan Control.
 
                         1. Kliknij *Workspaces*.
-                        2. Wybierz swój workspace.
+                        2. Wybierz swoją przestrzeń roboczą.
                         3. Kliknij *More features*.
                         4. Włącz *Tags*.
-                        5. Przejdź do *Tags* w edytorze workspace’u.
-                        6. Kliknij *+ Add tag*, aby utworzyć własny.
+                        5. Przejdź do *Tags* w edytorze przestrzeni roboczej.
+                        6. Kliknij *+ Add tag*, aby utworzyć własne.
 
-                        [Przejdź do dodatkowych funkcji](${workspaceMoreFeaturesLink}).
+                        [Przejdź do opcji „More features”](${workspaceMoreFeaturesLink}).
 
                         ![Skonfiguruj tagi](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
             },
@@ -3963,7 +3963,7 @@ ${
             existingConnections: 'Istniejące połączenia',
             existingConnectionsDescription: ({connectionName}: ConnectionNameParams) =>
                 `Ponieważ wcześniej połączyłeś(-aś) się z ${CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName]}, możesz ponownie użyć istniejącego połączenia lub utworzyć nowe.`,
-            lastSyncDate: ({connectionName, formattedDate}: LastSyncDateParams) => `${connectionName} – Ostatnia synchronizacja ${formattedDate}`,
+            lastSyncDate: ({connectionName, formattedDate}: LastSyncDateParams) => `${connectionName} – Ostatnia synchronizacja: ${formattedDate}`,
             authenticationError: (connectionName: string) => `Nie można połączyć z ${connectionName} z powodu błędu uwierzytelniania.`,
             learnMore: 'Dowiedz się więcej',
             memberAlternateText: 'Przesyłaj i zatwierdzaj raporty.',
@@ -5055,7 +5055,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             addShippingDetails: 'Dodaj dane wysyłki',
             issuedCard: (assignee: string) => `wydano użytkownikowi ${assignee} kartę Expensify! Karta dotrze w ciągu 2–3 dni roboczych.`,
             issuedCardNoShippingDetails: (assignee: string) => `przyznał(-a) ${assignee} kartę Expensify! Karta zostanie wysłana po potwierdzeniu danych wysyłki.`,
-            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `wydał(a) użytkownikowi ${assignee} wirtualną kartę Expensify! Z ${link} można korzystać od razu.`,
+            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `przyznał(-a) ${assignee} wirtualną kartę Expensify! Z ${link} można korzystać od razu.`,
             addedShippingDetails: (assignee: string) => `${assignee} dodał(a) dane wysyłki. Karta Expensify dotrze w ciągu 2–3 dni roboczych.`,
             replacedCard: (assignee: string) => `${assignee} wymienił(-a) swoją kartę Expensify. Nowa karta dotrze w ciągu 2–3 dni roboczych.`,
             replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} wymienił(-a) swoją wirtualną kartę Expensify! ${link} można używać od razu.`,
@@ -5087,7 +5087,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             categoryName: 'Nazwa kategorii',
             requiresCategory: 'Członkowie muszą kategoryzować wszystkie wydatki',
             needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) =>
-                `Wszystkie wydatki muszą zostać skategoryzowane, aby można je było wyeksportować do ${connectionName}.`,
+                `Wszystkie wydatki muszą być skategoryzowane, aby można je było wyeksportować do ${connectionName}.`,
             subtitle: 'Uzyskaj lepszy wgląd w to, gdzie wydawane są pieniądze. Użyj naszych domyślnych kategorii lub dodaj własne.',
             emptyCategories: {
                 title: 'Nie utworzyłeś(-aś) żadnych kategorii',
@@ -5227,8 +5227,8 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 allCards: 'Wszystkie karty',
                 assignedCards: 'Przypisano',
                 unassignedCards: 'Nieprzypisane',
-                integrationExport: ({integration, type}: IntegrationExportParams) => (integration && type ? `eksport ${integration} ${type.toLowerCase()}` : `Eksport z ${integration}`),
-                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `Wybierz konto ${integration}, do którego mają być eksportowane transakcje.`,
+                integrationExport: ({integration, type}: IntegrationExportParams) => (integration && type ? `eksport ${integration} ${type.toLowerCase()}` : `Eksport ${integration}`),
+                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `Wybierz konto ${integration}, do którego powinny zostać wyeksportowane transakcje.`,
                 integrationExportTitle: ({integration, exportPageLink}: IntegrationExportParams) =>
                     `Wybierz konto ${integration}, do którego mają być eksportowane transakcje. Wybierz inną <a href="${exportPageLink}">opcję eksportu</a>, aby zmienić dostępne konta.`,
                 lastUpdated: 'Ostatnia aktualizacja',
@@ -5709,7 +5709,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 `Wystąpił błąd z połączeniem skonfigurowanym w Expensify Classic. [Przejdź do Expensify Classic, aby rozwiązać ten problem.](${oldDotPolicyConnectionsURL})`,
             goToODToSettings: 'Przejdź do Expensify Classic, aby zarządzać swoimi ustawieniami.',
             setup: 'Połącz',
-            lastSync: ({relativeDate}: LastSyncAccountingParams) => `Ostatnia synchronizacja ${relativeDate}`,
+            lastSync: ({relativeDate}: LastSyncAccountingParams) => `Ostatnia synchronizacja: ${relativeDate}`,
             notSync: 'Nie zsynchronizowano',
             import: 'Importuj',
             export: 'Eksportuj',
@@ -7339,7 +7339,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                     `nie udało się wyeksportować tego raportu do ${label} („${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}”)`,
                 managerAttachReceipt: `dodano paragon`,
                 managerDetachReceipt: `usunął(-ę) paragon`,
-                markedReimbursed: ({amount, currency}: MarkedReimbursedParams) => `zapłacono ${currency}${amount} gdzie indziej`,
+                markedReimbursed: ({amount, currency}: MarkedReimbursedParams) => `zapłacono gdzie indziej ${currency}${amount}`,
                 markedReimbursedFromIntegration: ({amount, currency}: MarkReimbursedFromIntegrationParams) => `zapłacono ${currency}${amount} przez integrację`,
                 outdatedBankAccount: `nie można było przetworzyć płatności z powodu problemu z kontem bankowym płatnika`,
                 reimbursementACHBounce: `nie udało się przetworzyć płatności z powodu problemu z kontem bankowym`,
@@ -7546,10 +7546,14 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             endReading: 'Zakończ czytanie',
             saveForLater: 'Zapisz na później',
             totalDistance: 'Całkowity dystans',
-            startPhotoTitle: 'Zdjęcie początku stanu licznika',
-            endPhotoTitle: 'Zdjęcie końcowe licznika przebiegu',
+            startPhotoTitle: 'Zdjęcie licznika na początku',
+            endPhotoTitle: 'Końcowe zdjęcie licznika przebiegu',
             startMessageWeb: 'Dodaj zdjęcie licznika kilometrów z <strong>początku</strong> swojej podróży. Przeciągnij tutaj plik lub wybierz go, aby przesłać.',
             endMessageWeb: 'Dodaj zdjęcie licznika przebiegu z <strong>końca</strong> swojej podróży. Przeciągnij tutaj plik lub wybierz jeden, aby go przesłać.',
+            startTitle: 'Stan licznika początkowy',
+            endTitle: 'Stan licznika na końcu',
+            deleteOdometerPhoto: 'Usuń zdjęcie licznika przebiegu',
+            deleteOdometerPhotoConfirmation: 'Na pewno chcesz usunąć to zdjęcie licznika?',
         },
     },
     gps: {

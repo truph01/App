@@ -839,7 +839,7 @@ const translations: TranslationDeepObject<typeof en> = {
         writeSomething: '写点什么…',
         blockedFromConcierge: '通信被禁止',
         fileUploadFailed: '上传失败。不支持该文件。',
-        localTime: ({user, time}: LocalTimeParams) => `现在是${user}的${time}`,
+        localTime: ({user, time}: LocalTimeParams) => `现在是 ${user} 的 ${time}`,
         edited: '（已编辑）',
         emoji: '表情符号',
         collapse: '折叠',
@@ -1189,10 +1189,10 @@ const translations: TranslationDeepObject<typeof en> = {
         deleteReceipt: '删除收据',
         findExpense: '查找报销',
         deletedTransaction: (amount: string, merchant: string) => `已删除一笔报销（${merchant} 的 ${amount}）`,
-        movedFromReport: ({reportName}: MovedFromReportParams) => `已移动一笔报销${reportName ? `来自${reportName}` : ''}`,
+        movedFromReport: ({reportName}: MovedFromReportParams) => `已移动一笔报销${reportName ? `来自 ${reportName}` : ''}`,
         movedTransactionTo: ({reportUrl, reportName}: MovedTransactionParams) => `已移动此报销${reportName ? `到 <a href="${reportUrl}">${reportName}</a>` : ''}`,
         movedTransactionFrom: ({reportUrl, reportName}: MovedTransactionParams) => `已移动此报销${reportName ? `来自 <a href="${reportUrl}">${reportName}</a>` : ''}`,
-        unreportedTransaction: ({reportUrl}: MovedTransactionParams) => `已将此报销移动到你的<a href="${reportUrl}">个人空间</a>`,
+        unreportedTransaction: ({reportUrl}: MovedTransactionParams) => `已将此报销移至你的<a href="${reportUrl}">个人空间</a>`,
         movedAction: ({shouldHideMovedReportUrl, movedReportUrl, newParentReportUrl, toPolicyName}: MovedActionParams) => {
             if (shouldHideMovedReportUrl) {
                 return `已将此报表移动到<a href="${newParentReportUrl}">${toPolicyName}</a>工作区`;
@@ -1301,7 +1301,7 @@ const translations: TranslationDeepObject<typeof en> = {
         payerSpentAmount: (amount: number | string, payer?: string) => `${payer} 支出了 ${amount}`,
         payerSpent: (payer: string) => `${payer} 支出：`,
         managerApproved: ({manager}: ManagerApprovedParams) => `${manager} 已批准：`,
-        managerApprovedAmount: ({manager, amount}: ManagerApprovedAmountParams) => `${manager} 已批准 ${amount}`,
+        managerApprovedAmount: ({manager, amount}: ManagerApprovedAmountParams) => `${manager}已批准${amount}`,
         payerSettled: (amount: number | string) => `已支付 ${amount}`,
         payerSettledWithMissingBankAccount: (amount: number | string) => `已支付 ${amount}。添加一个银行账户以接收你的付款。`,
         automaticallyApproved: `通过<a href="${CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL}">工作区规则</a>批准`,
@@ -1907,7 +1907,7 @@ const translations: TranslationDeepObject<typeof en> = {
             enterCommand: '输入命令',
             execute: '执行',
             noLogsAvailable: '无可用日志',
-            logSizeTooLarge: ({size}: LogSizeParams) => `日志大小超过 ${size} MB 限制。请使用“保存日志”来下载日志文件。`,
+            logSizeTooLarge: ({size}: LogSizeParams) => `日志大小超过 ${size} MB 的限制。请使用“保存日志”来下载日志文件。`,
             logs: '日志',
             viewConsole: '查看控制台',
         },
@@ -1936,14 +1936,11 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     mergeAccountsPage: {
         mergeAccount: '合并账户',
-        accountDetails: {
-            accountToMergeInto: ({login}: MergeAccountIntoParams) => `输入要与 <strong>${login}</strong> 合并的账户。`,
-            notReversibleConsent: '我明白此操作无法撤销',
-        },
+        accountDetails: {accountToMergeInto: ({login}: MergeAccountIntoParams) => `输入你想要合并到 <strong>${login}</strong> 的账号。`, notReversibleConsent: '我明白此操作无法撤销'},
         accountValidate: {
             confirmMerge: '确定要合并账户吗？',
-            lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) => `合并您的账户后将无法撤销，并且会导致 <strong>${login}</strong> 的所有未提交报销被删除。`,
-            enterMagicCode: ({login}: MergeAccountIntoParams) => `要继续，请输入发送到 <strong>${login}</strong> 的魔法验证码。`,
+            lossOfUnsubmittedData: ({login}: MergeAccountIntoParams) => `合并您的账户后将无法撤销，并会导致 <strong>${login}</strong> 下所有未提交报销的丢失。`,
+            enterMagicCode: ({login}: MergeAccountIntoParams) => `若要继续，请输入发送到 <strong>${login}</strong> 的验证码。`,
             errors: {
                 incorrectMagicCode: '魔术验证码不正确或无效。请重试或请求新的验证码。',
                 fallback: '出现问题。请稍后再试。',
@@ -2695,7 +2692,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
                 title: ({workspaceCategoriesLink}) => `设置[类别](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *设置类别*，让你的团队可以为报销分类，方便出具报表。
+                        *设置类别*，以便你的团队可以为报销分类，方便生成报表。
 
                         1. 点击 *工作区*。
                         2. 选择你的工作区。
@@ -2703,7 +2700,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
                         4. 关闭任何不需要的类别。
                         5. 在右上角添加你自己的类别。
 
-                        [带我前往工作区类别设置](${workspaceCategoriesLink})。
+                        [前往工作区类别设置](${workspaceCategoriesLink}).
 
                         ![设置类别](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
             },
@@ -2787,15 +2784,15 @@ ${
                 title: ({workspaceMembersLink}) => `邀请[您的团队](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *邀请您的团队* 使用 Expensify，这样他们今天就能开始记录报销。
+                        *邀请您的团队*加入 Expensify，让他们从今天开始跟踪报销费用。
 
-                        1. 点击 *Workspaces*。
+                        1. 点击 *工作区*。
                         2. 选择您的工作区。
-                        3. 点击 *Members* > *Invite member*。
-                        4. 输入邮箱地址或电话号码。
+                        3. 点击 *成员* > *邀请成员*。
+                        4. 输入邮箱或电话号码。
                         5. 如有需要，可添加自定义邀请消息！
 
-                        [带我前往工作区成员页面](${workspaceMembersLink})。
+                        [带我前往工作区成员](${workspaceMembersLink})。
 
                         ![邀请您的团队](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
             },
@@ -2811,14 +2808,14 @@ ${
                 title: ({workspaceTagsLink}) => `设置[标签](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        使用标签来添加额外的报销明细，如项目、客户、地点和部门。如果你需要多级标签，可以升级到 Control 方案。
+                        使用标签添加更多报销详情，例如项目、客户、地点和部门。如果你需要多级标签，可以升级到 Control 方案。
 
                         1. 点击 *工作区*。
                         2. 选择你的工作区。
                         3. 点击 *更多功能*。
                         4. 启用 *标签*。
                         5. 在工作区编辑器中前往 *标签*。
-                        6. 点击 *+ 添加标签* 来创建你自己的标签。
+                        6. 点击 *+ 添加标签* 创建你自己的标签。
 
                         [带我前往更多功能](${workspaceMoreFeaturesLink})。
 
@@ -2974,7 +2971,7 @@ ${
     },
     unlinkLoginForm: {
         toValidateLogin: ({primaryLogin, secondaryLogin}: ToValidateLoginParams) => `若要验证 ${secondaryLogin}，请从 ${primaryLogin} 的账户设置中重新发送魔法验证码。`,
-        noLongerHaveAccess: ({primaryLogin}: NoLongerHaveAccessParams) => `如果你已无法访问 ${primaryLogin}，请先解除账户关联。`,
+        noLongerHaveAccess: ({primaryLogin}: NoLongerHaveAccessParams) => `如果你已无法访问 ${primaryLogin}，请先取消关联你的账户。`,
         unlink: '取消关联',
         linkSent: '链接已发送！',
         successfullyUnlinkedLogin: '次要登录已成功取消关联！',
@@ -4968,10 +4965,10 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             addShippingDetails: '添加收货详情',
             issuedCard: (assignee: string) => `已向 ${assignee} 发放一张 Expensify 卡！该卡将在 2–3 个工作日内送达。`,
             issuedCardNoShippingDetails: (assignee: string) => `已向 ${assignee} 发放 Expensify 卡！一旦收货信息确认，卡片将寄出。`,
-            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `已为 ${assignee} 发放一张虚拟 Expensify 卡！${link} 可立即使用。`,
+            issuedCardVirtual: ({assignee, link}: IssueVirtualCardParams) => `已向${assignee}发放了一张虚拟 Expensify 卡！${link}可立即使用。`,
             addedShippingDetails: (assignee: string) => `${assignee} 已添加邮寄详情。Expensify 卡将在 2-3 个工作日内送达。`,
             replacedCard: (assignee: string) => `${assignee} 已更换他们的 Expensify 卡。新卡将在 2–3 个工作日内送达。`,
-            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} 已更换他们的虚拟 Expensify 卡！${link} 可以立即使用。`,
+            replacedVirtualCard: ({assignee, link}: IssueVirtualCardParams) => `${assignee} 已更换他们的虚拟 Expensify 卡！${link} 可立即使用。`,
             card: '卡片',
             replacementCard: '替换卡',
             verifyingHeader: '正在验证',
@@ -4999,7 +4996,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             deleteFailureMessage: '删除类别时出错，请重试',
             categoryName: '类别名称',
             requiresCategory: '成员必须为所有报销分类',
-            needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) => `要导出到 ${connectionName}，所有报销都必须先进行分类。`,
+            needCategoryForExportToIntegration: ({connectionName}: NeedCategoryForExportToIntegrationParams) => `要导出到 ${connectionName}，所有报销必须先完成分类。`,
             subtitle: '更好地了解资金的支出去向。使用我们的默认类别或添加你自己的类别。',
             emptyCategories: {
                 title: '你还没有创建任何类别',
@@ -5140,7 +5137,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 assignedCards: '已分配',
                 unassignedCards: '未分配',
                 integrationExport: ({integration, type}: IntegrationExportParams) => (integration && type ? `${integration} ${type.toLowerCase()} 导出` : `${integration} 导出`),
-                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `选择要导出交易的 ${integration} 账户。`,
+                integrationExportTitleXero: ({integration}: IntegrationExportParams) => `选择要导出交易记录的 ${integration} 账户。`,
                 integrationExportTitle: ({integration, exportPageLink}: IntegrationExportParams) =>
                     `选择要导出交易的 ${integration} 账户。选择其他<a href="${exportPageLink}">导出选项</a>以更改可用账户。`,
                 lastUpdated: '最近更新',
@@ -5614,7 +5611,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             errorODIntegration: (oldDotPolicyConnectionsURL: string) => `Expensify Classic 中已设置的某个连接出错。[前往 Expensify Classic 解决此问题](${oldDotPolicyConnectionsURL})`,
             goToODToSettings: '前往 Expensify Classic 管理您的设置。',
             setup: '连接',
-            lastSync: ({relativeDate}: LastSyncAccountingParams) => `上次同步于 ${relativeDate}`,
+            lastSync: ({relativeDate}: LastSyncAccountingParams) => `上次同步时间：${relativeDate}`,
             notSync: '未同步',
             import: '导入',
             export: '导出',
@@ -7202,7 +7199,7 @@ ${reportName}
                     `未能将此报表导出到 ${label}（“${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}”）`,
                 managerAttachReceipt: `已添加一张收据`,
                 managerDetachReceipt: `移除了报销单`,
-                markedReimbursed: ({amount, currency}: MarkedReimbursedParams) => `在其他地方已支付${currency}${amount}`,
+                markedReimbursed: ({amount, currency}: MarkedReimbursedParams) => `在其他地方已支付 ${currency}${amount}`,
                 markedReimbursedFromIntegration: ({amount, currency}: MarkReimbursedFromIntegrationParams) => `通过集成支付了 ${currency}${amount}`,
                 outdatedBankAccount: `由于付款方的银行账户出现问题，无法处理该付款`,
                 reimbursementACHBounce: `由于银行账户问题，无法处理付款`,
@@ -7235,7 +7232,7 @@ ${reportName}
                     }
                     return !previousValue ? `已将“${newValue}”添加到 ${email} 的自定义字段 2` : `将 ${email} 的自定义字段 2 更改为“${newValue}”（之前为“${previousValue}”）`;
                 },
-                leftWorkspace: ({nameOrEmail}: LeftWorkspaceParams) => `${nameOrEmail} 离开了工作区`,
+                leftWorkspace: ({nameOrEmail}: LeftWorkspaceParams) => `${nameOrEmail} 已离开该工作区`,
                 removeMember: (email: string, role: string) => `已移除 ${role} ${email}`,
                 removedConnection: ({connectionName}: ConnectionNameParams) => `已移除与 ${CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName]} 的连接`,
                 addedConnection: ({connectionName}: ConnectionNameParams) => `已连接到 ${CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName]}`,
@@ -7403,10 +7400,14 @@ ${reportName}
             endReading: '结束阅读',
             saveForLater: '稍后保存',
             totalDistance: '总距离',
-            startPhotoTitle: '里程表起始照片',
-            endPhotoTitle: '里程表结束照片',
+            startPhotoTitle: '起始里程表照片',
+            endPhotoTitle: '结束里程表照片',
             startMessageWeb: '从行程<strong>开始</strong>时添加一张里程表照片。将文件拖到此处或选择一个文件上传。',
             endMessageWeb: '在行程<strong>结束</strong>时添加一张里程表照片。将文件拖到此处或选择一个文件上传。',
+            startTitle: '起始里程表读数',
+            endTitle: '里程表结束值',
+            deleteOdometerPhoto: '删除里程表照片',
+            deleteOdometerPhotoConfirmation: '确定要删除这个里程表照片吗？',
         },
     },
     gps: {
