@@ -332,7 +332,6 @@ describe('buildIndividualCardsData', () => {
             ['21588678'],
             illustrationsMock as IllustrationsType,
             companyCardIconsMock,
-            translateMock as LocaleContextProps['translate'],
         );
 
         expect(result.unselected.length + result.selected.length).toEqual(13);
@@ -359,7 +358,6 @@ describe('buildIndividualCardsData', () => {
             [],
             illustrationsMock as IllustrationsType,
             companyCardIconsMock,
-            translateMock as LocaleContextProps['translate'],
         );
         expect(result.unselected.length + result.selected.length).toEqual(0);
     });
@@ -374,7 +372,6 @@ describe('buildCardsData closed cards', () => {
             ['21539012'],
             illustrationsMock as IllustrationsType,
             companyCardIconsMock,
-            translateMock as LocaleContextProps['translate'],
             true,
         );
         expect(result.unselected.length + result.selected.length).toEqual(4);
@@ -397,7 +394,7 @@ describe('buildCardsData closed cards', () => {
 
 describe('buildCardsData with empty argument objects', () => {
     it('Returns empty array when cardList and workspaceCardFeeds are empty', () => {
-        const result = buildCardsData({}, {}, {}, [], illustrationsMock as IllustrationsType, companyCardIconsMock, translateMock as LocaleContextProps['translate']);
+        const result = buildCardsData({}, {}, {}, [], illustrationsMock as IllustrationsType, companyCardIconsMock);
         expect(result).toEqual({selected: [], unselected: []});
     });
 });
