@@ -4015,6 +4015,43 @@ describe('OptionsListUtils', () => {
             const scanningTransactions = transactions.filter((transaction) => isScanning(transaction));
             expect(result).toBe(translateLocal('iou.receiptScanning', {count: scanningTransactions.length}));
         });
+        it('should NOT leak fraud alert text when user cannot perform write actions', async () => {
+            const report = {
+                ...createRandomReport(1, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                permissions: [CONST.REPORT.PERMISSIONS.READ],
+                isReportArchived: false,
+                lastMessageText: 'Fraud alert: Sensitive transaction details',
+            };
+            const fraudAction = {
+                ...createRandomReportAction(2),
+                actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_FRAUD_ALERT,
+                message: [
+                    {
+                        text: 'Sensitive',
+                        type: CONST.REPORT.MESSAGE.TYPE.COMMENT,
+                        whisperedTo: [],
+                    },
+                ],
+                originalMessage: {
+                    whisperedTo: [],
+                },
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, report);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                [fraudActionID]: fraudAction,
+            });
+            await waitForBatchedUpdates();
+
+            const result = getLastMessageTextForReport({
+                report,
+                translate: translateLocal,
+                lastActorDetails: null,
+                isReportArchived: false,
+            });
+            expect(result).toBe('');
+        });
 
         describe('DEW (Dynamic External Workflow)', () => {
             beforeEach(async () => {
