@@ -43,7 +43,6 @@ import {markAsManuallyExportedMultipleReports, moveIOUReportToPolicy, moveIOURep
 import {
     approveMoneyRequestOnSearch,
     bulkDeleteReports,
-    deleteMoneyRequestOnSearch,
     exportMultipleReportsToIntegration,
     exportSearchItemsToCSV,
     getExportTemplates,
@@ -70,6 +69,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SearchFullscreenNavigatorParamList} from '@libs/Navigation/types';
 import {getActiveAdminWorkspaces, getConnectedIntegration, hasDynamicExternalWorkflow, hasOnlyPersonalPolicies as hasOnlyPersonalPoliciesUtil, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getFilteredReportActionsForReportView} from '@libs/ReportActionsUtils';
 import {getSecondaryExportReportActions, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
     generateReportID,
@@ -79,6 +79,7 @@ import {
     isBusinessInvoiceRoom,
     isCurrentUserSubmitter,
     isExpenseReport as isExpenseReportUtil,
+    isExported as isExportedUtils,
     isInvoiceReport,
     isIOUReport as isIOUReportUtil,
     isSelfDM,
@@ -136,6 +137,7 @@ function SearchPage({route}: SearchPageProps) {
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
+    const [allReportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {canBeMissing: true});
     const {accountID} = useCurrentUserPersonalDetails();
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
@@ -788,9 +790,43 @@ function SearchPage({route}: SearchPageProps) {
                         text: connectionNameFriendly,
                         icon: integrationIcon,
                         onSelected: () => {
-                            // Show accounting integration confirmation modal
-                            setAccountingExportModalVisible(true);
-                            exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
+                            let exportedReportName = '';
+                            const areAnyReportsExported = selectedReportIDs.some((reportID) => {
+                                const unfilteredReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
+                                if (!unfilteredReportActions) {
+                                    return false;
+                                }
+
+                                const reportActions = getFilteredReportActionsForReportView(Object.values(unfilteredReportActions));
+                                const isExported = isExportedUtils(reportActions);
+                                if (isExported && !exportedReportName) {
+                                    exportedReportName = getReportOrDraftReport(reportID)?.reportName ?? '';
+                                }
+                                return isExported;
+                            });
+
+                            if (areAnyReportsExported) {
+                                showConfirmModal({
+                                    title: translate('workspace.exportAgainModal.title'),
+                                    prompt: translate('workspace.exportAgainModal.description', {
+                                        connectionName: connectedIntegration,
+                                        reportName: exportedReportName,
+                                    }),
+                                    confirmText: translate('workspace.exportAgainModal.confirmText'),
+                                    cancelText: translate('workspace.exportAgainModal.cancelText'),
+                                }).then((result) => {
+                                    if (result.action !== ModalActions.CONFIRM) {
+                                        return;
+                                    }
+
+                                    if (hash) {
+                                        exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
+                                    }
+                                });
+                            } else if (hash) {
+                                setAccountingExportModalVisible(true);
+                                exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
+                            }
                         },
                         shouldCloseModalOnSelect: true,
                         shouldCallAfterModalHide: true,
@@ -1120,49 +1156,51 @@ function SearchPage({route}: SearchPageProps) {
 
         return options;
     }, [
-        searchResults,
         selectedTransactionsKeys,
         status,
         hash,
         selectedTransactions,
+        queryJSON?.type,
+        expensifyIcons,
         translate,
-        localeCompare,
         areAllMatchingItemsSelected,
         isOffline,
         selectedReports,
-        selectedTransactionReportIDs,
         lastPaymentMethods,
         selectedReportIDs,
+        personalPolicyID,
+        searchResults,
         allTransactions,
-        queryJSON?.type,
+        currentSearchResults?.data,
+        selectedTransactionReportIDs,
         selectedPolicyIDs,
         policies,
         integrationsExportTemplates,
         csvExportLayouts,
-        clearSelectedTransactions,
+        currentUserPersonalDetails.accountID,
+        currentUserPersonalDetails?.login,
+        bankAccountList,
+        allReportActions,
+        handleBasicExport,
         beginExportWithTemplate,
+        handleApproveWithDEWCheck,
+        allTransactionViolations,
+        isDelegateAccessRestricted,
+        dismissedRejectUseExplanation,
+        showDelegateNoAccessModal,
+        clearSelectedTransactions,
         bulkPayButtonOptions,
         onBulkPaySelected,
-        handleBasicExport,
-        handleApproveWithDEWCheck,
-        handleDeleteSelectedTransactions,
+        areAllTransactionsFromSubmitter,
+        dismissedHoldUseExplanation,
+        localeCompare,
         allReports,
+        handleDeleteSelectedTransactions,
         theme.icon,
         styles.colorMuted,
         styles.fontWeightNormal,
         styles.textWrap,
-        dismissedHoldUseExplanation,
-        dismissedRejectUseExplanation,
-        areAllTransactionsFromSubmitter,
-        allTransactionViolations,
-        currentSearchResults?.data,
-        isDelegateAccessRestricted,
-        showDelegateNoAccessModal,
-        currentUserPersonalDetails.accountID,
-        currentUserPersonalDetails?.login,
-        personalPolicyID,
-        bankAccountList,
-        expensifyIcons,
+        showConfirmModal,
     ]);
 
     const saveFileAndInitMoneyRequest = (files: FileObject[]) => {
