@@ -8134,7 +8134,7 @@ describe('actions/IOU', () => {
                 ancestors,
                 text: 'Testing a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
-                currentUserAccountID: TEST_USER_ACCOUNT_ID,
+                currentUserAccountID: CARLOS_ACCOUNT_ID,
             });
             await waitForBatchedUpdates();
 
@@ -8391,7 +8391,7 @@ describe('actions/IOU', () => {
                 ancestors: [],
                 text: 'Testing a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
-                currentUserAccountID: TEST_USER_ACCOUNT_ID,
+                currentUserAccountID: CARLOS_ACCOUNT_ID,
             });
             await waitForBatchedUpdates();
 
