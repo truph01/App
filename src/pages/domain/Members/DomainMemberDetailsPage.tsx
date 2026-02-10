@@ -98,12 +98,12 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
             />
             <DecisionModal
                 title={translate('domain.members.closeAccount', {count: 1})}
-                prompt={translate('domain.members.closeAccountInfo')}
+                prompt={translate('domain.members.closeAccountInfo', {count: 1})}
                 isSmallScreenWidth={isSmallScreenWidth}
                 onFirstOptionSubmit={handleForceCloseAccount}
                 onSecondOptionSubmit={handleSafeCloseAccount}
-                secondOptionText={translate('domain.members.safeCloseAccount')}
-                firstOptionText={translate('domain.members.forceCloseAccount')}
+                secondOptionText={translate('domain.members.safeCloseAccount', {count: 1})}
+                firstOptionText={translate('domain.members.forceCloseAccount', {count: 1})}
                 isVisible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
                 onModalHide={() => {

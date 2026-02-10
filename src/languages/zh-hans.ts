@@ -8274,10 +8274,15 @@ ${reportName}
                 other: '关闭账户',
             }),
             closeAccountPrompt: '您确定吗？此操作是永久性的。',
-            forceCloseAccount: '强制关闭账户',
-            safeCloseAccount: '安全关闭账户',
-            closeAccountInfo:
-                '我们建议安全地关闭该账户，以便在存在以下情况时跳过关闭操作：<ul><li>待处理的审批</li><li>正在进行的报销</li><li>没有其他登录方式</li></ul>否则，您可以忽略上述安全预防措施并强制关闭所选账户。',
+            forceCloseAccount: () => ({one: '强制关闭账户', other: '强制关闭账户'}),
+            safeCloseAccount: () => ({
+                one: '安全关闭账户',
+                other: '安全关闭账户',
+            }),
+            closeAccountInfo: () => ({
+                one: '我们建议安全地关闭该账户，以便在存在以下情况时跳过关闭操作：<ul><li>待处理的审批</li><li>正在进行的报销</li><li>没有其他登录方式</li></ul>否则，您可以忽略上述安全预防措施并强制关闭所选账户。',
+                other: '我们建议安全地关闭该账户，以便在存在以下情况时跳过关闭操作：<ul><li>待处理的审批</li><li>正在进行的报销</li><li>没有其他登录方式</li></ul>否则，您可以忽略上述安全预防措施并强制关闭所选账户。',
+            }),
             error: {
                 removeMember: '无法移除此用户。请重试。',
                 addMember: '无法添加此成员。请重试。',
