@@ -1867,6 +1867,12 @@ describe('TransactionUtils', () => {
 
             expect(result).toBe(false);
         });
+
+        it('should return false when both policy and transaction are undefined', () => {
+            const result = TransactionUtils.hasTaxRateWithMatchingValue(undefined, undefined);
+
+            expect(result).toBe(false);
+        });
     });
 
     describe('getTaxRateTitle', () => {

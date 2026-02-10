@@ -266,8 +266,11 @@ function getIsViolationFixed(violationError: string, params: ViolationFixParams)
                 return !taxCode;
             }
             const matchingTaxRate = policyTaxRates[taxCode];
+            if (!matchingTaxRate) {
+                return false;
+            }
             // If taxValue is provided, check that it matches the policy tax rate. If taxValue is not provided, just check that the tax code exists in the policy.
-            return taxValue !== undefined ? matchingTaxRate?.value === taxValue : !!matchingTaxRate;
+            return taxValue !== undefined ? matchingTaxRate.value === taxValue : true;
         },
         [`${CONST.VIOLATIONS_PREFIX}${CONST.VIOLATIONS.MISSING_ATTENDEES}`]: () => {
             // Attendees violation is fixed if getIsMissingAttendeesViolation returns false

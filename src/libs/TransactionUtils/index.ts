@@ -2155,8 +2155,13 @@ function getTaxName(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transactio
  */
 
 function hasTaxRateWithMatchingValue(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>) {
+    if (!policy || !transaction) {
+        return false;
+    }
+
     const transactionTaxCode = getTaxCode(transaction);
-    const taxRate = Object.values(transformedTaxRates(policy, transaction)).find((rate) => rate.code === transactionTaxCode);
+    const transformedRates = transformedTaxRates(policy, transaction);
+    const taxRate = Object.values(transformedRates).find((rate) => rate.code === transactionTaxCode);
 
     if (!transaction?.taxValue) {
         return !!taxRate;

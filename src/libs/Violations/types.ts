@@ -6,6 +6,7 @@ type ViolationFixParams = {
     category: string;
     tag: string;
     taxCode: string | undefined;
+    /** Tax value as a percentage string (e.g., "5%", "10%") or undefined if not set */
     taxValue?: string;
     policyCategories: PolicyCategories | undefined;
     policyTagLists: PolicyTagLists | undefined;

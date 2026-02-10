@@ -71,7 +71,7 @@ function IOURequestStepTaxRatePage({
         Navigation.goBack(backTo);
     };
 
-    const taxRateTitle = getTaxRateTitle(policy, transaction, isMovingTransactionFromTrackExpense(action), policyForMovingExpenses);
+    const taxRateTitle = getTaxRateTitle(policy, currentTransaction, isMovingTransactionFromTrackExpense(action), policyForMovingExpenses);
     const currency = getCurrency(currentTransaction);
     const decimals = getCurrencyDecimals(currency);
 
@@ -88,6 +88,7 @@ function IOURequestStepTaxRatePage({
             setDraftSplitTransaction(currentTransaction.transactionID, splitDraftTransaction, {
                 taxAmount: convertToBackendAmount(taxAmount ?? 0),
                 taxCode: taxes.code,
+                taxValue,
             });
             navigateBack();
             return;
