@@ -19,6 +19,7 @@ import {
     isCard,
     isCardClosed,
     isCardHiddenFromSearch,
+    isDirectFeed,
 } from './CardUtils';
 import type {CompanyCardFeedIcons} from './CardUtils';
 import {getDescriptionForPolicyDomainCard} from './PolicyUtils';
@@ -549,6 +550,11 @@ function getCombinedCardFeedsFromAllFeeds(allFeeds: OnyxCollection<CardFeeds> | 
             const status = workspaceFeedsSettings?.cardFeedsStatus?.[feedName];
 
             if (!domainID) {
+                continue;
+            }
+
+            // Skip stale direct feeds (OAuth/Plaid) that are missing their oAuthAccountDetails
+            if (isDirectFeed(feedName) && !oAuthAccountDetails) {
                 continue;
             }
 

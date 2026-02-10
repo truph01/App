@@ -40,6 +40,7 @@ import {
     hasOnlyOneCardToAssign,
     isCSVFeedOrExpensifyCard,
     isCustomFeed as isCustomFeedCardUtils,
+    isDirectFeed as isDirectFeedCardUtils,
     isExpensifyCard,
     isExpensifyCardFullySetUp,
     isMatchingCard,
@@ -73,6 +74,31 @@ const directFeedBanks = [
     CONST.COMPANY_CARD.FEED_BANK_NAME.CITIBANK,
     CONST.COMPANY_CARD.FEED_BANK_NAME.STRIPE,
     CONST.COMPANY_CARD.FEED_BANK_NAME.WELLS_FARGO,
+];
+
+// OAuth/Plaid feeds that require oAuthAccountDetails (matches backend: isOAuthBank || isPlaidBank)
+const oAuthAndPlaidFeedTypes: CompanyCardFeed[] = [
+    CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.CAPITAL_ONE,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.BANK_OF_AMERICA,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.BREX,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.WELLS_FARGO,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.CITIBANK,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.MOCK_BANK,
+    'plaid.ins_123456' as CompanyCardFeed,
+];
+
+// Non-direct feeds that should show even WITHOUT oAuthAccountDetails
+const nonDirectFeedTypes: CompanyCardFeed[] = [
+    CONST.COMPANY_CARD.FEED_BANK_NAME.MASTER_CARD,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_1205,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.CSV,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_FILE_DOWNLOAD,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.STRIPE,
+    CONST.COMPANY_CARD.FEED_BANK_NAME.PEX,
 ];
 
 const companyCardsCustomFeedSettings = {
@@ -490,6 +516,32 @@ describe('CardUtils', () => {
         });
     });
 
+    describe('isDirectFeed', () => {
+        test.each(oAuthAndPlaidFeedTypes)('Should return true for the OAuth/Plaid feed %s', (feed) => {
+            expect(isDirectFeedCardUtils(feed)).toBe(true);
+        });
+
+        it('Should return true for a Plaid feed with a different institution ID', () => {
+            expect(isDirectFeedCardUtils('plaid.ins_129663')).toBe(true);
+        });
+
+        it('Should return true for an OldDot OAuth feed variant with a number suffix', () => {
+            expect(isDirectFeedCardUtils('oauth.americanexpressfdx.com 2003')).toBe(true);
+        });
+
+        test.each(nonDirectFeedTypes)('Should return false for the non-direct feed %s', (feed) => {
+            expect(isDirectFeedCardUtils(feed)).toBe(false);
+        });
+
+        it('Should return false for the Expensify Card', () => {
+            expect(isDirectFeedCardUtils(CONST.EXPENSIFY_CARD.BANK)).toBe(false);
+        });
+
+        it('Should return false for undefined', () => {
+            expect(isDirectFeedCardUtils(undefined)).toBe(false);
+        });
+    });
+
     describe('getOriginalCompanyFeeds', () => {
         it('Should return both custom and direct feeds with filtered out "Expensify Card" bank', () => {
             const companyFeeds = getOriginalCompanyFeeds(cardFeedsCollection.FAKE_ID_1);
@@ -504,6 +556,105 @@ describe('CardUtils', () => {
         it('Should return empty object if undefined is passed', () => {
             const companyFeeds = getOriginalCompanyFeeds(undefined);
             expect(companyFeeds).toStrictEqual({});
+        });
+
+        test.each(nonDirectFeedTypes)('Should include non-direct feed %s even without oAuthAccountDetails', (feed) => {
+            const cardFeeds: CardFeeds = {
+                settings: {
+                    companyCards: {
+                        [feed]: {pending: false},
+                    },
+                },
+            };
+            const companyFeeds = getOriginalCompanyFeeds(cardFeeds);
+            expect(Object.keys(companyFeeds)).toContain(feed);
+        });
+
+        test.each(oAuthAndPlaidFeedTypes)('Should include OAuth/Plaid feed %s when oAuthAccountDetails is present', (feed) => {
+            const cardFeeds: CardFeeds = {
+                settings: {
+                    companyCards: {
+                        [feed]: {pending: false},
+                    },
+                    oAuthAccountDetails: {
+                        [feed]: {
+                            accountList: ['CREDIT CARD...1234'],
+                            credentials: 'xxxxx',
+                            expiration: 1730998958,
+                        },
+                    },
+                },
+            };
+            const companyFeeds = getOriginalCompanyFeeds(cardFeeds);
+            expect(Object.keys(companyFeeds)).toContain(feed);
+        });
+
+        test.each(oAuthAndPlaidFeedTypes)('Should filter out OAuth/Plaid feed %s when oAuthAccountDetails is missing', (feed) => {
+            const cardFeeds: CardFeeds = {
+                settings: {
+                    companyCards: {
+                        [feed]: {pending: false},
+                    },
+                },
+            };
+            const companyFeeds = getOriginalCompanyFeeds(cardFeeds);
+            expect(Object.keys(companyFeeds)).not.toContain(feed);
+        });
+
+        it('Should filter out stale direct feeds while keeping non-direct feeds in a mixed scenario', () => {
+            const cardFeeds: CardFeeds = {
+                settings: {
+                    companyCards: {
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.VISA]: {pending: false},
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.MASTER_CARD]: {pending: false},
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE]: {pending: false},
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.CAPITAL_ONE]: {pending: false},
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.STRIPE]: {pending: false},
+                    },
+                    oAuthAccountDetails: {
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE]: {
+                            accountList: ['CREDIT CARD...6607'],
+                            credentials: 'xxxxx',
+                            expiration: 1730998958,
+                        },
+                    },
+                },
+            };
+            const companyFeeds = getOriginalCompanyFeeds(cardFeeds);
+            const feedKeys = Object.keys(companyFeeds);
+
+            // Commercial and gray-zone feeds should remain
+            expect(feedKeys).toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.VISA);
+            expect(feedKeys).toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.MASTER_CARD);
+            expect(feedKeys).toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.STRIPE);
+
+            // Chase has oAuthAccountDetails so it should remain
+            expect(feedKeys).toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE);
+
+            // CapitalOne has no oAuthAccountDetails so it should be filtered out
+            expect(feedKeys).not.toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.CAPITAL_ONE);
+        });
+
+        it('Should filter out direct feed when oAuthAccountDetails object exists but feed key is missing', () => {
+            const cardFeeds: CardFeeds = {
+                settings: {
+                    companyCards: {
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE]: {pending: false},
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.BREX]: {pending: false},
+                    },
+                    oAuthAccountDetails: {
+                        [CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE]: {
+                            accountList: ['CREDIT CARD...6607'],
+                            credentials: 'xxxxx',
+                            expiration: 1730998958,
+                        },
+                    },
+                },
+            };
+            const companyFeeds = getOriginalCompanyFeeds(cardFeeds);
+            const feedKeys = Object.keys(companyFeeds);
+            expect(feedKeys).toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE);
+            expect(feedKeys).not.toContain(CONST.COMPANY_CARD.FEED_BANK_NAME.BREX);
         });
     });
 

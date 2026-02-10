@@ -465,13 +465,35 @@ function isCSVFeedOrExpensifyCard(feedKey: string): boolean {
     return lowerFeedKey.startsWith('csv') || lowerFeedKey.includes(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV) || feedKey === CONST.EXPENSIFY_CARD.BANK;
 }
 
+/**
+ * Checks if a feed is a direct feed (OAuth or Plaid based).
+ * Direct feeds require oAuthAccountDetails to be valid.
+ */
+function isDirectFeed(feed: string | undefined): boolean {
+    if (!feed) {
+        return false;
+    }
+    const lowerFeed = feed.toLowerCase();
+    return lowerFeed.startsWith('oauth') || lowerFeed.startsWith('plaid');
+}
+
 function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>): CompanyFeeds {
+    const oAuthAccountDetails = cardFeeds?.settings?.oAuthAccountDetails;
     return Object.fromEntries(
         Object.entries(cardFeeds?.settings?.companyCards ?? {}).filter(([key, value]) => {
             if (value?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || value?.pending) {
                 return false;
             }
-            return key !== CONST.EXPENSIFY_CARD.BANK;
+            if (key === CONST.EXPENSIFY_CARD.BANK) {
+                return false;
+            }
+
+            // Direct feeds (OAuth/Plaid) require oAuthAccountDetails to be valid.
+            // Filter out stale orphaned entries where oAuthAccountDetails was removed but companyCards remains.
+            if (isDirectFeed(key) && !oAuthAccountDetails?.[key as CompanyCardFeed]) {
+                return false;
+            }
+            return true;
         }),
     );
 }
@@ -1165,6 +1187,7 @@ export {
     getPlaidInstitutionId,
     getFeedConnectionBrokenCard,
     getCorrectStepForPlaidSelectedBank,
+    isDirectFeed,
     getOriginalCompanyFeeds,
     getCompanyCardFeed,
     getCardFeedWithDomainID,
