@@ -9,7 +9,7 @@ function rand64(): string {
     // Max 64-bit signed:
     // 9,223,372,036,854,775,807
     // The left part of the max 64-bit number *+1* because we're flooring it.
-    const left = Math.floor(Math.random() * CONST.MAX_64BIT_LEFT_PART) + 1;
+    const left = Math.floor(Math.random() * (CONST.MAX_64BIT_LEFT_PART + 1));
 
     let middle;
     let right;
@@ -33,7 +33,8 @@ function rand64(): string {
     const middleString = middle.toString().padStart(7, '0');
     const rightString = right.toString().padStart(7, '0');
 
-    return left + middleString + rightString;
+    // Strip leading zeros by converting through BigInt
+    return BigInt(left + middleString + rightString).toString();
 }
 
 /**
