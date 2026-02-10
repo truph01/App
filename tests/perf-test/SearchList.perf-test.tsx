@@ -1,6 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
-import Text from '@components/Text';
 import Onyx from 'react-native-onyx';
 import {measureRenders} from 'reassure';
 import ComposeProviders from '@components/ComposeProviders';
@@ -10,6 +9,7 @@ import ScrollOffsetContextProvider from '@components/ScrollOffsetContextProvider
 import SearchList from '@components/Search/SearchList';
 import type {SearchColumnType, SearchQueryJSON} from '@components/Search/types';
 import type {SearchListItem} from '@components/SelectionListWithSections/types';
+import Text from '@components/Text';
 import ThemeProvider from '@components/ThemeProvider';
 import ThemeStylesProvider from '@components/ThemeStylesProvider';
 import CONST from '@src/CONST';
@@ -208,9 +208,7 @@ function SearchListWrapper() {
 
 function SearchListWrapperWithProviders() {
     return (
-        <ComposeProviders
-            components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}
-        >
+        <ComposeProviders components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}>
             <SearchListWrapper />
         </ComposeProviders>
     );
