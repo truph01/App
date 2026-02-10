@@ -4375,6 +4375,9 @@ function getBillableAndTaxTotal(report: OnyxEntry<Report>, transactions: Array<O
         };
     }
     for (const transaction of transactions) {
+        if (transaction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+            continue;
+        }
         const {amount = 0, taxAmount = 0, currency, billable} = getTransactionDetails(transaction) ?? {};
         if (billable) {
             if (currency === report?.currency) {
