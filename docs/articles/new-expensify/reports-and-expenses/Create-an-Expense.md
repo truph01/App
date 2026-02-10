@@ -1,7 +1,7 @@
 ---
 title: Create an Expense
 description: Learn how to create and submit expenses in Expensify using SmartScan, manual entry, or distance tracking.
-keywords: [New Expensify, create expense, SmartScan, manual expense, distance expense, submit expense, expense report, submit to individual, track mileage, scan receipts, group split, Expensify chat, upload receipts, multi-scan, bulk upload, submit to workspace, peer reimbursement]
+keywords: [New Expensify, create expense, SmartScan, manual expense, distance expense, submit expense, expense report, submit to individual, track mileage, scan receipts, group split, Expensify chat, upload receipts, multi-scan, bulk upload, submit to workspace, peer reimbursement, workspace merchant rules, auto-categorize, reimbursable, billable]
 internalScope: Audience is submitters, approvers, and admins. Covers how to create and submit expenses to a workspace or individual using SmartScan, manual entry, or distance tracking. Does not cover credit card import. 
 ---
 
@@ -43,6 +43,8 @@ You can create an expense by scanning a receipt, entering details manually, or t
 - Forward your digital receipts to receipts@expensify.com.
 - Text a receipt photo to 47777 (US numbers only). Make sure you [add your phone number as a contact method to Expensify](https://new.expensify.com/settings/profile/contact-methods).
 
+**Note:** When submitting expenses to a workspace, [Workspace Merchant Rules](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) may automatically apply categories, tags, descriptions, reimbursable status, billable status, and other fields based on the merchant name.
+
 ---
 
 ## How to manually create an expense
@@ -51,8 +53,10 @@ You can create an expense by scanning a receipt, entering details manually, or t
 2. Select **Create Expense** then **Manual**.
 3. Enter the amount and currency, then click **Next**.
 4. Choose a workspace or an individual.
-5. Add details like description, category, tags, and tax.
+5. Add details like description, category, tags, tax, and set whether the expense is reimbursable or billable.
 6. Click **Create expense**.
+
+**Note:** If submitting to a workspace with [Workspace Merchant Rules](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) configured, some fields may be automatically filled based on the merchant name.
 
 ---
 
@@ -90,6 +94,7 @@ You can create an expense by scanning a receipt, entering details manually, or t
 ## What happens after submitting an expense to a workspace
 
 - Expenses are automatically added to a report.
+- [Workspace Merchant Rules](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) may automatically apply categories, tags, descriptions, and other coding based on the merchant name.
 - Workspace rules check for violations or missing fields.
 - Approvers are notified to review and approve.
 - Reports can be submitted manually or automatically.
