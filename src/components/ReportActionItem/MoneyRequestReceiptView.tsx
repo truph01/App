@@ -278,7 +278,7 @@ function MoneyRequestReceiptView({
         </View>
     );
 
-    const onReplaceReceipt = (files: FileObject[]) => {
+    const setReceiptFile = (files: FileObject[]) => {
         if (files.length === 0) {
             return;
         }
@@ -324,7 +324,7 @@ function MoneyRequestReceiptView({
                         isInMoneyRequestView
                         style={receiptStyle}
                         isDisplayedInWideRHP={isDisplayedInWideRHP}
-                        onReplaceReceipt={onReplaceReceipt}
+                        setReceiptFile={setReceiptFile}
                     />
                 </OfflineWithFeedback>
             )}

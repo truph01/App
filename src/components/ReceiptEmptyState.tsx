@@ -40,7 +40,7 @@ type ReceiptEmptyStateProps = {
     isDisplayedInWideRHP?: boolean;
 
     /** Callback to be called when a receipt is selected */
-    onReplaceReceipt?: (files: FileObject[]) => void;
+    setReceiptFile?: (files: FileObject[]) => void;
 };
 
 // Returns an SVG icon indicating that the user should attach a receipt
@@ -53,14 +53,14 @@ function ReceiptEmptyState({
     style,
     onLoad,
     isDisplayedInWideRHP = false,
-    onReplaceReceipt = () => {},
+    setReceiptFile = () => {},
 }: ReceiptEmptyStateProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const theme = useTheme();
     const isLoadedRef = useRef(false);
     const icons = useMemoizedLazyExpensifyIcons(['ReceiptPlaceholderPlus', 'Receipt']);
-    const {validateFiles, PDFValidationComponent, ErrorModal} = useFilesValidation(onReplaceReceipt);
+    const {validateFiles, PDFValidationComponent, ErrorModal} = useFilesValidation(setReceiptFile);
 
     const Wrapper = onPress ? PressableWithoutFeedback : View;
     const containerStyle = [
