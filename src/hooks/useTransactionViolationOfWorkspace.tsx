@@ -9,6 +9,7 @@ import useOnyx from './useOnyx';
 
 function useTransactionViolationOfWorkspace(policyID?: string) {
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
+    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
     const reportsToArchive = useMemo(
         () =>
             Object.values(allReports ?? {}).filter(
@@ -28,7 +29,7 @@ function useTransactionViolationOfWorkspace(policyID?: string) {
             }
         }
         return set;
-    }, [reportsToArchive]);
+    }, [reportsToArchive, allTransactions]);
 
     const transactionViolationSelector = useCallback(
         (violations: OnyxCollection<TransactionViolations>) => {
