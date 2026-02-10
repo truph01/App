@@ -123,7 +123,9 @@ describe('IOU Utils', () => {
             navigateToQuickAction({
                 isValidReport: true,
                 quickAction: {action: CONST.QUICK_ACTIONS.REQUEST_TIME, chatReportID: reportID},
-                selectOption: (onSelected) => onSelected,
+                selectOption: (onSelected: () => void) => {
+                    onSelected();
+                },
                 targetAccountPersonalDetails: createPersonalDetails(1),
                 currentUserAccountID: CONST.DEFAULT_NUMBER_ID,
             });
