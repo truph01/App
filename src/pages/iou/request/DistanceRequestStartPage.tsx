@@ -65,6 +65,7 @@ function DistanceRequestStartPage({
     const {isBetaEnabled} = usePermissions();
     const showGPSTab = isBetaEnabled(CONST.BETAS.GPS_MILEAGE);
     const isTrackDistanceExpense = iouType === CONST.IOU.TYPE.TRACK;
+    const showOdometerTab = isBetaEnabled(CONST.BETAS.ODOMETER_EXPENSES);
 
     const hasOnlyPersonalPolicies = useMemo(() => hasOnlyPersonalPoliciesUtil(allPolicies), [allPolicies]);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -73,8 +74,8 @@ function DistanceRequestStartPage({
     const tabTitles = {
         [CONST.IOU.TYPE.REQUEST]: translate('iou.trackDistance'),
         [CONST.IOU.TYPE.SUBMIT]: translate('iou.trackDistance'),
-        [CONST.IOU.TYPE.SEND]: translate('iou.paySomeone', {name: getPayeeName(report)}),
-        [CONST.IOU.TYPE.PAY]: translate('iou.paySomeone', {name: getPayeeName(report)}),
+        [CONST.IOU.TYPE.SEND]: translate('iou.paySomeone', getPayeeName(report)),
+        [CONST.IOU.TYPE.PAY]: translate('iou.paySomeone', getPayeeName(report)),
         [CONST.IOU.TYPE.SPLIT]: translate('iou.splitExpense'),
         [CONST.IOU.TYPE.SPLIT_EXPENSE]: translate('iou.splitExpense'),
         [CONST.IOU.TYPE.TRACK]: translate('iou.trackDistance'),
@@ -230,7 +231,7 @@ function DistanceRequestStartPage({
                                 )}
                             </TopTab.Screen>
                         )}
-                        {false && (
+                        {showOdometerTab && (
                             <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_ODOMETER}>
                                 {() => (
                                     <TabScreenWithFocusTrapWrapper>

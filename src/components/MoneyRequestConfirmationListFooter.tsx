@@ -420,6 +420,8 @@ function MoneyRequestConfirmationListFooter({
     const resolvedReceiptImage = isLocalFile ? receiptImage : tryResolveUrlFromApiRoot(receiptImage ?? '');
 
     const shouldNavigateToUpgradePath = !policyForMovingExpensesID && !shouldSelectPolicy;
+    // Time requests appear as regular expenses after they're created, with editable amount and merchant, not hours and rate
+    const shouldShowTimeRequestFields = isTimeRequest && action === CONST.IOU.ACTION.CREATE;
 
     const contextMenuContextValue = useMemo(
         () => ({
@@ -455,12 +457,12 @@ function MoneyRequestConfirmationListFooter({
             item: (
                 <MenuItemWithTopDescription
                     key={translate('iou.amount')}
-                    shouldShowRightIcon={!isReadOnly && !isDistanceRequest && !isTimeRequest}
+                    shouldShowRightIcon={!isReadOnly && !isDistanceRequest && !shouldShowTimeRequestFields}
                     title={formattedAmount}
                     description={translate('iou.amount')}
-                    interactive={!isReadOnly && !isTimeRequest}
+                    interactive={!isReadOnly && !shouldShowTimeRequestFields}
                     onPress={() => {
-                        if (isDistanceRequest || isTimeRequest || !transactionID) {
+                        if (isDistanceRequest || shouldShowTimeRequestFields || !transactionID) {
                             return;
                         }
 
@@ -515,7 +517,7 @@ function MoneyRequestConfirmationListFooter({
                 <MenuItemWithTopDescription
                     key={translate('common.distance')}
                     shouldShowRightIcon={!isReadOnly && !isGPSDistanceRequest}
-                    title={DistanceRequestUtils.getDistanceForDisplay(hasRoute, distance, unit, rate, translate)}
+                    title={DistanceRequestUtils.getDistanceForDisplay(hasRoute, distance, unit, rate, translate, undefined, isManualDistanceRequest)}
                     description={translate('common.distance')}
                     style={[styles.moneyRequestMenuItem]}
                     titleStyle={styles.flex1}
@@ -630,7 +632,7 @@ function MoneyRequestConfirmationListFooter({
                     interactive={!isReadOnly}
                 />
             ),
-            shouldShow: isTimeRequest,
+            shouldShow: shouldShowTimeRequestFields,
         },
         {
             item: (
@@ -651,7 +653,7 @@ function MoneyRequestConfirmationListFooter({
                     interactive={!isReadOnly}
                 />
             ),
-            shouldShow: isTimeRequest,
+            shouldShow: shouldShowTimeRequestFields,
         },
         {
             item: (
@@ -966,6 +968,7 @@ function MoneyRequestConfirmationListFooter({
                         }}
                         accessibilityRole={CONST.ROLE.BUTTON}
                         accessibilityLabel={translate('accessibilityHints.viewAttachment')}
+                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.PDF_RECEIPT_THUMBNAIL}
                         disabled={!shouldDisplayReceipt}
                         disabledStyle={styles.cursorDefault}
                         style={styles.h100}
@@ -994,6 +997,7 @@ function MoneyRequestConfirmationListFooter({
                         disabled={!shouldDisplayReceipt || isThumbnail}
                         accessibilityRole={CONST.ROLE.BUTTON}
                         accessibilityLabel={translate('accessibilityHints.viewAttachment')}
+                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.RECEIPT_THUMBNAIL}
                         disabledStyle={styles.cursorDefault}
                         style={[styles.h100, styles.flex1]}
                     >

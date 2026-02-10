@@ -9,7 +9,7 @@ import {setReviewDuplicatesKey} from './actions/Transaction';
 import {isCategoryMissing} from './CategoryUtils';
 import {convertToDisplayString} from './CurrencyUtils';
 import DateUtils from './DateUtils';
-import {getPolicy, hasDynamicExternalWorkflow} from './PolicyUtils';
+import {hasDynamicExternalWorkflow} from './PolicyUtils';
 import {getMostRecentActiveDEWSubmitFailedAction, getOriginalMessage, isDynamicExternalWorkflowSubmitFailedAction, isMessageDeleted, isMoneyRequestAction} from './ReportActionsUtils';
 import {
     hasActionWithErrorsForTransaction,
@@ -44,6 +44,7 @@ import {
     isPending,
     isScanning,
 } from './TransactionUtils';
+import {isInvalidMerchantValue} from './ValidationUtils';
 import {filterReceiptViolations} from './Violations/ViolationsUtils';
 
 const emptyPersonalDetails: OnyxTypes.PersonalDetails = {
@@ -185,6 +186,7 @@ function getUniqueActionErrorsForTransaction(reportActions: OnyxTypes.ReportActi
 
 function getTransactionPreviewTextAndTranslationPaths({
     iouReport,
+    policy,
     transaction,
     action,
     violations,
@@ -198,6 +200,7 @@ function getTransactionPreviewTextAndTranslationPaths({
     originalTransaction,
 }: {
     iouReport: OnyxEntry<OnyxTypes.Report>;
+    policy: OnyxEntry<OnyxTypes.Policy>;
     transaction: OnyxEntry<OnyxTypes.Transaction>;
     action: OnyxEntry<OnyxTypes.ReportAction>;
     violations: OnyxTypes.TransactionViolations;
@@ -223,11 +226,8 @@ function getTransactionPreviewTextAndTranslationPaths({
     const hasFieldErrors = hasMissingSmartscanFields(transaction, iouReport);
     const isPaidGroupPolicy = isPaidGroupPolicyUtil(iouReport);
 
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const policy = getPolicy(iouReport?.policyID);
     const hasViolationsOfTypeNotice = hasNoticeTypeViolation(transaction, violations, currentUserEmail ?? '', currentUserAccountID, iouReport, policy, true) && isPaidGroupPolicy;
-    const hasActionWithErrors = hasActionWithErrorsForTransaction(iouReport?.reportID, transaction);
+    const hasActionWithErrors = hasActionWithErrorsForTransaction(iouReport?.reportID, transaction, reportActions);
 
     const {amount: requestAmount, currency: requestCurrency} = transactionDetails;
 
@@ -350,6 +350,7 @@ function getTransactionPreviewTextAndTranslationPaths({
 
 function createTransactionPreviewConditionals({
     iouReport,
+    policy,
     transaction,
     action,
     violations,
@@ -362,6 +363,7 @@ function createTransactionPreviewConditionals({
     reportActions,
 }: {
     iouReport: OnyxEntry<OnyxTypes.Report>;
+    policy: OnyxEntry<OnyxTypes.Policy>;
     transaction: OnyxEntry<OnyxTypes.Transaction> | undefined;
     action: OnyxEntry<OnyxTypes.ReportAction>;
     violations: OnyxTypes.TransactionViolations;
@@ -382,9 +384,6 @@ function createTransactionPreviewConditionals({
     const isApproved = isReportApproved({report: iouReport});
     const isSettlementOrApprovalPartial = !!iouReport?.pendingFields?.partial;
 
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const policy = getPolicy(iouReport?.policyID);
     const hasViolationsOfTypeNotice =
         hasNoticeTypeViolation(transaction, violations, currentUserEmail ?? '', currentUserAccountID, iouReport ?? undefined, policy, true) && iouReport && isPaidGroupPolicyUtil(iouReport);
     const hasFieldErrors = hasMissingSmartscanFields(transaction, iouReport);
@@ -411,7 +410,8 @@ function createTransactionPreviewConditionals({
                 (violation) => violation.name === CONST.VIOLATIONS.MODIFIED_AMOUNT && (violation.type === CONST.VIOLATION_TYPES.VIOLATION || violation.type === CONST.VIOLATION_TYPES.NOTICE),
             ));
     const hasErrorOrOnHold = hasFieldErrors || (!isFullySettled && !isFullyApproved && isTransactionOnHold);
-    const hasReportViolationsOrActionErrors = (isReportOwner(iouReport) && hasReportViolations(iouReport?.reportID)) || hasActionWithErrorsForTransaction(iouReport?.reportID, transaction);
+    const hasReportViolationsOrActionErrors =
+        (isReportOwner(iouReport) && hasReportViolations(iouReport?.reportID)) || hasActionWithErrorsForTransaction(iouReport?.reportID, transaction, reportActions);
     const isDEWSubmitFailed = hasDynamicExternalWorkflow(policy) && !!getMostRecentActiveDEWSubmitFailedAction(reportActions);
     const shouldShowRBR = hasAnyViolations || hasErrorOrOnHold || hasReportViolationsOrActionErrors || hasReceiptError(transaction) || isDEWSubmitFailed;
 
@@ -425,11 +425,7 @@ function createTransactionPreviewConditionals({
  - the expense is not a distance expense with a pending route and amount = 0 - in this case,
    the merchant says: "Route pending...", which is already shown in the amount field;
 */
-    const shouldShowMerchant =
-        !!requestMerchant &&
-        requestMerchant !== CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT &&
-        requestMerchant !== CONST.TRANSACTION.DEFAULT_MERCHANT &&
-        !(isFetchingWaypoints && !requestAmount);
+    const shouldShowMerchant = !isInvalidMerchantValue(requestMerchant) && !(isFetchingWaypoints && !requestAmount);
     const shouldShowDescription = !!description && !shouldShowMerchant && !isScanning(transaction);
 
     return {

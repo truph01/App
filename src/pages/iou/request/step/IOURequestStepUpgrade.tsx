@@ -99,7 +99,7 @@ function IOURequestStepUpgrade({
                 if (!isTrack) {
                     setTransactionReport(transactionID, {reportID: expenseReportID}, true);
                     // Let the confirmation step decide the distance rate because policy data is not fully available at this step
-                    setCustomUnitRateID(transactionID, '-1');
+                    setCustomUnitRateID(transactionID, '-1', undefined, undefined);
                     Navigation.setParams({reportID: expenseReportID});
                 }
 
