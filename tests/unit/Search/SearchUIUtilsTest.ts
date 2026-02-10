@@ -5376,7 +5376,7 @@ describe('SearchUIUtils', () => {
 
             expect(searchQueryJSON?.view).toBe(CONST.SEARCH.VIEW.LINE);
             expect(searchQueryJSON?.sortBy).toBe(CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH);
-            expect(searchQueryJSON?.sortOrder).toBe(CONST.SEARCH.SORT_ORDER.DESC);
+            expect(searchQueryJSON?.sortOrder).toBe(CONST.SEARCH.SORT_ORDER.ASC);
         });
 
         test('Should return Spend Over Time search with valid hash', () => {
@@ -5397,7 +5397,7 @@ describe('SearchUIUtils', () => {
             expect(searchQuery).toContain(`date:${CONST.SEARCH.DATE_PRESETS.YEAR_TO_DATE}`);
             expect(searchQuery).toContain(`view:${CONST.SEARCH.VIEW.LINE}`);
             expect(searchQuery).toContain(`sortBy:${CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH}`);
-            expect(searchQuery).toContain(`sortOrder:${CONST.SEARCH.SORT_ORDER.DESC}`);
+            expect(searchQuery).toContain(`sortOrder:${CONST.SEARCH.SORT_ORDER.ASC}`);
         });
     });
 

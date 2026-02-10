@@ -825,7 +825,7 @@ function getSuggestedSearches(
                 },
                 {
                     sortBy: CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH,
-                    sortOrder: CONST.SEARCH.SORT_ORDER.DESC,
+                    sortOrder: CONST.SEARCH.SORT_ORDER.ASC,
                 },
             ),
             get searchQueryJSON() {
