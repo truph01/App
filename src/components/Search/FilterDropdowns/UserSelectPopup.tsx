@@ -113,8 +113,8 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
                 excludeLogins: CONST.EXPENSIFY_EMAILS_OBJECT,
                 includeCurrentUser: true,
                 personalDetails,
+                countryCode,
             },
-            countryCode,
         );
     }, [options.reports, options.personalDetails, allPolicies, draftComments, nvpDismissedProductTraining, loginList, countryCode, personalDetails, currentUserAccountID, currentUserEmail]);
 
