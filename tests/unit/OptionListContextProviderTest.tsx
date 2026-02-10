@@ -3,7 +3,7 @@ import React from 'react';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import OptionListContextProvider, {useOptionsList} from '@components/OptionListContextProvider';
 import useOnyx from '@hooks/useOnyx';
-import {createOptionList} from '@libs/OptionsListUtils';
+import {createOptionList, processReport} from '@libs/OptionsListUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 jest.mock('@libs/OptionsListUtils', () => {
@@ -19,11 +19,17 @@ jest.mock('@libs/OptionsListUtils', () => {
 });
 
 jest.mock('@hooks/useOnyx', () => jest.fn());
+const EMPTY_ARCHIVED_MAP = {};
+jest.mock('@hooks/usePrivateIsArchivedMap', () => ({
+    __esModule: true,
+    default: jest.fn(() => EMPTY_ARCHIVED_MAP),
+}));
 jest.mock('@components/OnyxListItemProvider', () => ({
     usePersonalDetails: jest.fn(),
 }));
 
 const mockCreateOptionList = createOptionList as jest.MockedFunction<typeof createOptionList>;
+const mockProcessReport = processReport as jest.MockedFunction<typeof processReport>;
 const mockUseOnyx = useOnyx as jest.MockedFunction<typeof useOnyx>;
 const mockUsePersonalDetails = usePersonalDetails as jest.MockedFunction<typeof usePersonalDetails>;
 
@@ -113,5 +119,58 @@ describe('OptionListContextProvider', () => {
         rerender({shouldInitialize: false});
 
         expect(mockCreateOptionList).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls processReport with privateIsArchived when reports change', () => {
+        const reportID = '1';
+        const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${reportID}`;
+        const report = {reportID};
+
+        const {result, rerender} = renderHook(({shouldInitialize}) => useOptionsList({shouldInitialize}), {
+            initialProps: {shouldInitialize: false},
+            wrapper,
+        });
+
+        act(() => {
+            result.current.initializeOptions();
+        });
+
+        mockProcessReport.mockClear();
+
+        onyxState = {
+            ...onyxState,
+            [ONYXKEYS.COLLECTION.REPORT]: {[reportKey]: report},
+        };
+        onyxSourceValues = {
+            ...onyxSourceValues,
+            [ONYXKEYS.COLLECTION.REPORT]: {[reportKey]: report},
+        };
+        rerender({shouldInitialize: false});
+
+        expect(mockProcessReport).toHaveBeenCalled();
+    });
+
+    it('calls processReport with privateIsArchived when report actions change', () => {
+        const reportID = '2';
+        const reportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`;
+
+        const {result, rerender} = renderHook(({shouldInitialize}) => useOptionsList({shouldInitialize}), {
+            initialProps: {shouldInitialize: false},
+            wrapper,
+        });
+
+        act(() => {
+            result.current.initializeOptions();
+        });
+
+        mockProcessReport.mockClear();
+
+        onyxSourceValues = {
+            ...onyxSourceValues,
+            [ONYXKEYS.COLLECTION.REPORT_ACTIONS]: {[reportActionsKey]: {someAction: {}}},
+        };
+        rerender({shouldInitialize: false});
+
+        expect(mockProcessReport).toHaveBeenCalled();
     });
 });
