@@ -37,7 +37,6 @@ import {
     shouldEnableNegative,
 } from '@libs/ReportUtils';
 import {
-    getCurrency,
     getDistanceInMeters,
     hasCustomUnit,
     isDistanceRequest,
