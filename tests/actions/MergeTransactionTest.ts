@@ -604,7 +604,7 @@ describe('mergeTransactionRequest', () => {
             const participantAccountIDs = Object.keys(thread.participants ?? {}).map(Number);
             const userLogins = getLoginsByAccountIDs(participantAccountIDs);
             jest.advanceTimersByTime(10);
-            openReport(thread.reportID, '', userLogins, thread, sourceIOUAction.reportActionID);
+            openReport(thread.reportID, undefined, '', userLogins, thread, sourceIOUAction.reportActionID);
             await waitForBatchedUpdates();
 
             let transactionThreadReportActions: OnyxEntry<ReportActions>;
@@ -629,16 +629,17 @@ describe('mergeTransactionRequest', () => {
             jest.advanceTimersByTime(10);
 
             // When a comment is added
-            addComment(
-                thread,
-                thread.reportID,
-                [
+            addComment({
+                report: thread,
+                notifyReportID: thread.reportID,
+                ancestors: [
                     {report: sourceReport, reportAction: sourceIOUAction, shouldDisplayNewMarker: false},
                     {report: chatReport, reportAction: previewAction, shouldDisplayNewMarker: false},
                 ],
-                'test comment',
-                CONST.DEFAULT_TIME_ZONE,
-            );
+                text: 'test comment',
+                timezoneParam: CONST.DEFAULT_TIME_ZONE,
+                currentUserAccountID: TEST_ACCOUNT_ID,
+            });
             await waitForBatchedUpdates();
 
             // Then the report should have 2 actions
@@ -770,7 +771,7 @@ describe('mergeTransactionRequest', () => {
             const participantAccountIDs = Object.keys(thread.participants ?? {}).map(Number);
             const userLogins = getLoginsByAccountIDs(participantAccountIDs);
             jest.advanceTimersByTime(10);
-            openReport(thread.reportID, '', userLogins, thread, sourceIOUAction.reportActionID);
+            openReport(thread.reportID, undefined, '', userLogins, thread, sourceIOUAction.reportActionID);
             await waitForBatchedUpdates();
 
             await new Promise<void>((resolve) => {
