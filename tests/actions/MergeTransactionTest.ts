@@ -290,7 +290,8 @@ describe('mergeTransactionRequest', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${sourceTransaction.transactionID}`, sourceTransaction);
         await Onyx.set(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${mergeTransactionID}`, mergeTransaction);
 
-        const apiModule = jest.requireActual('@libs/API');
+        type ApiModule = {write: (...args: unknown[]) => unknown};
+        const apiModule = jest.requireActual('@libs/API') as ApiModule;
         const writeSpy = jest.spyOn(apiModule, 'write');
 
         mockFetch?.pause?.();
