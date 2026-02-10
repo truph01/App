@@ -7464,11 +7464,7 @@ ${reportName}
             tryDifferentEmail: '別のメールアドレスをお試しください',
         },
     },
-    cardTransactions: {
-        notActivated: '未有効化',
-        outOfPocket: '返金可能',
-        companySpend: '返金不可',
-    },
+    cardTransactions: {notActivated: '未有効化', outOfPocket: '精算対象', companySpend: '精算対象外'},
     distance: {
         addStop: '経由地を追加',
         address: '住所',
@@ -8381,6 +8377,7 @@ ${reportName}
             error: {
                 removeMember: 'このユーザーを削除できません。もう一度お試しください。',
                 addMember: 'このメンバーを追加できませんでした。もう一度お試しください。',
+                vacationDelegate: 'このユーザーを休暇代理人として設定できませんでした。もう一度お試しください。',
             },
         },
     },

@@ -7496,11 +7496,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             tryDifferentEmail: 'Tente outro e-mail',
         },
     },
-    cardTransactions: {
-        notActivated: 'Não ativado',
-        outOfPocket: 'Reembolsável',
-        companySpend: 'Não reembolsável',
-    },
+    cardTransactions: {notActivated: 'Não ativado', outOfPocket: 'Reembolsável', companySpend: 'Não reembolsável'},
     distance: {
         addStop: 'Adicionar parada',
         address: 'Endereço',
@@ -8419,6 +8415,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             error: {
                 removeMember: 'Não foi possível remover este usuário. Tente novamente.',
                 addMember: 'Não foi possível adicionar este membro. Tente novamente.',
+                vacationDelegate: 'Não foi possível definir este usuário como delegado de férias. Tente novamente.',
             },
         },
     },

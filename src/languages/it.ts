@@ -597,7 +597,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Settimana',
         year: 'Anno',
         quarter: 'Trimestre',
-        vacationDelegate: 'Delegato ferie',
+        vacationDelegate: 'Delega ferie',
     },
     supportalNoAccess: {
         title: 'Non così in fretta',
@@ -7525,11 +7525,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             tryDifferentEmail: 'Prova con un’altra email',
         },
     },
-    cardTransactions: {
-        notActivated: 'Non attivato',
-        outOfPocket: 'Rimborsabile',
-        companySpend: 'Non rimborsabile',
-    },
+    cardTransactions: {notActivated: 'Non attivato', outOfPocket: 'Rimborsabile', companySpend: 'Non rimborsabile'},
     distance: {
         addStop: 'Aggiungi fermata',
         address: 'Indirizzo',
@@ -8450,6 +8446,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             error: {
                 removeMember: 'Impossibile rimuovere questo utente. Riprova.',
                 addMember: 'Impossibile aggiungere questo membro. Riprova.',
+                vacationDelegate: 'Impossibile impostare questo utente come delegato per le ferie. Riprova.',
             },
         },
     },

@@ -7495,11 +7495,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             tryDifferentEmail: 'Spróbuj użyć innego adresu e-mail',
         },
     },
-    cardTransactions: {
-        notActivated: 'Nieaktywne',
-        outOfPocket: 'Zwrotne',
-        companySpend: 'Niezgodne z refundacją',
-    },
+    cardTransactions: {notActivated: 'Nieaktywne', outOfPocket: 'Podlegające zwrotowi', companySpend: 'Niepodlegające zwrotowi'},
     distance: {
         addStop: 'Dodaj przystanek',
         address: 'Adres',
@@ -8417,6 +8413,7 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             error: {
                 removeMember: 'Nie można usunąć tego użytkownika. Spróbuj ponownie.',
                 addMember: 'Nie można dodać tego członka. Spróbuj ponownie.',
+                vacationDelegate: 'Nie można ustawić tego użytkownika jako zastępcy na czas urlopu. Spróbuj ponownie.',
             },
         },
     },

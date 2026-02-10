@@ -7514,11 +7514,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             tryDifferentEmail: 'Probeer een ander e-mailadres',
         },
     },
-    cardTransactions: {
-        notActivated: 'Niet geactiveerd',
-        outOfPocket: 'Vergoedbaar',
-        companySpend: 'Niet vergoedbaar',
-    },
+    cardTransactions: {notActivated: 'Niet geactiveerd', outOfPocket: 'Terugbetaalbaar', companySpend: 'Niet-declarabel'},
     distance: {
         addStop: 'Stop toevoegen',
         address: 'Adres',
@@ -8438,6 +8434,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             error: {
                 removeMember: 'Kan deze gebruiker niet verwijderen. Probeer het opnieuw.',
                 addMember: 'Kan dit lid niet toevoegen. Probeer het opnieuw.',
+                vacationDelegate: 'Kan deze gebruiker niet als vervangende gemachtigde voor vakanties instellen. Probeer het opnieuw.',
             },
         },
     },

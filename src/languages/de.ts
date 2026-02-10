@@ -2828,7 +2828,8 @@ ${
                         5. Füge eine eigene Einladung hinzu, wenn du möchtest!
 
                         [Zu den Workspace-Mitgliedern](${workspaceMembersLink}).
-        `),
+
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Richte [Kategorien](${workspaceCategoriesLink}) und [Tags](${workspaceTagsLink}) ein`,
@@ -7544,11 +7545,7 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
             tryDifferentEmail: 'Bitte versuche eine andere E-Mail-Adresse',
         },
     },
-    cardTransactions: {
-        notActivated: 'Nicht aktiviert',
-        outOfPocket: 'Erstattungsfähig',
-        companySpend: 'Nicht erstattungsfähig',
-    },
+    cardTransactions: {notActivated: 'Nicht aktiviert', outOfPocket: 'Erstattungsfähig', companySpend: 'Nicht erstattungsfähig'},
     distance: {
         addStop: 'Stopp hinzufügen',
         address: 'Adresse',
@@ -8471,6 +8468,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             error: {
                 removeMember: 'Dieser Benutzer kann nicht entfernt werden. Bitte versuche es erneut.',
                 addMember: 'Dieses Mitglied kann nicht hinzugefügt werden. Bitte versuche es erneut.',
+                vacationDelegate: 'Dieser Nutzer kann nicht als Urlaubsvertretung festgelegt werden. Bitte versuche es erneut.',
             },
         },
     },

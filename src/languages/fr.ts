@@ -7559,11 +7559,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             tryDifferentEmail: 'Veuillez essayer une autre adresse e-mail',
         },
     },
-    cardTransactions: {
-        notActivated: 'Non activé',
-        outOfPocket: 'Remboursable',
-        companySpend: 'Non remboursable',
-    },
+    cardTransactions: {notActivated: 'Non activé', outOfPocket: 'Remboursable', companySpend: 'Non remboursable'},
     distance: {
         addStop: 'Ajouter un arrêt',
         address: 'Adresse',
@@ -8485,6 +8481,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             error: {
                 removeMember: 'Impossible de supprimer cet utilisateur. Veuillez réessayer.',
                 addMember: 'Impossible d’ajouter ce membre. Veuillez réessayer.',
+                vacationDelegate: 'Impossible de définir cet utilisateur comme délégataire de vacances. Veuillez réessayer.',
             },
         },
     },
