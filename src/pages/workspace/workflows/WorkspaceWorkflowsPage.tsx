@@ -179,11 +179,13 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
     const filteredApprovalWorkflows = policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.ADVANCED ? approvalWorkflows : approvalWorkflows.filter((workflow) => workflow.isDefault);
 
+    const everyoneText = translate('workspace.common.everyone');
+
     const filterWorkflow = (workflow: ApprovalWorkflow, searchInput: string) => {
         const searchableTexts: string[] = [];
 
         if (workflow.isDefault) {
-            searchableTexts.push(translate('workspace.common.everyone'));
+            searchableTexts.push(everyoneText);
         }
 
         for (const member of workflow.members) {
