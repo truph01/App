@@ -10,6 +10,7 @@ import SelectionList from '@components/SelectionListWithSections';
 import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
 import type {Section} from '@components/SelectionListWithSections/types';
 import Text from '@components/Text';
+import useArchivedReportsIdSet from '@hooks/useArchivedReportsIdSet';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnboardingMessages from '@hooks/useOnboardingMessages';
@@ -59,6 +60,7 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
     const session = useSession();
     const {isBetaEnabled} = usePermissions();
     const [conciergeReportID = ''] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
+    const archivedReportsIdSet = useArchivedReportsIdSet();
 
     const ineligibleInvitees = getIneligibleInvitees(policy?.employeeList);
     const excludedUsers: Record<string, boolean> = {};
@@ -137,6 +139,7 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
             isSmallScreenWidth,
             isBetaEnabled(CONST.BETAS.DEFAULT_ROOMS),
             conciergeReportID,
+            archivedReportsIdSet,
             onboardingPolicyID,
             onboardingAdminsChatReportID,
             // Onboarding tasks would show in Concierge instead of admins room for testing accounts, we should open where onboarding tasks are located
