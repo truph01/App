@@ -6,9 +6,10 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
+import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useRestartOnReceiptFailure from '@hooks/useRestartOnReceiptFailure';
 import {setDraftSplitTransaction, setMoneyRequestCurrency, setMoneyRequestParticipantsFromReport, setMoneyRequestTaxAmount, updateMoneyRequestTaxAmount} from '@libs/actions/IOU';
-import {convertToBackendAmount} from '@libs/CurrencyUtils';
+import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
 import {getTransactionDetails} from '@libs/ReportUtils';
@@ -30,7 +31,7 @@ type IOURequestStepTaxAmountPageProps = WithWritableReportOrNotFoundProps<typeof
     transaction: OnyxEntry<Transaction>;
 };
 
-function getTaxAmount(transaction: OnyxEntry<Transaction>, policy: OnyxEntry<Policy>, currency: string | undefined, isEditing: boolean): number | undefined {
+function getTaxAmount(transaction: OnyxEntry<Transaction>, policy: OnyxEntry<Policy>, currency: string | undefined, decimals: number, isEditing: boolean): number | undefined {
     if (!transaction?.amount && !transaction?.modifiedAmount) {
         return;
     }
@@ -42,7 +43,7 @@ function getTaxAmount(transaction: OnyxEntry<Transaction>, policy: OnyxEntry<Pol
     const moneyRequestTaxPercentage = (transactionTaxCode ? getTaxValueByTaxCode(transactionTaxCode) : defaultTaxValue) ?? '';
     const editingTaxPercentage = (transactionTaxCode ? getTaxValueByTaxCode(transactionTaxCode) : moneyRequestTaxPercentage) ?? '';
     const taxPercentage = isEditing ? editingTaxPercentage : moneyRequestTaxPercentage;
-    return convertToBackendAmount(calculateTaxAmount(taxPercentage, transactionTaxAmount, currency ?? CONST.CURRENCY.USD));
+    return convertToBackendAmount(calculateTaxAmount(taxPercentage, transactionTaxAmount, decimals));
 }
 
 function IOURequestStepTaxAmountPage({
@@ -52,9 +53,10 @@ function IOURequestStepTaxAmountPage({
     transaction,
     report,
 }: IOURequestStepTaxAmountPageProps) {
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`, {canBeMissing: true});
-    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
-    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${report?.policyID}`, {canBeMissing: true});
+    const {policy} = usePolicyForTransaction({transaction, report, action, iouType});
+
+    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`, {canBeMissing: true});
+    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`, {canBeMissing: true});
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`, {canBeMissing: true});
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
@@ -74,6 +76,7 @@ function IOURequestStepTaxAmountPage({
     const currentTransaction = isEditingSplitBill && !isEmptyObject(splitDraftTransaction) ? splitDraftTransaction : transaction;
     const transactionDetails = getTransactionDetails(currentTransaction);
     const currency = transactionDetails?.currency;
+    const decimals = getCurrencyDecimals(currency);
 
     useFocusEffect(
         useCallback(() => {
@@ -159,7 +162,7 @@ function IOURequestStepTaxAmountPage({
                 isEditing={!!(backTo || isEditing)}
                 currency={currency}
                 amount={Math.abs(transactionDetails?.taxAmount ?? 0)}
-                taxAmount={getTaxAmount(currentTransaction, policy, currency, !!(backTo || isEditing))}
+                taxAmount={getTaxAmount(currentTransaction, policy, currency, decimals, !!(backTo || isEditing))}
                 ref={(e) => {
                     textInput.current = e;
                 }}
