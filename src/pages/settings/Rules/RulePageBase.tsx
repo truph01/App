@@ -36,6 +36,7 @@ type RulePageBaseProps = {
 };
 
 type SectionItemType = {
+    key: string;
     description: string;
     required?: boolean;
     title?: string;
@@ -144,6 +145,7 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
             titleTranslationKey: 'expenseRulesPage.addRule.expenseContains',
             items: [
                 {
+                    key: 'merchantToMatch',
                     description: translate('common.merchant'),
                     required: true,
                     title: form?.merchantToMatch,
@@ -155,12 +157,14 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
             titleTranslationKey: 'expenseRulesPage.addRule.applyUpdates',
             items: [
                 {
+                    key: 'merchant',
                     description: translate('common.merchant'),
                     title: form?.merchant,
                     onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.RENAME_MERCHANT, hash),
                 },
                 hasPolicyCategories
                     ? {
+                          key: 'category',
                           description: translate('common.category'),
                           title: form?.category ? getDecodedCategoryName(form.category) : undefined,
                           onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.CATEGORY, hash),
@@ -170,6 +174,7 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                     ? policyTags.map(({name, orderWeight, tags}) => {
                           const tag = Object.values(tags).find(({name: tagName}) => tagName === formTags.at(orderWeight));
                           return {
+                              key: `tag-${name}-${orderWeight}`,
                               description: name,
                               title: tag ? getCleanedTagName(tag.name) : undefined,
                               onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.TAG, hash, orderWeight),
@@ -178,28 +183,33 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                     : []),
                 hasTaxRates
                     ? {
+                          key: 'tax',
                           description: translate('common.tax'),
                           title: selectedTaxRate ? `${selectedTaxRate.name} (${selectedTaxRate.value})` : undefined,
                           onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.TAX, hash),
                       }
                     : undefined,
                 {
+                    key: 'description',
                     description: translate('common.description'),
                     title: form?.comment ? Parser.replace(form.comment) : undefined,
                     onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.DESCRIPTION, hash),
                     shouldRenderAsHTML: true,
                 },
                 {
+                    key: 'reimbursable',
                     description: translate('common.reimbursable'),
                     title: form?.reimbursable ? translate(form.reimbursable === 'true' ? 'common.yes' : 'common.no') : '',
                     onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.REIMBURSABLE, hash),
                 },
                 {
+                    key: 'billable',
                     description: translate('common.billable'),
                     title: form?.billable ? translate(form.billable === 'true' ? 'common.yes' : 'common.no') : '',
                     onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.BILLABLE, hash),
                 },
                 {
+                    key: 'addToReport',
                     description: translate('expenseRulesPage.addRule.addToReport'),
                     title: form?.report,
                     onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.REPORT, hash),
@@ -229,7 +239,7 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                                 }
                                 return (
                                     <MenuItemWithTopDescription
-                                        key={item.description}
+                                        key={item.key}
                                         description={item.description}
                                         errorText={shouldShowError && item.required && !item.title ? translate('common.error.fieldRequired') : ''}
                                         onPress={item.onPress}

@@ -42,6 +42,7 @@ type MerchantRulePageBaseProps = {
 };
 
 type SectionItemType = {
+    key: string;
     description: string;
     required?: boolean;
     title?: string;
@@ -259,6 +260,7 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
             titleTranslationKey: 'workspace.rules.merchantRules.expensesWith',
             items: [
                 {
+                    key: 'merchantToMatch',
                     description: translate('common.merchant'),
                     required: true,
                     title: form?.merchantToMatch,
@@ -270,12 +272,14 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
             titleTranslationKey: 'workspace.rules.merchantRules.applyUpdates',
             items: [
                 {
+                    key: 'merchant',
                     description: translate('common.merchant'),
                     title: form?.merchant,
                     onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_MERCHANT.getRoute(policyID, ruleID)),
                 },
                 hasCategories()
                     ? {
+                          key: 'category',
                           description: translate('common.category'),
                           title: categoryDisplayName,
                           onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_CATEGORY.getRoute(policyID, ruleID)),
@@ -285,6 +289,7 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
                     ? policyTags.map(({name, orderWeight, tags}) => {
                           const tag = Object.values(tags).find(({name: tagName}) => tagName === formTags.at(orderWeight));
                           return {
+                              key: `tag-${name}-${orderWeight}`,
                               description: name,
                               title: tag ? getCleanedTagName(tag.name) : undefined,
                               onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_TAG.getRoute(policyID, ruleID, orderWeight)),
@@ -293,24 +298,28 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
                     : []),
                 hasTaxes()
                     ? {
+                          key: 'tax',
                           description: translate('common.tax'),
                           title: taxDisplayName(),
                           onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_TAX.getRoute(policyID, ruleID)),
                       }
                     : undefined,
                 {
+                    key: 'description',
                     description: translate('common.description'),
                     title: form?.comment ? Parser.replace(form.comment) : undefined,
                     onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_DESCRIPTION.getRoute(policyID, ruleID)),
                     shouldRenderAsHTML: true,
                 },
                 {
+                    key: 'reimbursable',
                     description: translate('common.reimbursable'),
                     title: getBooleanTitle(form?.reimbursable, translate),
                     onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_REIMBURSABLE.getRoute(policyID, ruleID)),
                 },
                 isBillableEnabled
                     ? {
+                          key: 'billable',
                           description: translate('common.billable'),
                           title: getBooleanTitle(form?.billable, translate),
                           onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_BILLABLE.getRoute(policyID, ruleID)),
@@ -353,7 +362,7 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
                                 .filter((item): item is SectionItemType => !!item)
                                 .map((item) => (
                                     <MenuItemWithTopDescription
-                                        key={item.description}
+                                        key={item.key}
                                         description={item.description}
                                         errorText={shouldShowError && item.required && !item.title ? translate('common.error.fieldRequired') : ''}
                                         onPress={item.onPress}
