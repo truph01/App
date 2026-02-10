@@ -910,7 +910,7 @@ const translations = {
         yourSpace: 'Your space',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Welcome to ${roomName}!`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => ` Use the + button to ${additionalText} an expense.`,
-        askConcierge: ' Ask me anything!',
+        askConcierge: 'This is your chat with Concierge, your personal AI agent. I can do almost anything, try me!',
         conciergeSupport: 'Your personal AI agent',
         create: 'create',
         iouTypes: {
@@ -2236,7 +2236,8 @@ const translations = {
         unshareBankAccountDescription: 'Everyone below has access to this bank account. You can remove access at any point. We’ll still complete any payments in process.',
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} will lose access to this business bank account. We’ll still complete any payments in process.`,
         reachOutForHelp: 'It’s being used with the Expensify Card. <concierge-link>Reach out to Concierge</concierge-link> if you need to unshare it.',
-        unshareErrorModalTitle: 'Can’t unshare bank account',
+        unshareErrorModalTitle: `Can't unshare bank account`,
+        chaseAccountNumberDifferent: 'Why is my account number different?',
     },
     cardPage: {
         expensifyCard: 'Expensify Card',
@@ -2756,7 +2757,6 @@ const translations = {
 
                         [Take me to workspace category settings](${workspaceCategoriesLink}).
 
-                        ![Set up categories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)
                     `),
             },
             combinedTrackSubmitExpenseTask: {
@@ -2851,7 +2851,6 @@ const translations = {
 
                         [Take me to workspace members](${workspaceMembersLink}).
 
-                        ![Invite your team](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)
                     `),
             },
 
@@ -2879,7 +2878,6 @@ const translations = {
 
                         [Take me to more features](${workspaceMoreFeaturesLink}).
 
-                        ![Set up tags](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)
                     `),
             },
 
@@ -5127,16 +5125,17 @@ const translations = {
                     ctaText: 'Request sent',
                 },
                 bookOrManageYourTrip: {
-                    title: 'Book or manage your trip',
-                    subtitle: 'Use Expensify Travel to get the best travel offers and manage all your business expenses in a single place.',
-                    ctaText: 'Book or manage',
+                    title: 'Travel booking',
+                    subtitle: "Congrats! You're all set to book and manage travel on this workspace.",
+                    ctaText: 'Manage travel',
+                },
+                settings: {
+                    autoAddTripName: {
+                        title: 'Add trip names to expenses',
+                        subtitle: 'Automatically add trip names to expense descriptions for travel booked in Expensify.',
+                    },
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Travel booking',
-                        subtitle: "Congrats! You're all set to book and manage travel on this workspace.",
-                        manageTravelLabel: 'Manage travel',
-                    },
                     centralInvoicingSection: {
                         title: 'Central invoicing',
                         subtitle: 'Centralize all travel spend in a monthly invoice instead of paying at time of purchase.',
@@ -6324,8 +6323,8 @@ const translations = {
                 preventSelfApprovalsSubtitle: 'Prevent workspace members from approving their own expense reports.',
                 autoApproveCompliantReportsTitle: 'Auto-approve compliant reports',
                 autoApproveCompliantReportsSubtitle: 'Configure which expense reports are eligible for auto-approval.',
-                autoApproveReportsUnderTitle: 'Auto-approve reports under',
-                autoApproveReportsUnderDescription: 'Fully compliant expense reports under this amount will be automatically approved.',
+                autoApproveReportsUnderTitle: 'Auto-approve reports with all expenses under',
+                autoApproveReportsUnderDescription: 'Fully compliant expense reports where all expenses are under this amount will be automatically approved.',
                 randomReportAuditTitle: 'Random report audit',
                 randomReportAuditDescription: 'Require that some reports be manually approved, even if eligible for auto-approval.',
                 autoPayApprovedReportsTitle: 'Auto-pay approved reports',
@@ -7487,8 +7486,8 @@ const translations = {
     },
     cardTransactions: {
         notActivated: 'Not activated',
-        outOfPocket: 'Reimbursable',
-        companySpend: 'Non-reimbursable',
+        outOfPocket: 'Out-of-pocket spend',
+        companySpend: 'Company spend',
     },
     distance: {
         addStop: 'Add stop',

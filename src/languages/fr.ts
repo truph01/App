@@ -900,7 +900,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: 'Votre espace',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `Bienvenue dans ${roomName} !`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `Utilisez le bouton + pour ${additionalText} une dépense.`,
-        askConcierge: 'Posez-moi vos questions !',
+        askConcierge: 'Ceci est votre chat avec Concierge, votre agent IA personnel. Je peux faire presque tout, essayez-moi !',
         conciergeSupport: 'Votre agent IA personnel',
         create: 'créer',
         iouTypes: {
@@ -2209,6 +2209,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} perdra l’accès à ce compte bancaire professionnel. Nous terminerons tout de même les paiements en cours.`,
         reachOutForHelp: 'Elle est utilisée avec la carte Expensify. <concierge-link>Contactez Concierge</concierge-link> si vous devez arrêter de la partager.',
         unshareErrorModalTitle: 'Impossible d’annuler le partage du compte bancaire',
+        chaseAccountNumberDifferent: 'Pourquoi mon numéro de compte est-il différent ?',
     },
     cardPage: {
         expensifyCard: 'Carte Expensify',
@@ -2742,8 +2743,7 @@ ${amount} pour ${merchant} - ${date}`,
                         5. Ajoutez vos propres catégories en haut à droite.
 
                         [Accéder aux paramètres des catégories de l’espace de travail](${workspaceCategoriesLink}).
-
-                        ![Configurer des catégories](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: 'Soumettre une dépense',
@@ -2834,8 +2834,7 @@ ${
                         5. Ajoutez un message d’invitation personnalisé si vous le souhaitez !
 
                         [Aller aux membres de l’espace de travail](${workspaceMembersLink}).
-
-                        ![Invitez votre équipe](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Configurer les [catégories](${workspaceCategoriesLink}) et les [tags](${workspaceTagsLink})`,
@@ -2860,7 +2859,7 @@ ${
 
                         [Afficher plus de fonctionnalités](${workspaceMoreFeaturesLink}).
 
-                        ![Configurer les tags](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `Invitez votre [comptable](${workspaceMembersLink})`,
@@ -5181,16 +5180,17 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                     ctaText: 'Demande envoyée',
                 },
                 bookOrManageYourTrip: {
-                    title: 'Réserver ou gérer votre voyage',
-                    subtitle: 'Utilisez Expensify Travel pour obtenir les meilleures offres de voyage et gérer toutes vos dépenses professionnelles en un seul endroit.',
-                    ctaText: 'Réserver ou gérer',
+                    title: 'Réservation de voyage',
+                    subtitle: 'Félicitations ! Vous êtes prêt à réserver et gérer des voyages dans cet espace de travail.',
+                    ctaText: 'Gérer les déplacements',
+                },
+                settings: {
+                    autoAddTripName: {
+                        title: 'Ajouter des noms de voyage aux dépenses',
+                        subtitle: 'Ajouter automatiquement les noms de voyage aux descriptions des dépenses pour les voyages réservés dans Expensify.',
+                    },
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Réservation de voyage',
-                        subtitle: 'Félicitations ! Vous êtes prêt à réserver et gérer des voyages sur cet espace de travail.',
-                        manageTravelLabel: 'Gérer les déplacements',
-                    },
                     centralInvoicingSection: {
                         title: 'Facturation centralisée',
                         subtitle: 'Centralisez toutes les dépenses de voyage dans une facture mensuelle au lieu de payer au moment de l’achat.',
@@ -6403,8 +6403,8 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
                 preventSelfApprovalsSubtitle: 'Empêcher les membres de l’espace de travail d’approuver leurs propres notes de frais.',
                 autoApproveCompliantReportsTitle: 'Approuver automatiquement les notes de frais conformes',
                 autoApproveCompliantReportsSubtitle: 'Configurer quelles notes de frais sont éligibles à l’auto-approbation.',
-                autoApproveReportsUnderTitle: 'Approuver automatiquement les notes de frais inférieures à',
-                autoApproveReportsUnderDescription: 'Les notes de frais entièrement conformes en dessous de ce montant seront automatiquement approuvées.',
+                autoApproveReportsUnderTitle: 'Approuver automatiquement les notes de frais dont toutes les dépenses sont inférieures à',
+                autoApproveReportsUnderDescription: 'Les notes de frais entièrement conformes dont toutes les dépenses sont en dessous de ce montant seront automatiquement approuvées.',
                 randomReportAuditTitle: 'Audit aléatoire de notes de frais',
                 randomReportAuditDescription: 'Exiger que certaines notes de frais soient approuvées manuellement, même si elles sont éligibles à l’auto-approbation.',
                 autoPayApprovedReportsTitle: 'Payer automatiquement les notes de frais approuvées',
@@ -7562,8 +7562,8 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
     },
     cardTransactions: {
         notActivated: 'Non activé',
-        outOfPocket: 'Remboursable',
-        companySpend: 'Non remboursable',
+        outOfPocket: 'Dépenses personnelles',
+        companySpend: 'Dépenses de l’entreprise',
     },
     distance: {
         addStop: 'Ajouter un arrêt',

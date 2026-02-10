@@ -885,7 +885,7 @@ const translations: TranslationDeepObject<typeof en> = {
         yourSpace: '你的空间',
         welcomeToRoom: ({roomName}: WelcomeToRoomParams) => `欢迎来到 ${roomName}！`,
         usePlusButton: ({additionalText}: UsePlusButtonParams) => `使用 + 按钮来${additionalText}一笔费用。`,
-        askConcierge: '尽管问我任何问题！',
+        askConcierge: '这是您与 Concierge（您的个人 AI 代理）的聊天。我几乎什么都能做，来试试吧！',
         conciergeSupport: '您的专属AI助手',
         create: '创建',
         iouTypes: {
@@ -2162,6 +2162,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} 将失去对此企业银行账户的访问权限。我们仍会完成任何正在处理中的付款。`,
         reachOutForHelp: '它正在与 Expensify Card 一起使用。若需要取消共享，请<concierge-link>联系 Concierge</concierge-link>。',
         unshareErrorModalTitle: '无法取消共享银行账户',
+        chaseAccountNumberDifferent: '为什么我的账户号码不同？',
     },
     cardPage: {
         expensifyCard: 'Expensify 卡',
@@ -2682,8 +2683,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
                         5. 在右上角添加你自己的类别。
 
                         [带我前往工作区类别设置](${workspaceCategoriesLink})。
-
-                        ![设置类别](${CONST.CLOUDFRONT_URL}/videos/walkthrough-categories-v2.mp4)`),
+                    `),
             },
             combinedTrackSubmitExpenseTask: {
                 title: '提交报销',
@@ -2774,8 +2774,7 @@ ${
                         5. 如有需要，可添加自定义邀请消息！
 
                         [带我前往工作区成员页面](${workspaceMembersLink})。
-
-                        ![邀请您的团队](${CONST.CLOUDFRONT_URL}/videos/walkthrough-invite_members-v2.mp4)`),
+                    `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `设置[类别](${workspaceCategoriesLink})和[标签](${workspaceTagsLink})`,
@@ -2800,7 +2799,7 @@ ${
 
                         [带我前往更多功能](${workspaceMoreFeaturesLink})。
 
-                        ![设置标签](${CONST.CLOUDFRONT_URL}/videos/walkthrough-tags-v2.mp4)`),
+                    `),
             },
             inviteAccountantTask: {
                 title: ({workspaceMembersLink}) => `邀请你的[会计](${workspaceMembersLink})`,
@@ -5048,17 +5047,9 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                     subtitle: '我们正在审核你启用 Expensify Travel 的请求。别担心，准备好后我们会通知你。',
                     ctaText: '请求已发送',
                 },
-                bookOrManageYourTrip: {
-                    title: '预订或管理您的行程',
-                    subtitle: '使用 Expensify Travel 获取最优出行优惠，并在一个地方管理您所有的商务费用。',
-                    ctaText: '预订或管理',
-                },
+                bookOrManageYourTrip: {title: '差旅预订', subtitle: '恭喜！您现在可以在此工作区预订和管理差旅了。', ctaText: '管理差旅'},
+                settings: {autoAddTripName: {title: '将行程名称添加到报销单', subtitle: '为在 Expensify 中预订的行程，自动将行程名称添加到报销事由描述中。'}},
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: '差旅预订',
-                        subtitle: '恭喜！您已经可以在此工作区预订和管理差旅了。',
-                        manageTravelLabel: '管理差旅',
-                    },
                     centralInvoicingSection: {
                         title: '集中开票',
                         subtitle: '将所有差旅支出集中到每月发票中，而不是在购买时即时支付。',
@@ -6234,8 +6225,8 @@ ${reportName}
                 preventSelfApprovalsSubtitle: '防止工作区成员审批自己的报销报告。',
                 autoApproveCompliantReportsTitle: '自动批准合规报表',
                 autoApproveCompliantReportsSubtitle: '配置符合条件可自动审批的报销单。',
-                autoApproveReportsUnderTitle: '自动批准低于此金额的报表',
-                autoApproveReportsUnderDescription: '低于此金额且完全合规的报销报告将自动获批。',
+                autoApproveReportsUnderTitle: '自动批准所有费用低于此金额的报表',
+                autoApproveReportsUnderDescription: '所有费用均低于此金额且完全合规的报销报告将自动获批。',
                 randomReportAuditTitle: '随机报销报告审核',
                 randomReportAuditDescription: '即使符合自动审批条件，也要求部分报销单必须人工审批。',
                 autoPayApprovedReportsTitle: '自动支付已批准报销单',
@@ -7355,9 +7346,9 @@ ${reportName}
         },
     },
     cardTransactions: {
-        notActivated: '未激活',
-        outOfPocket: '可报销',
-        companySpend: '不可报销',
+        notActivated: '未启用',
+        outOfPocket: '个人垫付支出',
+        companySpend: '公司支出',
     },
     distance: {
         addStop: '添加站点',
