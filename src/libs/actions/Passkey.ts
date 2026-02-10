@@ -2,14 +2,18 @@ import Onyx from 'react-native-onyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {LocalPasskeyEntry, PasskeyCredential} from '@src/types/onyx';
 
+/** Identifies a passkey storage scope: a specific user on a specific relying party */
+type PasskeyScope = {
+    userId: string;
+    rpId: string;
+};
+
 /** Returns Onyx key: passkey_${userId}@${rpId} */
 function getPasskeyOnyxKey(userId: string, rpId: string): `${typeof ONYXKEYS.COLLECTION.PASSKEYS}${string}` {
     return `${ONYXKEYS.COLLECTION.PASSKEYS}${userId}@${rpId}`;
 }
 
-type SetLocalPasskeyCredentialsParams = {
-    userId: string;
-    rpId: string;
+type SetLocalPasskeyCredentialsParams = PasskeyScope & {
     entry: LocalPasskeyEntry;
 };
 
@@ -25,9 +29,7 @@ function setLocalPasskeyCredentials({userId, rpId, entry}: SetLocalPasskeyCreden
     Onyx.set(getPasskeyOnyxKey(userId, rpId), entry);
 }
 
-type AddLocalPasskeyCredentialParams = {
-    userId: string;
-    rpId: string;
+type AddLocalPasskeyCredentialParams = PasskeyScope & {
     credential: PasskeyCredential;
     existingEntry: LocalPasskeyEntry | null;
 };
@@ -55,9 +57,7 @@ function deleteLocalPasskeyCredentials(userId: string, rpId: string): void {
 /** Backend returns simplified format without transports */
 type BackendPasskeyCredential = Omit<PasskeyCredential, 'transports'>;
 
-type ReconcileLocalPasskeysWithBackendParams = {
-    userId: string;
-    rpId: string;
+type ReconcileLocalPasskeysWithBackendParams = PasskeyScope & {
     backendPasskeyCredentials: BackendPasskeyCredential[];
     localEntry: LocalPasskeyEntry | null;
 };
