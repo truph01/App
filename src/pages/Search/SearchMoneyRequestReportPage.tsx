@@ -32,10 +32,10 @@ import {
     getOneTransactionThreadReportID,
     getOriginalMessage,
     getReportAction,
-    isDeletedAction,
     isMoneyRequestAction,
 } from '@libs/ReportActionsUtils';
 import {isMoneyRequestReportPendingDeletion, isValidReportIDFromPath} from '@libs/ReportUtils';
+import {doesDeleteNavigateBackUrlIncludeDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
 import {isDefaultAvatar, isLetterAvatar, isPresetAvatar} from '@libs/UserAvatarUtils';
 import Navigation from '@navigation/Navigation';
 import ReactionListWrapper from '@pages/inbox/ReactionListWrapper';
@@ -89,13 +89,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
         if (isFocused || !deleteTransactionNavigateBackUrl) {
             return;
         }
-        let decodedDeleteNavigateBackUrl = deleteTransactionNavigateBackUrl;
-        try {
-            decodedDeleteNavigateBackUrl = decodeURIComponent(deleteTransactionNavigateBackUrl);
-        } catch {
-            decodedDeleteNavigateBackUrl = deleteTransactionNavigateBackUrl;
-        }
-        if (decodedDeleteNavigateBackUrl.includes('/duplicates/review')) {
+        if (doesDeleteNavigateBackUrlIncludeDuplicatesReview(deleteTransactionNavigateBackUrl)) {
             return;
         }
         // Clear the URL only after we navigate away to avoid a brief Not Found flash.
@@ -153,9 +147,12 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
     const hasLoadedParentReportActions =
         !!parentReportMetadata && ((parentReportMetadata?.hasOnceLoadedReportActions ?? parentReportMetadata?.isLoadingInitialReportActions === false) || isOffline);
-    const isParentActionMissingAfterLoad = !!report?.parentReportID && !!report?.parentReportActionID && hasLoadedParentReportActions && !parentReportAction;
-    const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
-    const wasParentActionDeleted = isParentActionDeleted || isParentActionMissingAfterLoad;
+    const {wasParentActionDeleted} = getParentReportActionDeletionStatus({
+        parentReportID: report?.parentReportID,
+        parentReportActionID: report?.parentReportActionID,
+        parentReportAction,
+        hasLoadedParentReportActions,
+    });
     const ownerAccountID = report?.ownerAccountID;
     const ownerPersonalDetailsSelector = useCallback(
         (personalDetailsList: OnyxEntry<PersonalDetailsList>) => {

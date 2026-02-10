@@ -57,7 +57,6 @@ import {
     getIOUActionForReportID,
     getOneTransactionThreadReportID,
     isCreatedAction,
-    isDeletedAction,
     isDeletedParentAction,
     isMoneyRequestAction,
     isSentMoneyReportAction,
@@ -88,6 +87,7 @@ import {
     isTaskReport,
     isValidReportIDFromPath,
 } from '@libs/ReportUtils';
+import {doesDeleteNavigateBackUrlIncludeDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
 import {cancelSpan} from '@libs/telemetry/activeSpans';
 import {isNumeric} from '@libs/ValidationUtils';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
@@ -518,21 +518,19 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
     const [deleteTransactionNavigateBackUrl] = useOnyx(ONYXKEYS.NVP_DELETE_TRANSACTION_NAVIGATE_BACK_URL, {canBeMissing: true});
     const hasLoadedParentReportActions =
         !!parentReportMetadata && ((parentReportMetadata?.hasOnceLoadedReportActions ?? parentReportMetadata?.isLoadingInitialReportActions === false) || isOffline);
-    const isParentActionMissingAfterLoad = !!report?.parentReportID && !!report?.parentReportActionID && hasLoadedParentReportActions && !parentReportAction;
-    const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
+    const {isParentActionMissingAfterLoad, isParentActionDeleted} = getParentReportActionDeletionStatus({
+        parentReportID: report?.parentReportID,
+        parentReportActionID: report?.parentReportActionID,
+        parentReportAction,
+        hasLoadedParentReportActions,
+    });
     const isDeletedTransactionThread = isReportTransactionThread(report) && (isParentActionDeleted || isParentActionMissingAfterLoad);
 
     useEffect(() => {
         if (isFocused || !deleteTransactionNavigateBackUrl) {
             return;
         }
-        let decodedDeleteNavigateBackUrl = deleteTransactionNavigateBackUrl;
-        try {
-            decodedDeleteNavigateBackUrl = decodeURIComponent(deleteTransactionNavigateBackUrl);
-        } catch {
-            decodedDeleteNavigateBackUrl = deleteTransactionNavigateBackUrl;
-        }
-        if (decodedDeleteNavigateBackUrl.includes('/duplicates/review')) {
+        if (doesDeleteNavigateBackUrlIncludeDuplicatesReview(deleteTransactionNavigateBackUrl)) {
             return;
         }
         // Clear the URL only after we navigate away to avoid a brief Not Found flash.

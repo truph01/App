@@ -22,8 +22,9 @@ import {setActiveTransactionIDs} from '@libs/actions/TransactionThreadNavigation
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {TransactionDuplicateNavigatorParamList} from '@libs/Navigation/types';
-import {getLinkedTransactionID, getReportAction, isDeletedAction} from '@libs/ReportActionsUtils';
+import {getLinkedTransactionID, getReportAction} from '@libs/ReportActionsUtils';
 import {isReportIDApproved, isSettled} from '@libs/ReportUtils';
+import {doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -127,25 +128,23 @@ function TransactionDuplicateReview() {
     const hasLoadedParentReportActions =
         !!parentReportMetadata && ((parentReportMetadata?.hasOnceLoadedReportActions ?? parentReportMetadata?.isLoadingInitialReportActions === false) || isOffline);
     const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
-    const isParentActionDeleted = !reportAction?.reportActionID && (hasLoadedParentReportActions || !report?.parentReportID);
+    const {wasParentActionDeleted} = getParentReportActionDeletionStatus({
+        parentReportID: report?.parentReportID,
+        parentReportActionID: report?.parentReportActionID,
+        parentReportAction: reportAction,
+        hasLoadedParentReportActions,
+        shouldRequireParentReportActionID: false,
+        shouldTreatMissingParentReportAsDeleted: true,
+    });
     const isReportActionPendingDelete = reportAction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-    const isReportActionDeleted = !!reportAction && isDeletedAction(reportAction);
-    const wasTransactionDeleted = isThreadReportDeleted || isParentActionDeleted || isReportActionPendingDelete || isReportActionDeleted;
+    const wasTransactionDeleted = isThreadReportDeleted || wasParentActionDeleted || isReportActionPendingDelete;
     const isLoadingPage =
         (!report?.reportID && !hasLoadedThreadReportActions && !isThreadReportDeleted) ||
-        (!reportAction?.reportActionID && !hasLoadedParentReportActions && !isParentActionDeleted && !isThreadReportDeleted);
-    const isDeleteNavigateBackToThisReview = useMemo(() => {
-        if (!deleteTransactionNavigateBackUrl) {
-            return false;
-        }
-        let decodedDeleteNavigateBackUrl = deleteTransactionNavigateBackUrl;
-        try {
-            decodedDeleteNavigateBackUrl = decodeURIComponent(deleteTransactionNavigateBackUrl);
-        } catch {
-            decodedDeleteNavigateBackUrl = deleteTransactionNavigateBackUrl;
-        }
-        return decodedDeleteNavigateBackUrl.includes('/duplicates/review') && decodedDeleteNavigateBackUrl.includes(route.params.threadReportID);
-    }, [deleteTransactionNavigateBackUrl, route.params.threadReportID]);
+        (!reportAction?.reportActionID && !hasLoadedParentReportActions && !wasParentActionDeleted && !isThreadReportDeleted);
+    const isDeleteNavigateBackToThisReview = useMemo(
+        () => doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview(deleteTransactionNavigateBackUrl, route.params.threadReportID),
+        [deleteTransactionNavigateBackUrl, route.params.threadReportID],
+    );
     const isNavigatingBackToDeletedReview = !!deleteTransactionNavigateBackUrl && !(isDeleteNavigateBackToThisReview && wasTransactionDeleted);
 
     useFocusEffect(
