@@ -937,6 +937,14 @@ function isCardPendingActivate(card?: Card) {
     return card?.state === CONST.EXPENSIFY_CARD.STATE.NOT_ACTIVATED;
 }
 
+/**
+ * Check if a card has potential fraud that needs review.
+ * Returns true if the card has fraud type 'domain' or 'individual'.
+ */
+function isCardWithPotentialFraud(card: Card): boolean {
+    return card.fraud === CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN || card.fraud === CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL;
+}
+
 function isCardPendingReplace(card?: Card) {
     return (
         (isCardPendingActivate(card) || isCardPendingIssue(card)) &&
@@ -1169,6 +1177,7 @@ export {
     isCardAlreadyAssigned,
     generateCardID,
     hasDisplayableAssignedCards,
+    isCardWithPotentialFraud,
 };
 
 export type {CompanyCardFeedIcons, CompanyCardBankIcons};
