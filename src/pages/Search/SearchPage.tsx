@@ -18,10 +18,11 @@ import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import {useSearchContext} from '@components/Search/SearchContext';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {PaymentData, SearchParams} from '@components/Search/types';
-import {usePlaybackContext} from '@components/VideoPlayerContexts/PlaybackContext';
+import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
 import useAllTransactions from '@hooks/useAllTransactions';
 import useBulkPayOptions from '@hooks/useBulkPayOptions';
 import useConfirmModal from '@hooks/useConfirmModal';
+import useConfirmReadyToOpenApp from '@hooks/useConfirmReadyToOpenApp';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useFilesValidation from '@hooks/useFilesValidation';
 import useFilterFormValues from '@hooks/useFilterFormValues';
@@ -33,10 +34,10 @@ import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useSearchShouldCalculateTotals from '@hooks/useSearchShouldCalculateTotals';
 import useSelfDMReport from '@hooks/useSelfDMReport';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {confirmReadyToOpenApp} from '@libs/actions/App';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {deleteAppReport, moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter, searchInServer} from '@libs/actions/Report';
 import {
@@ -80,7 +81,7 @@ import {
     isSelfDM,
 } from '@libs/ReportUtils';
 import {buildSearchQueryJSON} from '@libs/SearchQueryUtils';
-import {shouldShowDeleteOption} from '@libs/SearchUIUtils';
+import {navigateToSearchRHP, shouldShowDeleteOption} from '@libs/SearchUIUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {hasTransactionBeenRejected} from '@libs/TransactionUtils';
 import type {ReceiptFile} from '@pages/iou/request/step/IOURequestStepScan/types';
@@ -109,8 +110,17 @@ function SearchPage({route}: SearchPageProps) {
     const theme = useTheme();
     const {isOffline} = useNetwork();
     const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
-    const {selectedTransactions, clearSelectedTransactions, selectedReports, lastSearchType, setLastSearchType, areAllMatchingItemsSelected, selectAllMatchingItems, currentSearchResults} =
-        useSearchContext();
+    const {
+        selectedTransactions,
+        clearSelectedTransactions,
+        selectedReports,
+        lastSearchType,
+        setLastSearchType,
+        areAllMatchingItemsSelected,
+        selectAllMatchingItems,
+        currentSearchKey,
+        currentSearchResults,
+    } = useSearchContext();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
     const allTransactions = useAllTransactions();
@@ -234,9 +244,7 @@ function SearchPage({route}: SearchPageProps) {
         updateAdvancedFilters(formValues, true);
     }, [formValues]);
 
-    useEffect(() => {
-        confirmReadyToOpenApp();
-    }, []);
+    useConfirmReadyToOpenApp();
 
     useEffect(() => {
         if (!currentSearchResults?.search?.type) {
@@ -515,10 +523,11 @@ function SearchPage({route}: SearchPageProps) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             InteractionManager.runAfterInteractions(() => {
                 if (isExpenseReportType) {
-                    // For expense reports, call deleteAppReport which properly un-reports the expenses
                     for (const reportID of selectedReportIDs) {
+                        const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
                         deleteAppReport(
-                            reportID,
+                            report,
+                            selfDMReport,
                             currentUserPersonalDetails?.login ?? '',
                             currentUserPersonalDetails?.accountID,
                             validTransactions,
@@ -531,9 +540,19 @@ function SearchPage({route}: SearchPageProps) {
                     const transactionsViolations = allTransactionViolations
                         ? Object.fromEntries(Object.entries(allTransactionViolations).filter((entry): entry is [string, TransactionViolations] => !!entry[1]))
                         : {};
-                    bulkDeleteReports(hash, selectedTransactions, currentUserPersonalDetails.email ?? '', accountID, reportTransactions, transactionsViolations, bankAccountList);
+                    bulkDeleteReports(
+                        allReports,
+                        selfDMReport,
+                        hash,
+                        selectedTransactions,
+                        currentUserPersonalDetails.email ?? '',
+                        accountID,
+                        reportTransactions,
+                        transactionsViolations,
+                        bankAccountList,
+                    );
+                    clearSelectedTransactions();
                 }
-                clearSelectedTransactions();
             });
         });
     }, [
@@ -545,15 +564,17 @@ function SearchPage({route}: SearchPageProps) {
         translate,
         allTransactions,
         isExpenseReportType,
-        clearSelectedTransactions,
         selectedReportIDs,
+        selfDMReport,
         currentUserPersonalDetails?.login,
         currentUserPersonalDetails?.accountID,
         currentUserPersonalDetails.email,
         allTransactionViolations,
         bankAccountList,
+        allReports,
         selectedTransactions,
         accountID,
+        clearSelectedTransactions,
     ]);
 
     const onBulkPaySelected = useCallback(
@@ -902,7 +923,7 @@ function SearchPage({route}: SearchPageProps) {
 
         options.push(exportButtonOption);
 
-        const shouldShowHoldOption = !isOffline && selectedTransactionsKeys.every((id) => selectedTransactions[id].canHold) && !isExpenseReportType;
+        const shouldShowHoldOption = !isOffline && selectedTransactionsKeys.every((id) => selectedTransactions[id].canHold);
 
         if (shouldShowHoldOption) {
             options.push({
@@ -924,7 +945,7 @@ function SearchPage({route}: SearchPageProps) {
                     const isDismissed = areAllTransactionsFromSubmitter ? dismissedHoldUseExplanation : dismissedRejectUseExplanation;
 
                     if (isDismissed) {
-                        Navigation.navigate(ROUTES.TRANSACTION_HOLD_REASON_RHP);
+                        navigateToSearchRHP(ROUTES.TRANSACTION_HOLD_REASON_SEARCH, ROUTES.TRANSACTION_HOLD_REASON_RHP);
                     } else if (areAllTransactionsFromSubmitter) {
                         setIsHoldEducationalModalVisible(true);
                     } else {
@@ -934,7 +955,7 @@ function SearchPage({route}: SearchPageProps) {
             });
         }
 
-        const shouldShowUnholdOption = !isOffline && selectedTransactionsKeys.every((id) => selectedTransactions[id].canUnhold) && !isExpenseReportType;
+        const shouldShowUnholdOption = !isOffline && selectedTransactionsKeys.every((id) => selectedTransactions[id].canUnhold);
 
         if (shouldShowUnholdOption) {
             options.push({
@@ -1005,7 +1026,7 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.DocumentMerge,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_REPORT,
                 shouldCloseModalOnSelect: true,
-                onSelected: () => Navigation.navigate(ROUTES.MOVE_TRANSACTIONS_SEARCH_RHP),
+                onSelected: () => Navigation.navigate(ROUTES.MOVE_TRANSACTIONS_SEARCH_RHP.getRoute()),
             });
         }
 
@@ -1024,7 +1045,9 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.ArrowSplit,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
-                    initSplitExpense(allTransactions, allReports, firstTransaction);
+                    const report = firstTransaction?.reportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${firstTransaction.reportID}`] : undefined;
+                    const transactionPolicy = report?.policyID ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`] : undefined;
+                    initSplitExpense(allTransactions, allReports, firstTransaction, transactionPolicy);
                 },
             });
         }
@@ -1061,60 +1084,59 @@ function SearchPage({route}: SearchPageProps) {
 
         return options;
     }, [
+        searchResults,
         selectedTransactionsKeys,
         status,
         hash,
         selectedTransactions,
-        queryJSON?.type,
-        expensifyIcons.Export,
-        expensifyIcons.ArrowRight,
-        expensifyIcons.Table,
-        expensifyIcons.ThumbsUp,
-        expensifyIcons.ThumbsDown,
-        expensifyIcons.Send,
-        expensifyIcons.MoneyBag,
-        expensifyIcons.Stopwatch,
-        expensifyIcons.ArrowCollapse,
-        expensifyIcons.DocumentMerge,
-        expensifyIcons.ArrowSplit,
-        expensifyIcons.Trashcan,
-        expensifyIcons.Exclamation,
         translate,
+        localeCompare,
         areAllMatchingItemsSelected,
         isOffline,
         selectedReports,
+        selectedTransactionReportIDs,
         lastPaymentMethods,
         selectedReportIDs,
-        personalPolicyID,
-        isExpenseReportType,
-        searchResults,
         allTransactions,
-        currentSearchResults?.data,
-        selectedTransactionReportIDs,
+        queryJSON?.type,
         selectedPolicyIDs,
         policies,
         integrationsExportTemplates,
         csvExportLayouts,
-        handleBasicExport,
-        beginExportWithTemplate,
-        handleApproveWithDEWCheck,
-        allTransactionViolations,
-        isDelegateAccessRestricted,
-        dismissedRejectUseExplanation,
-        showDelegateNoAccessModal,
         clearSelectedTransactions,
+        beginExportWithTemplate,
         bulkPayButtonOptions,
         onBulkPaySelected,
-        areAllTransactionsFromSubmitter,
-        dismissedHoldUseExplanation,
-        currentUserPersonalDetails.accountID,
-        localeCompare,
-        allReports,
+        handleBasicExport,
+        handleApproveWithDEWCheck,
         handleDeleteSelectedTransactions,
+        allReports,
         theme.icon,
         styles.colorMuted,
         styles.fontWeightNormal,
         styles.textWrap,
+        expensifyIcons.ArrowCollapse,
+        expensifyIcons.ArrowRight,
+        expensifyIcons.ArrowSplit,
+        expensifyIcons.DocumentMerge,
+        expensifyIcons.Exclamation,
+        expensifyIcons.Export,
+        expensifyIcons.MoneyBag,
+        expensifyIcons.Send,
+        expensifyIcons.Stopwatch,
+        expensifyIcons.Table,
+        expensifyIcons.ThumbsDown,
+        expensifyIcons.ThumbsUp,
+        expensifyIcons.Trashcan,
+        dismissedHoldUseExplanation,
+        dismissedRejectUseExplanation,
+        areAllTransactionsFromSubmitter,
+        allTransactionViolations,
+        currentSearchResults?.data,
+        isDelegateAccessRestricted,
+        showDelegateNoAccessModal,
+        currentUserPersonalDetails.accountID,
+        personalPolicyID,
     ]);
 
     const saveFileAndInitMoneyRequest = (files: FileObject[]) => {
@@ -1193,10 +1215,11 @@ function SearchPage({route}: SearchPageProps) {
         validateFiles(files, Array.from(e.dataTransfer?.items ?? []));
     };
 
-    const {resetVideoPlayerData} = usePlaybackContext();
+    const {resetVideoPlayerData} = usePlaybackActionsContext();
 
     const metadata = searchResults?.search;
-    const shouldShowFooter = !!metadata?.count || selectedTransactionsKeys.length > 0;
+    const shouldAllowFooterTotals = useSearchShouldCalculateTotals(currentSearchKey, queryJSON?.hash, true);
+    const shouldShowFooter = selectedTransactionsKeys.length > 0 || (shouldAllowFooterTotals && !!metadata?.count);
 
     // Handles video player cleanup:
     // 1. On mount: Resets player if navigating from report screen
@@ -1238,7 +1261,11 @@ function SearchPage({route}: SearchPageProps) {
     }, []);
 
     const footerData = useMemo(() => {
-        const shouldUseClientTotal = !metadata?.count || (selectedTransactionsKeys.length > 0 && !areAllMatchingItemsSelected);
+        if (!shouldAllowFooterTotals && selectedTransactionsKeys.length === 0) {
+            return {count: undefined, total: undefined, currency: undefined};
+        }
+
+        const shouldUseClientTotal = selectedTransactionsKeys.length > 0 || !metadata?.count || (selectedTransactionsKeys.length > 0 && !areAllMatchingItemsSelected);
         const selectedTransactionItems = Object.values(selectedTransactions);
         const currency = metadata?.currency ?? selectedTransactionItems.at(0)?.groupCurrency;
         const numberOfExpense = shouldUseClientTotal
@@ -1254,7 +1281,7 @@ function SearchPage({route}: SearchPageProps) {
         const total = shouldUseClientTotal ? selectedTransactionItems.reduce((acc, transaction) => acc - (transaction.groupAmount ?? 0), 0) : metadata?.total;
 
         return {count: numberOfExpense, total, currency};
-    }, [areAllMatchingItemsSelected, metadata?.count, metadata?.currency, metadata?.total, selectedTransactions, selectedTransactionsKeys]);
+    }, [areAllMatchingItemsSelected, metadata?.count, metadata?.currency, metadata?.total, selectedTransactions, selectedTransactionsKeys, shouldAllowFooterTotals]);
 
     const onSortPressedCallback = useCallback(() => {
         setIsSorting(true);
@@ -1283,7 +1310,7 @@ function SearchPage({route}: SearchPageProps) {
         setIsHoldEducationalModalVisible(false);
         setNameValuePair(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION, true, false, !isOffline);
         if (hash && selectedTransactionsKeys.length > 0) {
-            Navigation.navigate(ROUTES.TRANSACTION_HOLD_REASON_RHP);
+            navigateToSearchRHP(ROUTES.TRANSACTION_HOLD_REASON_SEARCH, ROUTES.TRANSACTION_HOLD_REASON_RHP);
         }
     }, [hash, selectedTransactionsKeys.length, isOffline]);
 
@@ -1291,7 +1318,7 @@ function SearchPage({route}: SearchPageProps) {
         if (rejectModalAction === CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD) {
             dismissRejectUseExplanation();
             if (hash && selectedTransactionsKeys.length > 0) {
-                Navigation.navigate(ROUTES.TRANSACTION_HOLD_REASON_RHP);
+                navigateToSearchRHP(ROUTES.TRANSACTION_HOLD_REASON_SEARCH, ROUTES.TRANSACTION_HOLD_REASON_RHP);
             }
         } else {
             dismissRejectUseExplanation();
@@ -1317,6 +1344,7 @@ function SearchPage({route}: SearchPageProps) {
                             currentSelectedReportID={selectedTransactionReportIDs?.at(0) ?? selectedReportIDs?.at(0)}
                             confirmPayment={onBulkPaySelected}
                             latestBankItems={latestBankItems}
+                            shouldShowFooter={shouldShowFooter}
                         />
                         <DragAndDropConsumer onDrop={initScanRequest}>
                             <DropZoneUI
