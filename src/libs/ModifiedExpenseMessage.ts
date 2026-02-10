@@ -3,6 +3,7 @@ import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {LocalizedTranslate} from '@components/LocaleContextProvider';
+import {isInvalidMerchantValue} from '@libs/ValidationUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -75,11 +76,11 @@ function buildMessageFragmentForValue(
     const isCategoryField = valueName.includes(translate('common.category').toLowerCase());
 
     const displayValueName = shouldConvertToLowercase ? valueName.toLowerCase() : valueName;
-    const isOldValuePartialMerchant = valueName === translate('common.merchant') && oldValue === CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT;
+    const isOldMerchantInvalid = valueName === translate('common.merchant') && isInvalidMerchantValue(oldValue);
     const isOldCategoryMissing = isCategoryField && isCategoryMissing(oldValue);
     const isNewCategoryMissing = isCategoryField && isCategoryMissing(newValue);
 
-    if (!oldValue || isOldValuePartialMerchant || isOldCategoryMissing) {
+    if (!oldValue || isOldMerchantInvalid || isOldCategoryMissing) {
         if (!(isOldCategoryMissing && isNewCategoryMissing)) {
             const fragment = translate('iou.setTheRequest', {valueName: displayValueName, newValueToDisplay});
             setFragments.push(fragment);
