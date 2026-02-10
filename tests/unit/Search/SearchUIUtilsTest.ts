@@ -2967,7 +2967,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-12-01 (the filter limit)
             // instead of 2025-01-01 (the year start)
@@ -2993,7 +2993,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-06-15 (the filter limit)
             expect(result.start).toBe('2025-06-15');
@@ -3025,7 +3025,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(monthDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(monthDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-12-15 (the filter limit)
             // instead of 2025-12-01 (the month start)
@@ -3051,7 +3051,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(monthDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(monthDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-06-10 (the filter limit)
             expect(result.start).toBe('2025-06-10');
@@ -3073,7 +3073,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-09-15 (the filter limit)
             // instead of 2025-07-01 (the quarter start)
@@ -3099,7 +3099,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-05-10 (the filter limit)
             expect(result.start).toBe('2025-05-10');
@@ -3125,7 +3125,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, [dateFilter]);
 
             // Should intersect: max(preset start, constraint start) = max(2026-01-01, 2025-04-01) = 2026-01-01
             // The preset start should be preserved, not overwritten by the earlier constraint
@@ -3152,7 +3152,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(yearDateRange, [dateFilter]);
 
             // Start should remain the preset start (2026-01-01)
             expect(result.start).toBe('2026-01-01');
@@ -3178,7 +3178,7 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-12-03 (GREATER_THAN 2025-12-02 means >= 2025-12-03)
             // But since quarter starts at 2026-01-01, we take the max: max(2026-01-01, 2025-12-03) = 2026-01-01
@@ -3205,13 +3205,46 @@ describe('SearchUIUtils', () => {
                 ],
             };
 
-            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, dateFilter);
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, [dateFilter]);
 
             // The start date should be adjusted to 2025-12-03 (GREATER_THAN 2025-12-02 means >= 2025-12-03)
             expect(result.start).toBe('2025-12-03');
             // The end date should be adjusted to 2025-12-31 (quarter end, since 2026-02-01 is outside the quarter)
             // We take min(2025-12-31, 2026-02-01) = 2025-12-31
             expect(result.end).toBe('2025-12-31');
+        });
+
+        it('should handle multiple date filter objects when multiple date filters exist in flatFilters', () => {
+            // Test that adjustTimeRangeToDateFilters correctly merges and processes multiple date filter objects
+            // This simulates the scenario where date>2025-12-02 and date<2026-02-02 are stored as separate filter objects
+            const quarterDateRange = DateUtils.getQuarterDateRange(2026, 1); // Q1 2026: 2026-01-01 to 2026-03-31
+            const flatFilters = [
+                {
+                    key: CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
+                    filters: [
+                        {
+                            operator: CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN,
+                            value: '2025-12-02',
+                        },
+                    ],
+                },
+                {
+                    key: CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
+                    filters: [
+                        {
+                            operator: CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN,
+                            value: '2026-02-02',
+                        },
+                    ],
+                },
+            ];
+
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, flatFilters);
+
+            // The start date should be adjusted to 2026-01-01 (quarter start, since 2025-12-03 is before the quarter)
+            expect(result.start).toBe('2026-01-01');
+            // The end date should be adjusted to 2026-02-01 (LOWER_THAN 2026-02-02 means <= 2026-02-01)
+            expect(result.end).toBe('2026-02-01');
         });
 
         it('should return getQuarterSections result when type is EXPENSE and groupBy is quarter', () => {
