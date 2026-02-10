@@ -21,6 +21,7 @@ import {useSearchContext} from '@components/Search/SearchContext';
 import Text from '@components/Text';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useExportProgressModal from '@hooks/useExportProgressModal';
+import useFilterSelectedTransactions from '@hooks/useFilterSelectedTransactions';
 import {AUTOSCROLL_TO_TOP_THRESHOLD} from '@hooks/useFlatListScrollKey';
 import useLoadReportActions from '@hooks/useLoadReportActions';
 import useLocalize from '@hooks/useLocalize';
@@ -58,11 +59,11 @@ import markOpenReportEnd from '@libs/telemetry/markOpenReportEnd';
 import {isTransactionPendingDelete} from '@libs/TransactionUtils';
 import Visibility from '@libs/Visibility';
 import isSearchTopmostFullScreenRoute from '@navigation/helpers/isSearchTopmostFullScreenRoute';
-import FloatingMessageCounter from '@pages/home/report/FloatingMessageCounter';
-import getInitialNumToRender from '@pages/home/report/getInitialNumReportActionsToRender';
-import ReportActionsListItemRenderer from '@pages/home/report/ReportActionsListItemRenderer';
-import shouldDisplayNewMarkerOnReportAction from '@pages/home/report/shouldDisplayNewMarkerOnReportAction';
-import useReportUnreadMessageScrollTracking from '@pages/home/report/useReportUnreadMessageScrollTracking';
+import FloatingMessageCounter from '@pages/inbox/report/FloatingMessageCounter';
+import getInitialNumToRender from '@pages/inbox/report/getInitialNumReportActionsToRender';
+import ReportActionsListItemRenderer from '@pages/inbox/report/ReportActionsListItemRenderer';
+import shouldDisplayNewMarkerOnReportAction from '@pages/inbox/report/shouldDisplayNewMarkerOnReportAction';
+import useReportUnreadMessageScrollTracking from '@pages/inbox/report/useReportUnreadMessageScrollTracking';
 import variables from '@styles/variables';
 import {openReport, readNewestAction, subscribeToNewActionEvent} from '@userActions/Report';
 import CONST from '@src/CONST';
@@ -184,10 +185,17 @@ function MoneyRequestReportActionsList({
 
     const {selectedTransactionIDs, setSelectedTransactions, clearSelectedTransactions} = useSearchContext();
 
+    useFilterSelectedTransactions(transactions);
+
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
     const {queueExportSearchWithTemplate} = useExportProgressModal();
     const beginExportWithTemplate = useCallback(
         (templateName: string, templateType: string, transactionIDList: string[]) => {
+            if (isOffline) {
+                setOfflineModalVisible(true);
+                return;
+            }
+
             if (!report) {
                 return;
             }
@@ -201,12 +209,13 @@ function MoneyRequestReportActionsList({
                 policyID: policy?.id,
             });
         },
-        [report, policy?.id, queueExportSearchWithTemplate],
+        [isOffline, report, policy?.id, queueExportSearchWithTemplate],
     );
 
     const {
         options: selectedTransactionsOptions,
         handleDeleteTransactions,
+        handleDeleteTransactionsWithNavigation,
         isDeleteModalVisible,
         hideDeleteModal,
     } = useSelectedTransactionsActions({
@@ -709,6 +718,7 @@ function MoneyRequestReportActionsList({
                                 role="button"
                                 accessibilityState={{checked: isSelectAllChecked}}
                                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
+                                sentryLabel={CONST.SENTRY_LABEL.REPORT.MONEY_REQUEST_REPORT_ACTIONS_LIST_SELECT_ALL}
                             >
                                 <Text style={[styles.textStrong, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>
                             </PressableWithFeedback>
@@ -720,10 +730,11 @@ function MoneyRequestReportActionsList({
                         onConfirm={() => {
                             const shouldNavigateBack =
                                 transactions.filter((trans) => trans.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length === selectedTransactionIDs.length;
-                            handleDeleteTransactions();
                             if (shouldNavigateBack) {
                                 const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
-                                Navigation.goBack(backToRoute);
+                                handleDeleteTransactionsWithNavigation(backToRoute);
+                            } else {
+                                handleDeleteTransactions();
                             }
                         }}
                         onCancel={hideDeleteModal}
