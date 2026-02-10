@@ -49,10 +49,11 @@ function SearchEditMultipleBooleanPage() {
     );
 
     const selectValue = (item: BooleanOption) => {
+        const shouldClear = selectedValue === item.value;
         if (isBillableScreen) {
-            updateBulkEditDraftTransaction({billable: item.value});
+            updateBulkEditDraftTransaction({billable: shouldClear ? null : item.value});
         } else {
-            updateBulkEditDraftTransaction({reimbursable: item.value});
+            updateBulkEditDraftTransaction({reimbursable: shouldClear ? null : item.value});
         }
         Navigation.goBack();
     };
