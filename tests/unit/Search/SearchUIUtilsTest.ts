@@ -5374,7 +5374,7 @@ describe('SearchUIUtils', () => {
             expect(dateFilter).toBeDefined();
             expect(dateFilter?.filters?.some((f) => f.value === CONST.SEARCH.DATE_PRESETS.YEAR_TO_DATE)).toBe(true);
 
-            expect(searchQueryJSON?.view).toBe(CONST.SEARCH.VIEW.BAR);
+            expect(searchQueryJSON?.view).toBe(CONST.SEARCH.VIEW.LINE);
             expect(searchQueryJSON?.sortBy).toBe(CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH);
             expect(searchQueryJSON?.sortOrder).toBe(CONST.SEARCH.SORT_ORDER.DESC);
         });
@@ -5395,7 +5395,7 @@ describe('SearchUIUtils', () => {
             expect(searchQuery).toContain(`type:${CONST.SEARCH.DATA_TYPES.EXPENSE}`);
             expect(searchQuery).toContain(`groupBy:${CONST.SEARCH.GROUP_BY.MONTH}`);
             expect(searchQuery).toContain(`date:${CONST.SEARCH.DATE_PRESETS.YEAR_TO_DATE}`);
-            expect(searchQuery).toContain(`view:${CONST.SEARCH.VIEW.BAR}`);
+            expect(searchQuery).toContain(`view:${CONST.SEARCH.VIEW.LINE}`);
             expect(searchQuery).toContain(`sortBy:${CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH}`);
             expect(searchQuery).toContain(`sortOrder:${CONST.SEARCH.SORT_ORDER.DESC}`);
         });
