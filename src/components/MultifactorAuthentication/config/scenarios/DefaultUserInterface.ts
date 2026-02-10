@@ -9,7 +9,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
 /**
- * Default callback that returns SHOW_OUTCOME_SCREEN to maintain backward compatibility.
+ * Default callback that returns SHOW_OUTCOME_SCREEN.
  * Scenarios can override this with their own callback to handle custom navigation logic.
  */
 const defaultCallback = (): MultifactorAuthenticationCallbackResponse => CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SHOW_OUTCOME_SCREEN;

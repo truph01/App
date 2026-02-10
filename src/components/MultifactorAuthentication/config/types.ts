@@ -184,7 +184,6 @@ type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> =
 
 /**
  * Scenario configuration for custom scenarios with optional overrides.
- * The callback is optional here because customConfig provides a default callback if none is specified.
  */
 type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<MultifactorAuthenticationScenarioConfig<T>, 'MODALS' | 'OUTCOMES' | 'callback'> & {
     MODALS?: MultifactorAuthenticationModalOptional;
