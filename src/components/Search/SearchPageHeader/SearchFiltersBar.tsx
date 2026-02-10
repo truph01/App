@@ -765,7 +765,7 @@ function SearchFiltersBar({
         );
 
         const hiddenFilters = advancedSearchFiltersKeys.filter((key) => !exposedFiltersKeys.has(key as SearchAdvancedFiltersKey));
-        const hasReportFields = Object.keys(searchAdvancedFiltersForm).some(
+        const hasReportFields = Object.keys(filterFormValues).some(
             (key) => key.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX) && !key.startsWith(CONST.SEARCH.REPORT_FIELD.NOT_PREFIX),
         );
 
@@ -790,7 +790,7 @@ function SearchFiltersBar({
 
             return filterFormValues[key as SearchAdvancedFiltersKey];
         });
-    }, [filterFormValues, filters, searchAdvancedFiltersForm, typeFiltersKeys]);
+    }, [filterFormValues, filters, typeFiltersKeys]);
 
     const adjustScroll = useCallback((info: {distanceFromEnd: number}) => {
         // Workaround for a known React Native bug on Android (https://github.com/facebook/react-native/issues/27504):
