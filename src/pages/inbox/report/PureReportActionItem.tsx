@@ -886,7 +886,7 @@ function PureReportActionItem({
                 text: `${i + 1} - ${option}`,
                 key: `${action.reportActionID}-conciergeCategoryOptions-${option}`,
                 onPress: () => {
-                    resolveConciergeCategoryOptions(reportActionReport, reportID, action.reportActionID, option, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE);
+                    resolveConciergeCategoryOptions(reportActionReport, reportID, action.reportActionID, option, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE, currentUserAccountID);
                 },
             }));
         }
@@ -909,7 +909,7 @@ function PureReportActionItem({
                 text: `${i + 1} - ${option}`,
                 key: `${action.reportActionID}-conciergeDescriptionOptions-${option}`,
                 onPress: () => {
-                    resolveConciergeDescriptionOptions(reportActionReport, reportID, action.reportActionID, option, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE);
+                    resolveConciergeDescriptionOptions(reportActionReport, reportID, action.reportActionID, option, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE, currentUserAccountID);
                 },
             }));
         }
@@ -922,7 +922,7 @@ function PureReportActionItem({
                     shouldUseLocalization: false,
                     key: `${action.reportActionID}-followup-${followup.text}`,
                     onPress: () => {
-                        resolveSuggestedFollowup(reportActionReport, reportID, action, followup, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE);
+                        resolveSuggestedFollowup(reportActionReport, reportID, action, followup, personalDetail.timezone ?? CONST.DEFAULT_TIME_ZONE, currentUserAccountID);
                     },
                 }));
             }
@@ -1633,7 +1633,7 @@ function PureReportActionItem({
         } else if (isActionableJoinRequest(action)) {
             children = (
                 <View>
-                    <ReportActionItemBasicMessage message={getJoinRequestMessage(translate, action)} />
+                    <ReportActionItemBasicMessage message={getJoinRequestMessage(translate, policy, action)} />
                     {actionableItemButtons.length > 0 && (
                         <ActionableItemButtons
                             items={actionableItemButtons}
@@ -1648,10 +1648,12 @@ function PureReportActionItem({
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.DEMOTED_FROM_WORKSPACE)) {
             children = <ReportActionItemBasicMessage message={getDemotedFromWorkspaceMessage(translate, action)} />;
         } else if (isCardIssuedAction(action)) {
+            const shouldNavigateToCardDetails = isPolicyAdmin(policy);
             children = (
                 <IssueCardMessage
                     action={action}
                     policyID={report?.policyID}
+                    shouldNavigateToCardDetails={shouldNavigateToCardDetails}
                 />
             );
         } else if (isCardBrokenConnectionAction(action)) {
