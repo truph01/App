@@ -1,5 +1,5 @@
-import {useCallback} from 'react';
-import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import {useMemo} from 'react';
+import type {OnyxEntry} from 'react-native-onyx';
 import {getPolicyByCustomUnitID} from '@libs/PolicyUtils';
 import {isExpenseUnreported} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
@@ -30,13 +30,15 @@ type UsePolicyForTransactionResult = {
     policy: OnyxEntry<Policy>;
 };
 
-const customUnitPolicySelector = (policies: OnyxCollection<Policy>, transaction: OnyxEntry<Transaction>) => getPolicyByCustomUnitID(transaction, policies);
-
 function usePolicyForTransaction({transaction, reportPolicyID, action, iouType, isPerDiemRequest}: UsePolicyForTransactionParams): UsePolicyForTransactionResult {
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
 
-    const policySelector = useCallback((policies: OnyxCollection<Policy>) => customUnitPolicySelector(policies, transaction), [transaction]);
-    const [customUnitPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true, selector: policySelector});
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
+
+    const customUnitPolicy = useMemo(() => {
+        const result = getPolicyByCustomUnitID(transaction, allPolicies);
+        return result;
+    }, [transaction, allPolicies]);
 
     const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${reportPolicyID}`, {canBeMissing: true});
 
