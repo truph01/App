@@ -3,7 +3,6 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {getReportPreviewAction} from '@libs/actions/IOU';
 import {areTransactionsEligibleForMerge, mergeTransactionRequest, setMergeTransactionKey, setupMergeTransactionData} from '@libs/actions/MergeTransaction';
 import {addComment, openReport} from '@libs/actions/Report';
-import * as API from '@libs/API';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import {getLoginsByAccountIDs} from '@libs/PersonalDetailsUtils';
 import {getReportAction} from '@libs/ReportActionsUtils';
@@ -291,7 +290,8 @@ describe('mergeTransactionRequest', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${sourceTransaction.transactionID}`, sourceTransaction);
         await Onyx.set(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${mergeTransactionID}`, mergeTransaction);
 
-        const writeSpy = jest.spyOn(API, 'write');
+        const apiModule = jest.requireActual<typeof import('@libs/API')>('@libs/API');
+        const writeSpy = jest.spyOn(apiModule, 'write');
 
         mockFetch?.pause?.();
 
@@ -319,7 +319,22 @@ describe('mergeTransactionRequest', () => {
         // Then: Verify we called MERGE_TRANSACTION with correct parameters
         expect(writeSpy).toHaveBeenCalled();
         const [firstCall] = writeSpy.mock.calls;
-        const [calledCommand, calledParams] = firstCall;
+        const [calledCommand, rawParams] = firstCall;
+        const calledParams = rawParams as {
+            transactionID: string;
+            transactionIDList: string[];
+            created: string;
+            merchant: string;
+            amount: number;
+            currency: string;
+            category: string;
+            billable?: boolean;
+            reimbursable?: boolean;
+            tag?: string;
+            receiptID?: string;
+            reportID: string;
+            comment: string;
+        };
 
         expect(calledCommand).toBe(WRITE_COMMANDS.MERGE_TRANSACTION);
         expect(calledParams).toEqual(
@@ -340,7 +355,7 @@ describe('mergeTransactionRequest', () => {
         );
 
         // And: The comment payload sent to the API should reflect the merged details
-        const parsedComment = JSON.parse((calledParams as any).comment as string);
+        const parsedComment = JSON.parse(calledParams.comment);
         expect(parsedComment.comment).toBe(mergeTransaction.description);
         expect(parsedComment.customUnit).toBe(mergeTransaction.customUnit);
         expect(parsedComment.waypoints).toBe(mergeTransaction.waypoints ?? null);
