@@ -137,7 +137,7 @@ function OptionsListContextProvider({children}: OptionsListProviderProps) {
                 reports: Array.from(updatedReportsMap.values()),
             };
         });
-    }, [changedReportsEntries, personalDetails, currentUserAccountID, reportAttributes?.reports]);
+    }, [changedReportsEntries, personalDetails, currentUserAccountID, reports, reportAttributes?.reports]);
 
     useEffect(() => {
         if (!changedReportActions || !areOptionsInitialized.current) {
@@ -169,7 +169,7 @@ function OptionsListContextProvider({children}: OptionsListProviderProps) {
                 reports: Array.from(updatedReportsMap.values()),
             };
         });
-    }, [changedReportActions, personalDetails, currentUserAccountID, reportAttributes?.reports]);
+    }, [changedReportActions, personalDetails, currentUserAccountID, reports, reportAttributes?.reports]);
 
     /**
      * This effect is used to update the options list when personal details change.

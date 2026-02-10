@@ -680,6 +680,7 @@ function SearchAutocompleteList({
         hasAutocompleteList,
         isAutocompleteList,
         personalDetails,
+        reports,
     ]);
 
     const sortedRecentSearches = useMemo(() => {
