@@ -288,7 +288,7 @@ function ComposerWithSuggestions({
 
     const [selection, setSelection] = useState<TextSelection>(() => ({start: value.length, end: value.length, positionX: 0, positionY: 0}));
 
-    const [defaultComposerHeight, setDefaultComposerHeight] = useState<number | null>(null);
+    const [composerHeightAfterClear, setDefaultComposerHeight] = useState<number | null>(null);
     const emptyComposerHeightRef = useRef<number | null>(null);
 
     const textInputRef = useRef<TextInput | null>(null);
@@ -569,11 +569,11 @@ function ComposerWithSuggestions({
      * After that, the composer will adjust it's height based on it's parent flex layout.
      */
     const clearComposerHeight = useCallback(() => {
-        if (defaultComposerHeight == null) {
+        if (composerHeightAfterClear == null) {
             return;
         }
         setDefaultComposerHeight(null);
-    }, [defaultComposerHeight]);
+    }, [composerHeightAfterClear]);
 
     const onChangeText = useCallback(
         (commentValue: string) => {
@@ -891,7 +891,7 @@ function ComposerWithSuggestions({
     return (
         <>
             <View
-                style={[containerComposeStyles, styles.textInputComposeBorder, defaultComposerHeight != null && styles.textInputComposeAfterClear]}
+                style={[containerComposeStyles, styles.textInputComposeBorder, composerHeightAfterClear != null && styles.textInputComposeAfterClear]}
                 onTouchEndCapture={() => {
                     isTouchEndedRef.current = true;
                 }}
@@ -909,7 +909,7 @@ function ComposerWithSuggestions({
                     style={[
                         styles.textInputCompose,
                         isComposerFullSize ? styles.textInputFullCompose : styles.textInputCollapseCompose,
-                        defaultComposerHeight != null && {height: defaultComposerHeight},
+                        composerHeightAfterClear != null && {height: composerHeightAfterClear},
                     ]}
                     maxLines={maxComposerLines}
                     onFocus={handleFocus}
