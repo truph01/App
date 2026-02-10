@@ -10,6 +10,7 @@ import type {
     MultifactorAuthenticationActionParams,
     MultifactorAuthenticationKeyInfo,
     MultifactorAuthenticationReason,
+    MultifactorAuthenticationScenarioCallback,
 } from '@libs/MultifactorAuthentication/Biometrics/types';
 import type CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -140,6 +141,8 @@ type MultifactorAuthenticationOutcomeSuffixes<T extends MultifactorAuthenticatio
 type MultifactorAuthenticationScenarioResponse = {
     httpCode: number;
     reason: MultifactorAuthenticationReason;
+    /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
+    body?: Record<string, unknown>;
 };
 
 /**
@@ -168,14 +171,25 @@ type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> =
      * so the absence of payload will be tolerated at the run-time.
      */
     pure?: true;
+
+    /**
+     * Callback function that is invoked after the API call completes (success or failure).
+     * The callback receives the success status and input containing HTTP code, message, and response body.
+     * Returns a response that determines whether to show the outcome screen:
+     * - SKIP_OUTCOME_SCREEN: The callback handles navigation itself
+     * - SHOW_OUTCOME_SCREEN: Continue with normal flow and show the outcome screen
+     */
+    callback: MultifactorAuthenticationScenarioCallback;
 } & MultifactorAuthenticationUI;
 
 /**
  * Scenario configuration for custom scenarios with optional overrides.
+ * The callback is optional here because customConfig provides a default callback if none is specified.
  */
-type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<MultifactorAuthenticationScenarioConfig<T>, 'MODALS' | 'OUTCOMES'> & {
+type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<MultifactorAuthenticationScenarioConfig<T>, 'MODALS' | 'OUTCOMES' | 'callback'> & {
     MODALS?: MultifactorAuthenticationModalOptional;
     OUTCOMES: MultifactorAuthenticationOutcomeOptional;
+    callback?: MultifactorAuthenticationScenarioCallback;
 };
 
 /**

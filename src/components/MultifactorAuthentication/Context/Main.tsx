@@ -8,7 +8,7 @@ import type {MultifactorAuthenticationScenario, MultifactorAuthenticationScenari
 import useNetwork from '@hooks/useNetwork';
 import {requestValidateCodeAction} from '@libs/actions/User';
 import getPlatform from '@libs/getPlatform';
-import type {ChallengeType, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
+import type {ChallengeType, MultifactorAuthenticationCallbackInput, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
 import {processRegistration, processScenario} from '@userActions/MultifactorAuthentication/processing';
@@ -113,6 +113,22 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             if (error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.REGISTRATION_REQUIRED) {
                 clearLocalMFAPublicKeyList();
                 dispatch({type: 'REREGISTER'});
+                return;
+            }
+
+            // Invoke the scenario callback to determine whether to show the outcome screen
+            const scenarioConfig = MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[scenario];
+            const callbackInput: MultifactorAuthenticationCallbackInput = {
+                httpCode: state.scenarioResponse?.httpCode,
+                message: state.scenarioResponse?.reason ?? error.reason,
+                body: state.scenarioResponse?.body,
+            };
+
+            const callbackResponse = await scenarioConfig.callback(false, callbackInput);
+
+            // If the callback returns SKIP_OUTCOME_SCREEN, the callback handles navigation itself
+            if (callbackResponse === CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SKIP_OUTCOME_SCREEN) {
+                dispatch({type: 'SET_FLOW_COMPLETE', payload: true});
                 return;
             }
 
@@ -283,6 +299,9 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                         ...payload,
                     });
 
+                    // Store the scenario response for callback invocation at outcome navigation
+                    dispatch({type: 'SET_SCENARIO_RESPONSE', payload: scenarioAPIResponse});
+
                     if (!scenarioAPIResponse.success) {
                         dispatch({
                             type: 'SET_ERROR',
@@ -300,7 +319,22 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             return;
         }
 
-        // 5. All steps completed - success
+        // 5. All steps completed - invoke callback to determine whether to show the outcome screen
+        const scenarioConfig = MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[scenario];
+        const callbackInput: MultifactorAuthenticationCallbackInput = {
+            httpCode: state.scenarioResponse?.httpCode,
+            message: state.scenarioResponse?.reason,
+            body: state.scenarioResponse?.body,
+        };
+
+        const callbackResponse = await scenarioConfig.callback(true, callbackInput);
+
+        // If the callback returns SKIP_OUTCOME_SCREEN, the callback handles navigation itself
+        if (callbackResponse === CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SKIP_OUTCOME_SCREEN) {
+            dispatch({type: 'SET_FLOW_COMPLETE', payload: true});
+            return;
+        }
+
         Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME.getRoute(paths.successOutcome), {forceReplace: true});
         dispatch({type: 'SET_FLOW_COMPLETE', payload: true});
     }, [biometrics, dispatch, isOffline, state, isWeb]);

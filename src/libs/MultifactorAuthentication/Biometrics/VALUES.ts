@@ -213,6 +213,17 @@ const MULTIFACTOR_AUTHENTICATION_VALUES = {
      */
     PUBLIC_KEYS_PREVIOUSLY_BUT_NOT_CURRENTLY_REGISTERED: [] as string[],
     PUBLIC_KEYS_AUTHENTICATION_NEVER_REGISTERED: undefined,
+
+    /**
+     * Callback response values that determine what the MultifactorAuthenticationContext should do
+     * after a scenario callback is executed.
+     */
+    CALLBACK_RESPONSE: {
+        /** Skip the outcome screen - the callback handles navigation itself */
+        SKIP_OUTCOME_SCREEN: 'SKIP_OUTCOME_SCREEN',
+        /** Show the outcome screen - continue with normal flow */
+        SHOW_OUTCOME_SCREEN: 'SHOW_OUTCOME_SCREEN',
+    },
 } as const;
 
 export {MultifactorAuthenticationCallbacks};

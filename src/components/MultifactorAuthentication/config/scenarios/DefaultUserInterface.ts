@@ -1,10 +1,18 @@
 import type {MultifactorAuthenticationDefaultUIConfig, MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import NoEligibleMethodsDescription from '@components/MultifactorAuthentication/NoEligibleMethodsDescription';
 import UnsupportedDeviceDescription from '@components/MultifactorAuthentication/UnsupportedDeviceDescription';
+import type {MultifactorAuthenticationCallbackResponse} from '@libs/MultifactorAuthentication/Biometrics/types';
 // Spacing utilities are needed for icon padding configuration in outcomes defaults
 // eslint-disable-next-line no-restricted-imports
 import spacing from '@styles/utils/spacing';
 import variables from '@styles/variables';
+import CONST from '@src/CONST';
+
+/**
+ * Default callback that returns SHOW_OUTCOME_SCREEN to maintain backward compatibility.
+ * Scenarios can override this with their own callback to handle custom navigation logic.
+ */
+const defaultCallback = (): MultifactorAuthenticationCallbackResponse => CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SHOW_OUTCOME_SCREEN;
 
 /**
  * Default UI configuration for all multifactor authentication scenarios with modals and outcomes.
@@ -112,6 +120,7 @@ function customConfig<const T extends MultifactorAuthenticationScenarioCustomCon
         ...config,
         MODALS,
         OUTCOMES,
+        callback: config.callback ?? defaultCallback,
     } as const;
 }
 

@@ -5,7 +5,6 @@ import type {
     MultifactorAuthenticationScenarioConfig,
 } from '@components/MultifactorAuthentication/config/types';
 import type {MarqetaAuthTypeName, MultifactorAuthenticationKeyInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
-import VALUES from '@libs/MultifactorAuthentication/Biometrics/VALUES';
 import CONST from '@src/CONST';
 import Base64URL from '@src/utils/Base64URL';
 import {registerAuthenticationKey} from './index';
@@ -13,6 +12,9 @@ import {registerAuthenticationKey} from './index';
 type ProcessResult = {
     success: boolean;
     reason: MultifactorAuthenticationReason;
+    httpCode: number;
+    /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
+    body?: Record<string, unknown>;
 };
 
 /**
@@ -76,13 +78,6 @@ function createKeyInfoObject({publicKey, challenge}: {publicKey: string; challen
  * @returns Object with success status and reason code
  */
 async function processRegistration(params: RegistrationParams): Promise<ProcessResult> {
-    if (!params.challenge) {
-        return {
-            success: false,
-            reason: VALUES.REASON.CHALLENGE.CHALLENGE_MISSING,
-        };
-    }
-
     const keyInfo = createKeyInfoObject({
         publicKey: params.publicKey,
         challenge: params.challenge,
@@ -98,6 +93,7 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
     return {
         success,
         reason,
+        httpCode,
     };
 }
 
@@ -120,20 +116,14 @@ async function processScenario<T extends MultifactorAuthenticationScenario>(
     params: MultifactorAuthenticationProcessScenarioParameters<T> & {authenticationMethod: MarqetaAuthTypeName},
 ): Promise<ProcessResult> {
     const currentScenario = MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[scenario] as MultifactorAuthenticationScenarioConfig;
-
-    if (!params.signedChallenge) {
-        return {
-            success: false,
-            reason: VALUES.REASON.GENERIC.SIGNATURE_MISSING,
-        };
-    }
-
-    const {httpCode, reason} = await currentScenario.action(params);
+    const {httpCode, reason, body} = await currentScenario.action(params);
     const success = isHttpSuccess(httpCode);
 
     return {
         success,
         reason,
+        httpCode,
+        body,
     };
 }
 
