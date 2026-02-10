@@ -29,6 +29,14 @@ const ONYXKEYS = {
     /** A unique ID for the device */
     DEVICE_ID: 'deviceID',
 
+    /** Holds information about device-specific biometrics which:
+     * - does need to be persisted
+     * - does not need to be kept in secure storage
+     * - does not persist across uninstallations
+     * (secure storage persists across uninstallation)
+     */
+    DEVICE_BIOMETRICS: 'deviceBiometrics',
+
     /** Boolean flag set whenever the sidebar has loaded */
     IS_SIDEBAR_LOADED: 'isSidebarLoaded',
 
@@ -54,9 +62,6 @@ const ONYXKEYS = {
 
     /** Keeps track if 'GPS in progress' modal is opened */
     IS_GPS_IN_PROGRESS_MODAL_OPEN: 'isGpsInProgressModalOpen',
-
-    /** Stores the PIN for an activated UK/EU Expensify card to be shown once after activation */
-    ACTIVATED_CARD_PIN: 'activatedCardPin',
 
     /** Keeps track if there is a full screen currently visible or not */
     FULLSCREEN_VISIBILITY: 'fullscreenVisibility',
@@ -1212,7 +1217,6 @@ type OnyxValuesMapping = {
     [ONYXKEYS.RECENTLY_USED_CURRENCIES]: string[];
     [ONYXKEYS.ACTIVE_CLIENTS]: string[];
     [ONYXKEYS.DEVICE_ID]: string;
-    [ONYXKEYS.ACTIVATED_CARD_PIN]: string | undefined;
     [ONYXKEYS.IS_SIDEBAR_LOADED]: boolean;
     [ONYXKEYS.PERSISTED_REQUESTS]: OnyxTypes.AnyRequest[];
     [ONYXKEYS.PERSISTED_ONGOING_REQUESTS]: OnyxTypes.AnyRequest;
@@ -1419,6 +1423,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.IS_OPEN_CONFIRM_NAVIGATE_EXPENSIFY_CLASSIC_MODAL_OPEN]: boolean;
     [ONYXKEYS.PERSONAL_POLICY_ID]: string;
     [ONYXKEYS.TRANSACTION_IDS_HIGHLIGHT_ON_SEARCH_ROUTE]: Record<string, Record<string, boolean>>;
+    [ONYXKEYS.DEVICE_BIOMETRICS]: OnyxTypes.DeviceBiometrics;
 };
 
 type OnyxDerivedValuesMapping = {
