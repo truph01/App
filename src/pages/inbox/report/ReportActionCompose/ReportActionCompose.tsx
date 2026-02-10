@@ -310,12 +310,14 @@ function ReportActionCompose({
 
     const addAttachment = useCallback((file: FileObject | FileObject[]) => {
         attachmentFileRef.current = file;
-        const clear = composerRef.current?.clearWorklet;
-        if (!clear) {
-            throw new Error('The composerRef.clear function is not set yet. This should never happen, and indicates a developer error.');
+
+        const clearWorklet = composerRef.current?.clearWorklet;
+
+        if (!clearWorklet) {
+            throw new Error('The composerRef.clearWorklet function is not set yet. This should never happen, and indicates a developer error.');
         }
 
-        scheduleOnUI(clear);
+        scheduleOnUI(clearWorklet);
     }, []);
 
     /**
