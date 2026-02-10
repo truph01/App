@@ -335,6 +335,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                             reportID,
                             transaction,
                             removeSettledAndApprovedTransactions(Object.values(duplicateTransactions ?? {}).filter((t) => t?.transactionID !== transaction?.transactionID)),
+                            policy,
                             policyCategories,
                             transactionReport,
                         ),
@@ -430,7 +431,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
             icon: expensifyIcons.ArrowSplit,
             value: CONST.REPORT.SECONDARY_ACTIONS.SPLIT,
             onSelected: () => {
-                initSplitExpense(allTransactions, allReports, transaction);
+                initSplitExpense(allTransactions, allReports, transaction, policy);
             },
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MERGE]: {
