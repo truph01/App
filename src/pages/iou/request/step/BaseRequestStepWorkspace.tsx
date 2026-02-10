@@ -48,12 +48,7 @@ function BaseRequestStepWorkspace({transaction, getPolicies, onSelectWorkspace}:
     const availableWorkspaces = getPolicies(allPolicies, currentUserLogin);
     const workspaceOptions: WorkspaceListItem[] = availableWorkspaces
         .sort((policy1, policy2) =>
-            sortWorkspacesBySelected(
-                {policyID: policy1.id, name: policy1.name},
-                {policyID: policy2.id, name: policy2.name},
-                initiallyFocusedKey ? [initiallyFocusedKey] : [],
-                localeCompare,
-            ),
+            sortWorkspacesBySelected({policyID: policy1.id, name: policy1.name}, {policyID: policy2.id, name: policy2.name}, initiallyFocusedKey ? [initiallyFocusedKey] : [], localeCompare),
         )
         .map((policy) => ({
             text: policy.name,

@@ -36,8 +36,7 @@ function usePolicyForTransaction({transaction, reportPolicyID, action, iouType, 
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
 
     const customUnitPolicy = useMemo(() => {
-        const result = getPolicyByCustomUnitID(transaction, allPolicies);
-        return result;
+        return getPolicyByCustomUnitID(transaction, allPolicies);
     }, [transaction, allPolicies]);
 
     const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${reportPolicyID}`, {canBeMissing: true});
