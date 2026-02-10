@@ -227,7 +227,9 @@ function OptionsListContextProvider({children}: OptionsListProviderProps) {
                 }
 
                 const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report.reportID}`];
-                const newReportOption = createOptionFromReport(report, personalDetails, currentUserAccountID, reports, privateIsArchived, reportAttributes?.reports, {showPersonalDetails: true});
+                const newReportOption = createOptionFromReport(report, personalDetails, currentUserAccountID, reports, privateIsArchived, reportAttributes?.reports, {
+                    showPersonalDetails: true,
+                });
                 const replaceIndex = options.reports.findIndex((option) => option.reportID === report.reportID);
                 newReportOptions.push({
                     newReportOption,

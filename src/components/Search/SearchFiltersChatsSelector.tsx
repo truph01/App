@@ -67,7 +67,14 @@ function SearchFiltersChatsSelector({initialReportIDs, onFiltersUpdate, isScreen
     const selectedOptions: OptionData[] = selectedReportIDs.map((id) => {
         const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${id}`];
         const report = getSelectedOptionData(
-            createOptionFromReport({...reports?.[`${ONYXKEYS.COLLECTION.REPORT}${id}`], reportID: id}, personalDetails, currentUserAccountID, reports, privateIsArchived, reportAttributesDerived),
+            createOptionFromReport(
+                {...reports?.[`${ONYXKEYS.COLLECTION.REPORT}${id}`], reportID: id},
+                personalDetails,
+                currentUserAccountID,
+                reports,
+                privateIsArchived,
+                reportAttributesDerived,
+            ),
         );
         const isReportArchived = !!privateIsArchived;
         const alternateText = getAlternateText(report, {}, isReportArchived, currentUserAccountID, {}, reportAttributesDerived);

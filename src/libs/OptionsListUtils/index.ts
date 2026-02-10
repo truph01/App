@@ -965,7 +965,6 @@ function createOption(
 
         const computedReportName = getReportName(report, reportAttributesDerived);
 
-
         reportName = showPersonalDetails
             ? getDisplayNameForParticipant({accountID: accountIDs.at(0), formatPhoneNumber: formatPhoneNumberPhoneUtils}) || formatPhoneNumberPhoneUtils(personalDetail?.login ?? '')
             : computedReportName;

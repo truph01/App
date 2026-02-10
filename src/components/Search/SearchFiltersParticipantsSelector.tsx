@@ -193,7 +193,19 @@ function SearchFiltersParticipantsSelector({initialAccountIDs, onFiltersUpdate, 
         }
 
         return filteredOptions;
-    }, [unselectedOptions, cleanSearchTerm, countryCode, loginList, selectedOptions, shouldAllowNameOnlyOptions, searchTerm, currentUserEmail, currentUserAccountID, reports, personalDetails]);
+    }, [
+        unselectedOptions,
+        cleanSearchTerm,
+        countryCode,
+        loginList,
+        selectedOptions,
+        shouldAllowNameOnlyOptions,
+        searchTerm,
+        currentUserEmail,
+        currentUserAccountID,
+        reports,
+        personalDetails,
+    ]);
 
     const {sections, headerMessage} = useMemo(() => {
         const newSections: SelectionListSections = [];
