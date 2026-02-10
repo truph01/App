@@ -1010,6 +1010,7 @@ function changeTransactionsReport({
 
         let comment: NullishDeep<Comment> | undefined;
         let modifiedAmount: number | undefined;
+        let modifiedCurrency: string | undefined;
         let modifiedMerchant: string | undefined;
         if (isUnreported) {
             // If the transaction is on hold, we need to unhold it because unreported transactions (on selfDM) should never remain on hold.
@@ -1024,19 +1025,27 @@ function changeTransactionsReport({
                     customUnitRateID: CONST.CUSTOM_UNITS.FAKE_P2P_ID,
                 };
 
-                // For distance requests we also need to set the defaultP2PRate and update the amount and merchant
+                // For distance requests we also need to set the defaultP2PRate and update the distanceUnit, the quantity, the amount, the currency and the merchant
                 if (isDistanceRequest(transaction)) {
-                    const currency = getCurrency(transaction);
-                    const unit = transaction?.comment?.customUnit?.distanceUnit ?? CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES;
-                    const distanceInMeters = getDistanceInMeters(transaction, unit);
-                    const defaultP2PRate = DistanceRequestUtils.getRateForP2PInUnit(currency, transaction, unit);
-                    comment.customUnit.defaultP2PRate = defaultP2PRate;
-                    modifiedAmount = -DistanceRequestUtils.getDistanceRequestAmount(distanceInMeters, unit, defaultP2PRate);
+                    const currency = destinationCurrency && CONST.CURRENCY_TO_DEFAULT_MILEAGE_RATE[destinationCurrency] ? destinationCurrency : CONST.CURRENCY.USD;
+                    const {rate, unit} = CONST.CURRENCY_TO_DEFAULT_MILEAGE_RATE[currency];
+                    const distance = parseFloat(
+                        DistanceRequestUtils.getRoundedDistanceInUnits(
+                            getDistanceInMeters(transaction, transaction?.comment?.customUnit?.distanceUnit ?? CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES),
+                            unit,
+                        ),
+                    );
+                    const distanceInMeters = DistanceRequestUtils.convertToDistanceInMeters(distance, unit);
+                    comment.customUnit.defaultP2PRate = rate;
+                    comment.customUnit.distanceUnit = unit;
+                    comment.customUnit.quantity = distance;
+                    modifiedAmount = -DistanceRequestUtils.getDistanceRequestAmount(distanceInMeters, unit, rate ?? 0);
+                    modifiedCurrency = currency;
                     modifiedMerchant = DistanceRequestUtils.getDistanceMerchant(
                         true,
                         distanceInMeters,
                         unit,
-                        defaultP2PRate,
+                        rate,
                         currency,
                         translate,
                         toLocaleDigit,
@@ -1056,6 +1065,7 @@ function changeTransactionsReport({
                 reportID,
                 comment,
                 modifiedAmount,
+                modifiedCurrency,
                 modifiedMerchant,
                 ...(shouldClearAmount && {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}),
                 ...(shouldClearAmount && {convertedAmount: null}),
