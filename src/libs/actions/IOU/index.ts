@@ -38,7 +38,7 @@ import type {
     UpdateMoneyRequestParams,
 } from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
-import {convertAmountToDisplayString, convertToDisplayString, convertToFrontendAmountAsString} from '@libs/CurrencyUtils';
+import {convertAmountToDisplayString, convertToDisplayString, convertToFrontendAmountAsString, getCurrencySymbol} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorObject, getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
@@ -55,6 +55,7 @@ import {
     updateIOUOwnerAndTotal,
 } from '@libs/IOUUtils';
 import isFileUploadable from '@libs/isFileUploadable';
+import {toLocaleDigit} from '@libs/LocaleDigitUtils';
 import {formatPhoneNumber} from '@libs/LocalePhoneNumber';
 import * as Localize from '@libs/Localize';
 import Log from '@libs/Log';
@@ -242,6 +243,7 @@ import {getOnboardingMessages} from '@userActions/Welcome/OnboardingFlow';
 import type {OnboardingCompanySize} from '@userActions/Welcome/OnboardingFlow';
 import type {IOUAction, IOUActionParams, IOUType, OdometerImageType} from '@src/CONST';
 import CONST from '@src/CONST';
+import IntlStore from '@src/languages/IntlStore';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
@@ -467,6 +469,9 @@ type RequestMoneyTransactionParams = Omit<BaseTransactionParams, 'comment'> & {
     pendingFields?: PendingFields<string>;
     distance?: number;
     isLinkedTrackedExpenseReportArchived?: boolean;
+    customUnit?: TransactionCustomUnit;
+    odometerStart?: number;
+    odometerEnd?: number;
 
     /** Transaction type (e.g., 'time' for time tracking expenses) */
     type?: ValueOf<typeof CONST.TRANSACTION.TYPE>;
@@ -865,7 +870,6 @@ type DeleteMoneyRequestFunctionParams = {
     isSingleTransactionView?: boolean;
     transactionIDsPendingDeletion?: string[];
     selectedTransactionIDs?: string[];
-    hash?: number;
     allTransactionViolationsParam: OnyxCollection<OnyxTypes.TransactionViolations>;
     currentUserAccountID: number;
 };
@@ -3501,7 +3505,18 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
     // I want to clean this up at some point, but it's possible this will live in the code for a while so I've created https://github.com/Expensify/App/issues/25417
     // to remind me to do this.
     if (isDistanceRequest && existingTransaction) {
-        optimisticTransaction = fastMerge(existingTransaction, optimisticTransaction, false);
+        // For split expenses, exclude merchant from merge to preserve merchant from splitExpense
+        if (isSplitExpense) {
+            // Preserve merchant from transactionParams (splitExpense.merchant) before merge
+            const preservedMerchant = merchant || optimisticTransaction.merchant;
+            const {merchant: omittedMerchant, ...existingTransactionWithoutMerchant} = existingTransaction;
+            optimisticTransaction = fastMerge(existingTransactionWithoutMerchant, optimisticTransaction, false) as OnyxTypes.Transaction;
+
+            // Explicitly set merchant from splitExpense to ensure it's not overwritten
+            optimisticTransaction.merchant = preservedMerchant;
+        } else {
+            optimisticTransaction = fastMerge(existingTransaction, optimisticTransaction, false);
+        }
     }
 
     if (isSplitExpense && existingTransaction) {
@@ -8749,7 +8764,6 @@ function deleteMoneyRequest({
     transactionIDsPendingDeletion,
     selectedTransactionIDs,
     allTransactionViolationsParam,
-    hash,
     currentUserAccountID,
 }: DeleteMoneyRequestFunctionParams) {
     if (!transactionID) {
@@ -8775,13 +8789,7 @@ function deleteMoneyRequest({
     // STEP 2: Build Onyx data
     // The logic mostly resembles the cleanUpMoneyRequest function
     const optimisticData: Array<
-        OnyxUpdate<
-            | typeof ONYXKEYS.COLLECTION.TRANSACTION
-            | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
-            | typeof ONYXKEYS.COLLECTION.REPORT
-            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
-            | typeof ONYXKEYS.COLLECTION.SNAPSHOT
-        >
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>
     > = [
         {
             onyxMethod: Onyx.METHOD.SET,
@@ -9006,23 +9014,6 @@ function deleteMoneyRequest({
             key: `${ONYXKEYS.COLLECTION.REPORT}${chatReport?.reportID}`,
             value: {
                 hasOutstandingChildRequest: true,
-            },
-        });
-    }
-
-    if (hash && shouldDeleteIOUReport) {
-        optimisticData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
-            value: {
-                data: {
-                    [`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.reportID}`]: {
-                        pendingFields: {
-                            // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
-                            preview: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-                        },
-                    },
-                },
             },
         });
     }
