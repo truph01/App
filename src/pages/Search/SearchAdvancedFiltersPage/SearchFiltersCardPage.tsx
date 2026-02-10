@@ -158,7 +158,6 @@ function SearchFiltersCardPage() {
                             }
                             disableMaintainingScrollPosition
                             shouldStopPropagation
-                            shouldShowTooltips
                             canSelectMultiple
                         />
                     </View>
