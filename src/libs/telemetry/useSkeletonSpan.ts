@@ -47,9 +47,9 @@ function useSkeletonSpan(component: string, reasonAttributes?: SkeletonSpanReaso
         }
 
         const namespacedAttributes = Object.fromEntries(Object.entries(reasonAttributes).map(([key, value]) => [`${CONST.TELEMETRY.ATTRIBUTE_SKELETON_PREFIX}${key}`, value]));
-        span.setAttributes(namespacedAttributes)
-        span.addEvent(CONST.TELEMETRY.EVENT_SKELETON_ATTRIBUTES_UPDATE, namespacedAttributes)
-    }, [reasonAttributes, spanId])
+        span.setAttributes(namespacedAttributes);
+        span.addEvent(CONST.TELEMETRY.EVENT_SKELETON_ATTRIBUTES_UPDATE, namespacedAttributes);
+    }, [reasonAttributes, spanId]);
 }
 
 export default useSkeletonSpan;
