@@ -697,10 +697,12 @@ function getForReportActionTemp({
 
     const hasModifiedBillable = isReportActionOriginalMessageAnObject && 'oldBillable' in reportActionOriginalMessage && 'billable' in reportActionOriginalMessage;
     if (hasModifiedBillable) {
+        const oldBillable = reportActionOriginalMessage?.oldBillable === 'billable' ? translate('common.billable').toLowerCase() : translate('common.nonBillable').toLowerCase();
+        const newBillable = reportActionOriginalMessage?.billable === 'billable' ? translate('common.billable').toLowerCase() : translate('common.nonBillable').toLowerCase();
         buildMessageFragmentForValue(
             translate,
-            reportActionOriginalMessage?.billable ?? '',
-            reportActionOriginalMessage?.oldBillable ?? '',
+            newBillable,
+            oldBillable,
             translate('iou.expense'),
             true,
             setFragments,
@@ -711,10 +713,14 @@ function getForReportActionTemp({
 
     const hasModifiedReimbursable = isReportActionOriginalMessageAnObject && 'oldReimbursable' in reportActionOriginalMessage && 'reimbursable' in reportActionOriginalMessage;
     if (hasModifiedReimbursable) {
+        const oldReimbursable =
+            reportActionOriginalMessage?.oldReimbursable === 'reimbursable' ? translate('iou.reimbursable').toLowerCase() : translate('iou.nonReimbursable').toLowerCase();
+        const newReimbursable =
+            reportActionOriginalMessage?.reimbursable === 'reimbursable' ? translate('iou.reimbursable').toLowerCase() : translate('iou.nonReimbursable').toLowerCase();
         buildMessageFragmentForValue(
             translate,
-            reportActionOriginalMessage?.reimbursable ?? '',
-            reportActionOriginalMessage?.oldReimbursable ?? '',
+            newReimbursable,
+            oldReimbursable,
             translate('iou.expense'),
             true,
             setFragments,
@@ -745,6 +751,13 @@ function getForReportActionTemp({
         getMessageLine(translate, `\n${translate('iou.removed')}`, removalFragments);
 
     if (message === '') {
+        // If we don't have enough structured information to build a detailed message but we
+        // know the change was AI-generated, fall back to an AI-attributed generic summary so
+        // users can still understand that Concierge updated the expense automatically.
+        if (reportActionOriginalMessage?.aiGenerated) {
+            return `${translate('iou.changedTheExpense')} ${translate('iou.basedOnAI')}`;
+        }
+
         return translate('iou.changedTheExpense');
     }
     return `${message.substring(1, message.length)}`;

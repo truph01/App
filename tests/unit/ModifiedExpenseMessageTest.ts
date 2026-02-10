@@ -1250,5 +1250,74 @@ describe('ModifiedExpenseMessage', () => {
                 expect(result).toEqual(expectedResult);
             });
         });
+
+        describe('when the billable field is changed', () => {
+            const reportAction = {
+                ...createRandomReportAction(1),
+                actionName: CONST.REPORT.ACTIONS.TYPE.MODIFIED_EXPENSE,
+                originalMessage: {
+                    oldBillable: 'nonBillable',
+                    billable: 'billable',
+                },
+            };
+
+            it('returns the correct translated text message', () => {
+                const expectedResult = 'changed the expense to "billable" (previously "non-billable")';
+
+                const result = getForReportActionTemp({
+                    translate: translateLocal,
+                    reportAction,
+                    policyTags: undefined,
+                    currentUserLogin: 'test@example.com',
+                });
+
+                expect(result).toEqual(expectedResult);
+            });
+        });
+
+        describe('when the reimbursable field is changed', () => {
+            const reportAction = {
+                ...createRandomReportAction(1),
+                actionName: CONST.REPORT.ACTIONS.TYPE.MODIFIED_EXPENSE,
+                originalMessage: {
+                    oldReimbursable: 'reimbursable',
+                    reimbursable: 'nonReimbursable',
+                },
+            };
+
+            it('returns the correct translated text message', () => {
+                const expectedResult = 'changed the expense to "non-reimbursable" (previously "reimbursable")';
+
+                const result = getForReportActionTemp({
+                    translate: translateLocal,
+                    reportAction,
+                    policyTags: undefined,
+                    currentUserLogin: 'test@example.com',
+                });
+
+                expect(result).toEqual(expectedResult);
+            });
+        });
+
+        describe('when there are no changes but aiGenerated is true', () => {
+            const reportAction = {
+                ...createRandomReportAction(1),
+                actionName: CONST.REPORT.ACTIONS.TYPE.MODIFIED_EXPENSE,
+                originalMessage: {aiGenerated: true},
+            };
+
+            it('returns the AI-attributed message', () => {
+                const expectedResult = 'changed the expense based on past activity';
+
+                const result = getForReportActionTemp({
+                    translate: translateLocal,
+                    reportAction,
+                    policyTags: undefined,
+                    currentUserLogin: 'test@example.com',
+                });
+
+                expect(result).toEqual(expectedResult);
+            });
+        });
     });
 });
