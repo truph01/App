@@ -1060,7 +1060,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}` as const,
             value: {
                 member: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegate: vacationDelegate?.delegate ? CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE : CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                     },
                 },
@@ -1071,7 +1071,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}` as const,
             value: {
                 memberErrors: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegateErrors: null,
                     },
                 },
@@ -1085,7 +1085,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegateErrors: null,
                     },
                 },
@@ -1096,7 +1096,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
             value: {
                 member: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegate: null,
                     },
                 },
@@ -1110,7 +1110,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegateErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.error.vacationDelegate'),
                     },
                 },
@@ -1123,6 +1123,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
         vacationerEmail: vacationer,
         vacationDelegateEmail: delegate,
         overridePolicyDiffWarning: true,
+        domainAccountID,
     };
 
     // We don't use the side effect here but `SetVacationDelegate` command is declared as side effect command
@@ -1147,7 +1148,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}` as const,
             value: {
                 member: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegate: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                     },
                 },
@@ -1158,7 +1159,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegateErrors: null,
                     },
                 },
@@ -1172,7 +1173,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}` as const,
             value: {
                 member: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegate: null,
                     },
                 },
@@ -1183,7 +1184,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegateErrors: null,
                     },
                 },
@@ -1204,7 +1205,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
             value: {
                 member: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegate: null,
                     },
                 },
@@ -1215,7 +1216,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
-                    [domainMemberAccountID]: {
+                    [vacationer]: {
                         vacationDelegateErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.error.vacationDelegate'),
                     },
                 },
@@ -1223,10 +1224,10 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
         },
     ];
 
-    API.write(WRITE_COMMANDS.DELETE_VACATION_DELEGATE, {vacationerEmail: vacationer}, {optimisticData, successData, failureData});
+    API.write(WRITE_COMMANDS.DELETE_VACATION_DELEGATE, {vacationerEmail: vacationer, domainAccountID}, {optimisticData, successData, failureData});
 }
 
-function clearVacationDelegateError(domainAccountID: number, domainMemberAccountID: number, pendingAction?: PendingAction) {
+function clearVacationDelegateError(domainAccountID: number, domainMemberAccountID: number, domainMemberEmail: string, pendingAction?: PendingAction) {
     if (pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
         Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
             [`${CONST.DOMAIN.PRIVATE_VACATION_DELEGATE_PREFIX}${domainMemberAccountID}`]: null,
@@ -1235,7 +1236,7 @@ function clearVacationDelegateError(domainAccountID: number, domainMemberAccount
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
         memberErrors: {
-            [domainMemberAccountID]: {
+            [domainMemberEmail]: {
                 vacationDelegateErrors: null,
             },
         },
@@ -1243,7 +1244,7 @@ function clearVacationDelegateError(domainAccountID: number, domainMemberAccount
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
         member: {
-            [domainMemberAccountID]: {
+            [domainMemberEmail]: {
                 vacationDelegate: null,
             },
         },

@@ -3,6 +3,7 @@ type SetVacationDelegateParams = {
     vacationerEmail?: string;
     vacationDelegateEmail: string;
     overridePolicyDiffWarning: boolean;
+    domainAccountID?: number;
 };
 
 export default SetVacationDelegateParams;

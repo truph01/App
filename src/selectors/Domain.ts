@@ -146,8 +146,6 @@ function vacationDelegateSelector(accountID: number): (domain: OnyxEntry<Domain>
     return (domain: OnyxEntry<Domain>) => domain?.[`${CONST.DOMAIN.PRIVATE_VACATION_DELEGATE_PREFIX}${accountID}`];
 }
 
-const domainEmailSelector = (domain: OnyxEntry<Domain>) => domain?.email;
-
 const adminPendingActionSelector = (pendingAction: OnyxEntry<DomainPendingActions>) => pendingAction?.admin ?? {};
 
 const defaultSecurityGroupIDSelector = (domain: OnyxEntry<Domain>) => domain?.domain_defaultSecurityGroupID;

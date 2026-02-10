@@ -1,6 +1,5 @@
 import type * as OnyxCommon from './OnyxCommon';
 
-
 /**
  * Basic errors for domain members
  */
@@ -46,4 +45,5 @@ type DomainErrors = {
     errors: OnyxCommon.Errors;
 };
 
+export type {GeneralDomainMemberErrors};
 export default DomainErrors;

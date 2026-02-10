@@ -1,6 +1,5 @@
 import type * as OnyxCommon from './OnyxCommon';
 
-
 /**
  * General pending action structure for domain members
  * Pending actions structure is dictated by how `domain_` updates are handled in the app to prevent them from resetting unintentionally.
@@ -47,4 +46,5 @@ type DomainPendingAction = {
     pendingAction?: OnyxCommon.PendingAction;
 };
 
+export type {GeneralDomainMemberPendingAction};
 export default DomainPendingAction;
