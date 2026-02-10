@@ -208,7 +208,7 @@ describe('QuickActionUtils', () => {
 
         describe('Policy with time tracking', () => {
             it('should allow requestTime action when policy has time tracking enabled', () => {
-                mockedPolicyUtils.isTimeTrackingEnabled.mockReturnValue(false);
+                mockedPolicyUtils.isTimeTrackingEnabled.mockReturnValue(true);
                 expect(
                     isQuickActionAllowed(
                         {action: CONST.QUICK_ACTIONS.REQUEST_TIME},
@@ -226,11 +226,11 @@ describe('QuickActionUtils', () => {
                         false,
                         false,
                     ),
-                ).toBe(false);
+                ).toBe(true);
             });
 
             it('should not allow requestTime action when policy has time tracking disabled', () => {
-                mockedPolicyUtils.isTimeTrackingEnabled.mockReturnValue(true);
+                mockedPolicyUtils.isTimeTrackingEnabled.mockReturnValue(false);
                 expect(
                     isQuickActionAllowed(
                         {action: CONST.QUICK_ACTIONS.REQUEST_TIME},
@@ -247,7 +247,7 @@ describe('QuickActionUtils', () => {
                         false,
                         false,
                     ),
-                ).toBe(true);
+                ).toBe(false);
             });
         });
     });
