@@ -129,6 +129,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 style={[shouldUseNarrowLayout && styles.flexGrow1, shouldUseNarrowLayout && styles.mb3]}
                 isDisabled={!selectedMembers.length}
                 testID="DomainMembersPage-header-dropdown-menu-button"
+                wrapperStyle={shouldUseNarrowLayout && styles.flexGrow1}
             />
         ) : (
             <>
