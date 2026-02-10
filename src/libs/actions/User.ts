@@ -947,7 +947,8 @@ function subscribeToUserEvents() {
         const updates = {
             type: CONST.ONYX_UPDATE_TYPES.PUSHER,
             lastUpdateID: Number(pushEventData.lastUpdateID ?? CONST.DEFAULT_NUMBER_ID),
-            updates: (pushEventData.updates as OnyxUpdateEvent[]) ?? [],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            updates: (pushEventData.updates as Array<OnyxUpdateEvent<any>>) ?? [],
             previousUpdateID: Number(pushJSON.previousUpdateID ?? CONST.DEFAULT_NUMBER_ID),
         };
         Log.info('[subscribeToUserEvents] Applying Onyx updates');

@@ -62,7 +62,8 @@ type AnyOnyxData = OnyxDataBase<AnyOnyxUpdate>;
 type RequestType = 'get' | 'post';
 
 /** Generic base model for API requests containing common metadata and handlers */
-type RequestDataBase<TKey extends OnyxKey = OnyxKey> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RequestDataBase<TKey extends OnyxKey = any> = {
     /** Name of the API command */
     command: string;
 
@@ -79,6 +80,7 @@ type RequestDataBase<TKey extends OnyxKey = OnyxKey> = {
     shouldUseSecure?: boolean;
 
     /** Promise resolve handler */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolve?: (value: Response<TKey>) => void;
 
     /** Promise reject handler */
