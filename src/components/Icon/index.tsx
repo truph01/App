@@ -4,14 +4,11 @@ import type {LayoutChangeEvent, StyleProp, ViewStyle} from 'react-native';
 import {PixelRatio, StyleSheet, View} from 'react-native';
 import {useSharedValue} from 'react-native-reanimated';
 import type {SharedValue} from 'react-native-reanimated';
+import type {AttachmentCarouselPagerStateContextType} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
 import {
     useAttachmentCarouselPagerActions,
     useAttachmentCarouselPagerState,
 } from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
-import type {
-    AttachmentCarouselPagerActionsContextType,
-    AttachmentCarouselPagerStateContextType,
-} from '@components/Attachments/AttachmentCarousel/Pager/types';
 import ImageSVG from '@components/ImageSVG';
 import MultiGestureCanvas, {DEFAULT_ZOOM_RANGE} from '@components/MultiGestureCanvas';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -116,8 +113,8 @@ function Icon({
     );
 
     const isScrollingEnabledFallback = useSharedValue(false);
-    const state: AttachmentCarouselPagerStateContextType | null = useAttachmentCarouselPagerState();
-    const actions: AttachmentCarouselPagerActionsContextType | null = useAttachmentCarouselPagerActions();
+    const state = useAttachmentCarouselPagerState();
+    const actions = useAttachmentCarouselPagerActions();
 
     const {onTap, onSwipeDown, pagerRef, isScrollEnabled}: IconCarouselPagerProps = useMemo((): IconCarouselPagerProps => {
         if (state === null || actions === null) {

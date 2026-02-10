@@ -8,7 +8,14 @@ import Animated, {scrollTo, useAnimatedRef, useSharedValue} from 'react-native-r
 import CarouselActions from '@components/Attachments/AttachmentCarousel/CarouselActions';
 import CarouselButtons from '@components/Attachments/AttachmentCarousel/CarouselButtons';
 import CarouselItem from '@components/Attachments/AttachmentCarousel/CarouselItem';
-import {AttachmentCarouselPagerProvider} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
+import {
+    AttachmentCarouselPagerActionsContext,
+    AttachmentCarouselPagerStateContext,
+} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
+import type {
+    AttachmentCarouselPagerActionsContextType,
+    AttachmentCarouselPagerStateContextType,
+} from '@components/Attachments/AttachmentCarousel/Pager/types';
 import type {UpdatePageProps} from '@components/Attachments/AttachmentCarousel/types';
 import useCarouselContextEvents from '@components/Attachments/AttachmentCarousel/useCarouselContextEvents';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';
@@ -149,7 +156,7 @@ function AttachmentCarouselView({
         [cellWidth],
     );
 
-    const stateValue = useMemo(
+    const stateValue = useMemo<AttachmentCarouselPagerStateContextType>(
         () => ({
             pagerItems: [{source, index: 0, isActive: true}],
             activePage: 0,
@@ -160,7 +167,7 @@ function AttachmentCarouselView({
         [source, isPagerScrolling, isScrollEnabled],
     );
 
-    const actionsValue = useMemo(
+    const actionsValue = useMemo<AttachmentCarouselPagerActionsContextType>(
         () => ({
             onTap: handleTap,
             onScaleChanged: handleScaleChange,
@@ -261,31 +268,33 @@ function AttachmentCarouselView({
                         autoHideArrow={autoHideArrows}
                         cancelAutoHideArrow={cancelAutoHideArrow}
                     />
-                    <AttachmentCarouselPagerProvider state={stateValue} actions={actionsValue}>
-                        <DeviceAwareGestureDetector
-                            canUseTouchScreen={canUseTouchScreen}
-                            gesture={pan}
-                        >
-                            <Animated.FlatList
-                                keyboardShouldPersistTaps="handled"
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                // scrolling is controlled by the pan gesture
-                                scrollEnabled={false}
-                                ref={scrollRef}
-                                initialScrollIndex={page}
-                                initialNumToRender={3}
-                                windowSize={5}
-                                maxToRenderPerBatch={CONST.MAX_TO_RENDER_PER_BATCH.CAROUSEL}
-                                data={attachments}
-                                renderItem={renderItem}
-                                getItemLayout={getItemLayout}
-                                keyExtractor={extractItemKey}
-                                viewabilityConfig={viewabilityConfig}
-                                onViewableItemsChanged={updatePage}
-                            />
-                        </DeviceAwareGestureDetector>
-                    </AttachmentCarouselPagerProvider>
+                    <AttachmentCarouselPagerStateContext.Provider value={stateValue}>
+                        <AttachmentCarouselPagerActionsContext.Provider value={actionsValue}>
+                            <DeviceAwareGestureDetector
+                                canUseTouchScreen={canUseTouchScreen}
+                                gesture={pan}
+                            >
+                                <Animated.FlatList
+                                    keyboardShouldPersistTaps="handled"
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    // scrolling is controlled by the pan gesture
+                                    scrollEnabled={false}
+                                    ref={scrollRef}
+                                    initialScrollIndex={page}
+                                    initialNumToRender={3}
+                                    windowSize={5}
+                                    maxToRenderPerBatch={CONST.MAX_TO_RENDER_PER_BATCH.CAROUSEL}
+                                    data={attachments}
+                                    renderItem={renderItem}
+                                    getItemLayout={getItemLayout}
+                                    keyExtractor={extractItemKey}
+                                    viewabilityConfig={viewabilityConfig}
+                                    onViewableItemsChanged={updatePage}
+                                />
+                            </DeviceAwareGestureDetector>
+                        </AttachmentCarouselPagerActionsContext.Provider>
+                    </AttachmentCarouselPagerStateContext.Provider>
                     <CarouselActions onCycleThroughAttachments={cycleThroughAttachments} />
                 </>
             )}
