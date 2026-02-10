@@ -40,7 +40,6 @@ type ApprovalOption = {
     icon: IconAsset;
     onSelected: () => void;
     keyForList: string;
-    subMenuHeaderText?: string;
 };
 
 type ApprovalDropdownOptionProps = {
@@ -78,7 +77,6 @@ function getApprovalDropdownOptions({
             icon: illustrations.ThumbsUp,
             onSelected: onPartialApprove,
             keyForList: APPROVE_PARTIAL,
-            subMenuHeaderText: translate('iou.confirmApprovalWithHeldAmount'),
         });
     }
 
@@ -88,7 +86,6 @@ function getApprovalDropdownOptions({
         icon: illustrations.DocumentCheck,
         onSelected: onFullApprove,
         keyForList: APPROVE_FULL,
-        subMenuHeaderText: translate('iou.confirmApprovalWithHeldAmount'),
     });
 
     return options;

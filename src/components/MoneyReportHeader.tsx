@@ -1228,7 +1228,7 @@ function MoneyReportHeader({
               translate,
               illustrations: expensifyIcons,
           })
-        : [];
+        : undefined;
 
     const connectedIntegrationName = connectedIntegration ? translate('workspace.accounting.connectionName', {connectionName: connectedIntegration}) : '';
     const unapproveWarningText = useMemo(
