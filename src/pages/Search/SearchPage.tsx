@@ -375,7 +375,9 @@ function SearchPage({route}: SearchPageProps) {
                 reportIDList:
                     selectedReports.length > 0
                         ? (selectedReports.map((report) => report?.reportID).filter((reportID) => reportID !== undefined) ?? [])
-                        : (Object.values(selectedTransactions ?? {}).map((transaction) => transaction?.reportID ?? '') ?? []),
+                        : (Object.values(selectedTransactions ?? {})
+                              .map((transaction) => transaction?.reportID)
+                              ?.filter((reportID) => reportID !== undefined) ?? []),
 
                 transactionIDList: selectedTransactionsKeys,
             },
