@@ -7552,8 +7552,6 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             endReading: 'Fine lettura',
             saveForLater: 'Salva per dopo',
             totalDistance: 'Distanza totale',
-            startPhotoTitle: 'Foto iniziale del contachilometri',
-            endPhotoTitle: 'Foto contachilometri finale',
             startMessageWeb: 'Aggiungi una foto del contachilometri all’<strong>inizio</strong> del tuo viaggio. Trascina qui un file oppure scegli un file da caricare.',
             endMessageWeb: 'Aggiungi una foto del contachilometri scattata alla <strong>fine</strong> del viaggio. Trascina qui un file oppure scegli un file da caricare.',
             startTitle: 'Inizio contachilometri',

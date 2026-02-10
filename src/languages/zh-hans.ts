@@ -7380,8 +7380,6 @@ ${reportName}
             endReading: '结束阅读',
             saveForLater: '稍后保存',
             totalDistance: '总距离',
-            startPhotoTitle: '起始里程表照片',
-            endPhotoTitle: '结束里程表照片',
             startMessageWeb: '从行程<strong>开始</strong>时添加一张里程表照片。将文件拖到此处或选择一个文件上传。',
             endMessageWeb: '在行程<strong>结束</strong>时添加一张里程表照片。将文件拖到此处或选择一个文件上传。',
             startTitle: '起始里程表读数',

@@ -7510,8 +7510,6 @@ const translations = {
             endReading: 'End reading',
             saveForLater: 'Save for later',
             totalDistance: 'Total distance',
-            startPhotoTitle: 'Odometer start photo',
-            endPhotoTitle: 'Odometer end photo',
             startTitle: 'Odometer start',
             endTitle: 'Odometer end',
             deleteOdometerPhoto: 'Delete odometer photo',

@@ -7491,8 +7491,6 @@ ${reportName}
             endReading: '読み終える',
             saveForLater: '後で保存',
             totalDistance: '合計距離',
-            startPhotoTitle: '走行距離計の開始時の写真',
-            endPhotoTitle: '走行距離計（終了時）の写真',
             startMessageWeb: '旅行の<strong>開始時</strong>のオドメーターの写真を追加してください。ここにファイルをドラッグするか、またはアップロードするファイルを選択してください。',
             endMessageWeb: '旅行の<strong>終了時</strong>の走行距離計の写真を追加してください。ここにファイルをドラッグするか、アップロードするファイルを選択してください。',
             startTitle: '走行距離計の開始',
