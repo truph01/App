@@ -98,6 +98,10 @@ function IOURequestStepDestination({
     };
 
     const updateDestination = (destination: ListItem & {currency: string}) => {
+        if (openedFromStartPage && policy?.id && shouldRestrictUserBillableActions(policy.id)) {
+            return Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
+        }
+
         if (isEmptyObject(customUnit)) {
             return;
         }
@@ -106,9 +110,6 @@ function IOURequestStepDestination({
             if (openedFromStartPage) {
                 if (iouType === CONST.IOU.TYPE.CREATE && transaction?.isFromGlobalCreate) {
                     targetReport = getPolicyExpenseChat(accountID, defaultExpensePolicy?.id);
-                }
-                if (targetReport?.policyID && shouldRestrictUserBillableActions(targetReport.policyID)) {
-                    return Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(targetReport.policyID));
                 }
                 setTransactionReport(transactionID, {reportID: targetReport?.reportID}, true);
                 setMoneyRequestParticipantsFromReport(transactionID, targetReport, accountID);
