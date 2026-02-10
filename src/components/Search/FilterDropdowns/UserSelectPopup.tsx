@@ -80,7 +80,10 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
 
             const optionData = getSelectedOptionData(participant);
             if (optionData) {
-                acc.push(optionData);
+                acc.push({
+                    ...optionData,
+                    keyForList: optionData.keyForList ?? optionData.reportID,
+                });
             }
 
             return acc;
@@ -130,12 +133,12 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
     ]);
 
     const filteredOptions = useMemo(() => {
-        return filterAndOrderOptions(optionsList, cleanSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, reports, {
+        return filterAndOrderOptions(optionsList, cleanSearchTerm, countryCode, loginList, currentUserEmail, currentUserAccountID, reports, personalDetails, {
             excludeLogins: CONST.EXPENSIFY_EMAILS_OBJECT,
             maxRecentReportsToShow: CONST.IOU.MAX_RECENT_REPORTS_TO_SHOW,
             canInviteUser: false,
         });
-    }, [optionsList, cleanSearchTerm, countryCode, loginList, currentUserAccountID, currentUserEmail, reports]);
+    }, [optionsList, cleanSearchTerm, countryCode, loginList, currentUserAccountID, currentUserEmail, reports, personalDetails]);
 
     const listData = useMemo(() => {
         const personalDetailList = filteredOptions.personalDetails.map((participant) => ({

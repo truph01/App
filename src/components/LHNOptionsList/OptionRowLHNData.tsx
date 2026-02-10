@@ -22,6 +22,7 @@ function OptionRowLHNData({
     isOptionFocused = false,
     fullReport,
     reportAttributes,
+    reportAttributesDerived,
     oneTransactionThreadReport,
     reportNameValuePairs,
     reportActions,
@@ -51,7 +52,6 @@ function OptionRowLHNData({
 
     const [movedFromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getMovedReportID(lastAction, CONST.REPORT.MOVE_TYPE.FROM)}`, {canBeMissing: true});
     const [movedToReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getMovedReportID(lastAction, CONST.REPORT.MOVE_TYPE.TO)}`, {canBeMissing: true});
-    const [visibleReportActionsData] = useOnyx(ONYXKEYS.DERIVED.VISIBLE_REPORT_ACTIONS, {canBeMissing: true});
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fullReport?.chatReportID}`, {canBeMissing: true});
     // Check the report errors equality to avoid re-rendering when there are no changes
     const prevReportErrors = usePrevious(reportAttributes?.reportErrors);
@@ -81,7 +81,7 @@ function OptionRowLHNData({
             movedToReport,
             currentUserAccountID,
             chatReport,
-            visibleReportActionsData,
+            reportAttributesDerived,
         });
         if (deepEqual(item, optionItemRef.current)) {
             return optionItemRef.current;
@@ -118,7 +118,7 @@ function OptionRowLHNData({
         movedFromReport,
         movedToReport,
         currentUserAccountID,
-        visibleReportActionsData,
+        reportAttributesDerived,
     ]);
 
     return (

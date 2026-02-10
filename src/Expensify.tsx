@@ -1,6 +1,5 @@
 import HybridAppModule from '@expensify/react-native-hybrid-app';
 import * as Sentry from '@sentry/react-native';
-import {Audio} from 'expo-av';
 import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import type {NativeEventSubscription} from 'react-native';
 import {AppState, Linking, Platform} from 'react-native';
@@ -47,10 +46,8 @@ import './libs/Notification/PushNotification/subscribeToPushNotifications';
 // This lib needs to be imported, but it has nothing to export since all it contains is an Onyx connection
 import './libs/registerPaginationConfig';
 import setCrashlyticsUserId from './libs/setCrashlyticsUserId';
-import StartupTimer from './libs/StartupTimer';
 import {endSpan, getSpan, startSpan} from './libs/telemetry/activeSpans';
-// This lib needs to be imported, but it has nothing to export since all it contains is an Onyx connection
-import './libs/telemetry/TelemetrySynchronizer';
+import {cleanupMemoryTrackingTelemetry, initializeMemoryTrackingTelemetry} from './libs/telemetry/TelemetrySynchronizer';
 // This lib needs to be imported, but it has nothing to export since all it contains is an Onyx connection
 import './libs/UnreadIndicatorUpdater';
 import Visibility from './libs/Visibility';
@@ -133,6 +130,13 @@ function Expensify() {
 
     useDebugShortcut();
     usePriorityMode();
+
+    useEffect(() => {
+        initializeMemoryTrackingTelemetry();
+        return () => {
+            cleanupMemoryTrackingTelemetry();
+        };
+    }, []);
 
     const bootsplashSpan = useRef<Sentry.Span>(null);
 
@@ -297,10 +301,6 @@ function Expensify() {
             }
         }, 30 * 1000);
 
-        // This timer is set in the native layer when launching the app and we stop it here so we can measure how long
-        // it took for the main app itself to load.
-        StartupTimer.stop();
-
         // Run any Onyx schema migrations and then continue loading the main app
         migrateOnyx().then(() => {
             // In case of a crash that led to disconnection, we want to remove all the push notifications.
@@ -329,11 +329,6 @@ function Expensify() {
             appStateChangeListener.current?.remove();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't want this effect to run again
-    }, []);
-
-    // This is being done since we want to play sound even when iOS device is on silent mode, to align with other platforms.
-    useEffect(() => {
-        Audio.setAudioModeAsync({playsInSilentModeIOS: true});
     }, []);
 
     useEffect(() => {
