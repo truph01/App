@@ -9,7 +9,9 @@ In Expensify, **tags** represent attributes like classes, projects, cost centers
 
 Workspace Admins can create tags manually, import them from a spreadsheet, or sync them from an accounting system like QuickBooks Online, Intacct, Xero, or NetSuite. Once created, tags can be enabled or disabled as needed. Over time, Expensify also learns your tag preferences and applies them automatically.
 
-![The Tags tab]({{site.url}}/assets/images/ExpensifyHelp_R4_Tags_2.png){:width="100%"}
+The Tags table displays the tag **Name**, **GL Code** (if assigned), and whether it's **Required** for expenses.
+
+![The Tags tab]({{site.url}}/assets/images/NewExpensify_ManageTags_3.png){:width="100%"}
 
 ---
 
@@ -22,13 +24,24 @@ Before you can manage tags, you need to enable the **Tags** feature for your wor
 3. Select **More Features**. 
 4. In the **Organize** section, toggle **Tags** on. 
 
-![The toggle to enable Tags]({{site.url}}/assets/images/ExpensifyHelp_R4_Tags_1.png){:width="100%"}
-
 ---
 
 # How to add expense Tags 
 
-## How manually add a single expense tag 
+## Manually Add A Single Tag
+
+1. Go to **Workspaces > [Workspace Name] > Tags**.
+2. Click **Add Tag** at the top of the page.
+3. Enter a name and click **Save**.
+
+## Import A Single Level Of Tags From A Spreadsheet
+
+1. Go to **Workspaces > [Workspace Name] > Tags**.
+2. Click **More > Import spreadsheet** (or if you haven't added any tags yet, just click **Import** from the main Tags settings page).
+3. Click **Single level of tags**.
+4. Click **Choose File** and select the file to import.
+5. Toggle the "File contains column headers" on or off accordingly, then select which spreadsheet column should be mapped to which tag field. We require columns Name and Enabled, and you can optionally include a column for Tag GL Code. GL codes will be visible to Workspace Admins in the Tags table.
+6. Click **Import** to finish importing the tags.
 
 1. In the **navigation tabs** (on the left on web, and at the bottom on mobile), click **Workspaces**.
 2. Select your **workspace name**.
@@ -157,4 +170,9 @@ It will be removed from the workspace’s tag list. However, it will still appea
 ## Why can’t I enable multi-level tags?
 
 If you are connected to an accounting integration, you will not see this feature. You will need to add those tags in your accounting system first, then sync the connection.
+
+## How can my Employees see the GL Codes?
+
+GL codes are visible to Workspace Admins in the Tags table but are not visible to workspace members. If you need members to see GL codes, consider including the GL code in the tag
+name itself.
 
