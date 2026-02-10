@@ -46,7 +46,10 @@ import type {
     OutstandingReportsByPolicyIDDerivedValue,
     ReportAttributesDerivedValue,
     ReportTransactionsAndViolationsDerivedValue,
+    TodoMetadata,
+    TodosDerivedValue,
 } from './DerivedValues';
+import type DeviceBiometrics from './DeviceBiometrics';
 import type DismissedProductTraining from './DismissedProductTraining';
 import type DismissedReferralBanners from './DismissedReferralBanners';
 import type Domain from './Domain';
@@ -332,6 +335,8 @@ export type {
     OutstandingReportsByPolicyIDDerivedValue,
     NonPersonalAndWorkspaceCardListDerivedValue,
     CardFeedErrorsDerivedValue,
+    TodosDerivedValue,
+    TodoMetadata,
     ScheduleCallDraft,
     ValidateUserAndGetAccessiblePolicies,
     VacationDelegate,
@@ -345,4 +350,5 @@ export type {
     DomainSecurityGroup,
     CodingRuleMatchingTransaction,
     UserSecurityGroupData,
+    DeviceBiometrics,
 };

@@ -13,7 +13,7 @@ import {useSession} from '@components/OnyxListItemProvider';
 import PerDiemEReceipt from '@components/PerDiemEReceipt';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
-import {usePlaybackContext} from '@components/VideoPlayerContexts/PlaybackContext';
+import {usePlaybackActionsContext, usePlaybackStateContext} from '@components/VideoPlayerContexts/PlaybackContext';
 import useFirstRenderRoute from '@hooks/useFirstRenderRoute';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -138,7 +138,8 @@ function AttachmentView({
     const session = useSession();
     const encryptedAuthToken = session?.encryptedAuthToken ?? '';
     const {translate} = useLocalize();
-    const {updateCurrentURLAndReportID, currentlyPlayingURL, playVideo} = usePlaybackContext();
+    const {currentlyPlayingURL} = usePlaybackStateContext();
+    const {updateCurrentURLAndReportID, playVideo} = usePlaybackActionsContext();
 
     const attachmentCarouselPagerContext = useContext(AttachmentCarouselPagerContext);
     const {onAttachmentError, onTap} = attachmentCarouselPagerContext ?? {};
