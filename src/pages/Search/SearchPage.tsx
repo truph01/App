@@ -18,7 +18,7 @@ import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import {useSearchContext} from '@components/Search/SearchContext';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {PaymentData, SearchParams} from '@components/Search/types';
-import {usePlaybackContext} from '@components/VideoPlayerContexts/PlaybackContext';
+import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
 import useAllTransactions from '@hooks/useAllTransactions';
 import useBulkPayOptions from '@hooks/useBulkPayOptions';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -80,7 +80,7 @@ import {
     isSelfDM,
 } from '@libs/ReportUtils';
 import {buildSearchQueryJSON} from '@libs/SearchQueryUtils';
-import {shouldShowDeleteOption} from '@libs/SearchUIUtils';
+import {navigateToSearchRHP, shouldShowDeleteOption} from '@libs/SearchUIUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {hasTransactionBeenRejected} from '@libs/TransactionUtils';
 import type {ReceiptFile} from '@pages/iou/request/step/IOURequestStepScan/types';
@@ -512,7 +512,18 @@ function SearchPage({route}: SearchPageProps) {
                 const transactionsViolations = allTransactionViolations
                     ? Object.fromEntries(Object.entries(allTransactionViolations).filter((entry): entry is [string, TransactionViolations] => !!entry[1]))
                     : {};
-                bulkDeleteReports(hash, selectedTransactions, currentUserPersonalDetails.email ?? '', accountID, reportTransactions, transactionsViolations, bankAccountList, transactions);
+                bulkDeleteReports(
+                    allReports,
+                    selfDMReport,
+                    hash,
+                    selectedTransactions,
+                    currentUserPersonalDetails.email ?? '',
+                    accountID,
+                    reportTransactions,
+                    transactionsViolations,
+                    bankAccountList,
+                    transactions,
+                );
                 clearSelectedTransactions();
             });
         });
@@ -530,6 +541,8 @@ function SearchPage({route}: SearchPageProps) {
         bankAccountList,
         clearSelectedTransactions,
         transactions,
+        allReports,
+        selfDMReport,
     ]);
 
     const onBulkPaySelected = useCallback(
@@ -900,7 +913,7 @@ function SearchPage({route}: SearchPageProps) {
                     const isDismissed = areAllTransactionsFromSubmitter ? dismissedHoldUseExplanation : dismissedRejectUseExplanation;
 
                     if (isDismissed) {
-                        Navigation.navigate(ROUTES.TRANSACTION_HOLD_REASON_RHP);
+                        navigateToSearchRHP(ROUTES.TRANSACTION_HOLD_REASON_SEARCH, ROUTES.TRANSACTION_HOLD_REASON_RHP);
                     } else if (areAllTransactionsFromSubmitter) {
                         setIsHoldEducationalModalVisible(true);
                     } else {
@@ -981,7 +994,7 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.DocumentMerge,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_REPORT,
                 shouldCloseModalOnSelect: true,
-                onSelected: () => Navigation.navigate(ROUTES.MOVE_TRANSACTIONS_SEARCH_RHP),
+                onSelected: () => Navigation.navigate(ROUTES.MOVE_TRANSACTIONS_SEARCH_RHP.getRoute()),
             });
         }
 
@@ -1168,7 +1181,7 @@ function SearchPage({route}: SearchPageProps) {
         validateFiles(files, Array.from(e.dataTransfer?.items ?? []));
     };
 
-    const {resetVideoPlayerData} = usePlaybackContext();
+    const {resetVideoPlayerData} = usePlaybackActionsContext();
 
     const metadata = searchResults?.search;
     const shouldShowFooter = !!metadata?.count || selectedTransactionsKeys.length > 0;
@@ -1258,7 +1271,7 @@ function SearchPage({route}: SearchPageProps) {
         setIsHoldEducationalModalVisible(false);
         setNameValuePair(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION, true, false, !isOffline);
         if (hash && selectedTransactionsKeys.length > 0) {
-            Navigation.navigate(ROUTES.TRANSACTION_HOLD_REASON_RHP);
+            navigateToSearchRHP(ROUTES.TRANSACTION_HOLD_REASON_SEARCH, ROUTES.TRANSACTION_HOLD_REASON_RHP);
         }
     }, [hash, selectedTransactionsKeys.length, isOffline]);
 
@@ -1266,7 +1279,7 @@ function SearchPage({route}: SearchPageProps) {
         if (rejectModalAction === CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD) {
             dismissRejectUseExplanation();
             if (hash && selectedTransactionsKeys.length > 0) {
-                Navigation.navigate(ROUTES.TRANSACTION_HOLD_REASON_RHP);
+                navigateToSearchRHP(ROUTES.TRANSACTION_HOLD_REASON_SEARCH, ROUTES.TRANSACTION_HOLD_REASON_RHP);
             }
         } else {
             dismissRejectUseExplanation();
