@@ -1,9 +1,9 @@
-import { useMemo, useRef, useState } from 'react';
-import { Gesture } from 'react-native-gesture-handler';
-import type { SharedValue } from 'react-native-reanimated';
-import { useAnimatedReaction, useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
-import { useChartInteractionState } from './useChartInteractionState';
+import {useMemo, useRef, useState} from 'react';
+import {Gesture} from 'react-native-gesture-handler';
+import type {SharedValue} from 'react-native-reanimated';
+import {useAnimatedReaction, useAnimatedStyle, useDerivedValue} from 'react-native-reanimated';
+import {scheduleOnRN} from 'react-native-worklets';
+import {useChartInteractionState} from './useChartInteractionState';
 
 /** Gap between bar top and tooltip bottom */
 const TOOLTIP_BAR_GAP = 8;
@@ -209,7 +209,7 @@ function useChartInteractions({handlePress, checkIsOver, chartBottom, yZero}: Us
             position: 'absolute',
             left: chartInteractionState.x.position.get(),
             top: barTopY - TOOLTIP_BAR_GAP,
-            transform: [{ translateX: '-50%' }, { translateY: '-100%' }],
+            transform: [{translateX: '-50%'}, {translateY: '-100%'}],
             opacity: chartInteractionState.isActive.get() ? 1 : 0,
         };
     });
@@ -228,5 +228,5 @@ function useChartInteractions({handlePress, checkIsOver, chartBottom, yZero}: Us
     };
 }
 
-export { useChartInteractions, TOOLTIP_BAR_GAP };
-export type { HitTestArgs };
+export {useChartInteractions, TOOLTIP_BAR_GAP};
+export type {HitTestArgs};

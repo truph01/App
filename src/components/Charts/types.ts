@@ -1,4 +1,4 @@
-import type { Color } from '@shopify/react-native-skia';
+import type {Color} from '@shopify/react-native-skia';
 import type IconAsset from '@src/types/utils/IconAsset';
 
 type ChartDataPoint = {
@@ -64,4 +64,4 @@ type ProcessedSlice = {
 
 type YAxisUnitPosition = 'left' | 'right';
 
-export type { ChartDataPoint, CartesianChartProps, PieChartProps, ProcessedSlice, YAxisUnitPosition };
+export type {ChartDataPoint, CartesianChartProps, PieChartProps, ProcessedSlice, YAxisUnitPosition};
