@@ -2495,6 +2495,15 @@ describe('initSplitExpense', () => {
 });
 
 describe('addSplitExpenseField', () => {
+    const expenseReport = {
+        reportID: '456',
+        type: CONST.REPORT.TYPE.EXPENSE,
+        stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+        statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+        total: 100,
+        currency: 'USD',
+    };
+
     it('should add new split expense field to draft transaction', async () => {
         const transaction: Transaction = {
             transactionID: '123',
@@ -2528,7 +2537,6 @@ describe('addSplitExpenseField', () => {
                         category: 'Food',
                         tags: ['lunch'],
                         created: DateUtils.getDBTime(),
-                        isManuallyEdited: true, // Lock the existing split so new split gets remaining amount
                     },
                 ],
                 attendees: [],
@@ -2540,7 +2548,7 @@ describe('addSplitExpenseField', () => {
             reportID: '456',
         };
 
-        addSplitExpenseField(transaction, draftTransaction);
+        addSplitExpenseField(transaction, draftTransaction, expenseReport);
         await waitForBatchedUpdates();
 
         const updatedDraftTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transaction.transactionID}`);
@@ -2548,7 +2556,7 @@ describe('addSplitExpenseField', () => {
 
         const splitExpenses = updatedDraftTransaction?.comment?.splitExpenses;
         expect(splitExpenses).toHaveLength(2);
-        expect(splitExpenses?.[1].amount).toBe(50); // New split gets remaining 50 from total 100 - 50 locked
+        expect(splitExpenses?.[1].amount).toBe(0);
         expect(splitExpenses?.[1].description).toBe('Test comment');
         expect(splitExpenses?.[1].category).toBe('Food');
         expect(splitExpenses?.[1].tags).toEqual(['lunch']);
@@ -2590,7 +2598,6 @@ describe('addSplitExpenseField', () => {
                         tags: ['lunch'],
                         created: DateUtils.getDBTime(),
                         reimbursable: false, // Existing split - not reimbursable
-                        isManuallyEdited: true, // Lock the existing split so new split gets remaining amount
                     },
                 ],
                 attendees: [],
@@ -2604,7 +2611,7 @@ describe('addSplitExpenseField', () => {
         };
 
         // Action: Add a new split expense field
-        addSplitExpenseField(cardTransaction, draftTransaction);
+        addSplitExpenseField(cardTransaction, draftTransaction, expenseReport);
         await waitForBatchedUpdates();
 
         const updatedDraftTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${cardTransaction.transactionID}`);
@@ -2615,7 +2622,7 @@ describe('addSplitExpenseField', () => {
 
         // Verify: The new split should have reimbursable: false (not counted as out-of-pocket)
         expect(splitExpenses?.[1].reimbursable).toBe(false);
-        expect(splitExpenses?.[1].amount).toBe(50); // New split gets remaining 50 from total 100 - 50 locked
+        expect(splitExpenses?.[1].amount).toBe(0);
         expect(splitExpenses?.[1].description).toBe('Card transaction');
         expect(splitExpenses?.[1].category).toBe('Food');
         expect(splitExpenses?.[1].tags).toEqual(['lunch']);
