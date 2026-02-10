@@ -2160,10 +2160,6 @@ const staticStyles = (theme: ThemeColors) =>
             flex: 4,
         },
 
-        textInputComposeAfterClear: {
-            justifyContent: 'center',
-        },
-
         // composer padding should not be modified unless thoroughly tested against the cases in this PR: #12669
         textInputComposeSpacing: {
             paddingVertical: 5,
