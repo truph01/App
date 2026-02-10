@@ -849,11 +849,6 @@ function getLastMessageTextForReport({
         lastMessageTextFromReport = lastVisibleMessage?.lastMessageText;
     }
 
-    // If the last action differs from last original action, it means there's a hidden action (like a whisper), then use getLastVisibleMessage to get the preview text
-    if (!lastMessageTextFromReport && !lastReportAction && !!lastOriginalReportAction && isWhisperAction(lastOriginalReportAction)) {
-        return lastVisibleMessage?.lastMessageText ?? '';
-    }
-
     if (reportID && !lastMessageTextFromReport && reportUtilsIsMoneyRequestReport(report)) {
         const transactions = getReportTransactions(reportID);
         const scanningTransactions = transactions.filter((transaction) => isScanning(transaction));
@@ -865,6 +860,11 @@ function getLastMessageTextForReport({
         } else if (report?.transactionCount === 0) {
             lastMessageTextFromReport = translate('report.noActivityYet');
         }
+    }
+
+    // If the last action differs from last original action, it means there's a hidden action (like a whisper), then use getLastVisibleMessage to get the preview text
+    if (!lastMessageTextFromReport && !lastReportAction && !!lastOriginalReportAction) {
+        return lastVisibleMessage?.lastMessageText ?? '';
     }
 
     return lastMessageTextFromReport || (report?.lastMessageText ?? '');
