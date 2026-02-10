@@ -101,7 +101,10 @@ function ReportActionItem({
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
     const {accountID: currentUserAccountID, login: currentUserLogin} = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
-    // Use policyForMovingExpensesID when policyID is fake to ensure tag edits on moved expenses use the correct workspace's tag lists
+    // When an expense is moved from a self-DM to a workspace, the report's policyID is temporarily
+    // set to a fake placeholder (CONST.POLICY.OWNER_EMAIL_FAKE). Looking up POLICY_TAGS with that
+    // fake ID would return nothing, so we fall back to policyForMovingExpensesID (the actual
+    // destination workspace) to fetch the correct tag list for display.
     const policyIDForTags = report?.policyID === CONST.POLICY.OWNER_EMAIL_FAKE && policyForMovingExpensesID ? policyForMovingExpensesID : report?.policyID;
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyIDForTags}`, {canBeMissing: true});
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
@@ -171,7 +174,7 @@ function ReportActionItem({
                 policy,
                 movedFromReport,
                 movedToReport,
-                policyTags,
+                policyTags: policyTags ?? CONST.POLICY.DEFAULT_TAG_LIST,
                 currentUserLogin: currentUserLogin ?? '',
             })}
             getTransactionsWithReceipts={getTransactionsWithReceipts}
