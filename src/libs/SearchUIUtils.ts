@@ -821,7 +821,7 @@ function getSuggestedSearches(
                     type: CONST.SEARCH.DATA_TYPES.EXPENSE,
                     groupBy: CONST.SEARCH.GROUP_BY.MONTH,
                     dateOn: CONST.SEARCH.DATE_PRESETS.YEAR_TO_DATE,
-                    view: CONST.SEARCH.VIEW.BAR,
+                    view: CONST.SEARCH.VIEW.LINE,
                 },
                 {
                     sortBy: CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH,
