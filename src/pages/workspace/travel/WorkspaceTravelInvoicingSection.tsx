@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
+import ActivityIndicator from '@components/ActivityIndicator';
 import AnimatedSubmitButton from '@components/AnimatedSubmitButton';
 import ConfirmModal from '@components/ConfirmModal';
 import MenuItem from '@components/MenuItem';
@@ -79,9 +80,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         settlementFrequency === CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.MONTHLY
             ? translate('workspace.expensifyCard.frequency.monthly')
             : translate('workspace.expensifyCard.frequency.daily');
-
-    // Check if toggle is loading or has pending action
-    const isLoading = cardSettings?.isLoading ?? false;
 
     // Format currency values (assuming USD for Travel Invoicing based on PROGRAM_TRAVEL_US)
     const formattedSpend = convertToDisplayString(travelSpend, CONST.CURRENCY.USD);
@@ -182,7 +180,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             switchAccessibilityLabel: translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subtitle'),
             isActive: isTravelInvoicingEnabled,
             onToggle: handleToggle,
-            disabled: isLoading,
+            disabled: isTogglePendingAction,
             pendingAction: togglePendingAction,
             errors: toggleErrors,
             onCloseError: () => clearToggleTravelInvoicingErrors(workspaceAccountID),
@@ -278,6 +276,14 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 onCloseError={item.onCloseError}
                 subMenuItems={item.subMenuItems}
             />
+            {isTogglePendingAction && (
+                <View style={[styles.flexRow, styles.justifyContentCenter, styles.alignItemsCenter, styles.mt2]}>
+                    <ActivityIndicator
+                        size="small"
+                        testID="activity-indicator"
+                    />
+                </View>
+            )}
         </Section>
     );
 

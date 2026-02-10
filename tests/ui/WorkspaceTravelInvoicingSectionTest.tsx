@@ -319,4 +319,46 @@ describe('WorkspaceTravelInvoicingSection', () => {
             expect(screen.getByText('Settlement frequency')).toBeTruthy();
         });
     });
+
+    describe('Loading indicator', () => {
+        const cardSettingsKey = `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${WORKSPACE_ACCOUNT_ID}` as OnyxKey;
+
+        it('should show loading indicator when toggle has a pending action', async () => {
+            // Given the toggle action is in flight (pendingAction = ADD, isLoading = true)
+            await act(async () => {
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
+                await Onyx.merge(cardSettingsKey, {
+                    isEnabled: true,
+                    isLoading: true,
+                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                });
+                await waitForBatchedUpdatesWithAct();
+            });
+
+            // When rendering the component
+            renderWorkspaceTravelInvoicingSection();
+            await waitForBatchedUpdatesWithAct();
+
+            // Then the loading indicator should be visible
+            expect(screen.getByTestId('activity-indicator')).toBeTruthy();
+        });
+
+        it('should NOT show loading indicator when only isLoading is true without pendingAction (page fetch)', async () => {
+            // Given the page is loading data (isLoading = true, but no pendingAction)
+            await act(async () => {
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
+                await Onyx.merge(cardSettingsKey, {
+                    isLoading: true,
+                });
+                await waitForBatchedUpdatesWithAct();
+            });
+
+            // When rendering the component
+            renderWorkspaceTravelInvoicingSection();
+            await waitForBatchedUpdatesWithAct();
+
+            // Then the loading indicator should NOT be visible
+            expect(screen.queryByTestId('activity-indicator')).toBeNull();
+        });
+    });
 });
