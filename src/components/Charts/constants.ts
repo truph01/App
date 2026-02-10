@@ -2,7 +2,7 @@
 const Y_AXIS_TICK_COUNT = 5;
 
 /** Desired visual gap (px) between axis labels and the chart edge, used for both axes */
-const AXIS_LABEL_GAP = 8;
+const AXIS_LABEL_GAP = 12;
 
 /** Chart padding */
 const CHART_PADDING = 5;
