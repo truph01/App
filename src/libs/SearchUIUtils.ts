@@ -489,9 +489,12 @@ function createTopSearchMenuItem(
     groupBy: ValueOf<typeof CONST.SEARCH.GROUP_BY>,
     limit?: number,
 ): SearchTypeMenuItem {
-    const isCategory = groupBy === CONST.SEARCH.GROUP_BY.CATEGORY;
-    const defaultSortBy = isCategory ? CONST.SEARCH.TABLE_COLUMNS.GROUP_CATEGORY : CONST.SEARCH.TABLE_COLUMNS.GROUP_TOTAL;
-    const defaultSortOrder = isCategory ? CONST.SEARCH.SORT_ORDER.ASC : CONST.SEARCH.SORT_ORDER.DESC;
+    const groupByToSortColumn: Partial<Record<ValueOf<typeof CONST.SEARCH.GROUP_BY>, string>> = {
+        [CONST.SEARCH.GROUP_BY.CATEGORY]: CONST.SEARCH.TABLE_COLUMNS.GROUP_CATEGORY,
+        [CONST.SEARCH.GROUP_BY.MERCHANT]: CONST.SEARCH.TABLE_COLUMNS.GROUP_MERCHANT,
+    };
+    const defaultSortBy = groupByToSortColumn[groupBy] ?? CONST.SEARCH.TABLE_COLUMNS.GROUP_TOTAL;
+    const defaultSortOrder = groupByToSortColumn[groupBy] ? CONST.SEARCH.SORT_ORDER.ASC : CONST.SEARCH.SORT_ORDER.DESC;
 
     const searchQuery = buildQueryStringFromFilterFormValues(
         {
