@@ -784,9 +784,9 @@ function ComposerWithSuggestions({
             focus,
             replaceSelectionWithText,
             isFocused: () => !!textInputRef.current?.isFocused(),
+            getCurrentText,
             clearWorklet,
             resetHeight,
-            getCurrentText,
         }),
         [blur, focus, replaceSelectionWithText, clearWorklet, resetHeight, getCurrentText],
     );
