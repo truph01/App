@@ -289,8 +289,7 @@ function HeaderWithBackButton({
                                         onPress={onRotateButtonPress}
                                         style={[styles.touchableButtonImage]}
                                         role="button"
-                                        accessibilityLabel={translate('common.rotate')}
-                                        
+                                        accessibilityLabel={translate('common.rotate')}                                        
                                         sentryLabel={CONST.SENTRY_LABEL.HEADER.ROTATE_BUTTON}
                                     >
                                         <Icon
