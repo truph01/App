@@ -414,14 +414,16 @@ function IOURequestStepDistance({
             }
 
             setOptimisticWaypoints(newWaypoints);
+            const shouldPassSplitDraft = isEditingSplit && !isEmpty(splitDraftTransaction);
+
             Promise.all([
-                removeWaypoint(currentTransaction, emptyWaypointIndex.toString(), shouldUseTransactionDraft(action)),
-                updateWaypointsUtil(transactionID, newWaypoints, shouldUseTransactionDraft(action)),
+                removeWaypoint(currentTransaction, emptyWaypointIndex.toString(), shouldUseTransactionDraft(action), shouldPassSplitDraft ? splitDraftTransaction : undefined),
+                updateWaypointsUtil(transactionID, newWaypoints, transactionState),
             ]).then(() => {
                 setOptimisticWaypoints(null);
             });
         },
-        [waypointItems, currentTransaction, action, transactionID, getWaypoint, waypoints],
+        [waypointItems, getWaypoint, waypoints, isEditingSplit, splitDraftTransaction, currentTransaction, action, transactionID, transactionState],
     );
 
     const submitWaypoints = useCallback(() => {

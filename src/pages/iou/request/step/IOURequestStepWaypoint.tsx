@@ -232,7 +232,7 @@ function IOURequestStepWaypoint({
                                 text={translate('common.remove')}
                                 style={[styles.mb3]}
                                 onPress={() => {
-                                    removeWaypoint(transaction, pageIndex, shouldUseTransactionDraft(action));
+                                    removeWaypoint(transaction, pageIndex, shouldUseTransactionDraft(action), shouldPassSplitDraft ? splitDraftTransaction : undefined);
                                     goBack();
                                 }}
                                 large

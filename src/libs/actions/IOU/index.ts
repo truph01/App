@@ -3514,6 +3514,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
             const preservedMerchant = merchant || optimisticTransaction.merchant;
             const {merchant: omittedMerchant, ...existingTransactionWithoutMerchant} = existingTransaction;
             optimisticTransaction = fastMerge(existingTransactionWithoutMerchant, optimisticTransaction, false) as OnyxTypes.Transaction;
+
             // Explicitly set merchant from splitExpense to ensure it's not overwritten
             optimisticTransaction.merchant = preservedMerchant;
         } else {
