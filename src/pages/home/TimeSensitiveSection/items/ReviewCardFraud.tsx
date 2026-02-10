@@ -19,16 +19,16 @@ type ReviewCardFraudProps = {
 function ReviewCardFraud({possibleFraud}: ReviewCardFraudProps) {
     const {translate} = useLocalize();
 
-    const fraudAlertReportID = possibleFraud.fraudAlertReportID;
-    const triggerAmount = possibleFraud.triggerAmount;
-    const triggerMerchant = possibleFraud.triggerMerchant;
-    const triggerCurrency = possibleFraud.triggerCurrency;
+    const fraudAlertReportID = possibleFraud?.fraudAlertReportID ?? 0;
+    const triggerAmount = possibleFraud?.triggerAmount ?? 0;
+    const triggerMerchant = possibleFraud?.triggerMerchant ?? 'Merchant';
+    const currency = possibleFraud?.currency ?? DEFAULT_CURRENCY;
 
     // Generate the title with amount and merchant if available
     const title =
         triggerAmount !== undefined && triggerMerchant
             ? translate('homePage.timeSensitiveSection.reviewCardFraud.titleWithDetails', {
-                  amount: convertToDisplayString(triggerAmount, triggerCurrency ?? DEFAULT_CURRENCY),
+                  amount: convertToDisplayString(triggerAmount, currency),
                   merchant: triggerMerchant,
               })
             : translate('homePage.timeSensitiveSection.reviewCardFraud.title');

@@ -30,7 +30,7 @@ type PossibleFraudData = {
     triggerMerchant?: string;
 
     /** Currency of the transaction that triggered the fraud detection */
-    triggerCurrency?: string;
+    currency?: string;
 
     /** Report ID for the fraud alert action (used for deeplink) */
     fraudAlertReportID?: number;
