@@ -197,7 +197,7 @@ function ReportActionCompose({
     const icons = useMemoizedLazyExpensifyIcons(['MessageInABottle']);
 
     const suggestionsRef = useRef<SuggestionsRef>(null);
-    const composerRef = useRef<ComposerRef | undefined>(undefined);
+    const composerRef = useRef<ComposerRef | null>(null);
     const reportParticipantIDs = useMemo(
         () =>
             Object.keys(report?.participants ?? {})
@@ -576,7 +576,7 @@ function ReportActionCompose({
                         />
                         <ComposerWithSuggestions
                             ref={(ref) => {
-                                composerRef.current = ref ?? undefined;
+                                composerRef.current = ref;
                                 composerRefShared.set({
                                     clearWorklet: ref?.clearWorklet,
                                 });
