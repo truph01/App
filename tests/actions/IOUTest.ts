@@ -9158,6 +9158,7 @@ describe('actions/IOU', () => {
                             }
 
                             deleteWorkspace({
+                                policies: {[policy.id]: policy},
                                 policyID: policy.id,
                                 personalPolicyID: undefined,
                                 activePolicyID: undefined,

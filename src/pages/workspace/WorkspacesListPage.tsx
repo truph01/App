@@ -216,6 +216,7 @@ function WorkspacesListPage() {
         }
 
         deleteWorkspace({
+            policies,
             policyID: policyIDToDelete,
             activePolicyID,
             policyName: policyNameToDelete,
