@@ -5,9 +5,9 @@ import type {SearchQueryString} from '@components/Search/types';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useSidePanel from '@hooks/useSidePanel';
 import {queueExportSearchWithTemplate as queueExportSearchWithTemplateAction} from '@libs/actions/Search';
 import {ExportSearchWithTemplateParams} from '@libs/API/parameters';
+import useSidePanelActions from './useSidePanelActions';
 
 /**
  * Hook that provides a standardized export progress modal with an optional "Open Concierge" button.
@@ -18,7 +18,7 @@ function useExportProgressModal() {
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const {openSidePanel} = useSidePanel();
+    const {openSidePanel} = useSidePanelActions();
     const {clearSelectedTransactions} = useSearchContext();
 
     const showExportProgressModal = useCallback(async () => {
@@ -29,7 +29,7 @@ function useExportProgressModal() {
             cancelText: translate('export.openConcierge'),
             shouldShowCancelButton: !shouldUseNarrowLayout,
         });
-
+        console.log('>>>>>>>>>>>>>>', result);
         if (result.action === ModalActions.CLOSE) {
             openSidePanel();
         }
