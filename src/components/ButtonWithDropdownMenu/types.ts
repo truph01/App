@@ -141,14 +141,6 @@ type ButtonWithDropdownMenuProps<TValueType> = WithSentryLabel & {
     /** Icon for main button */
     icon?: IconAsset;
 
-    iconFill?: string;
-
-    iconRightFill?: string;
-
-    iconHoverFill?: string;
-
-    iconRightHoverFill?: string;
-
     /** Whether the popover content should be scrollable */
     shouldPopoverUseScrollView?: boolean;
 
