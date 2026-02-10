@@ -1921,6 +1921,7 @@ const translations: TranslationDeepObject<typeof en> = {
             viewConsole: 'Console bekijken',
         },
         security: 'Beveiliging',
+        signOut: 'Afmelden',
         restoreStashed: 'Opgeslagen login herstellen',
         signOutConfirmationText: 'Je verliest alle offline wijzigingen als je je afmeldt.',
         versionLetter: 'v',
