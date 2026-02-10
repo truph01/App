@@ -753,14 +753,13 @@ function SearchPage({route}: SearchPageProps) {
             const connectedIntegration = getConnectedIntegration(policy);
             const isReportsTab = typeExpenseReport;
 
-            // Helper function to check if a single report can be exported
             const canReportBeExported = (report: (typeof selectedReports)[0]) => {
                 if (!report.reportID) {
                     return false;
                 }
 
                 const reportPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
-                const completeReport = getReportOrDraftReport(report.reportID);
+                const completeReport = getReportOrDraftReport(report.reportID) ?? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`];
 
                 if (!completeReport) {
                     return false;
@@ -777,7 +776,6 @@ function SearchPage({route}: SearchPageProps) {
                 return reportExportOptions.includes(CONST.REPORT.EXPORT_OPTIONS.EXPORT_TO_INTEGRATION);
             };
 
-            // Check if all selected reports can be exported using existing logic
             const canExportAllReports = isReportsTab && selectedReportIDs.length > 0 && includeReportLevelExport && selectedReports.every(canReportBeExported);
 
             // Add accounting integration export options if conditions are met
@@ -820,12 +818,14 @@ function SearchPage({route}: SearchPageProps) {
                                     }
 
                                     if (hash) {
+                                        clearSelectedTransactions();
                                         exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
                                     }
                                 });
                             } else if (hash) {
                                 setAccountingExportModalVisible(true);
                                 exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration);
+                                clearSelectedTransactions();
                             }
                         },
                         shouldCloseModalOnSelect: true,
