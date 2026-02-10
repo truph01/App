@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import type {GestureResponderEvent} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import RenderHTML from '@components/RenderHTML';
@@ -8,9 +8,8 @@ import useLocalize from '@hooks/useLocalize';
 import {openLink} from '@libs/actions/Link';
 import {explain} from '@libs/actions/Report';
 import {hasReasoning} from '@libs/ReportActionsUtils';
-import {getOriginalReportID} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import type {ReportAction} from '@src/types/onyx';
+import type {Report, ReportAction} from '@src/types/onyx';
 import ReportActionItemBasicMessage from './ReportActionItemBasicMessage';
 
 type ReportActionItemMessageWithExplainProps = {
@@ -20,15 +19,18 @@ type ReportActionItemMessageWithExplainProps = {
     /** All the data of the action item */
     action: OnyxEntry<ReportAction>;
 
-    /** The report ID of linked report */
-    reportID: string | undefined;
+    /** The child report of the action item */
+    childReport: OnyxEntry<Report>;
+
+    /** Original report from which the given reportAction is first created */
+    originalReport: OnyxEntry<Report>;
 };
 
 /**
  * Wrapper component that renders a message and automatically appends the "Explain" link
  * if the action has reasoning.
  */
-function ReportActionItemMessageWithExplain({message, action, reportID}: ReportActionItemMessageWithExplainProps) {
+function ReportActionItemMessageWithExplain({message, action, childReport, originalReport}: ReportActionItemMessageWithExplainProps) {
     const {translate} = useLocalize();
     const personalDetail = useCurrentUserPersonalDetails();
     const {environmentURL} = useEnvironment();
@@ -36,20 +38,16 @@ function ReportActionItemMessageWithExplain({message, action, reportID}: ReportA
     const actionHasReasoning = hasReasoning(action);
     const computedMessage = actionHasReasoning ? `${message}${translate('iou.AskToExplain')}` : message;
 
-    const handleLinkPress = useCallback(
-        (event: GestureResponderEvent | KeyboardEvent, href: string) => {
-            // Handle the special "Explain" link
-            if (href.endsWith(CONST.CONCIERGE_EXPLAIN_LINK_PATH)) {
-                const actionOriginalReportID = getOriginalReportID(reportID, action);
-                explain(action, actionOriginalReportID, translate, personalDetail.accountID, personalDetail.timezone);
-                return;
-            }
+    const handleLinkPress = (event: GestureResponderEvent | KeyboardEvent, href: string) => {
+        // Handle the special "Explain" link
+        if (href.endsWith(CONST.CONCIERGE_EXPLAIN_LINK_PATH)) {
+            explain(childReport, originalReport, action, translate, personalDetail.accountID, personalDetail?.timezone);
+            return;
+        }
 
-            // For all other links, use the default link handler
-            openLink(href, environmentURL);
-        },
-        [action, reportID, translate, personalDetail.timezone, personalDetail.accountID, environmentURL],
-    );
+        // For all other links, use the default link handler
+        openLink(href, environmentURL);
+    }
 
     return (
         <ReportActionItemBasicMessage>
