@@ -1,5 +1,5 @@
-import type {OnyxInputOrEntry, ReportAction} from '@src/types/onyx';
 import CONST from '@src/CONST';
+import type {OnyxInputOrEntry, ReportAction} from '@src/types/onyx';
 import {isDeletedAction} from './ReportActionsUtils';
 
 type ParentReportActionDeletionStatusParams = {
@@ -44,8 +44,7 @@ function getParentReportActionDeletionStatus({
 }: ParentReportActionDeletionStatusParams) {
     const canUseParentActionIDForMissingCheck = !shouldRequireParentReportActionID || !!parentReportActionID;
     const isParentActionMissingAfterLoad = !!parentReportID && canUseParentActionIDForMissingCheck && hasLoadedParentReportActions && !parentReportAction;
-    const isParentActionDeleted =
-        !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
+    const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
     const isMissingParentReport = shouldTreatMissingParentReportAsDeleted && !parentReportID && !parentReportAction?.reportActionID;
     const wasParentActionDeleted = isParentActionDeleted || isParentActionMissingAfterLoad || isMissingParentReport;
 
