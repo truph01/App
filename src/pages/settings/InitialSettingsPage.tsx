@@ -87,6 +87,7 @@ type MenuData = {
     iconRight?: IconAsset;
     badgeText?: string;
     badgeStyle?: ViewStyle;
+    sentryLabel?: string;
 };
 
 type Menu = {sectionStyle: StyleProp<ViewStyle>; sectionTranslationKey: TranslationPaths; items: MenuData[]};
@@ -232,6 +233,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             icon: icons.Profile,
             screenName: SCREENS.SETTINGS.PROFILE.ROOT,
             brickRoadIndicator: profileBrickRoadIndicator,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.PROFILE,
             action: () => Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute()),
         },
         {
@@ -239,6 +241,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             icon: icons.Wallet,
             screenName: SCREENS.SETTINGS.WALLET.ROOT,
             brickRoadIndicator: walletBrickRoadIndicator,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.WALLET,
             action: () => Navigation.navigate(ROUTES.SETTINGS_WALLET),
             badgeText: hasActivatedWallet ? convertToDisplayString(userWallet?.currentBalance) : undefined,
         },
@@ -246,18 +249,21 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             translationKey: 'expenseRulesPage.title',
             icon: icons.Bolt,
             screenName: SCREENS.SETTINGS.RULES.ROOT,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.RULES,
             action: () => Navigation.navigate(ROUTES.SETTINGS_RULES),
         },
         {
             translationKey: 'common.preferences',
             icon: icons.Gear,
             screenName: SCREENS.SETTINGS.PREFERENCES.ROOT,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.PREFERENCES,
             action: () => Navigation.navigate(ROUTES.SETTINGS_PREFERENCES),
         },
         {
             translationKey: 'initialSettingsPage.security',
             icon: icons.Lock,
             screenName: SCREENS.SETTINGS.SECURITY,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.SECURITY,
             action: () => Navigation.navigate(ROUTES.SETTINGS_SECURITY),
         },
     ];
@@ -273,6 +279,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                     : undefined,
             badgeText: freeTrialText,
             badgeStyle: freeTrialText ? styles.badgeSuccess : undefined,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.SUBSCRIPTION,
             action: () => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION.route),
         });
     }
@@ -430,6 +437,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                             onSecondaryInteraction={item.link ? (event) => openPopover(item.link, event) : undefined}
                             focused={isFocused}
                             isPaneMenu
+                            sentryLabel={item.sentryLabel}
                             iconRight={item.iconRight}
                             shouldShowRightIcon={item.shouldShowRightIcon}
                             shouldIconUseAutoWidthStyle
@@ -455,6 +463,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                             accessibilityLabel={emojiCode ? `${translate('statusPage.status')}: ${emojiCode}` : translate('statusPage.status')}
                             accessibilityRole="button"
                             accessible
+                            sentryLabel={CONST.SENTRY_LABEL.ACCOUNT.STATUS_PICKER}
                             onPress={() => Navigation.navigate(ROUTES.SETTINGS_STATUS)}
                         >
                             <View style={styles.primaryMediumIcon}>
