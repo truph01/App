@@ -24,7 +24,6 @@ import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentU
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import useConfirmModal from '@hooks/useConfirmModal';
-import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -133,8 +132,6 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isExecuting, singleExecution} = useSingleExecution();
-    const {isProduction} = useEnvironment();
-
     const popoverAnchor = useRef(null);
     const {translate} = useLocalize();
     const focusedRouteName = useNavigationState((state) => findFocusedRoute(state)?.name);
@@ -249,17 +246,13 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             action: () => Navigation.navigate(ROUTES.SETTINGS_WALLET),
             badgeText: hasActivatedWallet ? convertToDisplayString(userWallet?.currentBalance) : undefined,
         },
-        ...(!isProduction
-            ? [
-                  {
-                      translationKey: 'expenseRulesPage.title' as const,
-                      icon: icons.Bolt,
-                      screenName: SCREENS.SETTINGS.RULES.ROOT,
-                      sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.RULES,
-                      action: () => Navigation.navigate(ROUTES.SETTINGS_RULES),
-                  },
-              ]
-            : []),
+        {
+            translationKey: 'expenseRulesPage.title',
+            icon: icons.Bolt,
+            screenName: SCREENS.SETTINGS.RULES.ROOT,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.RULES,
+            action: () => Navigation.navigate(ROUTES.SETTINGS_RULES),
+        },
         {
             translationKey: 'common.preferences',
             icon: icons.Gear,
