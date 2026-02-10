@@ -162,9 +162,6 @@ type CardFeedData = CustomCardFeedData | DirectCardFeedData;
 /** Both custom and direct company feeds */
 type CompanyFeeds = Partial<Record<CompanyCardFeedWithNumber, CardFeedData>>;
 
-/** Custom feed names */
-type CompanyCardNicknames = Partial<Record<CompanyCardFeedWithNumber, string>>;
-
 /** Domain settings model */
 type DomainSettings = {
     /** Domain settings */
@@ -203,20 +200,20 @@ type CardFeedsStatusByDomainID = Record<number, CardFeedsStatus>;
 /**
  * Collection of card feeds status by domain ID
  */
-type WorkspaceCardFeedsStatus = Record<CompanyCardFeedWithNumber, CardFeedsStatus>;
+type WorkspaceCardFeedsStatus = Record<CardFeedWithNumber, CardFeedsStatus>;
 
 /** Card feeds model, including domain settings */
 type CardFeeds = {
     /** Feed settings */
     settings: {
         /** User-friendly feed nicknames */
-        companyCardNicknames?: CompanyCardNicknames;
+        companyCardNicknames?: Partial<Record<CardFeedWithNumber, string>>;
 
         /** Company cards feeds */
-        companyCards?: Partial<Record<CompanyCardFeedWithNumber, CustomCardFeedData>>;
+        companyCards?: Partial<Record<CardFeedWithNumber, CustomCardFeedData>>;
 
         /** Account details */
-        oAuthAccountDetails?: Partial<Record<CompanyCardFeedWithNumber, DirectCardFeedData>>;
+        oAuthAccountDetails?: Partial<Record<CardFeedWithNumber, DirectCardFeedData>>;
 
         /** Collection of card feeds status by domain ID */
         cardFeedsStatus?: WorkspaceCardFeedsStatus;
@@ -300,7 +297,7 @@ type CombinedCardFeed = CustomCardFeedData &
         customFeedName?: string;
 
         /** Feed name */
-        feed: CompanyCardFeedWithNumber;
+        feed: CardFeedWithNumber;
 
         /** Card feed status */
         status?: CardFeedsStatus;
@@ -332,7 +329,6 @@ export type {
     WorkspaceCardFeedsStatus,
     CompanyFeeds,
     CustomCardFeedData,
-    CompanyCardNicknames,
     FundID,
     StatementPeriodEnd,
     StatementPeriodEndDay,

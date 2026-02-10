@@ -1170,10 +1170,7 @@ function hasPolicyWithXeroConnection(adminPolicies: Policy[] | undefined) {
 }
 
 /** Whether the user can send invoice from the workspace */
-function canSendInvoiceFromWorkspace(policyID: string | undefined): boolean {
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const policy = getPolicy(policyID);
+function canSendInvoiceFromWorkspace(policy: OnyxEntry<Policy>): boolean {
     return policy?.areInvoicesEnabled ?? false;
 }
 
@@ -1185,7 +1182,7 @@ function canSubmitPerDiemExpenseFromWorkspace(policy: OnyxEntry<Policy>): boolea
 
 /** Whether the user can send invoice */
 function canSendInvoice(policies: OnyxCollection<Policy> | null, currentUserLogin: string | undefined): boolean {
-    return getActiveAdminWorkspaces(policies, currentUserLogin).some((policy) => canSendInvoiceFromWorkspace(policy.id));
+    return getActiveAdminWorkspaces(policies, currentUserLogin).some((policy) => canSendInvoiceFromWorkspace(policy));
 }
 
 function hasDependentTags(policy: OnyxEntry<Policy>, policyTagList: OnyxEntry<PolicyTagLists>) {
@@ -1861,13 +1858,11 @@ function getMostFrequentEmailDomain(acceptedDomains: string[], policy?: Policy) 
     return mostFrequent.domain;
 }
 
-const getDescriptionForPolicyDomainCard = (domainName: string, policies?: OnyxCollection<Policy>): string => {
+const getDescriptionForPolicyDomainCard = (domainName: string, policies: OnyxCollection<Policy>): string => {
     // A domain name containing a policyID indicates that this is a workspace feed
     const policyID = domainName.match(CONST.REGEX.EXPENSIFY_POLICY_DOMAIN_NAME)?.[1];
     if (policyID) {
-        // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        const policy = getPolicy(policyID.toUpperCase(), policies);
+        const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID.toUpperCase()}`];
         return policy?.name ?? domainName;
     }
     return domainName;
