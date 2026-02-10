@@ -8,7 +8,7 @@ import {CartesianChart, Line, Scatter} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
-import {CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, X_AXIS_LABEL_OFFSET, X_AXIS_LINE_WIDTH, Y_AXIS_LABEL_OFFSET, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
+import {AXIS_LABEL_GAP, CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, X_AXIS_LINE_WIDTH, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
 import fontSource from '@components/Charts/font';
 import type {HitTestArgs} from '@components/Charts/hooks';
 import {useChartInteractions, useChartLabelFormats, useChartLabelLayout, useDynamicYDomain, useTooltipData} from '@components/Charts/hooks';
@@ -160,7 +160,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
             const fontMetrics = font.getMetrics();
             const ascent = Math.abs(fontMetrics.ascent);
             const descent = Math.abs(fontMetrics.descent);
-            const labelY = args.chartBounds.bottom + X_AXIS_LABEL_OFFSET + rotatedLabelYOffset(ascent, descent, angleRad);
+            const labelY = args.chartBounds.bottom + AXIS_LABEL_GAP + rotatedLabelYOffset(ascent, descent, angleRad);
 
             return truncatedLabels.map((label, i) => {
                 if (i % labelSkipInterval !== 0) {
@@ -263,7 +263,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
                                 tickCount: Y_AXIS_TICK_COUNT,
                                 lineWidth: Y_AXIS_LINE_WIDTH,
                                 lineColor: theme.border,
-                                labelOffset: Y_AXIS_LABEL_OFFSET,
+                                labelOffset: AXIS_LABEL_GAP,
                                 domain: yAxisDomain,
                             },
                         ]}
