@@ -1,6 +1,6 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import lodashDebounce from 'lodash/debounce';
-import type {RefObject} from 'react';
+import type {Ref, RefObject} from 'react';
 import React, {memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
 import type {BlurEvent, LayoutChangeEvent, MeasureInWindowOnSuccessCallback, TextInput, TextInputContentSizeChangeEvent, TextInputKeyPressEvent, TextInputScrollEvent} from 'react-native';
 import {DeviceEventEmitter, InteractionManager, NativeModules, StyleSheet, View} from 'react-native';
@@ -142,7 +142,7 @@ type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
         didHideComposerInput?: boolean;
 
         /** Reference to the outer element */
-        ref?: RefObject<ComposerRef | null>;
+        ref?: Ref<ComposerRef | null>;
     };
 
 type SwitchToCurrentReportProps = {
