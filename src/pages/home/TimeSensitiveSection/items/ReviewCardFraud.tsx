@@ -19,7 +19,7 @@ type ReviewCardFraudProps = {
 function ReviewCardFraud({possibleFraud}: ReviewCardFraudProps) {
     const {translate} = useLocalize();
 
-    const fraudAlertReportID = possibleFraud?.fraudAlertReportID ?? 0;
+    const fraudAlertReportID = possibleFraud?.fraudAlertReportID ?? CONST.DEFAULT_NUMBER_ID;
     const triggerAmount = possibleFraud?.triggerAmount ?? 0;
     const triggerMerchant = possibleFraud?.triggerMerchant ?? 'Merchant';
     const currency = possibleFraud?.currency ?? DEFAULT_CURRENCY;
