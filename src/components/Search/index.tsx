@@ -621,8 +621,10 @@ function Search({
                     );
                     const canRejectRequest = email && transactionItem.report ? canRejectReportAction(email, transactionItem.report, transactionItem.policy) : false;
 
-                    const itemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`] as OnyxEntry<Transaction>;
-                    const originalItemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`];
+                    const searchResultsLookupKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`;
+                    const itemTransaction = (searchResults?.data?.[searchResultsLookupKey] ?? transactions?.[searchResultsLookupKey]) as OnyxEntry<Transaction>;
+                    const originalItemTransaction = (searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]
+                        ?? transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]);
 
                     newTransactionList[transactionItem.transactionID] = {
                         transaction: transactionItem,
@@ -873,8 +875,10 @@ function Search({
                     currentTransactions
                         .filter((t) => !isTransactionPendingDelete(t))
                         .map((transactionItem) => {
-                            const itemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`] as OnyxEntry<Transaction>;
-                            const originalItemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`];
+                            const txKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`;
+                            const itemTransaction = (searchResults?.data?.[txKey] ?? transactions?.[txKey]) as OnyxEntry<Transaction>;
+                            const originalItemTransaction = (searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]
+                                ?? transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]);
                             return mapTransactionItemToSelectedEntry(transactionItem, itemTransaction, originalItemTransaction, email ?? '', accountID, outstandingReportsByPolicyID);
                         }),
                 ),
