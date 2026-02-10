@@ -7,7 +7,7 @@ function rand64(): string {
     const buffer = new BigUint64Array(1);
     crypto.getRandomValues(buffer);
 
-    // Right shift by 1 bit to ensure the number is positive (63-bit range)
+    // eslint-disable-next-line no-bitwise
     const positiveValue = buffer[0] >> 1n;
     return BigInt.asIntN(64, positiveValue).toString();
 }
