@@ -1788,6 +1788,8 @@ const CONST = {
         ATTRIBUTE_MIN_DURATION: 'min_duration',
         ATTRIBUTE_FINISHED_MANUALLY: 'finished_manually',
         ATTRIBUTE_SKELETON_PREFIX: 'skeleton.',
+        // Event names
+        EVENT_SKELETON_ATTRIBUTES_UPDATE: 'skeleton_attributes_updated',
         CONFIG: {
             SKELETON_MIN_DURATION: 10_000,
             MEMORY_TRACKING_INTERVAL: 2 * 60 * 1000,

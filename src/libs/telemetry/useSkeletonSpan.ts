@@ -1,7 +1,7 @@
 import type {SpanAttributes} from '@sentry/core';
 import {useEffect, useId} from 'react';
 import CONST from '@src/CONST';
-import {endSpan, startSpan} from './activeSpans';
+import {endSpan, getSpan, startSpan} from './activeSpans';
 
 /**
  * Reason attributes for skeleton spans - describes why the skeleton is being rendered.
@@ -16,10 +16,9 @@ type SkeletonSpanReasonAttributes = SpanAttributes;
  */
 function useSkeletonSpan(component: string, reasonAttributes?: SkeletonSpanReasonAttributes) {
     const reactId = useId();
+    const spanId = `${CONST.TELEMETRY.SPAN_SKELETON}_${component}_${reactId}`;
 
     useEffect(() => {
-        const spanId = `${CONST.TELEMETRY.SPAN_SKELETON}_${component}_${reactId}`;
-
         // Add skeleton namespace to all reason attributes for easy querying in Sentry
         const namespacedAttributes = reasonAttributes
             ? Object.fromEntries(Object.entries(reasonAttributes).map(([key, value]) => [`${CONST.TELEMETRY.ATTRIBUTE_SKELETON_PREFIX}${key}`, value]))
@@ -40,6 +39,17 @@ function useSkeletonSpan(component: string, reasonAttributes?: SkeletonSpanReaso
         return () => endSpan(spanId);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally removing reasonAttributes to prevent re-creating the span on every render if the parameters are unstable
     }, [component, reactId]);
+
+    useEffect(() => {
+        const span = getSpan(spanId);
+        if (!span || !reasonAttributes) {
+            return;
+        }
+
+        const namespacedAttributes = Object.fromEntries(Object.entries(reasonAttributes).map(([key, value]) => [`${CONST.TELEMETRY.ATTRIBUTE_SKELETON_PREFIX}${key}`, value]));
+        span.setAttributes(namespacedAttributes)
+        span.addEvent(CONST.TELEMETRY.EVENT_SKELETON_ATTRIBUTES_UPDATE, namespacedAttributes)
+    }, [reasonAttributes, spanId])
 }
 
 export default useSkeletonSpan;
