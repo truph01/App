@@ -14,7 +14,7 @@ fi
 
 # Extract ruleId from YAML frontmatter of each non-underscore .md file
 # Frontmatter is between --- delimiters; ruleId is on its own line
-> "$OUTPUT_FILE"
+true > "$OUTPUT_FILE"
 for file in "$RULES_DIR"/[!_]*.md; do
     [[ -f "$file" ]] || continue
     grep -m1 '^ruleId:' "$file" | sed 's/^ruleId:[[:space:]]*//' >> "$OUTPUT_FILE"
