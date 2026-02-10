@@ -299,7 +299,6 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                         ...payload,
                     });
 
-                    // Store the scenario response for callback invocation at outcome navigation
                     if (!scenarioAPIResponse.isSuccess) {
                         dispatch({
                             type: 'SET_ERROR',
@@ -309,8 +308,9 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                         });
                         return;
                     }
-                    dispatch({type: 'SET_SCENARIO_RESPONSE', payload: scenarioAPIResponse});
 
+                     // Store the scenario response for callback invocation at outcome navigation
+                    dispatch({type: 'SET_SCENARIO_RESPONSE', payload: scenarioAPIResponse});
                     dispatch({type: 'SET_AUTHENTICATION_METHOD', payload: result.authenticationMethod});
                     dispatch({type: 'SET_AUTHORIZATION_COMPLETE', payload: true});
                 },

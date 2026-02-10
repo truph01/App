@@ -85,6 +85,7 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
             reason: VALUES.REASON.CHALLENGE.CHALLENGE_MISSING,
         };
     }
+
     const keyInfo = createKeyInfoObject({
         publicKey: params.publicKey,
         challenge: params.challenge,
@@ -100,7 +101,6 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
     return {
         isSuccess,
         reason,
-        httpCode,
     };
 }
 
