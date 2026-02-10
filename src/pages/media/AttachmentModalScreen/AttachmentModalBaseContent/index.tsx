@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Animated, {FadeIn, LayoutAnimationConfig, useSharedValue} from 'react-native-reanimated';
 import AttachmentCarousel from '@components/Attachments/AttachmentCarousel';
-import AttachmentCarouselPagerContext from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
+import {AttachmentCarouselPagerProvider} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
 import AttachmentView from '@components/Attachments/AttachmentView';
 import useAttachmentErrors from '@components/Attachments/AttachmentView/useAttachmentErrors';
 import type {Attachment} from '@components/Attachments/types';
@@ -206,19 +206,25 @@ function AttachmentModalBaseContent({
 
     // We need to pass a shared value of type boolean to the context, so `falseSV` acts as a default value.
     const falseSV = useSharedValue(false);
-    const context = useMemo(
+    const stateValue = useMemo(
         () => ({
             pagerItems: [{source: sourceForAttachmentView, index: 0, isActive: true}],
             activePage: 0,
             pagerRef: undefined,
             isPagerScrolling: falseSV,
             isScrollEnabled: falseSV,
+        }),
+        [falseSV, sourceForAttachmentView],
+    );
+
+    const actionsValue = useMemo(
+        () => ({
             onTap: () => {},
             onScaleChanged: () => {},
             onAttachmentError: setAttachmentError,
             ...(shouldCloseOnSwipeDown ? {onSwipeDown: onClose} : {}),
         }),
-        [falseSV, sourceForAttachmentView, setAttachmentError, shouldCloseOnSwipeDown, onClose],
+        [setAttachmentError, shouldCloseOnSwipeDown, onClose],
     );
 
     const shouldDisplayContent = !shouldShowNotFoundPage && !isLoading;
@@ -246,7 +252,7 @@ function AttachmentModalBaseContent({
             />
         ) : (
             !!sourceForAttachmentView && (
-                <AttachmentCarouselPagerContext.Provider value={context}>
+                <AttachmentCarouselPagerProvider state={stateValue} actions={actionsValue}>
                     <AttachmentView
                         containerStyles={[styles.mh5]}
                         source={sourceForAttachmentView}
@@ -262,14 +268,15 @@ function AttachmentModalBaseContent({
                         isUploaded={!isEmptyObject(report)}
                         reportID={reportID ?? (!isEmptyObject(report) ? report.reportID : undefined)}
                     />
-                </AttachmentCarouselPagerContext.Provider>
+                </AttachmentCarouselPagerProvider>
             )
         );
     }, [
         AttachmentContent,
         accountID,
         attachmentID,
-        context,
+        stateValue,
+        actionsValue,
         currentAttachmentLink,
         fallbackSource,
         fileToDisplay,

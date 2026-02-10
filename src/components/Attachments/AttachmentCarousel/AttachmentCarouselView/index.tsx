@@ -8,7 +8,7 @@ import Animated, {scrollTo, useAnimatedRef, useSharedValue} from 'react-native-r
 import CarouselActions from '@components/Attachments/AttachmentCarousel/CarouselActions';
 import CarouselButtons from '@components/Attachments/AttachmentCarousel/CarouselButtons';
 import CarouselItem from '@components/Attachments/AttachmentCarousel/CarouselItem';
-import AttachmentCarouselPagerContext from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
+import {AttachmentCarouselPagerProvider} from '@components/Attachments/AttachmentCarousel/Pager/AttachmentCarouselPagerContext';
 import type {UpdatePageProps} from '@components/Attachments/AttachmentCarousel/types';
 import useCarouselContextEvents from '@components/Attachments/AttachmentCarousel/useCarouselContextEvents';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';
@@ -149,19 +149,25 @@ function AttachmentCarouselView({
         [cellWidth],
     );
 
-    const context = useMemo(
+    const stateValue = useMemo(
         () => ({
             pagerItems: [{source, index: 0, isActive: true}],
             activePage: 0,
             pagerRef,
             isPagerScrolling,
             isScrollEnabled,
+        }),
+        [source, isPagerScrolling, isScrollEnabled],
+    );
+
+    const actionsValue = useMemo(
+        () => ({
             onTap: handleTap,
             onScaleChanged: handleScaleChange,
             onSwipeDown,
             onAttachmentError,
         }),
-        [onAttachmentError, source, isPagerScrolling, isScrollEnabled, handleTap, handleScaleChange, onSwipeDown],
+        [handleTap, handleScaleChange, onSwipeDown, onAttachmentError],
     );
 
     /** Defines how a single attachment should be rendered */
@@ -255,7 +261,7 @@ function AttachmentCarouselView({
                         autoHideArrow={autoHideArrows}
                         cancelAutoHideArrow={cancelAutoHideArrow}
                     />
-                    <AttachmentCarouselPagerContext.Provider value={context}>
+                    <AttachmentCarouselPagerProvider state={stateValue} actions={actionsValue}>
                         <DeviceAwareGestureDetector
                             canUseTouchScreen={canUseTouchScreen}
                             gesture={pan}
@@ -279,7 +285,7 @@ function AttachmentCarouselView({
                                 onViewableItemsChanged={updatePage}
                             />
                         </DeviceAwareGestureDetector>
-                    </AttachmentCarouselPagerContext.Provider>
+                    </AttachmentCarouselPagerProvider>
                     <CarouselActions onCycleThroughAttachments={cycleThroughAttachments} />
                 </>
             )}

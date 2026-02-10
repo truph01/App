@@ -9,7 +9,7 @@ import CarouselItem from '@components/Attachments/AttachmentCarousel/CarouselIte
 import useCarouselContextEvents from '@components/Attachments/AttachmentCarousel/useCarouselContextEvents';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';
 import useThemeStyles from '@hooks/useThemeStyles';
-import AttachmentCarouselPagerContext from './AttachmentCarouselPagerContext';
+import {AttachmentCarouselPagerProvider} from './AttachmentCarouselPagerContext';
 import usePageScrollHandler from './usePageScrollHandler';
 
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
@@ -85,20 +85,26 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
 
     const nativeGestureHandler = Gesture.Native();
 
-    const contextValue = useMemo(
+    const stateValue = useMemo(
         () => ({
             pagerItems,
             activePage: activePageIndex,
             isPagerScrolling,
             isScrollEnabled,
             pagerRef,
+            externalGestureHandler: nativeGestureHandler,
+        }),
+        [pagerItems, activePageIndex, isPagerScrolling, isScrollEnabled, nativeGestureHandler],
+    );
+
+    const actionsValue = useMemo(
+        () => ({
             onTap: handleTap,
             onSwipeDown,
             onScaleChanged: handleScaleChange,
             onAttachmentError,
-            externalGestureHandler: nativeGestureHandler,
         }),
-        [pagerItems, activePageIndex, isPagerScrolling, isScrollEnabled, handleTap, onSwipeDown, handleScaleChange, nativeGestureHandler, onAttachmentError],
+        [handleTap, onSwipeDown, handleScaleChange, onAttachmentError],
     );
 
     const animatedProps = useAnimatedProps(() => ({
@@ -133,7 +139,7 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
     ));
 
     return (
-        <AttachmentCarouselPagerContext.Provider value={contextValue}>
+        <AttachmentCarouselPagerProvider state={stateValue} actions={actionsValue}>
             <GestureDetector gesture={nativeGestureHandler}>
                 <AnimatedPagerView
                     pageMargin={40}
@@ -148,7 +154,7 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
                     {carouselItems}
                 </AnimatedPagerView>
             </GestureDetector>
-        </AttachmentCarouselPagerContext.Provider>
+        </AttachmentCarouselPagerProvider>
     );
 }
 

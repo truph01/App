@@ -1,12 +1,11 @@
 import type {ForwardedRef} from 'react';
-import {createContext} from 'react';
 import type {GestureType} from 'react-native-gesture-handler';
 import type PagerView from 'react-native-pager-view';
 import type {SharedValue} from 'react-native-reanimated';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';
 
 /** The pager items array is used within the pager to render and navigate between the images */
-type AttachmentCarouselPagerItems = Pick<Attachment, 'attachmentID'> & {
+export type AttachmentCarouselPagerItems = Pick<Attachment, 'attachmentID'> & {
     /** The source of the image is used to identify each attachment/page in the pager */
     source: AttachmentSource;
 
@@ -20,7 +19,7 @@ type AttachmentCarouselPagerItems = Pick<Attachment, 'attachmentID'> & {
     isActive: boolean;
 };
 
-type AttachmentCarouselPagerContextValue = {
+export type AttachmentCarouselPagerStateContextType = {
     /** List of attachments displayed in the pager */
     pagerItems: AttachmentCarouselPagerItems[];
 
@@ -36,6 +35,11 @@ type AttachmentCarouselPagerContextValue = {
     /** Indicates if scrolling is enabled for the attachment */
     isScrollEnabled: SharedValue<boolean>;
 
+    /** In case we need a gesture that should work simultaneously with panning in MultiGestureCanvas */
+    externalGestureHandler?: GestureType;
+};
+
+export type AttachmentCarouselPagerActionsContextType = {
     /** Function to call after a tap event */
     onTap?: (shouldShowArrows?: boolean) => void;
 
@@ -47,12 +51,4 @@ type AttachmentCarouselPagerContextValue = {
 
     /** Callback for attachment errors */
     onAttachmentError?: (source: AttachmentSource, state?: boolean) => void;
-
-    /** In case we need a gesture that should work simultaneously with panning in MultiGestureCanvas */
-    externalGestureHandler?: GestureType;
 };
-
-const AttachmentCarouselPagerContext = createContext<AttachmentCarouselPagerContextValue | null>(null);
-
-export default AttachmentCarouselPagerContext;
-export type {AttachmentCarouselPagerContextValue};
