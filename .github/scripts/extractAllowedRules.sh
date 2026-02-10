@@ -17,7 +17,7 @@ fi
 true > "$OUTPUT_FILE"
 for file in "$RULES_DIR"/[!_]*.md; do
     [[ -f "$file" ]] || continue
-    grep -m1 '^ruleId:' "$file" | sed 's/^ruleId:[[:space:]]*//' >> "$OUTPUT_FILE"
+    grep -m1 '^ruleId:' "$file" | sed 's/^ruleId:[[:space:]]*//' >> "$OUTPUT_FILE" || true
 done
 
 sort -u -o "$OUTPUT_FILE" "$OUTPUT_FILE"
