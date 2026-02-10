@@ -766,7 +766,7 @@ function insertZWNJBetweenDigitAndEmoji(input: string): string {
 
     // Fix corrupted key caps that Safari created (key cap followed by emoji indicates corruption)
     // Only fix key caps that are immediately followed by another emoji, preserving legitimate standalone key caps
-    let result = input.replaceAll(/([\d#*])\uFE0F?\u20E3([\u{1F300}-\u{1FAFF}\u{1F000}-\u{1F9FF}\u2600-\u27BF])/gu, '$1\u200C$2');
+    let result = input.replaceAll(CONST.REGEX.CORRUPTED_KEYCAP_FOLLOWED_BY_EMOJI, '$1\u200C$2');
     // Insert ZWNJ between digit/symbol and emoji (the main fix to prevent corruption)
     result = result.replaceAll(CONST.REGEX.DIGIT_OR_SYMBOL_FOLLOWED_BY_EMOJI, '$1\u200C$2');
 
@@ -783,7 +783,7 @@ function getZWNJCursorOffset(text: string, cursorPosition: number | undefined | 
     }
     const textBeforeCursor = text.substring(0, cursorPosition);
     const textWithZWNJBeforeCursor = insertZWNJBetweenDigitAndEmoji(textBeforeCursor);
-    return textWithZWNJBeforeCursor.length - textBeforeCursor.length;
+    return Math.max(0, textWithZWNJBeforeCursor.length - textBeforeCursor.length);
 }
 
 export type {HeaderIndices, EmojiPickerList, EmojiPickerListItem};

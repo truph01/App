@@ -3936,8 +3936,8 @@ const CONST = {
 
         // Regex pattern to match a digit (#, *, or 0-9) followed by an emoji (used for Safari ZWNJ insertion)
         DIGIT_OR_SYMBOL_FOLLOWED_BY_EMOJI: /([\d#*])([\u{1F300}-\u{1FAFF}\u{1F000}-\u{1F9FF}\u2600-\u27BF])/gu,
-        // Regex pattern to match an emoji followed by optional whitespace and then # or * (prevents Safari corruption when * comes after emoji)
-        EMOJI_FOLLOWED_BY_SYMBOL: /([\u{1F300}-\u{1FAFF}\u{1F000}-\u{1F9FF}\u2600-\u27BF])\s*([#*])/gu,
+        // Regex pattern to match a corrupted keycap sequence followed by an emoji
+        CORRUPTED_KEYCAP_FOLLOWED_BY_EMOJI: /([\d#*])\uFE0F?\u20E3([\u{1F300}-\u{1FAFF}\u{1F000}-\u{1F9FF}\u2600-\u27BF])/gu,
 
         TAX_ID: /^\d{9}$/,
         NON_NUMERIC: /\D/g,
