@@ -49,7 +49,7 @@ function deleteLocalPasskeyCredentials(userId: string, rpId: string): void {
     if (!userId || !rpId) {
         throw new Error('userId and rpId are required to delete passkey credentials');
     }
-    Onyx.set(getPasskeyOnyxKey(userId, rpId), null);
+    Onyx.set(getPasskeyOnyxKey(userId, rpId), {credentials: []});
 }
 
 /** Backend returns simplified format without transports */
@@ -78,11 +78,7 @@ function reconcileLocalPasskeysWithBackend({userId, rpId, backendPasskeyCredenti
     const matchedCredentials = localEntry.credentials.filter((c) => backendCredentialIds.has(c.id));
 
     if (matchedCredentials.length !== localEntry.credentials.length) {
-        if (matchedCredentials.length === 0) {
-            deleteLocalPasskeyCredentials(userId, rpId);
-        } else {
-            setLocalPasskeyCredentials({userId, rpId, entry: {credentials: matchedCredentials}});
-        }
+        setLocalPasskeyCredentials({userId, rpId, entry: {credentials: matchedCredentials}});
     }
 
     return matchedCredentials;
