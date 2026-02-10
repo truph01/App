@@ -8,6 +8,9 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {setPolicyTravelSettings} from '@libs/actions/Policy/Travel';
 import {openTravelDotLink} from '@libs/openTravelDotLink';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
+import usePermissions from '@hooks/usePermissions';
+import CONST from '@src/CONST';
+import WorkspaceTravelInvoicingSection from './WorkspaceTravelInvoicingSection';
 
 type GetStartedTravelProps = {
     policyID: string;
@@ -18,6 +21,9 @@ function GetStartedTravel({policyID}: GetStartedTravelProps) {
     const styles = useThemeStyles();
     const policy = usePolicy(policyID);
     const icons = useMemoizedLazyExpensifyIcons(['LuggageWithLines', 'NewWindow'] as const);
+    const {isBetaEnabled} = usePermissions();
+    const isTravelInvoicingEnabled = isBetaEnabled(CONST.BETAS.TRAVEL_INVOICING);
+    const isPreventSpotnanaTravelEnabled = isBetaEnabled(CONST.BETAS.PREVENT_SPOTNANA_TRAVEL);
 
     const autoAddTripName = policy?.travelSettings?.autoAddTripName !== false;
 
@@ -26,6 +32,10 @@ function GetStartedTravel({policyID}: GetStartedTravelProps) {
     };
 
     const handleManageTravel = () => {
+        // TODO: Show the prevention modal when the beta is enabled
+        if (isPreventSpotnanaTravelEnabled) {
+            return;
+        }
         openTravelDotLink(policyID);
     };
 
@@ -55,6 +65,7 @@ function GetStartedTravel({policyID}: GetStartedTravelProps) {
                 pendingAction={policy?.pendingFields?.travelSettings}
                 wrapperStyle={styles.mt3}
             />
+            {isTravelInvoicingEnabled && <WorkspaceTravelInvoicingSection policyID={policyID} />}
         </Section>
     );
 }
