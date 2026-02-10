@@ -56,15 +56,10 @@ describe('actions/Passkey', () => {
             expect(value).toEqual({credentials: [{id: 'existing', type: CONST.PASSKEY_CREDENTIAL_TYPE, transports: [CONST.PASSKEY_TRANSPORT.INTERNAL]}, credential]});
         });
 
-        it('should update existing credential when id matches', async () => {
+        it('should throw error when credential with same id already exists', () => {
             const existingEntry: LocalPasskeyEntry = {credentials: [{id: 'cred-1', type: CONST.PASSKEY_CREDENTIAL_TYPE, transports: [CONST.PASSKEY_TRANSPORT.INTERNAL]}]};
-            const updatedCredential: PasskeyCredential = {id: 'cred-1', type: CONST.PASSKEY_CREDENTIAL_TYPE, transports: [CONST.PASSKEY_TRANSPORT.INTERNAL, CONST.PASSKEY_TRANSPORT.HYBRID]};
 
-            addLocalPasskeyCredential({userId, rpId, credential: updatedCredential, existingEntry});
-            await waitForBatchedUpdates();
-
-            const value = await getOnyxValue(getPasskeyOnyxKey(userId, rpId));
-            expect(value).toEqual({credentials: [updatedCredential]});
+            expect(() => addLocalPasskeyCredential({userId, rpId, credential, existingEntry})).toThrow();
         });
     });
 

@@ -36,14 +36,12 @@ type AddLocalPasskeyCredentialParams = PasskeyScope & {
 
 function addLocalPasskeyCredential({userId, rpId, credential, existingEntry}: AddLocalPasskeyCredentialParams): void {
     const existingCredentials = existingEntry?.credentials ?? [];
-    const credentialExists = existingCredentials.some((c) => c.id === credential.id);
 
-    if (credentialExists) {
-        const updatedCredentials = existingCredentials.map((c) => (c.id === credential.id ? credential : c));
-        setLocalPasskeyCredentials({userId, rpId, entry: {credentials: updatedCredentials}});
-    } else {
-        setLocalPasskeyCredentials({userId, rpId, entry: {credentials: [...existingCredentials, credential]}});
+    if (existingCredentials.some((c) => c.id === credential.id)) {
+        throw new Error(`Passkey credential with id "${credential.id}" already exists for ${userId}@${rpId}`);
     }
+
+    setLocalPasskeyCredentials({userId, rpId, entry: {credentials: [...existingCredentials, credential]}});
 }
 
 /** Deletes all passkey credentials for a user/rpId from Onyx storage */
