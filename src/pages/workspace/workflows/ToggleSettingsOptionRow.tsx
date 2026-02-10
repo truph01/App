@@ -13,6 +13,7 @@ import Tooltip from '@components/Tooltip';
 import useAccordionAnimation from '@hooks/useAccordionAnimation';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Parser from '@libs/Parser';
+import CONST from '@src/CONST';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type IconAsset from '@src/types/utils/IconAsset';
 
@@ -213,9 +214,9 @@ function ToggleSettingOptionRow({
                         style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}
                         onPress={shouldMakeContentPressable ? onPress : undefined}
                         accessibilityLabel={title}
-                        role="button"
+                        role={shouldMakeContentPressable ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
                         accessible={false}
-                        interactive={!!shouldMakeContentPressable}
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TOGGLE_SETTINGS_ROW}
                     >
                         {contentArea}
                     </PressableWithoutFeedback>
