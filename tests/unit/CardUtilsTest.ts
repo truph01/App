@@ -40,6 +40,7 @@ import {
     isCustomFeed as isCustomFeedCardUtils,
     isExpensifyCard,
     isExpensifyCardFullySetUp,
+    isMatchingCard,
     lastFourNumbersFromCardName,
     maskCardNumber,
     sortCardsByCardholderName,
