@@ -43,7 +43,8 @@ You can create an expense by scanning a receipt, entering details manually, or t
 - Forward your digital receipts to receipts@expensify.com.
 - Text a receipt photo to 47777 (US numbers only). Make sure you [add your phone number as a contact method to Expensify](https://new.expensify.com/settings/profile/contact-methods).
 
-**Note:** When submitting expenses to a workspace, [Workspace Merchant Rules](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Merchant-Rules) may automatically apply categories, tags, descriptions, reimbursable status, billable status, and other fields based on the merchant name.
+**Note:** When submitting expenses to a workspace, Workspace Merchant Rules set by your workspace may automatically apply categories, tags, descriptions, reimbursable status, billable status, and other fields based on the merchant name.
+
 
 ---
 
