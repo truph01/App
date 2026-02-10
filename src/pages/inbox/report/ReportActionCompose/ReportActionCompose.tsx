@@ -367,7 +367,18 @@ function ReportActionCompose({
                 onSubmit(newCommentTrimmed);
             }
         },
-        [isConciergeChat, kickoffWaitingIndicator, transactionThreadReport, report, reportID, ancestors, personalDetail.timezone, onSubmit, isInSidePanel],
+        [
+            isConciergeChat,
+            kickoffWaitingIndicator,
+            transactionThreadReport,
+            report,
+            reportID,
+            ancestors,
+            currentUserPersonalDetails.accountID,
+            personalDetail.timezone,
+            isInSidePanel,
+            onSubmit,
+        ],
     );
 
     const onTriggerAttachmentPicker = useCallback(() => {
