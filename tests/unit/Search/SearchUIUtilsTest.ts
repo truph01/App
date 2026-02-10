@@ -3161,6 +3161,59 @@ describe('SearchUIUtils', () => {
             expect(result.end).toBe('2026-01-15');
         });
 
+        it('should correctly intersect multiple date filters (GREATER_THAN and LOWER_THAN) when expanding quarter groups', () => {
+            // This verifies that both date filters are respected when expanding quarter groups
+            const quarterDateRange = DateUtils.getQuarterDateRange(2026, 1);
+            const dateFilter = {
+                key: CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
+                filters: [
+                    {
+                        operator: CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN,
+                        value: '2025-12-02',
+                    },
+                    {
+                        operator: CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN,
+                        value: '2026-02-02',
+                    },
+                ],
+            };
+
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, dateFilter);
+
+            // The start date should be adjusted to 2025-12-03 (GREATER_THAN 2025-12-02 means >= 2025-12-03)
+            // But since quarter starts at 2026-01-01, we take the max: max(2026-01-01, 2025-12-03) = 2026-01-01
+            expect(result.start).toBe('2026-01-01');
+            // The end date should be adjusted to 2026-02-01 (LOWER_THAN 2026-02-02 means <= 2026-02-01)
+            // And we take the min: min(2026-03-31, 2026-02-01) = 2026-02-01
+            expect(result.end).toBe('2026-02-01');
+        });
+
+        it('should correctly intersect GREATER_THAN and LOWER_THAN filters that narrow the range', () => {
+            // Test case where both filters narrow down a quarter range
+            const quarterDateRange = DateUtils.getQuarterDateRange(2025, 4);
+            const dateFilter = {
+                key: CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
+                filters: [
+                    {
+                        operator: CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN,
+                        value: '2025-12-02',
+                    },
+                    {
+                        operator: CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN,
+                        value: '2026-02-02',
+                    },
+                ],
+            };
+
+            const result = SearchUIUtils.adjustTimeRangeToDateFilters(quarterDateRange, dateFilter);
+
+            // The start date should be adjusted to 2025-12-03 (GREATER_THAN 2025-12-02 means >= 2025-12-03)
+            expect(result.start).toBe('2025-12-03');
+            // The end date should be adjusted to 2025-12-31 (quarter end, since 2026-02-01 is outside the quarter)
+            // We take min(2025-12-31, 2026-02-01) = 2025-12-31
+            expect(result.end).toBe('2025-12-31');
+        });
+
         it('should return getQuarterSections result when type is EXPENSE and groupBy is quarter', () => {
             const transactionQuarterGroupListItems: TransactionQuarterGroupListItemType[] = [
                 {
