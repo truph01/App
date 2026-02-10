@@ -63,7 +63,7 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
         }
 
         revokeDomainAdminAccess(route.params.domainAccountID, route.params.accountID);
-        Navigation.dismissModal();
+        Navigation.goBack(ROUTES.WORKSPACES_LIST.route);
     };
 
     return (
