@@ -4,9 +4,9 @@ import {PressableWithoutFeedback} from '@components/Pressable';
 import Text from '@components/Text';
 import useEnvironment from '@hooks/useEnvironment';
 import useThemeStyles from '@hooks/useThemeStyles';
+import type {FooterColumnRow} from '@pages/signin/SignInPageLayout/types';
 import {openLink as openLinkUtil} from '@userActions/Link';
 import CONST from '@src/CONST';
-import type {FooterColumnRow} from './types';
 
 type FooterRowProps = FooterColumnRow & {
     text: string;
