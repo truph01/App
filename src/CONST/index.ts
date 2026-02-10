@@ -750,6 +750,7 @@ const CONST = {
         UBER_FOR_BUSINESS: 'uberForBusiness',
         NEW_DOT_DEW: 'newDotDEW',
         GPS_MILEAGE: 'gpsMileage',
+        ODOMETER_EXPENSES: 'odometerExpenses',
         NEW_DOT_HOME: 'newDotHome',
         SINGLE_USE_AND_EXPIRE_BY_CARDS: 'singleUseAndExpireByCards',
         PERSONAL_CARD_IMPORT: 'personalCardImport',
@@ -2756,6 +2757,14 @@ const CONST = {
             CONFIRM: 'confirm',
         },
     },
+
+    SUBSCRIPTION_SIZE: {
+        PAGE_NAME: {
+            SIZE: 'size',
+            CONFIRM: 'confirm',
+        },
+    },
+
     MISSING_PERSONAL_DETAILS_INDEXES: {
         MAPPING: {
             LEGAL_NAME: 0,
@@ -3546,6 +3555,7 @@ const CONST = {
             AMEX_FILE_DOWNLOAD: 'americanexpressfd.us',
             CSV: 'ccupload',
             MOCK_BANK: 'oauth.mockbank.com',
+            UPLOAD: 'upload',
         },
         FEED_KEY_SEPARATOR: '#',
         CARD_NUMBER_MASK_CHAR: 'X',
@@ -3650,6 +3660,13 @@ const CONST = {
             STRIPE: 'stripe',
             CSV: 'CSV',
         },
+        CARD_TYPE_NAMES: {
+            AMEX: 'American Express',
+            VISA: 'Visa',
+            MASTERCARD: 'Mastercard',
+            STRIPE: 'Stripe',
+            CSV: 'CSV',
+        },
         FEED_TYPE: {
             CUSTOM: 'customFeed',
             DIRECT: 'directFeed',
@@ -3664,6 +3681,8 @@ const CONST = {
             STRIPE: 'Stripe',
             WELLS_FARGO: 'Wells Fargo',
             MOCK_BANK: 'Mock Bank',
+            PEX: 'PEX',
+            EXPENSIFY: 'Expensify',
             OTHER: 'Other',
         },
         BANK_CONNECTIONS: {
@@ -3692,9 +3711,6 @@ const CONST = {
         },
         CARD_NAME: {
             CASH: '__CASH__',
-        },
-        BANK_NAME: {
-            UPLOAD: 'upload',
         },
         CARD_LIST_THRESHOLD: 8,
         DEFAULT_EXPORT_TYPE: 'default',
@@ -7965,6 +7981,9 @@ const CONST = {
             REFUND: 'REFUND',
             EXCHANGE: 'EXCHANGE',
         },
+        SETTINGS: {
+            AUTO_ADD_TRIP_NAME: 'autoAddTripName',
+        },
         /**
          * The Travel Invoicing feed type constant.
          * This feed is used for Travel Invoicing cards which are separate from regular Expensify Cards.
@@ -8087,6 +8106,7 @@ const CONST = {
         HEADER: {
             BACK_BUTTON: 'Header-BackButton',
             DOWNLOAD_BUTTON: 'Header-DownloadButton',
+            ROTATE_BUTTON: 'Header-RotateButton',
             CLOSE_BUTTON: 'Header-CloseButton',
             MORE_BUTTON: 'Header-MoreButton',
         },
@@ -8147,6 +8167,7 @@ const CONST = {
             PURE_REPORT_ACTION_ITEM: 'Report-PureReportActionItem',
             MODERATION_BUTTON: 'Report-ModerationButton',
             MONEY_REQUEST_REPORT_ACTIONS_LIST_SELECT_ALL: 'MoneyRequestReportActionsList-SelectAll',
+            REPORT_ACTION_AVATAR: 'Report-ReportActionAvatar',
         },
         SIDEBAR: {
             SIGN_IN_BUTTON: 'Sidebar-SignInButton',
@@ -8272,6 +8293,12 @@ const CONST = {
         HOME_PAGE: {
             WIDGET_ITEM: 'HomePage-WidgetItem',
         },
+        CALENDAR_PICKER: {
+            YEAR_PICKER: 'CalendarPicker-YearPicker',
+            PREV_MONTH: 'CalendarPicker-PrevMonth',
+            NEXT_MONTH: 'CalendarPicker-NextMonth',
+            DAY: 'CalendarPicker-Day',
+        },
         REPORT_DETAILS: {
             WORKSPACE_LINK: 'ReportDetails-WorkspaceLink',
         },
@@ -8299,6 +8326,9 @@ const CONST = {
         WORKSPACE: {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
+            COMPANY_CARDS: {
+                TABLE_ITEM: 'Workspace-CompanyCards-TableItem',
+            },
         },
         ACCOUNT_SWITCHER: {
             SHOW_ACCOUNTS: 'AccountSwitcher-ShowAccounts',
