@@ -646,8 +646,9 @@ function Search({
 
                     const searchResultsLookupKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`;
                     const itemTransaction = (searchResults?.data?.[searchResultsLookupKey] ?? transactions?.[searchResultsLookupKey]) as OnyxEntry<Transaction>;
-                    const originalItemTransaction = (searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]
-                        ?? transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]);
+                    const originalItemTransaction =
+                        searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`] ??
+                        transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`];
 
                     newTransactionList[transactionItem.transactionID] = {
                         transaction: transactionItem,
@@ -900,8 +901,9 @@ function Search({
                         .map((transactionItem) => {
                             const txKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`;
                             const itemTransaction = (searchResults?.data?.[txKey] ?? transactions?.[txKey]) as OnyxEntry<Transaction>;
-                            const originalItemTransaction = (searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]
-                                ?? transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`]);
+                            const originalItemTransaction =
+                                searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`] ??
+                                transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`];
                             return mapTransactionItemToSelectedEntry(transactionItem, itemTransaction, originalItemTransaction, email ?? '', accountID, outstandingReportsByPolicyID);
                         }),
                 ),
