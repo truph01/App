@@ -22,6 +22,7 @@ import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/Playbac
 import useAllTransactions from '@hooks/useAllTransactions';
 import useBulkPayOptions from '@hooks/useBulkPayOptions';
 import useConfirmModal from '@hooks/useConfirmModal';
+import useConfirmReadyToOpenApp from '@hooks/useConfirmReadyToOpenApp';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useFilesValidation from '@hooks/useFilesValidation';
 import useFilterFormValues from '@hooks/useFilterFormValues';
@@ -36,7 +37,6 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSelfDMReport from '@hooks/useSelfDMReport';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {confirmReadyToOpenApp} from '@libs/actions/App';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter, searchInServer} from '@libs/actions/Report';
 import {
@@ -233,9 +233,7 @@ function SearchPage({route}: SearchPageProps) {
         updateAdvancedFilters(formValues, true);
     }, [formValues]);
 
-    useEffect(() => {
-        confirmReadyToOpenApp();
-    }, []);
+    useConfirmReadyToOpenApp();
 
     useEffect(() => {
         if (!currentSearchResults?.search?.type) {
@@ -1016,7 +1014,9 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.ArrowSplit,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
-                    initSplitExpense(allTransactions, allReports, firstTransaction);
+                    const report = firstTransaction?.reportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${firstTransaction.reportID}`] : undefined;
+                    const transactionPolicy = report?.policyID ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`] : undefined;
+                    initSplitExpense(allTransactions, allReports, firstTransaction, transactionPolicy);
                 },
             });
         }
