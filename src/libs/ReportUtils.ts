@@ -154,7 +154,6 @@ import {
     getForwardsToAccount,
     getManagerAccountEmail,
     getManagerAccountID,
-    getPolicyEmployeeListByIdWithoutCurrentUser,
     getPolicyNameByID,
     getPolicyRole,
     getRuleApprovers,
@@ -1991,13 +1990,6 @@ function shouldEnableNegative(report: OnyxEntry<Report>, policy?: OnyxEntry<Poli
 }
 
 /**
- * Given an array of reports, return them filtered by a policyID and policyMemberAccountIDs.
- */
-function filterReportsByPolicyIDAndMemberAccountIDs(reports: Array<OnyxEntry<Report>>, policyMemberAccountIDs: number[] = [], policyID?: string) {
-    return reports.filter((report) => !!report && doesReportBelongToWorkspace(report, policyMemberAccountIDs, policyID, conciergeReportIDOnyxConnect ?? ''));
-}
-
-/**
  * Returns true if report is still being processed
  */
 function isProcessingReport(report: OnyxEntry<Report>): boolean {
@@ -2263,36 +2255,17 @@ function getMostRecentlyVisitedReport(reports: Array<OnyxEntry<Report>>, reportM
  * This function is used to find the last accessed report and we don't need to subscribe the data in the UI.
  * So please use `Onyx.connectWithoutView()` to get the necessary data when we remove the `Onyx.connect()`
  */
-function findLastAccessedReport(
-    ignoreDomainRooms: boolean,
-    openOnAdminRoom = false,
-    policyID?: string,
-    excludeReportID?: string,
-    archivedReportsIdSet?: ArchivedReportsIDSet,
-): OnyxEntry<Report> {
-    // If it's the user's first time using New Expensify, then they could either have:
-    //   - just a Concierge report, if so we'll return that
-    //   - their Concierge report, and a separate report that must have deeplinked them to the app before they created their account.
-    // If it's the latter, we'll use the deeplinked report over the Concierge report,
-    // since the Concierge report would be incorrectly selected over the deep-linked report in the logic below.
-
-    const policyMemberAccountIDs = getPolicyEmployeeListByIdWithoutCurrentUser(allPolicies, policyID, currentUserAccountID);
-
+function findLastAccessedReport(ignoreDomainRooms: boolean, openOnAdminRoom = false, excludeReportID?: string, archivedReportsIdSet?: ArchivedReportsIDSet): OnyxEntry<Report> {
     let reportsValues = Object.values(allReports ?? {});
 
-    if (!!policyID || policyMemberAccountIDs.length > 0) {
-        reportsValues = filterReportsByPolicyIDAndMemberAccountIDs(reportsValues, policyMemberAccountIDs, policyID);
-    }
-
-    let adminReport: OnyxEntry<Report>;
     if (openOnAdminRoom) {
-        adminReport = reportsValues.find((report) => {
+        const adminReport = reportsValues.find((report) => {
             const chatType = getChatType(report);
             return chatType === CONST.REPORT.CHAT_TYPE.POLICY_ADMINS;
         });
-    }
-    if (adminReport) {
-        return adminReport;
+        if (adminReport) {
+            return adminReport;
+        }
     }
 
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -4385,6 +4358,41 @@ function getMoneyRequestSpendBreakdown(report: OnyxInputOrEntry<Report>, searchR
         nonReimbursableSpend: 0,
         reimbursableSpend: 0,
         totalDisplaySpend: 0,
+    };
+}
+
+function getBillableAndTaxTotal(report: OnyxEntry<Report>, transactions: Array<OnyxEntry<Transaction>>) {
+    let billableTotal = 0;
+    let taxTotal = 0;
+    if (!isExpenseReport(report)) {
+        return {
+            billableTotal: 0,
+            taxTotal: 0,
+        };
+    }
+    for (const transaction of transactions) {
+        if (transaction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+            continue;
+        }
+        const {amount = 0, taxAmount = 0, currency, billable} = getTransactionDetails(transaction) ?? {};
+        if (billable) {
+            if (currency === report?.currency) {
+                billableTotal += amount;
+            } else {
+                billableTotal -= transaction?.convertedAmount ?? 0;
+            }
+        }
+        if (taxAmount) {
+            if (currency === report?.currency) {
+                taxTotal += taxAmount;
+            } else {
+                taxTotal -= transaction?.convertedTaxAmount ?? 0;
+            }
+        }
+    }
+    return {
+        billableTotal,
+        taxTotal,
     };
 }
 
@@ -13212,6 +13220,7 @@ export {
     isOneTransactionReport,
     isTrackExpenseReportNew,
     shouldHideSingleReportField,
+    getBillableAndTaxTotal,
     getReportForHeader,
     isReportOpenOrUnsubmitted,
 };

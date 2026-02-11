@@ -618,8 +618,6 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS.SUBSCRIPTION.SIZE]: {
         canChangeSize: 0 | 1;
-        subPage?: string;
-        action?: 'edit';
     };
     [SCREENS.SETTINGS.SUBSCRIPTION.SETTINGS_DETAILS]: undefined;
     [SCREENS.SETTINGS.SUBSCRIPTION.ADD_PAYMENT_CARD]: undefined;
@@ -1539,6 +1537,12 @@ type SettingsNavigatorParamList = {
         accountID: number;
     };
     [SCREENS.DOMAIN.ADD_MEMBER]: {
+        domainAccountID: number;
+    };
+    [SCREENS.DOMAIN.MEMBERS_SETTINGS]: {
+        domainAccountID: number;
+    };
+    [SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH]: {
         domainAccountID: number;
     };
 } & ReimbursementAccountNavigatorParamList;
