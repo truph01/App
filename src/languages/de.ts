@@ -8468,12 +8468,20 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             findMember: 'Mitglied finden',
             addMember: 'Mitglied hinzufügen',
             email: 'E-Mail-Adresse',
-            closeAccount: 'Konto schließen',
+            closeAccount: () => ({
+                one: 'Konto schließen',
+                other: 'Konten schließen',
+            }),
             closeAccountPrompt: 'Bist du sicher? Diese Aktion ist dauerhaft.',
-            forceCloseAccount: 'Konto zwangsweise schließen',
-            safeCloseAccount: 'Konto sicher schließen',
-            closeAccountInfo:
-                'Wir empfehlen, das Konto sicher zu schließen, um das Schließen zu überspringen, falls Folgendes vorliegt: <ul><li>Ausstehende Genehmigungen</li><li>Aktive Erstattungen</li><li>Keine alternativen Anmeldemethoden</li></ul>Andernfalls können Sie die oben genannten Sicherheitsvorkehrungen ignorieren und das ausgewählte Konto zwangsweise schließen.',
+            forceCloseAccount: () => ({one: 'Konto zwangsweise schließen', other: 'Konten zwangsweise schließen'}),
+            safeCloseAccount: () => ({
+                one: 'Konto sicher schließen',
+                other: 'Konten sicher schließen',
+            }),
+            closeAccountInfo: () => ({
+                one: 'Wir empfehlen, das Konto sicher zu schließen, um das Schließen zu überspringen, falls Folgendes vorliegt: <ul><li>Ausstehende Genehmigungen</li><li>Aktive Erstattungen</li><li>Keine alternativen Anmeldemethoden</li></ul>Andernfalls können Sie die oben genannten Sicherheitsvorkehrungen ignorieren und das ausgewählte Konto zwangsweise schließen.',
+                other: 'Wir empfehlen, die Konten sicher zu schließen, um das Schließen zu überspringen, falls Folgendes vorliegt: <ul><li>Ausstehende Genehmigungen</li><li>Aktive Erstattungen</li><li>Keine alternativen Anmeldemethoden</li></ul>Andernfalls können Sie die oben genannten Sicherheitsvorkehrungen ignorieren und die ausgewählten Konten zwangsweise schließen.',
+            }),
             error: {
                 removeMember: 'Dieser Benutzer kann nicht entfernt werden. Bitte versuche es erneut.',
                 addMember: 'Dieses Mitglied kann nicht hinzugefügt werden. Bitte versuche es erneut.',

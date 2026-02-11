@@ -8417,12 +8417,20 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             findMember: 'Znajdź członka',
             addMember: 'Dodaj członka',
             email: 'Adres e-mail',
-            closeAccount: 'Zamknij konto',
+            closeAccount: () => ({
+                one: 'Zamknij konto',
+                other: 'Zamknij konta',
+            }),
             closeAccountPrompt: 'Czy na pewno? Ta czynność jest nieodwracalna.',
-            forceCloseAccount: 'Wymuś zamknięcie konta',
-            safeCloseAccount: 'Zamknij konto bezpiecznie',
-            closeAccountInfo:
-                'Zalecamy bezpieczne zamknięcie konta, aby pominąć jego zamykanie w przypadku, gdy występują: <ul><li>Oczekujące zatwierdzenia</li><li>Aktywne zwroty kosztów</li><li>Brak alternatywnych metod logowania</li></ul>W przeciwnym razie możesz zignorować powyższe środki ostrożności i wymusić zamknięcie wybranego konta.',
+            forceCloseAccount: () => ({one: 'Wymuś zamknięcie konta', other: 'Wymuś zamknięcie kont'}),
+            safeCloseAccount: () => ({
+                one: 'Zamknij konto bezpiecznie',
+                other: 'Zamknij konta bezpiecznie',
+            }),
+            closeAccountInfo: () => ({
+                one: 'Zalecamy bezpieczne zamknięcie konta, aby pominąć jego zamykanie w przypadku, gdy występują: <ul><li>Oczekujące zatwierdzenia</li><li>Aktywne zwroty kosztów</li><li>Brak alternatywnych metod logowania</li></ul>W przeciwnym razie możesz zignorować powyższe środki ostrożności i wymusić zamknięcie wybranego konta.',
+                other: 'Zalecamy bezpieczne zamknięcie kont, aby pominąć ich zamykanie w przypadku, gdy występują: <ul><li>Oczekujące zatwierdzenia</li><li>Aktywne zwroty kosztów</li><li>Brak alternatywnych metod logowania</li></ul>W przeciwnym razie możesz zignorować powyższe środki ostrożności i wymusić zamknięcie wybranych kont.',
+            }),
             error: {
                 removeMember: 'Nie można usunąć tego użytkownika. Spróbuj ponownie.',
                 addMember: 'Nie można dodać tego członka. Spróbuj ponownie.',

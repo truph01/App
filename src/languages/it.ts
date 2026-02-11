@@ -8452,12 +8452,20 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             findMember: 'Trova membro',
             addMember: 'Aggiungi membro',
             email: 'Indirizzo email',
-            closeAccount: 'Chiudi account',
+            closeAccount: () => ({
+                one: 'Chiudi account',
+                other: 'Chiudi account',
+            }),
             closeAccountPrompt: 'Sei sicuro? Questa azione è permanente.',
-            forceCloseAccount: 'Forza chiusura account',
-            safeCloseAccount: 'Chiudi il conto in sicurezza',
-            closeAccountInfo:
-                'Consigliamo di chiudere l’account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura dell’account selezionato.',
+            forceCloseAccount: () => ({one: 'Forza chiusura account', other: 'Forza chiusura account'}),
+            safeCloseAccount: () => ({
+                one: 'Chiudi il conto in sicurezza',
+                other: 'Chiudi i conti in sicurezza',
+            }),
+            closeAccountInfo: () => ({
+                one: 'Consigliamo di chiudere l’account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura dell’account selezionato.',
+                other: 'Consigliamo di chiudere gli account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura degli account selezionati.',
+            }),
             error: {
                 removeMember: 'Impossibile rimuovere questo utente. Riprova.',
                 addMember: 'Impossibile aggiungere questo membro. Riprova.',

@@ -8421,12 +8421,20 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             findMember: 'Encontrar membro',
             addMember: 'Adicionar membro',
             email: 'Endereço de e-mail',
-            closeAccount: 'Encerrar conta',
+            closeAccount: () => ({
+                one: 'Encerrar conta',
+                other: 'Encerrar contas',
+            }),
             closeAccountPrompt: 'Tem certeza? Esta ação é permanente.',
-            forceCloseAccount: 'Forçar encerramento da conta',
-            safeCloseAccount: 'Fechar conta com segurança',
-            closeAccountInfo:
-                'Recomendamos fechar a conta com segurança para evitar o fechamento caso haja: <ul><li>aprovações pendentes</li><li>reembolsos ativos</li><li>nenhum método de login alternativo</li></ul>Caso contrário, você pode ignorar as precauções de segurança acima e forçar o fechamento da conta selecionada.',
+            forceCloseAccount: () => ({one: 'Forçar encerramento da conta', other: 'Forçar encerramento das contas'}),
+            safeCloseAccount: () => ({
+                one: 'Fechar conta com segurança',
+                other: 'Fechar contas com segurança',
+            }),
+            closeAccountInfo: () => ({
+                one: 'Recomendamos fechar a conta com segurança para evitar o fechamento caso haja: <ul><li>aprovações pendentes</li><li>reembolsos ativos</li><li>nenhum método de login alternativo</li></ul>Caso contrário, você pode ignorar as precauções de segurança acima e forçar o fechamento da conta selecionada.',
+                other: 'Recomendamos fechar as contas com segurança para evitar o fechamento caso haja: <ul><li>aprovações pendentes</li><li>reembolsos ativos</li><li>nenhum método de login alternativo</li></ul>Caso contrário, você pode ignorar as precauções de segurança acima e forçar o fechamento das contas selecionadas.',
+            }),
             error: {
                 removeMember: 'Não foi possível remover este usuário. Tente novamente.',
                 addMember: 'Não foi possível adicionar este membro. Tente novamente.',
