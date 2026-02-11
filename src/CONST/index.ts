@@ -8450,19 +8450,19 @@ const CONST = {
     HOME: {
         ANNOUNCEMENTS: [
             {
-                title: 'Start the year with smarter spending, admin controls, and more.',
+                title: 'Better controls, auto-approvals, & an Uber discount',
                 subtitle: 'Product update',
                 url: 'https://use.expensify.com/blog/expensify-january-2026-product-update',
                 publishedDate: '2026-01-28',
             },
             {
-                title: 'Our favorite features + final upgrades of the year',
+                title: '2025 highlights: 460+ updates, AI upgrades, & more',
                 subtitle: 'Product update',
                 url: 'https://use.expensify.com/blog/expensify-2025-year-end-product-update',
                 publishedDate: '2025-12-22',
             },
             {
-                title: 'Uber for business + Expensify automates ride and meal receipts',
+                title: 'Group expenses, bulk actions, one-click PDFs',
                 subtitle: 'Product update',
                 url: 'https://use.expensify.com/blog/uber-for-business-and-expensify-integration-update',
                 publishedDate: '2025-12-01',
