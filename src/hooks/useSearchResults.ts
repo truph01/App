@@ -1,4 +1,4 @@
-import {useDeferredValue, useEffect, useMemo, useState} from 'react';
+import {useDeferredValue, useEffect, useState} from 'react';
 import CONST from '@src/CONST';
 import usePrevious from './usePrevious';
 
@@ -12,15 +12,11 @@ function useSearchResults<TValue>(data: TValue[], filterData: (datum: TValue, se
     const deferredInput = useDeferredValue(inputValue);
     const prevData = usePrevious(data);
 
-    const result = useMemo(() => {
-        const normalizedSearchQuery = deferredInput.trim().toLowerCase();
+    const searchQuery = inputValue.trim().length ? deferredInput : '';
 
-        // Create shallow copy of data to prevent mutation. When no search query exists, we pass the full dataset
-        // to sortData. If sortData uses Array.sort() (which sorts in place and returns the same reference),
-        // the original data array would be mutated.
-        const filtered = normalizedSearchQuery.length ? data.filter((item) => filterData(item, normalizedSearchQuery)) : [...data];
-        return sortData(filtered);
-    }, [data, filterData, deferredInput, sortData]);
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+    const filtered = normalizedSearchQuery.length ? data.filter((item) => filterData(item, normalizedSearchQuery)) : [...data];
+    const result = sortData(filtered);
 
     useEffect(() => {
         if (prevData.length <= CONST.SEARCH_ITEM_LIMIT || data.length > CONST.SEARCH_ITEM_LIMIT) {
