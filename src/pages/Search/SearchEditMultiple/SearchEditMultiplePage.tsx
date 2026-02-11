@@ -120,7 +120,7 @@ function SearchEditMultiplePage() {
         }
 
         const changes: TransactionChanges = {};
-        if (draftTransaction.amount !== undefined && draftTransaction.amount !== 0) {
+        if (draftTransaction.amount !== undefined) {
             changes.amount = draftTransaction.amount;
         }
         if (draftTransaction.merchant) {
@@ -203,7 +203,7 @@ function SearchEditMultiplePage() {
     const fields: Array<{description: string; title: string; route: Route; disabled?: boolean}> = [
         {
             description: translate('iou.amount'),
-            title: draftTransaction?.amount ? convertToDisplayStringWithoutCurrency(draftTransaction.amount, currency) : '',
+            title: draftTransaction?.amount !== undefined ? convertToDisplayStringWithoutCurrency(draftTransaction.amount, currency) : '',
             route: ROUTES.SEARCH_EDIT_MULTIPLE_AMOUNT_RHP,
             disabled: hasCustomUnitTransaction || hasPartiallyEditableTransaction,
         },

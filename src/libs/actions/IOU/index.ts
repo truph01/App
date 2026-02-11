@@ -13293,7 +13293,7 @@ function updateMultipleMoneyRequests(
         if (changes.created && canEditField(CONST.EDIT_REQUEST_FIELD.DATE)) {
             transactionChanges.created = changes.created;
         }
-        if (changes.amount && canEditField(CONST.EDIT_REQUEST_FIELD.AMOUNT)) {
+        if (changes.amount !== undefined && canEditField(CONST.EDIT_REQUEST_FIELD.AMOUNT)) {
             transactionChanges.amount = changes.amount;
         }
         if (changes.currency && canEditField(CONST.EDIT_REQUEST_FIELD.CURRENCY)) {
@@ -13342,7 +13342,7 @@ function updateMultipleMoneyRequests(
         if (transactionChanges.taxCode) {
             updates.taxCode = transactionChanges.taxCode;
         }
-        if (transactionChanges.amount) {
+        if (transactionChanges.amount !== undefined) {
             updates.amount = transactionChanges.amount;
         }
         if (transactionChanges.billable !== undefined) {
@@ -13395,7 +13395,8 @@ function updateMultipleMoneyRequests(
         });
 
         // To build proper offline update message, we need to include the currency
-        const optimisticTransactionChanges = transactionChanges?.amount && !transactionChanges?.currency ? {...transactionChanges, currency: getCurrency(transaction)} : transactionChanges;
+        const optimisticTransactionChanges =
+            transactionChanges?.amount !== undefined && !transactionChanges?.currency ? {...transactionChanges, currency: getCurrency(transaction)} : transactionChanges;
 
         // Build optimistic modified expense report action
         const optimisticReportAction = buildOptimisticModifiedExpenseReportAction(
