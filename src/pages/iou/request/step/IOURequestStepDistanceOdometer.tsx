@@ -336,7 +336,7 @@ function IOURequestStepDistanceOdometer({
             if (!reportID || !transactionID) {
                 return;
             }
-            Navigation.navigate(ROUTES.TRANSACTION_RECEIPT.getRoute(reportID, transactionID, false, undefined, imageType, action, iouType));
+            Navigation.navigate(ROUTES.MONEY_REQUEST_RECEIPT_PREVIEW.getRoute(reportID, transactionID, action, iouType, imageType));
         },
         [reportID, transactionID, action, iouType],
     );

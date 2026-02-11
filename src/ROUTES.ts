@@ -1101,15 +1101,15 @@ const ROUTES = {
             getUrlWithBackToParam(`${action as string}/${iouType as string}/report/${transactionID}/${reportID}${reportActionID ? `/${reportActionID}` : ''}`, backTo),
     },
     MONEY_REQUEST_RECEIPT_PREVIEW: {
-        route: ':action/:iouType/receipt/:transactionID/:reportID',
-        getRoute: (reportID: string, transactionID: string, action: IOUAction, iouType: IOUType) => {
+        route: ':action/:iouType/receipt/:transactionID/:reportID/:imageType?',
+        getRoute: (reportID: string, transactionID: string, action: IOUAction, iouType: IOUType, imageType?: OdometerImageType) => {
             if (!reportID) {
                 Log.warn('Invalid reportID is used to build the MONEY_REQUEST_RECEIPT_PREVIEW route');
             }
             if (!transactionID) {
                 Log.warn('Invalid transactionID is used to build the MONEY_REQUEST_RECEIPT_PREVIEW route');
             }
-            return `${action}/${iouType}/receipt/${transactionID}/${reportID}?readonly=false` as const;
+            return `${action}/${iouType}/receipt/${transactionID}/${reportID}?readonly=false${imageType ? `&imageType=${imageType}` : ''}` as const;
         },
     },
     MONEY_REQUEST_EDIT_REPORT: {
@@ -3065,9 +3065,6 @@ const ROUTES = {
             transactionID: string | undefined,
             readonly = false,
             mergeTransactionID?: string,
-            imageType?: OdometerImageType,
-            action?: IOUAction,
-            iouType?: IOUType,
         ) => {
             if (!reportID) {
                 Log.warn('Invalid reportID is used to build the TRANSACTION_RECEIPT route');
@@ -3075,7 +3072,7 @@ const ROUTES = {
             if (!transactionID) {
                 Log.warn('Invalid transactionID is used to build the TRANSACTION_RECEIPT route');
             }
-            return `r/${reportID}/transaction/${transactionID}/receipt${action ? `/${action}` : ''}${iouType ? `/${iouType}` : ''}?readonly=${readonly}${mergeTransactionID ? `&mergeTransactionID=${mergeTransactionID}` : ''}${imageType ? `&imageType=${imageType}` : ''}` as const;
+            return `r/${reportID}/transaction/${transactionID}/receipt?readonly=${readonly}${mergeTransactionID ? `&mergeTransactionID=${mergeTransactionID}` : ''}` as const;
         },
     },
 
