@@ -398,17 +398,23 @@ function SettlementButton({
             };
 
             if (isIndividualInvoiceRoomUtil(chatReport)) {
+                // Gate default so main split button never triggers Pay via Expensify when beta is off (or currency unsupported).
+                const invoiceDefaultValue = isPayInvoiceViaExpensifyBetaEnabled
+                    ? hasIntentToPay
+                        ? CONST.IOU.PAYMENT_TYPE.EXPENSIFY
+                        : (lastPaymentMethod ?? CONST.IOU.PAYMENT_TYPE.ELSEWHERE)
+                    : CONST.IOU.PAYMENT_TYPE.ELSEWHERE;
                 buttonOptions.push({
                     text: translate('iou.settlePersonal', {formattedAmount}),
                     icon: icons.User,
-                    value: hasIntentToPay ? CONST.IOU.PAYMENT_TYPE.EXPENSIFY : (lastPaymentMethod ?? CONST.IOU.PAYMENT_TYPE.ELSEWHERE),
+                    value: invoiceDefaultValue,
                     backButtonText: translate('iou.individual'),
                     subMenuItems: getInvoicesOptions(false),
                 });
                 buttonOptions.push({
                     text: translate('iou.settleBusiness', {formattedAmount}),
                     icon: icons.Building,
-                    value: hasIntentToPay ? CONST.IOU.PAYMENT_TYPE.EXPENSIFY : (lastPaymentMethod ?? CONST.IOU.PAYMENT_TYPE.ELSEWHERE),
+                    value: invoiceDefaultValue,
                     backButtonText: translate('iou.business'),
                     subMenuItems: getInvoicesOptions(true),
                 });
@@ -461,7 +467,7 @@ function SettlementButton({
 
         if (isInvoiceReport) {
             // if user has intent to pay, we should get the only bank account information to pay the invoice.
-            if (hasIntentToPay) {
+            if (hasIntentToPay && isPayInvoiceViaExpensifyBetaEnabled) {
                 const currentBankInformation = formattedPaymentMethods.at(0) as BankAccount;
                 onPress(
                     CONST.IOU.PAYMENT_TYPE.EXPENSIFY,
