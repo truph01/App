@@ -5,28 +5,38 @@ import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {loadIllustration} from '@components/Icon/IllustrationLoader';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
-import {MULTIFACTOR_AUTHENTICATION_OUTCOME_MAP} from '@components/MultifactorAuthentication/config';
-import {getOutcomePath} from '@components/MultifactorAuthentication/config/outcomePaths';
+import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
+import type {MultifactorAuthenticationOutcomeConfig} from '@components/MultifactorAuthentication/config/types';
 import {useMultifactorAuthenticationState} from '@components/MultifactorAuthentication/Context';
 import ScreenWrapper from '@components/ScreenWrapper';
 import {useMemoizedLazyAsset} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
-import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
-import type {MultifactorAuthenticationParamList} from '@libs/Navigation/types';
 import CONST from '@src/CONST';
 import type {MultifactorAuthenticationTranslationParams} from '@src/languages/params';
 import type {TranslationPaths} from '@src/languages/types';
-import type SCREENS from '@src/SCREENS';
-
-type MultifactorAuthenticationOutcomePageProps = PlatformStackScreenProps<MultifactorAuthenticationParamList, typeof SCREENS.MULTIFACTOR_AUTHENTICATION.OUTCOME>;
 
 type MultifactorAuthenticationLocalize = LocaleContextProps & {
     translate: <TPath extends TranslationPaths>(path: TPath, params: MultifactorAuthenticationTranslationParams) => string;
 };
 
-function MultifactorAuthenticationOutcomePage({route}: MultifactorAuthenticationOutcomePageProps) {
+function getOutcomeKey(errorReason: string | undefined): string {
+    if (!errorReason) {
+        return 'success';
+    }
+
+    switch (errorReason) {
+        case CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS:
+            return 'noEligibleMethods';
+        case CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE:
+            return 'unsupportedDevice';
+        default:
+            return 'failure';
+    }
+}
+
+function MultifactorAuthenticationOutcomePage() {
     const {translate} = useLocalize() as MultifactorAuthenticationLocalize;
     const styles = useThemeStyles();
     const {state} = useMultifactorAuthenticationState();
@@ -34,28 +44,19 @@ function MultifactorAuthenticationOutcomePage({route}: MultifactorAuthentication
         Navigation.closeRHPFlow();
     };
 
-    let outcomePath = route.params.outcomeType;
-
-    switch (state.error?.reason) {
-        case CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS:
-            outcomePath = getOutcomePath(state.scenario, 'no-eligible-methods');
-            break;
-        case CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE:
-            outcomePath = getOutcomePath(state.scenario, 'unsupported-device');
-            break;
-        default:
-            break;
-    }
-
-    const data = MULTIFACTOR_AUTHENTICATION_OUTCOME_MAP[outcomePath];
+    const outcomeKey = getOutcomeKey(state.error?.reason);
+    const scenarioConfig = state.scenario ? MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[state.scenario] : undefined;
+    const data: MultifactorAuthenticationOutcomeConfig | undefined = scenarioConfig?.OUTCOMES[outcomeKey as keyof typeof scenarioConfig.OUTCOMES];
 
     const {asset: icon} = useMemoizedLazyAsset(() => loadIllustration(data?.illustration ?? 'HumptyDumpty'));
 
-    // Get text values from outcome config and translate them
-    const headerTitle = translate(data.headerTitle ?? 'multifactorAuthentication.biometricsTest.biometricsAuthentication');
-    const title = translate(data.title ?? 'multifactorAuthentication.oops');
+    const headerTitle = translate(data?.headerTitle ?? 'multifactorAuthentication.biometricsTest.biometricsAuthentication');
+    const title = translate(data?.title ?? 'multifactorAuthentication.oops');
 
-    const description = translate(data.description ?? 'multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful', {authType: state.authenticationMethod?.name, registered: false});
+    const description = translate(data?.description ?? 'multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful', {
+        authType: state.authenticationMethod?.name,
+        registered: false,
+    });
 
     const CustomDescription = data?.customDescription;
     const CustomSubtitle = CustomDescription ? <CustomDescription /> : undefined;

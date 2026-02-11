@@ -2,7 +2,7 @@
  * Configuration types for multifactor authentication UI and scenarios.
  */
 import type {ViewStyle} from 'react-native';
-import type {EmptyObject, KebabCase, Replace, ValueOf} from 'type-fest';
+import type {EmptyObject, ValueOf} from 'type-fest';
 import type {IllustrationName} from '@components/Icon/chunks/illustrations.chunk';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
 import type {
@@ -14,7 +14,7 @@ import type {
 import type CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import type SCREENS from '@src/SCREENS';
-import type {MULTIFACTOR_AUTHENTICATION_PROMPT_UI, MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG, MultifactorAuthenticationScenarioPayload} from './index';
+import type {MULTIFACTOR_AUTHENTICATION_PROMPT_UI, MultifactorAuthenticationScenarioPayload} from './index';
 
 /**
  * Configuration for cancel confirmation modal in multifactor authentication.
@@ -80,59 +80,10 @@ type MultifactorAuthenticationModalOptional = {
  */
 type MultifactorAuthenticationOutcomeOptional = Record<string, Partial<MultifactorAuthenticationOutcomeConfig>>;
 
-/**
- * Type representation of the scenario configuration constant.
- */
-type MultifactorAuthenticationConfigRecordConst = typeof MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG;
-
-/**
- * Maps each scenario to its outcomes configuration type.
- */
-type MultifactorAuthenticationScenarioOutcomeConst = {
-    [K in MultifactorAuthenticationScenario]: MultifactorAuthenticationConfigRecordConst[K]['OUTCOMES'];
-};
-
-/**
- * Available outcome options for each scenario.
- */
-type MultifactorAuthenticationOutcomeScenarioOptions = {
-    [K in MultifactorAuthenticationScenario]: keyof MultifactorAuthenticationScenarioOutcomeConst[K];
-};
-
-/**
- * Maps scenarios to their outcome configurations.
- */
-type MultifactorAuthenticationOutcomeRecord = Record<MultifactorAuthenticationScenario, MultifactorAuthenticationOutcome>;
-
-/**
- * Constructs a kebab-case outcome type string from scenario and outcome name.
- */
-type MultifactorAuthenticationOutcomeType<T extends MultifactorAuthenticationScenario> = `${Lowercase<T>}-${KebabCase<MultifactorAuthenticationOutcomeScenarioOptions[T]>}`;
-
 type MultifactorAuthenticationUI = {
     MODALS: MultifactorAuthenticationModal;
     OUTCOMES: MultifactorAuthenticationOutcome;
 };
-
-/**
- * All possible outcome types key across all scenarios.
- */
-type AllMultifactorAuthenticationOutcomeType = MultifactorAuthenticationOutcomeType<MultifactorAuthenticationScenario>;
-
-/**
- * Maps all outcome type keys to their configurations.
- */
-type MultifactorAuthenticationOutcomeMap = Record<AllMultifactorAuthenticationOutcomeType, MultifactorAuthenticationOutcomeConfig>;
-
-/**
- * All available outcome options across scenarios.
- */
-type MultifactorAuthenticationOutcomeOptions = keyof MultifactorAuthenticationScenarioOutcomeConst[MultifactorAuthenticationScenario];
-
-/**
- * Outcome type suffixes for a specific scenario (removes the scenario prefix).
- */
-type MultifactorAuthenticationOutcomeSuffixes<T extends MultifactorAuthenticationScenario> = Replace<AllMultifactorAuthenticationOutcomeType, `${Lowercase<T>}-`, ''>;
 
 /**
  * Response from a multifactor authentication scenario action.
@@ -240,23 +191,18 @@ type MultifactorAuthenticationScenario = ValueOf<typeof CONST.MULTIFACTOR_AUTHEN
 export type {
     MultifactorAuthenticationPrompt,
     MultifactorAuthenticationOutcome,
+    MultifactorAuthenticationOutcomeConfig,
     MultifactorAuthenticationModal,
-    MultifactorAuthenticationOutcomeRecord,
-    MultifactorAuthenticationOutcomeMap,
     MultifactorAuthenticationScenarioResponse,
     MultifactorAuthenticationScenarioAdditionalParams,
     MultifactorAuthenticationScenarioParameters,
     MultifactorAuthenticationScenario,
-    MultifactorAuthenticationOutcomeOptions,
     MultifactorAuthenticationScenarioParams,
     MultifactorAuthenticationPromptType,
-    MultifactorAuthenticationOutcomeType,
-    AllMultifactorAuthenticationOutcomeType,
     MultifactorAuthenticationScenarioConfig,
     MultifactorAuthenticationUI,
     MultifactorAuthenticationScenarioConfigRecord,
     MultifactorAuthenticationProcessScenarioParameters,
     MultifactorAuthenticationDefaultUIConfig,
-    MultifactorAuthenticationOutcomeSuffixes,
     MultifactorAuthenticationScenarioCustomConfig,
 };

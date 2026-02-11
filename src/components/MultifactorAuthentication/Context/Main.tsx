@@ -3,12 +3,11 @@ import type {ReactNode} from 'react';
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
-import {getOutcomePaths} from '@components/MultifactorAuthentication/config/outcomePaths';
 import type {MultifactorAuthenticationScenario, MultifactorAuthenticationScenarioParams} from '@components/MultifactorAuthentication/config/types';
 import useNetwork from '@hooks/useNetwork';
 import {requestValidateCodeAction} from '@libs/actions/User';
 import getPlatform from '@libs/getPlatform';
-import type {ChallengeType, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
+import type {ChallengeType, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
 import {processRegistration, processScenario} from '@userActions/MultifactorAuthentication/processing';
@@ -33,7 +32,7 @@ Onyx.connectWithoutView({
     },
 });
 
-type ExecuteScenarioParams<T extends MultifactorAuthenticationScenario> = MultifactorAuthenticationScenarioParams<T> & Partial<OutcomePaths>;
+type ExecuteScenarioParams<T extends MultifactorAuthenticationScenario> = MultifactorAuthenticationScenarioParams<T>;
 
 type MultifactorAuthenticationContextValue = {
     /** Execute a multifactor authentication scenario */
@@ -88,7 +87,6 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             registrationChallenge,
             authorizationChallenge,
             payload,
-            outcomePaths,
             isRegistrationComplete,
             isAuthorizationComplete,
             isFlowComplete,
@@ -106,8 +104,6 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             return;
         }
 
-        const paths = outcomePaths ?? getOutcomePaths(scenario);
-
         // 1. Check if there's an error - stop processing
         if (error) {
             if (error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.REGISTRATION_REQUIRED) {
@@ -116,7 +112,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                 return;
             }
 
-            Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME.getRoute(paths.failureOutcome), {forceReplace: true});
+            Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME_FAILURE, {forceReplace: true});
             dispatch({type: 'SET_FLOW_COMPLETE', payload: true});
             return;
         }
@@ -301,7 +297,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
         }
 
         // 5. All steps completed - success
-        Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME.getRoute(paths.successOutcome), {forceReplace: true});
+        Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME_SUCCESS, {forceReplace: true});
         dispatch({type: 'SET_FLOW_COMPLETE', payload: true});
     }, [biometrics, dispatch, isOffline, state, isWeb]);
 
@@ -357,26 +353,16 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
      *
      * @template T - The type of the multifactor authentication scenario
      * @param scenario - The MFA scenario to process
-     * @param {ExecuteScenarioParams<T>} [params] - Optional parameters including:
-     *   - successOutcome: Navigation route for successful authentication (overrides default)
-     *   - failureOutcome: Navigation route for failed authentication (overrides default)
-     *   - Additional payload data to pass through the authentication flow
+     * @param {ExecuteScenarioParams<T>} [params] - Optional parameters for the scenario
      * @returns {Promise<void>} A promise that resolves when the scenario has been initialized
      */
     const executeScenario = useCallback(
         async <T extends MultifactorAuthenticationScenario>(scenario: T, params?: ExecuteScenarioParams<T>): Promise<void> => {
-            const {successOutcome, failureOutcome, ...payload} = params ?? {};
-            const paths = getOutcomePaths(scenario);
-
             dispatch({
                 type: 'INIT',
                 payload: {
                     scenario,
-                    payload: Object.keys(payload).length > 0 ? payload : undefined,
-                    outcomePaths: {
-                        successOutcome: successOutcome ?? paths.successOutcome,
-                        failureOutcome: failureOutcome ?? paths.failureOutcome,
-                    },
+                    payload: params && Object.keys(params).length > 0 ? params : undefined,
                 },
             });
         },
