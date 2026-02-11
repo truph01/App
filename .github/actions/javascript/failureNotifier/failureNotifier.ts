@@ -2,12 +2,24 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import getMergedPR from '@github/libs/failureNotifierUtils';
 
+type WorkflowRun = {
+    id: number;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    workflow_id: number;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    head_commit: {id: string} | null;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    head_branch: string;
+    actor: {login: string} | null;
+    status: string | null;
+};
+
 async function run() {
     const token = core.getInput('GITHUB_TOKEN', {required: true});
     const octokit = github.getOctokit(token);
 
     const {owner, repo} = github.context.repo;
-    const workflowRun = github.context.payload.workflow_run;
+    const workflowRun = github.context.payload.workflow_run as WorkflowRun;
 
     // Fetch current workflow run jobs
     const jobsData = await octokit.rest.actions.listJobsForWorkflowRun({
@@ -74,7 +86,7 @@ async function run() {
             continue;
         }
 
-        const annotations = await octokit.rest.checks.listAnnotations({
+        const checkResults = await octokit.rest.checks.listAnnotations({
             owner,
             repo,
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -82,8 +94,8 @@ async function run() {
         });
 
         let errorMessage = '';
-        for (const annotation of annotations.data) {
-            errorMessage += `${annotation.annotation_level}: ${annotation.message}\n`;
+        for (const checkResult of checkResults.data) {
+            errorMessage += `${checkResult.annotation_level}: ${checkResult.message}\n`;
         }
 
         const issueTitle = `Investigate workflow job failing on main: ${job.name}`;

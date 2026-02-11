@@ -9611,15 +9611,15 @@ async function run() {
         if (previousJob?.conclusion !== 'success') {
             continue;
         }
-        const annotations = await octokit.rest.checks.listAnnotations({
+        const checkResults = await octokit.rest.checks.listAnnotations({
             owner,
             repo,
             // eslint-disable-next-line @typescript-eslint/naming-convention
             check_run_id: job.id,
         });
         let errorMessage = '';
-        for (const annotation of annotations.data) {
-            errorMessage += `${annotation.annotation_level}: ${annotation.message}\n`;
+        for (const checkResult of checkResults.data) {
+            errorMessage += `${checkResult.annotation_level}: ${checkResult.message}\n`;
         }
         const issueTitle = `Investigate workflow job failing on main: ${job.name}`;
         const issueBody = `🚨 **Failure Summary** 🚨:\n\n` +
