@@ -103,20 +103,6 @@ const ITEM_LAYOUT_TYPE = {
 
 const reportAttributesSelector = (c: OnyxEntry<ReportAttributesDerivedValue>) => c?.reports;
 
-function CellRendererComponent({children, ...props}: CellRendererProps<ListRenderItemInfo<Transaction>>) {
-    const styles = useThemeStyles();
-    const showMoreItemStyle = props.index === MAX_PREVIEWS_NUMBER ? styles.alignSelfAnchorCenter : undefined;
-    return (
-        <View
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...props}
-            style={[props.style, showMoreItemStyle]}
-        >
-            {children}
-        </View>
-    );
-}
-
 function MoneyRequestReportPreviewContent({
     iouReportID,
     chatReportID,
@@ -901,7 +887,6 @@ function MoneyRequestReportPreviewContent({
                                                 viewabilityConfig={viewabilityConfig}
                                                 ListFooterComponent={<View style={styles.pl2} />}
                                                 ListHeaderComponent={<View style={styles.pr2} />}
-                                                CellRendererComponent={CellRendererComponent}
                                                 drawDistance={1000}
                                             />
                                             {shouldShowAccessPlaceHolder && <AccessMoneyRequestReportPreviewPlaceHolder />}
