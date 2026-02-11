@@ -7810,14 +7810,17 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
         },
         customRules: ({message}: ViolationsCustomRulesParams) => message,
         reviewRequired: 'Examen requis',
-        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard}: ViolationsRterParams) => {
+        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
                 return 'Impossible d’associer automatiquement le reçu en raison d’une connexion bancaire interrompue';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
-                return isAdmin
+                if (!connectionLink) {
+                    return "Impossible de faire correspondre automatiquement le reçu en raison d'une connexion bancaire interrompue.";
+                }
+                return isMarkAsCash
                     ? `Impossible de faire correspondre automatiquement le reçu en raison d'une connexion carte défaillante. Marquez-le comme paiement en espèces pour l'ignorer, ou <a href="${connectionLink}">réparez la carte</a> pour faire correspondre le reçu.`
-                    : "Impossible de faire correspondre automatiquement le reçu en raison d'une connexion carte défaillante.";
+                    : `Impossible de faire correspondre automatiquement le reçu en raison d'une connexion carte défaillante. <a href="${connectionLink}">Réparez la carte</a> pour faire correspondre le reçu.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin

@@ -2146,7 +2146,7 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     personalCard: {
         fixCard: 'カードを修正',
-        brokenConnection: 'カード接続が切断されました',
+        brokenConnection: 'カード接続が切断されました。',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
             `${cardName} カードの接続が切断されました。<a href="${connectionLink}">銀行にログイン</a>してカードを修復してください。`,
     },
@@ -7705,14 +7705,17 @@ ${reportName}
         },
         customRules: ({message}: ViolationsCustomRulesParams) => message,
         reviewRequired: '要レビュー',
-        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard}: ViolationsRterParams) => {
+        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
                 return '銀行連携の不具合によりレシートを自動照合できません';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
-                return isAdmin
+                if (!connectionLink) {
+                    return '銀行接続が切断されているため、領収書を自動照合できません。';
+                }
+                return isMarkAsCash
                     ? `カード接続が切断されているため、レシートを自動照合できません。現金としてマークして無視するか、レシートと一致するように<a href="${connectionLink}">カードを修正</a>してください。`
-                    : 'カード接続が切断されているため、領収書を自動照合できません。';
+                    : `カード接続が切断されているため、レシートを自動照合できません。<a href="${connectionLink}">カードを修正</a>してください。`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin

@@ -241,6 +241,10 @@ function PaymentMethodList({
                     }
                 }
 
+                if (card.errors && isUserPersonalCard) {
+                    brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
+                }
+
                 if (!isExpensifyCard(card)) {
                     const lastFourPAN = lastFourNumbersFromCardName(card.cardName);
                     const plaidUrl = getPlaidInstitutionIconUrl(card.bank);
@@ -282,7 +286,7 @@ function PaymentMethodList({
                         disabled: isDisabled,
                         shouldShowRightIcon,
                         shouldShowThreeDotsMenu: !isUserPersonalCard || isCSVCard,
-                        errors: card.errors,
+                        errors: isUserPersonalCard ? undefined : card.errors,
                         canDismissError: false,
                         pendingAction: card.pendingAction,
                         brickRoadIndicator,

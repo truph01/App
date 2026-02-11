@@ -7787,14 +7787,17 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
         },
         customRules: ({message}: ViolationsCustomRulesParams) => message,
         reviewRequired: 'Überprüfung erforderlich',
-        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard}: ViolationsRterParams) => {
+        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
                 return 'Beleg kann wegen unterbrochener Bankverbindung nicht automatisch zugeordnet werden';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
-                return isAdmin
+                if (!connectionLink) {
+                    return 'Die automatische Zuordnung des Belegs ist aufgrund einer unterbrochenen Bankverbindung nicht möglich.';
+                }
+                return isMarkAsCash
                     ? `Der Beleg kann aufgrund einer fehlerhaften Kartenverbindung nicht automatisch zugeordnet werden. Markieren Sie ihn als Bargeld, um ihn zu ignorieren, oder <a href="${connectionLink}">korrigieren Sie die Kartenverbindung</a>, damit er zum Beleg passt.`
-                    : 'Automatischer Abgleich des Belegs aufgrund einer unterbrochenen Kartenverbindung nicht möglich.';
+                    : `Der Beleg kann aufgrund einer fehlerhaften Kartenverbindung nicht automatisch zugeordnet werden. <a href="${connectionLink}">Korrigieren Sie die Kartenverbindung</a>, damit er zum Beleg passt.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin

@@ -1953,7 +1953,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     personalCard: {
-        brokenConnection: 'La conexión de tu tarjeta está rota',
+        brokenConnection: 'La conexión de tu tarjeta está rota.',
         fixCard: 'Reparar tarjeta',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
             `La conexión de tu tarjeta ${cardName} está interrumpida. <a href="${connectionLink}">Inicia sesión en tu banco</a> para reparar la tarjeta.`,
@@ -7917,14 +7917,17 @@ ${amount} para ${merchant} - ${date}`,
         },
         customRules: ({message}) => message,
         reviewRequired: 'Revisión requerida',
-        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard}: ViolationsRterParams) => {
+        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
                 return 'No se puede emparejar automáticamente el recibo debido a una conexión bancaria interrumpida.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
-                return isAdmin
+                if (!connectionLink) {
+                    return 'No se puede hacer coincidir automáticamente el recibo debido a una conexión bancaria interrumpida.';
+                }
+                return isMarkAsCash
                     ? `No se puede vincular automáticamente el recibo debido a una conexión de tarjeta defectuosa. Márquelo como efectivo para ignorarlo o <a href="${connectionLink}">arregle la tarjeta</a> para que coincida con el recibo.`
-                    : 'No se puede hacer coincidir automáticamente el recibo debido a una conexión de tarjeta rota.';
+                    : `No se puede vincular automáticamente el recibo debido a una conexión de tarjeta defectuosa. <a href="${connectionLink}">Arregle la tarjeta</a> para que coincida con el recibo.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin

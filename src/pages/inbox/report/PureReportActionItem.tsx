@@ -1665,7 +1665,7 @@ function PureReportActionItem({
             const connectionLink = cardID ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : '';
             children = (
                 <ReportActionItemBasicMessage message="">
-                    <RenderHTML html={`<comment><muted-text>${getCardConnectionBrokenMessage(action, card, translate, connectionLink)}</muted-text></comment>`} />
+                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(action, card, translate, connectionLink)}</comment>`} />
                 </ReportActionItemBasicMessage>
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {

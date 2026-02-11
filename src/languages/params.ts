@@ -174,6 +174,7 @@ type ViolationsRterParams = {
     companyCardPageURL?: string;
     connectionLink?: string;
     isPersonalCard?: boolean;
+    isMarkAsCash?: boolean;
 };
 
 type ViolationsTagOutOfPolicyParams = {tagName?: string} | undefined;

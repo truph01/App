@@ -2151,7 +2151,7 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     personalCard: {
         fixCard: 'Karta Fix',
-        brokenConnection: 'Połączenie z Twoją kartą jest zerwane',
+        brokenConnection: 'Połączenie z Twoją kartą jest zerwane.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
             `Połączenie z Twoją kartą ${cardName} jest zerwane. <a href="${connectionLink}">Zaloguj się do swojego banku</a>, aby naprawić kartę.`,
     },
@@ -7742,14 +7742,17 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
         },
         customRules: ({message}: ViolationsCustomRulesParams) => message,
         reviewRequired: 'Wymagana weryfikacja',
-        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard}: ViolationsRterParams) => {
+        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
                 return 'Nie można automatycznie dopasować paragonu z powodu przerwanego połączenia z bankiem';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
-                return isAdmin
+                if (!connectionLink) {
+                    return 'Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia bankowego.';
+                }
+                return isMarkAsCash
                     ? `Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z kartą. Oznacz jako gotówkę, aby zignorować, lub <a href="${connectionLink}">napraw kartę</a>, aby dopasować ją do paragonu.`
-                    : 'Nie można automatycznie dopasować paragonu z powodu uszkodzonego połączenia karty.';
+                    : `Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z kartą. <a href="${connectionLink}">Napraw kartę</a>, aby dopasować ją do paragonu.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin

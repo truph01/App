@@ -635,6 +635,7 @@ const ViolationsUtils = {
         companyCardPageURL?: string,
         connectionLink?: string,
         card?: Card,
+        isMarkAsCash?: boolean,
     ): string {
         const {
             brokenBankConnection = false,
@@ -728,6 +729,7 @@ const ViolationsUtils = {
                     companyCardPageURL,
                     connectionLink,
                     isPersonalCard: isPersonalCardViolation,
+                    isMarkAsCash,
                 });
             }
             case 'smartscanFailed':
@@ -780,6 +782,7 @@ const ViolationsUtils = {
         companyCardPageURL?: string,
         connectionLink?: string,
         cardList?: CardList,
+        isMarkAsCash?: boolean,
     ): string {
         const errorMessages = extractErrorMessages(transaction?.errors ?? {}, transactionThreadActions?.filter((e) => !!e.errors) ?? [], translate);
         const filteredViolations = filterReceiptViolations(transactionViolations);
@@ -792,7 +795,7 @@ const ViolationsUtils = {
             ...filteredViolations.map((violation) => {
                 const cardID = violation?.data?.cardID;
                 const card = cardID ? cardList?.[cardID] : undefined;
-                const message = ViolationsUtils.getViolationTranslation(violation, translate, true, tags, companyCardPageURL, connectionLink, card);
+                const message = ViolationsUtils.getViolationTranslation(violation, translate, true, tags, companyCardPageURL, connectionLink, card, isMarkAsCash);
                 if (!message) {
                     return;
                 }

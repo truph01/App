@@ -12,6 +12,7 @@ import Text from './Text';
 type ViolationMessagesProps = {
     violations: TransactionViolation[];
     isLast?: boolean;
+    isMarkAsCash?: boolean;
     containerStyle?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
     canEdit: boolean;
@@ -19,7 +20,7 @@ type ViolationMessagesProps = {
     connectionLink?: string;
 };
 
-export default function ViolationMessages({violations, isLast, containerStyle, textStyle, canEdit, companyCardPageURL, connectionLink}: ViolationMessagesProps) {
+export default function ViolationMessages({violations, isLast, containerStyle, textStyle, canEdit, companyCardPageURL, connectionLink, isMarkAsCash}: ViolationMessagesProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
@@ -31,9 +32,9 @@ export default function ViolationMessages({violations, isLast, containerStyle, t
             filteredViolations.map((violation) => {
                 const cardID = violation.data?.cardID;
                 const card = cardID ? cardList?.[cardID] : undefined;
-                return [violation.name, ViolationsUtils.getViolationTranslation(violation, translate, canEdit, undefined, companyCardPageURL, connectionLink, card)];
+                return [violation.name, ViolationsUtils.getViolationTranslation(violation, translate, canEdit, undefined, companyCardPageURL, connectionLink, card, isMarkAsCash)];
             }),
-        [canEdit, translate, filteredViolations, companyCardPageURL, connectionLink, cardList],
+        [canEdit, translate, filteredViolations, companyCardPageURL, connectionLink, cardList, isMarkAsCash],
     );
 
     return (

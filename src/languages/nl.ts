@@ -7761,14 +7761,17 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         },
         customRules: ({message}: ViolationsCustomRulesParams) => message,
         reviewRequired: 'Beoordeling vereist',
-        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard}: ViolationsRterParams) => {
+        rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
                 return 'Kan bon niet automatisch koppelen vanwege een verbroken bankverbinding';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
-                return isAdmin
+                if (!connectionLink) {
+                    return 'Automatische koppeling van ontvangstbewijs mislukt vanwege verbroken bankverbinding.';
+                }
+                return isMarkAsCash
                     ? `Automatische koppeling van bon mislukt vanwege verbroken kaartverbinding. Markeer als contant om te negeren, of <a href="${connectionLink}">corrigeer de kaart</a> zodat deze overeenkomt met de bon.`
-                    : 'Bon kan niet automatisch worden gekoppeld vanwege een onderbroken kaartverbinding.';
+                    : `Automatische koppeling van bon mislukt vanwege verbroken kaartverbinding. <a href="${connectionLink}">Corrigeer de kaart</a> zodat deze overeenkomt met de bon.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin

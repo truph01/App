@@ -56,6 +56,7 @@ import {
 } from '@libs/PolicyUtils';
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {getReportName} from '@libs/ReportNameUtils';
+import {isMarkAsCashActionForTransaction} from '@libs/ReportPrimaryActionUtils';
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
 import {
     canEditFieldOfMoneyRequest,
@@ -416,6 +417,7 @@ function MoneyRequestView({
             getViolationsForField(field, data, policyHasDependentTags, tagValue).length > 0,
         [getViolationsForField],
     );
+    const isMarkAsCash = parentReport && currentUserEmailParam ? isMarkAsCashActionForTransaction(currentUserEmailParam, parentReport, transactionViolations, policy) : false;
     // Need to return undefined when we have pendingAction to avoid the duplicate pending action
     const getPendingFieldAction = (fieldPath: TransactionPendingFieldsKey) => (pendingAction ? undefined : transaction?.pendingFields?.[fieldPath]);
 
@@ -570,7 +572,7 @@ function MoneyRequestView({
                 .map((violation) => {
                     const cardID = violation.data?.cardID;
                     const card = cardID ? cardList?.[cardID] : undefined;
-                    return ViolationsUtils.getViolationTranslation(violation, translate, canEdit, undefined, companyCardPageURL, connectionLink, card);
+                    return ViolationsUtils.getViolationTranslation(violation, translate, canEdit, undefined, companyCardPageURL, connectionLink, card, isMarkAsCash);
                 })
                 .join('. ')}.`;
         }
@@ -1119,6 +1121,7 @@ function MoneyRequestView({
                                     containerStyle={[styles.mt1]}
                                     textStyle={[styles.ph0]}
                                     isLast
+                                    isMarkAsCash={isMarkAsCash}
                                     canEdit={canEdit}
                                     companyCardPageURL={companyCardPageURL}
                                     connectionLink={connectionLink}
