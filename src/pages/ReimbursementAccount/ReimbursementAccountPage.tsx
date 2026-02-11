@@ -151,11 +151,8 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy, navigation}: 
 
     useEffect(() => {
         return () => {
-            // we want to clear reimbursementAccount and reimbursementAccountDraft when the setup is initiated from the Wallet
-            if (backTo === ROUTES.SETTINGS_BANK_ACCOUNT_PURPOSE || backTo === ROUTES.SETTINGS_WALLET) {
-                clearReimbursementAccountDraft();
-                clearReimbursementAccount();
-            }
+            clearReimbursementAccountDraft();
+            clearReimbursementAccount();
             getPaymentMethods(true);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
