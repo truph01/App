@@ -4711,7 +4711,7 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         baseListHeaderWrapperStyle: {
-            ...spacing.ph10,
+            ...spacing.ph9,
             ...spacing.pv3,
             ...spacing.pb5,
         },
