@@ -1011,6 +1011,12 @@ const translations = {
                 subtitle: 'Validate your card and start spending.',
                 cta: 'Activate',
             },
+            reviewCardFraud: {
+                title: 'Review potential fraud on your Expensify Card',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Review ${amount} in potential fraud at ${merchant}`,
+                subtitle: 'Expensify Card',
+                cta: 'Review',
+            },
         },
         announcements: 'Announcements',
         discoverSection: {
@@ -5126,16 +5132,17 @@ const translations = {
                     ctaText: 'Request sent',
                 },
                 bookOrManageYourTrip: {
-                    title: 'Book or manage your trip',
-                    subtitle: 'Use Expensify Travel to get the best travel offers and manage all your business expenses in a single place.',
-                    ctaText: 'Book or manage',
+                    title: 'Travel booking',
+                    subtitle: "Congrats! You're all set to book and manage travel on this workspace.",
+                    ctaText: 'Manage travel',
+                },
+                settings: {
+                    autoAddTripName: {
+                        title: 'Add trip names to expenses',
+                        subtitle: 'Automatically add trip names to expense descriptions for travel booked in Expensify.',
+                    },
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Travel booking',
-                        subtitle: "Congrats! You're all set to book and manage travel on this workspace.",
-                        manageTravelLabel: 'Manage travel',
-                    },
                     centralInvoicingSection: {
                         title: 'Central invoicing',
                         subtitle: 'Centralize all travel spend in a monthly invoice instead of paying at time of purchase.',
@@ -7083,6 +7090,7 @@ const translations = {
         savedSearchesMenuItemTitle: 'Saved',
         topCategories: 'Top categories',
         topMerchants: 'Top merchants',
+        spendOverTime: 'Spend over time',
         groupedExpenses: 'grouped expenses',
         bulkActions: {
             approve: 'Approve',
