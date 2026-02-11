@@ -149,7 +149,6 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
                     onboardingInitialPath,
                     onboardingValues,
                 }),
-                linkingConfig.config,
             );
         }
 
