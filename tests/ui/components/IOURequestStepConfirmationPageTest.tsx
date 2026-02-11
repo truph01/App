@@ -1103,7 +1103,7 @@ describe('IOURequestStepConfirmationPageTest', () => {
             await signInWithTestUser(ACCOUNT_ID, ACCOUNT_LOGIN);
         });
 
-        it('should route unreported manual expense to trackExpense instead of requestMoney', async () => {
+        it('should route unreported manual expense to requestMoney and skip trackExpense', async () => {
             const transactionID = 'tx-unreported-1';
 
             await act(async () => {
@@ -1147,11 +1147,11 @@ describe('IOURequestStepConfirmationPageTest', () => {
             await waitForBatchedUpdatesWithAct();
             fireEvent.press(await screen.findByText(/^Create .*expense/i));
 
-            expect(IOU.trackExpense).toHaveBeenCalled();
-            expect(IOU.requestMoney).not.toHaveBeenCalled();
+            expect(IOU.requestMoney).toHaveBeenCalled();
+            expect(IOU.trackExpense).not.toHaveBeenCalled();
         });
 
-        it('should route unreported distance expense to trackExpense and skip createDistanceRequest', async () => {
+        it('should route unreported distance expense to requestMoney and skip createDistanceRequest', async () => {
             const transactionID = 'tx-unreported-dist';
             const policy = createPolicyWithTaxAndDistance();
 
@@ -1219,9 +1219,9 @@ describe('IOURequestStepConfirmationPageTest', () => {
             await waitForBatchedUpdatesWithAct();
             fireEvent.press(await screen.findByText(/^Create .*expense/i));
 
-            // Unreported distance requests should skip createDistanceRequest and use trackExpense
+            // Unreported distance requests should skip createDistanceRequest and use requestMoney
             expect(IOU.createDistanceRequest).not.toHaveBeenCalled();
-            expect(IOU.trackExpense).toHaveBeenCalled();
+            expect(IOU.requestMoney).toHaveBeenCalled();
         });
     });
 
