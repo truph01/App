@@ -43,7 +43,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import type {PersonalDetailsList, Policy, Report, Transaction, TransactionViolations} from '@src/types/onyx';
-import {getEmptyObject, isEmptyObject} from '@src/types/utils/EmptyObject';
+import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 type SearchMoneyRequestPageProps =
     | PlatformStackScreenProps<RightModalNavigatorParamList, typeof SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT>
@@ -58,13 +58,6 @@ const defaultReportMetadata = {
     isOptimisticReport: false,
 };
 
-function isEmpty(report: OnyxEntry<Report>): boolean {
-    if (isEmptyObject(report)) {
-        return true;
-    }
-    return !Object.values(report).some((value) => value !== undefined && value !== '');
-}
-
 function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
@@ -72,19 +65,19 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     const reportIDFromRoute = getNonEmptyStringOnyxID(route.params?.reportID);
     const {currentSearchResults: snapshot} = useSearchContext();
 
-    const [firstRender, setFirstRender] = useState(true);
+    const firstRenderRef = useRef(true);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`, {allowStaleData: true, canBeMissing: true});
 
     const isFocused = useIsFocused();
 
     useEffect(() => {
-        if (firstRender) {
-            setFirstRender(false);
+        if (firstRenderRef.current) {
+            firstRenderRef.current = false;
             return;
         }
 
-        const isRemovalExpectedForReportType = isEmpty(report) && isMoneyRequestReport(report);
+        const isRemovalExpectedForReportType = !report && isMoneyRequestReport(report);
 
         if (isRemovalExpectedForReportType) {
             if (!isFocused) {
