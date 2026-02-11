@@ -568,7 +568,7 @@ function SearchPage({route}: SearchPageProps) {
         transactions,
         allReports,
         selfDMReport,
-        currentUserPersonalDetails?.login,
+        currentUserPersonalDetails?.email,
         currentUserPersonalDetails?.accountID,
         isExpenseReportType,
         selectedReportIDs,
