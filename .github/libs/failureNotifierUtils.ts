@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention -- matching GitHub API response field names */
 type PullRequest = {
     html_url: string;
     user: {login: string} | null;
@@ -5,6 +6,7 @@ type PullRequest = {
     base: {ref: string};
     number: number;
 };
+/* eslint-enable @typescript-eslint/naming-convention */
 
 /**
  * Given the list of PRs associated with a commit on the target branch,
