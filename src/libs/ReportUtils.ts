@@ -4388,6 +4388,41 @@ function getMoneyRequestSpendBreakdown(report: OnyxInputOrEntry<Report>, searchR
     };
 }
 
+function getBillableAndTaxTotal(report: OnyxEntry<Report>, transactions: Array<OnyxEntry<Transaction>>) {
+    let billableTotal = 0;
+    let taxTotal = 0;
+    if (!isExpenseReport(report)) {
+        return {
+            billableTotal: 0,
+            taxTotal: 0,
+        };
+    }
+    for (const transaction of transactions) {
+        if (transaction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+            continue;
+        }
+        const {amount = 0, taxAmount = 0, currency, billable} = getTransactionDetails(transaction) ?? {};
+        if (billable) {
+            if (currency === report?.currency) {
+                billableTotal += amount;
+            } else {
+                billableTotal -= transaction?.convertedAmount ?? 0;
+            }
+        }
+        if (taxAmount) {
+            if (currency === report?.currency) {
+                taxTotal += taxAmount;
+            } else {
+                taxTotal -= transaction?.convertedTaxAmount ?? 0;
+            }
+        }
+    }
+    return {
+        billableTotal,
+        taxTotal,
+    };
+}
+
 /**
  * Given a report field, check if the field is for the report title.
  */
@@ -13211,6 +13246,7 @@ export {
     isOneTransactionReport,
     isTrackExpenseReportNew,
     shouldHideSingleReportField,
+    getBillableAndTaxTotal,
     getReportForHeader,
     isReportOpenOrUnsubmitted,
 };

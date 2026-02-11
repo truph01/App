@@ -4213,7 +4213,7 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
             category,
             tag,
             taxCode,
-            taxAmount,
+            taxAmount: taxAmount ? -taxAmount : undefined,
             billable,
             pendingFields: isDistanceRequest && !isManualDistanceRequest ? {waypoints: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD} : undefined,
             reimbursable,
