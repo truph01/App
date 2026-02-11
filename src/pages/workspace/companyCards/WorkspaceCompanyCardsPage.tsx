@@ -10,7 +10,6 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import {getDomainOrWorkspaceAccountID} from '@libs/CardUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
-import {getMemberAccountIDsForWorkspace} from '@libs/PolicyUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import WorkspacePageWithSections from '@pages/workspace/WorkspacePageWithSections';
 import {openPolicyCompanyCardsFeed, openPolicyCompanyCardsPage} from '@userActions/CompanyCards';
@@ -59,16 +58,15 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         }
 
         loadPolicyCompanyCardsPage();
-    }, [policyID, domainOrWorkspaceAccountID, loadPolicyCompanyCardsPage, isOffline]);
+    }, [policyID, loadPolicyCompanyCardsPage, isOffline]);
 
     const loadPolicyCompanyCardsFeed = useCallback(() => {
         if (isLoading || !bankName || isFeedPending) {
             return;
         }
 
-        const clientMemberEmails = Object.keys(getMemberAccountIDsForWorkspace(policy?.employeeList));
-        openPolicyCompanyCardsFeed(domainOrWorkspaceAccountID, policyID, bankName, translate, clientMemberEmails);
-    }, [bankName, domainOrWorkspaceAccountID, isFeedPending, isLoading, policy?.employeeList, policyID, translate]);
+        openPolicyCompanyCardsFeed(domainOrWorkspaceAccountID, policyID, bankName, translate);
+    }, [bankName, domainOrWorkspaceAccountID, isFeedPending, isLoading, policyID, translate]);
 
     useEffect(() => {
         loadPolicyCompanyCardsFeed();

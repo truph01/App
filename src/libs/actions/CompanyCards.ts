@@ -856,12 +856,11 @@ function openPolicyCompanyCardsPage(policyID: string, domainOrWorkspaceAccountID
     API.read(READ_COMMANDS.OPEN_POLICY_COMPANY_CARDS_PAGE, params, {optimisticData, successData, failureData});
 }
 
-function openPolicyCompanyCardsFeed(domainAccountID: number, policyID: string, feed: CompanyCardFeedWithNumber, translate: LocaleContextProps['translate'], emailList?: string[]) {
+function openPolicyCompanyCardsFeed(domainAccountID: number, policyID: string, feed: CompanyCardFeedWithNumber, translate: LocaleContextProps['translate']) {
     const parameters: OpenPolicyCompanyCardsFeedParams = {
         domainAccountID,
         policyID,
         feed,
-        emailList: emailList ? JSON.stringify(emailList) : undefined,
     };
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER>> = [

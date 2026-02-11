@@ -4,7 +4,6 @@ type OpenPolicyCompanyCardsFeedParams = {
     domainAccountID?: number;
     policyID: string;
     feed: CompanyCardFeedWithNumber;
-    emailList?: string;
 };
 
 export default OpenPolicyCompanyCardsFeedParams;
