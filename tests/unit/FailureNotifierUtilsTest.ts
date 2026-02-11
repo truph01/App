@@ -1,31 +1,42 @@
 /**
  * @jest-environment node
  */
-import getMergedPR from '@github/libs/failureNotifierUtils';
-import type {PullRequest} from '@github/libs/failureNotifierUtils';
+
+/* eslint-disable @typescript-eslint/naming-convention -- matching GitHub API response field names */
+
+// eslint-disable-next-line rulesdir/no-relative-import -- .github/libs is outside src
+const getMergedPR = require('../../.github/libs/failureNotifierUtils');
+
+type PullRequest = {
+    html_url: string;
+    user: {login: string} | null;
+    merged_at: string | null;
+    base: {ref: string};
+    number: number;
+};
 
 describe('getMergedPR', () => {
     const mergedPR: PullRequest = {
-        htmlUrl: 'https://github.com/Expensify/App/pull/82016',
+        html_url: 'https://github.com/Expensify/App/pull/82016',
         user: {login: 'test-user'},
-        mergedAt: '2026-02-10T17:00:00Z',
-        baseRef: 'main',
+        merged_at: '2026-02-10T17:00:00Z',
+        base: {ref: 'main'},
         number: 82016,
     };
 
     const openPRWithMainMerged: PullRequest = {
-        htmlUrl: 'https://github.com/Expensify/App/pull/80254',
+        html_url: 'https://github.com/Expensify/App/pull/80254',
         user: {login: 'test-user'},
-        mergedAt: null,
-        baseRef: 'main',
+        merged_at: null,
+        base: {ref: 'main'},
         number: 80254,
     };
 
     const openPRDifferentBase: PullRequest = {
-        htmlUrl: 'https://github.com/Expensify/App/pull/99999',
+        html_url: 'https://github.com/Expensify/App/pull/99999',
         user: {login: 'other-user'},
-        mergedAt: null,
-        baseRef: 'staging',
+        merged_at: null,
+        base: {ref: 'staging'},
         number: 99999,
     };
 
@@ -38,7 +49,7 @@ describe('getMergedPR', () => {
 
         // Should pick the actually-merged PR, not the open one
         expect(result?.number).toBe(82016);
-        expect(result?.mergedAt).not.toBeNull();
+        expect(result?.merged_at).not.toBeNull();
     });
 
     it('should return the merged PR even when it appears first', () => {
@@ -53,8 +64,8 @@ describe('getMergedPR', () => {
         const mergedToStaging: PullRequest = {
             ...mergedPR,
             number: 11111,
-            baseRef: 'staging',
-            mergedAt: '2026-02-10T18:00:00Z',
+            base: {ref: 'staging'},
+            merged_at: '2026-02-10T18:00:00Z',
         };
 
         const associatedPRs = [mergedToStaging, mergedPR];

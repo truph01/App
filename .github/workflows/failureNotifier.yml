@@ -74,12 +74,9 @@ jobs:
               repo: context.repo.repo,
               commit_sha: headCommit,
             });
-            // Filter for the PR that was actually merged to the target branch.
-            // listPullRequestsAssociatedWithCommit returns ALL PRs containing
-            // the commit, including open PRs that merged the target branch
-            // into their feature branch, which would blame the wrong PR.
+            const getMergedPR = require('./.github/libs/failureNotifierUtils');
             const targetBranch = "${{ github.event.workflow_run.head_branch }}";
-            const pr = prData.data.find(p => p.merged_at !== null && p.base.ref === targetBranch) ?? prData.data.at(0);
+            const pr = getMergedPR(prData.data, targetBranch);
             const prLink = pr?.html_url ?? 'N/A';
             const prAuthor = pr?.user?.login ?? 'unknown';
             const prMerger = "${{ github.event.workflow_run.actor.login }}";
