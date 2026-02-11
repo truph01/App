@@ -449,7 +449,7 @@ function getCardFeedIcon(cardFeed: CardFeedWithNumber | CardFeedWithDomainID | u
 /**
  * Verify if the feed is a custom feed. Those are also referred to as commercial feeds.
  */
-function isCustomFeed(feed: CardFeedWithNumber | CardFeedWithDomainID | undefined): boolean {
+function isCustomFeed(feed: string | undefined): boolean {
     if (!feed) {
         return false;
     }
@@ -524,7 +524,6 @@ function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>, feedKeysWithCa
             }
 
             // "Gray zone" feeds (not commercial AND not direct) are only shown when they have assigned cards.
-            // Examples: capitalonecards, americanexpressfd.us, ccupload, stripe, admin.pexcard.com, gl1205, etc.
             if (!isCustomFeed(key) && !isDirectFeed(key) && !feedHasCards(key, resolvedDomainID, feedKeysWithCards)) {
                 return false;
             }
