@@ -2806,7 +2806,7 @@ function formatSectionsFromSearchTerm(
                           const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
                           if (isReportPolicyExpenseChat) {
                               const expenseReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${participant.reportID}`];
-                              const chatReport = expenseReport?.chatReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.chatReportID}`] : undefined;
+                              const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport?.chatReportID}`];
                               return getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, expenseReport, chatReport, reportAttributesDerived);
                           }
                           return getParticipantsOption(participant, personalDetails);
@@ -2837,7 +2837,7 @@ function formatSectionsFromSearchTerm(
                       const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
                       if (isReportPolicyExpenseChat) {
                           const expenseReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${participant.reportID}`];
-                          const chatReport = expenseReport?.chatReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.chatReportID}`] : undefined;
+                          const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport?.chatReportID}`];
                           return getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, expenseReport, chatReport, reportAttributesDerived);
                       }
                       return getParticipantsOption(participant, personalDetails);
