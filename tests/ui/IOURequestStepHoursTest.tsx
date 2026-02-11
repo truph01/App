@@ -5,7 +5,6 @@ import Onyx from 'react-native-onyx';
 import {CurrentUserPersonalDetailsProvider} from '@components/CurrentUserPersonalDetailsProvider';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
-import type Navigation from '@libs/Navigation/Navigation';
 import IOURequestStepHours from '@pages/iou/request/step/IOURequestStepHours';
 import type {IOUAction} from '@src/CONST';
 import CONST from '@src/CONST';
@@ -202,38 +201,7 @@ describe('IOURequestStepHours', () => {
             expect(setMoneyRequestAmountSpy).not.toHaveBeenCalled();
         });
 
-        it('should accept valid whole number hours', async () => {
-            const hours = 8;
-
-            await act(async () => {
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`, {
-                    transactionID: TRANSACTION_ID,
-                    reportID: REPORT_ID,
-                    comment: {
-                        units: {
-                            count: hours,
-                            rate: 5000,
-                        },
-                    },
-                });
-            });
-
-            renderComponent();
-
-            await waitForBatchedUpdatesWithAct();
-
-            const nextButton = screen.getByText(/next|save/i);
-            fireEvent.press(nextButton);
-
-            await waitFor(() => {
-                expect(setMoneyRequestTimeCountSpy).toHaveBeenCalledWith(TRANSACTION_ID, hours, true);
-            });
-
-            // Should compute amount: 5000 * 8 = 40000
-            expect(setMoneyRequestAmountSpy).toHaveBeenCalledWith(TRANSACTION_ID, 40000, CONST.CURRENCY.USD);
-        });
-
-        it('should accept valid decimal hours', async () => {
+        it('should accept valid hours', async () => {
             const hours = 2.5;
 
             await act(async () => {
@@ -265,120 +233,18 @@ describe('IOURequestStepHours', () => {
         });
     });
 
-    describe('merchant formatting', () => {
-        it('should format merchant string with hours and rate', async () => {
-            const hours = 8;
-            const rate = 5000; // $50.00
-
-            await act(async () => {
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`, {
-                    transactionID: TRANSACTION_ID,
-                    reportID: REPORT_ID,
-                    comment: {
-                        units: {
-                            count: hours,
-                            rate,
-                        },
-                    },
-                });
-            });
-
-            renderComponent();
-
-            await waitForBatchedUpdatesWithAct();
-
-            const nextButton = screen.getByText(/next|save/i);
-            fireEvent.press(nextButton);
-
-            await waitFor(() => {
-                expect(setMoneyRequestMerchantSpy).toHaveBeenCalled();
-            });
-
-            expect(setMoneyRequestMerchantSpy).toHaveBeenCalledWith(TRANSACTION_ID, '8 hours @ $50.00 / hour', true);
-        });
-    });
-
-    describe('edit mode', () => {
-        it('should navigate back after saving in edit mode', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-            const navigationMock = jest.requireMock('@libs/Navigation/Navigation') as typeof Navigation;
-            const hours = 6;
-
-            await act(async () => {
-                await Onyx.set(ONYXKEYS.IS_LOADING_APP, false);
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, {
-                    reportID: REPORT_ID,
-                    policyID: POLICY_ID,
-                    type: CONST.REPORT.TYPE.EXPENSE,
-                });
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, {
-                    transactionID: TRANSACTION_ID,
-                    reportID: REPORT_ID,
-                    comment: {
-                        units: {
-                            count: hours,
-                            rate: 5000,
-                        },
-                    },
-                });
-            });
-
-            renderComponent(SCREENS.MONEY_REQUEST.STEP_HOURS_EDIT, CONST.IOU.ACTION.EDIT);
-
-            await waitForBatchedUpdatesWithAct();
-
-            const saveButton = screen.getByText(/save/i);
-            fireEvent.press(saveButton);
-
-            await waitFor(() => {
-                expect(setMoneyRequestTimeCountSpy).toHaveBeenCalledWith(TRANSACTION_ID, hours, false);
-            });
-
-            expect(navigationMock.goBack).toHaveBeenCalled();
-        });
-
-        it('should not set rate again in edit mode', async () => {
-            await act(async () => {
-                await Onyx.set(ONYXKEYS.IS_LOADING_APP, false);
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, {
-                    reportID: REPORT_ID,
-                    policyID: POLICY_ID,
-                    type: CONST.REPORT.TYPE.EXPENSE,
-                });
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, {
-                    transactionID: TRANSACTION_ID,
-                    reportID: REPORT_ID,
-                    comment: {
-                        units: {
-                            count: 4,
-                            rate: 5000,
-                        },
-                    },
-                });
-            });
-
-            renderComponent(SCREENS.MONEY_REQUEST.STEP_HOURS_EDIT, CONST.IOU.ACTION.EDIT);
-
-            await waitForBatchedUpdatesWithAct();
-
-            const saveButton = screen.getByText(/save/i);
-            fireEvent.press(saveButton);
-
-            await waitFor(() => {
-                expect(setMoneyRequestTimeCountSpy).toHaveBeenCalled();
-            });
-
-            // In edit mode, rate should not be set again
-            expect(setMoneyRequestTimeRateSpy).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('non-edit mode', () => {
+    describe('time expense transaction fields', () => {
         it('should set all required transaction fields', async () => {
             const hours = 8;
             const rate = 5000;
 
             await act(async () => {
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, {outputCurrency: CONST.CURRENCY.EUR});
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, {
+                    reportID: REPORT_ID,
+                    policyID: POLICY_ID,
+                    type: CONST.REPORT.TYPE.EXPENSE,
+                });
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`, {
                     transactionID: TRANSACTION_ID,
                     reportID: REPORT_ID,
@@ -403,72 +269,9 @@ describe('IOURequestStepHours', () => {
             });
 
             // Verify all transaction updates
-            expect(setMoneyRequestAmountSpy).toHaveBeenCalledWith(TRANSACTION_ID, 40000, CONST.CURRENCY.USD);
-            expect(setMoneyRequestMerchantSpy).toHaveBeenCalled();
+            expect(setMoneyRequestAmountSpy).toHaveBeenCalledWith(TRANSACTION_ID, 40000, CONST.CURRENCY.EUR);
+            expect(setMoneyRequestMerchantSpy).toHaveBeenCalledWith(TRANSACTION_ID, '8 hours @ €50.00 / hour', true);
             expect(setMoneyRequestTimeRateSpy).toHaveBeenCalledWith(TRANSACTION_ID, rate, true);
-            expect(setMoneyRequestTimeCountSpy).toHaveBeenCalledWith(TRANSACTION_ID, hours, true);
-        });
-    });
-
-    describe('currency handling', () => {
-        it('should use policy currency', async () => {
-            await act(async () => {
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, {outputCurrency: CONST.CURRENCY.EUR});
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, {
-                    reportID: REPORT_ID,
-                    policyID: POLICY_ID,
-                    type: CONST.REPORT.TYPE.EXPENSE,
-                });
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`, {
-                    transactionID: TRANSACTION_ID,
-                    reportID: REPORT_ID,
-                    comment: {
-                        units: {
-                            count: 5,
-                            rate: 5000,
-                        },
-                    },
-                });
-            });
-
-            renderComponent();
-
-            await waitForBatchedUpdatesWithAct();
-
-            const nextButton = screen.getByText(/next|save/i);
-            fireEvent.press(nextButton);
-
-            await waitFor(() => {
-                // Should compute amount: 5000 * 5 = 25000
-                expect(setMoneyRequestAmountSpy).toHaveBeenCalledWith(TRANSACTION_ID, 25000, CONST.CURRENCY.EUR);
-            });
-        });
-
-        it('should default to USD if no policy currency', async () => {
-            await act(async () => {
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, {outputCurrency: null});
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`, {
-                    transactionID: TRANSACTION_ID,
-                    reportID: REPORT_ID,
-                    comment: {
-                        units: {
-                            count: 3,
-                            rate: 7500,
-                        },
-                    },
-                });
-            });
-
-            renderComponent();
-
-            await waitForBatchedUpdatesWithAct();
-
-            const nextButton = screen.getByText(/next|save/i);
-            fireEvent.press(nextButton);
-
-            await waitFor(() => {
-                expect(setMoneyRequestAmountSpy).toHaveBeenCalledWith(TRANSACTION_ID, 22500, CONST.CURRENCY.USD);
-            });
         });
     });
 

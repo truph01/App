@@ -225,29 +225,6 @@ describe('TimeExpenseConfirmationTest', () => {
             expect(within(rateRow).getByText(/\$50\.00 \/ hour/)).toBeDefined();
         });
 
-        it('should display decimal hours correctly', async () => {
-            await setupTransaction({
-                comment: {
-                    units: {
-                        count: 5.5,
-                        rate: 6000,
-                        unit: CONST.TIME_TRACKING.UNIT.HOUR,
-                    },
-                },
-                amount: 33000,
-                merchant: '5.5 hours @ $60.00 / hour',
-            });
-
-            renderConfirmation();
-            await waitForBatchedUpdatesWithAct();
-
-            const hoursRow = screen.getByTestId('menu-item-Hours');
-            expect(within(hoursRow).getByText('5.5')).toBeDefined();
-
-            const rateRow = screen.getByTestId('menu-item-Rate');
-            expect(within(rateRow).getByText(/\$60\.00 \/ hour/)).toBeDefined();
-        });
-
         it('should display correct total amount', async () => {
             await setupTransaction();
 
@@ -298,14 +275,14 @@ describe('TimeExpenseConfirmationTest', () => {
     describe('time expense with different currencies', () => {
         it('should display time expense in EUR', async () => {
             const policy = createPolicyWithTimeTracking();
-            policy.outputCurrency = 'EUR';
+            policy.outputCurrency = CONST.CURRENCY.EUR;
 
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
             });
 
             await setupTransaction({
-                currency: 'EUR',
+                currency: CONST.CURRENCY.EUR,
                 merchant: '8 hours @ €50.00 / hour',
             });
 

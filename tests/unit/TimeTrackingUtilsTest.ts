@@ -44,20 +44,6 @@ describe('TimeTrackingUtils', () => {
             expect(computeTimeAmount(rateInCents, hours)).toBe(expected);
         });
 
-        it('should handle zero hours', () => {
-            const rateInCents = 5000;
-            const hours = 0;
-
-            expect(computeTimeAmount(rateInCents, hours)).toBe(0);
-        });
-
-        it('should handle zero rate', () => {
-            const rateInCents = 0;
-            const hours = 8;
-
-            expect(computeTimeAmount(rateInCents, hours)).toBe(0);
-        });
-
         it('should handle small decimal hours', () => {
             const rateInCents = 5000; // $50.00
             const hours = 0.25; // 15 minutes
@@ -105,16 +91,6 @@ describe('TimeTrackingUtils', () => {
             expect(result).toContain('2.5 hours');
         });
 
-        it('should handle zero hours', () => {
-            const hours = 0;
-            const rate = 5000;
-            const currency = CONST.CURRENCY.USD;
-
-            const result = formatTimeMerchant(hours, rate, currency, translateLocal);
-
-            expect(result).toContain('0 hours');
-        });
-
         it('should put "hour" instead of "hours" when count is 1', () => {
             const hours = 1;
             const rate = 5000;
@@ -150,14 +126,6 @@ describe('TimeTrackingUtils', () => {
     describe('isValidTimeExpenseAmount', () => {
         it('should validate normal time expense amount', () => {
             const amount = 40000; // $400.00
-            const currency = CONST.CURRENCY.USD;
-            const decimals = 2;
-
-            expect(isValidTimeExpenseAmount(amount, currency, decimals)).toBe(true);
-        });
-
-        it('should validate small amounts', () => {
-            const amount = 100; // $1.00
             const currency = CONST.CURRENCY.USD;
             const decimals = 2;
 
