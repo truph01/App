@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
+import type {OnyxEntry} from 'react-native-onyx';
 import ConfirmationPage from '@components/ConfirmationPage';
 import LottieAnimations from '@components/LottieAnimations';
 import useEnvironment from '@hooks/useEnvironment';
@@ -16,16 +17,24 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import type {TryNewDot} from '@src/types/onyx';
 import TwoFactorAuthWrapper from './TwoFactorAuthWrapper';
 
 type SuccessPageProps = PlatformStackScreenProps<TwoFactorAuthNavigatorParamList, typeof SCREENS.TWO_FACTOR_AUTH.SUCCESS>;
+
+function classicRedirectDismissedSelector(tryNewDot: OnyxEntry<TryNewDot>) {
+    return tryNewDot?.classicRedirect?.dismissed;
+}
 
 function SuccessPage({route}: SuccessPageProps) {
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
     const styles = useThemeStyles();
 
-    const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {canBeMissing: true});
+    const [isClassicRedirectDismissed] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {
+        selector: classicRedirectDismissedSelector,
+        canBeMissing: true,
+    });
 
     const goBack = useCallback(() => {
         quitAndNavigateBack(route.params?.backTo ?? ROUTES.SETTINGS_2FA_ROOT.getRoute());
@@ -55,7 +64,7 @@ function SuccessPage({route}: SuccessPageProps) {
                 shouldShowButton
                 buttonText={translate('common.buttonConfirm')}
                 onButtonPress={() => {
-                    if (CONFIG.IS_HYBRID_APP && tryNewDot?.classicRedirect?.dismissed) {
+                    if (CONFIG.IS_HYBRID_APP && isClassicRedirectDismissed) {
                         closeReactNativeApp({shouldSetNVP: false, isTrackingGPS: false});
                         return;
                     }
