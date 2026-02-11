@@ -1,4 +1,4 @@
-import {reportAttributesByReportIDSelector} from '@selectors/Attributes';
+import {reportByIDsSelector} from '@selectors/Attributes';
 import {Str} from 'expensify-common';
 import React, {useCallback} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -46,8 +46,8 @@ function EditReportFieldPage({route}: EditReportFieldPageProps) {
     const fieldKey = getReportFieldKey(route.params.fieldID);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {canBeMissing: false});
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {canBeMissing: false});
-    const reportAttributesSelector = useCallback((attributes: OnyxEntry<ReportAttributesDerivedValue>) => reportAttributesByReportIDSelector(reportID)(attributes), [reportID]);
-    const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {
+    const reportAttributesSelector = useCallback((attributes: OnyxEntry<ReportAttributesDerivedValue>) => reportByIDsSelector([reportID])(attributes), [reportID]);
+    const [reportAttributesByReportID] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {
         canBeMissing: true,
         selector: reportAttributesSelector,
     });
@@ -121,7 +121,7 @@ function EditReportFieldPage({route}: EditReportFieldPageProps) {
     // Provide a default when the report name and the policy field list are empty
     /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
     const fieldValue = isReportFieldTitle
-        ? getReportNameFromReportNameUtils(report, reportAttributes ? {[reportID]: reportAttributes} : undefined) ||
+        ? getReportNameFromReportNameUtils(report, reportAttributesByReportID) ||
           (isPolicyFieldListEmpty(policy) ? CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME : '')
         : (reportField.value ?? reportField.defaultValue);
     /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */

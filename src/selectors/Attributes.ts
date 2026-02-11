@@ -1,6 +1,6 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ReportAttributesDerivedValue} from '@src/types/onyx';
-import {ReportAttributes} from '@src/types/onyx/DerivedValues';
+import type {ReportAttributes} from '@src/types/onyx/DerivedValues';
 
 const reportsSelector = (attributes: OnyxEntry<ReportAttributesDerivedValue>) => attributes?.reports;
 
