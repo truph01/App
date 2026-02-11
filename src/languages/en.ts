@@ -1011,6 +1011,12 @@ const translations = {
                 subtitle: 'Validate your card and start spending.',
                 cta: 'Activate',
             },
+            reviewCardFraud: {
+                title: 'Review potential fraud on your Expensify Card',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Review ${amount} in potential fraud at ${merchant}`,
+                subtitle: 'Expensify Card',
+                cta: 'Review',
+            },
         },
         announcements: 'Announcements',
         discoverSection: {
@@ -7083,6 +7089,7 @@ const translations = {
         savedSearchesMenuItemTitle: 'Saved',
         topCategories: 'Top categories',
         topMerchants: 'Top merchants',
+        spendOverTime: 'Spend over time',
         groupedExpenses: 'grouped expenses',
         bulkActions: {
             approve: 'Approve',

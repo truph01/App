@@ -1551,6 +1551,8 @@ const CONST = {
         OWNER_EMAIL_FAKE: '__FAKE__',
         OWNER_ACCOUNT_ID_FAKE: 0,
         DEFAULT_REPORT_NAME: 'Chat Report',
+        // Not translated because default report names are not translated on the backend (matches Expensify Classic behavior)
+        DEFAULT_EXPENSE_REPORT_NAME: 'New Report',
         PERMISSIONS: {
             READ: 'read',
             WRITE: 'write',
@@ -3555,6 +3557,7 @@ const CONST = {
             AMEX_FILE_DOWNLOAD: 'americanexpressfd.us',
             CSV: 'ccupload',
             MOCK_BANK: 'oauth.mockbank.com',
+            UPLOAD: 'upload',
         },
         FEED_KEY_SEPARATOR: '#',
         CARD_NUMBER_MASK_CHAR: 'X',
@@ -3659,6 +3662,13 @@ const CONST = {
             STRIPE: 'stripe',
             CSV: 'CSV',
         },
+        CARD_TYPE_NAMES: {
+            AMEX: 'American Express',
+            VISA: 'Visa',
+            MASTERCARD: 'Mastercard',
+            STRIPE: 'Stripe',
+            CSV: 'CSV',
+        },
         FEED_TYPE: {
             CUSTOM: 'customFeed',
             DIRECT: 'directFeed',
@@ -3673,6 +3683,8 @@ const CONST = {
             STRIPE: 'Stripe',
             WELLS_FARGO: 'Wells Fargo',
             MOCK_BANK: 'Mock Bank',
+            PEX: 'PEX',
+            EXPENSIFY: 'Expensify',
             OTHER: 'Other',
         },
         BANK_CONNECTIONS: {
@@ -3701,9 +3713,6 @@ const CONST = {
         },
         CARD_NAME: {
             CASH: '__CASH__',
-        },
-        BANK_NAME: {
-            UPLOAD: 'upload',
         },
         CARD_LIST_THRESHOLD: 8,
         DEFAULT_EXPORT_TYPE: 'default',
@@ -7435,6 +7444,7 @@ const CONST = {
             TOP_SPENDERS: 'topSpenders',
             TOP_CATEGORIES: 'topCategories',
             TOP_MERCHANTS: 'topMerchants',
+            SPEND_OVER_TIME: 'spendOverTime',
         },
         GROUP_PREFIX: 'group_',
         ANIMATION: {
@@ -8160,6 +8170,7 @@ const CONST = {
             PURE_REPORT_ACTION_ITEM: 'Report-PureReportActionItem',
             MODERATION_BUTTON: 'Report-ModerationButton',
             MONEY_REQUEST_REPORT_ACTIONS_LIST_SELECT_ALL: 'MoneyRequestReportActionsList-SelectAll',
+            REPORT_ACTION_AVATAR: 'Report-ReportActionAvatar',
         },
         SIDEBAR: {
             SIGN_IN_BUTTON: 'Sidebar-SignInButton',
@@ -8285,6 +8296,12 @@ const CONST = {
         HOME_PAGE: {
             WIDGET_ITEM: 'HomePage-WidgetItem',
         },
+        CALENDAR_PICKER: {
+            YEAR_PICKER: 'CalendarPicker-YearPicker',
+            PREV_MONTH: 'CalendarPicker-PrevMonth',
+            NEXT_MONTH: 'CalendarPicker-NextMonth',
+            DAY: 'CalendarPicker-Day',
+        },
         REPORT_DETAILS: {
             WORKSPACE_LINK: 'ReportDetails-WorkspaceLink',
         },
@@ -8312,6 +8329,9 @@ const CONST = {
         WORKSPACE: {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
+            COMPANY_CARDS: {
+                TABLE_ITEM: 'Workspace-CompanyCards-TableItem',
+            },
         },
         ACCOUNT_SWITCHER: {
             SHOW_ACCOUNTS: 'AccountSwitcher-ShowAccounts',

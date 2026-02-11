@@ -988,6 +988,12 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Convalida la tua carta e inizia a spendere.',
                 cta: 'Attiva',
             },
+            reviewCardFraud: {
+                title: 'Verifica un potenziale uso fraudolento della tua Expensify Card',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Verifica ${amount} di potenziale frode presso ${merchant}`,
+                subtitle: 'Carta Expensify',
+                cta: 'Rivedi',
+            },
             ctaFix: 'Correggi',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Correggi la connessione della carta aziendale ${feedName}` : 'Correggi connessione carta aziendale'),
@@ -7248,6 +7254,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             selectAllMatchingItems: 'Seleziona tutti gli elementi corrispondenti',
             allMatchingItemsSelected: 'Tutti gli elementi corrispondenti sono stati selezionati',
         },
+        spendOverTime: 'Spesa nel tempo',
     },
     genericErrorPage: {
         title: 'Oops, qualcosa è andato storto!',

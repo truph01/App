@@ -989,6 +989,12 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Zatwierdź swoją kartę i zacznij wydawać.',
                 cta: 'Aktywuj',
             },
+            reviewCardFraud: {
+                title: 'Sprawdź potencjalne oszustwo na swojej karcie Expensify',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Przejrzyj ${amount} potencjalnie oszukańczych transakcji u ${merchant}`,
+                subtitle: 'Karta Expensify',
+                cta: 'Przejrzyj',
+            },
             ctaFix: 'Napraw',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Napraw połączenie karty firmowej ${feedName}` : 'Napraw połączenie karty firmowej'),
@@ -7216,6 +7222,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             selectAllMatchingItems: 'Zaznacz wszystkie pasujące elementy',
             allMatchingItemsSelected: 'Zaznaczono wszystkie pasujące elementy',
         },
+        spendOverTime: 'Wydatki w czasie',
     },
     genericErrorPage: {
         title: 'Ups, coś poszło nie tak!',

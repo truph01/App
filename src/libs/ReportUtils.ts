@@ -166,6 +166,7 @@ import {
     isPendingDeletePolicy,
     isPolicyAdmin as isPolicyAdminPolicyUtils,
     isPolicyAuditor,
+    isPolicyFieldListEmpty,
     isPolicyMember,
     isPolicyMemberWithoutPendingDelete,
     isPolicyOwner,
@@ -993,6 +994,24 @@ Onyx.connectWithoutView({
 // Example case: when we need to get a report name of a thread which is dependent on a report action message.
 const parsedReportActionMessageCache: Record<string, string> = {};
 
+/**
+ * Fallback title field used when a policy has an empty fieldList (matches OldDot behavior).
+ */
+const FALLBACK_TITLE_FIELD: PolicyReportField = {
+    fieldID: CONST.REPORT_FIELD_TITLE_FIELD_ID,
+    name: CONST.POLICY.DEFAULT_FIELD_LIST_NAME,
+    type: CONST.REPORT_FIELD_TYPES.TEXT,
+    defaultValue: CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME,
+    deletable: true,
+    target: CONST.POLICY.DEFAULT_FIELD_LIST_TARGET,
+    values: [],
+    keys: [],
+    externalIDs: [],
+    disabledOptions: [],
+    orderWeight: 0,
+    isTax: false,
+};
+
 let conciergeReportIDOnyxConnect: OnyxEntry<string>;
 Onyx.connect({
     key: ONYXKEYS.CONCIERGE_REPORT_ID,
@@ -1040,12 +1059,14 @@ Onyx.connect({
 
 let allPolicies: OnyxCollection<Policy>;
 let hasPolicies: boolean;
+let policiesArray: Policy[] = [];
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.POLICY,
     waitForCollectionCallback: true,
     callback: (value) => {
         allPolicies = value;
         hasPolicies = !isEmptyObject(value);
+        policiesArray = Object.values(value ?? {}).filter((policy): policy is Policy => !!policy);
     },
 });
 
@@ -2749,7 +2770,9 @@ function isPayer(
     // If the report belongs to a workspace, verify the user is still a member
     // When a user leaves a workspace, they may no longer have access to the policy data,
     // or the policy.role/employeeList may be stale
-    if (iouReport?.policyID && iouReport.policyID !== CONST.POLICY.ID_FAKE) {
+    // Skip this check for IOU reports (personal 1:1 expenses) since they can inherit a policyID
+    // from the chat report but the payer may not be a member of that workspace
+    if (!isIOUReport(iouReport) && iouReport?.policyID && iouReport.policyID !== CONST.POLICY.ID_FAKE) {
         // No policy data means user likely left the workspace
         if (!policy) {
             return false;
@@ -4424,6 +4447,22 @@ function getTitleReportField(reportFields: Record<string, PolicyReportField>) {
 }
 
 /**
+ * Gets the title field from a policy, with a fallback when the policy fieldList is empty (matches OldDot behavior).
+ */
+function getTitleFieldWithFallback(policy: OnyxEntry<Policy>): PolicyReportField | undefined {
+    const policyTitleField = policy?.fieldList?.[CONST.POLICY.FIELDS.FIELD_LIST_TITLE];
+    if (policyTitleField) {
+        return policyTitleField;
+    }
+
+    if (isPolicyFieldListEmpty(policy)) {
+        return FALLBACK_TITLE_FIELD;
+    }
+
+    return undefined;
+}
+
+/**
  * Get the key for a report field
  */
 function getReportFieldKey(reportFieldId: string | undefined) {
@@ -4849,12 +4888,8 @@ function canEditFieldOfMoneyRequest(
 
         // Check if there are multiple outstanding reports across policies
         let outstandingReportsCount = 0;
-        for (const currentPolicy of Object.values(allPolicies ?? {})) {
-            const reports = getOutstandingReportsForUser(
-                currentPolicy?.id,
-                moneyRequestReport?.ownerAccountID,
-                outstandingReportsByPolicyID?.[currentPolicy?.id ?? CONST.DEFAULT_NUMBER_ID] ?? {},
-            );
+        for (const currentPolicy of policiesArray) {
+            const reports = getOutstandingReportsForUser(currentPolicy.id, moneyRequestReport?.ownerAccountID, outstandingReportsByPolicyID?.[currentPolicy?.id] ?? {});
             outstandingReportsCount += reports.length;
 
             // Short-circuit once we find more than 1
@@ -5935,8 +5970,8 @@ function getReportSubtitlePrefix(report: OnyxEntry<Report>): string {
     }
 
     let policyCount = 0;
-    for (const policy of Object.values(allPolicies ?? {})) {
-        if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
+    for (const policy of policiesArray) {
+        if (!shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
 
@@ -6580,6 +6615,30 @@ function buildOptimisticInvoiceReport(
 }
 
 /**
+ * Computes the optimistic report name using the policy's title field formula, with a fallback to the default expense report name.
+ */
+function computeOptimisticReportName(report: Report, policy: OnyxEntry<Policy>, policyID: string | undefined, reportTransactions: Record<string, Transaction>): string | null {
+    if (!isGroupPolicy(policy?.type ?? '')) {
+        return null;
+    }
+
+    const titleReportField = getTitleReportField(getReportFieldsByPolicyID(policyID) ?? {});
+    const formulaContext: FormulaContext = {
+        report,
+        policy,
+        allTransactions: reportTransactions,
+    };
+
+    // We use dynamic require here to avoid a circular dependency between ReportUtils and Formula
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    const Formula = require('./Formula') as {compute: (formula?: string, context?: FormulaContext) => string};
+
+    // If there is no title field, use "New Report" as default (matches OldDot behavior)
+    const defaultValue = titleReportField?.defaultValue ?? CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME;
+    return Formula.compute(defaultValue, formulaContext);
+}
+
+/**
  * Returns the stateNum and statusNum for an expense report based on the policy settings
  * @param policy
  */
@@ -6688,20 +6747,12 @@ function buildOptimisticExpenseReport({
         expenseReport.managerID = submitToAccountID;
     }
 
-    const titleReportField = getTitleReportField(getReportFieldsByPolicyID(policyID) ?? {});
-    if (!!titleReportField && isGroupPolicy(policy?.type ?? '')) {
-        const formulaContext: FormulaContext = {
-            report: expenseReport,
-            policy,
-            allTransactions: reportTransactions ?? {},
-        };
-
-        // We use dynamic require here to avoid a circular dependency between ReportUtils and Formula
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-        const Formula = require('./Formula') as {compute: (formula?: string, context?: FormulaContext) => string};
-        const computedName = Formula.compute(titleReportField.defaultValue, formulaContext);
-        expenseReport.reportName = computedName ?? expenseReport.reportName;
+    // Compute optimistic report name if applicable
+    const computedName = computeOptimisticReportName(expenseReport, policy, policyID, reportTransactions ?? {});
+    if (computedName !== null) {
+        expenseReport.reportName = computedName;
     }
+    // Otherwise, keep the default format: `${policyName} owes ${formattedTotal}`
 
     expenseReport.fieldList = policy?.fieldList;
 
@@ -6718,7 +6769,6 @@ function buildOptimisticEmptyReport(
     betas: OnyxEntry<Beta[]>,
 ) {
     const {stateNum, statusNum} = getExpenseReportStateAndStatus(policy, betas, true);
-    const titleReportField = getTitleReportField(getReportFieldsByPolicyID(policy?.id) ?? {});
     const optimisticEmptyReport: OptimisticNewReport = {
         reportName: '',
         reportID,
@@ -6740,17 +6790,11 @@ function buildOptimisticEmptyReport(
         managerID: getManagerAccountID(policy, {ownerAccountID: accountID}),
     };
 
-    const formulaContext: FormulaContext = {
-        report: optimisticEmptyReport as Report,
-        policy,
-        allTransactions: {},
-    };
-
-    // We use dynamic require here to avoid a circular dependency between ReportUtils and Formula
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    const Formula = require('./Formula') as {compute: (formula?: string, context?: FormulaContext) => string};
-    const optimisticReportName = Formula.compute(titleReportField?.defaultValue ?? CONST.POLICY.DEFAULT_REPORT_NAME_PATTERN, formulaContext);
-    optimisticEmptyReport.reportName = optimisticReportName ?? '';
+    // Compute optimistic report name if applicable
+    const optimisticReportName = computeOptimisticReportName(optimisticEmptyReport as Report, policy, policy?.id, {});
+    if (optimisticReportName !== null) {
+        optimisticEmptyReport.reportName = optimisticReportName;
+    }
 
     optimisticEmptyReport.participants = accountID
         ? {
@@ -9967,11 +10011,11 @@ function canUserPerformWriteAction(report: OnyxEntry<Report>, isReportArchived: 
 /**
  * Returns ID of the original report from which the given reportAction is first created.
  */
-function getOriginalReportID(reportID: string | undefined, reportAction: OnyxInputOrEntry<ReportAction>): string | undefined {
+function getOriginalReportID(reportID: string | undefined, reportAction: OnyxInputOrEntry<ReportAction>, reportActionsParam: OnyxEntry<ReportActions> | undefined): string | undefined {
     if (!reportID) {
         return undefined;
     }
-    const reportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
+    const reportActions = reportActionsParam ?? allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
     const currentReportAction = reportAction?.reportActionID ? reportActions?.[reportAction.reportActionID] : undefined;
     const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
     const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
@@ -10815,16 +10859,6 @@ function getIndicatedMissingPaymentMethod(
 }
 
 /**
- * Checks if report chat contains missing payment method
- */
-function hasMissingPaymentMethod(userWalletTierName: string | undefined, iouReportID: string | undefined, bankAccountList: OnyxEntry<BankAccountList>): boolean {
-    const reportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReportID}`] ?? {};
-    return Object.values(reportActions)
-        .filter(Boolean)
-        .some((action) => getIndicatedMissingPaymentMethod(userWalletTierName, iouReportID, action, bankAccountList) !== undefined);
-}
-
-/**
  * Used from expense actions to decide if we need to build an optimistic expense report.
  * Create a new report if:
  * - we don't have an iouReport set in the chatReport
@@ -11054,8 +11088,8 @@ function createDraftTransactionAndNavigateToParticipantSelector(
 
     let firstPolicy: Policy | undefined;
     let filteredPoliciesCount = 0;
-    for (const policy of Object.values(allPolicies ?? {})) {
-        if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
+    for (const policy of policiesArray) {
+        if (!shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
 
@@ -12946,7 +12980,6 @@ export {
     hasExpensifyGuidesEmails,
     hasHeldExpenses,
     hasIOUWaitingOnCurrentUserBankAccount,
-    hasMissingPaymentMethod,
     hasNonReimbursableTransactions,
     hasOnlyHeldExpenses,
     hasOnlyTransactionsWithPendingRoutes,
@@ -13130,6 +13163,7 @@ export {
     isSelectedManagerMcTest,
     isTestTransactionReport,
     getReportSubtitlePrefix,
+    computeOptimisticReportName,
     getPolicyChangeMessage,
     getMovedTransactionMessage,
     getUnreportedTransactionMessage,
@@ -13139,6 +13173,7 @@ export {
     isBusinessInvoiceRoom,
     buildOptimisticResolvedDuplicatesReportAction,
     getTitleReportField,
+    getTitleFieldWithFallback,
     getReportFieldsByPolicyID,
     getChatListItemReportName,
     buildOptimisticMovedTransactionAction,

@@ -25,12 +25,15 @@ import Navigation from '@libs/Navigation/Navigation';
 // eslint-disable-next-line no-restricted-syntax
 import * as PolicyUtils from '@libs/PolicyUtils';
 import {getOriginalMessage, getReportAction, isWhisperAction} from '@libs/ReportActionsUtils';
+// Testing only so it's okay to import computeReportName
+// eslint-disable-next-line no-restricted-imports
 import {buildReportNameFromParticipantNames, computeReportName as computeReportNameOriginal, getGroupChatName, getPolicyExpenseChatName, getReportName} from '@libs/ReportNameUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import {
     buildOptimisticChatReport,
     buildOptimisticCreatedReportAction,
     buildOptimisticCreatedReportForUnapprovedAction,
+    buildOptimisticEmptyReport,
     buildOptimisticExpenseReport,
     buildOptimisticInvoiceReport,
     buildOptimisticIOUReportAction,
@@ -72,6 +75,7 @@ import {
     getIOUReportActionDisplayMessage,
     getMoneyReportPreviewName,
     getMostRecentlyVisitedReport,
+    getOriginalReportID,
     getOutstandingChildRequest,
     getParentNavigationSubtitle,
     getParticipantsList,
@@ -6004,6 +6008,24 @@ describe('ReportUtils', () => {
             // User should not be a payer even if role says admin, because they're not in employeeList
             expect(isPayer(currentUserAccountID, currentUserEmail, reportForNonMember, undefined, policyWithoutCurrentUser, false)).toBe(false);
         });
+
+        it('should return true for IOU report manager even when policy is not available', async () => {
+            // Simulate an IOU report that inherited a policyID from the chat report,
+            // but the receiver (payer) does not have access to that workspace policy
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}sender-workspace`, null);
+
+            const iouReportWithPolicyID: Report = {
+                ...createRandomReport(8, undefined),
+                type: CONST.REPORT.TYPE.IOU,
+                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                policyID: 'sender-workspace',
+                managerID: currentUserAccountID,
+            };
+
+            // IOU receiver (payer/manager) should still be able to pay even without access to the policy
+            expect(isPayer(currentUserAccountID, currentUserEmail, iouReportWithPolicyID, undefined, undefined, false)).toBe(true);
+        });
     });
     describe('buildReportNameFromParticipantNames', () => {
         beforeAll(async () => {
@@ -9582,6 +9604,64 @@ describe('ReportUtils', () => {
             const expenseReport = buildOptimisticExpenseReport({chatReportID, policyID: undefined, payeeAccountID: 1, total, currency, betas: [CONST.BETAS.ALL]});
             expect(expenseReport.reportName).toBe(`${fakePolicy.name} owes ${convertToDisplayString(-total, currency)}`);
         });
+
+        it('should set reportName to "New Report" when policy field list is empty', async () => {
+            // Given a policy with an empty field list
+            const policyID = '200';
+            const policyWithEmptyFieldList: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                fieldList: {},
+            };
+
+            await Onyx.set(ONYXKEYS.BETAS, [CONST.BETAS.ALL]);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, policyWithEmptyFieldList);
+            await waitForBatchedUpdates();
+
+            // When we create an expense report offline
+            const chatReportID = '1';
+            const reportDraft: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                policyID,
+            };
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_DRAFT}${chatReportID}`, reportDraft);
+            const total = 100;
+            const currency = CONST.CURRENCY.USD;
+            const expenseReport = buildOptimisticExpenseReport({chatReportID, policyID, payeeAccountID: 1, total, currency, betas: [CONST.BETAS.ALL]});
+
+            // Then the report name should be "New Report" instead of the default name
+            expect(expenseReport.reportName).toBe(CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME);
+        });
+
+        it('should set reportName to default expense report name when policy field list is empty for different report', async () => {
+            // Given a policy with an empty field list
+            const policyID = '201';
+            const policyWithEmptyFieldList: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                fieldList: {},
+            };
+
+            await Onyx.set(ONYXKEYS.BETAS, [CONST.BETAS.ALL]);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, policyWithEmptyFieldList);
+            await waitForBatchedUpdates();
+
+            // When we create an expense report offline
+            const chatReportID = '2';
+            const reportDraft: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                policyID,
+            };
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_DRAFT}${chatReportID}`, reportDraft);
+            const total = 100;
+            const currency = CONST.CURRENCY.USD;
+            const expenseReport = buildOptimisticExpenseReport({chatReportID, policyID, payeeAccountID: 1, total, currency, betas: [CONST.BETAS.ALL]});
+
+            // Then the report name should be the default expense report name
+            expect(expenseReport.reportName).toBe(CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME);
+        });
     });
 
     describe('hasEmptyReportsForPolicy', () => {
@@ -11878,6 +11958,66 @@ describe('ReportUtils', () => {
         });
     });
 
+    describe('buildOptimisticEmptyReport', () => {
+        it('should set reportName to "New Report" when policy field list is empty', async () => {
+            // Given a policy with an empty field list
+            const policyWithEmptyFieldList: Policy = {
+                ...createRandomPolicy(200),
+                id: '200',
+                type: CONST.POLICY.TYPE.TEAM,
+                fieldList: {},
+            };
+
+            const betas = [CONST.BETAS.ALL];
+            await Onyx.set(ONYXKEYS.BETAS, betas);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyWithEmptyFieldList.id}`, policyWithEmptyFieldList);
+            await waitForBatchedUpdates();
+
+            // When we create an empty expense report
+            const reportID = 'test-report-id-123';
+            const accountID = currentUserAccountID;
+            const parentReport = {
+                ...createPolicyExpenseChat(accountID),
+                policyID: policyWithEmptyFieldList.id,
+            };
+            const parentReportActionID = 'parent-report-action-id-456';
+            const timeOfCreation = DateUtils.getDBTime();
+
+            // Then the report name should be "New Report"
+            const optimisticReport = buildOptimisticEmptyReport(reportID, accountID, parentReport, parentReportActionID, policyWithEmptyFieldList, timeOfCreation, betas);
+            expect(optimisticReport.reportName).toBe(CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME);
+        });
+
+        it('should set reportName to "New Report" when policy field list is empty for different report', async () => {
+            // Given a policy with an empty field list
+            const policyWithEmptyFieldList: Policy = {
+                ...createRandomPolicy(201),
+                id: '201',
+                type: CONST.POLICY.TYPE.TEAM,
+                fieldList: {},
+            };
+
+            const betas = [CONST.BETAS.ALL];
+            await Onyx.set(ONYXKEYS.BETAS, betas);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyWithEmptyFieldList.id}`, policyWithEmptyFieldList);
+            await waitForBatchedUpdates();
+
+            // When we create an empty expense report
+            const reportID = 'test-report-id-456';
+            const accountID = currentUserAccountID;
+            const parentReport = {
+                ...createPolicyExpenseChat(accountID),
+                policyID: policyWithEmptyFieldList.id,
+            };
+            const parentReportActionID = 'parent-report-action-id-789';
+            const timeOfCreation = DateUtils.getDBTime();
+
+            // Then the report name should be "New Report"
+            const optimisticReport = buildOptimisticEmptyReport(reportID, accountID, parentReport, parentReportActionID, policyWithEmptyFieldList, timeOfCreation, betas);
+            expect(optimisticReport.reportName).toBe(CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME);
+        });
+    });
+
     describe('getReportSubtitlePrefix', () => {
         it('should return empty string if it is not a chat room', () => {
             const report = createExpenseReport(1);
@@ -12175,6 +12315,44 @@ describe('ReportUtils', () => {
                 policies: [],
             });
             expect(result).toBe('Report Fallback Name');
+        });
+    });
+
+    describe('getOriginalReportID', () => {
+        it('should return undefined when reportID is undefined', () => {
+            const reportAction = createRandomReportAction(1);
+            const result = getOriginalReportID(undefined, reportAction, undefined);
+            expect(result).toBeUndefined();
+        });
+
+        it('should return reportID when currentReportAction exists in reportActions', () => {
+            const reportID = '123';
+            const reportAction = createRandomReportAction(1);
+            const reportActions = {
+                [reportAction.reportActionID]: reportAction,
+            };
+
+            const result = getOriginalReportID(reportID, reportAction, reportActions);
+            expect(result).toBe(reportID);
+        });
+
+        it('should return reportID when reportActions is undefined but reportAction has no reportActionID', () => {
+            const reportID = '123';
+            const reportAction = {
+                ...createRandomReportAction(1),
+                reportActionID: undefined,
+            } as unknown as ReportAction;
+
+            const result = getOriginalReportID(reportID, reportAction, undefined);
+            expect(result).toBe(reportID);
+        });
+
+        it('should return reportID when reportActions is empty and no thread conditions apply', () => {
+            const reportID = '123';
+            const reportAction = createRandomReportAction(1);
+
+            const result = getOriginalReportID(reportID, reportAction, {});
+            expect(result).toBe(reportID);
         });
     });
 });
