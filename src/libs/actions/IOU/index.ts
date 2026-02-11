@@ -67,6 +67,7 @@ import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import {isOffline} from '@libs/Network/NetworkStore';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
+import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import {getManagerMcTestParticipant, getPersonalDetailsForAccountIDs} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
@@ -1508,15 +1509,48 @@ function setMoneyRequestReceipt(transactionID: string, source: string, filename:
 }
 
 /**
- * Set custom unit rateID for the transaction draft
+ * Set custom unit rateID for the transaction draft, also updates quantity and distanceUnit
+ * if passed transaction previously had it to make sure that transaction does not have inconsistent
+ * states (for example distanceUnit not matching distance unit of the new customUnitRateID)
  */
-function setCustomUnitRateID(transactionID: string, customUnitRateID: string | undefined) {
+function setCustomUnitRateID(transactionID: string, customUnitRateID: string | undefined, transaction: OnyxEntry<OnyxTypes.Transaction>, policy: OnyxEntry<OnyxTypes.Policy>) {
     const isFakeP2PRate = customUnitRateID === CONST.CUSTOM_UNITS.FAKE_P2P_ID;
+
+    let newDistanceUnit: Unit | undefined;
+    let newQuantity: number | undefined;
+
+    if (customUnitRateID && transaction) {
+        const distanceRate = isFakeP2PRate
+            ? DistanceRequestUtils.getRate({transaction, useTransactionDistanceUnit: false, policy})
+            : DistanceRequestUtils.getRateByCustomUnitRateID({policy, customUnitRateID});
+
+        const transactionDistanceUnit = transaction.comment?.customUnit?.distanceUnit;
+        const transactionQuantity = transaction.comment?.customUnit?.quantity;
+
+        const shouldUpdateDistanceUnit = !!transactionDistanceUnit && !!distanceRate?.unit;
+        const shouldUpdateQuantity = transactionQuantity !== null && transactionQuantity !== undefined;
+
+        if (shouldUpdateDistanceUnit) {
+            newDistanceUnit = distanceRate.unit;
+        }
+        if (shouldUpdateQuantity && !!distanceRate?.unit) {
+            const newQuantityInMeters = getDistanceInMeters(transaction, transactionDistanceUnit);
+
+            // getDistanceInMeters returns 0 only if there was not enough input to get the correct
+            // distance in meters or if the current transaction distance is 0
+            if (newQuantityInMeters !== 0) {
+                newQuantity = DistanceRequestUtils.convertDistanceUnit(newQuantityInMeters, distanceRate.unit);
+            }
+        }
+    }
+
     Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`, {
         comment: {
             customUnit: {
                 customUnitRateID,
                 ...(!isFakeP2PRate && {defaultP2PRate: null}),
+                distanceUnit: newDistanceUnit,
+                quantity: newQuantity,
             },
         },
     });
@@ -1664,8 +1698,8 @@ function addSubrate(transaction: OnyxEntry<OnyxTypes.Transaction>, currentIndex:
     Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transaction?.transactionID}`, newTransaction);
 }
 
-function setMoneyRequestDistance(transactionID: string, distanceAsFloat: number, isDraft: boolean) {
-    Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {comment: {customUnit: {quantity: distanceAsFloat}}});
+function setMoneyRequestDistance(transactionID: string, distanceAsFloat: number, isDraft: boolean, distanceUnit: Unit) {
+    Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {comment: {customUnit: {quantity: distanceAsFloat, distanceUnit}}});
 }
 
 /**
@@ -1727,6 +1761,7 @@ function setMoneyRequestDistanceRate(transactionID: string, customUnitRateID: st
     if (distanceRate?.unit && distanceRate?.unit !== transaction?.comment?.customUnit?.distanceUnit) {
         newDistance = DistanceRequestUtils.convertDistanceUnit(getDistanceInMeters(transaction, transaction?.comment?.customUnit?.distanceUnit), distanceRate.unit);
     }
+
     Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {
         comment: {
             customUnit: {
@@ -7149,7 +7184,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 attendees: attendees ? JSON.stringify(attendees) : undefined,
                 currency,
                 comment,
-                distance,
+                distance: distance !== undefined ? roundToTwoDecimalPlaces(distance) : undefined,
                 created,
                 merchant,
                 iouReportID: iouReport?.reportID,
@@ -7994,7 +8029,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             createdIOUReportActionID,
             reportPreviewReportActionID: reportPreviewAction.reportActionID,
             waypoints: JSON.stringify(sanitizedWaypoints),
-            distance,
+            distance: distance !== undefined ? roundToTwoDecimalPlaces(distance) : undefined,
             receipt,
             odometerStart,
             odometerEnd,
