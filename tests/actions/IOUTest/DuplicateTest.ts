@@ -1144,14 +1144,14 @@ describe('actions/Duplicate', () => {
                 targetPolicy: mockPolicy,
                 targetPolicyCategories: fakePolicyCategories,
                 targetReport: policyExpenseChat,
+                betas: [CONST.BETAS.ALL],
+                personalDetails: {},
             });
 
             await waitForBatchedUpdates();
 
             // Then the API should have been called with REQUEST_MONEY
-            const requestMoneyCall = writeSpy.mock.calls.find(
-                (call: [string, Record<string, unknown>]) => call[0] === WRITE_COMMANDS.REQUEST_MONEY,
-            );
+            const requestMoneyCall = writeSpy.mock.calls.find((call: [string, Record<string, unknown>]) => call[0] === WRITE_COMMANDS.REQUEST_MONEY);
             expect(requestMoneyCall).toBeDefined();
 
             // And the transactionThreadReportID in the API call should NOT be the childReportID
