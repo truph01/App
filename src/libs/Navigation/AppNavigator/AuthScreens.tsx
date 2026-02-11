@@ -200,7 +200,6 @@ function AuthScreens() {
         if (!Navigation.isActiveRoute(ROUTES.SIGN_IN_MODAL)) {
             return;
         }
-        console.log('Timing Refetching');
         // This means sign in in RHP was successful, so we can subscribe to user events
         initializePusher(session?.accountID);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -232,8 +231,6 @@ function AuthScreens() {
 
         NetworkConnection.listenForReconnect();
         NetworkConnection.onReconnect(() => handleNetworkReconnect());
-
-        console.log('Timing Refetching 2');
 
         // Pusher initialization span
         startSpan(CONST.TELEMETRY.SPAN_NAVIGATION.PUSHER_INIT, {

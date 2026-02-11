@@ -1,7 +1,6 @@
 import {getActionFromState} from '@react-navigation/core';
 import type {NavigationContainerRef, NavigationState, PartialState} from '@react-navigation/native';
 import {findFocusedRoute, StackActions} from '@react-navigation/native';
-import Timing from '@libs/actions/Timing';
 import {getMatchingFullScreenRoute, isFullScreenName} from '@libs/Navigation/helpers/getAdaptedStateFromPath';
 import getStateFromPath from '@libs/Navigation/helpers/getStateFromPath';
 import normalizePath from '@libs/Navigation/helpers/normalizePath';
@@ -184,6 +183,5 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     }
 
     const {action: minimalAction} = getMinimalAction(action, navigation.getRootState());
-
     navigation.dispatch(minimalAction);
 }
