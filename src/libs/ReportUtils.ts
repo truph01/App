@@ -1039,12 +1039,14 @@ Onyx.connect({
 
 let allPolicies: OnyxCollection<Policy>;
 let hasPolicies: boolean;
+let policiesArray: Policy[] = [];
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.POLICY,
     waitForCollectionCallback: true,
     callback: (value) => {
         allPolicies = value;
         hasPolicies = !isEmptyObject(value);
+        policiesArray = Object.values(value ?? {}).filter((policy): policy is Policy => !!policy);
     },
 });
 
@@ -2722,7 +2724,9 @@ function isPayer(
     // If the report belongs to a workspace, verify the user is still a member
     // When a user leaves a workspace, they may no longer have access to the policy data,
     // or the policy.role/employeeList may be stale
-    if (iouReport?.policyID && iouReport.policyID !== CONST.POLICY.ID_FAKE) {
+    // Skip this check for IOU reports (personal 1:1 expenses) since they can inherit a policyID
+    // from the chat report but the payer may not be a member of that workspace
+    if (!isIOUReport(iouReport) && iouReport?.policyID && iouReport.policyID !== CONST.POLICY.ID_FAKE) {
         // No policy data means user likely left the workspace
         if (!policy) {
             return false;
@@ -4822,12 +4826,8 @@ function canEditFieldOfMoneyRequest(
 
         // Check if there are multiple outstanding reports across policies
         let outstandingReportsCount = 0;
-        for (const currentPolicy of Object.values(allPolicies ?? {})) {
-            const reports = getOutstandingReportsForUser(
-                currentPolicy?.id,
-                moneyRequestReport?.ownerAccountID,
-                outstandingReportsByPolicyID?.[currentPolicy?.id ?? CONST.DEFAULT_NUMBER_ID] ?? {},
-            );
+        for (const currentPolicy of policiesArray) {
+            const reports = getOutstandingReportsForUser(currentPolicy.id, moneyRequestReport?.ownerAccountID, outstandingReportsByPolicyID?.[currentPolicy?.id] ?? {});
             outstandingReportsCount += reports.length;
 
             // Short-circuit once we find more than 1
@@ -5787,9 +5787,12 @@ function getReportName(
     }
 
     if (isInvoiceRoom(report)) {
+        const invoiceReceiverPolicyID = report?.invoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS ? report?.invoiceReceiver?.policyID : undefined;
         formattedName = getInvoicesChatName({
             report,
-            receiverPolicy: invoiceReceiverPolicy,
+            // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            receiverPolicy: invoiceReceiverPolicy ?? getPolicy(invoiceReceiverPolicyID),
             personalDetails,
             policies,
             currentUserAccountID,
@@ -5905,8 +5908,8 @@ function getReportSubtitlePrefix(report: OnyxEntry<Report>): string {
     }
 
     let policyCount = 0;
-    for (const policy of Object.values(allPolicies ?? {})) {
-        if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
+    for (const policy of policiesArray) {
+        if (!shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
 
@@ -11024,8 +11027,8 @@ function createDraftTransactionAndNavigateToParticipantSelector(
 
     let firstPolicy: Policy | undefined;
     let filteredPoliciesCount = 0;
-    for (const policy of Object.values(allPolicies ?? {})) {
-        if (!policy || !shouldShowPolicy(policy, false, currentUserEmail)) {
+    for (const policy of policiesArray) {
+        if (!shouldShowPolicy(policy, false, currentUserEmail)) {
             continue;
         }
 
