@@ -295,10 +295,7 @@ describe('IOURequestStepHours', () => {
                 expect(setMoneyRequestMerchantSpy).toHaveBeenCalled();
             });
 
-            const merchantCall = setMoneyRequestMerchantSpy.mock.calls.at(0) as unknown[] | undefined;
-            expect(merchantCall?.at(0)).toBe(TRANSACTION_ID);
-            // The merchant string should contain hours
-            expect(merchantCall?.at(1)).toContain('8');
+            expect(setMoneyRequestMerchantSpy).toHaveBeenCalledWith(TRANSACTION_ID, '8 hours @ $50.00 / hour', true);
         });
     });
 
