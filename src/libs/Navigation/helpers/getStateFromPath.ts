@@ -20,9 +20,9 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
     const redirectedPath = getRedirectedPath(normalizedPath);
     const normalizedPathAfterRedirection = getMatchingNewRoute(redirectedPath) ?? redirectedPath;
 
-    const dynamicRouteSuffix = getLastSuffixFromPath(path);
+    const dynamicRouteSuffix = getLastSuffixFromPath(normalizedPathAfterRedirection);
     if (isDynamicRouteSuffix(dynamicRouteSuffix)) {
-        const pathWithoutDynamicSuffix = path.replace(`/${dynamicRouteSuffix}`, '');
+        const pathWithoutDynamicSuffix = normalizedPathAfterRedirection.replace(`/${dynamicRouteSuffix}`, '');
 
         type DynamicRouteKey = keyof typeof DYNAMIC_ROUTES;
 
@@ -37,18 +37,13 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
         if (focusedRoute?.name) {
             if (entryScreens.includes(focusedRoute.name as Screen)) {
                 // Generate navigation state for the dynamic route
-                const verifyAccountState = getStateForDynamicRoute(normalizedPath, dynamicRoute as DynamicRouteKey);
-                return verifyAccountState;
+                const dynamicRouteState = getStateForDynamicRoute(normalizedPath, dynamicRoute as DynamicRouteKey);
+                return dynamicRouteState;
             }
 
-            // Fallback to root parsing so users can't land on /verify-account directly.
-            // This ensures navigation redirects back to the previous screen (root handles that).
+            // Fallback to not found page so users can't land on dynamic suffix directly.
             if (pathWithoutDynamicSuffix === '/' || pathWithoutDynamicSuffix === '') {
-                const state = RNGetStateFromPath(pathWithoutDynamicSuffix, linkingConfig.config);
-
-                if (!state) {
-                    throw new Error('Failed to parse the path to a navigation state.');
-                }
+                const state = {routes: [{name: 'not-found', path: normalizedPathAfterRedirection}]};
 
                 return state;
             }
@@ -64,7 +59,6 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
     if (!state) {
         throw new Error('Failed to parse the path to a navigation state.');
     }
-
     return state;
 }
 
