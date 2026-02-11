@@ -64,11 +64,11 @@ Flag when EITHER of these is true:
 
 **Case 1 — Missing cleanup:**
 - A `useEffect` performs async work (fetch, promise chain, async/await)
-- The async result is written to state via `setState`
+- The async callback performs side effects (setState, navigation, data mutations, deletions)
 - There is no cleanup mechanism to discard stale responses (no `ignore` flag, no `AbortController`, no cancellation token)
 
 **Case 2 — Suppressed dependency lint:**
-- A `useEffect` performs async work and sets state
+- A `useEffect` performs async work and triggers side effects (setState, navigation, mutations)
 - The dependency array has an `eslint-disable` comment suppressing `react-hooks/exhaustive-deps`
 - This hides a dependency that could change and cause a race condition
 
@@ -76,8 +76,8 @@ Flag when EITHER of these is true:
 
 - The Effect includes an `ignore`/`cancelled` boolean checked before `setState`
 - The Effect uses `AbortController` to cancel the request on cleanup
-- The dependency array is empty `[]` with no suppressed lint (no race possible — deps never change)
-- The async operation doesn't set state (fire-and-forget)
+- The async operation is truly fire-and-forget (no setState, no navigation, no mutations, just logging or analytics that are safe to complete after unmount)
+- The dependency array is empty `[]` with no suppressed lint, AND the async callback only performs idempotent/safe operations (no navigation, no destructive mutations that could fire after unmount)
 - Data fetching is handled by a library/framework (e.g., Onyx, React Query)
 
 **Search Patterns** (hints for reviewers):

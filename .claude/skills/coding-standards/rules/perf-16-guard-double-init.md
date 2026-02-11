@@ -64,8 +64,9 @@ Flag ONLY when ALL of these are true:
 
 **DO NOT flag if:**
 
-- A module-level guard variable prevents double execution (`if (didInit) return`)
+- A module-level or ref-based guard variable prevents double execution. A proper execution guard follows this pattern: `if (didInit) return; didInit = true;` — it checks a flag AND sets it. Conditional checks on data/props (e.g., `if (!transaction) return`, `if (action !== 'CREATE') return`) are NOT execution guards — they validate preconditions but don't prevent the logic from running again if the same preconditions hold in a second invocation (which happens in React Strict Mode).
 - The logic is idempotent (safe to run twice with no side effects)
+- NOTE: Navigation calls (e.g., `navigate()`), data deletion (e.g., `removeDraftTransactions()`) and similar mutations are NOT idempotent — running them twice produces different/undesirable results.
 - The logic is at module level, outside any component
 - The Effect has non-empty dependencies (not one-time init)
 

@@ -72,12 +72,18 @@ function ChatIndicator() {
 Flag ONLY when ALL of these are true:
 
 - A `useEffect` subscribes to an external source (DOM events, third-party store, browser API)
-- The Effect's only purpose is to read a value from that source and write it into state via `setState`
-- The pattern follows: subscribe in setup, unsubscribe in cleanup, `setState` in the listener
+- Inside the listener, at least one `setState` call directly mirrors an external value
+  (e.g., `setWidth(window.innerWidth)`, `setOnline(navigator.onLine)`)
+- The pattern for that state variable follows: subscribe in setup, unsubscribe in cleanup,
+  `setState(externalValue)` in the listener
+- Evaluate each state variable independently — if one state variable is a raw mirror of an
+  external value, flag it even if the same effect also manages other state for different purposes
 
 **DO NOT flag if:**
 
-- The subscription triggers side effects beyond reading a value (e.g., logging, navigation)
+- The specific state variable being flagged undergoes transformation, debouncing, or derives
+  from computation rather than directly mirroring the external value. Other state variables
+  in the same effect that DO directly mirror external values should still be flagged.
 - The external API doesn't fit the `subscribe` / `getSnapshot` contract
 - The code already uses `useSyncExternalStore`
 - The subscription is managed by a library (e.g., Onyx's `useOnyx`)
