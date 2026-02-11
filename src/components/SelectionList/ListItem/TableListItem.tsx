@@ -26,6 +26,7 @@ function TableListItem<TItem extends ListItem>({
     titleContainerStyles,
     shouldUseDefaultRightHandSideCheckmark,
     shouldShowRightCaret,
+    errorRowStyles,
 }: TableListItemProps<TItem>) {
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -63,7 +64,6 @@ function TableListItem<TItem extends ListItem>({
             pressableWrapperStyle={[styles.mh5, animatedHighlightStyle]}
             wrapperStyle={[styles.flexRow, styles.flex1, styles.justifyContentBetween, styles.userSelectNone, styles.alignItemsCenter]}
             containerStyle={styles.mb2}
-            errorRowStyles={[styles.ph5, styles.mb2]}
             isFocused={isFocused}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
@@ -73,6 +73,7 @@ function TableListItem<TItem extends ListItem>({
             onDismissError={onDismissError}
             rightHandSideComponent={rightHandSideComponent}
             errors={item.errors}
+            errorRowStyles={[errorRowStyles ?? styles.mb2]}
             pendingAction={item.pendingAction}
             keyForList={item.keyForList}
             onFocus={onFocus}

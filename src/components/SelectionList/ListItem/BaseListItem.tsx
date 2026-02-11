@@ -23,7 +23,6 @@ function BaseListItem<TItem extends ListItem>({
     wrapperStyle,
     pressableWrapperStyle,
     containerStyle,
-    errorRowStyles,
     isDisabled = false,
     shouldPreventEnterKeySubmit = false,
     canSelectMultiple = false,
@@ -32,6 +31,7 @@ function BaseListItem<TItem extends ListItem>({
     rightHandSideComponent,
     keyForList,
     errors,
+    errorRowStyles,
     pendingAction,
     FooterComponent,
     children,
@@ -48,6 +48,7 @@ function BaseListItem<TItem extends ListItem>({
     shouldDisableHoverStyle,
     shouldStopMouseLeavePropagation = true,
     shouldShowRightCaret = false,
+    accessible,
     accessibilityRole = getButtonRole(true),
 }: BaseListItemProps<TItem>) {
     const theme = useTheme();
@@ -95,7 +96,7 @@ function BaseListItem<TItem extends ListItem>({
             onClose={() => onDismissError(item)}
             pendingAction={pendingAction}
             errors={errors}
-            errorRowStyles={errorRowStyles ?? styles.ph5}
+            errorRowStyles={[styles.mh5, errorRowStyles]}
             contentContainerStyle={containerStyle}
         >
             <PressableWithFeedback
@@ -119,7 +120,6 @@ function BaseListItem<TItem extends ListItem>({
                 disabled={isDisabled && !item.isSelected}
                 interactive={item.isInteractive}
                 accessibilityLabel={item.accessibilityLabel ?? [item.text, item.text !== item.alternateText ? item.alternateText : undefined].filter(Boolean).join(', ')}
-                role={accessibilityRole}
                 accessibilityState={accessibilityState}
                 isNested
                 hoverDimmingValue={1}
@@ -141,9 +141,11 @@ function BaseListItem<TItem extends ListItem>({
                 ]}
                 onFocus={onFocus}
                 onMouseLeave={handleMouseLeave}
-                tabIndex={item.tabIndex}
+                tabIndex={accessible === false ? -1 : item.tabIndex}
                 wrapperStyle={pressableWrapperStyle}
                 testID={testID}
+                accessible={accessible}
+                role={accessible === false ? CONST.ROLE.PRESENTATION : accessibilityRole}
             >
                 <View
                     testID={`${CONST.BASE_LIST_ITEM_TEST_ID}${item.keyForList}`}
