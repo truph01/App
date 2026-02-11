@@ -1,3 +1,4 @@
+import type {FeedKeysWithAssignedCards} from '@selectors/Card';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
 import type {AdditionalCardProps} from '@components/SelectionListWithSections/Search/CardListItem';
@@ -9,6 +10,7 @@ import type {Card, CardFeeds, CardList, PersonalDetailsList, Policy, WorkspaceCa
 import type {CardFeedsStatus, CardFeedsStatusByDomainID, CardFeedWithNumber, CombinedCardFeed} from '@src/types/onyx/CardFeeds';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {
+    directFeedHasCards,
     getBankName,
     getCardFeedIcon,
     getCardFeedWithDomainID,
@@ -436,7 +438,12 @@ const generateSelectedCards = (
  *
  * The `allCards` parameter is only used to determine if we should add the "Expensify Card" feeds.
  */
-function getCardFeedsForDisplay(allCardFeeds: OnyxCollection<CardFeeds>, allCards: CardList | undefined, translate: LocalizedTranslate): CardFeedsForDisplay {
+function getCardFeedsForDisplay(
+    allCardFeeds: OnyxCollection<CardFeeds>,
+    allCards: CardList | undefined,
+    translate: LocalizedTranslate,
+    feedKeysWithCards?: FeedKeysWithAssignedCards,
+): CardFeedsForDisplay {
     const cardFeedsForDisplay = {} as CardFeedsForDisplay;
 
     for (const [domainKey, cardFeeds] of Object.entries(allCardFeeds ?? {})) {
@@ -446,7 +453,7 @@ function getCardFeedsForDisplay(allCardFeeds: OnyxCollection<CardFeeds>, allCard
             continue;
         }
 
-        for (const key of Object.keys(getOriginalCompanyFeeds(cardFeeds))) {
+        for (const key of Object.keys(getOriginalCompanyFeeds(cardFeeds, feedKeysWithCards, Number(fundID)))) {
             const feed = key as CardFeedWithNumber;
             const id = `${fundID}_${feed}`;
 
@@ -490,7 +497,11 @@ function getCardFeedsForDisplay(allCardFeeds: OnyxCollection<CardFeeds>, allCard
  *
  * Note: "Expensify Card" feeds are not included.
  */
-function getCardFeedsForDisplayPerPolicy(allCardFeeds: OnyxCollection<CardFeeds>, translate: LocalizedTranslate): Record<string, CardFeedForDisplay[]> {
+function getCardFeedsForDisplayPerPolicy(
+    allCardFeeds: OnyxCollection<CardFeeds>,
+    translate: LocalizedTranslate,
+    feedKeysWithCards?: FeedKeysWithAssignedCards,
+): Record<string, CardFeedForDisplay[]> {
     const cardFeedsForDisplayPerPolicy = {} as Record<string, CardFeedForDisplay[]>;
 
     for (const [domainKey, cardFeeds] of Object.entries(allCardFeeds ?? {})) {
@@ -500,7 +511,7 @@ function getCardFeedsForDisplayPerPolicy(allCardFeeds: OnyxCollection<CardFeeds>
             continue;
         }
 
-        for (const [key, feedData] of Object.entries(getOriginalCompanyFeeds(cardFeeds))) {
+        for (const [key, feedData] of Object.entries(getOriginalCompanyFeeds(cardFeeds, feedKeysWithCards, Number(fundID)))) {
             const preferredPolicy = feedData && 'preferredPolicy' in feedData ? (feedData.preferredPolicy ?? '') : '';
             const feed = key as CardFeedWithNumber;
             const id = `${fundID}_${feed}`;
@@ -532,7 +543,11 @@ function getWorkspaceCardFeedsStatus(allFeeds: OnyxCollection<CardFeeds> | undef
     }, {} as CardFeedsStatusByDomainID);
 }
 
-function getCombinedCardFeedsFromAllFeeds(allFeeds: OnyxCollection<CardFeeds> | undefined, includeFeedPredicate?: (feed: CombinedCardFeed) => boolean): CombinedCardFeeds {
+function getCombinedCardFeedsFromAllFeeds(
+    allFeeds: OnyxCollection<CardFeeds> | undefined,
+    includeFeedPredicate?: (feed: CombinedCardFeed) => boolean,
+    feedKeysWithCards?: FeedKeysWithAssignedCards,
+): CombinedCardFeeds {
     return Object.entries(allFeeds ?? {}).reduce<CombinedCardFeeds>((acc, [onyxKey, feeds]) => {
         const domainID = Number(onyxKey.split('_').at(-1));
 
@@ -553,8 +568,9 @@ function getCombinedCardFeedsFromAllFeeds(allFeeds: OnyxCollection<CardFeeds> | 
                 continue;
             }
 
-            // Skip stale direct feeds (OAuth/Plaid) that are missing their oAuthAccountDetails
-            if (isDirectFeed(feedName) && !oAuthAccountDetails) {
+            // Only filter stale direct feeds when we have card data to make an informed decision.
+            // A direct feed is stale if it has no oAuthAccountDetails AND no assigned cards.
+            if (feedKeysWithCards && isDirectFeed(feedName) && !oAuthAccountDetails && !directFeedHasCards(feedName, domainID, feedKeysWithCards)) {
                 continue;
             }
 

@@ -1,3 +1,4 @@
+import type {FeedKeysWithAssignedCards} from '@selectors/Card';
 import {fromUnixTime, isBefore} from 'date-fns';
 import groupBy from 'lodash/groupBy';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
@@ -467,7 +468,7 @@ function isCSVFeedOrExpensifyCard(feedKey: string): boolean {
 
 /**
  * Checks if a feed is a direct feed (OAuth or Plaid based).
- * Direct feeds require oAuthAccountDetails to be valid.
+ * Mirrors the backend's Card::isOAuthBank and Card::isPlaidBank logic.
  */
 function isDirectFeed(feed: string | undefined): boolean {
     if (!feed) {
@@ -477,7 +478,27 @@ function isDirectFeed(feed: string | undefined): boolean {
     return lowerFeed.startsWith('oauth') || lowerFeed.startsWith('plaid');
 }
 
-function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>): CompanyFeeds {
+/**
+ * Checks whether a direct feed has any assigned cards using a precomputed lightweight map.
+ * This is used as a fallback validity signal when oAuthAccountDetails is missing.
+ * The feedKeysWithCards map is produced by feedKeysWithAssignedCardsSelector in selectors/Card.ts.
+ */
+function directFeedHasCards(feedName: string, domainID: number, feedKeysWithCards: FeedKeysWithAssignedCards | undefined): boolean {
+    if (!feedKeysWithCards || !domainID) {
+        return false;
+    }
+
+    return feedKeysWithCards[`${domainID}_${feedName}`] === true;
+}
+
+/**
+ * Returns company feeds from cardFeeds, filtering out pending/deleted feeds, Expensify Card, and stale direct feeds.
+ *
+ * A direct feed (OAuth/Plaid) is considered stale when it has no oAuthAccountDetails AND no assigned cards.
+ * The stale feed filter only applies when feedKeysWithCards is provided so we have complete data.
+ * When feedKeysWithCards is not provided, direct feeds are not filtered (safer to show than hide).
+ */
+function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>, feedKeysWithCards?: FeedKeysWithAssignedCards, domainID?: number): CompanyFeeds {
     const oAuthAccountDetails = cardFeeds?.settings?.oAuthAccountDetails;
     return Object.fromEntries(
         Object.entries(cardFeeds?.settings?.companyCards ?? {}).filter(([key, value]) => {
@@ -488,9 +509,9 @@ function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>): CompanyFeeds 
                 return false;
             }
 
-            // Direct feeds (OAuth/Plaid) require oAuthAccountDetails to be valid.
-            // Filter out stale orphaned entries where oAuthAccountDetails was removed but companyCards remains.
-            if (isDirectFeed(key) && !oAuthAccountDetails?.[key as CompanyCardFeed]) {
+            // Only filter stale direct feeds when we have card data to make an informed decision.
+            // A direct feed is stale if it has no oAuthAccountDetails AND no assigned cards.
+            if (feedKeysWithCards && isDirectFeed(key) && !oAuthAccountDetails?.[key as CompanyCardFeed] && !directFeedHasCards(key, domainID ?? 0, feedKeysWithCards)) {
                 return false;
             }
             return true;
@@ -1188,6 +1209,7 @@ export {
     getFeedConnectionBrokenCard,
     getCorrectStepForPlaidSelectedBank,
     isDirectFeed,
+    directFeedHasCards,
     getOriginalCompanyFeeds,
     getCompanyCardFeed,
     getCardFeedWithDomainID,
