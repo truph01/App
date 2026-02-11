@@ -857,15 +857,7 @@ function SearchAutocompleteList({
     const sectionItemText = sections?.at(1)?.data?.[0]?.text ?? '';
     const normalizedReferenceText = sectionItemText.toLowerCase();
 
-    // Get the first focusable item from the first section with data
-    const firstFocusableItemKey = (() => {
-        for (const section of sections) {
-            if (section.data && section.data.length > 0) {
-                return section.data.at(0)?.keyForList;
-            }
-        }
-        return undefined;
-    })();
+    const firstRecentReportKey = styledRecentReports.at(0)?.keyForList;
 
     useEffect(() => {
         const targetText = autocompleteQueryValue;
@@ -886,13 +878,15 @@ function SearchAutocompleteList({
                 ListItem={SearchRouterItem as unknown as ValidListItem}
                 style={{
                     containerStyle: [styles.mh100],
-                    listStyle: [styles.ph2, styles.pb2, styles.overscrollBehaviorContain],
+                    listStyle: [styles.ph2, styles.overscrollBehaviorContain],
+                    contentContainerStyle: styles.pb2,
                     listItemWrapperStyle: [styles.pr0, styles.pl0],
                     sectionTitleStyles: styles.mhn2,
                 }}
                 shouldSingleExecuteRowSelect
                 ref={setListRef}
-                initiallyFocusedItemKey={!shouldUseNarrowLayout ? firstFocusableItemKey : undefined}
+                initialScrollIndex={0}
+                initiallyFocusedItemKey={!shouldUseNarrowLayout ? firstRecentReportKey : undefined}
                 shouldScrollToFocusedIndex={!isInitialRender}
                 disableKeyboardShortcuts={!shouldSubscribeToArrowKeyEvents}
                 addBottomSafeAreaPadding

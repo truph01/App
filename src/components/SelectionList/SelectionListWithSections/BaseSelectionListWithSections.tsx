@@ -290,7 +290,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
             case CONST.SECTION_LIST_ITEM_TYPE.HEADER:
                 return (
                     <View style={[styles.optionsListSectionHeader, styles.justifyContentCenter]}>
-                        <Text style={[styles.ph5, styles.textLabelSupporting]}>{(item as SectionHeader).title}</Text>
+                        <Text style={[styles.ph5, styles.textLabelSupporting, style?.sectionTitleStyles]}>{(item as SectionHeader).title}</Text>
                     </View>
                 );
             case CONST.SECTION_LIST_ITEM_TYPE.ROW: {
@@ -354,6 +354,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                         showsVerticalScrollIndicator
                         keyboardShouldPersistTaps="always"
                         style={style?.listStyle}
+                        contentContainerStyle={style?.contentContainerStyle}
                         maintainVisibleContentPosition={{disabled: disableMaintainingScrollPosition}}
                     />
                 </>
