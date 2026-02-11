@@ -102,15 +102,15 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
         // How much space is wasted on each side
         const wastedLeft = geometricPadding - firstLabelNeeds;
         const wastedRight = geometricPadding - lastLabelNeeds;
-        const canReduce = Math.min(wastedLeft, wastedRight);
+        const reclaimablePadding = Math.min(wastedLeft, wastedRight);
 
         // Only reduce if both sides have excess space (labels short enough for 0°)
-        // If canReduce <= 0, labels are too long and hook will use rotation/truncation
-        const extraPadding = canReduce > 0;
-        const horizontalPadding = Math.max(extraPadding ? geometricPadding - canReduce : geometricPadding, MIN_SAFE_PADDING);
+        // If reclaimablePadding <= 0, labels are too long and hook will use rotation/truncation
+        const shouldUseExtraPadding = reclaimablePadding > 0;
+        const horizontalPadding = Math.max(shouldUseExtraPadding ? geometricPadding - reclaimablePadding : geometricPadding, MIN_SAFE_PADDING);
 
-        // if extraPadding is true then we have to add the extra padding to the right so the label is not clipped
-        return {...BASE_DOMAIN_PADDING, left: horizontalPadding, right: horizontalPadding + (extraPadding ? MIN_SAFE_PADDING : 0)};
+        // If shouldUseExtraPadding is true then we have to add the extra padding to the right so the label is not clipped
+        return {...BASE_DOMAIN_PADDING, left: horizontalPadding, right: horizontalPadding + (shouldUseExtraPadding ? MIN_SAFE_PADDING : 0)};
     }, [chartWidth, data, font]);
 
     // For centered labels, tick spacing is evenly distributed across the plot area (same as BarChart)
