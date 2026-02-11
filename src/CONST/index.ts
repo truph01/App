@@ -1792,6 +1792,9 @@ const CONST = {
         ATTRIBUTE_ROUTE_TO: 'route_to',
         ATTRIBUTE_MIN_DURATION: 'min_duration',
         ATTRIBUTE_FINISHED_MANUALLY: 'finished_manually',
+        ATTRIBUTE_SKELETON_PREFIX: 'skeleton.',
+        // Event names
+        EVENT_SKELETON_ATTRIBUTES_UPDATE: 'skeleton_attributes_updated',
         CONFIG: {
             SKELETON_MIN_DURATION: 10_000,
             MEMORY_TRACKING_INTERVAL: 2 * 60 * 1000,
@@ -8417,6 +8420,9 @@ const CONST = {
         },
         ONBOARDING: {
             INTERESTED_FEATURES_ITEM: 'Onboarding-InterestedFeaturesItem',
+        },
+        REPORT_HEADER_SKELETON: {
+            GO_BACK: 'ReportHeaderSkeleton-GoBack',
         },
         TWO_FACTOR_AUTH: {
             RESEND_CODE: 'TwoFactorAuth-ResendCode',
