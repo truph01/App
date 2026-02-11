@@ -1,6 +1,6 @@
 import Onyx from 'react-native-onyx';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {LocalPasskeyEntry, PasskeyCredential} from '@src/types/onyx';
+import type {LocalPasskeyCredentialsEntry, PasskeyCredential} from '@src/types/onyx';
 
 /** Identifies a passkey storage scope for a specific user */
 type PasskeyScope = {
@@ -8,12 +8,12 @@ type PasskeyScope = {
 };
 
 /** Returns Onyx key: passkey_${userId} */
-function getPasskeyOnyxKey(userId: string): `${typeof ONYXKEYS.COLLECTION.PASSKEYS}${string}` {
-    return `${ONYXKEYS.COLLECTION.PASSKEYS}${userId}`;
+function getPasskeyOnyxKey(userId: string): `${typeof ONYXKEYS.COLLECTION.PASSKEY_CREDENTIALS}${string}` {
+    return `${ONYXKEYS.COLLECTION.PASSKEY_CREDENTIALS}${userId}`;
 }
 
 type SetLocalPasskeyCredentialsParams = PasskeyScope & {
-    entry: LocalPasskeyEntry;
+    entry: LocalPasskeyCredentialsEntry;
 };
 
 /**
@@ -30,17 +30,17 @@ function setLocalPasskeyCredentials({userId, entry}: SetLocalPasskeyCredentialsP
 
 type AddLocalPasskeyCredentialParams = PasskeyScope & {
     credential: PasskeyCredential;
-    existingEntry: LocalPasskeyEntry | null;
+    existingCredentials: LocalPasskeyCredentialsEntry | null;
 };
 
-function addLocalPasskeyCredential({userId, credential, existingEntry}: AddLocalPasskeyCredentialParams): void {
-    const existingCredentials = existingEntry?.credentials ?? [];
+function addLocalPasskeyCredential({userId, credential, existingCredentials}: AddLocalPasskeyCredentialParams): void {
+    const credentials = existingCredentials ?? [];
 
-    if (existingCredentials.some((c) => c.id === credential.id)) {
+    if (credentials.some((c) => c.id === credential.id)) {
         throw new Error(`Passkey credential with id "${credential.id}" already exists for user ${userId}`);
     }
 
-    setLocalPasskeyCredentials({userId, entry: {credentials: [...existingCredentials, credential]}});
+    setLocalPasskeyCredentials({userId, entry: [...credentials, credential]});
 }
 
 /** Deletes all passkey credentials for a user from Onyx storage */
@@ -48,34 +48,34 @@ function deleteLocalPasskeyCredentials(userId: string): void {
     if (!userId) {
         throw new Error('userId is required to delete passkey credentials');
     }
-    Onyx.set(getPasskeyOnyxKey(userId), {credentials: []});
+    Onyx.set(getPasskeyOnyxKey(userId), []);
 }
 
 /** Backend returns simplified format without transports */
 type BackendPasskeyCredential = Omit<PasskeyCredential, 'transports'>;
 
 type ReconcileLocalPasskeysWithBackendParams = PasskeyScope & {
-    backendPasskeyCredentials: BackendPasskeyCredential[];
-    localEntry: LocalPasskeyEntry | null;
+    backendCredentials: BackendPasskeyCredential[];
+    localCredentials: LocalPasskeyCredentialsEntry | null;
 };
 
 /**
  * Reconciles local Onyx passkeys with backend allowCredentials.
  * Removes local credentials that no longer exist on backend.
  */
-function reconcileLocalPasskeysWithBackend({userId, backendPasskeyCredentials, localEntry}: ReconcileLocalPasskeysWithBackendParams): PasskeyCredential[] {
+function reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials}: ReconcileLocalPasskeysWithBackendParams): PasskeyCredential[] {
     if (!userId) {
         throw new Error('userId is required to reconcile passkey credentials');
     }
-    if (!localEntry || localEntry.credentials.length === 0) {
+    if (!localCredentials || localCredentials.length === 0) {
         return [];
     }
 
-    const backendCredentialIds = new Set(backendPasskeyCredentials.map((c) => c.id));
-    const matchedCredentials = localEntry.credentials.filter((c) => backendCredentialIds.has(c.id));
+    const backendCredentialIds = new Set(backendCredentials.map((c) => c.id));
+    const matchedCredentials = localCredentials.filter((c) => backendCredentialIds.has(c.id));
 
-    if (matchedCredentials.length !== localEntry.credentials.length) {
-        setLocalPasskeyCredentials({userId, entry: {credentials: matchedCredentials}});
+    if (matchedCredentials.length !== localCredentials.length) {
+        setLocalPasskeyCredentials({userId, entry: matchedCredentials});
     }
 
     return matchedCredentials;
