@@ -2,6 +2,7 @@ import type {ReactElement, ReactNode} from 'react';
 import type {AccessibilityState, BlurEvent, NativeSyntheticEvent, Role, StyleProp, TargetedEvent, TextStyle, ViewStyle} from 'react-native';
 import type {AnimatedStyle} from 'react-native-reanimated';
 import type {ValueOf} from 'type-fest';
+import type {SearchRouterItem} from '@components/Search/SearchAutocompleteList';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
 import type {BrickRoad} from '@libs/WorkspacesSettingsUtils';
 // eslint-disable-next-line no-restricted-imports
@@ -11,7 +12,6 @@ import type {SplitExpense} from '@src/types/onyx/IOU';
 import type {Errors, Icon, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {ReceiptErrors} from '@src/types/onyx/Transaction';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
-import type {SearchRouterItem} from '@components/Search/SearchAutocompleteList';
 import type BaseListItem from './BaseListItem';
 import type InviteMemberListItem from './InviteMemberListItem';
 import type MultiSelectListItem from './MultiSelectListItem';
