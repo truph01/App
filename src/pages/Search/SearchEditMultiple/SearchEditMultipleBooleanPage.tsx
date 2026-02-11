@@ -51,9 +51,9 @@ function SearchEditMultipleBooleanPage() {
     const selectValue = (item: BooleanOption) => {
         const shouldClear = selectedValue === item.value;
         if (isBillableScreen) {
-            updateBulkEditDraftTransaction({billable: shouldClear ? null : item.value});
+            updateBulkEditDraftTransaction({billable: shouldClear ? undefined : item.value});
         } else {
-            updateBulkEditDraftTransaction({reimbursable: shouldClear ? null : item.value});
+            updateBulkEditDraftTransaction({reimbursable: shouldClear ? undefined : item.value});
         }
         Navigation.goBack();
     };
