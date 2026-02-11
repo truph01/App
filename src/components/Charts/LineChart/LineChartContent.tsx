@@ -151,7 +151,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
         checkIsOver: checkIsOverDot,
     });
 
-    const tooltipData = useTooltipData(activeDataIndex, data, yAxisUnit, yAxisUnitPosition);
+    const tooltipData = useTooltipData(activeDataIndex, data, formatYAxisLabel);
 
     // Custom x-axis labels with hybrid positioning:
     // - At 0° (horizontal): center label under the point (like bar chart)
