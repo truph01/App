@@ -96,7 +96,7 @@ function createCardFilterItem(
     const cardName = card?.nameValuePairs?.cardTitle;
     const text = personalDetails?.displayName ?? cardName;
     const plaidUrl = getPlaidInstitutionIconUrl(card?.bank);
-    const isCSVImportCard = card?.bank === CONST.COMPANY_CARDS.BANK_NAME.UPLOAD;
+    const isCSVImportCard = card?.bank === CONST.PERSONAL_CARD.BANK_NAME.CSV;
 
     return {
         lastFourPAN: isCSVImportCard ? card?.cardName : card.lastFourPAN,
