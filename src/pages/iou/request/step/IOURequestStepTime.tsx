@@ -70,6 +70,7 @@ function IOURequestStepTime({
     const shouldShowNotFound = !isValidMoneyRequestType(iouType) || isEmptyObject(policy) || (isEditPage && isEmptyObject(transaction?.comment?.customUnit));
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const policiesWithPerDiemEnabled = useMemo(() => getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates(allPolicies, currentUserLogin), [allPolicies, currentUserLogin]);
+    const hasMoreThanOnePolicyWithPerDiemEnabled = policiesWithPerDiemEnabled.length > 1;
 
     const navigateBack = () => {
         if (isEditPage) {
