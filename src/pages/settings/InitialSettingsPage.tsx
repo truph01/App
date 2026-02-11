@@ -277,7 +277,16 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             screenName: SCREENS.SETTINGS.SUBSCRIPTION.ROOT,
             brickRoadIndicator:
                 !!privateSubscription?.errors ||
-                hasSubscriptionRedDotError(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, amountOwed, ownerBillingGraceEndPeriod)
+                hasSubscriptionRedDotError(
+                    stripeCustomerId,
+                    retryBillingSuccessful,
+                    billingDisputePending,
+                    retryBillingFailed,
+                    fundList,
+                    billingStatus,
+                    amountOwed,
+                    ownerBillingGraceEndPeriod,
+                )
                     ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR
                     : undefined,
             badgeText: freeTrialText,
