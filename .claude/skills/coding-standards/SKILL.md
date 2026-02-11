@@ -1,6 +1,6 @@
 ---
 name: coding-standards
-description: Expensify coding standards for React Native — performance patterns, consistency rules, and clean React architecture. Guides both development and automated review.
+description: Provides coding standards for React Native — performance patterns, consistency rules, and clean React architecture. Use when writing, modifying, or reviewing code.
 alwaysApply: true
 ---
 
