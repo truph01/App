@@ -1938,6 +1938,7 @@ function evenlyDistributeSplitExpenseAmounts(draftTransaction: OnyxEntry<OnyxTyp
  * The original amount is distributed proportionally across all dates.
  *
  * @param transaction - The transaction containing split expenses
+ * @param transactionReport - The report of the transaction
  * @param startDate - Start date in format 'YYYY-MM-DD'
  * @param endDate - End date in format 'YYYY-MM-DD'
  */
