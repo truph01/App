@@ -23,7 +23,7 @@ import type {AssignCardData, AssignCardStep} from '@src/types/onyx/AssignCard';
 import useCardFeedErrors from './useCardFeedErrors';
 import useCardFeeds from './useCardFeeds';
 import type {CombinedCardFeed} from './useCardFeeds';
-import useCurrencyList from './useCurrencyList';
+import {useCurrencyListState} from './useCurrencyList';
 import useIsAllowedToIssueCompanyCard from './useIsAllowedToIssueCompanyCard';
 import useLocalize from './useLocalize';
 import useNetwork from './useNetwork';
@@ -142,7 +142,7 @@ function useInitialAssignCardStep({policyID, selectedFeed}: UseInitialAssignCard
     const {isOffline} = useNetwork();
 
     const policy = usePolicy(policyID);
-    const {currencyList} = useCurrencyList();
+    const {currencyList} = useCurrencyListState();
 
     const [countryByIp] = useOnyx(ONYXKEYS.COUNTRY, {canBeMissing: false});
 
