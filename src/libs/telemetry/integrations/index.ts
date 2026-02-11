@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import {browserProfilingIntegration, navigationIntegration, shouldCreateSpanForRequest} from './integrations.common';
+import {browserProfilingIntegration, navigationIntegration, shouldCreateSpanForRequest} from './common';
 
 const tracingIntegration = Sentry.reactNativeTracingIntegration({
     shouldCreateSpanForRequest,

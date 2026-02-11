@@ -1,5 +1,5 @@
 import * as SentryReact from '@sentry/react';
-import {browserProfilingIntegration, navigationIntegration, shouldCreateSpanForRequest} from './integrations.common';
+import {browserProfilingIntegration, navigationIntegration, shouldCreateSpanForRequest} from './common';
 
 /**
  * Browser tracing integration is enabled on Web to support web health measurements
