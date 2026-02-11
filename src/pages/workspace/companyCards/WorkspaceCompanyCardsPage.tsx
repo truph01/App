@@ -86,7 +86,7 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         >
             <WorkspacePageWithSections
                 icon={memoizedIllustrations.CompanyCard}
-                headerText={translate('workspace.common.companyCards')}
+                headerText={`${translate('workspace.common.companyCards')} ADHOC`}
                 route={route}
                 shouldShowOfflineIndicatorInWideScreen
                 showLoadingAsFirstRender={false}
