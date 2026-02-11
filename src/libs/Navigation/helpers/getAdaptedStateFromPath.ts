@@ -304,11 +304,12 @@ function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamL
  * see the NAVIGATION.md documentation.
  *
  * @param path - The path to generate state from
- * @param options - Extra options to fine-tune how to parse the path
- * @param shouldReplacePathInNestedState - Whether to replace the path in nested state
+ * @param options - Extra options kept for react-navigation compatibility
+ * @param shouldReplacePathInNestedState - Whether to replace the path in nested state (if passing this arg, pass `undefined` for `options`, otherwise omit both)
  * @returns The adapted navigation state
  * @throws Error if unable to get state from path
  */
+// We keep `options` in the signature for `linkingConfig` compatibility with react-navigation.
 const getAdaptedStateFromPath: GetAdaptedStateFromPath = (path, options, shouldReplacePathInNestedState = true) => {
     let normalizedPath = !path.startsWith('/') ? `/${path}` : path;
     normalizedPath = getRedirectedPath(normalizedPath);
