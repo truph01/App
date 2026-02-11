@@ -12462,16 +12462,13 @@ function getReportPersonalDetailsParticipants(report: Report, personalDetailsPar
 }
 
 function canRejectReportAction(currentUserLogin: string, report: Report, policy?: Policy): boolean {
-    const isReportApprover = isApproverUtils(policy, currentUserLogin);
     const isReportBeingProcessed = isProcessingReport(report);
     const isIOU = isIOUReport(report);
     const isInvoice = isInvoiceReport(report);
     const isCurrentUserManager = report?.managerID === currentUserAccountID;
-
-    const userCanReject = isReportApprover && isCurrentUserManager;
-
-    if (!userCanReject) {
-        return false; // must be approver or payer
+    
+    if (!isCurrentUserManager) {
+        return false;
     }
 
     if (isIOU) {
