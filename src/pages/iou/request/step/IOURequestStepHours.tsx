@@ -165,6 +165,7 @@ function IOURequestStepHours({
                         style={[styles.w100, canUseTouchScreen ? styles.mt5 : styles.mt0]}
                         onPress={saveTime}
                         text={translate(isEditingConfirmation ? 'common.save' : 'common.next')}
+                        sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.HOURS_NEXT_BUTTON}
                     />
                 }
             />
