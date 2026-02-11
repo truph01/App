@@ -2742,7 +2742,7 @@ ${amount} pour ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `Configurer les [catégories](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Configurez des catégories* pour que votre équipe puisse coder les dépenses afin de faciliter les rapports.
+                        *Configurez les catégories* pour que votre équipe puisse coder les dépenses et faciliter le reporting.
 
                         1. Cliquez sur *Espaces de travail*.
                         2. Sélectionnez votre espace de travail.
@@ -2833,12 +2833,12 @@ ${
                 title: ({workspaceMembersLink}) => `Invitez [votre équipe](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *Invitez votre équipe* sur Expensify pour qu’elle puisse commencer à suivre ses dépenses dès aujourd’hui.
+                        *Invitez votre équipe* sur Expensify afin qu’elle puisse commencer à suivre ses dépenses dès aujourd’hui.
 
                         1. Cliquez sur *Espaces de travail*.
                         2. Sélectionnez votre espace de travail.
                         3. Cliquez sur *Membres* > *Inviter un membre*.
-                        4. Saisissez des adresses e-mail ou des numéros de téléphone.
+                        4. Saisissez des e-mails ou des numéros de téléphone.
                         5. Ajoutez un message d’invitation personnalisé si vous le souhaitez !
 
                         [Aller aux membres de l’espace de travail](${workspaceMembersLink}).
@@ -2856,7 +2856,7 @@ ${
                 title: ({workspaceTagsLink}) => `Configurer les [tags](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Utilisez des tags pour ajouter des détails supplémentaires à vos dépenses, comme les projets, clients, lieux et services. Si vous avez besoin de plusieurs niveaux de tags, vous pouvez passer au plan Contrôle.
+                        Utilisez les tags pour ajouter des détails supplémentaires sur les dépenses, comme les projets, les clients, les lieux et les services. Si vous avez besoin de plusieurs niveaux de tags, vous pouvez passer au plan Control.
 
                         1. Cliquez sur *Espaces de travail*.
                         2. Sélectionnez votre espace de travail.
@@ -7597,11 +7597,13 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             endReading: 'Fin de lecture',
             saveForLater: 'Enregistrer pour plus tard',
             totalDistance: 'Distance totale',
-            startTitle: 'Photo du compteur au départ',
-            endTitle: 'Photo de fin d’odomètre',
             startMessageWeb:
                 'Ajoutez une photo de votre compteur kilométrique prise au <strong>début</strong> de votre trajet. Faites glisser un fichier ici ou choisissez-en un à télécharger.',
             endMessageWeb: 'Ajoutez une photo du compteur kilométrique prise à la <strong>fin</strong> de votre trajet. Faites glisser un fichier ici ou choisissez-en un à télécharger.',
+            startTitle: 'Photo du compteur de départ',
+            endTitle: 'Photo du compteur (arrivée)',
+            deleteOdometerPhoto: 'Supprimer la photo du compteur kilométrique',
+            deleteOdometerPhotoConfirmation: 'Voulez-vous vraiment supprimer cette photo de l’odomètre ?',
         },
     },
     gps: {

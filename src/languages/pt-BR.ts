@@ -1341,7 +1341,7 @@ const translations: TranslationDeepObject<typeof en> = {
         threadExpenseReportName: ({formattedAmount, comment}: ThreadRequestReportNameParams) => `${formattedAmount} ${comment ? `para ${comment}` : 'despesa'}`,
         invoiceReportName: ({linkedReportID}: OriginalMessage<typeof CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW>) => `Relatório de fatura nº ${linkedReportID}`,
         threadPaySomeoneReportName: ({formattedAmount, comment}: ThreadSentMoneyReportNameParams) => `${formattedAmount} enviado${comment ? `para ${comment}` : ''}`,
-        movedFromPersonalSpace: ({workspaceName, reportName}: MovedFromPersonalSpaceParams) => `moveu despesa do espaço pessoal para ${workspaceName ?? `conversar com ${reportName}`}`,
+        movedFromPersonalSpace: ({workspaceName, reportName}: MovedFromPersonalSpaceParams) => `moveu a despesa do espaço pessoal para ${workspaceName ?? `conversar com ${reportName}`}`,
         movedToPersonalSpace: 'moveu a despesa para o espaço pessoal',
         error: {
             invalidCategoryLength: 'O nome da categoria excede 255 caracteres. Reduza-o ou escolha uma categoria diferente.',
@@ -2816,10 +2816,10 @@ ${
                         *Convide sua equipe* para o Expensify para que possam começar a registrar despesas hoje.
 
                         1. Clique em *Workspaces*.
-                        2. Selecione o seu workspace.
+                        2. Selecione seu workspace.
                         3. Clique em *Members* > *Invite member*.
                         4. Insira e-mails ou números de telefone.
-                        5. Adicione uma mensagem personalizada ao convite, se quiser!
+                        5. Adicione uma mensagem de convite personalizada, se quiser!
 
                         [Leve-me para os membros do workspace](${workspaceMembersLink}).
                     `),
@@ -2836,16 +2836,16 @@ ${
                 title: ({workspaceTagsLink}) => `Configurar [tags](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Use tags para adicionar mais detalhes às despesas, como projetos, clientes, locais e departamentos. Se você precisar de vários níveis de tags, poderá fazer upgrade para o plano Control.
+                        Use tags para adicionar detalhes extras de despesas, como projetos, clientes, locais e departamentos. Se você precisar de vários níveis de tags, é possível fazer upgrade para o plano Control.
 
-                        1. Clique em *Workspaces*.
-                        2. Selecione seu workspace.
-                        3. Clique em *More features*.
+                        1. Clique em *Espaços de trabalho*.
+                        2. Selecione seu espaço de trabalho.
+                        3. Clique em *Mais recursos*.
                         4. Ative *Tags*.
-                        5. Acesse *Tags* no editor do workspace.
-                        6. Clique em *+ Add tag* para criar suas próprias tags.
+                        5. Vá até *Tags* no editor do espaço de trabalho.
+                        6. Clique em *+ Adicionar tag* para criar as suas.
 
-                        [Leve-me para more features](${workspaceMoreFeaturesLink}).
+                        [Levar-me para Mais recursos](${workspaceMoreFeaturesLink}).
 
                     `),
             },
@@ -7533,10 +7533,12 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             endReading: 'Finalizar leitura',
             saveForLater: 'Salvar para depois',
             totalDistance: 'Distância total',
-            startTitle: 'Foto inicial do hodômetro',
-            endTitle: 'Foto do hodômetro final',
             startMessageWeb: 'Adicione uma foto do hodômetro do <strong>início</strong> da sua viagem. Arraste um arquivo aqui ou escolha um para enviar.',
             endMessageWeb: 'Adicione uma foto do hodômetro do <strong>final</strong> da sua viagem. Arraste um arquivo aqui ou escolha um para enviar.',
+            startTitle: 'Foto inicial do hodômetro',
+            endTitle: 'Foto final do hodômetro',
+            deleteOdometerPhoto: 'Excluir foto do odômetro',
+            deleteOdometerPhotoConfirmation: 'Tem certeza de que deseja excluir esta foto do odômetro?',
         },
     },
     gps: {

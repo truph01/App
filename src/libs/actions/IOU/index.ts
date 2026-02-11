@@ -257,6 +257,7 @@ import type {ReportNextStep} from '@src/types/onyx/Report';
 import type ReportAction from '@src/types/onyx/ReportAction';
 import type {OnyxData} from '@src/types/onyx/Request';
 import type {Comment, Receipt, ReceiptSource, Routes, SplitShares, TransactionChanges, TransactionCustomUnit, WaypointCollection} from '@src/types/onyx/Transaction';
+import type {FileObject} from '@src/types/utils/Attachment';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 type IOURequestType = ValueOf<typeof CONST.IOU.REQUEST_TYPE>;
@@ -1678,6 +1679,22 @@ function setMoneyRequestOdometerReading(transactionID: string, startReading: num
     });
 }
 
+function revokeOdometerImageUri(image: FileObject | string | null | undefined, nextImage?: FileObject | string | null): void {
+    if (typeof URL === 'undefined') {
+        return;
+    }
+
+    const currentUri = typeof image === 'string' ? image : image?.uri;
+    if (!currentUri?.startsWith('blob:')) {
+        return;
+    }
+    const nextUri = typeof nextImage === 'string' ? nextImage : nextImage?.uri;
+    if (currentUri === nextUri) {
+        return;
+    }
+    URL.revokeObjectURL(currentUri);
+}
+
 /**
  * Set odometer image for a transaction
  * @param transactionID - The transaction ID
@@ -1687,9 +1704,21 @@ function setMoneyRequestOdometerReading(transactionID: string, startReading: num
  */
 function setMoneyRequestOdometerImage(transactionID: string, imageType: OdometerImageType, file: File | string, isDraft: boolean) {
     const imageKey = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? 'odometerStartImage' : 'odometerEndImage';
+    const normalizedFile: FileObject | string =
+        typeof file === 'string'
+            ? file
+            : {
+                  uri: file.uri ?? (typeof URL !== 'undefined' ? URL.createObjectURL(file) : undefined),
+                  name: file.name,
+                  type: file.type,
+                  size: file.size,
+              };
+    const transaction = isDraft ? allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`] : allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+    const existingImage = transaction?.comment?.[imageKey];
+    revokeOdometerImageUri(existingImage, normalizedFile);
     Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {
         comment: {
-            [imageKey]: file,
+            [imageKey]: normalizedFile,
         },
     });
 }
@@ -1698,11 +1727,13 @@ function setMoneyRequestOdometerImage(transactionID: string, imageType: Odometer
  * Remove odometer image from a transaction
  * @param transactionID - The transaction ID
  * @param imageType - 'start' or 'end'
- * @param file - The image file (File object on web, URI string on native)
  * @param isDraft - Whether this is a draft transaction
  */
-function removeMoneyRequestOdometerImage(transactionID: string, imageType: OdometerImageType, file: File | string, isDraft: boolean) {
+function removeMoneyRequestOdometerImage(transactionID: string, imageType: OdometerImageType, isDraft: boolean) {
     const imageKey = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? 'odometerStartImage' : 'odometerEndImage';
+    const transaction = isDraft ? allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`] : allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+    const existingImage = transaction?.comment?.[imageKey];
+    revokeOdometerImageUri(existingImage);
     Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {
         comment: {
             [imageKey]: null,
