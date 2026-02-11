@@ -810,7 +810,8 @@ function ReportActionsList({
         [isOffline, reportMetadata?.hasOnceLoadedReportActions, sortedVisibleReportActions],
     );
 
-    // If report actions are loading then show only the last report action as a fallback
+    // While reportActions are loading, use the last reportAction as a fallback
+    // since it’s available before the rest finish loading.
     const reportActionsToRender = useMemo(() => (shouldShowSkeleton ? sortedVisibleReportActions.slice(0, 1) : sortedVisibleReportActions), [shouldShowSkeleton, sortedVisibleReportActions]);
 
     const listFooterComponent = useMemo(() => {
