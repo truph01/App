@@ -281,11 +281,7 @@ function getInvoicesChatName({
     const invoiceReceiver = report?.invoiceReceiver;
     const isIndividual = invoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL;
     const invoiceReceiverAccountID = isIndividual ? invoiceReceiver.accountID : CONST.DEFAULT_NUMBER_ID;
-    const invoiceReceiverPolicyID = isIndividual ? undefined : invoiceReceiver?.policyID;
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const receiverPolicyResolved = receiverPolicy ?? getPolicy(invoiceReceiverPolicyID);
-    const isCurrentUserReceiver = (isIndividual && invoiceReceiverAccountID === currentUserAccountID) || (!isIndividual && isPolicyAdmin(receiverPolicyResolved));
+    const isCurrentUserReceiver = (isIndividual && invoiceReceiverAccountID === currentUserAccountID) || (!isIndividual && isPolicyAdmin(receiverPolicy));
 
     if (isCurrentUserReceiver) {
         return getPolicyName({report, policies});
@@ -295,7 +291,7 @@ function getInvoicesChatName({
         return formatPhoneNumberPhoneUtils(getDisplayNameOrDefault((personalDetails ?? allPersonalDetails)?.[invoiceReceiverAccountID]));
     }
 
-    return getPolicyName({report, policy: receiverPolicyResolved, policies});
+    return getPolicyName({report, policy: receiverPolicy, policies});
 }
 
 function getInvoiceReportName(report: OnyxEntry<Report>, policy?: OnyxEntry<Policy>, invoiceReceiverPolicy?: OnyxEntry<Policy>): string {
@@ -718,6 +714,10 @@ function computeChatThreadReportName(
     return reportActionMessage;
 }
 
+/**
+ * @internal Use this only for computation in derived report attributes
+ * In all other cases you should use `getReportName`
+ */
 function computeReportName(
     report?: Report,
     reports?: OnyxCollection<Report>,
