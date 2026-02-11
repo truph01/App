@@ -73,6 +73,7 @@ function CardSection() {
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID, {canBeMissing: true});
     const [billingStatusOnyx] = useOnyx(ONYXKEYS.NVP_PRIVATE_BILLING_STATUS, {canBeMissing: true});
     const [amountOwed = 0] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const requestRefund = useCallback(() => {
         requestRefundByUser();
         setIsRequestRefundModalVisible(false);
@@ -103,6 +104,7 @@ function CardSection() {
             creditCardEyesIcon: illustrations.CreditCardEyes,
             fundList,
             amountOwed,
+            ownerBillingGraceEndPeriod,
         }),
     );
 
@@ -128,6 +130,7 @@ function CardSection() {
                 creditCardEyesIcon: illustrations.CreditCardEyes,
                 fundList,
                 amountOwed,
+                ownerBillingGraceEndPeriod,
             }),
         );
     }, [
@@ -143,6 +146,7 @@ function CardSection() {
         illustrations.CreditCardEyes,
         fundList,
         amountOwed,
+        ownerBillingGraceEndPeriod,
     ]);
 
     const handleRetryPayment = () => {
