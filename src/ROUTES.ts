@@ -3060,12 +3060,7 @@ const ROUTES = {
 
     TRANSACTION_RECEIPT: {
         route: 'r/:reportID/transaction/:transactionID/receipt/:action?/:iouType?',
-        getRoute: (
-            reportID: string | undefined,
-            transactionID: string | undefined,
-            readonly = false,
-            mergeTransactionID?: string,
-        ) => {
+        getRoute: (reportID: string | undefined, transactionID: string | undefined, readonly = false, mergeTransactionID?: string) => {
             if (!reportID) {
                 Log.warn('Invalid reportID is used to build the TRANSACTION_RECEIPT route');
             }
