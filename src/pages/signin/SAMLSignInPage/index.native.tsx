@@ -44,37 +44,31 @@ function SAMLSignInPage() {
             }
 
             let shortLivedAuthToken: string | null = null;
-            let error: string | null = null;
-
             try {
                 const decodedData = JSON.parse(jsonParam) as Record<string, string | null>;
                 shortLivedAuthToken = decodedData.shortLivedAuthToken ?? null;
-                error = decodedData.error ?? null;
-                Log.info('SAMLSignInPage - Parsed data from JSON parameter');
-            } catch {
-                // We need to come generate translation for message indicating parsing error
-                Log.hmmm(`SAMLSignInPage - Failed to parse JSON parameter`);
-                error = 'Failed to parse JSON';
+                if (decodedData.error) {
+                    Log.hmmm('SAMLSignInPage - SAML login returned error', {error: decodedData.error});
+                }
+            } catch (parseError) {
+                Log.hmmm('SAMLSignInPage - Failed to parse JSON parameter', {error: parseError});
             }
 
-            if (!account?.isLoading && credentials?.login && !!shortLivedAuthToken) {
+            if (!account?.isLoading && credentials?.login && shortLivedAuthToken) {
                 Log.info('SAMLSignInPage - Successfully received shortLivedAuthToken. Signing in...');
                 signInWithShortLivedAuthToken(shortLivedAuthToken, true);
                 return;
             }
 
-            if (error) {
-                clearSignInData();
-                setAccountError(error);
-
-                Navigation.isNavigationReady().then(() => {
-                    // We must call goBack() to remove the /transition route from history
-                    Navigation.goBack();
-                    Navigation.navigate(ROUTES.HOME);
-                });
-            }
+            clearSignInData();
+            setAccountError(translate('common.error.login'));
+            Navigation.isNavigationReady().then(() => {
+                // We must call goBack() to remove the /transition route from history
+                Navigation.goBack();
+                Navigation.navigate(ROUTES.HOME);
+            });
         },
-        [credentials?.login, shouldShowNavigation, account?.isLoading],
+        [credentials?.login, shouldShowNavigation, account?.isLoading, translate],
     );
 
     useEffect(() => {
