@@ -68,7 +68,7 @@ function SAMLSignInPage() {
                 Navigation.navigate(ROUTES.HOME);
             });
         },
-        [credentials?.login, shouldShowNavigation, account?.isLoading, translate],
+        [credentials?.login, account?.isLoading, translate],
     );
 
     useEffect(() => {
