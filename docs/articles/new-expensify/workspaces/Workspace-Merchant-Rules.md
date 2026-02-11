@@ -26,10 +26,11 @@ To create a Workspace Merchant Rule:
 7. Select the fields you want the rule to update: 
    - **Merchant** to update the merchant name. 
    - **Category** to update the expense category. 
-   - **Tag** to update the expense tag. 
-   - **Description** to update the expense description 
+   - **Tag** to update the expense tag.
+   - **Tax** to update the tax rate (Tax must be enabled on the workspace).
+   - **Description** to update the expense description.
    - **Reimbursable** to update whether the expense is reimbursable or non-reimbursable.
-   - **Billable** to update whether the expense is billable or non-billable.
+   - **Billable** to update whether the expense is billable or non-billable (Billable must be enabled on the workspace).
 8. Select whether the rule should be applied to existing unsubmitted expenses and preview matches (optional). 
 9. Select **Save Rule**
 
