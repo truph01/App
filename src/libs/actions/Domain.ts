@@ -1050,7 +1050,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
             value: {
                 settings: {
-                    twoFactorAuthRequired,
+                    twoFactorAuthRequired: twoFactorAuthRequired ? true : undefined,
                 },
             },
         },

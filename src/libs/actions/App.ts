@@ -1,5 +1,4 @@
 // Issue - https://github.com/Expensify/App/issues/26719
-import {getPathFromState} from '@react-navigation/native';
 import {Str} from 'expensify-common';
 import type {AppStateStatus} from 'react-native';
 import {AppState} from 'react-native';
@@ -11,7 +10,6 @@ import {SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
 import Log from '@libs/Log';
 import getCurrentUrl from '@libs/Navigation/currentUrl';
-import {linkingConfig} from '@libs/Navigation/linkingConfig';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import Performance from '@libs/Performance';
 import {isPublicRoom, isValidReport} from '@libs/ReportUtils';
@@ -19,6 +17,7 @@ import {isLoggingInAsNewUser as isLoggingInAsNewUserSessionUtils} from '@libs/Se
 import {clearSoundAssetsCache} from '@libs/Sound';
 import {cancelAllSpans, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
+import getPathFromState from '@src/libs/Navigation/helpers/getPathFromState';
 import type {OnyxKey} from '@src/ONYXKEYS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
@@ -178,10 +177,14 @@ function confirmReadyToOpenApp() {
 }
 
 function getNonOptimisticPolicyIDs(policies: OnyxCollection<OnyxTypes.Policy>): string[] {
-    return Object.values(policies ?? {})
-        .filter((policy) => policy && policy.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD)
-        .map((policy) => policy?.id)
-        .filter((id): id is string => !!id);
+    const result: string[] = [];
+    for (const policy of Object.values(policies ?? {})) {
+        if (!policy || policy.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD || !policy.id) {
+            continue;
+        }
+        result.push(policy.id);
+    }
+    return result;
 }
 
 function setLocale(locale: Locale, currentPreferredLocale: Locale | undefined) {
@@ -238,7 +241,7 @@ function saveCurrentPathBeforeBackground() {
             return;
         }
 
-        const currentPath = getPathFromState(currentState, linkingConfig.config);
+        const currentPath = getPathFromState(currentState);
 
         if (currentPath) {
             Log.info('Saving current path before background', false, {currentPath});
@@ -251,10 +254,16 @@ function saveCurrentPathBeforeBackground() {
 
 let appState: AppStateStatus;
 AppState.addEventListener('change', (nextAppState) => {
+    // On app startup appState can be undefined
+    // or 'background' (app launched via push notification), causing the `appState === 'active'` check to fail
+    // and leaving spans running for a long time.
+    if (nextAppState.match(/inactive|background/)) {
+        Log.info('Cancelling telemetry spans as app is going inactive/background', false, {previousState: appState, nextState: nextAppState});
+        cancelAllSpans();
+    }
     if (nextAppState.match(/inactive|background/) && appState === 'active') {
         Log.info('Flushing logs as app is going inactive', true, {}, true);
         saveCurrentPathBeforeBackground();
-        cancelAllSpans();
     }
     appState = nextAppState;
 });
@@ -737,7 +746,7 @@ function clearOnyxAndResetApp(shouldNavigateToHomepage?: boolean) {
             }
 
             if (shouldNavigateToHomepage) {
-                Navigation.navigate(ROUTES.INBOX);
+                Navigation.navigate(ROUTES.HOME);
             }
 
             if (preservedUserSession) {
@@ -804,6 +813,7 @@ export {
     clearSupportalPermissionDenied,
     showSupportalPermissionDenied,
     setPreservedUserSession,
+    getNonOptimisticPolicyIDs,
     setPreservedAccount,
     KEYS_TO_PRESERVE,
 };

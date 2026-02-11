@@ -2,11 +2,13 @@ import {domainMemberSettingsSelector, domainNameSelector} from '@selectors/Domai
 import React from 'react';
 import {View} from 'react-native';
 import RenderHTML from '@components/RenderHTML';
+import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getLatestError} from '@libs/ErrorUtils';
+import {addLeadingForwardSlash} from '@libs/Url';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -38,7 +40,9 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
     });
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
-    const is2FAEnabled = account?.requiresTwoFactorAuth;
+
+    const {environmentURL} = useEnvironment();
+    const samlPageUrl = `${environmentURL}${addLeadingForwardSlash(ROUTES.DOMAIN_SAML.getRoute(domainAccountID))}`;
 
     return (
         <BaseDomainSettingsPage domainAccountID={domainAccountID}>
@@ -52,7 +56,8 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
                         return;
                     }
 
-                    if (!value && is2FAEnabled) {
+                    if (!value && account?.requiresTwoFactorAuth) {
+                        clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID);
                         Navigation.navigate(ROUTES.DOMAIN_MEMBERS_SETTINGS_TWO_FACTOR_AUTH.getRoute(domainAccountID));
                     } else {
                         toggleTwoFactorAuthRequiredForDomain(domainAccountID, domainName, value);
@@ -62,13 +67,17 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
                 subtitle={
                     <View style={[styles.flexRow, styles.renderHTML, styles.mt1]}>
                         <RenderHTML
-                            html={translate(domainSettings?.samlEnabled ? 'domain.common.forceTwoFactorAuthSAMLEnabledDescription' : 'domain.common.forceTwoFactorAuthDescription')}
+                            html={
+                                domainSettings?.samlEnabled
+                                    ? translate('domain.common.forceTwoFactorAuthSAMLEnabledDescription', samlPageUrl)
+                                    : translate('domain.common.forceTwoFactorAuthDescription')
+                            }
                         />
                     </View>
                 }
                 shouldPlaceSubtitleBelowSwitch
                 pendingAction={domainPendingActions?.twoFactorAuthRequired}
-                errors={getLatestError(domainErrors?.setTwoFactorAuthRequiredError)}
+                errors={!account?.requiresTwoFactorAuth || !domainSettings?.twoFactorAuthRequired ? getLatestError(domainErrors?.setTwoFactorAuthRequiredError) : undefined}
                 onCloseError={() => clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID)}
             />
         </BaseDomainSettingsPage>
