@@ -29,6 +29,7 @@ import {
     getReportPreviewAction,
     handleNavigateAfterExpenseCreate,
     initMoneyRequest,
+    initBulkEditDraftTransaction,
     markRejectViolationAsResolved,
     payMoneyRequest,
     rejectMoneyRequest,
