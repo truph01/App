@@ -16,12 +16,9 @@ import usePrevious from '@hooks/usePrevious';
 import useThemeStyles from '@hooks/useThemeStyles';
 import blurActiveElement from '@libs/Accessibility/blurActiveElement';
 import {
-    adjustRemainingSplitShares,
     computePerDiemExpenseAmount,
     isValidPerDiemExpenseAmount,
-    resetSplitShares,
     setCustomUnitRateID,
-    setIndividualShare,
     setMoneyRequestAmount,
     setMoneyRequestCategory,
     setMoneyRequestDistance,
@@ -30,8 +27,8 @@ import {
     setMoneyRequestTag,
     setMoneyRequestTaxAmount,
     setMoneyRequestTaxRate,
-    setSplitShares,
 } from '@libs/actions/IOU';
+import {adjustRemainingSplitShares, resetSplitShares, setIndividualShare, setSplitShares} from '@libs/actions/IOU/Split';
 import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {isCategoryDescriptionRequired} from '@libs/CategoryUtils';
 import {convertToBackendAmount, convertToDisplayString, convertToDisplayStringWithoutCurrency} from '@libs/CurrencyUtils';
@@ -1175,6 +1172,7 @@ function MoneyRequestConfirmationList({
                 useKeyboardShortcuts
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 isLoading={isConfirmed || isConfirming}
+                sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.CONFIRMATION_PAY_BUTTON}
             />
         ) : (
             <>
@@ -1184,6 +1182,7 @@ function MoneyRequestConfirmationList({
                         text={translate('iou.removeThisExpense')}
                         onPress={showRemoveExpenseConfirmModal}
                         style={styles.mb3}
+                        sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.CONFIRMATION_REMOVE_EXPENSE_BUTTON}
                     />
                 )}
                 <EducationalTooltip
@@ -1207,6 +1206,7 @@ function MoneyRequestConfirmationList({
                             useKeyboardShortcuts
                             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                             isLoading={isConfirmed || isConfirming}
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.CONFIRMATION_SUBMIT_BUTTON}
                         />
                     </View>
                 </EducationalTooltip>
