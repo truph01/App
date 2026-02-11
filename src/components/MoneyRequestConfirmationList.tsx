@@ -17,25 +17,24 @@ import usePrevious from '@hooks/usePrevious';
 import useThemeStyles from '@hooks/useThemeStyles';
 import blurActiveElement from '@libs/Accessibility/blurActiveElement';
 import {
-    adjustRemainingSplitShares,
     computePerDiemExpenseAmount,
     isValidPerDiemExpenseAmount,
-    resetSplitShares,
     setCustomUnitRateID,
-    setIndividualShare,
     setMoneyRequestAmount,
     setMoneyRequestCategory,
+    setMoneyRequestDistance,
     setMoneyRequestMerchant,
     setMoneyRequestPendingFields,
     setMoneyRequestTag,
     setMoneyRequestTaxAmount,
     setMoneyRequestTaxRate,
-    setSplitShares,
 } from '@libs/actions/IOU';
+import {adjustRemainingSplitShares, resetSplitShares, setIndividualShare, setSplitShares} from '@libs/actions/IOU/Split';
 import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {isCategoryDescriptionRequired} from '@libs/CategoryUtils';
 import {convertToBackendAmount, convertToDisplayString, convertToDisplayStringWithoutCurrency} from '@libs/CurrencyUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
+import {calculateGPSDistance} from '@libs/GPSDraftDetailsUtils';
 import {calculateAmount, insertTagIntoTransactionTagsString, isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseUtil} from '@libs/IOUUtils';
 import Log from '@libs/Log';
 import {validateAmount} from '@libs/MoneyRequestUtils';
@@ -79,10 +78,9 @@ import MoneyRequestAmountInput from './MoneyRequestAmountInput';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
 import {PressableWithFeedback} from './Pressable';
 import {useProductTrainingContext} from './ProductTrainingContext';
-// eslint-disable-next-line no-restricted-imports
-import SelectionList from './SelectionListWithSections';
-import type {SectionListDataType} from './SelectionListWithSections/types';
-import UserListItem from './SelectionListWithSections/UserListItem';
+import UserListItem from './SelectionList/ListItem/UserListItem';
+import SelectionListWithSections from './SelectionList/SelectionListWithSections';
+import type {Section} from './SelectionList/SelectionListWithSections/types';
 import SettlementButton from './SettlementButton';
 import Text from './Text';
 import EducationalTooltip from './Tooltip/EducationalTooltip';
@@ -221,7 +219,7 @@ type MoneyRequestConfirmationListProps = {
     showRemoveExpenseConfirmModal?: () => void;
 };
 
-type MoneyRequestConfirmationListItem = Participant | OptionData;
+type MoneyRequestConfirmationListItem = (Participant & {keyForList: string}) | OptionData;
 
 const mileageRateSelector = (policy: OnyxEntry<OnyxTypes.Policy>) => DistanceRequestUtils.getDefaultMileageRate(policy);
 
@@ -352,8 +350,8 @@ function MoneyRequestConfirmationList({
             return;
         }
 
-        setCustomUnitRateID(transactionID, lastSelectedRate, transaction, policy);
-    }, [customUnitRateID, transactionID, lastSelectedRate, isDistanceRequest, isPolicyExpenseChat, isMovingTransactionFromTrackExpense, transaction, policy]);
+        setCustomUnitRateID(transactionID, lastSelectedRate);
+    }, [customUnitRateID, transactionID, lastSelectedRate, isDistanceRequest, isPolicyExpenseChat, isMovingTransactionFromTrackExpense]);
 
     const mileageRate = DistanceRequestUtils.getRate({transaction, policy, policyDraft});
     const rate = mileageRate.rate;
@@ -399,6 +397,19 @@ function MoneyRequestConfirmationList({
     const isDistanceRequestWithPendingRoute = isDistanceRequest && (!hasRoute || !rate) && !isMovingTransactionFromTrackExpense;
 
     const distanceRequestAmount = DistanceRequestUtils.getDistanceRequestAmount(distance, unit ?? CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES, rate ?? 0);
+
+    // Update GPS distance whenever the current distance unit differs from the one that was used
+    // to calculate the distance stored in transaction.comment.customUnit.quantity
+    const gpsDistance = transaction?.comment?.customUnit?.quantity;
+    const gpsDistanceWithCurrentDistanceUnit = calculateGPSDistance(distance, unit);
+    const shouldUpdateGpsDistance = isGPSDistanceRequest && gpsDistance !== gpsDistanceWithCurrentDistanceUnit;
+    useEffect(() => {
+        if (!shouldUpdateGpsDistance || !transactionID || isReadOnly) {
+            return;
+        }
+
+        setMoneyRequestDistance(transactionID, gpsDistanceWithCurrentDistanceUnit, true);
+    }, [shouldUpdateGpsDistance, transactionID, isReadOnly, gpsDistanceWithCurrentDistanceUnit]);
 
     let amountToBeUsed = iouAmount;
 
@@ -506,7 +517,7 @@ function MoneyRequestConfirmationList({
         // If there is a distance rate in the policy that matches the rate and unit of the currently selected mileage rate, select it automatically
         const matchingRate = Object.values(policyRates).find((policyRate) => policyRate.rate === mileageRate.rate && policyRate.unit === mileageRate.unit);
         if (matchingRate?.customUnitRateID) {
-            setCustomUnitRateID(transactionID, matchingRate.customUnitRateID, transaction, policy);
+            setCustomUnitRateID(transactionID, matchingRate.customUnitRateID);
             return;
         }
 
@@ -523,7 +534,6 @@ function MoneyRequestConfirmationList({
         isMovingTransactionFromTrackExpense,
         setFormError,
         clearFormErrors,
-        transaction,
     ]);
 
     const routeError = Object.values(transaction?.errorFields?.route ?? {}).at(0);
@@ -707,6 +717,7 @@ function MoneyRequestConfirmationList({
                 }
                 return {
                     ...participantOption,
+                    keyForList: `${participantOption.keyForList ?? participantOption.accountID ?? participantOption.reportID}`,
                     isSelected: false,
                     isInteractive: false,
                     rightElement: (
@@ -726,6 +737,7 @@ function MoneyRequestConfirmationList({
             tabIndex: -1,
             isSelected: false,
             isInteractive: false,
+            keyForList: `${participantOption.keyForList ?? participantOption.accountID ?? participantOption.reportID}`,
             rightElement: (
                 <MoneyRequestAmountInput
                     autoGrow={false}
@@ -818,34 +830,33 @@ function MoneyRequestConfirmationList({
     );
 
     const sections = useMemo(() => {
-        const options: Array<SectionListDataType<MoneyRequestConfirmationListItem>> = [];
+        const options: Array<Section<MoneyRequestConfirmationListItem>> = [];
         if (isTypeSplit) {
             options.push(
-                ...[
-                    {
-                        title: translate('moneyRequestConfirmationList.paidBy'),
-                        data: [getIOUConfirmationOptionsFromPayeePersonalDetail(payeePersonalDetails)],
-                        shouldShow: true,
-                    },
-                    {
-                        CustomSectionHeader: getSplitSectionHeader,
-                        data: splitParticipants,
-                        shouldShow: true,
-                    },
-                ],
+                {
+                    title: translate('moneyRequestConfirmationList.paidBy'),
+                    data: [getIOUConfirmationOptionsFromPayeePersonalDetail(payeePersonalDetails)],
+                    sectionIndex: 0,
+                },
+                {
+                    customHeader: getSplitSectionHeader(),
+                    data: splitParticipants,
+                    sectionIndex: 1,
+                },
             );
-            options.push();
         } else {
             const formattedSelectedParticipants = selectedParticipants.map((participant) => ({
                 ...participant,
                 isSelected: false,
+                keyForList: `${participant.keyForList ?? participant.accountID ?? participant.reportID}`,
                 isInteractive: isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice),
-                shouldShowRightIcon: isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice),
+                shouldShowRightCaret: isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice),
             }));
+
             options.push({
                 title: translate('common.to'),
                 data: formattedSelectedParticipants,
-                shouldShow: true,
+                sectionIndex: 0,
             });
         }
 
@@ -1303,18 +1314,18 @@ function MoneyRequestConfirmationList({
 
     return (
         <MouseProvider>
-            <SelectionList<MoneyRequestConfirmationListItem>
+            <SelectionListWithSections<MoneyRequestConfirmationListItem>
                 sections={sections}
                 ListItem={UserListItem}
                 onSelectRow={navigateToParticipantPage}
                 shouldSingleExecuteRowSelect
-                canSelectMultiple={false}
                 shouldPreventDefaultFocusOnSelectRow
-                shouldShowListEmptyContent={false}
+                showListEmptyContent={false}
                 footerContent={footerContent}
                 listFooterContent={listFooterContent}
-                containerStyle={[styles.flexBasisAuto]}
-                removeClippedSubviews={false}
+                style={{
+                    containerStyle: [styles.flexBasisAuto],
+                }}
                 disableKeyboardShortcuts
             />
         </MouseProvider>
