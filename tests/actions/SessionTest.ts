@@ -1,4 +1,5 @@
 import {beforeEach, jest, test} from '@jest/globals';
+import {openAuthSessionAsync} from 'expo-web-browser';
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 import {confirmReadyToOpenApp, openApp, reconnectApp} from '@libs/actions/App';
@@ -7,6 +8,7 @@ import OnyxUpdateManager from '@libs/actions/OnyxUpdateManager';
 import {getAll as getAllPersistedRequests} from '@libs/actions/PersistedRequests';
 // eslint-disable-next-line no-restricted-syntax
 import * as SignInRedirect from '@libs/actions/SignInRedirect';
+import * as API from '@libs/API';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import asyncOpenURL from '@libs/asyncOpenURL';
 import HttpUtils from '@libs/HttpUtils';
@@ -31,6 +33,10 @@ jest.mock('@libs/Notification/PushNotification');
 
 // Mocked to check SignOutAndRedirectToSignIn behavior
 jest.mock('@libs/asyncOpenURL');
+
+jest.mock('expo-web-browser', () => ({
+    openAuthSessionAsync: jest.fn(() => Promise.resolve({type: 'success'})),
+}));
 
 jest.mock('@libs/actions/Link', () => {
     return {
@@ -332,6 +338,86 @@ describe('Session', () => {
 
             expect(buildOldDotURL).toHaveBeenCalledWith(CONST.OLDDOT_URLS.SUPPORTAL_RESTORE_STASHED_LOGIN);
             expect(openExternalLink).toHaveBeenCalledWith('mockOldDotURL', undefined, true);
+        });
+    });
+
+    describe('SAML sign out', () => {
+        // The supportal test above spies on SessionUtil.signOut and mocks it.
+        // We need to restore it so our tests call the real implementation.
+        beforeEach(() => jest.restoreAllMocks());
+
+        test('SignOut should call openAuthSessionAsync when signedInWithSAML is true', async () => {
+            await TestHelper.signInWithTestUser();
+            await Onyx.merge(ONYXKEYS.SESSION, {signedInWithSAML: true});
+            await waitForBatchedUpdates();
+
+            (openAuthSessionAsync as jest.MockedFunction<typeof openAuthSessionAsync>).mockClear();
+            const makeRequestSpy = jest.spyOn(API, 'makeRequestWithSideEffects').mockResolvedValue(undefined);
+
+            await SessionUtil.signOut();
+            await waitForBatchedUpdates();
+
+            expect(openAuthSessionAsync).toHaveBeenCalledWith(expect.stringContaining('/logout'), CONST.SAML_REDIRECT_URL);
+            expect(makeRequestSpy).toHaveBeenCalled();
+            makeRequestSpy.mockRestore();
+        });
+
+        test('SignOut should still call LOG_OUT when SAML browser session fails', async () => {
+            await TestHelper.signInWithTestUser();
+            await Onyx.merge(ONYXKEYS.SESSION, {signedInWithSAML: true});
+            await waitForBatchedUpdates();
+
+            (openAuthSessionAsync as jest.MockedFunction<typeof openAuthSessionAsync>).mockImplementationOnce(() => Promise.reject(new Error('Browser session failed')));
+            const makeRequestSpy = jest.spyOn(API, 'makeRequestWithSideEffects').mockResolvedValue(undefined);
+
+            await SessionUtil.signOut();
+            await waitForBatchedUpdates();
+
+            expect(makeRequestSpy).toHaveBeenCalled();
+            makeRequestSpy.mockRestore();
+        });
+
+        test('SignOut should follow normal LOG_OUT path when signedInWithSAML is false', async () => {
+            await TestHelper.signInWithTestUser();
+            await waitForBatchedUpdates();
+
+            (openAuthSessionAsync as jest.MockedFunction<typeof openAuthSessionAsync>).mockClear();
+            const makeRequestSpy = jest.spyOn(API, 'makeRequestWithSideEffects').mockResolvedValue(undefined);
+
+            await SessionUtil.signOut();
+            await waitForBatchedUpdates();
+
+            expect(openAuthSessionAsync).not.toHaveBeenCalled();
+            expect(makeRequestSpy).toHaveBeenCalled();
+            makeRequestSpy.mockRestore();
+        });
+    });
+
+    describe('SAML sign in', () => {
+        test('signInWithShortLivedAuthToken with isSAML=true should set signedInWithSAML in session', async () => {
+            let session: OnyxEntry<Session>;
+            Onyx.connect({
+                key: ONYXKEYS.SESSION,
+                callback: (val) => (session = val),
+            });
+
+            SessionUtil.signInWithShortLivedAuthToken('testAuthToken', true);
+            await waitForBatchedUpdates();
+
+            expect(session?.signedInWithSAML).toBe(true);
+        });
+
+        test('signInWithShortLivedAuthToken with isSAML=false should not set signedInWithSAML', async () => {
+            let session: OnyxEntry<Session>;
+            Onyx.connect({
+                key: ONYXKEYS.SESSION,
+                callback: (val) => (session = val),
+            });
+
+            SessionUtil.signInWithShortLivedAuthToken('testAuthToken', false);
+            await waitForBatchedUpdates();
+
+            expect(session?.signedInWithSAML).toBe(false);
         });
     });
 });
