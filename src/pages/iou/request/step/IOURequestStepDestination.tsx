@@ -22,6 +22,7 @@ import {setTransactionReport} from '@libs/actions/Transaction';
 import Navigation from '@libs/Navigation/Navigation';
 import {getPerDiemCustomUnit, isPolicyAdmin} from '@libs/PolicyUtils';
 import {getPolicyExpenseChat} from '@libs/ReportUtils';
+import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import variables from '@styles/variables';
 import {
     clearSubrates,
@@ -95,6 +96,11 @@ function IOURequestStepDestination({
     };
 
     const updateDestination = (destination: ListItem & {currency: string}) => {
+        if (openedFromStartPage && policy?.id && shouldRestrictUserBillableActions(policy.id)) {
+            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
+            return;
+        }
+
         if (isEmptyObject(customUnit)) {
             return;
         }
