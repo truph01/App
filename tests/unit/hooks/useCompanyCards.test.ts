@@ -308,6 +308,274 @@ describe('useCompanyCards', () => {
         });
     });
 
+    describe('assigned cards not in cardList (updated cardList)', () => {
+        it('should include assigned cards in the mapping when cardList is empty/stale for custom feeds', async () => {
+            // Simulate updated cardList: assigned card exists but cardList doesn't contain its entry
+            const staleCardsList = {
+                cardList: {}, // cardList is empty/stale
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '21570652': {
+                    cardID: 21570652,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    cardName: 'VISA - 1234',
+                    encryptedCardNumber: 'enc_visa_1234',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([staleCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Even though cardList is empty, the assigned card should appear in the mapping
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'VISA - 1234': 'enc_visa_1234',
+            });
+        });
+
+        it('should include assigned cards in the mapping when they are missing from OAuth feed accountList', async () => {
+            // OAuth feed has accountList with only one card, but there's an assigned card for a different one
+            const oAuthFeedWithPartialList = {
+                [mockOAuthFeed]: {
+                    ...mockOAuthFeedData[mockOAuthFeed],
+                    accountList: ['CREDIT CARD...6607'], // only one card in accountList
+                },
+            };
+
+            const cardsListWithExtraAssigned = {
+                cardList: {},
+                // This assigned card is NOT in accountList
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '99999': {
+                    cardID: 99999,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE,
+                    cardName: 'CREDIT CARD...5501',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockOAuthFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([oAuthFeedWithPartialList, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cardsListWithExtraAssigned, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Both the accountList card and the assigned card should appear
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'CREDIT CARD...6607': 'CREDIT CARD...6607', // from accountList
+                'CREDIT CARD...5501': 'CREDIT CARD...5501', // from assignedCards fallback
+            });
+        });
+
+        it('should not duplicate assigned cards already present in cardList by encryptedCardNumber', async () => {
+            const cardsListWithMatchingEncrypted = {
+                cardList: {
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
+                    'VISA - 1234': 'enc_visa_1234',
+                },
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '21570652': {
+                    cardID: 21570652,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    cardName: 'VISA - 1234',
+                    encryptedCardNumber: 'enc_visa_1234', // matches cardList entry
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cardsListWithMatchingEncrypted, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Should not duplicate — only one entry for this card
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'VISA - 1234': 'enc_visa_1234',
+            });
+        });
+
+        it('should not duplicate assigned cards already present in accountList by cardName match', async () => {
+            const oAuthFeedData = {
+                [mockOAuthFeed]: {
+                    ...mockOAuthFeedData[mockOAuthFeed],
+                    accountList: ['CREDIT CARD...6607'],
+                },
+            };
+
+            const cardsListWithMatchingName = {
+                cardList: {},
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '55555': {
+                    cardID: 55555,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE,
+                    cardName: 'CREDIT CARD...6607', // matches accountList entry
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockOAuthFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([oAuthFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cardsListWithMatchingName, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Should not duplicate — only one entry
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'CREDIT CARD...6607': 'CREDIT CARD...6607',
+            });
+        });
+
+        it('should handle multiple assigned cards missing from stale cardList', async () => {
+            const staleCardsList = {
+                cardList: {
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
+                    'VISA - 1111': 'enc_1111', // only this one is in cardList
+                },
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '10001': {
+                    cardID: 10001,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    cardName: 'VISA - 1111',
+                    encryptedCardNumber: 'enc_1111',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '10002': {
+                    cardID: 10002,
+                    accountID: 18439985,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    cardName: 'VISA - 2222',
+                    encryptedCardNumber: 'enc_2222',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '10003': {
+                    cardID: 10003,
+                    accountID: 18439986,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    cardName: 'VISA - 3333',
+                    encryptedCardNumber: 'enc_3333',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([staleCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Card 1111 from cardList + cards 2222 and 3333 from assignedCards fallback
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'VISA - 1111': 'enc_1111',
+                'VISA - 2222': 'enc_2222',
+                'VISA - 3333': 'enc_3333',
+            });
+        });
+
+        it('should skip assigned cards without a cardName', async () => {
+            const cardsListWithMissingName = {
+                cardList: {},
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '77777': {
+                    cardID: 77777,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    // no cardName property
+                    encryptedCardNumber: 'enc_no_name',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cardsListWithMissingName, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Card without cardName should be skipped
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({});
+        });
+
+        it('should use cardName as fallback value when assigned card has no encryptedCardNumber', async () => {
+            const cardsListNoEncrypted = {
+                cardList: {},
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '88888': {
+                    cardID: 88888,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                    cardName: 'VISA - 9999',
+                    // no encryptedCardNumber
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cardsListNoEncrypted, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Falls back to cardName as the value
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'VISA - 9999': 'VISA - 9999',
+            });
+        });
+
+        it('should not duplicate assigned card matching by normalized cardName with special characters', async () => {
+            // accountList has name without special chars, assigned card has name with ®
+            const oAuthFeedData = {
+                [mockOAuthFeed]: {
+                    ...mockOAuthFeedData[mockOAuthFeed],
+                    accountList: ['Business Platinum Card - JOHN SMITH - 1234'],
+                },
+            };
+
+            const cardsListWithSpecialChar = {
+                cardList: {},
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '44444': {
+                    cardID: 44444,
+                    accountID: 18439984,
+                    bank: CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE,
+                    cardName: 'Business Platinum Card® - JOHN SMITH - 1234', // has ® character
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockOAuthFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([oAuthFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cardsListWithSpecialChar, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // isMatchingCard normalizes special characters, so ® version should match the accountList entry
+            // Should not duplicate
+            expect(result.current.cardNamesToEncryptedCardNumberMapping).toEqual({
+                'Business Platinum Card - JOHN SMITH - 1234': 'Business Platinum Card - JOHN SMITH - 1234',
+            });
+        });
+    });
+
     describe('card ID consistency', () => {
         it('should ensure direct feed cardNamesToEncryptedCardNumberMapping maps names to themselves', async () => {
             await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockOAuthFeed);
