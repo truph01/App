@@ -3613,7 +3613,7 @@ function isCorrectSearchUserName(displayName?: string) {
 
 function isTodoSearch(hash: number, suggestedSearches: Record<string, SearchTypeMenuItem>) {
     const TODO_KEYS: SearchKey[] = [CONST.SEARCH.SEARCH_KEYS.SUBMIT, CONST.SEARCH.SEARCH_KEYS.APPROVE, CONST.SEARCH.SEARCH_KEYS.PAY, CONST.SEARCH.SEARCH_KEYS.EXPORT];
-    const matchedSearchKey = Object.values(suggestedSearches).find((search) => search.hash === hash)?.key;
+    const matchedSearchKey = (Object.entries(suggestedSearches).find(([, search]) => search.hash === hash)?.[0] ?? '') as SearchKey;
     return !!matchedSearchKey && TODO_KEYS.includes(matchedSearchKey);
 }
 
