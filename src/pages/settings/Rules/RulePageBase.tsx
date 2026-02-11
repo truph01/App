@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
-import type {OnyxCollection} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -85,6 +85,8 @@ const getErrorMessage = (translate: LocalizedTranslate, form?: ExpenseRuleForm) 
     return translate('expenseRulesPage.addRule.confirmError');
 };
 
+const policyTagsSelector = (tagLists: OnyxEntry<PolicyTagLists>) => getTagLists(tagLists, true);
+
 function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
     const {translate} = useLocalize();
     const [expenseRules = getEmptyArray<ExpenseRule>()] = useOnyx(ONYXKEYS.NVP_EXPENSE_RULES, {canBeMissing: true});
@@ -110,8 +112,10 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
     });
 
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
-    const [policyTags = getEmptyArray<ValueOf<PolicyTagLists>>()] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${activePolicyID}`, {canBeMissing: true, selector: getTagLists});
-    const hasPolicyTags = policyTags.some(({tags}) => Object.values(tags).some(({enabled}) => enabled));
+    const [policyTags = getEmptyArray<ValueOf<PolicyTagLists>>()] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${activePolicyID}`, {
+        canBeMissing: true,
+        selector: policyTagsSelector,
+    });
     const formTags = getTagArrayFromName(form?.tag ?? '');
 
     const [allTaxRates] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
@@ -170,17 +174,15 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                           onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.CATEGORY, hash),
                       }
                     : undefined,
-                ...(hasPolicyTags
-                    ? policyTags.map(({name, orderWeight, tags}) => {
-                          const tag = Object.values(tags).find(({name: tagName}) => tagName === formTags.at(orderWeight));
-                          return {
-                              key: `tag-${name}-${orderWeight}`,
-                              description: name,
-                              title: tag ? getCleanedTagName(tag.name) : undefined,
-                              onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.TAG, hash, orderWeight),
-                          };
-                      })
-                    : []),
+                ...policyTags.map(({name, orderWeight, tags}) => {
+                    const tag = Object.values(tags).find(({name: tagName}) => tagName === formTags.at(orderWeight));
+                    return {
+                        key: `tag-${name}-${orderWeight}`,
+                        description: name,
+                        title: tag ? getCleanedTagName(tag.name) : undefined,
+                        onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.TAG, hash, orderWeight),
+                    };
+                }),
                 hasTaxRates
                     ? {
                           key: 'tax',
