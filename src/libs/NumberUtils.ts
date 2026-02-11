@@ -1,7 +1,9 @@
+import CONST from '@src/CONST';
+
 /**
- * Generates a random positive 64-bit numeric string. Used to generate client-side IDs.
+ * Generates a random positive 64 bit numeric string by randomly generating the left, middle, and right parts and concatenating them. Used to generate client-side ids.
  *
- * @returns string representation of a randomly generated 64-bit signed integer
+ * @returns string representation of a randomly generated 64 bit signed integer
  */
 function rand64(): string {
     // Max 64-bit signed:
