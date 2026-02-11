@@ -1015,7 +1015,7 @@ function getReportOption(
     reportDrafts?: OnyxCollection<Report>,
 ): OptionData {
     const report = getReportOrDraftReport(participant.reportID, undefined, undefined, reportDrafts);
-    const chatReport = report?.chatReportID ? getReportOrDraftReport(report.chatReportID) : undefined;
+    const chatReport = report?.chatReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
     const visibleParticipantAccountIDs = getParticipantsAccountIDsForDisplay(report, true);
 
     const option = createOption(
