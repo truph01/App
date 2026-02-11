@@ -81,7 +81,8 @@ function BaseRequestStepWorkspace({transaction, getPolicies, onSelectWorkspace}:
     const selectWorkspace = (item: WorkspaceListItem) => {
         const policyID = item.policyID;
         if (shouldRestrictUserBillableActions(policyID)) {
-            return Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyID));
+            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyID));
+            return;
         }
         onSelectWorkspace(allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`]);
     };
