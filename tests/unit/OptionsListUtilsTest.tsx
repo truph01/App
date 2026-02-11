@@ -4327,6 +4327,7 @@ describe('OptionsListUtils', () => {
                 report,
                 lastActorDetails: null,
                 isReportArchived: false,
+                chatReport: undefined,
             });
             expect(lastMessage).toBe(translateLocal('report.noActivityYet'));
         });
@@ -4355,6 +4356,7 @@ describe('OptionsListUtils', () => {
                 report,
                 lastActorDetails: null,
                 isReportArchived: false,
+                chatReport: undefined,
             });
             const transactions = getReportTransactions(report.reportID);
             const scanningTransactions = transactions.filter((transaction) => isScanning(transaction));
@@ -4392,6 +4394,7 @@ describe('OptionsListUtils', () => {
                 translate: translateLocal,
                 lastActorDetails: null,
                 isReportArchived: false,
+                chatReport: undefined,
             });
             expect(result).toBe('');
         });
