@@ -37,6 +37,8 @@ function ScrollableTabSelectorItem({
         <AnimatedPressableWithFeedback
             ref={(ref: HTMLDivElement | View | null) => registerTab(tabKey, ref)}
             accessibilityLabel={title}
+            accessibilityState={{selected: isActive}}
+            accessibilityRole={CONST.ROLE.TAB}
             style={[styles.tabSelectorButton, styles.tabBackground(isHovered, isActive, backgroundColor), styles.userSelectNone]}
             wrapperStyle={[equalWidth ? styles.flex1 : styles.flexGrow1]}
             onPress={() => {
@@ -46,7 +48,7 @@ function ScrollableTabSelectorItem({
             onWrapperLayout={(event) => onTabLayout(tabKey, event)}
             onHoverIn={() => setIsHovered(true)}
             onHoverOut={() => setIsHovered(false)}
-            role={CONST.ROLE.BUTTON}
+            role={CONST.ROLE.TAB}
             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
             testID={testID}
         >
