@@ -4711,9 +4711,9 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         baseListHeaderWrapperStyle: {
-            paddingHorizontal: 40,
-            paddingVertical: 12,
-            paddingBottom: 20,
+            ...spacing.ph10,
+            ...spacing.pv3,
+            ...spacing.pb5,
         },
 
         selectionListStickyHeader: {
