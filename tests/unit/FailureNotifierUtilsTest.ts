@@ -4,9 +4,6 @@
 
 /* eslint-disable @typescript-eslint/naming-convention -- matching GitHub API response field names */
 
-// eslint-disable-next-line rulesdir/no-relative-import -- .github/libs is outside src
-const getMergedPR = require('../../.github/libs/failureNotifierUtils');
-
 type PullRequest = {
     html_url: string;
     user: {login: string} | null;
@@ -14,6 +11,9 @@ type PullRequest = {
     base: {ref: string};
     number: number;
 };
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports, rulesdir/no-relative-import -- .github/libs JS module outside src
+const getMergedPR: (associatedPRs: PullRequest[], targetBranch?: string) => PullRequest | undefined = require('../../.github/libs/failureNotifierUtils');
 
 describe('getMergedPR', () => {
     const mergedPR: PullRequest = {
