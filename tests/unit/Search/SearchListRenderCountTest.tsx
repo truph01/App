@@ -182,7 +182,7 @@ afterEach(() => {
 
 describe('SearchList render count', () => {
     it('should not exceed max render count on initial mount with stable props', async () => {
-        let countRef: React.MutableRefObject<number> | null = null;
+        let countRef: React.RefObject<number> | null = null;
 
         function SearchListWrapper({onRenderCount}: {onRenderCount: () => void}) {
             const onSelectRow = useCallback(() => {}, []);
@@ -250,7 +250,7 @@ describe('SearchList render count', () => {
         render(<TestRoot />);
         await waitForBatchedUpdates();
 
-        const ref = countRef as React.MutableRefObject<number> | null;
+        const ref = countRef as React.RefObject<number> | null;
         expect(ref?.current ?? 0).toBeLessThanOrEqual(MAX_INITIAL_RENDER_COUNT);
     });
 });
