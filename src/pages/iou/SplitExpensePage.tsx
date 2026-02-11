@@ -115,8 +115,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         const sameSign = (split.amount >= 0 && transactionDetailsAmount >= 0) || (split.amount < 0 && transactionDetailsAmount < 0);
         return sameSign && Math.abs(split.amount) > Math.abs(transactionDetailsAmount);
     });
-    const absDifference = Math.abs(sumOfSplitExpenses) - Math.abs(transactionDetailsAmount);
-
+    const difference = sumOfSplitExpenses - transactionDetailsAmount;
     const currencySymbol = getCurrencySymbol(transactionDetails.currency ?? '') ?? transactionDetails.currency ?? CONST.CURRENCY.USD;
 
     const isPerDiem = isPerDiemRequest(transaction);
@@ -207,23 +206,23 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             clearSplitTransactionDraftErrors(transactionID);
         }
 
-        if (invalidSplit && Math.abs(sumOfSplitExpenses) !== Math.abs(transactionDetailsAmount)) {
-            if (absDifference > 0) {
-                setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(absDifference, transactionDetails?.currency)}));
-            } else if (absDifference < 0) {
-                setErrorMessage(translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-absDifference, transactionDetails?.currency)}));
+        if (invalidSplit && sumOfSplitExpenses !== transactionDetailsAmount) {
+            if (difference > 0) {
+                setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails?.currency)}));
+            } else {
+                setErrorMessage(translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails?.currency)}));
             }
             return;
         }
 
         if (sumOfSplitExpenses > transactionDetailsAmount) {
-            const difference = sumOfSplitExpenses - transactionDetailsAmount;
-            setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(difference, transactionDetails?.currency)}));
+            const greaterThanDifference = sumOfSplitExpenses - transactionDetailsAmount;
+            setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(greaterThanDifference, transactionDetails?.currency)}));
             return;
         }
         if (sumOfSplitExpenses < transactionDetailsAmount && (isPerDiem || isCard)) {
-            const difference = transactionDetailsAmount - sumOfSplitExpenses;
-            setErrorMessage(translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(difference, transactionDetails?.currency)}));
+            const lessThanDifference = transactionDetailsAmount - sumOfSplitExpenses;
+            setErrorMessage(translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(lessThanDifference, transactionDetails?.currency)}));
             return;
         }
 
@@ -354,17 +353,18 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         </View>
     );
 
-    const difference = sumOfSplitExpenses - transactionDetailsAmount;
     let warningMessage = '';
 
-    if (invalidSplit && absDifference > 0) {
-        warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(absDifference, transactionDetails?.currency)});
-    } else if (invalidSplit && absDifference < 0) {
-        warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-absDifference, transactionDetails?.currency)});
+    if (invalidSplit && sumOfSplitExpenses !== transactionDetailsAmount) {
+        if (difference > 0) {
+            warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails?.currency)});
+        } else {
+            warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails?.currency)});
+        }
     } else if (difference < 0) {
-        warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-difference, transactionDetails.currency)});
+        warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails.currency)});
     } else if (difference > 0) {
-        warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(difference, transactionDetails?.currency)});
+        warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails?.currency)});
     }
 
     const footerContent = (

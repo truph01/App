@@ -4,7 +4,7 @@ import type CONST from '@src/CONST';
 import type {IOUType} from '@src/CONST';
 import type {Icon} from './OnyxCommon';
 import type Report from './Report';
-import {TransactionCustomUnit} from './Transaction';
+import type {TransactionCustomUnit} from './Transaction';
 
 /** Model of IOU participant */
 type Participant = {
