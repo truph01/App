@@ -6,6 +6,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import ConfirmationPage from '@components/ConfirmationPage';
 import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -474,6 +475,18 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy, navigation}: 
 
     const shouldShowPolicyName = topmostFullScreenRoute?.name === NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR;
     const policyNameToDisplay = shouldShowPolicyName ? policyName : '';
+
+    if (isOffline && !hasLoadedData) {
+        return (
+            <ScreenWrapper testID="ReimbursementAccountPage">
+                <HeaderWithBackButton
+                    title={translate('bankAccount.addBankAccount')}
+                    onBackButtonPress={() => Navigation.goBack(backTo)}
+                />
+                <FullPageOfflineBlockingView>{null}</FullPageOfflineBlockingView>
+            </ScreenWrapper>
+        );
+    }
 
     if (isLoadingPolicy) {
         return <FullScreenLoadingIndicator />;
