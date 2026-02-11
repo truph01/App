@@ -1,4 +1,4 @@
-import type {ViewStyle} from 'react-native';
+import type {FlexAlignType, ViewStyle} from 'react-native';
 
 /**
  * Flex layout utility styles with Bootstrap inspired naming.
@@ -83,6 +83,10 @@ export default {
 
     alignSelfStart: {
         alignSelf: 'flex-start',
+    },
+
+    alignSelfAnchorCenter: {
+        alignSelf: 'anchor-center' as FlexAlignType,
     },
 
     alignSelfEnd: {

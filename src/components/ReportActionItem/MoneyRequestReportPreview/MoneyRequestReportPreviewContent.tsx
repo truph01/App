@@ -2,7 +2,7 @@ import {FlashList} from '@shopify/flash-list';
 import type {FlashListRef, ListRenderItemInfo} from '@shopify/flash-list';
 import React, {useCallback, useContext, useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
-import type {ViewToken} from 'react-native';
+import type {CellRendererProps, ViewToken} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming} from 'react-native-reanimated';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -94,7 +94,28 @@ import AccessMoneyRequestReportPreviewPlaceHolder from './AccessMoneyRequestRepo
 import EmptyMoneyRequestReportPreview from './EmptyMoneyRequestReportPreview';
 import type {MoneyRequestReportPreviewContentProps} from './types';
 
+const MAX_PREVIEWS_NUMBER = 10;
+
+const ITEM_LAYOUT_TYPE = {
+    PREVIEW: 'preview',
+    SHOW_MORE: 'showMore',
+};
+
 const reportAttributesSelector = (c: OnyxEntry<ReportAttributesDerivedValue>) => c?.reports;
+
+function CellRendererComponent({children, ...props}: CellRendererProps<ListRenderItemInfo<Transaction>>) {
+    const styles = useThemeStyles();
+    const showMoreItemStyle = props.index === MAX_PREVIEWS_NUMBER ? styles.alignSelfAnchorCenter : undefined;
+    return (
+        <View
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...props}
+            style={[props.style, showMoreItemStyle]}
+        >
+            {children}
+        </View>
+    );
+}
 
 function MoneyRequestReportPreviewContent({
     iouReportID,
@@ -456,7 +477,7 @@ function MoneyRequestReportPreviewContent({
     const [optimisticIndex, setOptimisticIndex] = useState<number | undefined>(undefined);
     const carouselRef = useRef<FlashListRef<Transaction> | null>(null);
     const visibleItemsOnEndCount = useMemo(() => {
-        const lastItemWidth = transactions.length > 10 ? footerWidth : reportPreviewStyles.transactionPreviewCarouselStyle.width;
+        const lastItemWidth = transactions.length > MAX_PREVIEWS_NUMBER ? footerWidth : reportPreviewStyles.transactionPreviewCarouselStyle.width;
         const lastItemWithGap = lastItemWidth + styles.gap2.gap;
         const itemWithGap = reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.gap2.gap;
         return Math.floor((currentWidth - 2 * styles.pl2.paddingLeft - lastItemWithGap) / itemWithGap) + 1;
@@ -496,14 +517,14 @@ function MoneyRequestReportPreviewContent({
     };
 
     const renderItem = (itemInfo: ListRenderItemInfo<Transaction>) => {
-        if (itemInfo.index > 9) {
+        if (itemInfo.index > MAX_PREVIEWS_NUMBER - 1) {
             return (
                 <View
                     style={[styles.p5, styles.justifyContentCenter]}
                     onLayout={(e) => setFooterWidth(e.nativeEvent.layout.width)}
                 >
                     <Text style={{color: colors.blue600}}>
-                        +{transactions.length - 10} {translate('common.more').toLowerCase()}
+                        +{transactions.length - MAX_PREVIEWS_NUMBER} {translate('common.more').toLowerCase()}
                     </Text>
                 </View>
             );
@@ -705,6 +726,10 @@ function MoneyRequestReportPreviewContent({
 
     const renderSeparator = () => <View style={styles.transactionsCarouselGap} />;
 
+    const getItemType = (_item: Transaction, index: number) => {
+        return index === MAX_PREVIEWS_NUMBER ? ITEM_LAYOUT_TYPE.SHOW_MORE : ITEM_LAYOUT_TYPE.PREVIEW;
+    };
+
     const snapOffsets = carouselTransactions.map((_, index) => index * (reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.transactionsCarouselGap.width));
 
     return (
@@ -870,11 +895,13 @@ function MoneyRequestReportPreviewContent({
                                                 style={reportPreviewStyles.flatListStyle}
                                                 showsHorizontalScrollIndicator={false}
                                                 renderItem={renderItem}
+                                                getItemType={getItemType}
                                                 onViewableItemsChanged={onViewableItemsChanged}
                                                 onEndReached={adjustScroll}
                                                 viewabilityConfig={viewabilityConfig}
                                                 ListFooterComponent={<View style={styles.pl2} />}
                                                 ListHeaderComponent={<View style={styles.pr2} />}
+                                                CellRendererComponent={CellRendererComponent}
                                                 drawDistance={1000}
                                             />
                                             {shouldShowAccessPlaceHolder && <AccessMoneyRequestReportPreviewPlaceHolder />}
