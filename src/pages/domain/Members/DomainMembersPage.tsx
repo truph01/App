@@ -32,7 +32,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Profile']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'RemoveMembers']);
+    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Gear', 'DotIndicator', 'RemoveMembers']);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
     const clearSelectedMembers = () => setSelectedMembers([]);
@@ -112,7 +112,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const getBulkActionsButtonOptions: () => Array<DropdownOption<DomainMemberBulkActionType>> = () => [
         {
             text: translate('domain.members.closeAccount', {count: selectedMembers.length}),
-            value: CONST.DOMAIN.MEMBERS_BULK_ACTION_TYPES.CLOSE_ACCOUNT,
+            value: CONST.DOMAIN.MEMBERS.BULK_ACTION_TYPES.CLOSE_ACCOUNT,
             icon: icons.RemoveMembers,
             onSelected: () => {
                 setIsModalVisible(true);
@@ -129,7 +129,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 onPress={() => null}
                 options={getBulkActionsButtonOptions()}
                 isSplitButton={false}
-                style={[shouldUseNarrowLayout && styles.flexGrow1, shouldUseNarrowLayout && styles.mb3]}
+                style={shouldUseNarrowLayout ? [styles.flexGrow1, styles.mb3] : undefined}
                 isDisabled={!selectedMembers.length}
                 testID="DomainMembersPage-header-dropdown-menu-button"
                 wrapperStyle={shouldUseNarrowLayout && styles.flexGrow1}
@@ -142,7 +142,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                     text={translate('domain.members.addMember')}
                     icon={icons.Plus}
                     innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}
-                    style={[shouldUseNarrowLayout && styles.flexGrow1, shouldUseNarrowLayout && styles.mb3]}
+                    style={shouldUseNarrowLayout ? [styles.flexGrow1, styles.mb3] : undefined}
                 />
                 <ButtonWithDropdownMenu
                     success={false}
