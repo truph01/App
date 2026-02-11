@@ -1,5 +1,5 @@
-import React, {Profiler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {render} from '@testing-library/react-native';
+import React, {Profiler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {View} from 'react-native';
 import Onyx from 'react-native-onyx';
 import ComposeProviders from '@components/ComposeProviders';
@@ -225,9 +225,7 @@ describe('SearchList render count', () => {
 
         function SearchListWrapperWithProviders({onRenderCount}: {onRenderCount: () => void}) {
             return (
-                <ComposeProviders
-                    components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}
-                >
+                <ComposeProviders components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}>
                     <SearchListWrapper onRenderCount={onRenderCount} />
                 </ComposeProviders>
             );
