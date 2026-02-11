@@ -137,28 +137,12 @@ import {
 
 let allPersonalDetails: OnyxEntry<PersonalDetailsList>;
 
-const staticReportNameTypes = [
-    CONST.REPORT.TYPE.EXPENSE,
-] as const;
-type StaticReportNameType = TupleToUnion<typeof staticReportNameTypes>;
-
 Onyx.connect({
     key: ONYXKEYS.PERSONAL_DETAILS_LIST,
     callback: (value) => {
         allPersonalDetails = value;
     },
 });
-
-/**
- * Reports with certain types do not require name computation and static value can be used.
- */
-function shouldReturnStaticReportName(report: Report) {
-    if (!report.type) {
-        return false;
-    }
-
-    return staticReportNameTypes.includes(report.type as StaticReportNameType);
-}
 
 function generateArchivedReportName(reportName: string): string {
     // eslint-disable-next-line @typescript-eslint/no-deprecated
@@ -755,7 +739,7 @@ function computeReportName(
         return parentReportActionBasedName;
     }
 
-    if (report?.reportName && shouldReturnStaticReportName(report)) {
+    if (report?.reportName && report.type === CONST.REPORT.TYPE.EXPENSE) {
         return isArchivedNonExpense ? generateArchivedReportName(report?.reportName) : report?.reportName;
     }
 
