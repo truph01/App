@@ -203,7 +203,7 @@ function BaseDomainMembersPage({
             >
                 <HeaderWithBackButton
                     title={useSelectionModeHeader ? translate('common.selectMultiple') : headerTitle}
-                    onBackButtonPress={onBackButtonPress ?? Navigation.popToSidebar}
+                    onBackButtonPress={onBackButtonPress ?? Navigation.goBack}
                     icon={!useSelectionModeHeader ? headerIcon : undefined}
                     shouldShowBackButton={shouldUseNarrowLayout}
                     shouldUseHeadlineHeader={!useSelectionModeHeader}
