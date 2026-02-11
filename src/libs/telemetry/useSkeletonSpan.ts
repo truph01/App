@@ -7,7 +7,20 @@ import {endSpan, getSpan, startSpan} from './activeSpans';
  * Reason attributes for skeleton spans - describes why the skeleton is being rendered.
  * These will be namespaced with a 'skeleton.' prefix in telemetry.
  */
-type SkeletonSpanReasonAttributes = SpanAttributes;
+type SkeletonSpanReasonAttributes = {
+    /**
+     * Describes where the component is rendered using component hierarchy.
+     * Use dot notation to show parent-child relationships.
+     *
+     * Examples:
+     * - 'ReportScreen' - Top-level screen
+     * - 'ReportScreen.CommentsList' - Component within ReportScreen
+     * - 'WorkspaceSettings.Members.MemberList' - Nested component hierarchy
+     *
+     * We don't always need full hierarchy of components. Focus on keeping this descriptive yet simple.
+     */
+    context: string;
+} & SpanAttributes;
 
 /**
  * Create a span for a skeleton component. This helps identify "infinite skeleton" issues where loading states don't resolve.
