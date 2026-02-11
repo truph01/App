@@ -1,5 +1,5 @@
 type ToggleTravelInvoicingParams = {
-    domainName: string;
+    policyID: string;
     enabled: boolean;
 };
 

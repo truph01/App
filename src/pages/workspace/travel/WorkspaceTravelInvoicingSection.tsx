@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import ActivityIndicator from '@components/ActivityIndicator';
 import AnimatedSubmitButton from '@components/AnimatedSubmitButton';
 import ConfirmModal from '@components/ConfirmModal';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Section from '@components/Section';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
 import {openExternalLink} from '@libs/actions/Link';
@@ -40,8 +41,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import CentralInvoicingLearnHow from './CentralInvoicingLearnHow';
 import CentralInvoicingSubtitleWrapper from './CentralInvoicingSubtitleWrapper';
-import useSingleExecution from '@hooks/useSingleExecution';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type WorkspaceTravelInvoicingSectionProps = {
     /** The ID of the policy */
@@ -180,7 +179,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             switchAccessibilityLabel: translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subtitle'),
             isActive: isTravelInvoicingEnabled,
             onToggle: handleToggle,
-            disabled: isTogglePendingAction,
             pendingAction: togglePendingAction,
             errors: toggleErrors,
             onCloseError: () => clearToggleTravelInvoicingErrors(workspaceAccountID),
@@ -276,14 +274,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 onCloseError={item.onCloseError}
                 subMenuItems={item.subMenuItems}
             />
-            {isTogglePendingAction && (
-                <View style={[styles.flexRow, styles.justifyContentCenter, styles.alignItemsCenter, styles.mt2]}>
-                    <ActivityIndicator
-                        size="small"
-                        testID="activity-indicator"
-                    />
-                </View>
-            )}
         </Section>
     );
 

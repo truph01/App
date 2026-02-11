@@ -47,6 +47,9 @@ type ExpensifyCardSettingsBase = {
     /** Name of the domain card was issued for */
     domainName?: string;
 
+    /** Country code for the card program (e.g., "US") */
+    country?: string;
+
     /** Name of the bank account used for the card settlement */
     paymentBankAccountAddressName?: string;
 

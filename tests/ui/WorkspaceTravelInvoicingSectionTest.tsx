@@ -316,16 +316,15 @@ describe('WorkspaceTravelInvoicingSection', () => {
         });
     });
 
-    describe('Loading indicator', () => {
+    describe('Offline-first toggle (no loading indicator)', () => {
         const cardSettingsKey = `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${WORKSPACE_ACCOUNT_ID}` as OnyxKey;
 
-        it('should show loading indicator when toggle has a pending action', async () => {
-            // Given the toggle action is in flight (pendingAction = ADD, isLoading = true)
+        it('should NOT show loading indicator when toggle has a pending action (offline-first)', async () => {
+            // Given the toggle action is in flight (pendingAction = ADD)
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(cardSettingsKey, {
                     isEnabled: true,
-                    isLoading: true,
                     pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                 });
                 await waitForBatchedUpdatesWithAct();
@@ -335,8 +334,8 @@ describe('WorkspaceTravelInvoicingSection', () => {
             renderWorkspaceTravelInvoicingSection();
             await waitForBatchedUpdatesWithAct();
 
-            // Then the loading indicator should be visible
-            expect(screen.getByTestId('activity-indicator')).toBeTruthy();
+            // Then NO loading indicator should be visible (offline-first pattern)
+            expect(screen.queryByTestId('activity-indicator')).toBeNull();
         });
 
         it('should NOT show loading indicator when only isLoading is true without pendingAction (page fetch)', async () => {

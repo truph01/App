@@ -5,7 +5,6 @@ import * as API from '@libs/API';
 import type {OpenPolicyTravelPageParams, SetTravelInvoicingSettlementAccountParams, ToggleTravelInvoicingParams, UpdateTravelInvoicingSettlementFrequencyParams} from '@libs/API/parameters';
 import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import * as ErrorUtils from '@libs/ErrorUtils';
-import {getDomainNameForPolicy} from '@libs/PolicyUtils';
 import {getTravelInvoicingCardSettingsKey} from '@libs/TravelInvoicingUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -162,12 +161,7 @@ function clearTravelInvoicingSettlementAccountErrors(workspaceAccountID: number,
  * Optimistically updates the monthlySettlementDate based on the selected frequency.
  * Supports offline behavior - changes are queued and synced when back online.
  */
-function updateTravelInvoiceSettlementFrequency(
-    policyID: string,
-    workspaceAccountID: number,
-    frequency: ValueOf<typeof CONST.EXPENSIFY_CARD.FREQUENCY_SETTING>,
-    currentMonthlySettlementDate?: Date,
-) {
+function updateTravelInvoiceSettlementFrequency(workspaceAccountID: number, frequency: ValueOf<typeof CONST.EXPENSIFY_CARD.FREQUENCY_SETTING>, currentMonthlySettlementDate?: Date) {
     const cardSettingsKey = getTravelInvoicingCardSettingsKey(workspaceAccountID);
 
     // If Monthly, set date (optimistically today). If Daily, set null.
@@ -225,8 +219,7 @@ function updateTravelInvoiceSettlementFrequency(
     ];
 
     const params: UpdateTravelInvoicingSettlementFrequencyParams = {
-        policyID,
-        workspaceAccountID,
+        domainAccountID: workspaceAccountID,
         settlementFrequency: frequency,
     };
 
@@ -254,7 +247,6 @@ function clearTravelInvoicingSettlementFrequencyErrors(workspaceAccountID: numbe
  * Sets isEnabled flag optimistically, backend confirms via onyx data.
  */
 function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, enabled: boolean) {
-    const domainName = getDomainNameForPolicy(policyID);
     const cardSettingsKey = getTravelInvoicingCardSettingsKey(workspaceAccountID);
 
     const optimisticData: OnyxUpdate[] = [
@@ -263,7 +255,6 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
             key: cardSettingsKey,
             value: {
                 isEnabled: enabled,
-                isLoading: true,
                 pendingAction: enabled ? CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD : CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                 errors: null,
             },
@@ -275,7 +266,6 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
             onyxMethod: Onyx.METHOD.MERGE,
             key: cardSettingsKey,
             value: {
-                isLoading: false,
                 pendingAction: null,
             },
         },
@@ -288,7 +278,6 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
             key: cardSettingsKey,
             value: {
                 isEnabled: !enabled,
-                isLoading: false,
                 pendingAction: null,
                 errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
             },
@@ -296,7 +285,7 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
     ];
 
     const params: ToggleTravelInvoicingParams = {
-        domainName,
+        policyID,
         enabled,
     };
 

@@ -131,7 +131,6 @@ describe('TravelInvoicing', () => {
     });
 
     it('updateTravelInvoiceSettlementFrequency sends correct optimistic, success, and failure data', () => {
-        const policyID = '123';
         const workspaceAccountID = 456;
         const frequency = CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.MONTHLY;
         const currentMonthlySettlementDate = new Date('2024-01-01');
@@ -142,13 +141,12 @@ describe('TravelInvoicing', () => {
         jest.useFakeTimers();
         jest.setSystemTime(mockDate);
 
-        updateTravelInvoiceSettlementFrequency(policyID, workspaceAccountID, frequency, currentMonthlySettlementDate);
+        updateTravelInvoiceSettlementFrequency(workspaceAccountID, frequency, currentMonthlySettlementDate);
 
         expect(spyAPIWrite).toHaveBeenCalledWith(
             'UpdateTravelInvoiceSettlementFrequency',
             {
-                policyID,
-                workspaceAccountID,
+                domainAccountID: workspaceAccountID,
                 settlementFrequency: frequency,
             },
             expect.objectContaining({
