@@ -399,11 +399,12 @@ function SettlementButton({
 
             if (isIndividualInvoiceRoomUtil(chatReport)) {
                 // Gate default so main split button never triggers Pay via Expensify when beta is off (or currency unsupported).
-                const invoiceDefaultValue = isPayInvoiceViaExpensifyBetaEnabled
-                    ? hasIntentToPay
-                        ? CONST.IOU.PAYMENT_TYPE.EXPENSIFY
-                        : (lastPaymentMethod ?? CONST.IOU.PAYMENT_TYPE.ELSEWHERE)
-                    : CONST.IOU.PAYMENT_TYPE.ELSEWHERE;
+                let invoiceDefaultValue = lastPaymentMethod ?? CONST.IOU.PAYMENT_TYPE.ELSEWHERE;
+                if (showPayViaExpensifyOptions && (hasIntentToPay || lastPaymentMethod === CONST.IOU.PAYMENT_TYPE.EXPENSIFY)) {
+                    invoiceDefaultValue = CONST.IOU.PAYMENT_TYPE.EXPENSIFY;
+                } else if (lastPaymentMethod === CONST.IOU.PAYMENT_TYPE.EXPENSIFY) {
+                    invoiceDefaultValue = CONST.IOU.PAYMENT_TYPE.ELSEWHERE;
+                }
                 buttonOptions.push({
                     text: translate('iou.settlePersonal', {formattedAmount}),
                     icon: icons.User,
