@@ -158,8 +158,7 @@ modules/*/lib/
 .claude/settings.local.json
 
 # Playwright MCP
-.playwright/
-.playwright-mcp/
+playwright-output/
 
 # cspell cache
 .cspellcache
