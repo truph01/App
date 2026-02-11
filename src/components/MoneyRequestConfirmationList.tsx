@@ -329,21 +329,6 @@ function MoneyRequestConfirmationList({
     const defaultRate = defaultMileageRate?.customUnitRateID;
     const lastSelectedRate = policy?.id ? (lastSelectedDistanceRates?.[policy.id] ?? defaultRate) : defaultRate;
 
-    useEffect(() => {
-        if (
-            !['-1', CONST.CUSTOM_UNITS.FAKE_P2P_ID].includes(customUnitRateID) ||
-            !isDistanceRequest ||
-            !isPolicyExpenseChat ||
-            !transactionID ||
-            !lastSelectedRate ||
-            isMovingTransactionFromTrackExpense
-        ) {
-            return;
-        }
-
-        setCustomUnitRateID(transactionID, lastSelectedRate, transaction, policy);
-    }, [customUnitRateID, transactionID, lastSelectedRate, isDistanceRequest, isPolicyExpenseChat, isMovingTransactionFromTrackExpense, transaction, policy]);
-
     const mileageRate = DistanceRequestUtils.getRate({transaction, policy, policyDraft});
     const rate = mileageRate.rate;
     const prevRate = usePrevious(rate);
@@ -678,6 +663,22 @@ function MoneyRequestConfirmationList({
     const selectedParticipants = useMemo(() => selectedParticipantsProp.filter((participant) => participant.selected), [selectedParticipantsProp]);
     const payeePersonalDetails = useMemo(() => payeePersonalDetailsProp ?? currentUserPersonalDetails, [payeePersonalDetailsProp, currentUserPersonalDetails]);
     const shouldShowReadOnlySplits = useMemo(() => isPolicyExpenseChat || isReadOnly || isScanRequest, [isPolicyExpenseChat, isReadOnly, isScanRequest]);
+
+    useEffect(() => {
+        if (
+            !['-1', CONST.CUSTOM_UNITS.FAKE_P2P_ID].includes(customUnitRateID) ||
+            !isDistanceRequest ||
+            !isPolicyExpenseChat ||
+            !transactionID ||
+            !lastSelectedRate ||
+            isMovingTransactionFromTrackExpense ||
+            !selectedParticipants.some((participant) => participant.policyID === policy?.id)
+        ) {
+            return;
+        }
+
+        setCustomUnitRateID(transactionID, lastSelectedRate, transaction, policy);
+    }, [customUnitRateID, transactionID, lastSelectedRate, isDistanceRequest, isPolicyExpenseChat, isMovingTransactionFromTrackExpense, transaction, policy, selectedParticipants]);
 
     const splitParticipants = useMemo(() => {
         if (!isTypeSplit) {
