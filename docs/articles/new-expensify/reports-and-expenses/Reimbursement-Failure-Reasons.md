@@ -37,14 +37,12 @@ Example:
 - Bank account: Robert Smith  
 - Expensify profile: Bob Smith  
 
-### How to fix an account name close match error
-
-The member should:
+**How to fix it:** The member should:
 
 1. Confirm the exact account holder name with their bank.
 2. Update their bank account name in Expensify to match exactly.
 
-Even small differences (nicknames, missing middle initials, extra spaces) can cause ACH rejection.
+Even small differences like nicknames, missing middle initials, or extra spaces can cause ACH rejection.
 
 ---
 
@@ -52,9 +50,7 @@ Even small differences (nicknames, missing middle initials, extra spaces) can ca
 
 The account holder name provided in Expensify does not match the name on file with the bank.
 
-### How to fix an account name mismatch error
-
-The member should:
+**How to fix it:** The member should:
 
 1. Contact their bank to confirm the exact account holder name.
 2. Update their bank account details in Expensify so the name matches exactly.
@@ -66,14 +62,12 @@ The member should:
 
 The payment was sent as a personal reimbursement, but the bank account is registered as a business account.
 
-### How to fix a business vs personal account mismatch
+**How to fix it:** Confirm the intended account type:
 
-Confirm whether the member intended to use:
+- Personal bank account
+- Business bank account
 
-- A personal bank account, or  
-- A business bank account  
-
-Then update the connected bank account in Expensify to match the correct account type.
+Then update the connected bank account in Expensify to match.
 
 ---
 
@@ -81,9 +75,7 @@ Then update the connected bank account in Expensify to match the correct account
 
 The payment was sent as a business reimbursement, but the connected account is a personal account.
 
-### How to fix a personal vs business account mismatch
-
-Confirm the intended account type and reconnect the correct bank account in Expensify.
+**How to fix it:** Confirm the intended account type and reconnect the correct bank account in Expensify.
 
 ---
 
@@ -91,9 +83,7 @@ Confirm the intended account type and reconnect the correct bank account in Expe
 
 The account number or routing number does not correspond to a valid bank account.
 
-### How to fix an "Account Not Found" error
-
-The member should:
+**How to fix it:** The member should:
 
 1. Double-check their account and routing numbers.
 2. Remove the incorrect bank connection.
@@ -105,9 +95,7 @@ The member should:
 
 The bank account has been migrated, closed, or transferred to a new account number.
 
-### How to fix an "Account Has Been Switched" error
-
-The member should:
+**How to fix it:** The member should:
 
 1. Confirm their current bank account details.
 2. Reconnect their bank account in Expensify using the updated information.
@@ -118,14 +106,9 @@ The member should:
 
 The bank does not support account name verification for this account type.
 
-### What this means
-
 Expensify cannot automatically verify the account holder name through the bank.
 
-### What to do
-
-- Manually confirm the account details with the member.
-- Retry the payment once confirmed.
+**What to do:** Manually confirm the account details with the member, then retry the payment once confirmed.
 
 ---
 
@@ -133,10 +116,7 @@ Expensify cannot automatically verify the account holder name through the bank.
 
 The account holder opted out of name verification at their bank.
 
-### What to do
-
-- Verify the bank details directly with the member.
-- Retry the reimbursement once confirmed.
+**What to do:** Verify the bank details directly with the member, then retry the reimbursement once confirmed.
 
 ---
 
@@ -152,7 +132,7 @@ If you're a Workspace Admin, follow these steps:
 4. Confirm the member has corrected their bank details.
 5. Click **Pay** to retry the reimbursement.
 
-Note: Payments are not retried automatically. You must manually click **Pay** after the issue is resolved.
+Payments aren't retried automatically -- you must manually click **Pay** after the issue is resolved.
 
 ---
 
@@ -161,8 +141,8 @@ Note: Payments are not retried automatically. You must manually click **Pay** af
 If your reimbursement failed, follow these steps:
 
 1. Open the report from the **Reports** tab.
-   - On web: Navigation tabs on the left.
-   - On mobile: Navigation tabs on the bottom.
+   - On web: Select **Reports** from the navigation tabs on the left.
+   - On mobile: Tap **Reports** in the navigation tabs on the bottom.
 2. Review the failure message in the report chat.
 3. Go to **Settings**.
    - On web: Select **Settings** from the navigation tabs on the left.
@@ -174,7 +154,7 @@ If your reimbursement failed, follow these steps:
 
 ---
 
-# How to Mark a Report as Ready for Reimbursement After Fixing Bank Details
+# Retry the Reimbursement After Fixing Bank Details
 
 Once bank details are corrected:
 
@@ -187,7 +167,7 @@ This ensures the issue is fully resolved before funds are resent.
 
 # FAQ
 
-## Will Expensify automatically retry a failed reimbursement?
+## Does Expensify automatically retry failed reimbursements?
 
 No. The report returns to **Approved** status. A Workspace Admin must manually click **Pay** to retry the reimbursement.
 
@@ -199,7 +179,7 @@ Retried payments follow the same ACH processing timeline as the original payment
 
 ---
 
-## What if I see a reimbursement failure message not listed here?
+## What if a reimbursement failure message not listed here appears?
 
 If the message appears as a raw return reason from Corpay and is unclear:
 
