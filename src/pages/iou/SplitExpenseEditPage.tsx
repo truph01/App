@@ -26,7 +26,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {SplitExpenseParamList} from '@libs/Navigation/types';
 import Parser from '@libs/Parser';
 import {getTagLists} from '@libs/PolicyUtils';
-import {computeReportName} from '@libs/ReportNameUtils';
+import {getReportName} from '@libs/ReportNameUtils';
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {getParsedComment, getReportOrDraftReport, getTransactionDetails} from '@libs/ReportUtils';
@@ -105,7 +105,7 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
     const isSplitAvailable = report && transaction && isSplitAction(currentReport, [transaction], originalTransaction, login ?? '', currentUserAccountID, currentPolicy);
 
     const isCategoryRequired = !!currentPolicy?.requiresCategory;
-    const reportName = computeReportName(currentReport, undefined, undefined, undefined, undefined, undefined, undefined, currentUserAccountID);
+    const reportName = getReportName(currentReport);
     const isDescriptionRequired = isCategoryDescriptionRequired(policyCategories, splitExpenseDraftTransactionDetails?.category, currentPolicy?.areRulesEnabled);
 
     const shouldShowTags = !!currentPolicy?.areTagsEnabled && !!(transactionTag || hasEnabledTags(policyTagLists));
@@ -270,7 +270,7 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
                             style={[styles.w100]}
                             text={translate('common.save')}
                             onPress={() => {
-                                updateSplitExpenseField(splitExpenseDraftTransaction, originalTransactionDraft, splitExpenseTransactionID, originalTransaction);
+                                updateSplitExpenseField(splitExpenseDraftTransaction, originalTransactionDraft, splitExpenseTransactionID, transaction);
                                 Navigation.goBack(backTo);
                             }}
                             pressOnEnter

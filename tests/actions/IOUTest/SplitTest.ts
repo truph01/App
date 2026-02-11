@@ -14,7 +14,6 @@ import {
     addSplitExpenseField,
     completeSplitBill,
     evenlyDistributeSplitExpenseAmounts,
-    initDraftSplitExpenseDataForEdit,
     initSplitExpense,
     initSplitExpenseItemData,
     removeSplitExpenseField,
@@ -23,7 +22,6 @@ import {
     splitBill,
     startSplitBill,
     updateSplitExpenseAmountField,
-    updateSplitExpenseField,
     updateSplitTransactionsFromSplitExpensesFlow,
 } from '@userActions/IOU/Split';
 import CONST from '@src/CONST';
@@ -31,12 +29,11 @@ import IntlStore from '@src/languages/IntlStore';
 import DateUtils from '@src/libs/DateUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, RecentlyUsedTags, Report, ReportNameValuePairs, SearchResults} from '@src/types/onyx';
-import type {Participant as IOUParticipant, SplitExpense} from '@src/types/onyx/IOU';
+import type {SplitExpense} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 import type {Participant} from '@src/types/onyx/Report';
 import type ReportAction from '@src/types/onyx/ReportAction';
 import type Transaction from '@src/types/onyx/Transaction';
-import type {TransactionCustomUnit} from '@src/types/onyx/Transaction';
 import {toCollectionDataSet} from '@src/types/utils/CollectionDataSet';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import currencyList from '../../unit/currencyList.json';

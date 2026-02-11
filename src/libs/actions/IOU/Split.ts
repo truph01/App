@@ -1765,7 +1765,6 @@ function initSplitExpenseItemData(
         reportID,
         created,
         merchant,
-        customUnit,
     }: {amount?: number; transactionID?: string; reportID?: string; created?: string; merchant?: string; customUnit?: TransactionCustomUnit} = {},
 ): SplitExpense {
     const transactionDetails = getTransactionDetails(transaction);
@@ -1974,7 +1973,7 @@ function addSplitExpenseField(transaction: OnyxEntry<OnyxTypes.Transaction>, dra
  * - Works entirely on the provided `draftTransaction` to avoid direct Onyx reads.
  * - Uses `calculateAmount` utility to handle currency subunits and rounding consistently with existing logic.
  */
-function evenlyDistributeSplitExpenseAmounts(draftTransaction: OnyxEntry<OnyxTypes.Transaction>, transaction?: OnyxEntry<OnyxTypes.Transaction>) {
+function evenlyDistributeSplitExpenseAmounts(draftTransaction: OnyxEntry<OnyxTypes.Transaction>) {
     if (!draftTransaction) {
         return;
     }
@@ -1997,7 +1996,7 @@ function evenlyDistributeSplitExpenseAmounts(draftTransaction: OnyxEntry<OnyxTyp
 
     const updatedSplitExpenses = splitExpenses.map((splitExpense, index) => {
         const amount = calculateIOUAmount(splitCount - 1, total, currency, index === lastIndex, true);
-        let updatedSplitExpense: SplitExpense = {
+        const updatedSplitExpense: SplitExpense = {
             ...splitExpense,
             amount,
         };
@@ -2021,13 +2020,7 @@ function evenlyDistributeSplitExpenseAmounts(draftTransaction: OnyxEntry<OnyxTyp
  * @param endDate - End date in format 'YYYY-MM-DD'
  * @param policy - The policy (for distance transactions)
  */
-function resetSplitExpensesByDateRange(
-    transaction: OnyxEntry<OnyxTypes.Transaction>,
-    transactionReport: OnyxEntry<OnyxTypes.Report>,
-    startDate: string,
-    endDate: string,
-    policy?: OnyxEntry<OnyxTypes.Policy>,
-) {
+function resetSplitExpensesByDateRange(transaction: OnyxEntry<OnyxTypes.Transaction>, transactionReport: OnyxEntry<OnyxTypes.Report>, startDate: string, endDate: string) {
     if (!transaction || !startDate || !endDate) {
         return;
     }
@@ -2046,7 +2039,7 @@ function resetSplitExpensesByDateRange(
     const lastIndex = dates.length - 1;
     const newSplitExpenses: SplitExpense[] = dates.map((date, index) => {
         const amount = calculateIOUAmount(lastIndex, total, currency, index === lastIndex, true);
-        let splitExpense = initSplitExpenseItemData(transaction, transactionReport, {
+        const splitExpense = initSplitExpenseItemData(transaction, transactionReport, {
             amount,
             transactionID: NumberUtils.rand64(),
             reportID: transaction?.reportID,
@@ -2166,11 +2159,10 @@ function updateSplitExpenseAmountField(draftTransaction: OnyxEntry<OnyxTypes.Tra
     }
 
     const originalTransactionID = draftTransaction?.comment?.originalTransactionID;
-    const originalTransaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`];
 
     const updatedSplitExpenses = draftTransaction.comment?.splitExpenses?.map((splitExpense) => {
         if (splitExpense.transactionID === currentItemTransactionID) {
-            let updatedSplitExpense: SplitExpense = {
+            const updatedSplitExpense: SplitExpense = {
                 ...splitExpense,
                 amount,
             };
