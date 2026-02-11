@@ -9,7 +9,6 @@ import ConfirmModal from '@components/ConfirmModal';
 import PopoverWithMeasuredContent from '@components/PopoverWithMeasuredContent';
 import {useSearchContext} from '@components/Search/SearchContext';
 import useAncestors from '@hooks/useAncestors';
-import useChildReport from '@hooks/useChildReport';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDeleteTransactions from '@hooks/useDeleteTransactions';
 import useDuplicateTransactionsAndViolations from '@hooks/useDuplicateTransactionsAndViolations';
@@ -61,7 +60,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
     const isOriginalReportArchived = useReportIsArchived(getOriginalReportID(reportIDRef.current, reportActionRef.current, reportActions));
     const {iouReport, chatReport, isChatIOUReportArchived} = useGetIOUReportFromReportAction(reportActionRef.current);
     const {transitionActionSheetState} = useActionSheetAwareScrollViewActions();
-    const reportActionChildReport = useChildReport(reportActionRef.current);
 
     const cursorRelativePosition = useRef({
         horizontal: 0,
@@ -361,7 +359,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                 deleteTrackExpense({
                     chatReportID: reportIDRef.current,
                     chatReport: report,
-                    transactionThread: reportActionChildReport,
                     transactionID: originalMessage?.IOUTransactionID,
                     reportAction,
                     iouReport,
@@ -390,7 +387,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
         setIsDeleteCommentConfirmModalVisible(false);
     }, [
         report,
-        reportActionChildReport,
         childReport,
         selfDMReport,
         iouReport,

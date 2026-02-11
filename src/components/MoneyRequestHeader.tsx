@@ -606,7 +606,6 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                         deleteTrackExpense({
                             chatReportID: report?.parentReportID,
                             chatReport: parentReport,
-                            transactionThread: report,
                             transactionID: transaction.transactionID,
                             reportAction: parentReportAction,
                             iouReport,
