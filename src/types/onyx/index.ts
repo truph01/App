@@ -92,6 +92,7 @@ import type OnyxInputOrEntry from './OnyxInputOrEntry';
 import type {OnyxUpdateEvent, OnyxUpdatesFromServer} from './OnyxUpdatesFromServer';
 import type {DecisionName, OriginalMessageIOU} from './OriginalMessage';
 import type Pages from './Pages';
+import type PendingConciergeResponse from './PendingConciergeResponse';
 import type {PendingContactAction} from './PendingContactAction';
 import type PersonalBankAccount from './PersonalBankAccount';
 import type {PersonalDetailsList, PersonalDetailsMetadata} from './PersonalDetails';
@@ -225,6 +226,7 @@ export type {
     OnyxUpdateEvent,
     OnyxUpdatesFromServer,
     Pages,
+    PendingConciergeResponse,
     PersonalBankAccount,
     PersonalDetails,
     PersonalDetailsList,

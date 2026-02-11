@@ -11,7 +11,7 @@ import type {Timezone} from '@src/types/onyx/PersonalDetails';
 import {addComment, buildOptimisticResolvedFollowups} from '.';
 
 /** Delay before showing pre-generated Concierge response (in milliseconds) */
-const CONCIERGE_RESPONSE_DELAY_MS = 1500;
+const CONCIERGE_RESPONSE_DELAY_MS = 3000;
 
 /**
  * Resolves a suggested followup by posting the selected question as a comment
@@ -89,22 +89,49 @@ function resolveSuggestedFollowup(
     addOptimisticConciergeActionWithDelay(reportID, optimisticConciergeAction);
 }
 
-function addOptimisticConciergeActionWithDelay(reportID: string, optimisticConciergeAction: OptimisticReportAction) {
-    // Show "Concierge is typing..." indicator
-    Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`, {
-        [CONST.ACCOUNT_ID.CONCIERGE]: true,
-    });
-
-    setTimeout(() => {
-        // Clear the typing indicator
-        Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`, {
-            [CONST.ACCOUNT_ID.CONCIERGE]: false,
-        });
-
-        Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
-            [optimisticConciergeAction.reportAction.reportActionID]: optimisticConciergeAction.reportAction,
-        });
-    }, CONCIERGE_RESPONSE_DELAY_MS);
+/**
+ * Cancels any pending optimistic concierge action for the given reportID.
+ * Clears the pending response from Onyx and the typing indicator atomically.
+ */
+function cancelPendingConciergeAction(reportID: string) {
+    Onyx.update([
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: `${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`,
+            value: null,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`,
+            value: {[CONST.ACCOUNT_ID.CONCIERGE]: false},
+        },
+    ]);
 }
 
-export {resolveSuggestedFollowup, CONCIERGE_RESPONSE_DELAY_MS};
+/**
+ * Queues an optimistic concierge response for delayed display.
+ * Writes intent to Onyx — the ConciergeResponseScheduler component
+ * handles the actual delay and moves the action to REPORT_ACTIONS
+ * when the time arrives, with proper lifecycle cleanup.
+ */
+function addOptimisticConciergeActionWithDelay(reportID: string, optimisticConciergeAction: OptimisticReportAction) {
+    Onyx.update([
+        // Store the pending response for the scheduler to process
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: `${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`,
+            value: {
+                reportAction: optimisticConciergeAction.reportAction,
+                displayAfter: Date.now() + CONCIERGE_RESPONSE_DELAY_MS,
+            },
+        },
+        // Show "Concierge is typing..." indicator
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`,
+            value: {[CONST.ACCOUNT_ID.CONCIERGE]: true},
+        },
+    ]);
+}
+
+export {resolveSuggestedFollowup, cancelPendingConciergeAction, CONCIERGE_RESPONSE_DELAY_MS};
