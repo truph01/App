@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -30,13 +30,24 @@ import getCommonDependentTag from './SearchEditMultipleUtils';
 function SearchEditMultiplePage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const {selectedTransactionIDs, clearSelectedTransactions} = useSearchContext();
+    const {selectedTransactionIDs: selectedTransactionIDsFromContext, selectedTransactions, clearSelectedTransactions} = useSearchContext();
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const [draftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_BULK_EDIT_TRANSACTION_ID}`, {canBeMissing: true});
     const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
     const [allReportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {canBeMissing: true});
+
+    const selectedTransactionIDs = useMemo(() => {
+        if (selectedTransactionIDsFromContext.length) {
+            return selectedTransactionIDsFromContext;
+        }
+
+        return Object.keys(selectedTransactions ?? {}).filter((transactionID) => {
+            const selectedTransaction = selectedTransactions?.[transactionID];
+            return !!selectedTransaction?.transaction?.transactionID || !!allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+        });
+    }, [allTransactions, selectedTransactionIDsFromContext, selectedTransactions]);
 
     const hasCustomUnitTransaction = selectedTransactionIDs.some((transactionID) => {
         const transaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
@@ -143,7 +154,7 @@ function SearchEditMultiplePage() {
         }
 
         updateMultipleMoneyRequests(selectedTransactionIDs, changes, policy, allReports, allTransactions, allReportActions);
-        clearSelectedTransactions(true);
+        clearSelectedTransactions();
 
         Navigation.dismissToPreviousRHP();
     };
@@ -151,8 +162,8 @@ function SearchEditMultiplePage() {
     const currency = policy?.outputCurrency ?? CONST.CURRENCY.USD;
 
     // TODO: Currency editing and currency symbol should be handled in a separate PR
-    const selectedTransactions = selectedTransactionIDs.map((transactionID) => allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]);
-    const commonDependentTag = getCommonDependentTag(selectedTransactions);
+    const selectedTransactionsList = selectedTransactionIDs.map((transactionID) => allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]);
+    const commonDependentTag = getCommonDependentTag(selectedTransactionsList);
     const dependentTagSource = draftTransaction?.tag === undefined ? commonDependentTag : draftTransaction?.tag;
     const tagsArray = getTagArrayFromName(draftTransaction?.tag ?? '');
     const hasDependentTags = hasDependentTagsPolicyUtils(policy, policyTags);

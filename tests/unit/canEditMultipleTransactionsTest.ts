@@ -190,6 +190,14 @@ describe('canEditMultipleTransactions', () => {
         expect(result).toBe(false);
     });
 
+    it('returns false when selected entities are reports', () => {
+        const {transaction1, transaction2, reports, policies, reportActions} = buildTestData();
+
+        const result = canEditMultipleTransactions([transaction1, transaction2], reportActions, reports, policies, true);
+
+        expect(result).toBe(false);
+    });
+
     it('returns true when all selected transactions have an editable field', () => {
         const {transaction1, transaction2, reports, policies, reportActions} = buildTestData();
 

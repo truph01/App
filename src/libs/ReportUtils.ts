@@ -4796,7 +4796,12 @@ function canEditMultipleTransactions(
     reportActions: OnyxCollection<ReportActions>,
     reports: OnyxCollection<Report>,
     policies: OnyxCollection<Policy>,
+    areReportsSelected = false,
 ): boolean {
+    if (areReportsSelected) {
+        return false;
+    }
+
     if (selectedTransactions.length < 2) {
         return false;
     }
