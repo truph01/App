@@ -386,7 +386,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             <MenuItem
                                 icon={expensifyIcons.FreezeCard}
                                 title={translate('cardPage.freezeCard')}
-                                style={styles.mt3}
                                 disabled={isOffline}
                             />
                         )}
