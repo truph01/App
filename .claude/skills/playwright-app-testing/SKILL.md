@@ -4,9 +4,9 @@ description: Test the Expensify App using Playwright browser automation. Use whe
 alwaysApply: false
 ---
 
-## When to Use This Skill
-
 # Playwright App Testing
+
+## When to Use This Skill
 
 Use Playwright testing when:
 - User requests testing the App in a browser
