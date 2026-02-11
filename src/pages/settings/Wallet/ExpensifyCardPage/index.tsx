@@ -382,7 +382,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 );
                             }}
                         />
-                        {isBetaEnabled(CONST.BETAS.FREEZE_CARD) && isCardHolder && !isCardFrozen(currentPhysicalCard) && (
+                        {isBetaEnabled(CONST.BETAS.FREEZE_CARD) && isCardHolder && !!currentCard && !isCardFrozen(currentCard) && (
                             <MenuItem
                                 icon={expensifyIcons.FreezeCard}
                                 title={translate('cardPage.freezeCard')}
