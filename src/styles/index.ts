@@ -4709,6 +4709,12 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.componentBG,
         },
 
+        baseListHeaderWrapperStyle: {
+            ...spacing.ph9,
+            ...spacing.pv3,
+            ...spacing.pb5,
+        },
+
         selectionListStickyHeader: {
             backgroundColor: theme.appBG,
         },
