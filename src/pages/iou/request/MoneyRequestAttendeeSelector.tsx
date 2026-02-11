@@ -20,6 +20,7 @@ import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {
     formatSectionsFromSearchTerm,
     getFilteredRecentAttendees,
@@ -161,6 +162,10 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
         };
     }, [availableOptions, isPaidGroupPolicy, areOptionsInitialized, searchTerm, action]);
 
+    const userToInviteReportID = availableOptions?.userToInvite?.isPolicyExpenseChat ? availableOptions.userToInvite.reportID : undefined;
+    const [userToInviteExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteReportID)}`, {canBeMissing: true});
+    const [userToInviteChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteExpenseReport?.chatReportID)}`, {canBeMissing: true});
+
     const shouldShowErrorMessage = selectedOptions.length < 1;
 
     const handleConfirmSelection = useCallback(
@@ -260,7 +265,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
                 data: [orderedAvailableOptions.userToInvite].map((participant) => {
                     const isPolicyExpenseChat = participant?.isPolicyExpenseChat ?? false;
                     return isPolicyExpenseChat
-                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, reportAttributesDerived)
+                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, userToInviteExpenseReport, userToInviteChatReport, reportAttributesDerived)
                         : getParticipantsOption(participant, personalDetails);
                 }) as OptionData[],
                 shouldShow: true,
@@ -286,6 +291,8 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
         orderedAvailableOptions.personalDetails,
         orderedAvailableOptions.userToInvite,
         personalDetails,
+        userToInviteExpenseReport,
+        userToInviteChatReport,
         reportAttributesDerived,
         loginList,
         countryCode,

@@ -30,6 +30,7 @@ import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionS
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import getPlatform from '@libs/getPlatform';
 import goToSettings from '@libs/goToSettings';
 import {isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
@@ -241,6 +242,10 @@ function MoneyRequestParticipantsSelector({
 
     const cleanSearchTerm = useMemo(() => debouncedSearchTerm.trim().toLowerCase(), [debouncedSearchTerm]);
 
+    const userToInviteReportID = availableOptions?.userToInvite?.isPolicyExpenseChat ? availableOptions.userToInvite.reportID : undefined;
+    const [userToInviteExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteReportID)}`, {canBeMissing: true});
+    const [userToInviteChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteExpenseReport?.chatReportID)}`, {canBeMissing: true});
+
     useEffect(() => {
         searchInServer(debouncedSearchTerm.trim());
     }, [debouncedSearchTerm]);
@@ -346,7 +351,7 @@ function MoneyRequestParticipantsSelector({
                 data: [availableOptions.userToInvite].map((participant) => {
                     const isPolicyExpenseChat = participant?.isPolicyExpenseChat ?? false;
                     return isPolicyExpenseChat
-                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, reportAttributesDerived)
+                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, userToInviteExpenseReport, userToInviteChatReport, reportAttributesDerived)
                         : getParticipantsOption(participant, personalDetails);
                 }),
                 shouldShow: true,
@@ -372,6 +377,8 @@ function MoneyRequestParticipantsSelector({
         availableOptions.userToInvite,
         availableOptions.recentReports,
         availableOptions.personalDetails,
+        userToInviteExpenseReport,
+        userToInviteChatReport,
         isWorkspacesOnly,
         loginList,
         isPerDiemRequest,

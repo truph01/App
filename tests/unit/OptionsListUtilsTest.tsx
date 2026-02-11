@@ -5560,7 +5560,7 @@ describe('OptionsListUtils', () => {
                 selected: true,
             };
 
-            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, testPersonalDetails);
+            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, testPersonalDetails, report, undefined);
 
             expect(option).toBeDefined();
             expect(option.text).toBe('Test Workspace Policy');
@@ -5621,7 +5621,7 @@ describe('OptionsListUtils', () => {
                 isPolicyExpenseChat: true,
             };
 
-            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, testPersonalDetails);
+            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, testPersonalDetails, report, undefined);
 
             expect(option).toBeDefined();
             expect(option.text).toBe('Team Workspace');
@@ -5665,7 +5665,7 @@ describe('OptionsListUtils', () => {
             };
 
             // Should not throw when personalDetails is empty
-            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, {});
+            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, {}, report, undefined);
 
             expect(option).toBeDefined();
             expect(option.text).toBe('Workspace Without Details');
@@ -5709,7 +5709,7 @@ describe('OptionsListUtils', () => {
             };
 
             // Should not throw when personalDetails is undefined
-            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, undefined);
+            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, undefined, report, undefined);
 
             expect(option).toBeDefined();
             expect(option.text).toBe('Workspace Undefined Details');
@@ -5761,10 +5761,10 @@ describe('OptionsListUtils', () => {
                 selected: false,
             };
 
-            const optionSelected = getPolicyExpenseReportOption(participantSelected, CURRENT_USER_ACCOUNT_ID, {});
+            const optionSelected = getPolicyExpenseReportOption(participantSelected, CURRENT_USER_ACCOUNT_ID, {}, report, undefined);
 
             // eslint-disable-next-line rulesdir/no-negated-variables
-            const optionNotSelected = getPolicyExpenseReportOption(participantNotSelected, CURRENT_USER_ACCOUNT_ID, {});
+            const optionNotSelected = getPolicyExpenseReportOption(participantNotSelected, CURRENT_USER_ACCOUNT_ID, {}, report, undefined);
 
             expect(optionSelected.isSelected).toBe(true);
             expect(optionSelected.selected).toBe(true);
@@ -6091,10 +6091,6 @@ describe('OptionsListUtils', () => {
                 isPolicyExpenseChatEnabled: true,
             };
 
-            const reportsCollection = {
-                [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]: report,
-            };
-
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, report);
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${testPolicyID}`, policy);
             await waitForBatchedUpdates();
@@ -6105,8 +6101,8 @@ describe('OptionsListUtils', () => {
                 isPolicyExpenseChat: true,
             };
 
-            // When we call getPolicyExpenseReportOption with reports collection
-            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, PERSONAL_DETAILS);
+            // When we call getPolicyExpenseReportOption with report passed directly
+            const option = getPolicyExpenseReportOption(participant, CURRENT_USER_ACCOUNT_ID, PERSONAL_DETAILS, report, undefined);
 
             // Then the option should be created successfully
             expect(option).toBeDefined();

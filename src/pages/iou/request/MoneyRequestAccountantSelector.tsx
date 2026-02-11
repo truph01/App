@@ -15,6 +15,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import memoize from '@libs/memoize';
 import type {Section} from '@libs/OptionsListUtils';
 import {
@@ -141,6 +142,10 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
         return newOptions;
     }, [areOptionsInitialized, defaultOptions, debouncedSearchTerm, countryCode, loginList, currentUserAccountID, currentUserEmail, personalDetails]);
 
+    const userToInviteReportID = chatOptions?.userToInvite?.isPolicyExpenseChat ? chatOptions.userToInvite.reportID : undefined;
+    const [userToInviteExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteReportID)}`, {canBeMissing: true});
+    const [userToInviteChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteExpenseReport?.chatReportID)}`, {canBeMissing: true});
+
     /**
      * Returns the sections needed for the OptionsSelector
      */
@@ -193,7 +198,7 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
                 data: [chatOptions.userToInvite].map((participant) => {
                     const isPolicyExpenseChat = participant?.isPolicyExpenseChat ?? false;
                     return isPolicyExpenseChat
-                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, reportAttributesDerived)
+                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, userToInviteExpenseReport, userToInviteChatReport, reportAttributesDerived)
                         : getParticipantsOption(participant, personalDetails);
                 }),
                 shouldShow: true,
@@ -217,6 +222,8 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
         chatOptions.userToInvite,
         debouncedSearchTerm,
         personalDetails,
+        userToInviteExpenseReport,
+        userToInviteChatReport,
         reportAttributesDerived,
         translate,
         loginList,
