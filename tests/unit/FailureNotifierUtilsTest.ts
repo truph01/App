@@ -4,16 +4,8 @@
 
 /* eslint-disable @typescript-eslint/naming-convention -- matching GitHub API response field names */
 
-type PullRequest = {
-    html_url: string;
-    user: {login: string} | null;
-    merged_at: string | null;
-    base: {ref: string};
-    number: number;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment, import/no-relative-parent-imports -- .github/libs JS module outside src
-const getMergedPR: (associatedPRs: PullRequest[], targetBranch?: string) => PullRequest | undefined = require('../../.github/libs/failureNotifierUtils');
+import getMergedPR from '@github/libs/failureNotifierUtils';
+import type {PullRequest} from '@github/libs/failureNotifierUtils';
 
 describe('getMergedPR', () => {
     const mergedPR: PullRequest = {
