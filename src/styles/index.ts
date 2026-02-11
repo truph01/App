@@ -6330,12 +6330,6 @@ const plainStyles = (theme: ThemeColors) =>
                 marginTop: shouldUseNarrowLayout ? 20 : 32,
             }) satisfies ViewStyle,
 
-        widgetContainerIconWrapper: {
-            flexGrow: 0,
-            flexShrink: 0,
-            marginRight: 11,
-        },
-
         getWidgetItemIconContainerStyle: (backgroundColor: string) =>
             ({
                 alignItems: 'center',
