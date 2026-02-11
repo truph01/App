@@ -12,7 +12,7 @@ type PullRequest = {
     number: number;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports, rulesdir/no-relative-import -- .github/libs JS module outside src
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment, import/no-relative-parent-imports -- .github/libs JS module outside src
 const getMergedPR: (associatedPRs: PullRequest[], targetBranch?: string) => PullRequest | undefined = require('../../.github/libs/failureNotifierUtils');
 
 describe('getMergedPR', () => {

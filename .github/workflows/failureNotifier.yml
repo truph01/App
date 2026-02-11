@@ -75,7 +75,7 @@ jobs:
               commit_sha: headCommit,
             });
             const getMergedPR = require('./.github/libs/failureNotifierUtils');
-            const targetBranch = "${{ github.event.workflow_run.head_branch }}";
+            const targetBranch = context.payload.workflow_run.head_branch;
             const pr = getMergedPR(prData.data, targetBranch);
             const prLink = pr?.html_url ?? 'N/A';
             const prAuthor = pr?.user?.login ?? 'unknown';
