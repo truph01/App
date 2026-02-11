@@ -326,7 +326,7 @@ function getDefaultExpensifyCardLimitType(policy?: OnyxEntry<Policy>): ValueOf<t
     return areApprovalsConfigured ? CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART : CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY;
 }
 
-function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY_CARD.LIMIT_TYPES> | undefined): TranslationPaths | '' {
+function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY_CARD.LIMIT_TYPES> | undefined): TranslationPaths {
     switch (limitType) {
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART:
             return 'workspace.card.issueNewCard.smartLimit';
@@ -337,7 +337,7 @@ function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE:
             return 'workspace.card.issueNewCard.singleUse';
         default:
-            return '';
+            return 'workspace.card.issueNewCard.smartLimit';
     }
 }
 
@@ -937,6 +937,14 @@ function isCardPendingActivate(card?: Card) {
     return card?.state === CONST.EXPENSIFY_CARD.STATE.NOT_ACTIVATED;
 }
 
+/**
+ * Check if a card has potential fraud that needs review.
+ * Returns true if the card has fraud type 'domain' or 'individual'.
+ */
+function isCardWithPotentialFraud(card: Card): boolean {
+    return card.fraud === CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN || card.fraud === CONST.EXPENSIFY_CARD.FRAUD_TYPES.INDIVIDUAL;
+}
+
 function isCardPendingReplace(card?: Card) {
     return (
         (isCardPendingActivate(card) || isCardPendingIssue(card)) &&
@@ -1169,6 +1177,7 @@ export {
     isCardAlreadyAssigned,
     generateCardID,
     hasDisplayableAssignedCards,
+    isCardWithPotentialFraud,
 };
 
 export type {CompanyCardFeedIcons, CompanyCardBankIcons};
