@@ -99,7 +99,7 @@ function ReportActionItem({
     const originalReportID = useOriginalReportID(reportID, action);
     const originalReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`];
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
-    const {accountID: currentUserAccountID, login: currentUserLogin} = useCurrentUserPersonalDetails();
+    const {accountID: currentUserAccountID, email: currentUserEmail} = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     // When an expense is moved from a self-DM to a workspace, the report's policyID is temporarily
     // set to a fake placeholder (CONST.POLICY.OWNER_EMAIL_FAKE). Looking up POLICY_TAGS with that
@@ -175,7 +175,7 @@ function ReportActionItem({
                 movedFromReport,
                 movedToReport,
                 policyTags: policyTags ?? CONST.POLICY.DEFAULT_TAG_LIST,
-                currentUserLogin: currentUserLogin ?? '',
+                currentUserLogin: currentUserEmail ?? '',
             })}
             getTransactionsWithReceipts={getTransactionsWithReceipts}
             clearError={clearError}
