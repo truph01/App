@@ -21,8 +21,10 @@ import type CardContinuousReconciliation from './CardContinuousReconciliation';
 import type CardFeeds from './CardFeeds';
 import type {
     AddNewCompanyCardFeed,
+    CardFeed,
     CardFeedsStatus,
     CardFeedsStatusByDomainID,
+    CardFeedWithDomainID,
     CombinedCardFeed,
     CombinedCardFeeds,
     CompanyCardFeed,
@@ -150,7 +152,7 @@ import type Transaction from './Transaction';
 import type {TransactionViolation, ViolationName} from './TransactionViolation';
 import type TransactionViolations from './TransactionViolation';
 import type TravelProvisioning from './TravelProvisioning';
-import type {TravelSettings} from './TravelSettings';
+import type {TravelSettings, WorkspaceTravelSettings} from './TravelSettings';
 import type TryNewDot from './TryNewDot';
 import type UnshareBankAccount from './UnshareBankAccount';
 import type UserLocation from './UserLocation';
@@ -209,6 +211,8 @@ export type {
     CombinedCardFeeds,
     CardContinuousReconciliation,
     CompanyCardFeedWithDomainID,
+    CardFeed,
+    CardFeedWithDomainID,
     LastExportMethod,
     Locale,
     LockAccountDetails,
@@ -275,6 +279,7 @@ export type {
     TransactionViolation,
     TransactionViolations,
     TravelSettings,
+    WorkspaceTravelSettings,
     UserLocation,
     UserMetadata,
     UserWallet,
