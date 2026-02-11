@@ -35,6 +35,7 @@ import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct'
 jest.mock('@libs/PolicyUtils', () => ({
     ...jest.requireActual<typeof PolicyUtils>('@libs/PolicyUtils'),
     getConnectedIntegration: jest.fn(() => true),
+    isPolicyAdmin: jest.fn(() => true),
 }));
 
 describe('SidebarUtils', () => {
@@ -344,6 +345,7 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
@@ -362,6 +364,7 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
@@ -970,7 +973,7 @@ describe('SidebarUtils', () => {
                         }),
                     )
                     .then(() => {
-                        const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, translateLocal, localeCompare);
+                        const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
                         expect(result.messageHtml).toContain('This chat is with');
                         expect(result.messageHtml).toContain('<user-details accountid="1">');
                         expect(result.messageHtml).toContain('<user-details accountid="2">');
@@ -996,7 +999,7 @@ describe('SidebarUtils', () => {
                 });
             });
 
-            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, translateLocal, localeCompare);
+            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
             expect(result.messageText).toBe('This chat is with Email One.');
             expect(result.messageHtml).toContain('<user-details accountid="1">Email One</user-details>');
         });
@@ -1019,7 +1022,7 @@ describe('SidebarUtils', () => {
                 });
             });
 
-            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, translateLocal, localeCompare);
+            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
             expect(result.messageText).toMatch(/^This chat is with .+ and .+\.$/);
             expect(result.messageText).toContain(' and ');
             expect(result.messageText).not.toContain('<user-details');
@@ -1044,7 +1047,7 @@ describe('SidebarUtils', () => {
                 });
             });
 
-            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, translateLocal, localeCompare);
+            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
             expect(result.messageText).toMatch(/^This chat is with .+, .+, and .+\.$/);
             expect(result.messageText).toContain(', and ');
             expect(result.messageText).not.toContain('<user-details');
@@ -1079,7 +1082,7 @@ describe('SidebarUtils', () => {
                     .then(() => {
                         // Simulate how components call getWelcomeMessage() by using the hook useReportIsArchived() to see if the report is archived
                         const {result: isReportArchived} = renderHook(() => useReportIsArchived(MOCK_REPORT?.reportID));
-                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, translateLocal, localeCompare, isReportArchived.current);
+                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare, isReportArchived.current);
                     })
 
                     // Then the welcome message should indicate the report is archived
@@ -1109,12 +1112,175 @@ describe('SidebarUtils', () => {
                     .then(() => {
                         // Simulate how components call getWelcomeMessage() by using the hook useReportIsArchived() to see if the report is archived
                         const {result: isReportArchived} = renderHook(() => useReportIsArchived(MOCK_REPORT?.reportID));
-                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, translateLocal, localeCompare, isReportArchived.current);
+                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare, isReportArchived.current);
                     })
 
                     // Then the welcome message should explain the purpose of the room
                     .then((result) => expect(result.messageText).toBe('This chat is with everyone in Unavailable workspace. Use it for the most important announcements.'))
             );
+        });
+
+        it('should return correct welcome message for invoice room with business receiver', () => {
+            const invoiceReceiverPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Client Corporation',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                name: 'Vendor Workspace',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const invoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS,
+                    policyID: invoiceReceiverPolicy.id,
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(invoiceRoom, senderPolicy, invoiceReceiverPolicy, [], translateLocal, localeCompare);
+
+            expect(result.messageText).toContain('Client Corporation');
+            expect(result.messageText).toContain('Vendor Workspace');
+            expect(result.messageHtml).toContain('Client Corporation');
+            expect(result.messageHtml).toContain('Vendor Workspace');
+        });
+
+        it('should return correct welcome message for invoice room with individual receiver', () => {
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Service Provider',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const payerAccountID = 54321;
+            const invoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL,
+                    accountID: payerAccountID,
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(invoiceRoom, senderPolicy, undefined, [], translateLocal, localeCompare);
+
+            // When invoiceReceiverPolicy is undefined (individual payer), it should handle gracefully
+            expect(result.messageText).toBeTruthy();
+            expect(result.messageText).toContain('Service Provider');
+        });
+
+        it('should not return invoice room message for non-invoice rooms even with invoiceReceiverPolicy', () => {
+            const invoiceReceiverPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Some Policy',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                name: 'Regular Workspace',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const regularRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.POLICY_ANNOUNCE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.POLICY_ANNOUNCE,
+                policyID: policy.id,
+                policyName: policy.name,
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(regularRoom, policy, invoiceReceiverPolicy, [], translateLocal, localeCompare);
+
+            // Should not contain invoice-specific messaging
+            expect(result.messageText).not.toContain('Some Policy');
+            expect(result.messageText).toContain('Regular Workspace');
+        });
+
+        it('should handle archived invoice room with invoiceReceiverPolicy', () => {
+            const invoiceReceiverPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Archived Client',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                name: 'Archived Sender',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const archivedInvoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                reportName: 'Invoice Room',
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS,
+                    policyID: invoiceReceiverPolicy.id,
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(
+                archivedInvoiceRoom,
+                senderPolicy,
+                invoiceReceiverPolicy,
+                [],
+                translateLocal,
+                localeCompare,
+                true, // isReportArchived
+                'https://example.com/report',
+            );
+
+            // Should show archived message
+            expect(result.messageText).toContain('You missed the party');
+            expect(result.messageText).toContain(senderPolicy.name);
+        });
+
+        it('should handle invoice room when invoiceReceiverPolicy is null', () => {
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Sender Workspace',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const invoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS,
+                    policyID: '999',
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(
+                invoiceRoom,
+                senderPolicy,
+                undefined, // invoiceReceiverPolicy is undefined
+                [],
+                translateLocal,
+                localeCompare,
+            );
+
+            // Should still return a message, even if invoiceReceiverPolicy is missing
+            expect(result.messageText).toBeTruthy();
+            expect(result.messageText).toContain('Sender Workspace');
         });
     });
 
@@ -1166,6 +1332,7 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
@@ -1230,6 +1397,7 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
@@ -1297,6 +1465,7 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
@@ -1348,6 +1517,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
@@ -1390,6 +1560,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: LHNTestUtils.fakePersonalDetails,
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
@@ -1430,6 +1601,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
@@ -1569,6 +1741,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -1613,6 +1786,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
@@ -1687,6 +1861,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -1749,6 +1924,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -1801,6 +1977,7 @@ describe('SidebarUtils', () => {
                         [session.accountID]: {accountID: session.accountID},
                     },
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -1880,6 +2057,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -2000,6 +2178,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -2087,6 +2266,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: LHNTestUtils.fakePersonalDetails,
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -2186,6 +2366,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: personalDetailList,
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
@@ -2286,6 +2467,7 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: personalDetailList,
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,

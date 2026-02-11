@@ -5,9 +5,8 @@ import type {GestureResponderEvent} from 'react-native';
 import EmptySelectionListContent from '@components/EmptySelectionListContent';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
-// eslint-disable-next-line no-restricted-imports
-import SelectionList from '@components/SelectionListWithSections';
-import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
+import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
+import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
@@ -17,7 +16,6 @@ import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionS
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import memoize from '@libs/memoize';
-import type {Section} from '@libs/OptionsListUtils';
 import {
     filterAndOrderOptions,
     formatSectionsFromSearchTerm,
@@ -29,6 +27,7 @@ import {
     isCurrentUser,
     orderOptions,
 } from '@libs/OptionsListUtils';
+import type {SelectionListSections} from '@libs/OptionsListUtils/types';
 import {searchInServer} from '@userActions/Report';
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
@@ -150,7 +149,7 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
      * Returns the sections needed for the OptionsSelector
      */
     const [sections, header] = useMemo(() => {
-        const newSections: Section[] = [];
+        const newSections: SelectionListSections = [];
         if (!areOptionsInitialized || !didScreenTransitionEnd) {
             return [newSections, ''];
         }
@@ -169,20 +168,18 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
             undefined,
             reportAttributesDerived,
         );
-        // Just a temporary fix to satisfy the type checker
-        // Will be fixed when migrating to use new SelectionListWithSections
-        newSections.push({...formatResults.section, title: undefined, shouldShow: true});
+        newSections.push({...formatResults.section, sectionIndex: 0});
 
         newSections.push({
             title: translate('common.recents'),
             data: fiveRecents,
-            shouldShow: fiveRecents.length > 0,
+            sectionIndex: 1,
         });
 
         newSections.push({
             title: translate('common.contacts'),
             data: contactsWithRestOfRecents,
-            shouldShow: contactsWithRestOfRecents.length > 0,
+            sectionIndex: 2,
         });
 
         if (
@@ -201,7 +198,7 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
                         ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, userToInviteExpenseReport, userToInviteChatReport, reportAttributesDerived)
                         : getParticipantsOption(participant, personalDetails);
                 }),
-                shouldShow: true,
+                sectionIndex: 3,
             });
         }
 
@@ -262,23 +259,31 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
 
     const shouldShowListEmptyContent = useMemo(() => optionLength === 0 && !showLoadingPlaceholder, [optionLength, showLoadingPlaceholder]);
 
+    const textInputOptions = {
+        value: searchTerm,
+        label: translate('selectionList.nameEmailOrPhoneNumber'),
+        onChangeText: setSearchTerm,
+        headerMessage: header,
+        hint: offlineMessage,
+    };
+
     return (
-        <SelectionList
-            onConfirm={handleConfirmSelection}
-            sections={areOptionsInitialized ? sections : CONST.EMPTY_ARRAY}
+        <SelectionListWithSections
+            sections={areOptionsInitialized ? sections : []}
             ListItem={InviteMemberListItem}
-            textInputValue={searchTerm}
-            textInputLabel={translate('selectionList.nameEmailOrPhoneNumber')}
-            textInputHint={offlineMessage}
-            onChangeText={setSearchTerm}
             shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
             onSelectRow={selectAccountant}
+            confirmButtonOptions={{
+                onConfirm: handleConfirmSelection,
+            }}
+            shouldShowTextInput
             shouldSingleExecuteRowSelect
+            textInputOptions={textInputOptions}
             listEmptyContent={<EmptySelectionListContent contentType={iouType} />}
-            headerMessage={header}
             showLoadingPlaceholder={showLoadingPlaceholder}
             isLoadingNewOptions={!!isSearchingForReports}
-            shouldShowListEmptyContent={shouldShowListEmptyContent}
+            showListEmptyContent={shouldShowListEmptyContent}
+            disableMaintainingScrollPosition
         />
     );
 }
