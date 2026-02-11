@@ -8343,9 +8343,6 @@ const CONST = {
         ONBOARDING: {
             INTERESTED_FEATURES_ITEM: 'Onboarding-InterestedFeaturesItem',
         },
-        ONBOARDING: {
-            INTERESTED_FEATURE: 'Onboarding-InterestedFeature',
-        },
     },
 
     DOMAIN: {
