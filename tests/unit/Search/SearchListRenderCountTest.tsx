@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
+import {render} from '@testing-library/react-native';
 import {View} from 'react-native';
 import Onyx from 'react-native-onyx';
-import {measureRenders} from 'reassure';
 import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
@@ -14,9 +14,9 @@ import ThemeProvider from '@components/ThemeProvider';
 import ThemeStylesProvider from '@components/ThemeStylesProvider';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import * as TestHelper from '../utils/TestHelper';
-import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
-import wrapOnyxWithWaitForBatchedUpdates from '../utils/wrapOnyxWithWaitForBatchedUpdates';
+import * as TestHelper from '../../utils/TestHelper';
+import waitForBatchedUpdates from '../../utils/waitForBatchedUpdates';
+import wrapOnyxWithWaitForBatchedUpdates from '../../utils/wrapOnyxWithWaitForBatchedUpdates';
 
 jest.mock('@components/Icon/Expensicons');
 
@@ -83,6 +83,9 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('@src/components/ConfirmedRoute.tsx');
+
+/** Maximum allowed SearchList render count on initial mount with stable props. Exceeding this suggests a re-render regression. */
+const MAX_INITIAL_RENDER_COUNT = 5;
 
 function ThemeProviderWithLight({children}: {children: React.ReactNode}) {
     return <ThemeProvider theme="light">{children}</ThemeProvider>;
@@ -172,52 +175,64 @@ afterEach(() => {
     Onyx.clear();
 });
 
-function SearchListWrapper() {
-    const onSelectRow = useCallback(() => {}, []);
-    const onCheckboxPress = useCallback(() => {}, []);
-    const onAllCheckboxPress = useCallback(() => {}, []);
-    const onEndReached = useCallback(() => {}, []);
-    const onLayout = useCallback(() => {}, []);
+describe('SearchList render count', () => {
+    it('should not exceed max render count on initial mount with stable props', async () => {
+        const renderCountRef = {current: 0};
 
-    const queryJSON = useMemo(() => STABLE_QUERY_JSON, []);
-    const columns = useMemo(() => STABLE_COLUMNS, []);
-    const data = useMemo(() => MOCK_DATA, []);
-    const selectedTransactions = useMemo(() => ({}), []);
-    const contentContainerStyle = useMemo(() => ({}), []);
-    const containerStyle = useMemo(() => ({}), []);
+        function SearchListWithRenderCount(
+            props: React.ComponentProps<typeof SearchList>,
+        ): React.JSX.Element {
+            renderCountRef.current += 1;
+            return <SearchList {...props} />;
+        }
 
-    return (
-        <SearchList
-            data={data}
-            ListItem={MockListItem as never}
-            onSelectRow={onSelectRow}
-            onCheckboxPress={onCheckboxPress}
-            onAllCheckboxPress={onAllCheckboxPress}
-            canSelectMultiple={false}
-            selectedTransactions={selectedTransactions}
-            queryJSON={queryJSON}
-            columns={columns}
-            isMobileSelectionModeEnabled={false}
-            contentContainerStyle={contentContainerStyle}
-            containerStyle={containerStyle}
-            onEndReached={onEndReached}
-            onLayout={onLayout}
-        />
-    );
-}
+        function SearchListWrapper() {
+            const onSelectRow = useCallback(() => {}, []);
+            const onCheckboxPress = useCallback(() => {}, []);
+            const onAllCheckboxPress = useCallback(() => {}, []);
+            const onEndReached = useCallback(() => {}, []);
+            const onLayout = useCallback(() => {}, []);
 
-function SearchListWrapperWithProviders() {
-    return (
-        <ComposeProviders components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}>
-            <SearchListWrapper />
-        </ComposeProviders>
-    );
-}
+            const queryJSON = useMemo(() => STABLE_QUERY_JSON, []);
+            const columns = useMemo(() => STABLE_COLUMNS, []);
+            const data = useMemo(() => MOCK_DATA, []);
+            const selectedTransactions = useMemo(() => ({}), []);
+            const contentContainerStyle = useMemo(() => ({}), []);
+            const containerStyle = useMemo(() => ({}), []);
 
-test('[SearchList] should render with stable props on initial mount', async () => {
-    // No user interaction: measure render count when parent passes stable props
-    // (useCallback/useMemo). Used to detect regressions when optimizing SearchList re-renders.
-    const scenario = async (): Promise<void> => {};
+            return (
+                <SearchListWithRenderCount
+                    data={data}
+                    ListItem={MockListItem as never}
+                    onSelectRow={onSelectRow}
+                    onCheckboxPress={onCheckboxPress}
+                    onAllCheckboxPress={onAllCheckboxPress}
+                    canSelectMultiple={false}
+                    selectedTransactions={selectedTransactions}
+                    queryJSON={queryJSON}
+                    columns={columns}
+                    isMobileSelectionModeEnabled={false}
+                    contentContainerStyle={contentContainerStyle}
+                    containerStyle={containerStyle}
+                    onEndReached={onEndReached}
+                    onLayout={onLayout}
+                />
+            );
+        }
 
-    return waitForBatchedUpdates().then(() => measureRenders(<SearchListWrapperWithProviders />, {scenario}));
+        function SearchListWrapperWithProviders() {
+            return (
+                <ComposeProviders
+                    components={[ThemeProviderWithLight, ThemeStylesProvider, OnyxListItemProvider, LocaleContextProvider, ScrollOffsetContextProvider]}
+                >
+                    <SearchListWrapper />
+                </ComposeProviders>
+            );
+        }
+
+        render(<SearchListWrapperWithProviders />);
+        await waitForBatchedUpdates();
+
+        expect(renderCountRef.current).toBeLessThanOrEqual(MAX_INITIAL_RENDER_COUNT);
+    });
 });
