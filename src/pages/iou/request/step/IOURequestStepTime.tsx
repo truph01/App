@@ -16,7 +16,7 @@ import DateUtils from '@libs/DateUtils';
 import {addErrorMessage} from '@libs/ErrorUtils';
 import {isValidMoneyRequestType} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {getActivePoliciesWithExpenseChatAndPerDiemEnabled} from '@libs/PolicyUtils';
+import {getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates} from '@libs/PolicyUtils';
 import {getIOURequestPolicyID, setMoneyRequestDateAttribute} from '@userActions/IOU';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -69,8 +69,9 @@ function IOURequestStepTime({
     // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFound = !isValidMoneyRequestType(iouType) || isEmptyObject(policy) || (isEditPage && isEmptyObject(transaction?.comment?.customUnit));
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
-    const policiesWithPerDiemEnabled = useMemo(() => getActivePoliciesWithExpenseChatAndPerDiemEnabled(allPolicies, currentUserLogin), [allPolicies, currentUserLogin]);
+    const policiesWithPerDiemEnabled = useMemo(() => getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates(allPolicies, currentUserLogin), [allPolicies, currentUserLogin]);
     const hasMoreThanOnePolicyWithPerDiemEnabled = policiesWithPerDiemEnabled.length > 1;
+    const hasCurrentPolicyPerDiemEnabled = !!policy?.arePerDiemRatesEnabled;
 
     const navigateBack = () => {
         if (isEditPage) {
@@ -84,7 +85,9 @@ function IOURequestStepTime({
         }
 
         if (transaction?.isFromGlobalCreate || iouType === CONST.IOU.TYPE.TRACK) {
-            if (hasMoreThanOnePolicyWithPerDiemEnabled) {
+            // We want to navigate to destination step only when the first step was the workspace selector.
+            // If there is only one policy with per diem enabled, we want to navigate back to the start step because there is no separate destination step in that flow.
+            if (hasMoreThanOnePolicyWithPerDiemEnabled && !hasCurrentPolicyPerDiemEnabled) {
                 Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_DESTINATION.getRoute(action, iouType, transactionID, reportID));
                 return;
             }

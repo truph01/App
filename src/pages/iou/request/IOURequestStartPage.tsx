@@ -1,11 +1,11 @@
-import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Keyboard, View} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Keyboard, View } from 'react-native';
 import DragAndDropProvider from '@components/DragAndDrop/Provider';
 import FocusTrapContainerElement from '@components/FocusTrap/FocusTrapContainerElement';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import {useProductTrainingContext} from '@components/ProductTrainingContext';
-import type {AnimatedTextInputRef} from '@components/RNTextInput';
+import { useProductTrainingContext } from '@components/ProductTrainingContext';
+import type { AnimatedTextInputRef } from '@components/RNTextInput';
 import ScreenWrapper from '@components/ScreenWrapper';
 import TabSelector from '@components/TabSelector/TabSelector';
 import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
@@ -18,32 +18,26 @@ import usePersonalPolicy from '@hooks/usePersonalPolicy';
 import usePolicy from '@hooks/usePolicy';
 import usePrevious from '@hooks/usePrevious';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {dismissProductTraining} from '@libs/actions/Welcome';
-import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import { dismissProductTraining } from '@libs/actions/Welcome';
+import { canUseTouchScreen } from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import getPlatform from '@libs/getPlatform';
 import type Platform from '@libs/getPlatform/types';
 import Navigation from '@libs/Navigation/Navigation';
-import OnyxTabNavigator, {TabScreenWithFocusTrapWrapper, TopTab} from '@libs/Navigation/OnyxTabNavigator';
-import {getIsUserSubmittedExpenseOrScannedReceipt} from '@libs/OptionsListUtils';
+import OnyxTabNavigator, { TabScreenWithFocusTrapWrapper, TopTab } from '@libs/Navigation/OnyxTabNavigator';
+import { getIsUserSubmittedExpenseOrScannedReceipt } from '@libs/OptionsListUtils';
 import Performance from '@libs/Performance';
-import {
-    getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates,
-    getActivePoliciesWithExpenseChatAndTimeEnabled,
-    getPerDiemCustomUnit,
-    hasOnlyPersonalPolicies as hasOnlyPersonalPoliciesUtil,
-    isTimeTrackingEnabled,
-} from '@libs/PolicyUtils';
-import {getPayeeName} from '@libs/ReportUtils';
-import {endSpan} from '@libs/telemetry/activeSpans';
+import { getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates, getActivePoliciesWithExpenseChatAndTimeEnabled, getPerDiemCustomUnit, hasOnlyPersonalPolicies as hasOnlyPersonalPoliciesUtil, isTimeTrackingEnabled } from '@libs/PolicyUtils';
+import { getPayeeName } from '@libs/ReportUtils';
+import { endSpan } from '@libs/telemetry/activeSpans';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
-import type {IOURequestType} from '@userActions/IOU';
-import {initMoneyRequest} from '@userActions/IOU';
+import type { IOURequestType } from '@userActions/IOU';
+import { initMoneyRequest } from '@userActions/IOU';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
-import type {SelectedTabRequest} from '@src/types/onyx';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import type { SelectedTabRequest } from '@src/types/onyx';
+import { isEmptyObject } from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import IOURequestStepAmount from './step/IOURequestStepAmount';
 import IOURequestStepDestination from './step/IOURequestStepDestination';
@@ -52,7 +46,8 @@ import IOURequestStepHours from './step/IOURequestStepHours';
 import IOURequestStepPerDiemWorkspace from './step/IOURequestStepPerDiemWorkspace';
 import IOURequestStepScan from './step/IOURequestStepScan';
 import IOURequestStepTimeWorkspace from './step/IOURequestStepTimeWorkspace';
-import type {WithWritableReportOrNotFoundProps} from './step/withWritableReportOrNotFound';
+import type { WithWritableReportOrNotFoundProps } from './step/withWritableReportOrNotFound';
+
 
 type IOURequestStartPageProps = WithWritableReportOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.CREATE> & {
     defaultSelectedTab: SelectedTabRequest;
