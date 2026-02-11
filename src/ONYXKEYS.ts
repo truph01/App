@@ -788,7 +788,7 @@ const ONYXKEYS = {
         /**
          * Local passkeys storage for WebAuthn/Passkeys authentication.
          * Stores passkey credentials registered on this specific browser/device.
-         * Key format: passkey_${userId}@${rpId}
+         * Key format: passkey_${userId}
          */
         PASSKEYS: 'passkey_',
     },
