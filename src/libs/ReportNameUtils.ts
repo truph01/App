@@ -4,7 +4,6 @@
 import {Str} from 'expensify-common';
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
-import type {TupleToUnion} from 'type-fest';
 import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -742,8 +741,6 @@ function computeReportName(
     if (report?.reportName && report.type === CONST.REPORT.TYPE.EXPENSE) {
         return isArchivedNonExpense ? generateArchivedReportName(report?.reportName) : report?.reportName;
     }
-
-
 
     if (isTaskReport(report)) {
         return Parser.htmlToText(report?.reportName ?? '').trim();
