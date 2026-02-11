@@ -147,7 +147,7 @@ describe('actions/Passkey', () => {
             ];
 
             // When reconciling with backend
-            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials: localCredentials});
+            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials});
 
             // Then all local credentials should be returned
             expect(result).toEqual(localCredentials);
@@ -162,7 +162,7 @@ describe('actions/Passkey', () => {
             const backendCredentials: BackendPasskeyCredential[] = [{id: 'cred-1', type: CONST.PASSKEY_CREDENTIAL_TYPE}];
 
             // When reconciling with backend
-            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials: localCredentials});
+            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials});
             await waitForBatchedUpdates();
 
             // Then only the matching credential should be returned and stored in Onyx
@@ -178,7 +178,7 @@ describe('actions/Passkey', () => {
             const backendCredentials: BackendPasskeyCredential[] = [{id: 'new-cred', type: CONST.PASSKEY_CREDENTIAL_TYPE}];
 
             // When reconciling with backend
-            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials: localCredentials});
+            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials});
             await waitForBatchedUpdates();
 
             // Then an empty array should be returned and Onyx should be empty
@@ -196,7 +196,7 @@ describe('actions/Passkey', () => {
             const backendCredentials: BackendPasskeyCredential[] = [{id: 'cred-1', type: CONST.PASSKEY_CREDENTIAL_TYPE}];
 
             // When reconciling with backend
-            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials: localCredentials});
+            const result = reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials});
 
             // Then the local transports should be preserved in the result
             expect(result).toEqual(localCredentials);

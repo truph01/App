@@ -61,7 +61,10 @@ type ReconcileLocalPasskeysWithBackendParams = PasskeyScope & {
 
 /**
  * Reconciles local Onyx passkeys with backend allowCredentials.
- * Removes local credentials that no longer exist on backend.
+ * Removes local credentials that no longer exist on backend and updates Onyx accordingly.
+ *
+ * Returns the matched credentials (with locally preserved transports) so the caller
+ * can pass them directly as `allowCredentials` to `navigator.credentials.get()`.
  */
 function reconcileLocalPasskeysWithBackend({userId, backendCredentials, localCredentials}: ReconcileLocalPasskeysWithBackendParams): PasskeyCredential[] {
     if (!userId) {
