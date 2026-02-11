@@ -186,13 +186,13 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
         if (workflow.isDefault) {
             searchableTexts.push(everyoneText);
-        }
-
-        for (const member of workflow.members) {
-            searchableTexts.push(member.displayName);
-            searchableTexts.push(Str.removeSMSDomain(member.displayName));
-            searchableTexts.push(member.email);
-            searchableTexts.push(Str.removeSMSDomain(member.email));
+        } else {
+            for (const member of workflow.members) {
+                searchableTexts.push(member.displayName);
+                searchableTexts.push(Str.removeSMSDomain(member.displayName));
+                searchableTexts.push(member.email);
+                searchableTexts.push(Str.removeSMSDomain(member.email));
+            }
         }
 
         for (const approver of workflow.approvers) {
@@ -315,12 +315,12 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 label={translate('workflowsPage.findWorkflow')}
                                 inputValue={workflowSearchInput}
                                 onChangeText={setWorkflowSearchInput}
-                                style={[styles.mt6, styles.mbn3, {marginHorizontal: 0}]}
+                                style={[styles.mt6, {marginHorizontal: 0}]}
                             />
                         )}
                         {searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0 && (
-                            <View style={[styles.pt8, styles.pb5]}>
-                                <Text style={[styles.textLabel, styles.colorMuted, styles.minHeight5]}>{translate('common.noResultsFoundMatching', workflowSearchInput)}</Text>
+                            <View style={[styles.pt3, styles.pb5]}>
+                                <Text style={[styles.textNormal, styles.colorMuted]}>{translate('common.noResultsFoundMatching', workflowSearchInput)}</Text>
                             </View>
                         )}
                         {searchFilteredWorkflows.map((workflow) => (
