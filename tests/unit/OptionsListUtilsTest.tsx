@@ -3584,7 +3584,7 @@ describe('OptionsListUtils', () => {
             };
 
             // When we call createFilteredOptionList with this privateIsArchivedMap
-            const result = createFilteredOptionList(PERSONAL_DETAILS, privateIsArchivedMap, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined);
+            const result = createFilteredOptionList(PERSONAL_DETAILS, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined, privateIsArchivedMap);
 
             // Then the report options should have the correct private_isArchived values
             const report3Option = result.reports.find((r) => r.item?.reportID === '3');
@@ -3603,7 +3603,7 @@ describe('OptionsListUtils', () => {
             const emptyMap: PrivateIsArchivedMap = {};
 
             // When we call createFilteredOptionList with an empty privateIsArchivedMap
-            const result = createFilteredOptionList(PERSONAL_DETAILS, emptyMap, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined);
+            const result = createFilteredOptionList(PERSONAL_DETAILS, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined, emptyMap);
 
             // Then reports NOT in Onyx (like report 3, 5) should not have private_isArchived set
             // Note: Report 10 gets private_isArchived from Onyx (set in beforeAll)
@@ -3624,7 +3624,7 @@ describe('OptionsListUtils', () => {
             };
 
             // When we call createFilteredOptionList with this privateIsArchivedMap
-            const result = createFilteredOptionList(PERSONAL_DETAILS, privateIsArchivedMap, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined);
+            const result = createFilteredOptionList(PERSONAL_DETAILS, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined, privateIsArchivedMap);
 
             // Then the report options should have the correct private_isArchived values
             const report1Option = result.reports.find((r) => r.item?.reportID === '1');
@@ -3649,7 +3649,7 @@ describe('OptionsListUtils', () => {
             };
 
             // When we call createFilteredOptionList with maxRecentReports limit
-            const result = createFilteredOptionList(PERSONAL_DETAILS, privateIsArchivedMap, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined, {
+            const result = createFilteredOptionList(PERSONAL_DETAILS, REPORTS, CURRENT_USER_ACCOUNT_ID, undefined, privateIsArchivedMap, {
                 maxRecentReports: 5,
             });
 
