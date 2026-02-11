@@ -62,6 +62,11 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
         return <Badge text={translate('domain.admins.primaryContact')} />;
     };
 
+    const getCustomRowProps = (accountID: number) => ({
+        errors: domainErrors?.adminErrors?.[accountID]?.errors,
+        pendingAction: domainPendingAction?.[accountID]?.pendingAction,
+    });
+
     const hasSettingsErrors = hasDomainAdminsSettingsErrors(domainErrors);
     const headerContent = isAdmin ? (
         <>
@@ -94,8 +99,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
             headerIcon={illustrations.UserShield}
             headerContent={headerContent}
             getCustomRightElement={getCustomRightElement}
-            memberErrors={domainErrors?.adminErrors}
-            memberPendingActions={domainPendingAction}
+            getCustomRowProps={getCustomRowProps}
             onDismissError={(item) => clearAdminError(domainAccountID, item.accountID)}
             onSelectRow={(item) => Navigation.navigate(ROUTES.DOMAIN_ADMIN_DETAILS.getRoute(domainAccountID, item.accountID))}
         />
