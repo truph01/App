@@ -1285,6 +1285,7 @@ describe('getSecondaryAction', () => {
         const policy = {} as unknown as Policy;
 
         jest.spyOn(ReportUtils, 'canHoldUnholdReportAction').mockReturnValueOnce({canHoldRequest: true, canUnholdRequest: true});
+        jest.spyOn(ReportUtils, 'isAwaitingFirstLevelApproval').mockReturnValueOnce(true);
         jest.spyOn(ReportActionsUtils, 'getOneTransactionThreadReportID').mockReturnValueOnce(originalMessageR14932.IOUTransactionID);
         const result = getSecondaryReportActions({
             currentUserLogin: EMPLOYEE_EMAIL,
@@ -2620,6 +2621,7 @@ describe('getSecondaryTransactionThreadActions', () => {
         const policy = {} as unknown as Policy;
 
         jest.spyOn(ReportUtils, 'canHoldUnholdReportAction').mockReturnValueOnce({canHoldRequest: true, canUnholdRequest: true});
+        jest.spyOn(ReportUtils, 'isAwaitingFirstLevelApproval').mockReturnValueOnce(true);
         const result = getSecondaryTransactionThreadActions(EMPLOYEE_EMAIL, EMPLOYEE_ACCOUNT_ID, report, transaction, actionR14932, {} as Transaction, policy);
         expect(result.includes(CONST.REPORT.SECONDARY_ACTIONS.HOLD)).toBe(true);
     });
