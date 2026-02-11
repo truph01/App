@@ -511,7 +511,12 @@ function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>, feedKeysWithCa
 
             // Only filter stale direct feeds when we have card data to make an informed decision.
             // A direct feed is stale if it has no oAuthAccountDetails AND no assigned cards.
-            if (feedKeysWithCards && isDirectFeed(key) && !oAuthAccountDetails?.[key as CompanyCardFeed] && !directFeedHasCards(key, domainID ?? 0, feedKeysWithCards)) {
+            if (
+                feedKeysWithCards &&
+                isDirectFeed(key) &&
+                !oAuthAccountDetails?.[key as CompanyCardFeed] &&
+                !directFeedHasCards(key, domainID ?? CONST.DEFAULT_NUMBER_ID, feedKeysWithCards)
+            ) {
                 return false;
             }
             return true;
