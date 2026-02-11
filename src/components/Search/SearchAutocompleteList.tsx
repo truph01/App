@@ -5,7 +5,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {useOptionsList} from '@components/OptionListContextProvider';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
-import type {ListItem as NewListItem, UserListItemProps, ValidListItem} from '@components/SelectionList/ListItem/types';
+import type {ListItem as NewListItem, UserListItemProps} from '@components/SelectionList/ListItem/types';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {Section, SelectionListWithSectionsHandle} from '@components/SelectionList/SelectionListWithSections/types';
@@ -875,7 +875,7 @@ function SearchAutocompleteList({
                 showLoadingPlaceholder
                 sections={sections}
                 onSelectRow={onListItemPress}
-                ListItem={SearchRouterItem as unknown as ValidListItem}
+                ListItem={SearchRouterItem}
                 style={{
                     containerStyle: [styles.mh100],
                     listStyle: [styles.ph2, styles.overscrollBehaviorContain],

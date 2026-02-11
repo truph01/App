@@ -11,6 +11,7 @@ import type {SplitExpense} from '@src/types/onyx/IOU';
 import type {Errors, Icon, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {ReceiptErrors} from '@src/types/onyx/Transaction';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
+import type {SearchRouterItem} from '@components/Search/SearchAutocompleteList';
 import type BaseListItem from './BaseListItem';
 import type InviteMemberListItem from './InviteMemberListItem';
 import type MultiSelectListItem from './MultiSelectListItem';
@@ -286,6 +287,7 @@ type ValidListItem =
     | typeof InviteMemberListItem
     | typeof MultiSelectListItem
     | typeof RadioListItem
+    | typeof SearchRouterItem
     | typeof SingleSelectListItem
     | typeof SpendCategorySelectorListItem
     | typeof SplitListItem
