@@ -9587,7 +9587,7 @@ async function run() {
     });
     const previousRunJobs = previousRunJobsData.data;
     // Find the PR that caused this failure
-    const headCommit = workflowRun.head_commit?.id;
+    const headCommit = workflowRun.head_commit?.id ?? '';
     const prData = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
         owner,
         repo,
