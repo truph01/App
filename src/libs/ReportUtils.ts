@@ -12466,7 +12466,7 @@ function canRejectReportAction(currentUserLogin: string, report: Report, policy?
     const isIOU = isIOUReport(report);
     const isInvoice = isInvoiceReport(report);
     const isCurrentUserManager = report?.managerID === currentUserAccountID;
-    
+
     if (!isCurrentUserManager) {
         return false;
     }
