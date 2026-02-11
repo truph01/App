@@ -121,7 +121,7 @@ function TimeSensitiveSection() {
     // 6. Expensify card activation
     return (
         <WidgetContainer title={translate('homePage.timeSensitiveSection.title')}>
-            <View style={styles.getForYouSectionContainerStyle(shouldUseNarrowLayout)}>
+            <View style={shouldUseNarrowLayout ? styles.mb2 : styles.mb5}>
                 {/* Priority 1: Card fraud alerts */}
                 {shouldShowReviewCardFraud &&
                     cardsWithFraud.map((card) => {
