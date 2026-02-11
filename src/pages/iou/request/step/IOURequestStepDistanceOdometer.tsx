@@ -357,7 +357,7 @@ function IOURequestStepDistanceOdometer({
         const calculatedDistance = roundToTwoDecimalPlaces(distance);
 
         // Store total distance in transaction.comment.customUnit.quantity
-        setMoneyRequestDistance(transactionID, calculatedDistance, isTransactionDraft, unit);
+        setMoneyRequestDistance(transactionID, calculatedDistance, isTransactionDraft);
 
         if (isEditing) {
             // Update existing transaction
@@ -509,7 +509,7 @@ function IOURequestStepDistanceOdometer({
                 lastSelectedDistanceRates,
             });
             setTransactionReport(transactionID, {reportID: transactionReportID}, true);
-            setCustomUnitRateID(transactionID, rateID, transaction, policy);
+            setCustomUnitRateID(transactionID, rateID);
             setMoneyRequestParticipantsFromReport(transactionID, activePolicyExpenseChat, currentUserPersonalDetails.accountID).then(() => {
                 Navigation.navigate(
                     ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(
@@ -671,6 +671,7 @@ function IOURequestStepDistanceOdometer({
                         onPress={handleNext}
                         text={buttonText}
                         testID="next-save-button"
+                        sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.DISTANCE_ODOMETER_NEXT_BUTTON}
                     />
                 </View>
             </View>
