@@ -231,8 +231,13 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
             return -1;
         }
 
+        const exactMatchIndex = flattenedMenuItems.findIndex((item) => item.hash === hash);
+        if (exactMatchIndex !== -1) {
+            return exactMatchIndex;
+        }
+
         return flattenedMenuItems.findIndex((item) => item.similarSearchHash === similarSearchHash);
-    }, [similarSearchHash, isSavedSearchActive, flattenedMenuItems]);
+    }, [hash, similarSearchHash, isSavedSearchActive, flattenedMenuItems]);
 
     return (
         <>
