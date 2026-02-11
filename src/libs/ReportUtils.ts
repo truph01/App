@@ -12461,7 +12461,7 @@ function getReportPersonalDetailsParticipants(report: Report, personalDetailsPar
     };
 }
 
-function canRejectReportAction(currentUserLogin: string, report: Report, policy?: Policy): boolean {
+function canRejectReportAction(currentUserLogin: string, report: Report): boolean {
     const isReportBeingProcessed = isProcessingReport(report);
     const isIOU = isIOUReport(report);
     const isInvoice = isInvoiceReport(report);
