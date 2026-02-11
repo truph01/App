@@ -18,6 +18,9 @@ type UsePolicyForTransactionParams = {
 
     /** The type of IOU (split, track, submit, etc.) */
     iouType: string;
+
+    /** The draft policy linked to the report */
+    policyDraft?: OnyxEntry<Policy>;
 };
 
 type UsePolicyForTransactionResult = {
@@ -25,13 +28,13 @@ type UsePolicyForTransactionResult = {
     policy: OnyxEntry<Policy>;
 };
 
-function usePolicyForTransaction({transaction, report, action, iouType}: UsePolicyForTransactionParams): UsePolicyForTransactionResult {
+function usePolicyForTransaction({transaction, report, action, iouType, policyDraft}: UsePolicyForTransactionParams): UsePolicyForTransactionResult {
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const isUnreportedExpense = isExpenseUnreported(transaction);
     const isCreatingTrackExpense = action === CONST.IOU.ACTION.CREATE && iouType === CONST.IOU.TYPE.TRACK;
 
     const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`, {canBeMissing: true});
-    const policy = isUnreportedExpense || isCreatingTrackExpense ? policyForMovingExpenses : reportPolicy;
+    const policy = isUnreportedExpense || isCreatingTrackExpense ? policyForMovingExpenses : (reportPolicy ?? policyDraft);
 
     return {policy};
 }

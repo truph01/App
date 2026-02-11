@@ -9,7 +9,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
-import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
+import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getIOURequestPolicyID, setMoneyRequestDistanceRate, setMoneyRequestTaxAmount, setMoneyRequestTaxRate, updateMoneyRequestDistanceRate} from '@libs/actions/IOU';
@@ -53,8 +53,6 @@ function IOURequestStepDistanceRate({
     transaction,
 }: IOURequestStepDistanceRateProps) {
     const [policyDraft] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${getIOURequestPolicyID(transaction, reportDraft)}`, {canBeMissing: true});
-    /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-    const [policyReal] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`, {canBeMissing: true});
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${report?.policyID}`, {canBeMissing: true});
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
@@ -64,7 +62,7 @@ function IOURequestStepDistanceRate({
 
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`, {canBeMissing: true});
 
-    const policy: OnyxEntry<OnyxTypes.Policy> = policyReal ?? policyDraft;
+    const {policy} = usePolicyForTransaction({transaction, report, action, iouType, policyDraft});
 
     const styles = useThemeStyles();
     const {translate, toLocaleDigit, localeCompare} = useLocalize();
@@ -84,9 +82,7 @@ function IOURequestStepDistanceRate({
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
 
-    const {policyForMovingExpenses} = usePolicyForMovingExpenses();
-    const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
-    const rates = DistanceRequestUtils.getMileageRates(isTrackExpense ? policyForMovingExpenses : policy, false, currentRateID);
+    const rates = DistanceRequestUtils.getMileageRates(policy, false, currentRateID);
     const sortedRates = useMemo(() => Object.values(rates).sort((a, b) => localeCompare(a.name ?? '', b.name ?? '')), [rates, localeCompare]);
 
     const navigateBack = () => {
