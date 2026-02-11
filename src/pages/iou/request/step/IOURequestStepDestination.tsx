@@ -97,7 +97,8 @@ function IOURequestStepDestination({
 
     const updateDestination = (destination: ListItem & {currency: string}) => {
         if (openedFromStartPage && policy?.id && shouldRestrictUserBillableActions(policy.id)) {
-            return Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
+            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
+            return;
         }
 
         if (isEmptyObject(customUnit)) {
