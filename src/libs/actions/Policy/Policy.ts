@@ -308,10 +308,10 @@ function hasInvoicingDetails(policy: OnyxEntry<Policy>): boolean {
  * Returns a primary invoice workspace for the user
  */
 function getInvoicePrimaryWorkspace(activePolicy: OnyxEntry<Policy>, activeAdminWorkspaces: Policy[]): Policy | undefined {
-    if (PolicyUtils.canSendInvoiceFromWorkspace(activePolicy?.id) && PolicyUtils.isPolicyAdmin(activePolicy)) {
+    if (PolicyUtils.canSendInvoiceFromWorkspace(activePolicy) && PolicyUtils.isPolicyAdmin(activePolicy)) {
         return activePolicy;
     }
-    return activeAdminWorkspaces.find((policy) => PolicyUtils.canSendInvoiceFromWorkspace(policy.id));
+    return activeAdminWorkspaces.find((policy) => PolicyUtils.canSendInvoiceFromWorkspace(policy));
 }
 
 /**
@@ -344,6 +344,7 @@ function hasActiveChatEnabledPolicies(policies: Array<OnyxEntry<PolicySelector>>
 }
 
 type DeleteWorkspaceActionParams = {
+    policies: OnyxCollection<Policy>;
     policyID: string;
     personalPolicyID: string | undefined;
     activePolicyID: string | undefined;
@@ -362,11 +363,8 @@ type DeleteWorkspaceActionParams = {
  * Delete the workspace
  */
 function deleteWorkspace(params: DeleteWorkspaceActionParams) {
-    if (!deprecatedAllPolicies) {
-        return;
-    }
-
     const {
+        policies,
         policyID,
         activePolicyID,
         policyName,
@@ -381,10 +379,8 @@ function deleteWorkspace(params: DeleteWorkspaceActionParams) {
         personalPolicyID,
     } = params;
 
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const policy = getPolicy(policyID);
-    const filteredPolicies = Object.values(deprecatedAllPolicies).filter((p): p is Policy => p?.id !== policyID);
+    const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
+    const filteredPolicies = Object.values(policies ?? {}).filter((p): p is Policy => p?.id !== policyID);
     const workspaceAccountID = policy?.workspaceAccountID;
 
     // Filter out bank accounts associated with the policy being deleted
@@ -494,7 +490,7 @@ function deleteWorkspace(params: DeleteWorkspaceActionParams) {
     ];
 
     if (policyID === activePolicyID) {
-        const mostRecentlyCreatedGroupPolicy = Object.values(deprecatedAllPolicies ?? {})
+        const mostRecentlyCreatedGroupPolicy = Object.values(policies ?? {})
             .filter((p) => p && p.id !== activePolicyID && p.type !== CONST.POLICY.TYPE.PERSONAL && p.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
             .sort((policyA, policyB) => localeCompare(policyB?.created ?? '', policyA?.created ?? ''))
             .at(0);
@@ -526,7 +522,7 @@ function deleteWorkspace(params: DeleteWorkspaceActionParams) {
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
             value: {
                 ...(!isInvoiceReceiverReport && {
-                    oldPolicyName: deprecatedAllPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`]?.name,
+                    oldPolicyName: policy?.name,
                     policyName: '',
                 }),
                 isPinned: false,
@@ -2058,7 +2054,7 @@ function generateDefaultWorkspaceName(email = ''): string {
 
     if (isEmptyObject(deprecatedAllPolicies)) {
         // eslint-disable-next-line @typescript-eslint/no-deprecated
-        return isSMSDomain ? translateLocal('workspace.new.myGroupWorkspace', {}) : translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace});
+        return isSMSDomain ? translateLocal('workspace.new.myGroupWorkspace', {}) : translateLocal('workspace.new.workspaceName', displayNameForWorkspace);
     }
 
     // find default named workspaces and increment the last number
@@ -2080,7 +2076,7 @@ function generateDefaultWorkspaceName(email = ''): string {
         return translateLocal('workspace.new.myGroupWorkspace', {workspaceNumber: lastWorkspaceNumber !== undefined ? lastWorkspaceNumber + 1 : undefined});
     }
     // eslint-disable-next-line @typescript-eslint/no-deprecated
-    return translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace, workspaceNumber: lastWorkspaceNumber !== undefined ? lastWorkspaceNumber + 1 : undefined});
+    return translateLocal('workspace.new.workspaceName', displayNameForWorkspace, lastWorkspaceNumber !== undefined ? lastWorkspaceNumber + 1 : undefined);
 }
 
 /**
