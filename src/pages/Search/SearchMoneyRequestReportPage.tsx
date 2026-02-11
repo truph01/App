@@ -42,7 +42,7 @@ import {createTransactionThreadReport, openReport, updateLastVisitTime} from '@u
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
-import type {PersonalDetailsList, Policy, Report, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {PersonalDetailsList, Policy, Transaction, TransactionViolations} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 type SearchMoneyRequestPageProps =
@@ -68,6 +68,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     const firstRenderRef = useRef(true);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`, {allowStaleData: true, canBeMissing: true});
+    const prevReport = usePrevious(report);
 
     const isFocused = useIsFocused();
 
@@ -77,7 +78,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
             return;
         }
 
-        const isRemovalExpectedForReportType = !report && isMoneyRequestReport(report);
+        const isRemovalExpectedForReportType = !report && isMoneyRequestReport(prevReport);
 
         if (isRemovalExpectedForReportType) {
             if (!isFocused) {
