@@ -20,7 +20,7 @@ describe('SearchAutocompleteUtils', () => {
         const mockCategoryList = createSharedValueMock(['Travel', 'Meals', 'Office Supplies']);
         const mockTagList = createSharedValueMock(['Project A', 'Project B', 'Urgent']);
         const mockExportedToList = createSharedValueMock([
-            ...CONST.SEARCH.PREDEFINED_INTEGRATION_FILTER_VALUES,
+            ...CONST.POLICY.CONNECTIONS.EXPORTED_TO_INTEGRATION_DISPLAY_NAMES,
             CONST.REPORT.EXPORT_OPTION_LABELS.EXPENSE_LEVEL_EXPORT,
             CONST.REPORT.EXPORT_OPTION_LABELS.REPORT_LEVEL_EXPORT,
         ] as string[]);

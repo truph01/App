@@ -3373,6 +3373,9 @@ const CONST = {
                 microsoftDynamics: 'Microsoft Dynamics',
                 other: 'Other',
             },
+            get EXPORTED_TO_INTEGRATION_DISPLAY_NAMES(): string[] {
+                return Object.values(this.NAME).map((name) => this.NAME_USER_FRIENDLY[name as keyof typeof this.NAME_USER_FRIENDLY]);
+            },
             CORPORATE: ['quickbooksDesktop', 'netsuite', 'intacct', 'oracle', 'sap', 'microsoftDynamics', 'other'],
             AUTH_HELP_LINKS: {
                 intacct:
@@ -7475,7 +7478,6 @@ const CONST = {
         },
         TODO_BADGE_MAX_COUNT: 50,
         TOP_SEARCH_LIMIT: 10,
-        PREDEFINED_INTEGRATION_FILTER_VALUES: ['Xero', 'QuickBooks Online', 'QuickBooks Desktop', 'NetSuite', 'Sage Intacct', 'Certinia'],
     },
     SEARCH_SELECTOR: {
         SELECTION_MODE_SINGLE: 'single',
