@@ -312,11 +312,8 @@ function navigate(route: Route, options?: LinkToOptions) {
         }
     }
 
-    let updatedRoute;
-    if (route.startsWith(CONST.SAML_REDIRECT_URL)) {
-        updatedRoute = ROUTES.HOME;
-    }
-    linkTo(navigationRef.current, updatedRoute ?? route, options);
+    const targetRoute = route.startsWith(CONST.SAML_REDIRECT_URL) ? ROUTES.HOME : route;
+    linkTo(navigationRef.current, targetRoute, options);
     closeSidePanelOnNarrowScreen();
 }
 /**
