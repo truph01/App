@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-7
 title: Control component resets via key prop
-searchPatterns:
-  - "useEffect"
-  - "useState"
 ---
 
 ## [PERF-7] Control component resets via key prop
@@ -48,5 +45,18 @@ function ProfileView({ userId }) {
 
 ### Review Metadata
 
-- Flag when useEffect resets all or most component state when a prop changes
-- Should use `key` prop instead to reset the entire component
+Flag ONLY when ALL of these are true:
+
+- `useEffect` resets all or most component state when a prop changes
+- The component could be reset using the `key` prop instead
+- No side effects other than state reset are needed
+
+**DO NOT flag if:**
+
+- useEffect performs other side effects besides state reset
+- Only partial state needs to be reset
+- Key changes would cause unintended side effects
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `useState`

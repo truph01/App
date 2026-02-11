@@ -1,10 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-3
 title: Design context-free component contracts
-searchPatterns:
-  - "index: number"
-  - "useImperativeHandle"
-  - "ref"
 ---
 
 ## [CLEAN-REACT-PATTERNS-3] Design context-free component contracts
@@ -132,3 +128,8 @@ Flag ONLY when BOTH of these are true:
 - Callback does NOT describe *what consumer should do*: `navigateToWaypoint(index)`, `updateParentState(value)`
 - Props are used for rendering or internal logic, not just to compute callback arguments
 - Component works without modification in a different context
+
+**Search Patterns** (hints for reviewers):
+- `index: number` (in callback signatures)
+- `useImperativeHandle`
+- `ref`

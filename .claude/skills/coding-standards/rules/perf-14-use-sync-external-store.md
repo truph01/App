@@ -1,11 +1,6 @@
 ---
 ruleId: PERF-14
 title: Use useSyncExternalStore for external store subscriptions
-searchPatterns:
-  - "addEventListener"
-  - "subscribe"
-  - "useEffect"
-  - "useState"
 ---
 
 ## [PERF-14] Use `useSyncExternalStore` for external store subscriptions
@@ -86,3 +81,9 @@ Flag ONLY when ALL of these are true:
 - The external API doesn't fit the `subscribe` / `getSnapshot` contract
 - The code already uses `useSyncExternalStore`
 - The subscription is managed by a library (e.g., Onyx's `useOnyx`)
+
+**Search Patterns** (hints for reviewers):
+- `addEventListener`
+- `subscribe`
+- `useEffect`
+- `useState`

@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-3
 title: Use OnyxListItemProvider hooks instead of useOnyx in renderItem
-searchPatterns:
-  - "useOnyx"
-  - "renderItem"
 ---
 
 ## [PERF-3] Use OnyxListItemProvider hooks instead of useOnyx in renderItem
@@ -28,4 +25,18 @@ const personalDetails = usePersonalDetails();
 
 ### Review Metadata
 
-Components rendered inside `renderItem` functions should use dedicated hooks from `OnyxListItemProvider` instead of individual `useOnyx` calls.
+Flag ONLY when ALL of these are true:
+
+- Code is inside a renderItem function
+- A `useOnyx` hook is being called
+- A dedicated hook exists in OnyxListItemProvider for that data
+
+**DO NOT flag if:**
+
+- Component is not inside renderItem
+- No OnyxListItemProvider hook exists for the data
+- Data structure is custom and requires raw Onyx access
+
+**Search Patterns** (hints for reviewers):
+- `useOnyx`
+- `renderItem`

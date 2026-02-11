@@ -17,10 +17,10 @@ Your job is to scan through changed files and create **inline comments** for vio
 Coding standards are defined as individual files in `.claude/skills/coding-standards/rules/`.
 
 Each rule file contains:
-- **YAML frontmatter**: `ruleId`, `title`, `searchPatterns`
+- **YAML frontmatter**: `ruleId`, `title`
 - **Reasoning**: Why the rule matters
 - **Incorrect/Correct**: Code examples
-- **Review Metadata**: Conditions for flagging and "DO NOT flag" exceptions
+- **Review Metadata**: Conditions for flagging, "DO NOT flag" exceptions, and Search Patterns
 
 ## Review Workflow
 
@@ -39,20 +39,16 @@ Each rule file contains:
 
 ### Step 3: Analyze Each Changed File
 For each changed file, go through **every rule** on the checklist:
-- Use the rule's `searchPatterns` from YAML frontmatter to locate potential violations via Grep
-- Evaluate the rule's Condition and "DO NOT flag" exceptions from the Review Metadata section
-- If a violation is found, create an inline comment **immediately**
-- Mark the rule as checked (no violation) or flagged (violation found)
+- Read the changed portions of the file (use the diff from Step 2 to identify relevant lines)
+- Evaluate each rule's Condition and "DO NOT flag" exceptions from the Review Metadata section
+- A single rule **can produce multiple violations** within the same file — flag each occurrence separately with its own inline comment
+- Create an inline comment **immediately** for each violation found
+- Mark the rule as checked (no violation) or flagged (one or more violations found)
 
 ### Step 4: Track Progress
 - Every rule must be checked against every changed file before finishing
+- Remember that the same rule can be violated **multiple times across different files** — each violation gets its own inline comment
 - Use TodoWrite to track which rules have been checked for which files
-
-## Analysis Strategy
-
-- **For large files (>5000 lines):** Use Grep with the rule's `searchPatterns` instead of reading the entire file. Focus on changed portions shown in the diff.
-- **For smaller files:** You may read the full file using the Read tool
-- **If a Read fails with token limit error:** Immediately switch to Grep with targeted patterns
 
 ## Creating Inline Comments
 

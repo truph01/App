@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-5
 title: Use shallow comparisons instead of deep comparisons
-searchPatterns:
-  - "React.memo"
-  - "deepEqual"
 ---
 
 ## [PERF-5] Use shallow comparisons instead of deep comparisons
@@ -35,4 +32,18 @@ memo(ReportActionItem, (prevProps, nextProps) =>
 
 ### Review Metadata
 
-In `React.memo` and similar optimization functions, compare only specific relevant properties instead of using deep equality checks.
+Flag ONLY when ALL of these are true:
+
+- Code uses `React.memo` or similar comparison function
+- Deep equality check is used (e.g., `deepEqual`)
+- Some properties could be shallow-compared instead
+
+**DO NOT flag if:**
+
+- Deep comparison is necessary for the data type
+- Properties are primitives already (comparison is already shallow)
+- No optimization function is used
+
+**Search Patterns** (hints for reviewers):
+- `React.memo`
+- `deepEqual`

@@ -1,14 +1,6 @@
 ---
 ruleId: PERF-15
 title: Clean up async Effects to prevent race conditions
-searchPatterns:
-  - "useEffect"
-  - "fetch\\("
-  - "async"
-  - "await"
-  - "\\.then\\("
-  - "setState"
-  - "eslint-disable"
 ---
 
 ## [PERF-15] Clean up async Effects to prevent race conditions
@@ -87,3 +79,12 @@ Flag when EITHER of these is true:
 - The dependency array is empty `[]` with no suppressed lint (no race possible — deps never change)
 - The async operation doesn't set state (fire-and-forget)
 - Data fetching is handled by a library/framework (e.g., Onyx, React Query)
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `fetch\(`
+- `async`
+- `await`
+- `\.then\(`
+- `setState`
+- `eslint-disable`

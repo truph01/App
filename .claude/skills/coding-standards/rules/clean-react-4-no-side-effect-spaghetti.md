@@ -1,9 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-4
 title: Avoid side-effect spaghetti
-searchPatterns:
-  - "useEffect"
-  - "useOnyx"
 ---
 
 ## [CLEAN-REACT-PATTERNS-4] Avoid side-effect spaghetti
@@ -166,3 +163,7 @@ Flag when a component, hook, or utility aggregates multiple unrelated responsibi
 **DO NOT flag if:**
 - Component is a thin orchestration layer that ONLY composes child components (no business logic, no effects beyond rendering)
 - Effects are extracted into focused custom hooks with single responsibilities (e.g., `useDebugShortcut`, `usePriorityMode`) — inline `useEffect` calls are a code smell and should be named hooks
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `useOnyx`

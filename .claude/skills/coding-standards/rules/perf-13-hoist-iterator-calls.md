@@ -1,16 +1,6 @@
 ---
 ruleId: PERF-13
 title: Avoid iterator-independent function calls in array methods
-searchPatterns:
-  - "\\.map\\("
-  - "\\.reduce\\("
-  - "\\.filter\\("
-  - "\\.some\\("
-  - "\\.every\\("
-  - "\\.find\\("
-  - "\\.findIndex\\("
-  - "\\.flatMap\\("
-  - "\\.forEach\\("
 ---
 
 ## [PERF-13] Avoid iterator-independent function calls in array methods
@@ -72,3 +62,14 @@ Flag when ALL of these are true:
 - Function call depends on iterator (e.g. `item.value ?? getDefault()`)
 - Function is used when mapping to new entities (e.g. `const thing = { id: createID() }`)
 - Above but applied to index instead of iterator
+
+**Search Patterns** (hints for reviewers):
+- `\.map\(`
+- `\.reduce\(`
+- `\.filter\(`
+- `\.some\(`
+- `\.every\(`
+- `\.find\(`
+- `\.findIndex\(`
+- `\.flatMap\(`
+- `\.forEach\(`

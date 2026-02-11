@@ -1,8 +1,6 @@
 ---
 ruleId: CONSISTENCY-3
 title: Eliminate code duplication
-searchPatterns:
-  - "similar code patterns"
 ---
 
 ## [CONSISTENCY-3] Eliminate code duplication
@@ -71,3 +69,6 @@ Flag ONLY when ALL of these are true:
 - The code is intentionally duplicated for performance reasons or due to external constraints
 - The duplication is in test or mock code
 - The duplication is a temporary measure with a plan for refactoring
+
+**Search Patterns** (hints for reviewers):
+- Similar code patterns repeated across files/components

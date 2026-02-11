@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-1
 title: No spread in list item's renderItem
-searchPatterns:
-  - "renderItem"
-  - "\\.\\.\\."
 ---
 
 ## [PERF-1] No spread in list item's renderItem
@@ -51,3 +48,7 @@ Flag ONLY when ALL of these are true:
 - Spread is on an array
 - Object is created once outside renderItem and reused
 - Spread is used to clone for local manipulation (not passed as prop)
+
+**Search Patterns** (hints for reviewers):
+- `renderItem`
+- `\.\.\.` (spread operator)

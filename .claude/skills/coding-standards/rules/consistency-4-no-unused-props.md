@@ -1,9 +1,6 @@
 ---
 ruleId: CONSISTENCY-4
 title: Eliminate unused and redundant props
-searchPatterns:
-  - "type.*Props"
-  - "interface.*Props"
 ---
 
 ## [CONSISTENCY-4] Eliminate unused and redundant props
@@ -65,3 +62,7 @@ Flag ONLY when ALL of these are true:
 - Props are prepared for future use or part of an ongoing refactor
 - The prop is necessary for functionality or future extensibility
 - The prop is redundant but serves a distinct purpose (e.g., backward compatibility)
+
+**Search Patterns** (hints for reviewers):
+- `type.*Props`
+- `interface.*Props`

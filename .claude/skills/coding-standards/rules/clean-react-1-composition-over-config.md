@@ -1,12 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-1
 title: Favor composition over configuration
-searchPatterns:
-  - "shouldShow"
-  - "shouldEnable"
-  - "canSelect"
-  - "enable"
-  - "disable"
 ---
 
 ## [CLEAN-REACT-PATTERNS-1] Favor composition over configuration
@@ -166,3 +160,10 @@ Flag ONLY when ALL of these are true:
 - Props are narrow, stable values needed for coordination between composed parts (e.g., `reportID`, `data`, `columns`)
 - The component uses composition and child components for features
 - Parent components stay stable as features are added
+
+**Search Patterns** (hints for reviewers):
+- `shouldShow`
+- `shouldEnable`
+- `canSelect`
+- `enable`
+- `disable`

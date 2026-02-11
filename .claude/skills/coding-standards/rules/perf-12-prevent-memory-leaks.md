@@ -1,12 +1,6 @@
 ---
 ruleId: PERF-12
 title: Prevent memory leaks in components and plugins
-searchPatterns:
-  - "setInterval"
-  - "setTimeout"
-  - "addEventListener"
-  - "subscribe"
-  - "useEffect"
 ---
 
 ## [PERF-12] Prevent memory leaks in components and plugins
@@ -64,3 +58,10 @@ Flag ONLY when ALL of these are true:
 - The resource is not expected to persist beyond the component's lifecycle
 - The resource is managed by a library that handles cleanup automatically
 - The operation is guaranteed to complete before the component unmounts
+
+**Search Patterns** (hints for reviewers):
+- `setInterval`
+- `setTimeout`
+- `addEventListener`
+- `subscribe`
+- `useEffect`

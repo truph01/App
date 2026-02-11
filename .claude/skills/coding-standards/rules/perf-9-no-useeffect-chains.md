@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-9
 title: Avoid useEffect chains
-searchPatterns:
-  - "useEffect"
-  - "useState"
 ---
 
 ## [PERF-9] Avoid useEffect chains
@@ -57,4 +54,18 @@ function Form() {
 
 ### Review Metadata
 
-Flag when multiple useEffects form a chain where one effect's state update triggers another effect.
+Flag ONLY when ALL of these are true:
+
+- Multiple `useEffect` hooks exist
+- One effect's state update triggers another effect
+- Logic could be combined or computed instead
+
+**DO NOT flag if:**
+
+- Effects handle different concerns (e.g., one for setup, one for event listening)
+- Effects depend on external events that can't be combined
+- Separation of concerns requires multiple effects
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `useState`

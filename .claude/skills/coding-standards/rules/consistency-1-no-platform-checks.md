@@ -1,11 +1,6 @@
 ---
 ruleId: CONSISTENCY-1
 title: Avoid platform-specific checks within components
-searchPatterns:
-  - "Platform.OS"
-  - "isAndroid"
-  - "isIOS"
-  - "Platform\\.select"
 ---
 
 ## [CONSISTENCY-1] Avoid platform-specific checks within components
@@ -54,3 +49,9 @@ Flag ONLY when ALL of these are true:
 **DO NOT flag if:**
 
 - The logic is handled through platform-specific file extensions (e.g., `index.web.tsx`, `index.native.tsx`)
+
+**Search Patterns** (hints for reviewers):
+- `Platform.OS`
+- `isAndroid`
+- `isIOS`
+- `Platform\.select`

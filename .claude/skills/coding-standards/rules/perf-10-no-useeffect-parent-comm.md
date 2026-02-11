@@ -1,10 +1,6 @@
 ---
 ruleId: PERF-10
 title: Communicate with parent components without useEffect
-searchPatterns:
-  - "useEffect"
-  - "onChange"
-  - "onValueChange"
 ---
 
 ## [PERF-10] Communicate with parent components without useEffect
@@ -46,4 +42,19 @@ function Child({ value, onChange }) {
 
 ### Review Metadata
 
-Flag when useEffect calls parent callbacks to communicate state changes or pass data to parent components.
+Flag ONLY when ALL of these are true:
+
+- `useEffect` calls parent callbacks (onValueChange, onChange, etc.)
+- The callback is used to pass state to parent
+- State could be lifted to the parent instead
+
+**DO NOT flag if:**
+
+- useEffect synchronizes with external systems, not parent components
+- Callback performs side effects unrelated to passing state
+- Circular state updates would result from lifting state
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `onChange`
+- `onValueChange`

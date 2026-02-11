@@ -1,11 +1,6 @@
 ---
 ruleId: PERF-11
 title: Optimize data selection and handling
-searchPatterns:
-  - "useOnyx"
-  - "selector"
-  - "\\.filter\\("
-  - "\\.map\\("
 ---
 
 ## [PERF-11] Optimize data selection and handling
@@ -54,3 +49,9 @@ Flag ONLY when ALL of these are true:
 - The filtering is necessary for correct functionality
 - The fetched data is required and cannot be derived from existing data
 - The function requires the entire object for valid operations
+
+**Search Patterns** (hints for reviewers):
+- `useOnyx`
+- `selector`
+- `\.filter\(`
+- `\.map\(`

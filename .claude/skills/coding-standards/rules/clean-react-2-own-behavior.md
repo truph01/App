@@ -1,12 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-2
 title: Let components own their behavior and effects
-searchPatterns:
-  - "Report"
-  - "Policy"
-  - "Transaction"
-  - "Actions"
-  - "useOnyx"
 ---
 
 ## [CLEAN-REACT-PATTERNS-2] Let components own their behavior and effects
@@ -122,3 +116,10 @@ Flag when a parent component acts as a pure data intermediary — fetching or co
 - Props are structural/presentational that can't be derived internally (e.g., `style`, `testID`)
 - Parent genuinely uses the data for its own rendering or logic
 - Data is shared coordination state that parent legitimately owns (e.g., selection state managed by parent)
+
+**Search Patterns** (hints for reviewers):
+- `Report`
+- `Policy`
+- `Transaction`
+- `Actions`
+- `useOnyx`

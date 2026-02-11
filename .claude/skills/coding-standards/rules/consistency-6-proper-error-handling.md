@@ -1,14 +1,6 @@
 ---
 ruleId: CONSISTENCY-6
 title: Ensure proper error handling
-searchPatterns:
-  - "try"
-  - "catch"
-  - "async"
-  - "await"
-  - "Promise"
-  - "\\.then\\("
-  - "\\.catch\\("
 ---
 
 ## [CONSISTENCY-6] Ensure proper error handling
@@ -57,3 +49,12 @@ Flag ONLY when ALL of these are true:
 - Errors are intentionally suppressed with clear justification
 - Error handling is managed by a higher-level function or middleware
 - The operation is non-critical and errors are acceptable to ignore
+
+**Search Patterns** (hints for reviewers):
+- `try`
+- `catch`
+- `async`
+- `await`
+- `Promise`
+- `\.then\(`
+- `\.catch\(`

@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-16
 title: Guard initialization logic against double-execution
-searchPatterns:
-  - "useEffect"
-  - "\\[\\]"
 ---
 
 ## [PERF-16] Guard initialization logic against double-execution
@@ -71,3 +68,7 @@ Flag ONLY when ALL of these are true:
 - The logic is idempotent (safe to run twice with no side effects)
 - The logic is at module level, outside any component
 - The Effect has non-empty dependencies (not one-time init)
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `\[\]` (empty dependency array)

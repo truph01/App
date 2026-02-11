@@ -1,8 +1,6 @@
 ---
 ruleId: CONSISTENCY-2
 title: Avoid magic numbers and strings
-searchPatterns:
-  - "hardcoded numbers/strings"
 ---
 
 ## [CONSISTENCY-2] Avoid magic numbers and strings
@@ -50,3 +48,6 @@ Flag ONLY when ALL of these are true:
 - The value is part of configuration or environment variables
 - The value is documented with clear comments explaining its purpose
 - The value is defined as a named constant in the same file or imported module
+
+**Search Patterns** (hints for reviewers):
+- Hardcoded numbers/strings (not self-explanatory like Math.PI or "error")

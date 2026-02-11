@@ -1,10 +1,6 @@
 ---
 ruleId: CLEAN-REACT-PATTERNS-5
 title: Keep state and subscriptions narrow
-searchPatterns:
-  - "Context"
-  - "Provider"
-  - "useOnyx"
 ---
 
 ## [CLEAN-REACT-PATTERNS-5] Keep state and subscriptions narrow
@@ -116,3 +112,8 @@ Flag when a state structure (context, hook, store, or subscription) bundles unre
 - State values are cohesive — they change together and serve the same purpose (e.g., `keyboardHeight` + `isKeyboardShown` both relate to keyboard state)
 - The state structure is intentionally designed as an aggregation point and consumers use most/all values
 - Individual `useOnyx` calls without selectors — this is covered by [PERF-11]
+
+**Search Patterns** (hints for reviewers):
+- `Context`
+- `Provider`
+- `useOnyx`

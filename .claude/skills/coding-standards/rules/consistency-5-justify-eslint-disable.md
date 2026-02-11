@@ -1,10 +1,6 @@
 ---
 ruleId: CONSISTENCY-5
 title: Justify ESLint rule disables
-searchPatterns:
-  - "eslint-disable"
-  - "eslint-disable-next-line"
-  - "eslint-disable-line"
 ---
 
 ## [CONSISTENCY-5] Justify ESLint rule disables
@@ -44,3 +40,8 @@ Flag ONLY when ALL of these are true:
 **DO NOT flag if:**
 
 - The disablement is justified with a clear comment explaining why the rule is disabled
+
+**Search Patterns** (hints for reviewers):
+- `eslint-disable`
+- `eslint-disable-next-line`
+- `eslint-disable-line`

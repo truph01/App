@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-6
 title: Derive state from props
-searchPatterns:
-  - "useEffect"
-  - "useState"
 ---
 
 ## [PERF-6] Derive state from props
@@ -43,4 +40,18 @@ function Form() {
 
 ### Review Metadata
 
-Flag when useEffect updates state based on props or other state, when the value could be computed directly.
+Flag ONLY when ALL of these are true:
+
+- `useEffect` updates state based on props or other state
+- The value could be computed directly in the component body
+- No side effects are involved
+
+**DO NOT flag if:**
+
+- useEffect performs side effects (API calls, subscriptions, etc.)
+- The computed value is needed immediately on mount
+- Computation depends on timing or external events
+
+**Search Patterns** (hints for reviewers):
+- `useEffect`
+- `useState`

@@ -1,9 +1,6 @@
 ---
 ruleId: PERF-2
 title: Return early before expensive work
-searchPatterns:
-  - "if (!param)"
-  - "if (param === undefined)"
 ---
 
 ## [PERF-2] Return early before expensive work
@@ -53,3 +50,7 @@ Flag ONLY when ALL of these are true:
 - Simple checks already come first
 - Validation requires the computed result
 - Expensive work must run for side effects
+
+**Search Patterns** (hints for reviewers):
+- `if (!param)`
+- `if (param === undefined)`
