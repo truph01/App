@@ -139,6 +139,8 @@ type MoneyRequestStepDistanceNavigationParams = {
     selfDMReport: OnyxEntry<Report>;
     gpsCoordinates?: string;
     gpsDistance?: number;
+    odometerStart?: number;
+    odometerEnd?: number;
     betas: OnyxEntry<Beta[]>;
 };
 
@@ -522,6 +524,8 @@ function handleMoneyRequestStepDistanceNavigation({
     gpsCoordinates,
     gpsDistance,
     policyForMovingExpenses,
+    odometerStart,
+    odometerEnd,
     betas,
 }: MoneyRequestStepDistanceNavigationParams) {
     const isManualDistance = manualDistance !== undefined;
@@ -587,6 +591,8 @@ function handleMoneyRequestStepDistanceNavigation({
                         customUnitRateID,
                         attendees: transaction?.comment?.attendees,
                         gpsCoordinates,
+                        odometerStart,
+                        odometerEnd,
                     },
                     isASAPSubmitBetaEnabled,
                     currentUserAccountIDParam: currentUserAccountID,
@@ -621,6 +627,8 @@ function handleMoneyRequestStepDistanceNavigation({
                     splitShares: transaction?.splitShares,
                     attendees: transaction?.comment?.attendees,
                     gpsCoordinates,
+                    odometerStart,
+                    odometerEnd,
                 },
                 backToReport,
                 isASAPSubmitBetaEnabled,
