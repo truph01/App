@@ -2127,7 +2127,7 @@ function deleteReportComment(
     currentEmail: string,
 ) {
     const reportID = report?.reportID;
-    const originalReportID = getOriginalReportID(reportID, reportAction);
+    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
     const reportActionID = reportAction.reportActionID;
 
     if (!reportActionID || !originalReportID || !reportID) {
@@ -2455,13 +2455,13 @@ function editReportComment(
 
 /** Deletes the draft for a comment report action. */
 function deleteReportActionDraft(reportID: string | undefined, reportAction: ReportAction) {
-    const originalReportID = getOriginalReportID(reportID, reportAction);
+    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
     Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`, {[reportAction.reportActionID]: null});
 }
 
 /** Saves the draft for a comment report action. This will put the comment into "edit mode" */
 function saveReportActionDraft(reportID: string | undefined, reportAction: ReportAction, draftMessage: string) {
-    const originalReportID = getOriginalReportID(reportID, reportAction);
+    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
     Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`, {[reportAction.reportActionID]: {message: draftMessage}});
 }
 
@@ -3797,7 +3797,7 @@ function toggleEmojiReaction(
     currentUserAccountID: number,
     ignoreSkinToneOnCompare = false,
 ) {
-    const originalReportID = getOriginalReportID(reportID, reportAction);
+    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
 
     if (!originalReportID) {
         return;
