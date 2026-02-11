@@ -2620,7 +2620,7 @@ function getWeekSections(data: OnyxTypes.SearchResults['data'], queryJSON: Searc
  */
 function getYearSections(data: OnyxTypes.SearchResults['data'], queryJSON: SearchQueryJSON | undefined): [TransactionYearGroupListItemType[], number] {
     const yearSections: Record<string, TransactionYearGroupListItemType> = {};
-    const dateFilters = queryJSON?.flatFilters.find((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
+    const dateFilters = queryJSON?.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
     for (const key in data) {
         if (isGroupEntry(key)) {
             const yearGroup = data[key];
