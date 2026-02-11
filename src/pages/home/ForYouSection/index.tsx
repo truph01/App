@@ -80,7 +80,7 @@ function ForYouSection() {
     ].filter((item) => item.count > 0);
 
     const renderTodoItems = () => (
-        <View style={shouldUseNarrowLayout ? styles.mb2 : styles.mb5}>
+        <View style={styles.getForYouSectionContainerStyle(shouldUseNarrowLayout)}>
             {todoItems.map(({key, count, icon, translationKey, handler}) => (
                 <BaseWidgetItem
                     key={key}
