@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import type {ReactElement, ReactNode} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import type {ListItem} from '@components/SelectionList/ListItem/types';
 import type {BaseSelectionListProps} from '@components/SelectionList/types';
@@ -7,6 +7,9 @@ import type CONST from '@src/CONST';
 type Section<TItem extends ListItem> = {
     /** Title of the section */
     title?: string;
+
+    /** Custom header to display */
+    customHeader?: ReactElement;
 
     /** Array of items in the section */
     data: TItem[];
@@ -54,8 +57,9 @@ type SelectionListWithSectionsHandle<TItem extends ListItem = ListItem> = {
 
 type SectionHeader = {
     type: typeof CONST.SECTION_LIST_ITEM_TYPE.HEADER;
-    title: string;
     keyForList: string;
+    title?: string;
+    customHeader?: ReactElement;
     isDisabled: boolean;
 };
 
