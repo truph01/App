@@ -58,7 +58,7 @@ function DistanceRequestStartPage({
     const isLoadingSelectedTab = isLoadingOnyxValue(selectedTabResult);
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${getNonEmptyStringOnyxID(route?.params.transactionID)}`, {canBeMissing: true});
     const [draftTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {canBeMissing: true});
-    const {policy} = usePolicyForTransaction({transaction, report, action, iouType});
+    const {policy} = usePolicyForTransaction({transaction, reportPolicyID: report?.policyID, action, iouType});
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
     const [lastSelectedDistanceRates] = useOnyx(ONYXKEYS.NVP_LAST_SELECTED_DISTANCE_RATES, {canBeMissing: true});
     const [currentDate] = useOnyx(ONYXKEYS.CURRENT_DATE, {canBeMissing: true});

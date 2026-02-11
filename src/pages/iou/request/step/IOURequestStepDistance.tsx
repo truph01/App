@@ -350,7 +350,6 @@ function IOURequestStepDistance({
         reportAttributesDerived,
         personalDetails,
         waypoints,
-        customUnitRateID,
         currentUserEmailParam,
         currentUserAccountIDParam,
         backTo,
