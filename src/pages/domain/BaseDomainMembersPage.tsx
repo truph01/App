@@ -166,7 +166,7 @@ function BaseDomainMembersPage({
                     canSelectMultiple={false}
                     style={{
                         containerStyle: styles.flex1,
-                        listHeaderWrapperStyle: [styles.ph9, styles.pv3, styles.pb5],
+                        listHeaderWrapperStyle: [styles.ph10, styles.pv3, styles.pb5],
                         listItemTitleContainerStyles: shouldUseNarrowLayout ? undefined : styles.pr3,
                         listItemErrorRowStyles: [styles.ph4, styles.pb4],
                     }}

@@ -4710,6 +4710,12 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.componentBG,
         },
 
+        baseListHeaderWrapperStyle: {
+            paddingHorizontal: 40,
+            paddingVertical: 12,
+            paddingBottom: 20,
+        },
+
         selectionListStickyHeader: {
             backgroundColor: theme.appBG,
         },
