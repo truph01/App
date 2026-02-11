@@ -9,6 +9,8 @@ import getOnyxValue from '../utils/getOnyxValue';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 describe('actions/Passkey', () => {
+    const userId = '123';
+
     beforeAll(() => {
         Onyx.init({keys: ONYXKEYS});
     });
@@ -21,15 +23,14 @@ describe('actions/Passkey', () => {
         it('should return correct key format', () => {
             // Given a userId
             // When generating an Onyx key
-            const key = getPasskeyOnyxKey('123');
+            const key = getPasskeyOnyxKey(userId);
 
             // Then it should return the PASSKEYS collection prefix followed by the userId
-            expect(key).toBe(`${ONYXKEYS.COLLECTION.PASSKEYS}123`);
+            expect(key).toBe(`${ONYXKEYS.COLLECTION.PASSKEYS}${userId}`);
         });
     });
 
     describe('addLocalPasskeyCredential', () => {
-        const userId = '123';
         const credential: PasskeyCredential = {id: 'cred-1', type: CONST.PASSKEY_CREDENTIAL_TYPE, transports: [CONST.PASSKEY_TRANSPORT.INTERNAL]};
 
         it('should throw error when userId is empty', () => {
@@ -74,8 +75,6 @@ describe('actions/Passkey', () => {
     });
 
     describe('deleteLocalPasskeyCredentials', () => {
-        const userId = '123';
-
         it('should throw error when userId is empty', () => {
             // Given an empty userId
             // When deleting credentials
@@ -111,8 +110,6 @@ describe('actions/Passkey', () => {
     });
 
     describe('reconcileLocalPasskeysWithBackend', () => {
-        const userId = '123';
-
         it('should throw error when userId is empty', () => {
             // Given an empty userId
             // When reconciling credentials
