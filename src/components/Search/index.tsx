@@ -287,14 +287,7 @@ function Search({
 
     const {defaultCardFeed} = useCardFeedsForDisplay();
     const suggestedSearches = useMemo(() => getSuggestedSearches(accountID, defaultCardFeed?.id), [defaultCardFeed?.id, accountID]);
-    const searchKey = useMemo<SearchKey | undefined>(() => {
-        for (const suggestedSearchKey of Object.values(CONST.SEARCH.SEARCH_KEYS)) {
-            if (suggestedSearches[suggestedSearchKey].similarSearchHash === similarSearchHash) {
-                return suggestedSearchKey;
-            }
-        }
-        return undefined;
-    }, [suggestedSearches, similarSearchHash]);
+    const searchKey = useMemo(() => Object.values(suggestedSearches).find((search) => search.similarSearchHash === similarSearchHash)?.key, [suggestedSearches, similarSearchHash]);
     const searchDataType = useMemo(() => (shouldUseLiveData ? CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT : searchResults?.search?.type), [shouldUseLiveData, searchResults?.search?.type]);
     const shouldCalculateTotals = useSearchShouldCalculateTotals(searchKey, hash, offset === 0);
 

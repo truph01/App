@@ -3612,9 +3612,9 @@ function isCorrectSearchUserName(displayName?: string) {
 }
 
 function isTodoSearch(hash: number, suggestedSearches: Record<string, SearchTypeMenuItem>) {
-    const TODO_KEYS = [CONST.SEARCH.SEARCH_KEYS.SUBMIT, CONST.SEARCH.SEARCH_KEYS.APPROVE, CONST.SEARCH.SEARCH_KEYS.PAY, CONST.SEARCH.SEARCH_KEYS.EXPORT];
+    const TODO_KEYS: SearchKey[] = [CONST.SEARCH.SEARCH_KEYS.SUBMIT, CONST.SEARCH.SEARCH_KEYS.APPROVE, CONST.SEARCH.SEARCH_KEYS.PAY, CONST.SEARCH.SEARCH_KEYS.EXPORT];
     const matchedSearchKey = Object.values(suggestedSearches).find((search) => search.hash === hash)?.key;
-    return !!matchedSearchKey && TODO_KEYS.includes(matchedSearchKey as SearchKey);
+    return !!matchedSearchKey && TODO_KEYS.includes(matchedSearchKey);
 }
 
 // eslint-disable-next-line @typescript-eslint/max-params
