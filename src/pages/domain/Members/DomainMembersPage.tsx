@@ -96,9 +96,12 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
 
         for (const accountIDString of selectedMembers) {
             const accountID = Number(accountIDString);
-            const memberLogin = personalDetails?.[accountID]?.login ?? '';
+            const memberLogin = personalDetails?.[accountID]?.login;
+            if (!memberLogin || !domainName) {
+                continue;
+            }
             const securityGroupData = selectSecurityGroupForAccount(accountID)(domain);
-            closeUserAccount(domainAccountID, domainName ?? '', memberLogin, securityGroupData, shouldForceCloseAccount);
+            closeUserAccount(domainAccountID, domainName, memberLogin, securityGroupData, shouldForceCloseAccount);
         }
 
         setShouldForceCloseAccount(undefined);
@@ -178,6 +181,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 setSelectedMembers={setSelectedMembers}
                 canSelectMultiple={canSelectMultiple}
                 useSelectionModeHeader={selectionModeHeader}
+                turnOnSelectionModeOnLongPress
                 onBackButtonPress={() => {
                     if (isMobileSelectionModeEnabled) {
                         clearSelectedMembers();

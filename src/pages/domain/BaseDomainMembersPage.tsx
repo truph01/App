@@ -76,6 +76,9 @@ type BaseDomainMembersPageProps = {
 
     /** Custom back button press handler */
     onBackButtonPress?: () => void;
+
+    /** Weather long press should enable selection mode on mobile */
+    turnOnSelectionModeOnLongPress?: boolean;
 };
 
 function BaseDomainMembersPage({
@@ -93,6 +96,7 @@ function BaseDomainMembersPage({
     setSelectedMembers,
     canSelectMultiple = false,
     useSelectionModeHeader,
+    turnOnSelectionModeOnLongPress = false,
     onBackButtonPress,
 }: BaseDomainMembersPageProps) {
     const {formatPhoneNumber, localeCompare, translate} = useLocalize();
@@ -214,7 +218,7 @@ function BaseDomainMembersPage({
                     shouldShowRightCaret
                     style={{
                         containerStyle: styles.flex1,
-                        listHeaderWrapperStyle: [styles.ph9, styles.pv3, styles.pb5],
+                        listHeaderWrapperStyle: [styles.ph10, styles.pv3, styles.pb5],
                         listItemTitleContainerStyles: shouldUseNarrowLayout ? undefined : styles.pr3,
                         listItemErrorRowStyles: [styles.ph4, styles.pb4],
                     }}
@@ -230,7 +234,7 @@ function BaseDomainMembersPage({
                     onSelectAll={toggleAllUsers}
                     onCheckboxPress={toggleUser}
                     selectedItems={selectedMembers}
-                    turnOnSelectionModeOnLongPress
+                    turnOnSelectionModeOnLongPress={turnOnSelectionModeOnLongPress}
                     onTurnOnSelectionMode={(item) => item && toggleUser?.(item)}
                 />
             </ScreenWrapper>
