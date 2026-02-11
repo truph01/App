@@ -1,6 +1,6 @@
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {deepEqual} from 'fast-equals';
-import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
@@ -72,7 +72,7 @@ import type {SplitShares} from '@src/types/onyx/Transaction';
 import Button from './Button';
 import ButtonWithDropdownMenu from './ButtonWithDropdownMenu';
 import type {DropdownOption} from './ButtonWithDropdownMenu/types';
-import {DelegateNoAccessContext} from './DelegateNoAccessModalProvider';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from './DelegateNoAccessModalProvider';
 import FormHelpMessage from './FormHelpMessage';
 import MoneyRequestAmountInput from './MoneyRequestAmountInput';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
@@ -289,7 +289,8 @@ function MoneyRequestConfirmationList({
     const [lastSelectedDistanceRates] = useOnyx(ONYXKEYS.NVP_LAST_SELECTED_DISTANCE_RATES, {canBeMissing: true});
     const {getCurrencySymbol} = useCurrencyListActions();
     const {isBetaEnabled} = usePermissions();
-    const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
     const isTestReceipt = useMemo(() => {
         return transaction?.receipt?.isTestReceipt ?? false;

@@ -1,8 +1,8 @@
-import React, {useContext, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import type {ColorValue} from 'react-native';
 import {View} from 'react-native';
 import Checkbox from '@components/Checkbox';
-import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import Icon from '@components/Icon';
 import {PressableWithFeedback} from '@components/Pressable';
 import ReportSearchHeader from '@components/ReportSearchHeader';
@@ -223,7 +223,8 @@ function ReportListItemHeader<TItem extends ListItem>({
     const snapshotPolicy = useMemo(() => {
         return (snapshot?.data?.[`${ONYXKEYS.COLLECTION.POLICY}${reportItem.policyID}`] ?? {}) as Policy;
     }, [snapshot, reportItem.policyID]);
-    const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const avatarBorderColor =
         StyleUtils.getItemBackgroundColorStyle(!!reportItem.isSelected, !!isFocused || !!isHovered, !!isDisabled, theme.activeComponentBG, theme.hoverComponentBG)?.backgroundColor ??
         theme.highlightBG;

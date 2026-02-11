@@ -1,5 +1,5 @@
-import {useContext, useRef} from 'react';
-import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
+import {useRef} from 'react';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import {importPlaidAccounts} from '@libs/actions/Plaid';
 import {
     getCompanyCardFeed,
@@ -66,7 +66,8 @@ function useAssignCard({feedName, policyID, setShouldShowOfflineModal}: UseAssig
 
     const isAllowedToIssueCompanyCard = useIsAllowedToIssueCompanyCard({policyID});
 
-    const {isActingAsDelegate, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isActingAsDelegate} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
     const isAssigningCardDisabled = !currentFeedData || !!currentFeedData?.pending || isSelectedFeedConnectionBroken || !isAllowedToIssueCompanyCard;
 

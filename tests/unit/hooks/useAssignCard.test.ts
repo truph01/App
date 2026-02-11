@@ -100,8 +100,12 @@ jest.mock('@libs/actions/Plaid', () => ({
     importPlaidAccounts: jest.fn(),
 }));
 
-// Mock the DelegateNoAccessContext
-jest.mock('@components/DelegateNoAccessModalProvider');
+// Mock the DelegateNoAccessModalProvider hooks
+jest.mock('@components/DelegateNoAccessModalProvider', () => ({
+    ...jest.requireActual('@components/DelegateNoAccessModalProvider'),
+    useDelegateNoAccessState: () => ({isActingAsDelegate: false, isDelegateAccessRestricted: false}),
+    useDelegateNoAccessActions: () => ({showDelegateNoAccessModal: jest.fn()}),
+}));
 
 describe('useAssignCard', () => {
     const mockSetShouldShowOfflineModal = jest.fn();

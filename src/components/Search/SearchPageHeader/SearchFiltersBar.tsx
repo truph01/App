@@ -6,7 +6,7 @@ import {FlatList, View} from 'react-native';
 import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
-import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import KYCWall from '@components/KYCWall';
 import {KYCWallContext} from '@components/KYCWall/KYCWallContext';
 import type {PaymentMethodType} from '@components/KYCWall/types';
@@ -122,7 +122,8 @@ function SearchFiltersBar({
     const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER, {canBeMissing: true});
     const {isAccountLocked, showLockedAccountModal} = useContext(LockedAccountContext);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Filter', 'Columns']);
-    const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
     // Get workspace data for the filter
     const {sections: workspaces, shouldShowSearchInput: shouldShowWorkspaceSearchInput} = useWorkspaceList({
