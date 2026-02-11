@@ -7,8 +7,9 @@ import {isWaypointNullIsland} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import type {WaypointCollection} from '@src/types/onyx/Transaction';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 
-type DistanceRequestProps = {
+type DistanceRequestProps = WithSentryLabel & {
     /** The waypoints for the distance expense */
     waypoints?: WaypointCollection;
 
@@ -29,9 +30,6 @@ type DistanceRequestProps = {
 
     /** Whether the item is disabled */
     disabled?: boolean;
-
-    /** Label used for Sentry INP attribution */
-    sentryLabel?: string;
 };
 
 function DistanceRequestRenderItem({waypoints, item = '', onSecondaryInteraction, getIndex, isActive = false, onPress = () => {}, disabled = false, sentryLabel}: DistanceRequestProps) {

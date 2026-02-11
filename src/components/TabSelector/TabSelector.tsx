@@ -8,6 +8,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import TabSelectorBase from './TabSelectorBase';
 import type {TabSelectorBaseItem} from './TabSelectorBase';
 
@@ -31,11 +32,10 @@ type TabSelectorProps = MaterialTopTabBarProps & {
     equalWidth?: boolean;
 };
 
-type IconTitleAndTestID = {
+type IconTitleAndTestID = WithSentryLabel & {
     icon?: IconAsset;
     title: string;
     testID?: string;
-    sentryLabel?: string;
 };
 
 const MEMOIZED_LAZY_TAB_SELECTOR_ICONS = [

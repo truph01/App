@@ -10,12 +10,13 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import TabIcon from './TabIcon';
 import TabLabel from './TabLabel';
 
 const AnimatedPressableWithFeedback = Animated.createAnimatedComponent(PressableWithFeedback);
 
-type TabSelectorItemProps = {
+type TabSelectorItemProps = WithSentryLabel & {
     /** Function to call when onPress */
     onPress?: () => void;
 
@@ -42,9 +43,6 @@ type TabSelectorItemProps = {
 
     /** Test identifier used to find elements in unit and e2e tests */
     testID?: string;
-
-    /** Sentry label for INP attribution */
-    sentryLabel?: string;
 
     /** Determines whether the product training tooltip should be displayed to the user. */
     shouldShowProductTrainingTooltip?: boolean;

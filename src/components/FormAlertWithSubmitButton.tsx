@@ -5,10 +5,11 @@ import {View} from 'react-native';
 import useThemeStyles from '@hooks/useThemeStyles';
 import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import Button from './Button';
 import FormAlertWrapper from './FormAlertWrapper';
 
-type FormAlertWithSubmitButtonProps = {
+type FormAlertWithSubmitButtonProps = WithSentryLabel & {
     /** Error message to display above button */
     message?: string;
 
@@ -77,9 +78,6 @@ type FormAlertWithSubmitButtonProps = {
 
     /** Prevents the button from triggering blur on mouse down. */
     shouldPreventDefaultFocusOnPress?: boolean;
-
-    /** Sentry label for INP attribution */
-    sentryLabel?: string;
 };
 
 function FormAlertWithSubmitButton({
