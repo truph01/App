@@ -54,7 +54,7 @@ type UseReceiptScanParams = {
     /** Route to navigate back to */
     backTo?: Route;
 
-    /** Whether to navigate back to the report */
+    /** Report ID to navigate back to */
     backToReport?: string;
 
     /** Whether multi-scan is enabled */
