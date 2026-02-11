@@ -4,6 +4,8 @@ import {hasCompletedGuidedSetupFlowSelector} from '@selectors/Onboarding';
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 import Log from '@libs/Log';
+import CONST from '@src/CONST';
+import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
@@ -53,6 +55,34 @@ Onyx.connectWithoutView({
 });
 
 /**
+ * Check if navigation should be blocked while the test drive modal is active.
+ * After the guard redirects to the modal, there's a delay before the native Modal overlay becomes visible
+ * During this window, tab switches can push screens on top of the modal navigator,
+ * causing DISMISS_MODAL to fail since it only checks the last route.
+ */
+function shouldBlockWhileModalActive(state: NavigationState, action: NavigationAction): boolean {
+    const isModalDismissed = onboarding?.testDriveModalDismissed === true;
+    if (!hasRedirectedToTestDriveModal || isModalDismissed) {
+        return false;
+    }
+
+    // Only block when the test drive modal is the LAST route (on top of the stack).
+    // If something was already pushed on top (broken state), don't block — the user
+    // needs to be able to navigate to recover from the error.
+    const lastRoute = state.routes.at(-1);
+    if (lastRoute?.name !== NAVIGATORS.TEST_DRIVE_MODAL_NAVIGATOR) {
+        return false;
+    }
+
+    // Allow DISMISS_MODAL (Skip button) and GO_BACK (close/X button, confirm flow)
+    if (action.type === CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL || action.type === CONST.NAVIGATION.ACTION_TYPE.GO_BACK) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Check if we're already on or navigating to the test drive modal
  * This prevents redirect loops where our redirect creates new navigation actions
  */
@@ -82,6 +112,10 @@ const TestDriveModalGuard: NavigationGuard = {
     evaluate: (state: NavigationState, action: NavigationAction, context): GuardResult => {
         if (context.isLoading) {
             return {type: 'ALLOW'};
+        }
+
+        if (shouldBlockWhileModalActive(state, action)) {
+            return {type: 'BLOCK', reason: '[TestDriveModalGuard] Blocking navigation while test drive modal is active'};
         }
 
         const isModalDismissed = onboarding?.testDriveModalDismissed === true;
