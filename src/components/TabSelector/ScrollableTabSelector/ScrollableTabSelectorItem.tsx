@@ -27,6 +27,7 @@ function ScrollableTabSelectorItem({
     shouldShowLabelWhenInactive = true,
     testID,
     equalWidth = false,
+    sentryLabel,
 }: ScrollableTabSelectorItemProps) {
     const styles = useThemeStyles();
     const [isHovered, setIsHovered] = useState(false);
@@ -39,6 +40,7 @@ function ScrollableTabSelectorItem({
             accessibilityLabel={title}
             accessibilityState={{selected: isActive}}
             accessibilityRole={CONST.ROLE.TAB}
+            sentryLabel={sentryLabel}
             style={[styles.tabSelectorButton, styles.tabBackground(isHovered, isActive, backgroundColor), styles.userSelectNone]}
             wrapperStyle={[equalWidth ? styles.flex1 : styles.flexGrow1]}
             onPress={() => {

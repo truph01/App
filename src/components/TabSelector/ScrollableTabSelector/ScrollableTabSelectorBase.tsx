@@ -93,6 +93,7 @@ function ScrollableTabSelectorBase({tabs, activeTabKey, onTabPress = () => {}, p
                         backgroundColor={backgroundColor}
                         isActive={isActive}
                         testID={tab.testID}
+                        sentryLabel={tab.sentryLabel}
                         shouldShowLabelWhenInactive={shouldShowLabelWhenInactive}
                         equalWidth={equalWidth}
                     />

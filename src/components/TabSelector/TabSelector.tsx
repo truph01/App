@@ -22,12 +22,13 @@ function TabSelector({
     const {translate} = useLocalize();
 
     const tabs: TabSelectorBaseItem[] = state.routes.map((route) => {
-        const {icon, title, testID} = getIconTitleAndTestID(icons, route.name, translate);
+        const {icon, title, testID, sentryLabel} = getIconTitleAndTestID(icons, route.name, translate);
         return {
             key: route.name,
             icon,
             title,
             testID,
+            sentryLabel,
         };
     });
 

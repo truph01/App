@@ -33,6 +33,7 @@ function TabSelectorItem({
     isActive = false,
     shouldShowLabelWhenInactive = true,
     testID,
+    sentryLabel,
     shouldShowProductTrainingTooltip = false,
     renderProductTrainingTooltip,
     parentX = 0,
@@ -91,6 +92,7 @@ function TabSelectorItem({
             role={CONST.ROLE.TAB}
             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
             testID={testID}
+            sentryLabel={sentryLabel}
             ref={childRef}
         >
             <TabIcon

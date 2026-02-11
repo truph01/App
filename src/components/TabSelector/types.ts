@@ -3,6 +3,7 @@ import type {MaterialTopTabBarProps} from '@react-navigation/material-top-tabs';
 import type {Animated} from 'react-native';
 import type {ThemeColors} from '@styles/theme/types';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 
 type TabSelectorProps = MaterialTopTabBarProps & {
     /* Callback fired when tab is pressed */
@@ -24,7 +25,7 @@ type TabSelectorProps = MaterialTopTabBarProps & {
     renderProductTrainingTooltip?: () => React.JSX.Element;
 };
 
-type TabSelectorBaseItem = {
+type TabSelectorBaseItem = WithSentryLabel & {
     /** Stable key for the tab. */
     key: string;
 
@@ -64,7 +65,7 @@ type TabSelectorBaseProps = {
     renderProductTrainingTooltip?: () => React.JSX.Element;
 };
 
-type TabSelectorItemProps = {
+type TabSelectorItemProps = WithSentryLabel & {
     /** Function to call when onPress */
     onPress?: () => void;
 
