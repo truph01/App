@@ -10,7 +10,7 @@ import type {Card, CardFeeds, CardList, PersonalDetailsList, Policy, WorkspaceCa
 import type {CardFeedsStatus, CardFeedsStatusByDomainID, CardFeedWithNumber, CombinedCardFeed} from '@src/types/onyx/CardFeeds';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {
-    directFeedHasCards,
+    feedHasCards,
     getBankName,
     getCardFeedIcon,
     getCardFeedWithDomainID,
@@ -21,6 +21,7 @@ import {
     isCard,
     isCardClosed,
     isCardHiddenFromSearch,
+    isCustomFeed,
     isDirectFeed,
 } from './CardUtils';
 import type {CompanyCardFeedIcons} from './CardUtils';
@@ -568,10 +569,16 @@ function getCombinedCardFeedsFromAllFeeds(
                 continue;
             }
 
-            // Only filter stale direct feeds when we have card data to make an informed decision.
-            // A direct feed is stale if it has no oAuthAccountDetails AND no assigned cards.
-            if (feedKeysWithCards && isDirectFeed(feedName) && !oAuthAccountDetails && !directFeedHasCards(feedName, domainID, feedKeysWithCards)) {
-                continue;
+            // When we have card data, filter out stale feeds:
+            // - Direct feeds without oAuthAccountDetails AND no assigned cards
+            // - "Gray zone" feeds (not commercial, not direct) without assigned cards
+            if (feedKeysWithCards) {
+                if (isDirectFeed(feedName) && !oAuthAccountDetails && !feedHasCards(feedName, domainID, feedKeysWithCards)) {
+                    continue;
+                }
+                if (!isCustomFeed(feedName) && !isDirectFeed(feedName) && !feedHasCards(feedName, domainID, feedKeysWithCards)) {
+                    continue;
+                }
             }
 
             const combinedCardFeed: CombinedCardFeed = {

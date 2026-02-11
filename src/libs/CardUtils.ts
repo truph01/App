@@ -479,11 +479,12 @@ function isDirectFeed(feed: string | undefined): boolean {
 }
 
 /**
- * Checks whether a direct feed has any assigned cards using a precomputed lightweight map.
- * This is used as a fallback validity signal when oAuthAccountDetails is missing.
+ * Checks whether a feed has any assigned cards using a precomputed lightweight map.
+ * This is used as a validity signal: direct feeds use it as a fallback when oAuthAccountDetails is missing,
+ * and "gray zone" feeds (neither commercial nor direct) use it as the sole visibility criterion.
  * The feedKeysWithCards map is produced by feedKeysWithAssignedCardsSelector in selectors/Card.ts.
  */
-function directFeedHasCards(feedName: string, domainID: number, feedKeysWithCards: FeedKeysWithAssignedCards | undefined): boolean {
+function feedHasCards(feedName: string, domainID: number, feedKeysWithCards: FeedKeysWithAssignedCards | undefined): boolean {
     if (!feedKeysWithCards || !domainID) {
         return false;
     }
@@ -492,14 +493,17 @@ function directFeedHasCards(feedName: string, domainID: number, feedKeysWithCard
 }
 
 /**
- * Returns company feeds from cardFeeds, filtering out pending/deleted feeds, Expensify Card, and stale direct feeds.
+ * Returns company feeds from cardFeeds, filtering out pending/deleted feeds, Expensify Card, stale direct feeds,
+ * and "gray zone" feeds with no assigned cards.
  *
- * A direct feed (OAuth/Plaid) is considered stale when it has no oAuthAccountDetails AND no assigned cards.
- * The stale feed filter only applies when feedKeysWithCards is provided so we have complete data.
- * When feedKeysWithCards is not provided, direct feeds are not filtered (safer to show than hide).
+ * Feed visibility rules (when feedKeysWithCards is provided):
+ * - Commercial feeds (isCustomFeed): always shown
+ * - Direct feeds (isDirectFeed): shown if they have oAuthAccountDetails OR assigned cards
+ * - Gray zone feeds (everything else): shown only if they have assigned cards
  */
 function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>, feedKeysWithCards?: FeedKeysWithAssignedCards, domainID?: number): CompanyFeeds {
     const oAuthAccountDetails = cardFeeds?.settings?.oAuthAccountDetails;
+    const resolvedDomainID = domainID ?? CONST.DEFAULT_NUMBER_ID;
     return Object.fromEntries(
         Object.entries(cardFeeds?.settings?.companyCards ?? {}).filter(([key, value]) => {
             if (value?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || value?.pending) {
@@ -509,16 +513,22 @@ function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>, feedKeysWithCa
                 return false;
             }
 
-            // Only filter stale direct feeds when we have card data to make an informed decision.
+            // When we don't have card data, we can't make informed filtering decisions - show all feeds.
+            if (!feedKeysWithCards) {
+                return true;
+            }
+
             // A direct feed is stale if it has no oAuthAccountDetails AND no assigned cards.
-            if (
-                feedKeysWithCards &&
-                isDirectFeed(key) &&
-                !oAuthAccountDetails?.[key as CompanyCardFeed] &&
-                !directFeedHasCards(key, domainID ?? CONST.DEFAULT_NUMBER_ID, feedKeysWithCards)
-            ) {
+            if (isDirectFeed(key) && !oAuthAccountDetails?.[key as CompanyCardFeed] && !feedHasCards(key, resolvedDomainID, feedKeysWithCards)) {
                 return false;
             }
+
+            // "Gray zone" feeds (not commercial AND not direct) are only shown when they have assigned cards.
+            // Examples: capitalonecards, americanexpressfd.us, ccupload, stripe, admin.pexcard.com, gl1205, etc.
+            if (!isCustomFeed(key) && !isDirectFeed(key) && !feedHasCards(key, resolvedDomainID, feedKeysWithCards)) {
+                return false;
+            }
+
             return true;
         }),
     );
@@ -1214,7 +1224,7 @@ export {
     getFeedConnectionBrokenCard,
     getCorrectStepForPlaidSelectedBank,
     isDirectFeed,
-    directFeedHasCards,
+    feedHasCards,
     getOriginalCompanyFeeds,
     getCompanyCardFeed,
     getCardFeedWithDomainID,
