@@ -7,10 +7,8 @@ import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Section from '@components/Section';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
 import {openExternalLink} from '@libs/actions/Link';
@@ -42,6 +40,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import CentralInvoicingLearnHow from './CentralInvoicingLearnHow';
 import CentralInvoicingSubtitleWrapper from './CentralInvoicingSubtitleWrapper';
+import useSingleExecution from '@hooks/useSingleExecution';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type WorkspaceTravelInvoicingSectionProps = {
     /** The ID of the policy */
