@@ -524,7 +524,7 @@ function SearchPage({route}: SearchPageProps) {
                         deleteAppReport(
                             report,
                             selfDMReport,
-                            currentUserPersonalDetails?.login ?? '',
+                            currentUserPersonalDetails?.email ?? '',
                             currentUserPersonalDetails?.accountID,
                             validTransactions,
                             allTransactionViolations,
@@ -548,8 +548,8 @@ function SearchPage({route}: SearchPageProps) {
                         bankAccountList,
                         transactions,
                     );
-                    clearSelectedTransactions();
                 }
+                clearSelectedTransactions();
             });
         });
     }, [
