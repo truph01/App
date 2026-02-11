@@ -779,12 +779,6 @@ function isControlPolicy(policy: OnyxEntry<Policy>): boolean {
     return policy?.type === CONST.POLICY.TYPE.CORPORATE;
 }
 
-/** Features that are only available on Corporate (control) plans */
-const CORPORATE_ONLY_FEATURES: PolicyFeatureName[] = [
-    CONST.POLICY.MORE_FEATURES.ARE_RULES_ENABLED,
-    CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED,
-];
-
 /**
  * Whether the policy can access a feature based on plan level.
  * Corporate-only features are restricted to control (Corporate) policies.
@@ -793,11 +787,10 @@ function canPolicyAccessFeature(policy: OnyxEntry<Policy>, featureName: PolicyFe
     if (!isPaidGroupPolicy(policy)) {
         return false;
     }
-
-    if (CORPORATE_ONLY_FEATURES.includes(featureName)) {
+    const corporateOnlyFeatures = new Set<PolicyFeatureName>([CONST.POLICY.MORE_FEATURES.ARE_RULES_ENABLED, CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED]);
+    if (corporateOnlyFeatures.has(featureName)) {
         return isControlPolicy(policy);
     }
-
     return true;
 }
 
