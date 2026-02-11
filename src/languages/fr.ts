@@ -7597,8 +7597,8 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             startMessageWeb:
                 'Ajoutez une photo de votre compteur kilométrique prise au <strong>début</strong> de votre trajet. Faites glisser un fichier ici ou choisissez-en un à télécharger.',
             endMessageWeb: 'Ajoutez une photo du compteur kilométrique prise à la <strong>fin</strong> de votre trajet. Faites glisser un fichier ici ou choisissez-en un à télécharger.',
-            startTitle: 'Début du kilométrage',
-            endTitle: 'Fin du compteur kilométrique',
+            startTitle: 'Photo du compteur de départ',
+            endTitle: 'Photo du compteur (arrivée)',
             deleteOdometerPhoto: 'Supprimer la photo du compteur kilométrique',
             deleteOdometerPhotoConfirmation: 'Voulez-vous vraiment supprimer cette photo de l’odomètre ?',
         },
