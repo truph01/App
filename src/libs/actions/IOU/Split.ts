@@ -1940,7 +1940,6 @@ function evenlyDistributeSplitExpenseAmounts(draftTransaction: OnyxEntry<OnyxTyp
  * @param transaction - The transaction containing split expenses
  * @param startDate - Start date in format 'YYYY-MM-DD'
  * @param endDate - End date in format 'YYYY-MM-DD'
- * @param policy - The policy (for distance transactions)
  */
 function resetSplitExpensesByDateRange(transaction: OnyxEntry<OnyxTypes.Transaction>, transactionReport: OnyxEntry<OnyxTypes.Report>, startDate: string, endDate: string) {
     if (!transaction || !startDate || !endDate) {
@@ -2023,7 +2022,7 @@ function updateSplitExpenseField(
                 category: transactionDetails?.category,
                 tags: splitExpenseDraftTransaction?.tag ? [splitExpenseDraftTransaction?.tag] : [],
                 created: transactionDetails?.created ?? DateUtils.formatWithUTCTimeZone(DateUtils.getDBTime(), CONST.DATE.FNS_FORMAT_STRING),
-                amount: splitExpenseDraftTransaction?.amount ?? 0,
+                amount: splitExpenseDraftTransaction?.amount,
                 merchant: splitExpenseDraftTransaction?.modifiedMerchant ? splitExpenseDraftTransaction.modifiedMerchant : (splitExpenseDraftTransaction?.merchant ?? ''),
             };
 
