@@ -1663,7 +1663,6 @@ const staticStyles = (theme: ThemeColors) =>
         floatingActionButtonSmall: {
             width: variables.componentSizeNormal,
             height: variables.componentSizeNormal,
-            boxShadow: theme.shadow,
         },
 
         floatingCameraButton: {
