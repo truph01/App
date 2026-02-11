@@ -6968,9 +6968,10 @@ function getPerDiemExpenseInformationForSelfDM(perDiemExpenseInformation: PerDie
         onyxMethod: Onyx.METHOD.SET,
         key: ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE,
         value: {
-            action: CONST.QUICK_ACTIONS.PER_DIEM,
+            action: CONST.QUICK_ACTIONS.TRACK_PER_DIEM,
             chatReportID: chatReport?.reportID,
             isFirstQuickAction: isEmptyObject(quickAction),
+            perDiemPolicyID: policy?.id,
         },
     });
     failureData.push({
@@ -7232,7 +7233,7 @@ function submitPerDiemExpenseForSelfDM(submitPerDiemExpenseInformation: PerDiemE
     InteractionManager.runAfterInteractions(() => removeDraftTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID));
     dismissModalAndOpenReportInInboxTab(chatReport.reportID);
 
-    notifyNewAction(chatReport.reportID, currentUserAccountIDParam, true);
+    notifyNewAction(chatReport.reportID, undefined, true);
 }
 
 /**
