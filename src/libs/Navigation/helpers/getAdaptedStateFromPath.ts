@@ -10,7 +10,7 @@ import CONST from '@src/CONST';
 import {getSearchParamFromPath} from '@src/libs/Url';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Route as RoutePath} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type {Report} from '@src/types/onyx';
@@ -97,30 +97,37 @@ function getMatchingFullScreenRoute(route: NavigationPartialRoute) {
         const dynamicRouteSuffix = getLastSuffixFromPath(route.path);
         if (isDynamicRouteSuffix(dynamicRouteSuffix)) {
             // Remove dynamic suffix to get the base path
-            const pathWithoutDynamicSuffix = route.path?.replace(`/${dynamicRouteSuffix}`, '');
+            const basePath = route.path?.replace(`/${dynamicRouteSuffix}`, '');
 
             // Get navigation state for the base path without dynamic suffix
-            const stateUnderDynamicRoute = getStateFromPath(pathWithoutDynamicSuffix as RoutePath);
-            const lastRoute = stateUnderDynamicRoute?.routes.at(-1);
+            const baseState = getStateFromPath(basePath as RoutePath);
+            const baseLastRoute = baseState?.routes.at(-1);
 
-            if (!stateUnderDynamicRoute || !lastRoute || lastRoute.name === SCREENS.NOT_FOUND) {
-                return undefined;
+            type DynamicRouteKey = keyof typeof DYNAMIC_ROUTES;
+            const dynamicRouteKey = Object.keys(DYNAMIC_ROUTES).find((key) => DYNAMIC_ROUTES[key as DynamicRouteKey].path === dynamicRouteSuffix) as DynamicRouteKey | undefined;
+
+            const baseFocusedRoute = findFocusedRoute(baseState);
+
+            // Check if the focused route in the base path is allowed to access this dynamic route
+            const entryScreens = dynamicRouteKey ? (DYNAMIC_ROUTES[dynamicRouteKey].entryScreens as readonly string[]) : [];
+            const focusedRouteName = baseFocusedRoute?.name;
+            if (dynamicRouteKey && focusedRouteName && entryScreens.includes(focusedRouteName)) {
+                if (!baseState || !baseLastRoute || baseLastRoute.name === SCREENS.NOT_FOUND) {
+                    return undefined;
+                }
+
+                const isLastRouteFullScreen = isFullScreenName(baseLastRoute.name);
+                if (isLastRouteFullScreen) {
+                    return baseLastRoute;
+                }
+
+                if (!baseFocusedRoute) {
+                    return undefined;
+                }
+
+                // Recursively find the matching full screen route for the focused dynamic route
+                return getMatchingFullScreenRoute(baseFocusedRoute);
             }
-
-            const isLastRouteFullScreen = isFullScreenName(lastRoute.name);
-
-            if (isLastRouteFullScreen) {
-                return lastRoute;
-            }
-
-            const focusedStateForDynamicRoute = findFocusedRoute(stateUnderDynamicRoute);
-
-            if (!focusedStateForDynamicRoute) {
-                return undefined;
-            }
-
-            // Recursively find the matching full screen route for the focused dynamic route
-            return getMatchingFullScreenRoute(focusedStateForDynamicRoute);
         }
     }
 
