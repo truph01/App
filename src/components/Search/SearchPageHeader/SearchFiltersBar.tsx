@@ -46,6 +46,7 @@ import {getActiveAdminWorkspaces} from '@libs/PolicyUtils';
 import {isExpenseReport} from '@libs/ReportUtils';
 import {buildQueryStringFromFilterFormValues, getQueryWithUpdatedValues, isFilterSupported, isSearchDatePreset} from '@libs/SearchQueryUtils';
 import {
+    filterValidHasValues,
     getDatePresets,
     getFeedOptions,
     getGroupByOptions,
@@ -310,8 +311,10 @@ function SearchFiltersBar({
 
             // If the type has changed, reset the status so we dont have an invalid status selected
             if (updatedFilterFormValues.type !== searchAdvancedFiltersForm.type) {
-                updatedFilterFormValues.status = CONST.SEARCH.STATUS.EXPENSE.ALL;
                 updatedFilterFormValues.columns = [];
+                updatedFilterFormValues.status = CONST.SEARCH.STATUS.EXPENSE.ALL;
+                // Filter out invalid "has" values for the new type
+                updatedFilterFormValues.has = filterValidHasValues(updatedFilterFormValues.has, updatedFilterFormValues.type, translate);
             }
 
             if (updatedFilterFormValues.groupBy !== searchAdvancedFiltersForm.groupBy) {
@@ -337,7 +340,7 @@ function SearchFiltersBar({
                 Navigation.setParams({q: queryString, rawQuery: undefined});
             });
         },
-        [searchAdvancedFiltersForm, queryJSON.sortBy, queryJSON.sortOrder, queryJSON.limit],
+        [searchAdvancedFiltersForm, queryJSON.sortBy, queryJSON.sortOrder, queryJSON.limit, translate],
     );
 
     const openAdvancedFilters = useCallback(() => {
