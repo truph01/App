@@ -8,7 +8,6 @@ import OnyxUpdateManager from '@libs/actions/OnyxUpdateManager';
 import {getAll as getAllPersistedRequests} from '@libs/actions/PersistedRequests';
 // eslint-disable-next-line no-restricted-syntax
 import * as SignInRedirect from '@libs/actions/SignInRedirect';
-import * as API from '@libs/API';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import asyncOpenURL from '@libs/asyncOpenURL';
 import HttpUtils from '@libs/HttpUtils';
@@ -19,6 +18,7 @@ import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import * as SessionUtil from '@src/libs/actions/Session';
 import {KEYS_TO_PRESERVE_SUPPORTAL, signOutAndRedirectToSignIn} from '@src/libs/actions/Session';
+import * as API from '@src/libs/API';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Credentials, Session} from '@src/types/onyx';
 import * as TestHelper from '../utils/TestHelper';
@@ -342,22 +342,27 @@ describe('Session', () => {
     });
 
     describe('SAML sign out', () => {
+        const mockedOpenAuthSessionAsync = jest.mocked(openAuthSessionAsync);
+
         // The supportal test above spies on SessionUtil.signOut and mocks it.
         // We need to restore it so our tests call the real implementation.
-        beforeEach(() => jest.restoreAllMocks());
+        beforeEach(() => {
+            jest.restoreAllMocks();
+        });
 
         test('SignOut should call openAuthSessionAsync when signedInWithSAML is true', async () => {
             await TestHelper.signInWithTestUser();
             await Onyx.merge(ONYXKEYS.SESSION, {signedInWithSAML: true});
             await waitForBatchedUpdates();
 
-            (openAuthSessionAsync as jest.MockedFunction<typeof openAuthSessionAsync>).mockClear();
+            mockedOpenAuthSessionAsync.mockClear();
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const makeRequestSpy = jest.spyOn(API, 'makeRequestWithSideEffects').mockResolvedValue(undefined);
 
             await SessionUtil.signOut();
             await waitForBatchedUpdates();
 
-            expect(openAuthSessionAsync).toHaveBeenCalledWith(expect.stringContaining('/logout'), CONST.SAML_REDIRECT_URL);
+            expect(mockedOpenAuthSessionAsync).toHaveBeenCalledWith(expect.stringContaining('/logout'), CONST.SAML_REDIRECT_URL);
             expect(makeRequestSpy).toHaveBeenCalled();
             makeRequestSpy.mockRestore();
         });
@@ -367,7 +372,8 @@ describe('Session', () => {
             await Onyx.merge(ONYXKEYS.SESSION, {signedInWithSAML: true});
             await waitForBatchedUpdates();
 
-            (openAuthSessionAsync as jest.MockedFunction<typeof openAuthSessionAsync>).mockImplementationOnce(() => Promise.reject(new Error('Browser session failed')));
+            mockedOpenAuthSessionAsync.mockImplementationOnce(() => Promise.reject(new Error('Browser session failed')));
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const makeRequestSpy = jest.spyOn(API, 'makeRequestWithSideEffects').mockResolvedValue(undefined);
 
             await SessionUtil.signOut();
@@ -381,13 +387,14 @@ describe('Session', () => {
             await TestHelper.signInWithTestUser();
             await waitForBatchedUpdates();
 
-            (openAuthSessionAsync as jest.MockedFunction<typeof openAuthSessionAsync>).mockClear();
+            mockedOpenAuthSessionAsync.mockClear();
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const makeRequestSpy = jest.spyOn(API, 'makeRequestWithSideEffects').mockResolvedValue(undefined);
 
             await SessionUtil.signOut();
             await waitForBatchedUpdates();
 
-            expect(openAuthSessionAsync).not.toHaveBeenCalled();
+            expect(mockedOpenAuthSessionAsync).not.toHaveBeenCalled();
             expect(makeRequestSpy).toHaveBeenCalled();
             makeRequestSpy.mockRestore();
         });
