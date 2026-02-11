@@ -1057,7 +1057,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}` as const,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
             value: {
                 member: {
                     [vacationer]: {
@@ -1068,7 +1068,7 @@ function setDomainVacationDelegate(domainAccountID: number, domainMemberAccountI
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}` as const,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 memberErrors: {
                     [vacationer]: {
@@ -1145,7 +1145,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}` as const,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
             value: {
                 member: {
                     [vacationer]: {
@@ -1170,7 +1170,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
     const successData: OnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}` as const,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
             value: {
                 member: {
                     [vacationer]: {

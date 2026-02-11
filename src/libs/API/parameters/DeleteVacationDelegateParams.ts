@@ -1,6 +1,6 @@
 type DeleteVacationDelegateParams = {
-    vacationerEmail?: string;
-    domainAccountID?: number;
+    vacationerEmail: string;
+    domainAccountID: number;
 };
 
 export default DeleteVacationDelegateParams;

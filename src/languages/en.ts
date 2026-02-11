@@ -8405,7 +8405,7 @@ const translations = {
             error: {
                 addMember: 'Unable to add this member. Please try again.',
                 removeMember: 'Unable to remove this user. Please try again.',
-                vacationDelegate: 'Unable to set this user as an vacation delegate. Please try again.',
+                vacationDelegate: 'Unable to set this user as a vacation delegate. Please try again.',
             },
         },
     },

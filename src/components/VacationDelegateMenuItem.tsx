@@ -74,6 +74,4 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
     );
 }
 
-VacationDelegateMenuItem.displayName = 'VacationDelegateSection';
-
 export default VacationDelegateMenuItem;

@@ -38,7 +38,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
             return;
         }
 
-        setDomainVacationDelegate(domainAccountID, accountID, currentUserEmail, memberLogin, option.login ?? '', vacationDelegate);
+        setDomainVacationDelegate(domainAccountID, accountID, currentUserEmail, memberLogin, delegateLogin, vacationDelegate);
         Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
     };
 
@@ -46,11 +46,11 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
-                testID={DomainMemberVacationDelegatePage.displayName}
+                testID="DomainMemberVacationDelegate"
             >
                 <BaseVacationDelegateSelectionComponent
                     currentVacationDelegate={vacationDelegate?.delegate}
-                    headerTitle={translate('domain.common.vacationDelegate')}
+                    headerTitle={translate('common.vacationDelegate')}
                     onSelectRow={onSelectRow}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID))}
                 />
@@ -58,7 +58,5 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
         </DomainNotFoundPageWrapper>
     );
 }
-
-DomainMemberVacationDelegatePage.displayName = 'DomainMemberVacationDelegate';
 
 export default DomainMemberVacationDelegatePage;
