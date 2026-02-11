@@ -23,10 +23,7 @@ jest.mock('@libs/OptionsListUtils', () => {
 
 jest.mock('@hooks/useOnyx', () => jest.fn());
 const EMPTY_ARCHIVED_MAP = {};
-jest.mock('@hooks/usePrivateIsArchivedMap', () => ({
-    __esModule: true,
-    default: jest.fn(() => EMPTY_ARCHIVED_MAP),
-}));
+jest.mock('@hooks/usePrivateIsArchivedMap', () => jest.fn());
 jest.mock('@components/OnyxListItemProvider', () => ({
     usePersonalDetails: jest.fn(),
 }));
