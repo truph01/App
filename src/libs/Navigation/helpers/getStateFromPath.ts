@@ -5,6 +5,7 @@ import {linkingConfig} from '@libs/Navigation/linkingConfig';
 import type {Route} from '@src/ROUTES';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Screen} from '@src/SCREENS';
+import SCREENS from '@src/SCREENS';
 import getLastSuffixFromPath from './getLastSuffixFromPath';
 import getMatchingNewRoute from './getMatchingNewRoute';
 import getRedirectedPath from './getRedirectedPath';
@@ -43,7 +44,7 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
 
             // Fallback to not found page so users can't land on dynamic suffix directly.
             if (pathWithoutDynamicSuffix === '/' || pathWithoutDynamicSuffix === '') {
-                const state = {routes: [{name: 'not-found', path: normalizedPathAfterRedirection}]};
+                const state = {routes: [{name: SCREENS.NOT_FOUND, path: normalizedPathAfterRedirection}]};
 
                 return state;
             }
