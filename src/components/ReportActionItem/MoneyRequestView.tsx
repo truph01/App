@@ -420,7 +420,7 @@ function MoneyRequestView({
     let amountDescription = `${translate('iou.amount')}`;
     let dateDescription = `${translate('common.date')}`;
 
-    const {unit, rate} = DistanceRequestUtils.getRate({transaction: updatedTransaction ?? transaction, policy, isTrackExpense});
+    const {unit, rate} = DistanceRequestUtils.getRate({transaction: updatedTransaction ?? transaction, policy});
     const distance = getDistanceInMeters(transactionBackup ?? updatedTransaction ?? transaction, unit);
     const currency = transactionCurrency ?? CONST.CURRENCY.USD;
     const hasRequiredCompanyCardViolation = transactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.COMPANY_CARD_REQUIRED);

@@ -171,14 +171,14 @@ describe('DistanceRequestUtils', () => {
 
     describe('getRate', () => {
         it('returns the rate from policyForMovingExpenses if an unreported transaction rate belongs to it', () => {
-            const transaction = {...createRandomTransaction(1), comment: {customUnit: {customUnitRateID: 'EE75E6DBC6FF8'}}};
+            const transaction = {...createRandomTransaction(1), reportID: '0', comment: {customUnit: {customUnitRateID: 'EE75E6DBC6FF8'}}};
             const result = DistanceRequestUtils.getRate({policyForMovingExpenses: FAKE_POLICY, transaction, policy: undefined});
             expect(result.customUnitRateID).toBe('EE75E6DBC6FF8');
         });
 
         it('does not return the default rate of the policy if the customUnitRateID of the tracked transaction does not exist', () => {
-            const transaction = {...createRandomTransaction(1), comment: {customUnit: {customUnitRateID: 'some-rate'}}};
-            const result = DistanceRequestUtils.getRate({policy: FAKE_POLICY, transaction, isTrackExpense: true});
+            const transaction = {...createRandomTransaction(1), reportID: '0', comment: {customUnit: {customUnitRateID: 'some-rate'}}};
+            const result = DistanceRequestUtils.getRate({policy: FAKE_POLICY, transaction});
             expect(result.customUnitRateID).toBeUndefined();
         });
     });

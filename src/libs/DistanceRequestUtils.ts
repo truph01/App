@@ -9,7 +9,7 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 // This will be fixed as part of https://github.com/Expensify/App/issues/66397
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {getDistanceRateCustomUnit, getDistanceRateCustomUnitRate, getPersonalPolicy, getUnitRateValue} from './PolicyUtils';
-import {getCurrency, getRateID, isCustomUnitRateIDForP2P} from './TransactionUtils';
+import {getCurrency, getRateID, isCustomUnitRateIDForP2P, isExpenseUnreported} from './TransactionUtils';
 
 type MileageRate = {
     customUnitRateID?: string;
@@ -377,14 +377,12 @@ function getRate({
     policyDraft,
     useTransactionDistanceUnit = true,
     policyForMovingExpenses,
-    isTrackExpense = false,
 }: {
     transaction: OnyxEntry<Transaction>;
     policy: OnyxEntry<Policy>;
     policyDraft?: OnyxEntry<Policy>;
     policyForMovingExpenses?: OnyxEntry<Policy>;
     useTransactionDistanceUnit?: boolean;
-    isTrackExpense?: boolean;
 }): MileageRate {
     let mileageRates = getMileageRates(policy, true, transaction?.comment?.customUnit?.customUnitRateID);
     if (isEmptyObject(mileageRates) && policyDraft) {
@@ -396,9 +394,10 @@ function getRate({
     const policyCurrency = policy?.outputCurrency ?? getPersonalPolicy()?.outputCurrency ?? CONST.CURRENCY.USD;
     const defaultMileageRate = getDefaultMileageRate(policy);
     const customUnitRateID = getRateID(transaction);
+    const isUnreportedExpense = isExpenseUnreported(transaction);
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const customMileageRate =
-        (customUnitRateID && (mileageRates?.[customUnitRateID] ?? mileageRatesForMovingExpenses?.[customUnitRateID])) || (isTrackExpense ? undefined : defaultMileageRate);
+        (customUnitRateID && (mileageRates?.[customUnitRateID] ?? mileageRatesForMovingExpenses?.[customUnitRateID])) || (isUnreportedExpense ? undefined : defaultMileageRate);
     const mileageRate = isCustomUnitRateIDForP2P(transaction) ? getRateForP2P(policyCurrency, transaction) : customMileageRate;
     const unit = getDistanceUnit(useTransactionDistanceUnit ? transaction : undefined, mileageRate);
     return {
