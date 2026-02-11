@@ -327,6 +327,7 @@ function IOURequestStepDistanceManual({
                         onPress={submitAndNavigateToNextPage}
                         text={buttonText}
                         testID="next-button"
+                        sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.DISTANCE_MANUAL_NEXT_BUTTON}
                     />
                 }
             />

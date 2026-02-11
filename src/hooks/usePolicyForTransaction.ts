@@ -1,8 +1,10 @@
+import {useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import {getPolicyByCustomUnitID} from '@libs/PolicyUtils';
 import {isExpenseUnreported} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Policy, Report, Transaction} from '@src/types/onyx';
+import type {Policy, Transaction} from '@src/types/onyx';
 import useOnyx from './useOnyx';
 import usePolicyForMovingExpenses from './usePolicyForMovingExpenses';
 
@@ -10,8 +12,8 @@ type UsePolicyForTransactionParams = {
     /** The transaction to determine the policy for */
     transaction: OnyxEntry<Transaction>;
 
-    /** The report associated with the transaction */
-    report: OnyxEntry<Report>;
+    /** The report policy ID associated with the transaction */
+    reportPolicyID: string | undefined;
 
     /** The current action being performed */
     action: string;
@@ -21,6 +23,9 @@ type UsePolicyForTransactionParams = {
 
     /** The draft policy linked to the report */
     policyDraft?: OnyxEntry<Policy>;
+
+    /** Indicates if the request is a per diem request */
+    isPerDiemRequest?: boolean;
 };
 
 type UsePolicyForTransactionResult = {
@@ -28,13 +33,22 @@ type UsePolicyForTransactionResult = {
     policy: OnyxEntry<Policy>;
 };
 
-function usePolicyForTransaction({transaction, report, action, iouType, policyDraft}: UsePolicyForTransactionParams): UsePolicyForTransactionResult {
+function usePolicyForTransaction({transaction, reportPolicyID, action, iouType, policyDraft, isPerDiemRequest}: UsePolicyForTransactionParams): UsePolicyForTransactionResult {
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
+
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
+
+    const customUnitPolicy = useMemo(() => {
+        return getPolicyByCustomUnitID(transaction, allPolicies);
+    }, [transaction, allPolicies]);
+
+    const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${reportPolicyID}`, {canBeMissing: true});
+
     const isUnreportedExpense = isExpenseUnreported(transaction);
     const isCreatingTrackExpense = action === CONST.IOU.ACTION.CREATE && iouType === CONST.IOU.TYPE.TRACK;
 
-    const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`, {canBeMissing: true});
-    const policy = isUnreportedExpense || isCreatingTrackExpense ? policyForMovingExpenses : (reportPolicy ?? policyDraft);
+    const policyForSelfDMExpense = isPerDiemRequest ? customUnitPolicy : policyForMovingExpenses;
+    const policy = isUnreportedExpense || isCreatingTrackExpense ? policyForSelfDMExpense : (reportPolicy ?? policyDraft);
 
     return {policy};
 }
