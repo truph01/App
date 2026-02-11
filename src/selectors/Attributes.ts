@@ -1,9 +1,22 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ReportAttributesDerivedValue} from '@src/types/onyx';
+import {ReportAttributes} from '@src/types/onyx/DerivedValues';
 
 const reportsSelector = (attributes: OnyxEntry<ReportAttributesDerivedValue>) => attributes?.reports;
 
 const reportAttributesByReportIDSelector = (reportID: string) => (attributes: OnyxEntry<ReportAttributesDerivedValue>) => attributes?.reports?.[reportID];
 
-export {reportAttributesByReportIDSelector};
+const reportByIDsSelector = (reportIDs: string[]) => (attributes: OnyxEntry<ReportAttributesDerivedValue>) =>
+    reportIDs.reduce(
+        (acc, reportID) => {
+            const reportAttributes = attributes?.reports?.[reportID];
+            if (reportAttributes) {
+                acc[reportID] = reportAttributes;
+            }
+            return acc;
+        },
+        {} as Record<string, ReportAttributes>,
+    );
+
+export {reportAttributesByReportIDSelector, reportByIDsSelector};
 export default reportsSelector;
