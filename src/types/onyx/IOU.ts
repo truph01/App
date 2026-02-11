@@ -163,7 +163,7 @@ type SplitExpense = {
 
     /** Whether this split has been manually edited by the user (locks the value from auto-adjustment) */
     isManuallyEdited?: boolean;
-    
+
     /** Custom unit data for distance requests */
     customUnit?: TransactionCustomUnit;
 
