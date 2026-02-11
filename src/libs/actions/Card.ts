@@ -53,6 +53,9 @@ type IssueNewCardFlowData = {
 };
 
 type CardOnyxUpdate = OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST | typeof ONYXKEYS.CARD_LIST>;
+type CardListUpdateData = Omit<PartialDeep<Card>, 'errors'> & {
+    errors?: Card['errors'] | null;
+};
 
 function reportVirtualExpensifyCardFraud(card: Card, validateCode: string) {
     const cardID = card?.cardID ?? CONST.DEFAULT_NUMBER_ID;
@@ -764,7 +767,7 @@ function clearIssueNewCardError(policyID: string | undefined) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.ISSUE_NEW_EXPENSIFY_CARD}${policyID}`, {errors: null});
 }
 
-function buildCardListUpdates(workspaceAccountID: number, cardID: number, cardUpdateData: PartialDeep<Card>): CardOnyxUpdate[] {
+function buildCardListUpdates(workspaceAccountID: number, cardID: number, cardUpdateData: CardListUpdateData): CardOnyxUpdate[] {
     const workspaceKey = `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${workspaceAccountID}_${CONST.EXPENSIFY_CARD.BANK}` as `${typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${string}`;
 
     return [
@@ -785,7 +788,7 @@ function freezeCard(workspaceAccountID: number, card: Card, currentUserAccountID
     const cardID = card.cardID;
     const previousFrozen = card?.nameValuePairs?.frozen ?? null;
 
-    const frozenData: PartialDeep<Card> = {
+    const frozenData: CardListUpdateData = {
         state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
         nameValuePairs: {
             frozen: {
@@ -796,6 +799,7 @@ function freezeCard(workspaceAccountID: number, card: Card, currentUserAccountID
         },
         pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
         isLoading: true,
+        errors: null,
     };
 
     const optimisticData = buildCardListUpdates(workspaceAccountID, cardID, frozenData);
@@ -832,7 +836,7 @@ function unfreezeCard(workspaceAccountID: number, card: Card) {
     const cardID = card.cardID;
     const previousFrozen = card?.nameValuePairs?.frozen ?? null;
 
-    const unfrozenData: PartialDeep<Card> = {
+    const unfrozenData: CardListUpdateData = {
         state: CONST.EXPENSIFY_CARD.STATE.OPEN,
         nameValuePairs: {
             frozen: null,
@@ -840,6 +844,7 @@ function unfreezeCard(workspaceAccountID: number, card: Card) {
         },
         pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
         isLoading: true,
+        errors: null,
     };
 
     const optimisticData = buildCardListUpdates(workspaceAccountID, cardID, unfrozenData);
