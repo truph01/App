@@ -44,7 +44,7 @@ function SelectionListWithModal<TItem extends ListItem>({
 
     // Filter out the pending delete item when online to prevent making multiple updates to debouncedData which causes the deleted item is shown again
     const filteredData = useMemo(() => {
-        return data.filter((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isOffline);
+        return data.filter((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isOffline || item?.errors);
     }, [data, isOffline]);
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
