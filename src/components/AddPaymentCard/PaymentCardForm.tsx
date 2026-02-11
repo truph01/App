@@ -179,7 +179,7 @@ function PaymentCardForm({
     const [cardNumber, setCardNumber] = useState('');
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.ADD_PAYMENT_CARD_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.ADD_PAYMENT_CARD_FORM> => {
-        const errors = getFieldRequiredErrors(values, REQUIRED_FIELDS);
+        const errors = getFieldRequiredErrors(values, REQUIRED_FIELDS, translate);
 
         if (values.nameOnCard && !isValidLegalName(values.nameOnCard)) {
             errors.nameOnCard = translate(label.error.nameOnCard);
@@ -210,10 +210,7 @@ function PaymentCardForm({
         if (values.addressZipCode && !isValidPaymentZipCode(values.addressZipCode)) {
             errors.addressZipCode = translate('addPaymentCardPage.error.addressZipCode');
         } else if (values.addressZipCode.length > CONST.BANK_ACCOUNT.MAX_LENGTH.ZIP_CODE) {
-            errors.addressZipCode = translate('common.error.characterLimitExceedCounter', {
-                length: values.addressZipCode.length,
-                limit: CONST.BANK_ACCOUNT.MAX_LENGTH.ZIP_CODE,
-            });
+            errors.addressZipCode = translate('common.error.characterLimitExceedCounter', values.addressZipCode.length, CONST.BANK_ACCOUNT.MAX_LENGTH.ZIP_CODE);
         }
 
         if (!values.acceptTerms) {

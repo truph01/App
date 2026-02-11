@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useLayoutEffect, useMemo, useRef, useState} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {Animated} from 'react-native';
 import type {View} from 'react-native';
@@ -10,12 +10,13 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import TabIcon from './TabIcon';
 import TabLabel from './TabLabel';
 
 const AnimatedPressableWithFeedback = Animated.createAnimatedComponent(PressableWithFeedback);
 
-type TabSelectorItemProps = {
+type TabSelectorItemProps = WithSentryLabel & {
     /** Function to call when onPress */
     onPress?: () => void;
 
@@ -69,6 +70,7 @@ function TabSelectorItem({
     isActive = false,
     shouldShowLabelWhenInactive = true,
     testID,
+    sentryLabel,
     shouldShowProductTrainingTooltip = false,
     renderProductTrainingTooltip,
     parentX = 0,
@@ -112,17 +114,22 @@ function TabSelectorItem({
         };
     }, [isActive, childRef, isSmallScreenWidth, parentX, parentWidth]);
 
+    const accessibilityState = useMemo(() => ({selected: isActive}), [isActive]);
+
     const children = (
         <AnimatedPressableWithFeedback
             accessibilityLabel={title}
+            accessibilityState={accessibilityState}
+            accessibilityRole={CONST.ROLE.TAB}
             style={[styles.tabSelectorButton, styles.tabBackground(isHovered, isActive, backgroundColor), styles.userSelectNone]}
             wrapperStyle={[equalWidth ? styles.flex1 : styles.flexGrow1]}
             onPress={onPress}
             onHoverIn={() => setIsHovered(true)}
             onHoverOut={() => setIsHovered(false)}
-            role={CONST.ROLE.BUTTON}
+            role={CONST.ROLE.TAB}
             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
             testID={testID}
+            sentryLabel={sentryLabel}
             ref={childRef}
         >
             <TabIcon

@@ -64,7 +64,6 @@ function MVCPFlatList<T>({
     const lastScrollOffsetRef = useRef(0);
     const isListRenderedRef = useRef(false);
     const mvcpAutoscrollToTopThresholdRef = useRef(mvcpAutoscrollToTopThreshold);
-    // eslint-disable-next-line react-compiler/react-compiler
     mvcpAutoscrollToTopThresholdRef.current = mvcpAutoscrollToTopThreshold;
 
     const getScrollOffset = useCallback((): number => {
