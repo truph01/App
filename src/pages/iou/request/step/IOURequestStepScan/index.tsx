@@ -82,6 +82,50 @@ function IOURequestStepScan({
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash', 'ReplaceReceipt', 'SmartScan']);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
 
+    const updateScanAndNavigate = useCallback(
+        (file: FileObject, source: string) => {
+            replaceReceipt({transactionID: initialTransactionID, file: file as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories});
+            navigateBack();
+        },
+        [initialTransactionID, navigateBack, policy, policyCategories],
+    );
+
+    // Shared business logic from useReceiptScan hook
+    const {
+        transactions,
+        isEditing,
+        canUseMultiScan,
+        isReplacingReceipt,
+        shouldAcceptMultipleFiles,
+        startLocationPermissionFlow,
+        setStartLocationPermissionFlow,
+        receiptFiles,
+        setReceiptFiles,
+        shouldShowMultiScanEducationalPopup,
+        navigateToConfirmationStep,
+        validateFiles,
+        PDFValidationComponent,
+        ErrorModal,
+        submitReceipts,
+        submitMultiScanReceipts,
+        toggleMultiScan,
+        dismissMultiScanEducationalPopup,
+    } = useReceiptScan({
+        report,
+        reportID,
+        initialTransactionID,
+        initialTransaction,
+        iouType,
+        action,
+        currentUserPersonalDetails,
+        backTo,
+        backToReport,
+        isMultiScanEnabled,
+        isStartingScan,
+        setIsMultiScanEnabled,
+        updateScanAndNavigate,
+    });
+
     const [videoConstraints, setVideoConstraints] = useState<MediaTrackConstraints>();
     const isTabActive = useIsFocused();
 
@@ -236,14 +280,6 @@ function IOURequestStepScan({
         });
     }, [initialTransaction?.amount, iouType]);
 
-    const updateScanAndNavigate = useCallback(
-        (file: FileObject, source: string) => {
-            replaceReceipt({transactionID: initialTransactionID, file: file as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories});
-            navigateBack();
-        },
-        [initialTransactionID, navigateBack, policy, policyCategories],
-    );
-
     const handleDropReceipt = (e: DragEvent) => {
         const files = Array.from(e?.dataTransfer?.files ?? []);
         if (files.length === 0) {
@@ -268,42 +304,6 @@ function IOURequestStepScan({
         }
         setIsTorchAvailable('torch' in capabilities && !!capabilities.torch);
     };
-
-    // Shared business logic from useReceiptScan hook
-    const {
-        transactions,
-        isEditing,
-        canUseMultiScan,
-        isReplacingReceipt,
-        shouldAcceptMultipleFiles,
-        startLocationPermissionFlow,
-        setStartLocationPermissionFlow,
-        receiptFiles,
-        setReceiptFiles,
-        shouldShowMultiScanEducationalPopup,
-        navigateToConfirmationStep,
-        validateFiles,
-        PDFValidationComponent,
-        ErrorModal,
-        submitReceipts,
-        submitMultiScanReceipts,
-        toggleMultiScan,
-        dismissMultiScanEducationalPopup,
-    } = useReceiptScan({
-        report,
-        reportID,
-        initialTransactionID,
-        initialTransaction,
-        iouType,
-        action,
-        currentUserPersonalDetails,
-        backTo,
-        backToReport,
-        isMultiScanEnabled,
-        isStartingScan,
-        setIsMultiScanEnabled,
-        updateScanAndNavigate,
-    });
 
     const viewfinderLayout = useRef<LayoutRectangle>(null);
 
@@ -367,6 +367,7 @@ function IOURequestStepScan({
         receiptFiles,
         isEditing,
         submitReceipts,
+        setReceiptFiles,
         requestCameraPermission,
         showBlink,
         updateScanAndNavigate,
