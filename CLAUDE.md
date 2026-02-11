@@ -184,11 +184,6 @@ The skill provides guidance on:
 - **Build Compliance**: Android 16KB page alignment (Google Play requirement)
 - **Platform Tooling**: Xcode/Android Studio profiling and debugging setup
 
-### Coding Standards
-The project defines coding standards in `.claude/skills/coding-standards/`.
-Standards cover performance (PERF-*), consistency (CONSISTENCY-*), and clean React patterns (CLEAN-REACT-PATTERNS-*).
-When writing or modifying code in `src/`, consult the relevant standard files in `rules/` to ensure compliance.
-
 ### Code Quality
 - **TypeScript**: Strict mode enabled
 - **ESLint**: Linter
