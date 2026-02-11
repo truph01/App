@@ -6,8 +6,6 @@ alwaysApply: false
 
 # Playwright App Testing
 
-## When to Use This Skill
-
 Use Playwright testing when:
 - User requests testing the App in a browser
 - Verifying fixes or improvements you've made to UI/frontend code
@@ -26,8 +24,6 @@ ps aux | grep "webpack" | grep -v grep
 
 ## Dev Server Details
 - **URL**: `https://dev.new.expensify.com:8082/`
-- **Location**: HOST machine (not inside VM)
-- **Start command**: `cd App && npm run web`
 
 ## Playwright Testing Workflow
 
@@ -43,7 +39,8 @@ ps aux | grep "webpack" | grep -v grep
 
 When signing in to dev environment:
 - **Email**: Generate random Gmail address (e.g., `user+throwaway<random>@gmail.com`)
-- **Magic code**: Always `000000` (six zeros)
+    - **New Account**: Press join to create account
+    - **Existing Account**: Magic code: Always `000000`
 - **Onboarding**: Skip all optional steps
 
 ## Example Usage
