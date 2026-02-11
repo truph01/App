@@ -1,5 +1,5 @@
 import type {OnyxCollection, OnyxEntry, ResultMetadata} from 'react-native-onyx';
-import {getCompanyCardFeed, getCompanyFeeds, getSelectedFeed} from '@libs/CardUtils';
+import {getCompanyCardFeed, getCompanyFeeds, getSelectedFeed, isMatchingCard} from '@libs/CardUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {CardFeeds, CardList} from '@src/types/onyx';
@@ -63,6 +63,21 @@ function useCompanyCards({policyID, feedName: feedNameProp}: UseCompanyCardsProp
     }
     for (const [cardName, encryptedCardNumber] of Object.entries(cardList ?? {})) {
         cardNamesToEncryptedCardNumberMapping[cardName] = encryptedCardNumber;
+    }
+
+    // Ensure assigned cards appear in the mapping even when cardList is stale.
+    // If an assigned card's cardName/encryptedCardNumber is not already represented
+    // in the mapping (built from cardList + accountList), add it so the UI displays it.
+    for (const card of Object.values(assignedCards)) {
+        if (!card?.cardName) {
+            continue;
+        }
+
+        const alreadyInMapping = Object.entries(cardNamesToEncryptedCardNumberMapping).some(([name, encrypted]) => isMatchingCard(card, encrypted, name));
+
+        if (!alreadyInMapping) {
+            cardNamesToEncryptedCardNumberMapping[card.cardName] = card.encryptedCardNumber ?? card.cardName;
+        }
     }
 
     const onyxMetadata = {
