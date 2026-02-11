@@ -1,7 +1,7 @@
 import Onyx from 'react-native-onyx';
 import type {OnyxUpdate} from 'react-native-onyx';
 import * as API from '@libs/API';
-import {
+import type {
     AddAdminToDomainParams,
     AddMemberToDomainParams,
     DeleteDomainMemberParams,
@@ -1128,7 +1128,7 @@ function clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID: number)
 }
 
 function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, force2FA: boolean, twoFactorAuthCode?: string) {
-    const newExemptEmails = force2FA ? exemptEmails.filter((email) => email !== targetEmail) : [...new Set([...exemptEmails, targetEmail])];
+    const newExemptEmails = force2FA ? exemptEmails.filter((email) => email !== targetEmail) : exemptEmails;
 
     const optimisticData: OnyxUpdate[] = [
         {

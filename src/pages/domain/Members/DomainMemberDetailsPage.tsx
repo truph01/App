@@ -53,8 +53,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
         selector: domainMemberSettingsSelector,
     });
 
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
-    const is2FAEnabled = account?.requiresTwoFactorAuth;
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
 
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
         canBeMissing: true,
@@ -123,7 +122,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                             return;
                         }
 
-                        if (!value && is2FAEnabled) {
+                        if (!value && account?.requiresTwoFactorAuth) {
                             Navigation.navigate(ROUTES.DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
                         } else {
                             setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails.login, value);
@@ -131,7 +130,11 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     }}
                     title={translate('domain.common.forceTwoFactorAuth')}
                     pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
-                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
+                    errors={
+                        domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin) || !account?.requiresTwoFactorAuth
+                            ? getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)
+                            : undefined
+                    }
                     onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
                 />
 

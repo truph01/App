@@ -7,13 +7,17 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDomainMemberError} from '@libs/actions/Domain';
+import {hasDomainMemberDetailsErrors} from '@libs/DomainUtils';
+import {getLatestError} from '@libs/ErrorUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {DomainSplitNavigatorParamList} from '@navigation/types';
 import BaseDomainMembersPage from '@pages/domain/BaseDomainMembersPage';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import type {DomainMemberErrors} from '@src/types/onyx/DomainErrors';
 
 type DomainMembersPageProps = PlatformStackScreenProps<DomainSplitNavigatorParamList, typeof SCREENS.DOMAIN.MEMBERS>;
 
@@ -44,6 +48,21 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             style={shouldUseNarrowLayout ? [styles.flexGrow1, styles.mb3] : undefined}
         />
     );
+
+    const getCustomRowProps = (accountID: number, email?: string) => {
+        const emailPendingAction = email ? domainPendingActions?.[email]?.pendingAction : undefined;
+        const accountIDPendingAction = domainPendingActions?.[accountID]?.pendingAction;
+
+        const emailErrors = email ? domainErrors?.memberErrors?.[email] : undefined;
+        const accountIDErrors = domainErrors?.memberErrors?.[accountID];
+        const mergedErrors: DomainMemberErrors = {
+            errors: {...accountIDErrors?.errors, ...emailErrors?.errors},
+            twoFactorAuthExemptEmailsError: {...accountIDErrors?.twoFactorAuthExemptEmailsError, ...emailErrors?.twoFactorAuthExemptEmailsError},
+        };
+        const brickRoadIndicator = hasDomainMemberDetailsErrors(mergedErrors) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined;
+
+        return {errors: getLatestError(mergedErrors?.errors), pendingAction: emailPendingAction ?? accountIDPendingAction, brickRoadIndicator};
+    };
 
     return (
         <BaseDomainMembersPage

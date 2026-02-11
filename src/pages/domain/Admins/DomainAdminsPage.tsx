@@ -99,8 +99,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
             headerIcon={illustrations.UserShield}
             headerContent={headerContent}
             getCustomRightElement={getCustomRightElement}
-            memberErrors={domainErrors?.adminErrors}
-            memberPendingActions={domainPendingAction}
+            getCustomRowProps={getCustomRowProps}
             onDismissError={(item) => clearAdminError(domainAccountID, item.accountID)}
             onSelectRow={(item) => Navigation.navigate(ROUTES.DOMAIN_ADMIN_DETAILS.getRoute(domainAccountID, item.accountID))}
         />

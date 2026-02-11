@@ -8,22 +8,23 @@ import ScrollView from '@components/ScrollView';
 import TwoFactorAuthForm from '@components/TwoFactorAuthForm';
 import type {BaseTwoFactorAuthFormRef} from '@components/TwoFactorAuthForm/types';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import ONYXKEYS from '@src/ONYXKEYS';
+import {getLatestErrorMessage} from '@libs/ErrorUtils';
+import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
 import DomainNotFoundPageWrapper from './DomainNotFoundPageWrapper';
 
 type BaseDomainRequireTwoFactorAuthPageProps = {
     domainAccountID: number;
     onSubmit: (code: string) => void;
     onBackButtonPress: () => void;
+    onInputChange?: () => void;
+    errors?: Errors;
+    pendingAction?: PendingAction;
 };
 
-function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackButtonPress}: BaseDomainRequireTwoFactorAuthPageProps) {
+function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackButtonPress, onInputChange, errors, pendingAction}: BaseDomainRequireTwoFactorAuthPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
 
     const baseTwoFactorAuthRef = useRef<BaseTwoFactorAuthFormRef>(null);
 
@@ -51,6 +52,8 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                             shouldAllowRecoveryCode
                             onSubmit={onSubmit}
                             shouldAutoFocus={false}
+                            onInputChange={onInputChange}
+                            errorMessage={getLatestErrorMessage({errors})}
                         />
                     </View>
                 </ScrollView>
@@ -59,7 +62,7 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                         success
                         large
                         text={translate('common.disable')}
-                        isLoading={account?.isLoading}
+                        isLoading={!!pendingAction}
                         onPress={() => baseTwoFactorAuthRef.current?.validateAndSubmitForm()}
                     />
                 </FixedFooter>

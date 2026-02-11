@@ -1,11 +1,11 @@
-import {domainNameSelector} from '@selectors/Domain';
-import React from 'react';
+import {domainMemberSettingsSelector, domainNameSelector} from '@selectors/Domain';
+import React, {useEffect} from 'react';
 import useOnyx from '@hooks/useOnyx';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import BaseDomainRequireTwoFactorAuthPage from '@pages/domain/BaseDomainRequireTwoFactorAuthPage';
-import {toggleTwoFactorAuthRequiredForDomain} from '@userActions/Domain';
+import {clearToggleTwoFactorAuthRequiredForDomainError, toggleTwoFactorAuthRequiredForDomain} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -28,6 +28,13 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
         canBeMissing: true,
     });
 
+    useEffect(() => {
+        if (domainSettings?.twoFactorAuthRequired) {
+            return;
+        }
+        Navigation.goBack(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID));
+    }, [domainAccountID, domainSettings?.twoFactorAuthRequired]);
+
     return (
         <BaseDomainRequireTwoFactorAuthPage
             domainAccountID={domainAccountID}
@@ -37,11 +44,18 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
                 }
 
                 toggleTwoFactorAuthRequiredForDomain(domainAccountID, domainName, false, code);
-                Navigation.goBack(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID));
             }}
             onBackButtonPress={() => {
                 Navigation.goBack(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID));
             }}
+            onInputChange={() => {
+                if (isEmptyObject(domainErrors?.setTwoFactorAuthRequiredError)) {
+                    return;
+                }
+                clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID);
+            }}
+            errors={domainErrors?.setTwoFactorAuthRequiredError}
+            pendingAction={domainPendingActions?.twoFactorAuthRequired}
         />
     );
 }
