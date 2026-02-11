@@ -1,10 +1,10 @@
+import type {OnyxCollection} from 'react-native-onyx';
 import {getCardFeedsForDisplayPerPolicy} from '@libs/CardFeedUtils';
 import {isCustomFeed} from '@libs/CardUtils';
 import {isPaidGroupPolicy} from '@libs/PolicyUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
 import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
-import type { OnyxCollection } from 'react-native-onyx';
 import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
 
@@ -16,7 +16,6 @@ function getEligiblePolicyIDs(policies: OnyxCollection<Policy>): Set<string> {
         return policiesIDs;
     }, new Set<string>());
 }
-
 
 const useCardFeedsForDisplay = () => {
     const {localeCompare, translate} = useLocalize();
