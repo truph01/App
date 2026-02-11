@@ -2,7 +2,6 @@ import React, {createContext, useCallback, useContext, useEffect, useMemo} from 
 import type {ReactNode} from 'react';
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
-import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
 import type {MultifactorAuthenticationScenario, MultifactorAuthenticationScenarioParams} from '@components/MultifactorAuthentication/config/types';
 import useNetwork from '@hooks/useNetwork';
 import {requestValidateCodeAction} from '@libs/actions/User';
@@ -10,7 +9,7 @@ import getPlatform from '@libs/getPlatform';
 import type {ChallengeType, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
-import {processRegistration, processScenario} from '@userActions/MultifactorAuthentication/processing';
+import {processRegistration, processScenarioAction} from '@userActions/MultifactorAuthentication/processing';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -119,7 +118,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
 
         // 2. Check if device is compatible
         if (!biometrics.doesDeviceSupportBiometrics()) {
-            const {allowedAuthenticationMethods = [] as string[]} = scenario ? MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[scenario] : {};
+            const {allowedAuthenticationMethods = [] as string[]} = scenario;
 
             let reason: MultifactorAuthenticationReason = CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE;
 
@@ -249,7 +248,6 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
 
             await biometrics.authorize(
                 {
-                    scenario,
                     challenge: authorizationChallenge,
                 },
                 async (result: AuthorizeResult) => {
@@ -273,7 +271,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                     }
 
                     // Call backend with signed challenge
-                    const scenarioAPIResponse = await processScenario(scenario, {
+                    const scenarioAPIResponse = await processScenarioAction(scenario.action, {
                         signedChallenge: result.signedChallenge,
                         authenticationMethod: result.authenticationMethod.marqetaValue,
                         ...payload,

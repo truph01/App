@@ -5,7 +5,6 @@ import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {loadIllustration} from '@components/Icon/IllustrationLoader';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
-import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
 import type {MultifactorAuthenticationOutcomeConfig} from '@components/MultifactorAuthentication/config/types';
 import {useMultifactorAuthenticationState} from '@components/MultifactorAuthentication/Context';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -45,8 +44,7 @@ function MultifactorAuthenticationOutcomePage() {
     };
 
     const outcomeKey = getOutcomeKey(state.error?.reason);
-    const scenarioConfig = state.scenario ? MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[state.scenario] : undefined;
-    const data: MultifactorAuthenticationOutcomeConfig | undefined = scenarioConfig?.OUTCOMES[outcomeKey as keyof typeof scenarioConfig.OUTCOMES];
+    const data: MultifactorAuthenticationOutcomeConfig | undefined = state.scenario?.OUTCOMES[outcomeKey];
 
     const {asset: icon} = useMemoizedLazyAsset(() => loadIllustration(data?.illustration ?? 'HumptyDumpty'));
 

@@ -1,9 +1,4 @@
-import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
-import type {
-    MultifactorAuthenticationProcessScenarioParameters,
-    MultifactorAuthenticationScenario,
-    MultifactorAuthenticationScenarioConfig,
-} from '@components/MultifactorAuthentication/config/types';
+import type {MultifactorAuthenticationScenarioConfig} from '@components/MultifactorAuthentication/config/types';
 import type {MarqetaAuthTypeName, MultifactorAuthenticationKeyInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 import VALUES from '@libs/MultifactorAuthentication/Biometrics/VALUES';
 import CONST from '@src/CONST';
@@ -106,21 +101,14 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
  * Executes the scenario-specific action with the signed challenge
  * and additional parameters. Returns success status and reason.
  *
- * @async
- * @template T - The type of the multifactor authentication scenario
- * @param scenario - The MFA scenario to process
- * @param params - Scenario parameters including:
- *   - signedChallenge: The signed challenge response from biometric authentication
- *   - authenticationMethod: The biometric method used
- *   - Additional scenario-specific parameters (e.g., transactionID)
+ * @param action - The scenario's action function from the scenario config
+ * @param params - Action parameters including signedChallenge and authenticationMethod
  * @returns Object with success status and reason
  */
-async function processScenario<T extends MultifactorAuthenticationScenario>(
-    scenario: T,
-    params: MultifactorAuthenticationProcessScenarioParameters<T> & {authenticationMethod: MarqetaAuthTypeName},
+async function processScenarioAction(
+    action: MultifactorAuthenticationScenarioConfig['action'],
+    params: Parameters<MultifactorAuthenticationScenarioConfig['action']>[0],
 ): Promise<ProcessResult> {
-    const currentScenario = MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[scenario] as MultifactorAuthenticationScenarioConfig;
-
     if (!params.signedChallenge) {
         return {
             success: false,
@@ -128,7 +116,7 @@ async function processScenario<T extends MultifactorAuthenticationScenario>(
         };
     }
 
-    const {httpCode, reason} = await currentScenario.action(params);
+    const {httpCode, reason} = await action(params);
     const success = isHttpSuccess(httpCode);
 
     return {
@@ -137,5 +125,5 @@ async function processScenario<T extends MultifactorAuthenticationScenario>(
     };
 }
 
-export {processRegistration, processScenario};
+export {processRegistration, processScenarioAction};
 export type {ProcessResult, RegistrationParams};
