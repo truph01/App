@@ -626,13 +626,13 @@ function getTagListName(policyTagList: OnyxEntry<PolicyTagLists>, orderWeight: n
 /**
  * Gets all tag lists of a policy
  */
-function getTagLists(policyTagList: OnyxEntry<PolicyTagLists>, shouldFilterEnabledOnly = false): Array<ValueOf<PolicyTagLists>> {
+function getTagLists(policyTagList: OnyxEntry<PolicyTagLists>): Array<ValueOf<PolicyTagLists>> {
     if (isEmptyObject(policyTagList)) {
         return [];
     }
 
     return Object.values(policyTagList)
-        .filter((policyTagListValue) => policyTagListValue !== null && (!shouldFilterEnabledOnly || Object.values(policyTagListValue.tags).some(({enabled}) => enabled)))
+        .filter((policyTagListValue) => policyTagListValue !== null)
         .sort((tagA, tagB) => tagA.orderWeight - tagB.orderWeight);
 }
 

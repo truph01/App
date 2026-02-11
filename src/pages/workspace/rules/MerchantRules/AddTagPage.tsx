@@ -25,21 +25,22 @@ function AddTagPage({route}: AddTagPageProps) {
     const [policyTags = getEmptyArray<ValueOf<PolicyTagLists>>()] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {canBeMissing: true, selector: getTagLists});
     const tagList = policyTags.find((item) => item.orderWeight === orderWeight);
     const formTags = getTagArrayFromName(form?.tag ?? '');
+    const formTag = formTags.at(orderWeight);
 
     const tagItems = useMemo(() => {
         const tags: Array<{name: string; value: string}> = [];
 
         for (const tag of Object.values(tagList?.tags ?? {})) {
-            if (!tag.enabled) {
+            if (tag.name !== formTag && !tag.enabled) {
                 continue;
             }
             tags.push({name: getCleanedTagName(tag.name), value: tag.name});
         }
 
         return tags;
-    }, [tagList?.tags]);
+    }, [tagList?.tags, formTag]);
 
-    const selectedTagItem = tagItems.find(({value}) => value === formTags.at(orderWeight));
+    const selectedTagItem = tagItems.find(({value}) => value === formTag);
 
     const backToRoute = isEditing ? ROUTES.RULES_MERCHANT_EDIT.getRoute(policyID, ruleID) : ROUTES.RULES_MERCHANT_NEW.getRoute(policyID);
 

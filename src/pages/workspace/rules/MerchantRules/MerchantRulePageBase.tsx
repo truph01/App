@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import Button from '@components/Button';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
@@ -86,8 +85,6 @@ const getErrorMessage = (translate: LocalizedTranslate, form?: MerchantRuleForm)
     return translate('workspace.rules.merchantRules.confirmError');
 };
 
-const policyTagsSelector = (tagLists: OnyxEntry<PolicyTagLists>) => getTagLists(tagLists, true);
-
 function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRulePageBaseProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -99,7 +96,7 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`, {canBeMissing: true});
     const [policyTags = getEmptyArray<ValueOf<PolicyTagLists>>()] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {
         canBeMissing: true,
-        selector: policyTagsSelector,
+        selector: getTagLists,
     });
     const [shouldShowError, setShouldShowError] = useState(false);
     const {showConfirmModal} = useConfirmModal();
@@ -292,15 +289,17 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
                       }
                     : undefined,
                 ...(hasTags()
-                    ? policyTags.map(({name, orderWeight, tags}) => {
-                          const tag = Object.values(tags).find(({name: tagName}) => tagName === formTags.at(orderWeight));
-                          return {
-                              key: `tag-${name}-${orderWeight}`,
-                              description: name,
-                              title: tag ? getCleanedTagName(tag.name) : undefined,
-                              onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_TAG.getRoute(policyID, ruleID, orderWeight)),
-                          };
-                      })
+                    ? policyTags
+                          .filter(({orderWeight, tags}) => !!formTags.at(orderWeight) || Object.values(tags).some(({enabled}) => enabled))
+                          .map(({name, orderWeight}) => {
+                              const formTag = formTags.at(orderWeight);
+                              return {
+                                  key: `tag-${name}-${orderWeight}`,
+                                  description: name,
+                                  title: formTag ? getCleanedTagName(formTag) : undefined,
+                                  onPress: () => Navigation.navigate(ROUTES.RULES_MERCHANT_TAG.getRoute(policyID, ruleID, orderWeight)),
+                              };
+                          })
                     : []),
                 hasTaxes()
                     ? {
