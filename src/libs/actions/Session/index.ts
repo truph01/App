@@ -260,10 +260,15 @@ function signOut(): Promise<void | Response> {
 
 function callSAMLSignOut(params: LogOutParams): Promise<void | Response> {
     const queryString = CONFIG.IS_HYBRID_APP ? `appversion=${pkg.version}&referer=ecash&authToken=${session.authToken}` : `referer=ecash&authToken=${session.authToken}`;
-    return openAuthSessionAsync(`${CONFIG.EXPENSIFY.SAML_URL}/logout?${queryString}`, CONST.SAML_REDIRECT_URL).then(() => {
-        // eslint-disable-next-line rulesdir/no-api-side-effects-method
-        API.makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.LOG_OUT, params, {});
-    });
+    return openAuthSessionAsync(`${CONFIG.EXPENSIFY.SAML_URL}/logout?${queryString}`, CONST.SAML_REDIRECT_URL)
+        .catch((error) => {
+            Log.hmmm('SAML sign out failed', {error});
+        })
+        .then(() => {
+            // We always want to sign out the user from the app
+            // eslint-disable-next-line rulesdir/no-api-side-effects-method
+            return API.makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.LOG_OUT, params, {});
+        });
 }
 
 /**

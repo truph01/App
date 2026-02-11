@@ -83,13 +83,18 @@ function SAMLSignInPage() {
             return;
         }
         hasOpenedAuthSession.current = true;
-        openAuthSessionAsync(SAMLUrl, CONST.SAML_REDIRECT_URL).then((response: WebBrowserAuthSessionResult) => {
-            if (response.type !== 'success') {
+        openAuthSessionAsync(SAMLUrl, CONST.SAML_REDIRECT_URL)
+            .then((response: WebBrowserAuthSessionResult) => {
+                if (response.type !== 'success') {
+                    Navigation.goBack();
+                    return;
+                }
+                handleNavigationStateChange(response.url);
+            })
+            .catch((error) => {
+                Log.hmmm('SAML sign in failed', {error});
                 Navigation.goBack();
-                return;
-            }
-            handleNavigationStateChange(response.url);
-        });
+            });
     }, [SAMLUrl, handleNavigationStateChange]);
 
     useEffect(() => {
