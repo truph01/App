@@ -201,6 +201,19 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
         </View>
     );
 
+    const textInputOptions = {
+        headerMessage,
+        label: translate('selectionList.nameEmailOrPhoneNumber'),
+        style: {
+            containerStyle: onboardingIsMediumOrLargerScreenWidth ? styles.ph8 : styles.ph5,
+            headerMessageStyle: [onboardingIsMediumOrLargerScreenWidth ? styles.ph8 : styles.ph5, styles.pb5],
+        },
+        onChangeText: (value: string) => {
+            setSearchTerm(value);
+        },
+        value: searchTerm,
+    };
+
     return (
         <ScreenWrapper
             enableEdgeToEdgeBottomSafeAreaPadding
@@ -236,18 +249,7 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
                     sectionTitleStyles: onboardingIsMediumOrLargerScreenWidth ? styles.ph3 : undefined,
                     listItemWrapperStyle: onboardingIsMediumOrLargerScreenWidth ? [styles.pl8, styles.pr8] : [],
                 }}
-                textInputOptions={{
-                    headerMessage,
-                    label: translate('selectionList.nameEmailOrPhoneNumber'),
-                    style: {
-                        containerStyle: onboardingIsMediumOrLargerScreenWidth ? styles.ph8 : styles.ph5,
-                        headerMessageStyle: [onboardingIsMediumOrLargerScreenWidth ? styles.ph8 : styles.ph5, styles.pb5],
-                    },
-                    onChangeText: (value) => {
-                        setSearchTerm(value);
-                    },
-                    value: searchTerm,
-                }}
+                textInputOptions={textInputOptions}
                 footerContent={footerContent}
                 isLoadingNewOptions={!!isSearchingForReports}
                 addBottomSafeAreaPadding={isSmallScreenWidth}
