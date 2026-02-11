@@ -3983,11 +3983,6 @@ describe('OptionsListUtils', () => {
                 reportID: chatReportID,
             };
 
-            const reports = {
-                [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]: report,
-                [`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`]: chatReport,
-            };
-
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, report);
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, chatReport);
             await waitForBatchedUpdates();
@@ -5847,11 +5842,6 @@ describe('OptionsListUtils', () => {
 
     describe('reports parameter functionality', () => {
         it('getValidOptions should use reports parameter to look up chat reports', () => {
-            // Given a reports collection
-            const reportsCollection = {
-                ...REPORTS,
-            };
-
             // When we call getValidOptions with the reports collection
             const results = getValidOptions(
                 {reports: OPTIONS.reports, personalDetails: OPTIONS.personalDetails},
@@ -5891,11 +5881,6 @@ describe('OptionsListUtils', () => {
         });
 
         it('getSearchOptions should use reports parameter from config', () => {
-            // Given a reports collection
-            const reportsCollection = {
-                ...REPORTS,
-            };
-
             // When we call getSearchOptions with reports in the config
             const options = getSearchOptions({
                 options: OPTIONS,
@@ -5914,11 +5899,6 @@ describe('OptionsListUtils', () => {
         });
 
         it('getMemberInviteOptions should use reports parameter correctly', () => {
-            // Given personal details and a reports collection
-            const reportsCollection = {
-                ...REPORTS,
-            };
-
             // When we call getMemberInviteOptions with the reports parameter
             const results = getMemberInviteOptions(
                 OPTIONS.personalDetails,
@@ -5955,9 +5935,6 @@ describe('OptionsListUtils', () => {
         });
 
         it('should work correctly when reports is an empty object', () => {
-            // Given an empty reports collection
-            const emptyReports = {};
-
             // When we call getValidOptions with empty reports
             const results = getValidOptions(
                 {reports: OPTIONS.reports, personalDetails: OPTIONS.personalDetails},
@@ -6016,11 +5993,6 @@ describe('OptionsListUtils', () => {
                 reportName: 'Linked Chat Report',
             };
 
-            const reportsWithLinkedChat = {
-                [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]: expenseReport,
-                [`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`]: linkedChatReport,
-            };
-
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, expenseReport);
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, linkedChatReport);
             await waitForBatchedUpdates();
@@ -6049,11 +6021,6 @@ describe('OptionsListUtils', () => {
             const chatReport: Report = {
                 ...createRandomReport(1, undefined),
                 reportID: chatReportID,
-            };
-
-            const reportsCollection = {
-                [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]: report,
-                [`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`]: chatReport,
             };
 
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, report);
