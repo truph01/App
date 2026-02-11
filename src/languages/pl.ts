@@ -989,6 +989,12 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Zatwierdź swoją kartę i zacznij wydawać.',
                 cta: 'Aktywuj',
             },
+            reviewCardFraud: {
+                title: 'Sprawdź potencjalne oszustwo na swojej karcie Expensify',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Przejrzyj ${amount} potencjalnie oszukańczych transakcji u ${merchant}`,
+                subtitle: 'Karta Expensify',
+                cta: 'Przejrzyj',
+            },
             ctaFix: 'Napraw',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Napraw połączenie karty firmowej ${feedName}` : 'Napraw połączenie karty firmowej'),
@@ -5135,16 +5141,14 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                     ctaText: 'Żądanie wysłane',
                 },
                 bookOrManageYourTrip: {
-                    title: 'Zarezerwuj lub zarządzaj swoją podróżą',
-                    subtitle: 'Korzystaj z Expensify Travel, aby uzyskać najlepsze oferty podróży i zarządzać wszystkimi wydatkami służbowymi w jednym miejscu.',
-                    ctaText: 'Zarezerwuj lub zarządzaj',
+                    title: 'Rezerwacja podróży',
+                    subtitle: 'Gratulacje! Możesz już rezerwować i zarządzać podróżami w tym obszarze roboczym.',
+                    ctaText: 'Zarządzaj podróżami',
+                },
+                settings: {
+                    autoAddTripName: {title: 'Dodaj nazwy podróży do wydatków', subtitle: 'Automatycznie dodawaj nazwy podróży do opisów wydatków za podróże zarezerwowane w Expensify.'},
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Rezerwacja podróży',
-                        subtitle: 'Gratulacje! Wszystko gotowe, aby rezerwować i zarządzać podróżami w tym obszarze roboczym.',
-                        manageTravelLabel: 'Zarządzaj podróżami',
-                    },
                     centralInvoicingSection: {
                         title: 'Centralne fakturowanie',
                         subtitle: 'Skonsoliduj wszystkie wydatki na podróże w jednym miesięcznym rachunku zamiast płacić w momencie zakupu.',
@@ -6347,8 +6351,8 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 preventSelfApprovalsSubtitle: 'Uniemożliwij członkom przestrzeni roboczej zatwierdzanie własnych raportów wydatków.',
                 autoApproveCompliantReportsTitle: 'Automatycznie zatwierdzaj zgodne raporty',
                 autoApproveCompliantReportsSubtitle: 'Skonfiguruj, które raporty wydatków kwalifikują się do automatycznego zatwierdzania.',
-                autoApproveReportsUnderTitle: 'Automatycznie zatwierdzaj raporty poniżej',
-                autoApproveReportsUnderDescription: 'W pełni zgodne raporty wydatków poniżej tej kwoty zostaną zatwierdzone automatycznie.',
+                autoApproveReportsUnderTitle: 'Automatycznie zatwierdzaj raporty, gdy wszystkie wydatki są poniżej',
+                autoApproveReportsUnderDescription: 'W pełni zgodne raporty wydatków, w których wszystkie wydatki są poniżej tej kwoty, zostaną zatwierdzone automatycznie.',
                 randomReportAuditTitle: 'Losowa kontrola raportów',
                 randomReportAuditDescription: 'Wymagaj ręcznego zatwierdzania niektórych raportów, nawet jeśli kwalifikują się do automatycznego zatwierdzenia.',
                 autoPayApprovedReportsTitle: 'Automatycznie opłacaj zatwierdzone raporty',
@@ -7218,6 +7222,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             selectAllMatchingItems: 'Zaznacz wszystkie pasujące elementy',
             allMatchingItemsSelected: 'Zaznaczono wszystkie pasujące elementy',
         },
+        spendOverTime: 'Wydatki w czasie',
     },
     genericErrorPage: {
         title: 'Ups, coś poszło nie tak!',
