@@ -70,8 +70,6 @@ function IOURequestStepTime({
     const shouldShowNotFound = !isValidMoneyRequestType(iouType) || isEmptyObject(policy) || (isEditPage && isEmptyObject(transaction?.comment?.customUnit));
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const policiesWithPerDiemEnabled = useMemo(() => getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates(allPolicies, currentUserLogin), [allPolicies, currentUserLogin]);
-    const hasMoreThanOnePolicyWithPerDiemEnabled = policiesWithPerDiemEnabled.length > 1;
-    const hasCurrentPolicyPerDiemEnabled = !!policy?.arePerDiemRatesEnabled;
 
     const navigateBack = () => {
         if (isEditPage) {
@@ -87,7 +85,7 @@ function IOURequestStepTime({
         if (transaction?.isFromGlobalCreate || iouType === CONST.IOU.TYPE.TRACK) {
             // We want to navigate to destination step only when the first step was the workspace selector.
             // If there is only one policy with per diem enabled, we want to navigate back to the start step because there is no separate destination step in that flow.
-            if (hasMoreThanOnePolicyWithPerDiemEnabled && !hasCurrentPolicyPerDiemEnabled) {
+            if (hasMoreThanOnePolicyWithPerDiemEnabled) {
                 Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_DESTINATION.getRoute(action, iouType, transactionID, reportID));
                 return;
             }
