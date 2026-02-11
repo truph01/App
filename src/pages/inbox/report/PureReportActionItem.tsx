@@ -1823,7 +1823,7 @@ function PureReportActionItem({
                                             shouldUseLocalization={!isConciergeOptions && !actionContainsFollowUps}
                                             primaryTextNumberOfLines={actionableButtonsNoLines}
                                             styles={{
-                                                text: [isConciergeOptions || actionContainsFollowUps ? styles.textAlignLeft : undefined],
+                                                text: [isConciergeOptions || actionContainsFollowUps ? [styles.textAlignLeft, styles.breakWord] : undefined],
                                                 button: actionContainsFollowUps ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
                                                 container: [
                                                     actionContainsFollowUps && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
