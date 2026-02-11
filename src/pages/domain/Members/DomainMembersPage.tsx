@@ -25,7 +25,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const {domainAccountID} = route.params;
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['Profile']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Gear', 'DotIndicator']);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
 
@@ -38,7 +38,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         selector: memberAccountIDsSelector,
     });
 
-    const renderHeaderButtons = (
+    const headerContent = (
         <Button
             success
             onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADD_MEMBER.getRoute(domainAccountID))}
@@ -73,7 +73,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             onSelectRow={(item) => Navigation.navigate(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, item.accountID))}
             headerIcon={illustrations.Profile}
             getCustomRowProps={getCustomRowProps}
-            headerContent={renderHeaderButtons}
+            headerContent={headerContent}
             onDismissError={(item) => {
                 if (!defaultSecurityGroupID) {
                     return;
