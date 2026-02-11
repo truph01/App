@@ -2788,7 +2788,7 @@ function formatSectionsFromSearchTerm(
             section: {
                 title: undefined,
                 sectionIndex: 0,
-            data: shouldGetOptionDetails
+                data: shouldGetOptionDetails
                     ? selectedOptions.map((participant) => {
                           const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
                           if (isReportPolicyExpenseChat) {
@@ -2799,39 +2799,39 @@ function formatSectionsFromSearchTerm(
                           return getParticipantsOption(participant, personalDetails);
                       })
                     : selectedOptions,
+            },
+        };
+    }
+
+    const cleanSearchTerm = searchTerm.trim().toLowerCase();
+    // If you select a new user you don't have a contact for, they won't get returned as part of a recent report or personal details
+    // This will add them to the list of options, deduping them if they already exist in the other lists
+    const selectedParticipantsWithoutDetails = selectedOptions.filter((participant) => {
+        const accountID = participant.accountID ?? null;
+        const isPartOfSearchTerm = getPersonalDetailSearchTerms(participant, currentUserAccountID).join(' ').toLowerCase().includes(cleanSearchTerm);
+        const isReportInRecentReports = filteredRecentReports.some((report) => report.accountID === accountID) || filteredWorkspaceChats.some((report) => report.accountID === accountID);
+        const isReportInPersonalDetails = filteredPersonalDetails.some((personalDetail) => personalDetail.accountID === accountID);
+
+        return isPartOfSearchTerm && !isReportInRecentReports && !isReportInPersonalDetails;
+    });
+
+    return {
+        section: {
+            title: undefined,
+            sectionIndex: 0,
+            data: shouldGetOptionDetails
+                ? selectedParticipantsWithoutDetails.map((participant) => {
+                      const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
+                      if (isReportPolicyExpenseChat) {
+                          const expenseReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${participant.reportID}`];
+                          const chatReport = expenseReport?.chatReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.chatReportID}`] : undefined;
+                          return getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, expenseReport, chatReport, reportAttributesDerived);
+                      }
+                      return getParticipantsOption(participant, personalDetails);
+                  })
+                : selectedParticipantsWithoutDetails,
         },
     };
-}
-
-const cleanSearchTerm = searchTerm.trim().toLowerCase();
-// If you select a new user you don't have a contact for, they won't get returned as part of a recent report or personal details
-// This will add them to the list of options, deduping them if they already exist in the other lists
-const selectedParticipantsWithoutDetails = selectedOptions.filter((participant) => {
-    const accountID = participant.accountID ?? null;
-    const isPartOfSearchTerm = getPersonalDetailSearchTerms(participant, currentUserAccountID).join(' ').toLowerCase().includes(cleanSearchTerm);
-    const isReportInRecentReports = filteredRecentReports.some((report) => report.accountID === accountID) || filteredWorkspaceChats.some((report) => report.accountID === accountID);
-    const isReportInPersonalDetails = filteredPersonalDetails.some((personalDetail) => personalDetail.accountID === accountID);
-
-    return isPartOfSearchTerm && !isReportInRecentReports && !isReportInPersonalDetails;
-});
-
-return {
-    section: {
-        title: undefined,
-        sectionIndex: 0,
-        data: shouldGetOptionDetails
-            ? selectedParticipantsWithoutDetails.map((participant) => {
-                  const isReportPolicyExpenseChat = participant.isPolicyExpenseChat ?? false;
-                  if (isReportPolicyExpenseChat) {
-                      const expenseReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${participant.reportID}`];
-                      const chatReport = expenseReport?.chatReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.chatReportID}`] : undefined;
-                      return getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, expenseReport, chatReport, reportAttributesDerived);
-                  }
-                  return getParticipantsOption(participant, personalDetails);
-              })
-            : selectedParticipantsWithoutDetails,
-    },
-};
 }
 
 /**
