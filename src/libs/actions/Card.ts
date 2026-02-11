@@ -1,5 +1,5 @@
 import Onyx from 'react-native-onyx';
-import type {OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
+import type {OnyxCollection, OnyxUpdate} from 'react-native-onyx';
 import type {PartialDeep, ValueOf} from 'type-fest';
 import * as API from '@libs/API';
 import type {
@@ -53,14 +53,6 @@ type IssueNewCardFlowData = {
 };
 
 type CardOnyxUpdate = OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST | typeof ONYXKEYS.CARD_LIST>;
-
-let cardList: OnyxEntry<Record<string, Card>>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.CARD_LIST,
-    callback: (value) => {
-        cardList = value;
-    },
-});
 
 function reportVirtualExpensifyCardFraud(card: Card, validateCode: string) {
     const cardID = card?.cardID ?? CONST.DEFAULT_NUMBER_ID;
@@ -789,15 +781,15 @@ function buildCardListUpdates(workspaceAccountID: number, cardID: number, cardUp
     ];
 }
 
-function freezeCard(workspaceAccountID: number, cardID: number) {
-    const previousCard = cardList?.[String(cardID)];
-    const previousFrozen = previousCard?.nameValuePairs?.frozen ?? null;
+function freezeCard(workspaceAccountID: number, card: Card, currentUserAccountID: number) {
+    const cardID = card.cardID;
+    const previousFrozen = card?.nameValuePairs?.frozen ?? null;
 
     const frozenData: PartialDeep<Card> = {
         state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
         nameValuePairs: {
             frozen: {
-                byAccountID: previousCard?.accountID ?? CONST.DEFAULT_NUMBER_ID,
+                byAccountID: currentUserAccountID,
                 date: DateUtils.getDBTime(),
             },
             pendingFields: {frozen: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE},
@@ -815,7 +807,7 @@ function freezeCard(workspaceAccountID: number, cardID: number) {
         isLoading: false,
     });
     const failureData = buildCardListUpdates(workspaceAccountID, cardID, {
-        state: previousCard?.state ?? CONST.EXPENSIFY_CARD.STATE.OPEN,
+        state: card?.state ?? CONST.EXPENSIFY_CARD.STATE.OPEN,
         nameValuePairs: {
             frozen: previousFrozen,
             pendingFields: {frozen: null},
@@ -836,9 +828,9 @@ function freezeCard(workspaceAccountID: number, cardID: number) {
     });
 }
 
-function unfreezeCard(workspaceAccountID: number, cardID: number) {
-    const previousCard = cardList?.[String(cardID)];
-    const previousFrozen = previousCard?.nameValuePairs?.frozen ?? null;
+function unfreezeCard(workspaceAccountID: number, card: Card) {
+    const cardID = card.cardID;
+    const previousFrozen = card?.nameValuePairs?.frozen ?? null;
 
     const unfrozenData: PartialDeep<Card> = {
         state: CONST.EXPENSIFY_CARD.STATE.OPEN,
@@ -859,7 +851,7 @@ function unfreezeCard(workspaceAccountID: number, cardID: number) {
         isLoading: false,
     });
     const failureData = buildCardListUpdates(workspaceAccountID, cardID, {
-        state: previousCard?.state ?? CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
+        state: card?.state ?? CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
         nameValuePairs: {
             frozen: previousFrozen,
             pendingFields: {frozen: null},
