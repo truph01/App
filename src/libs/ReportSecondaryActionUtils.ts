@@ -558,7 +558,7 @@ function isHoldActionForTransaction(report: Report, reportTransaction: Transacti
 
     const isProcessingReport = isProcessingReportUtils(report);
 
-    return isProcessingReport;
+    return isProcessingReport && isAwaitingFirstLevelApproval(report);
 }
 
 function isChangeWorkspaceAction(report: Report, policies: OnyxCollection<Policy>, reportActions?: ReportAction[]): boolean {
