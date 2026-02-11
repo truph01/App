@@ -85,7 +85,7 @@ function useFilteredOptions(config: UseFilteredOptionsConfig = {}): UseFilteredO
 
     const options: OptionList | null =
         enabled && allReports && allPersonalDetails
-            ? createFilteredOptionList(allPersonalDetails, privateIsArchivedMap, allReports, currentUserPersonalDetails.accountID, reportAttributesDerived, {
+            ? createFilteredOptionList(allPersonalDetails, allReports, currentUserPersonalDetails.accountID, reportAttributesDerived, privateIsArchivedMap, {
                   maxRecentReports: reportsLimit,
                   includeP2P,
                   searchTerm,
