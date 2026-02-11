@@ -473,7 +473,7 @@ function mergeTransactionRequest({
             Log.warn("Can't find the iouAction for the transaction in the selfDM report.");
         } else {
             const {optimisticData, successData, failureData} = getDeleteTrackExpenseInformation(
-                selfDMReportID,
+                selfDMReport,
                 sourceTransaction.transactionID,
                 sourceIouAction,
                 false,
