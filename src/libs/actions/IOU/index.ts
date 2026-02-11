@@ -843,7 +843,6 @@ type GetSearchOnyxUpdateParams = {
 type DeleteTrackExpenseParams = {
     chatReportID: string | undefined;
     chatReport: OnyxEntry<OnyxTypes.Report> | undefined;
-    transactionThread: OnyxEntry<OnyxTypes.Report>;
     transactionID: string | undefined;
     reportAction: OnyxTypes.ReportAction;
     iouReport: OnyxEntry<OnyxTypes.Report>;
@@ -9391,7 +9390,6 @@ function deleteTrackExpense({
     chatReport,
     transactionID,
     reportAction,
-    transactionThread,
     iouReport,
     chatIOUReport,
     transactions,
