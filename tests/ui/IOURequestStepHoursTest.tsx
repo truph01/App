@@ -5,7 +5,6 @@ import Onyx from 'react-native-onyx';
 import {CurrentUserPersonalDetailsProvider} from '@components/CurrentUserPersonalDetailsProvider';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
-import * as IOU from '@libs/actions/IOU';
 import type Navigation from '@libs/Navigation/Navigation';
 import IOURequestStepHours from '@pages/iou/request/step/IOURequestStepHours';
 import type {IOUAction} from '@src/CONST';
@@ -69,10 +68,10 @@ describe('IOURequestStepHours', () => {
         jest.clearAllMocks();
         await signInWithTestUser(ACCOUNT_ID, ACCOUNT_LOGIN);
 
-        setMoneyRequestAmountSpy = jest.spyOn(IOU, 'setMoneyRequestAmount');
-        setMoneyRequestMerchantSpy = jest.spyOn(IOU, 'setMoneyRequestMerchant');
-        setMoneyRequestTimeCountSpy = jest.spyOn(IOU, 'setMoneyRequestTimeCount');
-        setMoneyRequestTimeRateSpy = jest.spyOn(IOU, 'setMoneyRequestTimeRate');
+        setMoneyRequestAmountSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestAmount');
+        setMoneyRequestMerchantSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestMerchant');
+        setMoneyRequestTimeCountSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestTimeCount');
+        setMoneyRequestTimeRateSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestTimeRate');
 
         await act(async () => {
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, createPolicyWithTimeTracking());

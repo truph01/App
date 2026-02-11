@@ -6,7 +6,7 @@ import HTMLEngineProvider from '@components/HTMLEngineProvider';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import type {MenuItemProps} from '@components/MenuItem';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
-import * as IOU from '@libs/actions/IOU';
+import {requestMoney} from '@libs/actions/IOU';
 import IOURequestStepConfirmation from '@pages/iou/request/step/IOURequestStepConfirmation';
 import type {IOUAction} from '@src/CONST';
 import CONST from '@src/CONST';
@@ -39,9 +39,9 @@ jest.mock('@rnmapbox/maps', () => ({
 }));
 
 jest.mock('@libs/actions/IOU', () => {
-    const actualNav = jest.requireActual<typeof IOU>('@libs/actions/IOU');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return {
-        ...actualNav,
+        ...jest.requireActual('@libs/actions/IOU'),
         startMoneyRequest: jest.fn(),
         requestMoney: jest.fn(() => ({iouReport: undefined})),
     };
@@ -328,7 +328,7 @@ describe('TimeExpenseConfirmationTest', () => {
             fireEvent.press(submitButton);
             await waitForBatchedUpdatesWithAct();
 
-            expect(IOU.requestMoney).toHaveBeenCalled();
+            expect(requestMoney).toHaveBeenCalled();
         });
 
         it('should show error when rate and hours result in too large amount', async () => {
@@ -353,7 +353,7 @@ describe('TimeExpenseConfirmationTest', () => {
             await waitForBatchedUpdatesWithAct();
 
             expect(screen.getByText(/total amount is too large/i)).toBeDefined();
-            expect(IOU.requestMoney).not.toHaveBeenCalled();
+            expect(requestMoney).not.toHaveBeenCalled();
         });
     });
 });

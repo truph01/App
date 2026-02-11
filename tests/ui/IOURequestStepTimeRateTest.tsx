@@ -3,7 +3,6 @@ import React from 'react';
 import Onyx from 'react-native-onyx';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
-import * as IOU from '@libs/actions/IOU';
 import IOURequestStepTimeRate from '@pages/iou/request/step/IOURequestStepTimeRate';
 import type {IOUAction} from '@src/CONST';
 import CONST from '@src/CONST';
@@ -75,9 +74,9 @@ describe('IOURequestStepTimeRate', () => {
         jest.clearAllMocks();
         await signInWithTestUser(ACCOUNT_ID, ACCOUNT_LOGIN);
 
-        setMoneyRequestAmountSpy = jest.spyOn(IOU, 'setMoneyRequestAmount');
-        setMoneyRequestMerchantSpy = jest.spyOn(IOU, 'setMoneyRequestMerchant');
-        setMoneyRequestTimeRateSpy = jest.spyOn(IOU, 'setMoneyRequestTimeRate');
+        setMoneyRequestAmountSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestAmount');
+        setMoneyRequestMerchantSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestMerchant');
+        setMoneyRequestTimeRateSpy = jest.spyOn(require('@libs/actions/IOU'), 'setMoneyRequestTimeRate');
     });
 
     afterEach(async () => {
