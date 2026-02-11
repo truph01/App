@@ -661,6 +661,10 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         const hasAtLeastOneNonAdminRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.ADMIN);
         const shouldShowChangeRoleAction = policy?.achAccount?.reimburser ? !selectedEmployees.includes(policy?.achAccount?.reimburser) : true;
 
+        if (hasAtLeastOneNonAdminRole) {
+            options.push(adminOption);
+        }
+
         if(!shouldShowChangeRoleAction) {
             return options;
         }
@@ -669,9 +673,6 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             options.push(memberOption);
         }
 
-        if (hasAtLeastOneNonAdminRole) {
-            options.push(adminOption);
-        }
 
         if (hasAtLeastOneNonAuditorRole && isControlPolicy(policy)) {
             options.push(auditorOption);
