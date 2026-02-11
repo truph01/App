@@ -32,8 +32,8 @@ import {
     setMoneyRequestParticipants,
     setMoneyRequestParticipantsFromReport,
     setMoneyRequestTag,
-    setSplitShares,
 } from '@userActions/IOU';
+import {setSplitShares} from '@userActions/IOU/Split';
 import {createDraftWorkspace} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -206,7 +206,7 @@ function IOURequestStepParticipants({
                 currentUserPersonalDetails.accountID,
                 shouldSetParticipantAutoAssignment ? isActivePolicyRequest : false,
             );
-            setTransactionReport(transaction.transactionID, {reportID: selfDMReportID}, true);
+            setTransactionReport(transaction.transactionID, {reportID: CONST.REPORT.UNREPORTED_REPORT_ID}, true);
         }
         const iouConfirmationPageRoute = ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, CONST.IOU.TYPE.TRACK, initialTransactionID, selfDMReportID);
         waitForKeyboardDismiss(() => {

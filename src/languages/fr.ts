@@ -993,6 +993,12 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Validez votre carte et commencez à dépenser.',
                 cta: 'Activer',
             },
+            reviewCardFraud: {
+                title: 'Examiner un risque potentiel de fraude sur votre carte Expensify',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Examiner ${amount} de fraude potentielle chez ${merchant}`,
+                subtitle: 'Carte Expensify',
+                cta: 'Examiner',
+            },
             ctaFix: 'Corriger',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corriger la connexion de la carte d'entreprise ${feedName}` : 'Corriger la connexion de la carte entreprise'),
@@ -7282,6 +7288,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             selectAllMatchingItems: 'Sélectionnez tous les éléments correspondants',
             allMatchingItemsSelected: 'Tous les éléments correspondants sont sélectionnés',
         },
+        spendOverTime: 'Dépenses dans le temps',
     },
     genericErrorPage: {
         title: 'Oups, quelque chose s’est mal passé !',
@@ -7562,8 +7569,8 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
     },
     cardTransactions: {
         notActivated: 'Non activé',
-        outOfPocket: 'Dépenses personnelles',
-        companySpend: 'Dépenses de l’entreprise',
+        outOfPocket: 'Remboursable',
+        companySpend: 'Non remboursable',
     },
     distance: {
         addStop: 'Ajouter un arrêt',
@@ -8403,6 +8410,8 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             disableSamlRequired: 'Désactiver SAML obligatoire',
             oktaWarningPrompt: 'Voulez-vous continuer ? Cela désactivera également Okta SCIM.',
             requireWithEmptyMetadataError: "Veuillez ajouter ci-dessous les métadonnées du fournisseur d'identité pour activer",
+            pleaseDisableTwoFactorAuth: (twoFactorAuthSettingsUrl: string) =>
+                `<muted-text>Désactivez <a href="${twoFactorAuthSettingsUrl}">forcer l’authentification à deux facteurs</a> pour activer la connexion SAML.</muted-text>`,
         },
         samlConfigurationDetails: {
             title: 'Détails de configuration SAML',
@@ -8452,7 +8461,6 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             primaryContact: 'Contact principal',
             addPrimaryContact: 'Ajouter un contact principal',
             setPrimaryContactError: 'Impossible de définir le contact principal. Veuillez réessayer plus tard.',
-            settings: 'Paramètres',
             consolidatedDomainBilling: 'Facturation de domaine consolidée',
             consolidatedDomainBillingDescription: (domainName: string) =>
                 `<comment><muted-text-label>Lorsque cette option est activée, le contact principal paiera pour tous les espaces de travail appartenant aux membres de <strong>${domainName}</strong> et recevra tous les reçus de facturation.</muted-text-label></comment>`,
@@ -8487,7 +8495,13 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
                 removeMember: 'Impossible de supprimer cet utilisateur. Veuillez réessayer.',
                 addMember: 'Impossible d’ajouter ce membre. Veuillez réessayer.',
             },
+            forceTwoFactorAuth: 'Imposer l’authentification à deux facteurs',
+            forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
+                `<muted-text>Veuillez désactiver <a href="${samlPageUrl}">SAML</a> pour imposer l’authentification à deux facteurs.</muted-text>`,
+            forceTwoFactorAuthDescription: `<muted-text>Exiger l’authentification à deux facteurs pour tous les membres de ce domaine. Les membres du domaine seront invités à configurer l’authentification à deux facteurs sur leur compte lorsqu’ils se connectent.</muted-text>`,
+            forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
         },
+        common: {settings: 'Paramètres'},
     },
 };
 export default translations;
