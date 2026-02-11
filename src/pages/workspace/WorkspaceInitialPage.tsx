@@ -170,6 +170,7 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
             isUberForBusinessEnabled,
             policy?.isTravelEnabled,
             isPolicyTimeTrackingEnabled,
+            policy?.type
         ],
     ) as PolicyFeatureStates;
 
