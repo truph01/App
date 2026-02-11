@@ -154,6 +154,7 @@ function SettlementButton({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
+    const isPayInvoiceViaExpensifyBetaEnabled = isBetaEnabled(CONST.BETAS.PAY_INVOICE_VIA_EXPENSIFY);
     const hasViolations = hasViolationsReportUtils(iouReport?.reportID, transactionViolations, accountID, email ?? '');
 
     const isInvoiceReport = (!isEmptyObject(iouReport) && isInvoiceReportUtil(iouReport)) || false;
@@ -337,7 +338,7 @@ function SettlementButton({
         }
 
         if (isInvoiceReport) {
-            const isCurrencySupported = isCurrencySupportedForGlobalReimbursement(currency as CurrencyType);
+            const showPayViaExpensifyOptions = isPayInvoiceViaExpensifyBetaEnabled && isCurrencySupportedForGlobalReimbursement(currency as CurrencyType);
             const hasActivePolicyAsAdmin = !!activePolicy && isPolicyAdmin(activePolicy) && isPaidGroupPolicy(activePolicy);
 
             const isActivePolicyCurrencySupported = isCurrencySupportedForDirectReimbursement(activePolicy?.outputCurrency ?? '');
@@ -379,8 +380,8 @@ function SettlementButton({
                     value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                 };
                 return [
-                    ...(isCurrencySupported ? getPaymentSubItems(payAsBusiness) : []),
-                    ...(isCurrencySupported && isPolicyCurrencySupported ? [addBankAccountItem] : []),
+                    ...(showPayViaExpensifyOptions ? getPaymentSubItems(payAsBusiness) : []),
+                    ...(showPayViaExpensifyOptions && isPolicyCurrencySupported ? [addBankAccountItem] : []),
                     {
                         text: translate('iou.payElsewhere', {formattedAmount: ''}),
                         icon: icons.Cash,
@@ -445,6 +446,7 @@ function SettlementButton({
         activeAdminPolicies,
         checkForNecessaryAction,
         icons,
+        isPayInvoiceViaExpensifyBetaEnabled,
     ]);
 
     const selectPaymentType = (event: KYCFlowEvent, iouPaymentType: PaymentMethodType) => {
