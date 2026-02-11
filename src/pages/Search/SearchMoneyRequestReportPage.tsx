@@ -86,7 +86,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
             }
             Navigation.dismissModal();
         }
-    }, [prevReport]);
+    }, [report]);
 
     useEffect(() => {
         // Update last visit time when the expense super wide RHP report is focused
