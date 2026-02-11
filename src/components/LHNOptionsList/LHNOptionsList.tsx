@@ -237,7 +237,7 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
                 movedFromReport,
                 movedToReport,
                 policy: itemPolicy,
-                isReportArchived,
+                isReportArchived: !!itemReportNameValuePairs?.private_isArchived,
                 policyForMovingExpensesID,
                 reportMetadata: itemReportMetadata,
                 chatReport,

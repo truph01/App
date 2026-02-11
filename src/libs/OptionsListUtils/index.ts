@@ -465,7 +465,7 @@ function getAlternateText(
     reportAttributesDerived?: ReportAttributesDerivedValue['reports'],
 ) {
     const report = getReportOrDraftReport(option.reportID);
-    const chatReport = getReportOrDraftReport(report?.chatReportID);
+    const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
     const isAdminRoom = reportUtilsIsAdminRoom(report);
     const isAnnounceRoom = reportUtilsIsAnnounceRoom(report);
     const isGroupChat = reportUtilsIsGroupChat(report);
@@ -1015,7 +1015,7 @@ function getReportOption(
     reportDrafts?: OnyxCollection<Report>,
 ): OptionData {
     const report = getReportOrDraftReport(participant.reportID, undefined, undefined, reportDrafts);
-    const chatReport = report?.chatReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
+    const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
     const visibleParticipantAccountIDs = getParticipantsAccountIDsForDisplay(report, true);
 
     const option = createOption(
@@ -1293,7 +1293,7 @@ function createOptionList(
 
     if (reports) {
         for (const report of Object.values(reports)) {
-            const chatReport = report?.chatReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
+            const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
             const {reportMapEntry, reportOption} = processReport(report, personalDetails, currentUserAccountID, chatReport, reportAttributesDerived);
 
             if (reportMapEntry) {
@@ -1310,7 +1310,7 @@ function createOptionList(
     const allPersonalDetailsOptions = Object.values(personalDetails ?? {}).map((personalDetail) => {
         const report = reportMapForAccountIDs[personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID];
         const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`];
-        const chatReport = report?.chatReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
+        const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
 
         return {
             item: personalDetail,
@@ -1415,7 +1415,7 @@ function createFilteredOptionList(
     // Step 5: Process the limited set of reports (performance optimization)
     const reportOptions: Array<SearchOption<Report>> = [];
     for (const report of limitedReports) {
-        const chatReport = report?.chatReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
+        const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
         const {reportMapEntry, reportOption} = processReport(report, personalDetails, currentUserAccountID, chatReport, reportAttributesDerived);
 
         if (reportMapEntry) {
@@ -1446,7 +1446,7 @@ function createFilteredOptionList(
 
               const report = reportMapForAccountIDs[accountID];
               const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`];
-              const chatReport = report?.chatReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
+              const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
               return {
                   item: personalDetail,
                   ...createOption(
@@ -2220,7 +2220,6 @@ function getRestrictedLogins(
 /**
  * Options are reports and personal details. This function filters out the options that are not valid to be displayed.
  */
-// eslint-disable-next-line @typescript-eslint/max-params
 function getValidOptions(
     options: OptionList,
     policiesCollection: OnyxCollection<Policy>,
@@ -2679,7 +2678,6 @@ function formatMemberForList(member: SearchOptionData): MemberForList {
  * Build the options for the Workspace Member Invite view
  * This method will be removed. See https://github.com/Expensify/App/issues/66615 for more information.
  */
-// eslint-disable-next-line @typescript-eslint/max-params
 function getMemberInviteOptions(
     personalDetails: Array<SearchOption<PersonalDetails>>,
     nvpDismissedProductTraining: OnyxEntry<DismissedProductTraining>,

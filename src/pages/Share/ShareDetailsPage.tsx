@@ -56,7 +56,6 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
 
     const [reportAttributesDerived] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
-    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
     const personalDetails = usePersonalDetails();
     const personalDetail = useCurrentUserPersonalDetails();
     const isTextShared = currentAttachment?.mimeType === CONST.SHARE_FILE_MIMETYPE.TXT;
@@ -69,7 +68,7 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
     const privateIsArchivedMap = usePrivateIsArchivedMap();
     const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`];
     const ancestors = useAncestors(report);
-    const chatReport = report?.chatReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`] : undefined;
+    const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`, {canBeMissing: true});
     const displayReport = useMemo(
         () => getReportDisplayOption(report, unknownUserDetails, personalDetail.accountID, personalDetails, privateIsArchived, chatReport, reportAttributesDerived),
         [report, unknownUserDetails, personalDetails, privateIsArchived, reportAttributesDerived, personalDetail.accountID, chatReport],
