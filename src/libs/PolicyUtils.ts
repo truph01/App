@@ -80,6 +80,13 @@ Onyx.connect({
 });
 
 /**
+ * Returns true if the policy has no fieldList or its fieldList is empty.
+ */
+function isPolicyFieldListEmpty(policy: OnyxEntry<Policy>): boolean {
+    return !policy?.fieldList || Object.keys(policy.fieldList).length === 0;
+}
+
+/**
  * Filter out the active policies, which will exclude policies with pending deletion
  * and policies the current user doesn't belong to.
  * These are policies that we can use to create reports with in NewDot.
@@ -2005,6 +2012,7 @@ export {
     hasEligibleActiveAdminFromWorkspaces,
     isPolicyEmployee,
     isPolicyFeatureEnabled,
+    isPolicyFieldListEmpty,
     getUberConnectionErrorDirectlyFromPolicy,
     isPolicyOwner,
     isPolicyMember,
