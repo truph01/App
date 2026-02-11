@@ -686,29 +686,25 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                         customTagName={policyTagLists.at(0)?.name ?? ''}
                         shouldShow={!hasDependentTags && !hasIndependentTags}
                     />
+                ) : hasDependentTags ? (
+                    <View style={[styles.renderHTML]}>
+                        <RenderHTML
+                            html={translate(
+                                'workspace.tags.dependentMultiLevelTagsSubtitle',
+                                isQuickSettingsFlow
+                                    ? `${environmentURL}/${ROUTES.SETTINGS_TAGS_IMPORT.getRoute(policyID, ROUTES.SETTINGS_TAGS_ROOT.getRoute(policyID, backTo))}`
+                                    : `${environmentURL}/${ROUTES.WORKSPACE_TAGS_IMPORT_OPTIONS.getRoute(policyID)}`,
+                            ).replace('<muted-text>', `<muted-text>${translate('workspace.tags.subtitle')}\n`)}
+                        />
+                    </View>
                 ) : (
-                    <>
-                        {hasDependentTags ? (
-                            <View style={[styles.renderHTML]}>
-                                <RenderHTML
-                                    html={translate(
-                                        'workspace.tags.dependentMultiLevelTagsSubtitle',
-                                        isQuickSettingsFlow
-                                            ? `${environmentURL}/${ROUTES.SETTINGS_TAGS_IMPORT.getRoute(policyID, ROUTES.SETTINGS_TAGS_ROOT.getRoute(policyID, backTo))}`
-                                            : `${environmentURL}/${ROUTES.WORKSPACE_TAGS_IMPORT_OPTIONS.getRoute(policyID)}`,
-                                    ).replace('<muted-text>', `<muted-text>${translate('workspace.tags.subtitle')}\n`)}
-                                />
-                            </View>
+                    <Text style={[styles.textNormal, styles.colorMuted]}>
+                        {!hasIndependentTags && !!policyTagLists.at(0)?.name ? (
+                            <EmployeesSeeTagsAsText customTagName={policyTagLists.at(0)?.name ?? ''} />
                         ) : (
-                            <Text style={[styles.textNormal, styles.colorMuted]}>
-                                {!hasIndependentTags && !!policyTagLists.at(0)?.name ? (
-                                    <EmployeesSeeTagsAsText customTagName={policyTagLists.at(0)?.name ?? ''} />
-                                ) : (
-                                    translate('workspace.tags.subtitle')
-                                )}
-                            </Text>
+                            translate('workspace.tags.subtitle')
                         )}
-                    </>
+                    </Text>
                 )}
             </View>
             {tagList.length > CONST.SEARCH_ITEM_LIMIT && (
