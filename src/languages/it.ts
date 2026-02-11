@@ -988,6 +988,12 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Convalida la tua carta e inizia a spendere.',
                 cta: 'Attiva',
             },
+            reviewCardFraud: {
+                title: 'Verifica un potenziale uso fraudolento della tua Expensify Card',
+                titleWithDetails: ({amount, merchant}: {amount: string; merchant: string}) => `Verifica ${amount} di potenziale frode presso ${merchant}`,
+                subtitle: 'Carta Expensify',
+                cta: 'Rivedi',
+            },
             ctaFix: 'Correggi',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Correggi la connessione della carta aziendale ${feedName}` : 'Correggi connessione carta aziendale'),
@@ -5153,16 +5159,17 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                     ctaText: 'Richiesta inviata',
                 },
                 bookOrManageYourTrip: {
-                    title: 'Prenota o gestisci il tuo viaggio',
-                    subtitle: 'Usa Expensify Travel per ottenere le migliori offerte di viaggio e gestire tutte le spese di lavoro in un unico posto.',
-                    ctaText: 'Prenota o gestisci',
+                    title: 'Prenotazione di viaggio',
+                    subtitle: 'Complimenti! Ora sei pronto per prenotare e gestire i viaggi in questo spazio di lavoro.',
+                    ctaText: 'Gestisci viaggi',
+                },
+                settings: {
+                    autoAddTripName: {
+                        title: 'Aggiungi nomi di viaggi alle spese',
+                        subtitle: 'Aggiungi automaticamente i nomi dei viaggi alle descrizioni delle spese per i viaggi prenotati in Expensify.',
+                    },
                 },
                 travelInvoicing: {
-                    travelBookingSection: {
-                        title: 'Prenotazione viaggi',
-                        subtitle: 'Complimenti! Ora sei prontə per prenotare e gestire i viaggi in questo spazio di lavoro.',
-                        manageTravelLabel: 'Gestisci viaggi',
-                    },
                     centralInvoicingSection: {
                         title: 'Fatturazione centralizzata',
                         subtitle: 'Centralizza tutte le spese di viaggio in una fattura mensile invece di pagare al momento dell’acquisto.',
@@ -7247,6 +7254,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             selectAllMatchingItems: 'Seleziona tutti gli elementi corrispondenti',
             allMatchingItemsSelected: 'Tutti gli elementi corrispondenti sono stati selezionati',
         },
+        spendOverTime: 'Spesa nel tempo',
     },
     genericErrorPage: {
         title: 'Oops, qualcosa è andato storto!',
