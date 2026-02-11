@@ -1,8 +1,8 @@
 type PullRequest = {
-    html_url: string;
+    htmlUrl: string;
     user: {login: string} | null;
-    merged_at: string | null;
-    base: {ref: string};
+    mergedAt: string | null;
+    baseRef: string;
     number: number;
 };
 
@@ -16,7 +16,7 @@ type PullRequest = {
  * targeting the correct base branch to avoid blaming the wrong PR.
  */
 function getMergedPR(associatedPRs: PullRequest[], targetBranch = 'main'): PullRequest | undefined {
-    return associatedPRs.find((pr) => pr.merged_at !== null && pr.base.ref === targetBranch) ?? associatedPRs[0];
+    return associatedPRs.find((pr) => pr.mergedAt !== null && pr.baseRef === targetBranch) ?? associatedPRs.at(0);
 }
 
 export default getMergedPR;

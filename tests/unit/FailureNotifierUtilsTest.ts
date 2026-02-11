@@ -6,26 +6,26 @@ import type {PullRequest} from '@github/libs/failureNotifierUtils';
 
 describe('getMergedPR', () => {
     const mergedPR: PullRequest = {
-        html_url: 'https://github.com/Expensify/App/pull/82016',
-        user: {login: 'neil-marcellini'},
-        merged_at: '2026-02-10T17:00:00Z',
-        base: {ref: 'main'},
+        htmlUrl: 'https://github.com/Expensify/App/pull/82016',
+        user: {login: 'test-user'},
+        mergedAt: '2026-02-10T17:00:00Z',
+        baseRef: 'main',
         number: 82016,
     };
 
     const openPRWithMainMerged: PullRequest = {
-        html_url: 'https://github.com/Expensify/App/pull/80254',
-        user: {login: 'neil-marcellini'},
-        merged_at: null,
-        base: {ref: 'main'},
+        htmlUrl: 'https://github.com/Expensify/App/pull/80254',
+        user: {login: 'test-user'},
+        mergedAt: null,
+        baseRef: 'main',
         number: 80254,
     };
 
     const openPRDifferentBase: PullRequest = {
-        html_url: 'https://github.com/Expensify/App/pull/99999',
-        user: {login: 'someone-else'},
-        merged_at: null,
-        base: {ref: 'staging'},
+        htmlUrl: 'https://github.com/Expensify/App/pull/99999',
+        user: {login: 'other-user'},
+        mergedAt: null,
+        baseRef: 'staging',
         number: 99999,
     };
 
@@ -38,7 +38,7 @@ describe('getMergedPR', () => {
 
         // Should pick the actually-merged PR, not the open one
         expect(result?.number).toBe(82016);
-        expect(result?.merged_at).not.toBeNull();
+        expect(result?.mergedAt).not.toBeNull();
     });
 
     it('should return the merged PR even when it appears first', () => {
@@ -53,8 +53,8 @@ describe('getMergedPR', () => {
         const mergedToStaging: PullRequest = {
             ...mergedPR,
             number: 11111,
-            base: {ref: 'staging'},
-            merged_at: '2026-02-10T18:00:00Z',
+            baseRef: 'staging',
+            mergedAt: '2026-02-10T18:00:00Z',
         };
 
         const associatedPRs = [mergedToStaging, mergedPR];
