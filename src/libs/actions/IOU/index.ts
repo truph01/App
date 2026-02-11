@@ -3016,7 +3016,6 @@ function buildOnyxDataForTrackExpense({
 
 function getDeleteTrackExpenseInformation(
     chatReport: OnyxEntry<OnyxTypes.Report>,
-    transactionThread: OnyxEntry<OnyxTypes.Report>,
     transactionID: string | undefined,
     reportAction: OnyxTypes.ReportAction,
     isChatReportArchived: boolean | undefined,
@@ -5878,7 +5877,6 @@ const getConvertTrackedExpenseInformation = (
         failureData: deleteFailureData,
     } = getDeleteTrackExpenseInformation(
         allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${linkedTrackedExpenseReportID}`],
-        allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${linkedTrackedExpenseReportAction?.childReportID}`],
         transactionID,
         linkedTrackedExpenseReportAction,
         isLinkedTrackedExpenseReportArchived,
@@ -9440,7 +9438,6 @@ function deleteTrackExpense({
     const actionableWhisperReportActionID = whisperAction?.reportActionID;
     const {parameters, optimisticData, successData, failureData} = getDeleteTrackExpenseInformation(
         chatReport,
-        transactionThread,
         transactionID,
         reportAction,
         isChatReportArchived,
