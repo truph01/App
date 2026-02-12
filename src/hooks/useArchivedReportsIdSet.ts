@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import {isArchivedReport} from '@libs/ReportUtils';
 import type {ArchivedReportsIDSet} from '@libs/SearchUIUtils';
@@ -31,7 +32,7 @@ function useArchivedReportsIdSet(): ArchivedReportsIDSet {
     const [reportNameValuePairs] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {
         canBeMissing: true,
     });
-    const archivedReportsIdSet = getArchivedReportsIdSet(reportNameValuePairs) ?? CONST.EMPTY_SET;
+    const archivedReportsIdSet = useMemo(() => getArchivedReportsIdSet(reportNameValuePairs) ?? CONST.EMPTY_SET, [reportNameValuePairs]);
 
     // useDeepCompareRef is used here to prevent unnecessary re-renders by maintaining referential equality
     // when the Set contents are the same, even if it's a new Set instance. This is important for performance
