@@ -1,8 +1,7 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import type {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {View} from 'react-native';
 import Animated from 'react-native-reanimated';
-import type {YAxisUnit, YAxisUnitPosition} from '@components/Charts';
 import type {
     TransactionCardGroupListItemType,
     TransactionCategoryGroupListItemType,
@@ -146,45 +145,36 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll}: 
     const styles = useThemeStyles();
     const {translate, preferredLocale} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Users', 'CreditCard', 'Send', 'Folder', 'Basket', 'Tag', 'Calendar'] as const);
+    const icons = useMemoizedLazyExpensifyIcons(['Users', 'CreditCard', 'Send', 'Folder', 'Basket', 'Tag', 'Calendar']);
     const {titleIconName, getLabel, getFilterQuery} = CHART_GROUP_BY_CONFIG[groupBy];
     const titleIcon = icons[titleIconName];
     const title = translate(`search.chartTitles.${groupBy}`);
     const ChartComponent = CHART_VIEW_TO_COMPONENT[view];
 
-    const handleItemPress = useCallback(
-        (filterQuery: string) => {
-            const currentQueryString = buildSearchQueryString(queryJSON);
-            const newQueryJSON = buildSearchQueryJSON(`${currentQueryString} ${filterQuery}`);
+    const handleItemPress = (filterQuery: string) => {
+        const currentQueryString = buildSearchQueryString(queryJSON);
+        const newQueryJSON = buildSearchQueryJSON(`${currentQueryString} ${filterQuery}`);
 
-            if (!newQueryJSON) {
-                Log.alert('[SearchChartView] Failed to build search query JSON from filter query');
-                return;
-            }
+        if (!newQueryJSON) {
+            Log.alert('[SearchChartView] Failed to build search query JSON from filter query');
+            return;
+        }
 
-            newQueryJSON.groupBy = undefined;
-            newQueryJSON.view = CONST.SEARCH.VIEW.TABLE;
+        newQueryJSON.groupBy = undefined;
+        newQueryJSON.view = CONST.SEARCH.VIEW.TABLE;
 
-            const newQueryString = buildSearchQueryString(newQueryJSON);
-            Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: newQueryString}));
-        },
-        [queryJSON],
-    );
+        const newQueryString = buildSearchQueryString(newQueryJSON);
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: newQueryString}));
+    };
 
-    const {yAxisUnit, yAxisUnitPosition} = useMemo((): {yAxisUnit: YAxisUnit; yAxisUnitPosition: YAxisUnitPosition} => {
-        const firstItem = data.at(0);
-        const currency = firstItem?.currency ?? 'USD';
-
-        const parts = formatToParts(preferredLocale, 0, {style: 'currency', currency});
-        const currencyPart = parts.find((p) => p.type === 'currency');
-        const currencyIndex = parts.findIndex((p) => p.type === 'currency');
-        const integerIndex = parts.findIndex((p) => p.type === 'integer');
-
-        return {
-            yAxisUnit: {value: currencyPart?.value ?? currency, fallback: currency},
-            yAxisUnitPosition: currencyIndex < integerIndex ? 'left' : 'right',
-        };
-    }, [data, preferredLocale]);
+    const firstItem = data.at(0);
+    const currency = firstItem?.currency ?? 'USD';
+    const parts = formatToParts(preferredLocale, 0, {style: 'currency', currency});
+    const currencyPart = parts.find((p) => p.type === 'currency');
+    const currencyIndex = parts.findIndex((p) => p.type === 'currency');
+    const integerIndex = parts.findIndex((p) => p.type === 'integer');
+    const yAxisUnit = {value: currencyPart?.value ?? currency, fallback: currency};
+    const yAxisUnitPosition = currencyIndex < integerIndex ? 'left' : 'right';
 
     return (
         <Animated.ScrollView

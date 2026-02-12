@@ -1,5 +1,4 @@
 import type {SkFont} from '@shopify/react-native-skia';
-import {useCallback} from 'react';
 import type {ChartDataPoint, YAxisUnit, YAxisUnitPosition} from '@components/Charts/types';
 import useLocalize from '@hooks/useLocalize';
 import {LABEL_ROTATIONS} from './useChartLabelLayout';
@@ -32,15 +31,7 @@ function resolveDisplayUnit(font: SkFont | null, yAxisUnit: YAxisUnit | undefine
         return undefined;
     }
 
-    if (!font) {
-        return yAxisUnit.value;
-    }
-
-    if (canFontRenderText(font, yAxisUnit.value)) {
-        return yAxisUnit.value;
-    }
-
-    return yAxisUnit.fallback;
+    return !font || canFontRenderText(font, yAxisUnit.value) ? yAxisUnit.value : yAxisUnit.fallback;
 }
 
 export default function useChartLabelFormats({data, font, yAxisUnit, yAxisUnitPosition = 'left', labelSkipInterval = 1, labelRotation = 0, truncatedLabels}: UseChartLabelFormatsProps) {
@@ -48,37 +39,31 @@ export default function useChartLabelFormats({data, font, yAxisUnit, yAxisUnitPo
 
     const displayUnit = resolveDisplayUnit(font, yAxisUnit);
 
-    const formatYAxisLabel = useCallback(
-        (value: number) => {
-            const formatted = numberFormat(value);
-            if (!displayUnit) {
-                return formatted;
-            }
-            // Add space for multi-character codes (e.g., "PLN 100") but not for symbols (e.g., "$100")
-            const separator = displayUnit.length > 1 ? ' ' : '';
-            return yAxisUnitPosition === 'left' ? `${displayUnit}${separator}${formatted}` : `${formatted}${separator}${displayUnit}`;
-        },
-        [displayUnit, yAxisUnitPosition, numberFormat],
-    );
+    const formatYAxisLabel = (value: number) => {
+        const formatted = numberFormat(value);
+        if (!displayUnit) {
+            return formatted;
+        }
+        // Add space for multi-character codes (e.g., "PLN 100") but not for symbols (e.g., "$100")
+        const separator = displayUnit.length > 1 ? ' ' : '';
+        return yAxisUnitPosition === 'left' ? `${displayUnit}${separator}${formatted}` : `${formatted}${separator}${displayUnit}`;
+    };
 
-    const formatXAxisLabel = useCallback(
-        (value: number) => {
-            const index = Math.round(value);
+    const formatXAxisLabel = (value: number) => {
+        const index = Math.round(value);
 
-            // Skip labels based on calculated interval
-            if (index % labelSkipInterval !== 0) {
-                return '';
-            }
+        // Skip labels based on calculated interval
+        if (index % labelSkipInterval !== 0) {
+            return '';
+        }
 
-            // Use pre-truncated labels
-            // If rotation is vertical (-90), we usually want full labels
-            // because they have more space vertically.
-            const sourceToUse = labelRotation === -LABEL_ROTATIONS.VERTICAL || !truncatedLabels ? data.map((p) => p.label) : truncatedLabels;
+        // Use pre-truncated labels
+        // If rotation is vertical (-90), we usually want full labels
+        // because they have more space vertically.
+        const sourceToUse = labelRotation === -LABEL_ROTATIONS.VERTICAL || !truncatedLabels ? data.map((p) => p.label) : truncatedLabels;
 
-            return sourceToUse.at(index) ?? '';
-        },
-        [labelSkipInterval, labelRotation, truncatedLabels, data],
-    );
+        return sourceToUse.at(index) ?? '';
+    };
 
     return {
         formatXAxisLabel,

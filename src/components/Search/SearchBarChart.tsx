@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import {BarChart} from '@components/Charts';
 import type {ChartDataPoint, YAxisUnit, YAxisUnitPosition} from '@components/Charts';
 import {convertToFrontendAmountAsInteger} from '@libs/CurrencyUtils';
@@ -36,34 +36,29 @@ type SearchBarChartProps = {
 
 function SearchBarChart({data, title, titleIcon, getLabel, getFilterQuery, onItemPress, isLoading, yAxisUnit, yAxisUnitPosition}: SearchBarChartProps) {
     // Transform grouped transaction data to BarChart format
-    const chartData: ChartDataPoint[] = useMemo(() => {
-        return data.map((item) => {
-            const currency = item.currency ?? 'USD';
-            const totalInDisplayUnits = convertToFrontendAmountAsInteger(item.total ?? 0, currency);
+    const chartData: ChartDataPoint[] = data.map((item) => {
+        const currency = item.currency ?? 'USD';
+        const totalInDisplayUnits = convertToFrontendAmountAsInteger(item.total ?? 0, currency);
 
-            return {
-                label: getLabel(item),
-                total: totalInDisplayUnits,
-            };
-        });
-    }, [data, getLabel]);
+        return {
+            label: getLabel(item),
+            total: totalInDisplayUnits,
+        };
+    });
 
-    const handleBarPress = useCallback(
-        (dataPoint: ChartDataPoint, index: number) => {
-            if (!onItemPress) {
-                return;
-            }
+    const handleBarPress = (dataPoint: ChartDataPoint, index: number) => {
+        if (!onItemPress) {
+            return;
+        }
 
-            const item = data.at(index);
-            if (!item) {
-                return;
-            }
+        const item = data.at(index);
+        if (!item) {
+            return;
+        }
 
-            const filterQuery = getFilterQuery(item);
-            onItemPress(filterQuery);
-        },
-        [data, getFilterQuery, onItemPress],
-    );
+        const filterQuery = getFilterQuery(item);
+        onItemPress(filterQuery);
+    };
 
     return (
         <BarChart
