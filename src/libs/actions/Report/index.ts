@@ -3,7 +3,7 @@ import {format as timezoneFormat, toZonedTime} from 'date-fns-tz';
 import {Str} from 'expensify-common';
 import isEmpty from 'lodash/isEmpty';
 import {DeviceEventEmitter, InteractionManager, Linking} from 'react-native';
-import type {NullishDeep, OnyxCollection, OnyxCollectionInputValue, OnyxEntry, OnyxKey, OnyxUpdate} from 'react-native-onyx';
+import type {NullishDeep, OnyxCollection, OnyxCollectionInputValue, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {PartialDeep, ValueOf} from 'type-fest';
 import type {Emoji} from '@assets/emojis/types';
@@ -5917,14 +5917,31 @@ function buildReportIDToThreadsReportIDsMap(): Record<string, string[]> {
  * @private
  * Recursively updates the policyID for a report and all its child reports.
  */
-function updatePolicyIdForReportAndThreads<TKey extends OnyxKey>(
+function updatePolicyIdForReportAndThreads(
     currentReportID: string,
     policyID: string,
     reportIDToThreadsReportIDsMap: Record<string, string[]>,
-    optimisticData: Array<OnyxUpdate<TKey | typeof ONYXKEYS.COLLECTION.REPORT>>,
-    failureData: Array<OnyxUpdate<TKey | typeof ONYXKEYS.COLLECTION.REPORT>>,
+    optimisticData: Array<
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.SNAPSHOT
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
+            | typeof ONYXKEYS.COLLECTION.NEXT_STEP
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION
+        >
+    >,
+    failureData: Array<
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.NEXT_STEP
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION
+        >
+    >,
 ) {
-    const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${currentReportID}`;
+    const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${currentReportID}` as const;
     const currentReport = allReports?.[reportKey];
     const originalPolicyID = currentReport?.policyID;
 
@@ -5933,12 +5950,12 @@ function updatePolicyIdForReportAndThreads<TKey extends OnyxKey>(
             onyxMethod: Onyx.METHOD.MERGE,
             key: reportKey,
             value: {policyID},
-        } as OnyxUpdate<TKey | typeof ONYXKEYS.COLLECTION.REPORT>);
+        });
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: reportKey,
             value: {policyID: originalPolicyID},
-        } as OnyxUpdate<TKey | typeof ONYXKEYS.COLLECTION.REPORT>);
+        });
     }
 
     // Recursively process child reports for the current report
