@@ -35,7 +35,6 @@ import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useWorkspaceList from '@hooks/useWorkspaceList';
 import {close} from '@libs/actions/Modal';
 import {handleBulkPayItemSelected, updateAdvancedFilters} from '@libs/actions/Search';
 import DateUtils from '@libs/DateUtils';
@@ -123,15 +122,7 @@ function SearchFiltersBar({
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Filter', 'Columns']);
     const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
 
-    // Get workspace data for the filter
-    const {sections: workspaces, shouldShowSearchInput: shouldShowWorkspaceSearchInput} = useWorkspaceList({
-        policies: allPolicies,
-        currentUserLogin: email,
-        shouldShowPendingDeletePolicy: false,
-        selectedPolicyIDs: undefined,
-        searchTerm: '',
-        localeCompare,
-    });
+    const {typeFiltersKeys, workspaces, shouldShowWorkspaceSearchInput} = useAdvancedSearchFilters();
 
     const shouldDisplayWorkspaceFilter = useMemo(() => workspaces.some((section) => section.data.length > 1), [workspaces]);
 
@@ -562,8 +553,6 @@ function SearchFiltersBar({
     );
 
     const workspaceValue = useMemo(() => selectedWorkspaceOptions.map((option) => option.text), [selectedWorkspaceOptions]);
-
-    const {typeFiltersKeys} = useAdvancedSearchFilters();
 
     /**
      * Builds the list of all filter chips to be displayed in the

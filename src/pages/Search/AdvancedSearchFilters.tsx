@@ -1,5 +1,4 @@
 import {filterCardsHiddenFromSearch} from '@selectors/Card';
-import {emailSelector} from '@selectors/Session';
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'react-native-gesture-handler/lib/typescript/typeUtils';
@@ -21,7 +20,6 @@ import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import type {WorkspaceListItem} from '@hooks/useWorkspaceList';
-import useWorkspaceList from '@hooks/useWorkspaceList';
 import {saveSearch} from '@libs/actions/Search';
 import {createCardFeedKey, getCardFeedKey, getCardFeedNamesWithType, getWorkspaceCardFeedKey} from '@libs/CardFeedUtils';
 import {getCardDescription} from '@libs/CardUtils';
@@ -573,21 +571,11 @@ function AdvancedSearchFilters() {
     const personalDetails = usePersonalDetails();
 
     const [policies = getEmptyObject<NonNullable<OnyxCollection<Policy>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
-    const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: false, selector: emailSelector});
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
     const taxRates = getAllTaxRates(policies);
 
-    const {sections: workspaces} = useWorkspaceList({
-        policies,
-        currentUserLogin,
-        shouldShowPendingDeletePolicy: false,
-        selectedPolicyIDs: undefined,
-        searchTerm: '',
-        localeCompare,
-    });
-
-    const {currentType, typeFiltersKeys} = useAdvancedSearchFilters();
+    const {currentType, typeFiltersKeys, workspaces} = useAdvancedSearchFilters();
 
     const queryString = useMemo(() => {
         const currentQueryJSON = getCurrentSearchQueryJSON();
