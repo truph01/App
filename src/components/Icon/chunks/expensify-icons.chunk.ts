@@ -78,6 +78,7 @@ import Lightbulb from '@assets/images/emojiCategoryIcons/light-bulb.svg';
 import EmptyStateRoutePending from '@assets/images/emptystate__routepending.svg';
 import EmptyStateSpyPigeon from '@assets/images/emptystate__spy-pigeon.svg';
 import EReceiptIcon from '@assets/images/eReceiptIcon.svg';
+import ExpenseCopy from '@assets/images/expense-copy.svg';
 import Exclamation from '@assets/images/exclamation.svg';
 import Exit from '@assets/images/exit.svg';
 import Expand from '@assets/images/expand.svg';
@@ -187,6 +188,7 @@ import ReceiptScan from '@assets/images/receipt-scan.svg';
 import ReceiptSlash from '@assets/images/receipt-slash.svg';
 import Receipt from '@assets/images/receipt.svg';
 import RemoveMembers from '@assets/images/remove-members.svg';
+import ReportCopy from '@assets/images/report-copy.svg';
 import Rotate from '@assets/images/rotate-image.svg';
 import RotateLeft from '@assets/images/rotate-left.svg';
 import Scan from '@assets/images/scan.svg';
@@ -306,6 +308,7 @@ const Expensicons = {
     EReceiptIcon,
     Emoji,
     EmptyStateRoutePending,
+    ExpenseCopy,
     Exclamation,
     Exit,
     ExpensifyAppIcon,
@@ -397,6 +400,7 @@ const Expensicons = {
     ReceiptScan,
     ReceiptSlash,
     RemoveMembers,
+    ReportCopy,
     ReplaceReceipt,
     ReceiptMultiple,
     Rotate,
