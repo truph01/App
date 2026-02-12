@@ -1,5 +1,5 @@
 import type {NavigationState} from '@react-navigation/native';
-import {DarkTheme, DefaultTheme, findFocusedRoute, NavigationContainer} from '@react-navigation/native';
+import {DarkTheme, DefaultTheme, findFocusedRoute, getPathFromState, NavigationContainer} from '@react-navigation/native';
 import {hasCompletedGuidedSetupFlowSelector, wasInvitedToNewDotSelector} from '@selectors/Onboarding';
 import React, {useCallback, useContext, useEffect, useMemo, useRef} from 'react';
 import {useOnboardingValues} from '@components/OnyxListItemProvider';
@@ -29,7 +29,6 @@ import ROUTES from '@src/ROUTES';
 import AppNavigator from './AppNavigator';
 import {cleanPreservedNavigatorStates} from './AppNavigator/createSplitNavigator/usePreserveNavigatorState';
 import getAdaptedStateFromPath from './helpers/getAdaptedStateFromPath';
-import getPathFromState from './helpers/getPathFromState';
 import {isSplitNavigatorName, isWorkspacesTabScreenName} from './helpers/isNavigatorName';
 import {saveSettingsTabPathToSessionStorage, saveWorkspacesTabPathToSessionStorage} from './helpers/lastVisitedTabPathUtils';
 import {linkingConfig} from './linkingConfig';
@@ -57,7 +56,7 @@ function parseAndLogRoute(state: NavigationState) {
         return;
     }
 
-    const currentPath = getPathFromState(state);
+    const currentPath = getPathFromState(state, linkingConfig.config);
 
     const focusedRoute = findFocusedRoute(state);
 
@@ -122,7 +121,7 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
                 Navigation.navigate(ROUTES.MIGRATED_USER_WELCOME_MODAL.getRoute());
             });
 
-            return getAdaptedStateFromPath(lastVisitedPath);
+            return getAdaptedStateFromPath(lastVisitedPath, linkingConfig.config);
         }
 
         if (!account || account.isFromPublicDomain) {
@@ -149,6 +148,7 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
                     onboardingInitialPath,
                     onboardingValues,
                 }),
+                linkingConfig.config,
             );
         }
 
@@ -160,7 +160,7 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
 
             if (!isSpecificDeepLink) {
                 Log.info('Restoring last visited path on app startup', false, {lastVisitedPath, initialUrl, path});
-                return getAdaptedStateFromPath(lastVisitedPath);
+                return getAdaptedStateFromPath(lastVisitedPath, linkingConfig.config);
             }
         }
 

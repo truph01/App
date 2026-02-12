@@ -91,6 +91,7 @@ import {
     isFromCreditCardImport as isCardTransactionTransactionUtils,
     isCategoryBeingAnalyzed,
     isDistanceRequest as isDistanceRequestTransactionUtils,
+    isDistanceTypeRequest,
     isExpenseUnreported as isExpenseUnreportedTransactionUtils,
     isGPSDistanceRequest as isGPSDistanceRequestTransactionUtils,
     isManualDistanceRequest as isManualDistanceRequestTransactionUtils,
@@ -285,7 +286,7 @@ function MoneyRequestView({
     const isManualDistanceRequest = isManualDistanceRequestTransactionUtils(transaction, !!mergeTransactionID);
     const isGPSDistanceRequest = isGPSDistanceRequestTransactionUtils(transaction);
     const isOdometerDistanceRequest = isOdometerDistanceRequestTransactionUtils(transaction);
-    const isMapDistanceRequest = isMapDistanceRequestTransactionUtils(transaction);
+    const isMapDistanceRequest = isMapDistanceRequestTransactionUtils(transaction) || isDistanceTypeRequest(transaction);
     const isTransactionScanning = isScanning(updatedTransaction ?? transaction);
     const hasRoute = hasRouteTransactionUtils(transactionBackup ?? transaction, isDistanceRequest);
 
@@ -603,6 +604,11 @@ function MoneyRequestView({
                             return;
                         }
 
+                        if (isExpenseSplit && isSplitAvailable) {
+                            initSplitExpense(allTransactions, allReports, transaction);
+                            return;
+                        }
+
                         if (isOdometerDistanceRequest) {
                             Navigation.navigate(
                                 ROUTES.MONEY_REQUEST_STEP_DISTANCE_ODOMETER.getRoute(CONST.IOU.ACTION.EDIT, iouType, transaction.transactionID, transactionThreadReport.reportID),
@@ -648,6 +654,11 @@ function MoneyRequestView({
                     titleStyle={styles.flex1}
                     onPress={() => {
                         if (!transaction?.transactionID || !transactionThreadReport?.reportID) {
+                            return;
+                        }
+
+                        if (isExpenseSplit && isSplitAvailable) {
+                            initSplitExpense(allTransactions, allReports, transaction);
                             return;
                         }
 
@@ -816,7 +827,7 @@ function MoneyRequestView({
                             }
 
                             if (isExpenseSplit && isSplitAvailable) {
-                                initSplitExpense(allTransactions, allReports, transaction, policy);
+                                initSplitExpense(allTransactions, allReports, transaction);
                                 return;
                             }
 
