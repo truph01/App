@@ -129,7 +129,6 @@ function save<TKey extends OnyxKey>(requestToPersist: Request<TKey>) {
         command: requestToPersist.command,
         previousQueueLength: previousLength,
         newQueueLength: requests.length,
-        allCommands: getCommands(requests as AnyRequest[]),
     });
 
     Onyx.set(ONYXKEYS.PERSISTED_REQUESTS, requests as AnyRequest[])
@@ -152,7 +151,6 @@ function endRequestAndRemoveFromQueue<TKey extends OnyxKey>(requestToRemove: Req
         commandToRemove: requestToRemove.command,
         currentOngoingCommand: ongoingRequest?.command ?? 'null',
         currentQueueLength: persistedRequests.length,
-        currentQueueCommands: getCommands(persistedRequests),
     });
 
     const previousOngoingRequest = ongoingRequest;
@@ -191,7 +189,6 @@ function endRequestAndRemoveFromQueue<TKey extends OnyxKey>(requestToRemove: Req
 
     Log.info('[PersistedRequests] Persisting updated queue and clearing ongoingRequest to disk', false, {
         newQueueLength: persistedRequests.length,
-        newQueueCommands: getCommands(persistedRequests),
     });
 
     Onyx.multiSet({
@@ -247,7 +244,6 @@ function processNextRequest(): AnyRequest | null {
 
     Log.info('[PersistedRequests] processNextRequest called', false, {
         queueLength: persistedRequests.length,
-        queueCommands: getCommands(persistedRequests),
     });
 
     // You must handle the case where there are no requests to process
@@ -272,7 +268,6 @@ function processNextRequest(): AnyRequest | null {
     Log.info('[PersistedRequests] Queue updated after moving request to ongoing', false, {
         ongoingCommand: ongoingRequest?.command ?? 'null',
         newQueueLength: persistedRequests.length,
-        newQueueCommands: getCommands(persistedRequests),
     });
 
     if (ongoingRequest && ongoingRequest.persistWhenOngoing) {
@@ -317,7 +312,6 @@ function rollbackOngoingRequest() {
     Log.info('[PersistedRequests] Rollback complete', false, {
         rolledBackCommand: requestToRollback.command,
         newQueueLength: persistedRequests.length,
-        newQueueCommands: getCommands(persistedRequests),
         ongoingRequestCleared: true,
     });
 }
