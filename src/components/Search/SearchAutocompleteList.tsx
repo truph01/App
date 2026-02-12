@@ -212,6 +212,7 @@ function SearchAutocompleteList({
     const [isInitialRender, setIsInitialRender] = useState(true);
     const prevQueryRef = useRef(autocompleteQueryValue);
     const innerListRef = useRef<SelectionListWithSectionsHandle | null>(null);
+    const hasSetInitialFocusRef = useRef(false);
 
     // Callback ref to set both inner ref and forward to external ref
     const setListRef = (instance: SelectionListWithSectionsHandle | null) => {
@@ -861,6 +862,35 @@ function SearchAutocompleteList({
 
     const firstRecentReportKey = styledRecentReports.at(0)?.keyForList;
 
+    // When options initialize after the list is already mounted, initiallyFocusedItemKey has no effect
+    // because useState(initialFocusedIndex) in useArrowKeyFocusManager only reads the initial value.
+    // Imperatively focus the first recent report once options become available (desktop only).
+    useEffect(() => {
+        if (shouldUseNarrowLayout || !areOptionsInitialized || hasSetInitialFocusRef.current || !firstRecentReportKey) {
+            return;
+        }
+        hasSetInitialFocusRef.current = true;
+
+        // Compute the flat index of firstRecentReportKey by replicating the flattening logic
+        // from useFlattenedSections: each section may prepend a header row when it has a title/customHeader.
+        let flatIndex = 0;
+        for (const section of sections) {
+            const hasData = (section.data?.length ?? 0) > 0;
+            const hasHeader = hasData && (section.title !== undefined || ('customHeader' in section && section.customHeader !== undefined));
+            if (hasHeader) {
+                flatIndex++;
+            }
+            for (const item of section.data ?? []) {
+                if (item.keyForList === firstRecentReportKey) {
+                    innerListRef.current?.updateAndScrollToFocusedIndex(flatIndex, false);
+                    return;
+                }
+                flatIndex++;
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [areOptionsInitialized, firstRecentReportKey, shouldUseNarrowLayout]);
+
     useEffect(() => {
         const targetText = autocompleteQueryValue;
 
@@ -885,9 +915,7 @@ function SearchAutocompleteList({
             shouldSingleExecuteRowSelect
             ref={setListRef}
             initialScrollIndex={0}
-            // Only set initiallyFocusedItemKey after options are initialized, otherwise the list would be
-            // empty on first render and auto-focusing would fail.
-            initiallyFocusedItemKey={!shouldUseNarrowLayout && areOptionsInitialized ? firstRecentReportKey : undefined}
+            initiallyFocusedItemKey={!shouldUseNarrowLayout ? firstRecentReportKey : undefined}
             shouldScrollToFocusedIndex={!isInitialRender}
             disableKeyboardShortcuts={!shouldSubscribeToArrowKeyEvents}
             addBottomSafeAreaPadding
