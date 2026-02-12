@@ -25,7 +25,7 @@ const feedKeysWithAssignedCardsSelector = (allWorkspaceCards: OnyxCollection<Wor
     const result: FeedKeysWithAssignedCards = {};
 
     for (const [key, cards] of Object.entries(allWorkspaceCards ?? {})) {
-        if (!cards) {
+        if (!cards || typeof cards !== 'object') {
             continue;
         }
 
