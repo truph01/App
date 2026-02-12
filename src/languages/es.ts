@@ -7955,6 +7955,7 @@ ${amount} para ${merchant} - ${date}`,
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}) => `${fieldName} es obligatorio`,
         reportContainsExpensesWithViolations: 'El informe contiene gastos con violaciones.',
+        reportContainsExportErrors: 'Nuestro mensaje de error habitual para exportaciones fallidas',
     },
     violationDismissal: {
         rter: {

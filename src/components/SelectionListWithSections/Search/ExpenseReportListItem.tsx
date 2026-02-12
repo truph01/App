@@ -26,6 +26,7 @@ import {isInvoiceReport, isOpenExpenseReport, isProcessingReport} from '@libs/Re
 import {isViolationDismissed, shouldShowViolation} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isActionLoadingSelector} from '@src/selectors/ReportMetaData';
 import type {Policy, Report} from '@src/types/onyx';
@@ -192,11 +193,8 @@ function ExpenseReportListItem<TItem extends ListItem>({
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const hasAnyVisibleViolations = reportItem?.hasVisibleViolations || hasSyncedMissingAttendeesViolation;
 
-    const getDescription = useMemo(() => {
-        if (!hasAnyVisibleViolations || !shouldShowViolationDescription) {
-            return;
-        }
-        return (
+    const renderIndicator = useCallback(
+        (messageKey: TranslationPaths) => (
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt2]}>
                 <Icon
                     src={expensifyIcons.DotIndicator}
@@ -205,22 +203,22 @@ function ExpenseReportListItem<TItem extends ListItem>({
                     width={12}
                     height={12}
                 />
-                <Text style={[styles.textMicro, styles.textDanger]}>{translate('reportViolations.reportContainsExpensesWithViolations')}</Text>
+                <Text style={[styles.textMicro, styles.textDanger]}>{translate(messageKey)}</Text>
             </View>
-        );
-    }, [
-        hasAnyVisibleViolations,
-        shouldShowViolationDescription,
-        styles.flexRow,
-        styles.alignItemsCenter,
-        styles.mt2,
-        styles.mr1,
-        styles.textMicro,
-        styles.textDanger,
-        expensifyIcons.DotIndicator,
-        theme.danger,
-        translate,
-    ]);
+        ),
+        [styles.flexRow, styles.alignItemsCenter, styles.mt2, styles.mr1, styles.textMicro, styles.textDanger, expensifyIcons.DotIndicator, theme.danger, translate],
+    );
+
+    const getDescription = useMemo(() => {
+        if (!hasAnyVisibleViolations || !shouldShowViolationDescription) {
+            if (parentReport?.errorFields?.export) {
+                return renderIndicator('reportViolations.reportContainsExportErrors');
+            }
+
+            return null;
+        }
+        return renderIndicator('reportViolations.reportContainsExpensesWithViolations');
+    }, [hasAnyVisibleViolations, shouldShowViolationDescription, renderIndicator, parentReport?.errorFields?.export]);
 
     return (
         <BaseListItem
