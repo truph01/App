@@ -5,10 +5,12 @@ import TextLink from '@components/TextLink';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getTranslationKeyForLimitType} from '@libs/CardUtils';
 import {getFormattedAddress} from '@libs/PersonalDetailsUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PrivatePersonalDetails} from '@src/types/onyx';
+import type {CardLimitType} from '@src/types/onyx/Card';
 
 const defaultPrivatePersonalDetails: PrivatePersonalDetails = {
     addresses: [
@@ -35,14 +37,14 @@ type CardDetailsProps = {
     /** Callback to navigate to update address page */
     onUpdateAddressPress?: () => void;
 
-    /** Whether the card is virtual */
-    isSingleUseCard?: boolean;
+    /** Card limit type */
+    limitType?: CardLimitType;
 
     /** Hint text for the card */
     cardHintText?: string;
 };
 
-function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress, isSingleUseCard = false, cardHintText}: CardDetailsProps) {
+function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress, cardHintText, limitType}: CardDetailsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
@@ -59,10 +61,10 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress,
                     forwardedFSClass={CONST.FULLSTORY.CLASS.MASK}
                 />
             )}
-            {isSingleUseCard && (
+            {!!limitType && (
                 <MenuItemWithTopDescription
                     description={translate('workspace.card.issueNewCard.limitType')}
-                    title={translate('workspace.card.issueNewCard.singleUse')}
+                    title={translate(getTranslationKeyForLimitType(limitType))}
                     interactive={false}
                     hintText={cardHintText}
                 />

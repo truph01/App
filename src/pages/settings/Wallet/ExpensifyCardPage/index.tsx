@@ -26,7 +26,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
-import {formatCardExpiration, getDomainCards, maskCard, maskPin} from '@libs/CardUtils';
+import {formatCardExpiration, getDomainCards, getTranslationKeyForLimitType, maskCard, maskPin} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -235,7 +235,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                             }
                                             Navigation.navigate(ROUTES.SETTINGS_WALLET_CARD_DIGITAL_DETAILS_UPDATE_ADDRESS.getRoute(domain));
                                         }}
-                                        isSingleUseCard={card?.nameValuePairs?.limitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE}
+                                        limitType={card?.nameValuePairs?.limitType}
                                         cardHintText={getCardHintText(
                                             card?.nameValuePairs?.validFrom,
                                             card?.nameValuePairs?.validThru,
@@ -280,19 +280,17 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                             }
                                         />
 
-                                        {card?.nameValuePairs?.limitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE && (
-                                            <MenuItemWithTopDescription
-                                                description={translate('workspace.card.issueNewCard.limitType')}
-                                                title={translate('workspace.card.issueNewCard.singleUse')}
-                                                interactive={false}
-                                                hintText={getCardHintText(
-                                                    card?.nameValuePairs?.validFrom,
-                                                    card?.nameValuePairs?.validThru,
-                                                    personalDetails?.[card?.accountID ?? CONST.DEFAULT_NUMBER_ID]?.timezone?.selected,
-                                                    translate,
-                                                )}
-                                            />
-                                        )}
+                                        <MenuItemWithTopDescription
+                                            description={translate('workspace.card.issueNewCard.limitType')}
+                                            title={translate(getTranslationKeyForLimitType(card?.nameValuePairs?.limitType))}
+                                            interactive={false}
+                                            hintText={getCardHintText(
+                                                card?.nameValuePairs?.validFrom,
+                                                card?.nameValuePairs?.validThru,
+                                                personalDetails?.[card?.accountID ?? CONST.DEFAULT_NUMBER_ID]?.timezone?.selected,
+                                                translate,
+                                            )}
+                                        />
 
                                         {cardsDetailsErrors[card.cardID] === 'cardPage.missingPrivateDetails' ? (
                                             <FormHelpMessage
