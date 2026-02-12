@@ -249,6 +249,90 @@ describe('MoneyRequest', () => {
                 }),
             );
         });
+
+        it('should pass existingTransactionDraft and draftTransactionIDs to requestMoney when allTransactionDrafts is provided', () => {
+            const draftTransaction = createRandomTransaction(99);
+            const linkedAction = {
+                reportActionID: 'action1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+                created: '',
+                originalMessage: {
+                    IOUTransactionID: draftTransaction.transactionID,
+                    IOUReportID: 'report456',
+                    type: CONST.IOU.REPORT_ACTION_TYPE.CREATE,
+                },
+            };
+            const transactionWithLinkedAction = {
+                ...fakeTransaction,
+                linkedTrackedExpenseReportAction: linkedAction,
+            };
+
+            createTransaction({
+                ...baseParams,
+                transactions: [transactionWithLinkedAction],
+                allTransactionDrafts: {
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draftTransaction.transactionID}`]: draftTransaction,
+                },
+            });
+
+            expect(IOU.requestMoney).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    existingTransactionDraft: draftTransaction,
+                    draftTransactionIDs: [draftTransaction.transactionID],
+                }),
+            );
+        });
+
+        it('should pass undefined existingTransactionDraft when no matching draft exists', () => {
+            createTransaction({
+                ...baseParams,
+                allTransactionDrafts: {},
+            });
+
+            expect(IOU.requestMoney).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    existingTransactionDraft: undefined,
+                    draftTransactionIDs: [],
+                }),
+            );
+        });
+
+        it('should compute draftTransactionIDs from allTransactionDrafts', () => {
+            const draft1 = createRandomTransaction(101);
+            const draft2 = createRandomTransaction(102);
+
+            createTransaction({
+                ...baseParams,
+                allTransactionDrafts: {
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draft1.transactionID}`]: draft1,
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draft2.transactionID}`]: draft2,
+                },
+            });
+
+            expect(IOU.requestMoney).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    draftTransactionIDs: expect.arrayContaining([draft1.transactionID, draft2.transactionID]),
+                }),
+            );
+        });
+
+        it('should filter out null entries from allTransactionDrafts when computing draftTransactionIDs', () => {
+            const draft1 = createRandomTransaction(101);
+
+            createTransaction({
+                ...baseParams,
+                allTransactionDrafts: {
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draft1.transactionID}`]: draft1,
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}nullEntry`]: undefined,
+                },
+            });
+
+            expect(IOU.requestMoney).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    draftTransactionIDs: [draft1.transactionID],
+                }),
+            );
+        });
     });
 
     describe('handleMoneyRequestStepScanParticipants', () => {
