@@ -19,6 +19,7 @@ import {useSearchContext} from '@components/Search/SearchContext';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {PaymentData, SearchParams} from '@components/Search/types';
 import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
+import useActiveAdminPolicies from '@hooks/useActiveAdminPolicies';
 import useAllTransactions from '@hooks/useAllTransactions';
 import useBulkPayOptions from '@hooks/useBulkPayOptions';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -67,7 +68,7 @@ import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SearchFullscreenNavigatorParamList} from '@libs/Navigation/types';
-import {getActiveAdminWorkspaces, hasDynamicExternalWorkflow, hasOnlyPersonalPolicies as hasOnlyPersonalPoliciesUtil, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {hasDynamicExternalWorkflow, hasOnlyPersonalPolicies as hasOnlyPersonalPoliciesUtil, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
     generateReportID,
@@ -164,7 +165,8 @@ function SearchPage({route}: SearchPageProps) {
 
     const queryJSON = useMemo(() => buildSearchQueryJSON(route.params.q, route.params.rawQuery), [route.params.q, route.params.rawQuery]);
     const {saveScrollOffset} = useContext(ScrollOffsetContext);
-    const activeAdminPolicies = getActiveAdminWorkspaces(policies, currentUserPersonalDetails?.accountID.toString()).sort((a, b) => localeCompare(a.name || '', b.name || ''));
+    const activeAdminPoliciesUnsorted = useActiveAdminPolicies();
+    const activeAdminPolicies = useMemo(() => activeAdminPoliciesUnsorted?.sort((a, b) => localeCompare(a.name || '', b.name || '')) ?? [], [activeAdminPoliciesUnsorted, localeCompare]);
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Export',
         'Table',

@@ -23,9 +23,9 @@ import UserSelectPopup from '@components/Search/FilterDropdowns/UserSelectPopup'
 import {useSearchContext} from '@components/Search/SearchContext';
 import type {BankAccountMenuItem, SearchDateFilterKeys, SearchQueryJSON, SingularSearchStatus} from '@components/Search/types';
 import SearchFiltersSkeleton from '@components/Skeletons/SearchFiltersSkeleton';
+import useActiveAdminPolicies from '@hooks/useActiveAdminPolicies';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import useCurrencyList from '@hooks/useCurrencyList';
-import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useFilterFormValues from '@hooks/useFilterFormValues';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -41,7 +41,6 @@ import {handleBulkPayItemSelected, updateAdvancedFilters} from '@libs/actions/Se
 import DateUtils from '@libs/DateUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
-import {getActiveAdminWorkspaces} from '@libs/PolicyUtils';
 import {isExpenseReport} from '@libs/ReportUtils';
 import {buildQueryStringFromFilterFormValues, getQueryWithUpdatedValues, isFilterSupported, isSearchDatePreset} from '@libs/SearchQueryUtils';
 import {
@@ -297,8 +296,8 @@ function SearchFiltersBar({
         const value = options.find((option) => option.value === searchAdvancedFiltersForm.withdrawalType) ?? null;
         return [options, value];
     }, [translate, searchAdvancedFiltersForm.withdrawalType]);
-    const {accountID} = useCurrentUserPersonalDetails();
-    const activeAdminPolicies = getActiveAdminWorkspaces(allPolicies, accountID.toString()).sort((a, b) => localeCompare(a.name || '', b.name || ''));
+    const activeAdminPoliciesUnsorted = useActiveAdminPolicies();
+    const activeAdminPolicies = useMemo(() => activeAdminPoliciesUnsorted?.sort((a, b) => localeCompare(a.name || '', b.name || '')) ?? [], [activeAdminPoliciesUnsorted, localeCompare]);
 
     const updateFilterForm = useCallback(
         (values: Partial<SearchAdvancedFiltersForm>) => {
