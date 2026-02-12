@@ -567,7 +567,7 @@ function handleMoneyRequestStepDistanceNavigation({
                 transactionReportID: transaction?.reportID,
             });
 
-            const validWaypoints = (!isManualDistance && !isOdometerDistance) ? getValidWaypoints(waypoints, true, isGPSDistance) : undefined;
+            const validWaypoints = !isManualDistance && !isOdometerDistance ? getValidWaypoints(waypoints, true, isGPSDistance) : undefined;
 
             if (isCreatingTrackExpense && participant) {
                 trackExpense({
