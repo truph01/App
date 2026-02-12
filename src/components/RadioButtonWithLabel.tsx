@@ -81,7 +81,7 @@ function RadioButtonWithLabel({
                     pressDimmingValue={0.5}
                     shouldBlendOpacity={shouldBlendOpacity}
                 >
-                    {!!label && (
+                    {!!label && !labelElement && (
                         <Text
                             style={[styles.ml1]}
                             fsClass={forwardedFSClass}

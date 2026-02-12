@@ -206,6 +206,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles, route}: BaseOnboarding
                 <RadioButtonWithLabel
                     isChecked={!!item.isSelected}
                     onPress={() => handleIntegrationSelect(item.keyForList)}
+                    label={item.text}
                     style={[styles.flexRowReverse]}
                     wrapperStyle={[styles.ml0]}
                     labelElement={
