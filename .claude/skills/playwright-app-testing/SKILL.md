@@ -32,12 +32,23 @@ ps aux | grep "webpack" | grep -v grep
 ## Playwright Testing Workflow
 
 1. **Verify server**: Check webpack process is running
-2. **Navigate**: Use `mcp__playwright__browser_navigate` to `https://dev.new.expensify.com:8082/`
-3. **Interact**: Use Playwright MCP tools including:
+2. **Navigate**: Use `browser_navigate` to `https://dev.new.expensify.com:8082/`
+3. **Interact**: Use browser MCP tools including:
    - **Inspection**: `browser_snapshot`, `browser_take_screenshot`, `browser_console_messages`
    - **Interaction**: `browser_click`, `browser_type`, `browser_fill_form`, `browser_hover`
    - **Navigation**: `browser_navigate_back`, `browser_tabs`, `browser_wait_for`
-   - All other Playwright tools as needed
+   - All other browser tools as needed
+
+## Speed Optimization: No Pre-Waiting
+
+**CRITICAL**: Do NOT add arbitrary waits (`browser_wait_for` with a time) after actions like clicks, fills, or navigation. Instead, follow this pattern:
+
+1. **Perform the action** (click, type, fill, etc.)
+2. **Immediately take a snapshot** (`browser_snapshot`) to check the result.
+3. **If the page appears unchanged** (same elements, same URL), wait 1 second and snapshot again.
+4. **Repeat up to 3 times** with 1-second waits if needed.
+
+This approach is significantly faster than adding 3-4 second waits after every action. Most actions in the app complete in under 500ms, so immediate snapshots will usually capture the result.
 
 ## Dev Environment Sign-In
 
