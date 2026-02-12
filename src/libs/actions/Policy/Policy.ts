@@ -4508,7 +4508,6 @@ function enablePolicyWorkflows(policyID: string, enabled: boolean) {
                         ? {
                               approvalMode: CONST.POLICY.APPROVAL_MODE.OPTIONAL,
                               autoReporting: false,
-                              autoReportingFrequency: CONST.POLICY.AUTO_REPORTING_FREQUENCIES.INSTANT,
                               harvesting: {
                                   enabled: false,
                               },
@@ -4521,7 +4520,6 @@ function enablePolicyWorkflows(policyID: string, enabled: boolean) {
                             ? {
                                   approvalMode: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                                   autoReporting: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
-                                  autoReportingFrequency: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                                   harvesting: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                                   reimbursementChoice: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                               }
@@ -4541,7 +4539,6 @@ function enablePolicyWorkflows(policyID: string, enabled: boolean) {
                             ? {
                                   approvalMode: null,
                                   autoReporting: null,
-                                  autoReportingFrequency: null,
                                   harvesting: null,
                                   reimbursementChoice: null,
                               }
@@ -4560,7 +4557,6 @@ function enablePolicyWorkflows(policyID: string, enabled: boolean) {
                         ? {
                               approvalMode: policy?.approvalMode,
                               autoReporting: policy?.autoReporting,
-                              autoReportingFrequency: policy?.autoReportingFrequency,
                               harvesting: policy?.harvesting,
                               reimbursementChoice: policy?.reimbursementChoice,
                           }
@@ -4571,7 +4567,6 @@ function enablePolicyWorkflows(policyID: string, enabled: boolean) {
                             ? {
                                   approvalMode: null,
                                   autoReporting: null,
-                                  autoReportingFrequency: null,
                                   harvesting: null,
                                   reimbursementChoice: null,
                               }
@@ -4583,11 +4578,6 @@ function enablePolicyWorkflows(policyID: string, enabled: boolean) {
     };
 
     const parameters: EnablePolicyWorkflowsParams = {policyID, enabled};
-
-    // When disabling workflows, set autoreporting back to "immediately"
-    if (!enabled) {
-        setWorkspaceAutoReportingFrequency(policyID, CONST.POLICY.AUTO_REPORTING_FREQUENCIES.INSTANT);
-    }
 
     // We can't use writeWithNoDuplicatesEnableFeatureConflicts because the workflows data is also changed when disabling/enabling this feature
     API.write(WRITE_COMMANDS.ENABLE_POLICY_WORKFLOWS, parameters, onyxData);
