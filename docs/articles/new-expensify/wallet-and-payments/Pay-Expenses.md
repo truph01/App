@@ -63,7 +63,7 @@ To send a personal payment, you must first [set up your Wallet](https://help.exp
 
 ## How long does it take for the submitter to receive a payment?
 
-If the payment is **under $100**, and your total withdrawals in the past 24 hours are **under $10,000**, the payment will process in **one business day**. Please note, this only applies to ACH payments within the US. 
+If the payment is **under $100**, and your total withdrawals in the past 24 hours are **under $10,000**, the payment will process in **one business day**. Please note, this only applies to ACH payments in the US. 
 
 Otherwise, standard bank transfer times apply, and the recipient will receive their funds within **4–5 business days**.
 
