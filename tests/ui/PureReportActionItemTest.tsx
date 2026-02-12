@@ -524,7 +524,6 @@ describe('PureReportActionItem', () => {
                                     policies={undefined}
                                     personalPolicyID={undefined}
                                     report={report}
-                                    reportActions={[]}
                                     parentReportAction={undefined}
                                     action={action}
                                     displayAsGroup={false}

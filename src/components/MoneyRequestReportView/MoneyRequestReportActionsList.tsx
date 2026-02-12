@@ -595,7 +595,6 @@ function MoneyRequestReportActionsList({
         },
         [
             visibleReportActions,
-            reportActions,
             parentReportAction,
             report,
             transactionThreadReport,

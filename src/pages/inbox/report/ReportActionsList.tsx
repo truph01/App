@@ -734,7 +734,6 @@ function ReportActionsList({
             emojiReactions,
             allReports,
             policies,
-            sortedReportActions,
             parentReportAction,
             parentReportActionForTransactionThread,
             report,
