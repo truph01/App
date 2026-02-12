@@ -222,11 +222,12 @@ function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: Po
             return translate('iou.policyRulesModifiedFields.tax', taxRateName, isFirst);
         }
 
-        let updatedValue = value as string;
+        const updatedValue = value as string;
         if (key === 'category') {
-            updatedValue = getDecodedCategoryName(updatedValue);
-        } else if (key === 'tag') {
-            updatedValue = getCommaSeparatedTagNameWithSanitizedColons(updatedValue);
+            return translate('iou.policyRulesModifiedFields.common', key, getDecodedCategoryName(updatedValue), isFirst);
+        }
+        if (key === 'tag') {
+            return translate('iou.policyRulesModifiedFields.common', key, getCommaSeparatedTagNameWithSanitizedColons(updatedValue), isFirst);
         }
 
         return translate('iou.policyRulesModifiedFields.common', key, updatedValue, isFirst);
