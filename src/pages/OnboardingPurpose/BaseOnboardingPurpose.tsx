@@ -42,17 +42,17 @@ function getOnboardingChoices(customChoices: OnboardingPurpose[]) {
 function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, route}: BaseOnboardingPurposeProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'SimpleReceiptUpload', 'PiggyBank', 'SplitBill']);
+    const illustrations = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'ReceiptsUpload', 'PiggyBank', 'SplitBill']);
 
     const menuIcons = useMemo(
         () => ({
-            [CONST.ONBOARDING_CHOICES.EMPLOYER]: illustrations.SimpleReceiptUpload,
+            [CONST.ONBOARDING_CHOICES.EMPLOYER]: illustrations.ReceiptsUpload,
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: illustrations.Abacus,
             [CONST.ONBOARDING_CHOICES.PERSONAL_SPEND]: illustrations.PiggyBank,
             [CONST.ONBOARDING_CHOICES.CHAT_SPLIT]: illustrations.SplitBill,
             [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: illustrations.Binoculars,
         }),
-        [illustrations.Abacus, illustrations.Binoculars, illustrations.SimpleReceiptUpload, illustrations.PiggyBank, illustrations.SplitBill],
+        [illustrations.Abacus, illustrations.Binoculars, illustrations.ReceiptsUpload, illustrations.PiggyBank, illustrations.SplitBill],
     );
     const {onboardingIsMediumOrLargerScreenWidth} = useResponsiveLayout();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
