@@ -1,6 +1,6 @@
 import lodashDebounce from 'lodash/debounce';
 import noop from 'lodash/noop';
-import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {BlurEvent, MeasureInWindowOnSuccessCallback, TextInputSelectionChangeEvent} from 'react-native';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -62,6 +62,7 @@ import {
 import {startSpan} from '@libs/telemetry/activeSpans';
 import {getTransactionID, hasReceipt as hasReceiptTransactionUtils} from '@libs/TransactionUtils';
 import willBlurTextInputOnTapOutsideFunc from '@libs/willBlurTextInputOnTapOutside';
+import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import AgentZeroProcessingRequestIndicator from '@pages/inbox/report/AgentZeroProcessingRequestIndicator';
 import ParticipantLocalTime from '@pages/inbox/report/ParticipantLocalTime';
 import ReportTypingIndicator from '@pages/inbox/report/ReportTypingIndicator';
@@ -166,6 +167,8 @@ function ReportActionCompose({
         canBeMissing: true,
     });
     const ancestors = useAncestors(transactionThreadReport ?? report);
+    const {scrollPosition} = useContext(ActionListContext);
+
     /**
      * Updates the Highlight state of the composer
      */
@@ -356,15 +359,18 @@ function ReportActionCompose({
                 });
                 attachmentFileRef.current = null;
             } else {
-                Performance.markStart(CONST.TIMING.SEND_MESSAGE, {message: newCommentTrimmed});
-                startSpan(CONST.TELEMETRY.SPAN_SEND_MESSAGE, {
-                    name: 'send-message',
-                    op: CONST.TELEMETRY.SPAN_SEND_MESSAGE,
-                    attributes: {
-                        [CONST.TELEMETRY.ATTRIBUTE_REPORT_ID]: reportID,
-                        [CONST.TELEMETRY.ATTRIBUTE_MESSAGE_LENGTH]: newCommentTrimmed.length,
-                    },
-                });
+                const isScrolledToBottom = !scrollPosition?.offset || scrollPosition.offset < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
+                if (isScrolledToBottom) {
+                    Performance.markStart(CONST.TIMING.SEND_MESSAGE, {message: newCommentTrimmed});
+                    startSpan(CONST.TELEMETRY.SPAN_SEND_MESSAGE, {
+                        name: 'send-message',
+                        op: CONST.TELEMETRY.SPAN_SEND_MESSAGE,
+                        attributes: {
+                            [CONST.TELEMETRY.ATTRIBUTE_REPORT_ID]: reportID,
+                            [CONST.TELEMETRY.ATTRIBUTE_MESSAGE_LENGTH]: newCommentTrimmed.length,
+                        },
+                    });
+                }
                 onSubmit(newCommentTrimmed, rand64());
             }
         },
@@ -379,6 +385,7 @@ function ReportActionCompose({
             personalDetail.timezone,
             isInSidePanel,
             onSubmit,
+            scrollPosition,
         ],
     );
 
