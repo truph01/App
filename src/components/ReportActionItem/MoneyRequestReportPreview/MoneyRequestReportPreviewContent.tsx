@@ -480,25 +480,27 @@ function MoneyRequestReportPreviewContent({
         setCurrentVisibleItems(viewableItemsIndexes);
     }).current;
 
+    const snapOffsets = carouselTransactions.map((_, index) => index * (reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.transactionsCarouselGap.width));
+
     const handleChange = (index: number) => {
-        const viewOffset = -(2 * styles.transactionsCarouselGap.width);
         if (index > carouselTransactions.length - visibleItemsOnEndCount) {
-            setOptimisticIndex(carouselTransactions.length - visibleItemsOnEndCount);
-            carouselRef.current?.scrollToIndex({index: carouselTransactions.length - visibleItemsOnEndCount, animated: true, viewOffset});
+            const lastScrollableIndex = carouselTransactions.length - visibleItemsOnEndCount;
+            setOptimisticIndex(lastScrollableIndex);
+            carouselRef.current?.scrollToOffset({offset: snapOffsets.at(lastScrollableIndex) ?? 0, animated: true});
             return;
         }
         if (index < 0) {
             setOptimisticIndex(0);
-            carouselRef.current?.scrollToIndex({index: 0, animated: true, viewOffset});
+            carouselRef.current?.scrollToTop({animated: true});
             return;
         }
         if (index === carouselTransactions.length - visibleItemsOnEndCount) {
             setOptimisticIndex(index);
-            carouselRef.current?.scrollToEnd();
+            carouselRef.current?.scrollToEnd({animated: true});
             return;
         }
         setOptimisticIndex(index);
-        carouselRef.current?.scrollToIndex({index, animated: true, viewOffset});
+        carouselRef.current?.scrollToOffset({offset: snapOffsets.at(index) ?? 0, animated: true});
     };
 
     const renderItem = (itemInfo: ListRenderItemInfo<Transaction>) => {
@@ -713,8 +715,6 @@ function MoneyRequestReportPreviewContent({
     const getItemType = (_item: Transaction, index: number) => {
         return index === MAX_PREVIEWS_NUMBER ? ITEM_LAYOUT_TYPE.SHOW_MORE : ITEM_LAYOUT_TYPE.PREVIEW;
     };
-
-    const snapOffsets = carouselTransactions.map((_, index) => index * (reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.transactionsCarouselGap.width));
 
     return (
         <View
