@@ -1,11 +1,12 @@
 import React from 'react';
-import type {ImageSourcePropType} from 'react-native';
 import {View} from 'react-native';
-import type {SvgProps} from 'react-native-svg';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import {loadIllustration} from '@components/Icon/IllustrationLoader';
+import type {IllustrationName} from '@components/Icon/IllustrationLoader';
 import ScreenWrapper from '@components/ScreenWrapper';
+import {useMemoizedLazyAsset} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
@@ -13,17 +14,18 @@ import type {TranslationPaths} from '@src/languages/types';
 
 type FailureScreenBaseProps = {
     headerTitle: TranslationPaths;
-    icon: React.FC<SvgProps> | ImageSourcePropType;
+    illustration: IllustrationName;
     iconWidth: number;
     iconHeight: number;
     title: TranslationPaths;
-    subtitle: TranslationPaths;
+    subtitle?: TranslationPaths;
     customSubtitle?: React.ReactElement;
 };
 
-function FailureScreenBase({headerTitle, icon, iconWidth, iconHeight, title, subtitle, customSubtitle}: FailureScreenBaseProps) {
+function FailureScreenBase({headerTitle, illustration, iconWidth, iconHeight, title, subtitle, customSubtitle}: FailureScreenBaseProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {asset: icon} = useMemoizedLazyAsset(() => loadIllustration(illustration));
 
     const onClose = () => {
         Navigation.closeRHPFlow();
@@ -44,7 +46,7 @@ function FailureScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
                     iconHeight={iconHeight}
                     title={translate(title)}
                     titleStyles={styles.mb2}
-                    subtitle={translate(subtitle)}
+                    subtitle={subtitle ? translate(subtitle) : undefined}
                     CustomSubtitle={customSubtitle}
                     subtitleStyle={styles.textSupporting}
                     containerStyle={styles.ph5}
@@ -67,3 +69,4 @@ function FailureScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
 FailureScreenBase.displayName = 'FailureScreenBase';
 
 export default FailureScreenBase;
+export type {FailureScreenBaseProps};

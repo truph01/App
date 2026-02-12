@@ -1,11 +1,12 @@
 import React from 'react';
-import type {ImageSourcePropType} from 'react-native';
 import {View} from 'react-native';
-import type {SvgProps} from 'react-native-svg';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import {loadIllustration} from '@components/Icon/IllustrationLoader';
+import type {IllustrationName} from '@components/Icon/IllustrationLoader';
 import ScreenWrapper from '@components/ScreenWrapper';
+import {useMemoizedLazyAsset} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
@@ -16,16 +17,17 @@ import type {TranslationPaths} from '@src/languages/types';
 
 type SuccessScreenBaseProps = {
     headerTitle: TranslationPaths;
-    icon: React.FC<SvgProps> | ImageSourcePropType;
+    illustration: IllustrationName;
     iconWidth: number;
     iconHeight: number;
     title: TranslationPaths;
     subtitle: TranslationPaths;
 };
 
-function SuccessScreenBase({headerTitle, icon, iconWidth, iconHeight, title, subtitle}: SuccessScreenBaseProps) {
+function SuccessScreenBase({headerTitle, illustration, iconWidth, iconHeight, title, subtitle}: SuccessScreenBaseProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {asset: icon} = useMemoizedLazyAsset(() => loadIllustration(illustration));
 
     const onClose = () => {
         Navigation.closeRHPFlow();
@@ -68,3 +70,4 @@ function SuccessScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
 SuccessScreenBase.displayName = 'SuccessScreenBase';
 
 export default SuccessScreenBase;
+export type {SuccessScreenBaseProps};

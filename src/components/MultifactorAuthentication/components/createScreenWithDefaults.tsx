@@ -1,6 +1,6 @@
 import React from 'react';
 
-function createScreenWithDefaults<P extends Record<string, unknown>>(element: React.ReactElement<P, React.ComponentType<P>>, displayName: string): React.FC<Partial<P>> {
+function createScreenWithDefaults<P extends Record<string, unknown>>(element: React.ReactElement<P>, displayName: string): React.FC<Partial<P>> {
     const {type: Component, props: defaultProps} = element;
 
     function Screen(overrideProps: Partial<P>) {
