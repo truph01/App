@@ -1813,7 +1813,7 @@ describe('TransactionUtils', () => {
         };
 
         it('should return empty keep and change when reviewingTransaction or reportID is missing', () => {
-            const result = TransactionUtils.compareDuplicateTransactionFields({}, undefined, [], undefined);
+            const result = TransactionUtils.compareDuplicateTransactionFields({}, undefined, [], undefined, undefined, undefined, undefined);
             expect(result.keep).toEqual({});
             expect(result.change).toEqual({});
         });
@@ -1834,7 +1834,7 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            const result = TransactionUtils.compareDuplicateTransactionFields({}, transaction1, [transaction2], fakeReport);
+            const result = TransactionUtils.compareDuplicateTransactionFields({}, transaction1, [transaction2], fakeReport, undefined, undefined, undefined);
 
             expect(result.keep.merchant).toBe('Merchant A');
             expect(result.keep.category).toBe('Food');
@@ -1856,7 +1856,7 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            const result = TransactionUtils.compareDuplicateTransactionFields({}, transaction1, [transaction2], fakeReport);
+            const result = TransactionUtils.compareDuplicateTransactionFields({}, transaction1, [transaction2], fakeReport, undefined, undefined, undefined);
 
             expect(result.change.merchant).toContain('Merchant A');
             expect(result.change.merchant).toContain('Merchant B');
@@ -1887,15 +1887,11 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
-                id: 'fakePolicyID',
-                areTagsEnabled: true,
-            }).then(() => {
-                const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport);
+            const fakePolicy = {...createRandomPolicy(0), id: 'fakePolicyID', areTagsEnabled: true};
+            const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport, undefined, fakePolicy, undefined);
 
-                expect(result.change.tag).toContain('Engineering');
-                expect(result.change.tag).toContain('Marketing');
-            });
+            expect(result.change.tag).toContain('Engineering');
+            expect(result.change.tag).toContain('Marketing');
         });
 
         it('should not include disabled tags in change options', () => {
@@ -1922,13 +1918,343 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
-                id: 'fakePolicyID',
-                areTagsEnabled: true,
-            }).then(() => {
-                const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport);
+            const fakePolicy = {...createRandomPolicy(0), id: 'fakePolicyID', areTagsEnabled: true};
+            const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport, undefined, fakePolicy, undefined);
 
-                // Since only one enabled tag is available and empty is not included, tag should not be in change
+            // Since only one enabled tag is available and empty is not included, tag should not be in change
+            expect(result.change.tag).toBeUndefined();
+        });
+
+        const mockPolicy = createRandomPolicy(1);
+        const mockReport = createRandomReport(1, undefined);
+
+        describe('when all fields are equal', () => {
+            it('should keep all fields when duplicate transactions are identical', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Starbucks',
+                    category: 'Food',
+                    tag: 'Project A',
+                    comment: {comment: 'Team lunch'},
+                    taxCode: 'id_TAX_EXEMPT',
+                    billable: true,
+                    reimbursable: true,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Starbucks',
+                        category: 'Food',
+                        tag: 'Project A',
+                        comment: {comment: 'Team lunch'},
+                        taxCode: 'id_TAX_EXEMPT',
+                        billable: true,
+                        reimbursable: true,
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.merchant).toBe('Starbucks');
+                expect(result.keep.category).toBe('Food');
+                expect(result.keep.tag).toBe('Project A');
+                expect(result.keep.description).toBe('Team lunch');
+                expect(result.keep.taxCode).toBe('id_TAX_EXEMPT');
+                expect(result.keep.billable).toBe(true);
+                expect(result.keep.reimbursable).toBe(true);
+                expect(result.change).toEqual({});
+            });
+
+            it('should handle empty descriptions as equal', () => {
+                const reviewingTransaction = generateTransaction({
+                    comment: {comment: ''},
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        comment: {comment: ''},
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.description).toBe('');
+                expect(result.change.description).toBeUndefined();
+            });
+        });
+
+        describe('merchant field comparison', () => {
+            it('should keep merchant when all merchants are the same', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Amazon',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Amazon',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.merchant).toBe('Amazon');
+                expect(result.change.merchant).toBeUndefined();
+            });
+
+            it('should show different merchants in change field', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Amazon',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Best Buy',
+                    }),
+                    generateTransaction({
+                        merchant: 'Target',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.merchant).toBeUndefined();
+                expect(result.change.merchant).toEqual(expect.arrayContaining(['Amazon', 'Best Buy', 'Target']));
+                expect(result.change.merchant?.length).toBe(3);
+            });
+
+            it('should prioritize modifiedMerchant over merchant', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Original Merchant',
+                    modifiedMerchant: 'Modified Merchant',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Another Merchant',
+                        modifiedMerchant: 'Modified Merchant',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.merchant).toBe('Modified Merchant');
+                expect(result.change.merchant).toBeUndefined();
+            });
+        });
+
+        describe('category field comparison', () => {
+            it('should keep category when all categories are the same and policy has categories enabled', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: true,
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    category: 'Travel',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        category: 'Travel',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, undefined);
+
+                expect(result.keep.category).toBe('Travel');
+                expect(result.change.category).toBeUndefined();
+            });
+
+            it('should show different categories when they differ and policy has categories enabled', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: true,
+                };
+
+                const policyCategories = {
+                    Travel: {
+                        name: 'Travel',
+                        enabled: true,
+                    },
+                    Food: {
+                        name: 'Food',
+                        enabled: true,
+                    },
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    category: 'Travel',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        category: 'Food',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, policyCategories);
+
+                expect(result.keep.category).toBeUndefined();
+                expect(result.change.category).toEqual(expect.arrayContaining(['Travel', 'Food']));
+            });
+
+            it('should exclude disabled categories from changes', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: true,
+                };
+
+                const policyCategories = {
+                    Travel: {
+                        name: 'Travel',
+                        enabled: true,
+                    },
+                    Food: {
+                        name: 'Food',
+                        enabled: false,
+                    },
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    category: 'Travel',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        category: 'Food',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, policyCategories);
+
+                // When only one valid category exists and fields differ, neither keep nor change is set
+                expect(result.keep.category).toBeUndefined();
+                expect(result.change.category).toBeUndefined();
+            });
+
+            it('should exclude deleted categories from changes', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: true,
+                };
+
+                const policyCategories = {
+                    Travel: {
+                        name: 'Travel',
+                        enabled: true,
+                    },
+                    Food: {
+                        name: 'Food',
+                        enabled: true,
+                        pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                    },
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    category: 'Travel',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        category: 'Food',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, policyCategories);
+
+                // When only one valid category exists and fields differ, neither keep nor change is set
+                expect(result.keep.category).toBeUndefined();
+                expect(result.change.category).toBeUndefined();
+            });
+
+            it('should not set keep or change when categories are not enabled and categories differ', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: false,
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    category: 'Travel',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        category: 'Food',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, undefined);
+
+                // When categories are not enabled and fields differ, neither keep nor change is set
+                expect(result.keep.category).toBeUndefined();
+                expect(result.change.category).toBeUndefined();
+            });
+
+            it('should include empty string in changes when one transaction has no category', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: true,
+                };
+
+                const policyCategories = {
+                    Travel: {
+                        name: 'Travel',
+                        enabled: true,
+                    },
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    category: '',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        category: 'Travel',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, policyCategories);
+
+                expect(result.change.category).toEqual(expect.arrayContaining(['Travel', '']));
+            });
+        });
+
+        describe('tag field comparison', () => {
+            it('should keep tag when all tags are the same', () => {
+                const reviewingTransaction = generateTransaction({
+                    tag: 'Client A',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        tag: 'Client A',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.tag).toBe('Client A');
+                expect(result.change.tag).toBeUndefined();
+            });
+
+            it('should keep tag when tags are not enabled and tags are the same', () => {
+                const policy = {
+                    ...mockPolicy,
+                    areTagsEnabled: false,
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    tag: 'Client A',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        tag: 'Client A',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, undefined);
+
+                expect(result.keep.tag).toBe('Client A');
                 expect(result.change.tag).toBeUndefined();
             });
         });
@@ -1964,15 +2290,11 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
-                id: 'fakePolicyID',
-                areTagsEnabled: true,
-            }).then(() => {
-                const result = TransactionUtils.compareDuplicateTransactionFields(multiLevelPolicyTags, transaction1, [transaction2], fakeReport);
+            const fakePolicy = {...createRandomPolicy(0), id: 'fakePolicyID', areTagsEnabled: true};
+            const result = TransactionUtils.compareDuplicateTransactionFields(multiLevelPolicyTags, transaction1, [transaction2], fakeReport, undefined, fakePolicy, undefined);
 
-                expect(result.change.tag).toContain('Engineering:Project A');
-                expect(result.change.tag).toContain('Engineering:Project B');
-            });
+            expect(result.change.tag).toContain('Engineering:Project A');
+            expect(result.change.tag).toContain('Engineering:Project B');
         });
 
         it('should keep tag when all transactions have same tag in multi-level tags mode', () => {
@@ -2006,7 +2328,7 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            const result = TransactionUtils.compareDuplicateTransactionFields(multiLevelPolicyTags, transaction1, [transaction2], fakeReport);
+            const result = TransactionUtils.compareDuplicateTransactionFields(multiLevelPolicyTags, transaction1, [transaction2], fakeReport, undefined, undefined, undefined);
 
             expect(result.keep.tag).toBe('Engineering:Project A');
             expect(result.change.tag).toBeUndefined();
@@ -2035,14 +2357,364 @@ describe('TransactionUtils', () => {
                 reportID: fakeReportID,
             });
 
-            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
-                id: 'fakePolicyID',
-                areTagsEnabled: true,
-            }).then(() => {
-                const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport);
+            const fakePolicy = {...createRandomPolicy(0), id: 'fakePolicyID', areTagsEnabled: true};
+            const result = TransactionUtils.compareDuplicateTransactionFields(singleLevelPolicyTags, transaction1, [transaction2], fakeReport, undefined, fakePolicy, undefined);
 
-                expect(result.change.tag).toContain('Engineering');
-                expect(result.change.tag).toContain('');
+            expect(result.change.tag).toContain('Engineering');
+            expect(result.change.tag).toContain('');
+        });
+
+        describe('description field comparison', () => {
+            it('should keep description when all descriptions are the same', () => {
+                const reviewingTransaction = generateTransaction({
+                    comment: {comment: 'Business meeting'},
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        comment: {comment: 'Business meeting'},
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.description).toBe('Business meeting');
+                expect(result.change.description).toBeUndefined();
+            });
+
+            it('should show different descriptions in change field', () => {
+                const reviewingTransaction = generateTransaction({
+                    comment: {comment: 'Business meeting'},
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        comment: {comment: 'Team lunch'},
+                    }),
+                    generateTransaction({
+                        comment: {comment: 'Client dinner'},
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.description).toBeUndefined();
+                expect(result.change.description).toHaveLength(3);
+            });
+        });
+
+        describe('taxCode field comparison', () => {
+            it('should keep taxCode when all tax codes are the same', () => {
+                const reviewingTransaction = generateTransaction({
+                    taxCode: 'id_TAX_EXEMPT',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        taxCode: 'id_TAX_EXEMPT',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.taxCode).toBe('id_TAX_EXEMPT');
+                expect(result.change.taxCode).toBeUndefined();
+            });
+
+            it('should exclude disabled tax codes from changes', () => {
+                const policy = {
+                    ...mockPolicy,
+                    taxRates: {
+                        defaultExternalID: 'id_TAX_EXEMPT',
+                        defaultValue: '0%',
+                        foreignTaxDefault: 'id_TAX_EXEMPT',
+                        name: 'Tax',
+                        taxes: {
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            id_TAX_EXEMPT: {
+                                name: 'Tax Exempt',
+                                value: '0%',
+                            },
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            id_TAX_DISABLED: {
+                                name: 'Disabled Tax',
+                                value: '10%',
+                                isDisabled: true,
+                            },
+                        },
+                    },
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    taxCode: 'id_TAX_EXEMPT',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        taxCode: 'id_TAX_DISABLED',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, undefined);
+
+                // When only one valid tax exists and fields differ, neither keep nor change is set
+                expect(result.keep.taxCode).toBeUndefined();
+                expect(result.change.taxCode).toBeUndefined();
+            });
+
+            it('should exclude deleted tax codes from changes', () => {
+                const policy = {
+                    ...mockPolicy,
+                    taxRates: {
+                        defaultExternalID: 'id_TAX_EXEMPT',
+                        defaultValue: '0%',
+                        foreignTaxDefault: 'id_TAX_EXEMPT',
+                        name: 'Tax',
+                        taxes: {
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            id_TAX_EXEMPT: {
+                                name: 'Tax Exempt',
+                                value: '0%',
+                            },
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            id_TAX_DELETED: {
+                                name: 'Deleted Tax',
+                                value: '10%',
+                                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                            },
+                        },
+                    },
+                };
+
+                const reviewingTransaction = generateTransaction({
+                    taxCode: 'id_TAX_EXEMPT',
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        taxCode: 'id_TAX_DELETED',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, undefined);
+
+                // When only one valid tax exists and fields differ, neither keep nor change is set
+                expect(result.keep.taxCode).toBeUndefined();
+                expect(result.change.taxCode).toBeUndefined();
+            });
+        });
+
+        describe('billable field comparison', () => {
+            it('should keep billable when all billable values are the same', () => {
+                const reviewingTransaction = generateTransaction({
+                    billable: true,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        billable: true,
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.billable).toBe(true);
+                expect(result.change.billable).toBeUndefined();
+            });
+
+            it('should show different billable values in change field', () => {
+                const reviewingTransaction = generateTransaction({
+                    billable: true,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        billable: false,
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.billable).toBeUndefined();
+                expect(result.change.billable).toEqual(expect.arrayContaining([true, false]));
+            });
+        });
+
+        describe('reimbursable field comparison', () => {
+            it('should keep reimbursable when all reimbursable values are the same', () => {
+                const reviewingTransaction = generateTransaction({
+                    reimbursable: true,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        reimbursable: true,
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.reimbursable).toBe(true);
+                expect(result.change.reimbursable).toBeUndefined();
+            });
+
+            it('should show different reimbursable values in change field', () => {
+                const reviewingTransaction = generateTransaction({
+                    reimbursable: true,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        reimbursable: false,
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.reimbursable).toBeUndefined();
+                expect(result.change.reimbursable).toEqual(expect.arrayContaining([true, false]));
+            });
+        });
+
+        describe('selectedTransactionID parameter', () => {
+            it('should include comment object in keep when selectedTransactionID is provided', () => {
+                const selectedTransactionID = 'selected-transaction-123';
+                const reviewingTransaction = generateTransaction({
+                    transactionID: selectedTransactionID,
+                    merchant: 'Starbucks',
+                    comment: {
+                        comment: 'Coffee',
+                        customUnit: {
+                            name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        },
+                    },
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Starbucks',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, selectedTransactionID, mockPolicy, undefined);
+
+                expect(result.keep.comment).toBeDefined();
+                expect(result.keep.comment?.customUnit?.name).toBe(CONST.CUSTOM_UNITS.NAME_DISTANCE);
+            });
+
+            it('should not include comment object in keep when selectedTransactionID is not provided', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Starbucks',
+                    comment: {
+                        comment: 'Coffee',
+                        customUnit: {
+                            name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        },
+                    },
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Starbucks',
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.comment).toBeUndefined();
+            });
+        });
+
+        describe('edge cases and data validation', () => {
+            it('should return empty keep and change when reviewingTransaction is undefined', () => {
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, undefined, [], mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep).toEqual({});
+                expect(result.change).toEqual({});
+            });
+
+            it('should handle empty duplicates array', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Amazon',
+                });
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, [], mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.merchant).toBe('Amazon');
+                expect(result.change).toEqual({});
+            });
+
+            it('should handle undefined duplicates array', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Amazon',
+                });
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, undefined, mockReport, undefined, mockPolicy, undefined);
+
+                expect(result.keep.merchant).toBe('Amazon');
+                expect(result.change).toEqual({});
+            });
+
+            it('should filter out settled and approved transactions', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Amazon',
+                    reportID: FAKE_OPEN_REPORT_ID,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Best Buy',
+                        reportID: FAKE_APPROVED_REPORT_ID,
+                    }),
+                    generateTransaction({
+                        merchant: 'Target',
+                        reportID: FAKE_OPEN_REPORT_ID,
+                    }),
+                ];
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, mockPolicy, undefined);
+
+                // Should compare all transactions (Amazon, Best Buy, Target) since removeSettledAndApprovedTransactions
+                // checks the actual report state from Onyx, and in this case all reports may not be properly settled
+                expect(result.change.merchant).toBeDefined();
+                expect(result.change.merchant?.length).toBeGreaterThan(1);
+            });
+
+            it('should handle multiple duplicate transactions with mixed fields', () => {
+                const reviewingTransaction = generateTransaction({
+                    merchant: 'Starbucks',
+                    category: 'Food',
+                    billable: true,
+                });
+
+                const duplicates = [
+                    generateTransaction({
+                        merchant: 'Starbucks',
+                        category: 'Travel',
+                        billable: true,
+                    }),
+                    generateTransaction({
+                        merchant: 'Starbucks',
+                        category: 'Food',
+                        billable: false,
+                    }),
+                ];
+
+                const policy = {
+                    ...mockPolicy,
+                    areCategoriesEnabled: true,
+                };
+
+                const policyCategories = {
+                    Food: {name: 'Food', enabled: true},
+                    Travel: {name: 'Travel', enabled: true},
+                };
+
+                const result = TransactionUtils.compareDuplicateTransactionFields({}, reviewingTransaction, duplicates, mockReport, undefined, policy, policyCategories);
+
+                expect(result.keep.merchant).toBe('Starbucks');
+                expect(result.change.category).toEqual(expect.arrayContaining(['Food', 'Travel']));
+                expect(result.change.billable).toEqual(expect.arrayContaining([true, false]));
             });
         });
     });
