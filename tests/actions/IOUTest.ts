@@ -14805,7 +14805,7 @@ describe('actions/IOU', () => {
             // Call should not throw when personalDetails is provided
             expect(() => {
                 convertBulkTrackedExpensesToIOU(
-                    [transactionID],
+                    [transaction],
                     targetReportID,
                     false, // isASAPSubmitBetaEnabled
                     currentUserAccountID,
