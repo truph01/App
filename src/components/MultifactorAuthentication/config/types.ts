@@ -1,9 +1,7 @@
 /**
  * Configuration types for multifactor authentication UI and scenarios.
  */
-import type {ViewStyle} from 'react-native';
 import type {EmptyObject, ValueOf} from 'type-fest';
-import type {IllustrationName} from '@components/Icon/chunks/illustrations.chunk';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
 import type {
     AllMultifactorAuthenticationBaseParameters,
@@ -36,28 +34,9 @@ type MultifactorAuthenticationPromptConfig = {
 };
 
 /**
- * Configuration for displaying multifactor authentication outcomes with illustrations and text.
- */
-type MultifactorAuthenticationOutcomeConfig = {
-    illustration: IllustrationName;
-    iconWidth: number;
-    iconHeight: number;
-    padding: ViewStyle;
-    headerTitle: TranslationPaths;
-    title: TranslationPaths;
-    description: TranslationPaths;
-    customDescription?: React.FunctionComponent;
-};
-
-/**
  * Collection of prompts keyed by prompt identifier.
  */
 type MultifactorAuthenticationPrompt = Record<string, MultifactorAuthenticationPromptConfig>;
-
-/**
- * Collection of outcomes keyed by an outcome type.
- */
-type MultifactorAuthenticationOutcome = Record<string, MultifactorAuthenticationOutcomeConfig>;
 
 /**
  * Configuration for modals in multifactor authentication flows.
@@ -75,14 +54,13 @@ type MultifactorAuthenticationModalOptional = {
     cancelConfirmation?: Partial<MultifactorAuthenticationCancelConfirm>;
 };
 
-/**
- * Optional outcome configuration with partial properties for scenario overrides.
- */
-type MultifactorAuthenticationOutcomeOptional = Record<string, Partial<MultifactorAuthenticationOutcomeConfig>>;
+type FailureScreenOverrides = Partial<Record<MultifactorAuthenticationReason, React.ReactElement>>;
 
 type MultifactorAuthenticationUI = {
     MODALS: MultifactorAuthenticationModal;
-    OUTCOMES: MultifactorAuthenticationOutcome;
+    successScreen?: React.ReactElement;
+    defaultFailureScreen?: React.ReactElement;
+    failureScreens?: FailureScreenOverrides;
 };
 
 /**
@@ -119,20 +97,27 @@ type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> =
      * so the absence of payload will be tolerated at the run-time.
      */
     pure?: true;
-} & MultifactorAuthenticationUI;
+} & MultifactorAuthenticationUI &
+    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultFailureScreen'>>;
 
 /**
  * Scenario configuration for custom scenarios with optional overrides.
  */
-type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<MultifactorAuthenticationScenarioConfig<T>, 'MODALS' | 'OUTCOMES'> & {
+type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<
+    MultifactorAuthenticationScenarioConfig<T>,
+    'MODALS' | 'failureScreens' | 'successScreen' | 'defaultFailureScreen'
+> & {
     MODALS?: MultifactorAuthenticationModalOptional;
-    OUTCOMES: MultifactorAuthenticationOutcomeOptional;
+    successScreen?: React.ReactElement;
+    defaultFailureScreen?: React.ReactElement;
+    failureScreens?: FailureScreenOverrides;
 };
 
 /**
  * Default UI configuration shared across scenarios.
  */
-type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS' | 'OUTCOMES'>;
+type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS'> &
+    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultFailureScreen' | 'failureScreens'>>;
 
 /**
  * Record mapping all scenarios to their configurations.
@@ -190,8 +175,6 @@ type MultifactorAuthenticationScenario = ValueOf<typeof CONST.MULTIFACTOR_AUTHEN
 
 export type {
     MultifactorAuthenticationPrompt,
-    MultifactorAuthenticationOutcome,
-    MultifactorAuthenticationOutcomeConfig,
     MultifactorAuthenticationModal,
     MultifactorAuthenticationScenarioResponse,
     MultifactorAuthenticationScenarioAdditionalParams,
@@ -205,4 +188,5 @@ export type {
     MultifactorAuthenticationProcessScenarioParameters,
     MultifactorAuthenticationDefaultUIConfig,
     MultifactorAuthenticationScenarioCustomConfig,
+    FailureScreenOverrides,
 };
