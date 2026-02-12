@@ -59,7 +59,7 @@ function applyHTTPSOnyxUpdates<TKey extends OnyxKey>(request: Request<TKey>, res
 
                 trackExpenseApiError({
                     command: request.command,
-                    jsonCode: Number(response.jsonCode),
+                    jsonCode: response.jsonCode ?? 0,
                     message: response.message,
                     requestData: request.data,
                 });

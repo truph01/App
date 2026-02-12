@@ -87,7 +87,7 @@ function trackExpenseCreationError(error: Error | null, context: ExpenseCreation
 
 type ApiErrorContext = {
     command: string;
-    jsonCode: number;
+    jsonCode: string | number;
     message?: string;
     transactionID?: string;
     reportID?: string;
