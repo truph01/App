@@ -1362,7 +1362,7 @@ describe('CardUtils', () => {
                 cardName: '480801XXXXXX2554',
                 domainName: 'expensify-policy41314f4dc5ce25af.exfy',
                 fraud: 'none',
-                fundID: 1,
+                fundID: '1',
                 lastFourPAN: '2554',
                 lastUpdated: '',
                 lastScrape: '2024-11-27 11:00:53',
