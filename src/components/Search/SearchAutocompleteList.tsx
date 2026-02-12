@@ -868,35 +868,33 @@ function SearchAutocompleteList({
     }, [autocompleteQueryValue, onHighlightFirstItem, normalizedReferenceText]);
 
     return (
-        // On page refresh, when the list is rendered before options are initialized the auto-focusing on initiallyFocusedOptionKey
-        // will fail because the list will be empty on first render so we only render after options are initialized.
-        areOptionsInitialized && (
-            <SelectionListWithSections<AutocompleteListItem>
-                showLoadingPlaceholder
-                sections={sections}
-                onSelectRow={onListItemPress}
-                ListItem={SearchRouterItem}
-                style={{
-                    containerStyle: [styles.mh100],
-                    listStyle: [styles.ph2, styles.overscrollBehaviorContain],
-                    contentContainerStyle: styles.pb2,
-                    listItemWrapperStyle: [styles.pr0, styles.pl0],
-                    sectionTitleStyles: styles.mhn2,
-                }}
-                shouldSingleExecuteRowSelect
-                ref={setListRef}
-                initialScrollIndex={0}
-                initiallyFocusedItemKey={!shouldUseNarrowLayout ? firstRecentReportKey : undefined}
-                shouldScrollToFocusedIndex={!isInitialRender}
-                disableKeyboardShortcuts={!shouldSubscribeToArrowKeyEvents}
-                addBottomSafeAreaPadding
-                onLayout={() => {
-                    setPerformanceTimersEnd();
-                    setIsInitialRender(false);
-                    innerListRef.current?.updateExternalTextInputFocus(textInputRef?.current?.isFocused() ?? false);
-                }}
-            />
-        )
+        <SelectionListWithSections<AutocompleteListItem>
+            showLoadingPlaceholder
+            sections={sections}
+            onSelectRow={onListItemPress}
+            ListItem={SearchRouterItem}
+            style={{
+                containerStyle: [styles.mh100],
+                listStyle: [styles.ph2, styles.overscrollBehaviorContain],
+                contentContainerStyle: styles.pb2,
+                listItemWrapperStyle: [styles.pr0, styles.pl0],
+                sectionTitleStyles: styles.mhn2,
+            }}
+            shouldSingleExecuteRowSelect
+            ref={setListRef}
+            initialScrollIndex={0}
+            // Only set initiallyFocusedItemKey after options are initialized, otherwise the list would be
+            // empty on first render and auto-focusing would fail.
+            initiallyFocusedItemKey={!shouldUseNarrowLayout && areOptionsInitialized ? firstRecentReportKey : undefined}
+            shouldScrollToFocusedIndex={!isInitialRender}
+            disableKeyboardShortcuts={!shouldSubscribeToArrowKeyEvents}
+            addBottomSafeAreaPadding
+            onLayout={() => {
+                setPerformanceTimersEnd();
+                setIsInitialRender(false);
+                innerListRef.current?.updateExternalTextInputFocus(textInputRef?.current?.isFocused() ?? false);
+            }}
+        />
     );
 }
 
