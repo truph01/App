@@ -87,7 +87,7 @@ import {
     isTaskReport,
     isValidReportIDFromPath,
 } from '@libs/ReportUtils';
-import {cancelSpan} from '@libs/telemetry/activeSpans';
+import {cancelSpan, cancelSpansByPrefix} from '@libs/telemetry/activeSpans';
 import {isNumeric} from '@libs/ValidationUtils';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 import {setShouldShowComposeInput} from '@userActions/Composer';
@@ -652,6 +652,9 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
 
             // We need to cancel telemetry span when user leaves the screen before full report data is loaded
             cancelSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`);
+
+            // Cancel any pending send-message spans to prevent orphaned spans when navigating away
+            cancelSpansByPrefix(CONST.TELEMETRY.SPAN_SEND_MESSAGE);
         };
     }, [reportID]);
 

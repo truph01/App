@@ -52,8 +52,16 @@ function cancelAllSpans() {
     }
 }
 
+function cancelSpansByPrefix(prefix: string) {
+    for (const [spanId] of activeSpans.entries()) {
+        if (spanId.startsWith(prefix)) {
+            cancelSpan(spanId);
+        }
+    }
+}
+
 function getSpan(spanId: string) {
     return activeSpans.get(spanId);
 }
 
-export {startSpan, endSpan, getSpan, cancelSpan, cancelAllSpans};
+export {startSpan, endSpan, getSpan, cancelSpan, cancelAllSpans, cancelSpansByPrefix};
