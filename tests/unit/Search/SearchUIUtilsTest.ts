@@ -4790,7 +4790,7 @@ describe('SearchUIUtils', () => {
             expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.EXPORT);
         });
 
-        it('should show split accounting sections with per-feed items and reconciliation sub-options', () => {
+        it('should show accounting section with statements, unapproved cash, unapproved card, and reconciliation items', () => {
             const mockPolicies = {
                 policy1: {
                     id: 'policy1',
@@ -4844,24 +4844,15 @@ describe('SearchUIUtils', () => {
                 reportCounts,
             );
 
-            const statementsSection = sections.find((section) => section.translationPath === 'search.cardStatements');
-            const unapprovedSection = sections.find((section) => section.translationPath === 'search.unapprovedAccruals');
-            const reconciliationSection = sections.find((section) => section.translationPath === 'search.bankReconciliation');
+            const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
+            expect(accountingSection).toBeDefined();
+            expect(accountingSection?.menuItems.length).toBeGreaterThan(0);
 
-            expect(statementsSection).toBeDefined();
-            expect(unapprovedSection).toBeDefined();
-            expect(reconciliationSection).toBeDefined();
-
-            const statementItemKeys = statementsSection?.menuItems.map((item) => item.key) ?? [];
-            expect(statementItemKeys.some((key) => key.startsWith(`${CONST.SEARCH.SEARCH_KEYS.STATEMENTS}_`))).toBeTruthy();
-
-            const unapprovedItemKeys = unapprovedSection?.menuItems.map((item) => item.key) ?? [];
-            expect(unapprovedItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH);
-            expect(unapprovedItemKeys.some((key) => key.startsWith(`${CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD}_`))).toBeTruthy();
-
-            const reconciliationItemKeys = reconciliationSection?.menuItems.map((item) => item.key) ?? [];
-            expect(reconciliationItemKeys).toContain(`${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT}`);
-            expect(reconciliationItemKeys).toContain(`${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD}`);
+            const menuItemKeys = accountingSection?.menuItems.map((item) => item.key) ?? [];
+            expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.STATEMENTS);
+            expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CASH);
+            expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.UNAPPROVED_CARD);
+            expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.RECONCILIATION);
         });
 
         it('should show saved section when there are saved searches', () => {
@@ -4978,7 +4969,7 @@ describe('SearchUIUtils', () => {
             expect(todoSection).toBeUndefined();
         });
 
-        it('should not show accounting sections when user has no admin permissions or card feeds', () => {
+        it('should not show accounting section when user has no admin permissions or card feeds', () => {
             const mockPolicies = {
                 policy1: {
                     id: 'policy1',
@@ -5008,8 +4999,8 @@ describe('SearchUIUtils', () => {
                 reportCounts,
             );
 
-            const accountingSections = sections.filter((section) => ['search.cardStatements', 'search.unapprovedAccruals', 'search.bankReconciliation'].includes(section.translationPath));
-            expect(accountingSections).toHaveLength(0);
+            const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
+            expect(accountingSection).toBeUndefined();
         });
 
         it('should show reconciliation for ACH-only scenario (payments enabled, active VBBA, reimburser set, areExpensifyCardsEnabled = false)', () => {
@@ -5039,14 +5030,14 @@ describe('SearchUIUtils', () => {
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Send', 'ThumbsUp']));
             const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, mockPolicies, {}, false, undefined, false, {}, reportCounts);
 
-            const reconciliationSection = sections.find((section) => section.translationPath === 'search.bankReconciliation');
-            expect(reconciliationSection).toBeDefined();
+            const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
+            expect(accountingSection).toBeDefined();
 
-            const menuItemKeys = reconciliationSection?.menuItems.map((item) => item.key) ?? [];
-            expect(menuItemKeys).toContain(`${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT}`);
+            const menuItemKeys = accountingSection?.menuItems.map((item) => item.key) ?? [];
+            expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.RECONCILIATION);
         });
 
-        it('should show Expensify Card reconciliation for card-only scenario without card feeds', () => {
+        it('should not show reconciliation for card-only scenario without card feeds (areExpensifyCardsEnabled = true but no card feeds)', () => {
             const mockPolicies = {
                 policy1: {
                     id: 'policy1',
@@ -5077,11 +5068,11 @@ describe('SearchUIUtils', () => {
                 {},
                 reportCounts,
             );
-            const reconciliationSection = sections.find((section) => section.translationPath === 'search.bankReconciliation');
+            const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
 
-            expect(reconciliationSection).toBeDefined();
-            const menuItemKeys = reconciliationSection?.menuItems.map((item) => item.key) ?? [];
-            expect(menuItemKeys).toContain(`${CONST.SEARCH.SEARCH_KEYS.RECONCILIATION}_${CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD}`);
+            expect(accountingSection).toBeDefined();
+            const menuItemKeys = accountingSection?.menuItems.map((item) => item.key) ?? [];
+            expect(menuItemKeys).toContain(CONST.SEARCH.SEARCH_KEYS.RECONCILIATION);
         });
 
         it('should generate correct routes', () => {

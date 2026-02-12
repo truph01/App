@@ -76,7 +76,6 @@ import {
     shouldShowEmptyState,
     shouldShowYear as shouldShowYearUtil,
 } from '@libs/SearchUIUtils';
-import type {SearchKey} from '@libs/SearchUIUtils';
 import {cancelSpan, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import {getOriginalTransactionWithSplitInfo, hasValidModifiedAmount, isOnHold, isTransactionPendingDelete} from '@libs/TransactionUtils';
 import Navigation, {navigationRef} from '@navigation/Navigation';
@@ -287,15 +286,7 @@ function Search({
 
     const {defaultCardFeed} = useCardFeedsForDisplay();
     const suggestedSearches = useMemo(() => getSuggestedSearches(accountID, defaultCardFeed?.id), [defaultCardFeed?.id, accountID]);
-    const searchKey = useMemo<SearchKey | undefined>(() => {
-        const exactMatch = Object.entries(suggestedSearches).find(([, search]) => search.hash === hash)?.[0];
-        if (exactMatch) {
-            return exactMatch as SearchKey;
-        }
-
-        const similarMatch = Object.entries(suggestedSearches).find(([, search]) => search.similarSearchHash === similarSearchHash)?.[0];
-        return similarMatch as SearchKey | undefined;
-    }, [suggestedSearches, hash, similarSearchHash]);
+    const searchKey = useMemo(() => Object.values(suggestedSearches).find((search) => search.similarSearchHash === similarSearchHash)?.key, [suggestedSearches, similarSearchHash]);
     const searchDataType = useMemo(() => (shouldUseLiveData ? CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT : searchResults?.search?.type), [shouldUseLiveData, searchResults?.search?.type]);
     const shouldCalculateTotals = useSearchShouldCalculateTotals(searchKey, hash, offset === 0);
 

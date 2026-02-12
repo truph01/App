@@ -209,7 +209,7 @@ export default function useSearchTypeMenu(queryJSON: SearchQueryJSON) {
 
                         sectionItems.push({
                             badgeText: item.badgeText,
-                            text: item.title ?? (item.translationPath ? translate(item.translationPath) : ''),
+                            text: translate(item.translationPath),
                             isSelected,
                             icon,
                             success: isSelected,
