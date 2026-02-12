@@ -87,7 +87,7 @@ const getCardHintText = (validFrom: string | undefined, validThru: string | unde
         return;
     }
     const formatDateForDisplay = (utcDateTime: string): string => {
-        const dateInTimezone = assigneeTimeZone ? DateUtils.formatUTCDateTimeToDateInTimezone(utcDateTime, assigneeTimeZone) : DateUtils.formatWithUTCTimeZone(utcDateTime, 'yyyy-MM-dd');
+        const dateInTimezone = DateUtils.formatUTCDateTimeToDateInTimezone(utcDateTime, assigneeTimeZone);
         return dateInTimezone ? DateUtils.formatToReadableString(dateInTimezone) : '';
     };
     const startDate = formatDateForDisplay(validFrom);
