@@ -324,8 +324,6 @@ function SearchAutocompleteList({
     const categoryAutocompleteList = getAutocompleteCategories(allPolicyCategories);
     const recentCategoriesAutocompleteList = getAutocompleteRecentCategories(allRecentCategories);
 
-    const [policies = getEmptyObject<NonNullable<OnyxCollection<Policy>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
-
     const taxRates = getAllTaxRates(policies);
 
     const taxAutocompleteList = getAutocompleteTaxList(taxRates);
