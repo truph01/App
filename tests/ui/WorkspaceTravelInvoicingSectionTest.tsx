@@ -5,6 +5,7 @@ import Onyx from 'react-native-onyx';
 import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
+import {getTravelInvoicingCardSettingsKey} from '@libs/TravelInvoicingUtils';
 import WorkspaceTravelInvoicingSection from '@pages/workspace/travel/WorkspaceTravelInvoicingSection';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -108,7 +109,7 @@ describe('WorkspaceTravelInvoicingSection', () => {
 
         it('should render sections when paymentBankAccountID is not set', async () => {
             // Given Travel Invoicing card settings exist but without paymentBankAccountID
-            const travelInvoicingKey = `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${WORKSPACE_ACCOUNT_ID}_${CONST.TRAVEL.PROGRAM_TRAVEL_US}` as OnyxKey;
+            const travelInvoicingKey = getTravelInvoicingCardSettingsKey(WORKSPACE_ACCOUNT_ID);
 
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
@@ -119,22 +120,17 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // The Central Invoicing section should be visible
             expect(screen.getByText('Central invoicing')).toBeTruthy();
         });
     });
 
     describe('When Travel Invoicing is configured', () => {
-        const travelInvoicingKey = `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${WORKSPACE_ACCOUNT_ID}_${CONST.TRAVEL.PROGRAM_TRAVEL_US}` as OnyxKey;
+        const travelInvoicingKey = getTravelInvoicingCardSettingsKey(WORKSPACE_ACCOUNT_ID);
         const bankAccountKey = ONYXKEYS.BANK_ACCOUNT_LIST;
 
         it('should render the section title when card settings are properly configured', async () => {
-            // Given Travel Invoicing is properly configured
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(travelInvoicingKey, {
@@ -154,17 +150,12 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // The section title should be visible
             expect(screen.getByText('Central invoicing')).toBeTruthy();
         });
 
         it('should display current travel spend label when configured', async () => {
-            // Given Travel Invoicing is configured with current balance
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(travelInvoicingKey, {
@@ -184,17 +175,12 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // Then the current travel spend label should be visible
             expect(screen.getByText('Current travel spend')).toBeTruthy();
         });
 
         it('should display current travel limit label when configured', async () => {
-            // Given Travel Invoicing is configured with remaining limit
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(travelInvoicingKey, {
@@ -214,17 +200,12 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // Then the current travel limit label should be visible
             expect(screen.getByText('Current travel limit')).toBeTruthy();
         });
 
         it('should display settlement account label', async () => {
-            // Given Travel Invoicing is configured with settlement account
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(travelInvoicingKey, {
@@ -244,17 +225,12 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // Then the settlement account label should be visible
             expect(screen.getByText('Settlement account')).toBeTruthy();
         });
 
         it('should display settlement frequency label', async () => {
-            // Given Travel Invoicing is configured
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(travelInvoicingKey, {
@@ -274,24 +250,19 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // Then the settlement frequency label should be visible
             expect(screen.getByText('Settlement frequency')).toBeTruthy();
         });
 
         it('should show correct frequency value and navigate on press', async () => {
-            // Given Travel Invoicing is configured with Monthly frequency (default if monthlySettlementDate exists)
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(travelInvoicingKey, {
                     paymentBankAccountID: 12345,
                     remainingLimit: 50000,
                     currentBalance: 10000,
-                    monthlySettlementDate: '2023-10-01',
+                    monthlySettlementDate: new Date(),
                 });
                 await Onyx.merge(bankAccountKey, {
                     12345: {
@@ -305,12 +276,8 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
-
             await waitForBatchedUpdatesWithAct();
-
-            // Then it should display "Monthly"
             expect(screen.getByText('Monthly')).toBeTruthy();
             expect(screen.getByText('Settlement frequency')).toBeTruthy();
         });
@@ -320,26 +287,21 @@ describe('WorkspaceTravelInvoicingSection', () => {
         const cardSettingsKey = `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${WORKSPACE_ACCOUNT_ID}` as OnyxKey;
 
         it('should NOT show loading indicator when toggle has a pending action (offline-first)', async () => {
-            // Given the toggle action is in flight (pendingAction = ADD)
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(cardSettingsKey, {
                     isEnabled: true,
-                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                 });
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
             await waitForBatchedUpdatesWithAct();
-
-            // Then NO loading indicator should be visible (offline-first pattern)
             expect(screen.queryByTestId('activity-indicator')).toBeNull();
         });
 
         it('should NOT show loading indicator when only isLoading is true without pendingAction (page fetch)', async () => {
-            // Given the page is loading data (isLoading = true, but no pendingAction)
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, mockPolicy);
                 await Onyx.merge(cardSettingsKey, {
@@ -348,11 +310,8 @@ describe('WorkspaceTravelInvoicingSection', () => {
                 await waitForBatchedUpdatesWithAct();
             });
 
-            // When rendering the component
             renderWorkspaceTravelInvoicingSection();
             await waitForBatchedUpdatesWithAct();
-
-            // Then the loading indicator should NOT be visible
             expect(screen.queryByTestId('activity-indicator')).toBeNull();
         });
     });

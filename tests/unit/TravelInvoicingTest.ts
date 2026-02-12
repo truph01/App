@@ -3,6 +3,7 @@ import {
     clearTravelInvoicingSettlementAccountErrors,
     clearTravelInvoicingSettlementFrequencyErrors,
     setTravelInvoicingSettlementAccount,
+    toggleTravelInvoicing,
     updateTravelInvoiceSettlementFrequency,
 } from '@libs/actions/TravelInvoicing';
 // We need to import API because it is used in the tests
@@ -199,5 +200,61 @@ describe('TravelInvoicing', () => {
         );
 
         jest.useRealTimers();
+    });
+
+    it('toggleTravelInvoicing sends correct optimistic, success, and failure data', () => {
+        const policyID = '123';
+        const workspaceAccountID = 456;
+        const enabled = true;
+        const cardSettingsKey = getTravelInvoicingCardSettingsKey(workspaceAccountID);
+
+        toggleTravelInvoicing(policyID, workspaceAccountID, enabled);
+
+        expect(spyAPIWrite).toHaveBeenCalledWith(
+            'ToggleTravelInvoicing',
+            {
+                policyID,
+                enabled,
+            },
+            expect.objectContaining({
+                optimisticData: expect.arrayContaining([
+                    expect.objectContaining({
+                        key: cardSettingsKey,
+                        value: expect.objectContaining({
+                            isEnabled: enabled,
+                            [CONST.TRAVEL.PROGRAM_TRAVEL_US]: expect.objectContaining({
+                                isEnabled: enabled,
+                            }),
+                            pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                            errors: null,
+                        }),
+                    }),
+                ]),
+                successData: expect.arrayContaining([
+                    expect.objectContaining({
+                        key: cardSettingsKey,
+                        value: expect.objectContaining({
+                            pendingAction: null,
+                            [CONST.TRAVEL.PROGRAM_TRAVEL_US]: expect.objectContaining({
+                                isEnabled: enabled,
+                            }),
+                        }),
+                    }),
+                ]),
+                failureData: expect.arrayContaining([
+                    expect.objectContaining({
+                        key: cardSettingsKey,
+                        value: expect.objectContaining({
+                            isEnabled: !enabled,
+                            [CONST.TRAVEL.PROGRAM_TRAVEL_US]: expect.objectContaining({
+                                isEnabled: !enabled,
+                            }),
+                            pendingAction: null,
+                            errors: expect.anything() as unknown,
+                        }),
+                    }),
+                ]),
+            }),
+        );
     });
 });

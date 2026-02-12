@@ -255,7 +255,10 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
             key: cardSettingsKey,
             value: {
                 isEnabled: enabled,
-                pendingAction: enabled ? CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD : CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                [CONST.TRAVEL.PROGRAM_TRAVEL_US]: {
+                    isEnabled: enabled,
+                },
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                 errors: null,
             },
         },
@@ -267,6 +270,9 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
             key: cardSettingsKey,
             value: {
                 pendingAction: null,
+                [CONST.TRAVEL.PROGRAM_TRAVEL_US]: {
+                    isEnabled: enabled,
+                },
             },
         },
     ];
@@ -278,6 +284,9 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
             key: cardSettingsKey,
             value: {
                 isEnabled: !enabled,
+                [CONST.TRAVEL.PROGRAM_TRAVEL_US]: {
+                    isEnabled: !enabled,
+                },
                 pendingAction: null,
                 errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
             },

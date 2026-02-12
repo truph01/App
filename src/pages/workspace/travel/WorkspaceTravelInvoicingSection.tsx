@@ -2,17 +2,13 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import AnimatedSubmitButton from '@components/AnimatedSubmitButton';
 import ConfirmModal from '@components/ConfirmModal';
-import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Section from '@components/Section';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
-import {openExternalLink} from '@libs/actions/Link';
 import {
     clearToggleTravelInvoicingErrors,
     clearTravelInvoicingSettlementAccountErrors,
@@ -35,7 +31,6 @@ import {
     hasTravelInvoicingSettlementAccount,
 } from '@libs/TravelInvoicingUtils';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
-import type {ToggleSettingOptionRowProps} from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -55,8 +50,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const workspaceAccountID = useWorkspaceAccountID(policyID);
-    const {isExecuting, singleExecution} = useSingleExecution();
-    const icons = useMemoizedLazyExpensifyIcons(['LuggageWithLines', 'NewWindow']);
 
     // Modal states
     const [isDisableConfirmModalVisible, setIsDisableConfirmModalVisible] = useState(false);
@@ -88,23 +81,24 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const settlementAccountNumber = hasSettlementAccount && settlementAccount?.last4 ? `${CONST.MASKED_PAN_PREFIX}${getLastFourDigits(settlementAccount?.last4 ?? '')}` : '';
 
     // Differentiate toggle errors from settlement account errors based on pendingAction
-    // Toggle actions use ADD or DELETE pendingAction, settlement account uses UPDATE
-    const isTogglePendingAction = cardSettings?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD || cardSettings?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-    const isSettlementAccountPendingAction = cardSettings?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
+    // Toggle actions use root pendingAction (UPDATE), settlement account uses pendingFields
+    const isTogglePendingAction =
+        cardSettings?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE ||
+        cardSettings?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD ||
+        cardSettings?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+    const isSettlementAccountPendingAction = cardSettings?.pendingFields?.paymentBankAccountID === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
 
     // Only show errors/pending under the toggle if it's a toggle action
     const toggleErrors = isTogglePendingAction ? cardSettings?.errors : undefined;
     const togglePendingAction = isTogglePendingAction ? cardSettings?.pendingAction : undefined;
 
     // Only show errors/pending under the settlement account if it's a settlement account action
-    // IMPORTANT: Don't show settlement account errors during toggle operations
-    const settlementAccountErrors = isSettlementAccountPendingAction ? cardSettings?.errors : undefined;
-    const settlementAccountPendingAction = isSettlementAccountPendingAction ? cardSettings?.pendingAction : undefined;
-    // Only show error indicator if we have settlement account errors AND it's not a toggle operation
-    const hasSettlementAccountError = !isTogglePendingAction && isSettlementAccountPendingAction && Object.keys(cardSettings?.errors ?? {}).length > 0;
-    const settlementFrequencyErrorKey = 'monthlySettlementDate';
-    const hasSettlementFrequencyError = !!cardSettings?.errorFields?.[settlementFrequencyErrorKey];
-    const settlementFrequencyErrors = hasSettlementFrequencyError ? cardSettings?.errorFields?.[settlementFrequencyErrorKey] : null;
+    const settlementAccountErrors = isSettlementAccountPendingAction ? cardSettings?.errorFields?.paymentBankAccountID : undefined;
+    const settlementAccountPendingAction = isSettlementAccountPendingAction ? cardSettings?.pendingFields?.paymentBankAccountID : undefined;
+    // Only show error indicator if we have settlement account errors
+    const hasSettlementAccountError = !!settlementAccountErrors;
+    const hasSettlementFrequencyError = !!cardSettings?.errorFields?.[CONST.TRAVEL.MONTHLY_SETTLEMENT_DATE];
+    const settlementFrequencyErrors = hasSettlementFrequencyError ? cardSettings?.errorFields?.[CONST.TRAVEL.MONTHLY_SETTLEMENT_DATE] : null;
 
     // Bank account eligibility for toggle handler
     const isSetupUnfinished = hasInProgressUSDVBBA(reimbursementAccount?.achData);
@@ -157,9 +151,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         toggleTravelInvoicing(policyID, workspaceAccountID, true);
     };
 
-    /**
-     * Confirm disable action - clears settings via toggleTravelInvoicing
-     */
     const handleConfirmDisable = () => {
         setIsDisableConfirmModalVisible(false);
         toggleTravelInvoicing(policyID, workspaceAccountID, false);
@@ -172,133 +163,96 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         return <CentralInvoicingSubtitleWrapper />;
     };
 
-    const optionItems: ToggleSettingOptionRowProps[] = [
-        {
-            title: translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.title'),
-            subtitle: getCentralInvoicingSubtitle(),
-            switchAccessibilityLabel: translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subtitle'),
-            isActive: isTravelInvoicingEnabled,
-            onToggle: handleToggle,
-            pendingAction: togglePendingAction,
-            errors: toggleErrors,
-            onCloseError: () => clearToggleTravelInvoicingErrors(workspaceAccountID),
-            subMenuItems: (
-                <>
-                    <View style={[styles.dFlex, styles.flexRow, styles.mt6, styles.gap4, styles.alignItemsCenter]}>
-                        <MenuItemWithTopDescription
-                            description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendLabel')}
-                            title={formattedSpend}
-                            rootWrapperStyle={styles.flex1}
-                            wrapperStyle={[styles.sectionMenuItemTopDescription]}
-                            titleStyle={[styles.textNormalThemeText, styles.headerAnonymousFooter]}
-                            descriptionTextStyle={styles.textLabelSupportingNormal}
-                            interactive={false}
-                        />
-                        <View style={[styles.wFitContent]}>
-                            <AnimatedSubmitButton
-                                text={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendCta')}
-                                success={false}
-                                onPress={() => {}}
-                                isSubmittingAnimationRunning={false}
-                                onAnimationFinish={() => {}}
-                                // isSubmittingAnimationRunning={isSubmittingAnimationRunning}
-                                // onAnimationFinish={stopAnimation}
-                                // isDisabled={shouldBlockSubmit}
-                            />
-                        </View>
-                    </View>
-                    <MenuItemWithTopDescription
-                        description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelLimitLabel')}
-                        title={formattedLimit}
-                        wrapperStyle={[styles.sectionMenuItemTopDescription]}
-                        titleStyle={styles.textNormalThemeText}
-                        descriptionTextStyle={styles.textLabelSupportingNormal}
-                        interactive={false}
+    const centralInvoicingSubMenuItems = (
+        <>
+            <View style={[styles.dFlex, styles.flexRow, styles.mt6, styles.gap4, styles.alignItemsCenter]}>
+                <MenuItemWithTopDescription
+                    description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendLabel')}
+                    title={formattedSpend}
+                    rootWrapperStyle={styles.flex1}
+                    wrapperStyle={[styles.sectionMenuItemTopDescription]}
+                    titleStyle={[styles.textNormalThemeText, styles.headerAnonymousFooter]}
+                    descriptionTextStyle={styles.textLabelSupportingNormal}
+                    interactive={false}
+                />
+                <View style={[styles.wFitContent]}>
+                    <AnimatedSubmitButton
+                        text={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendCta')}
+                        success={false}
+                        onPress={() => {}}
+                        isSubmittingAnimationRunning={false}
+                        onAnimationFinish={() => {}}
+                        // TODO: Release 7.2 - Pay balance
+                        // isSubmittingAnimationRunning={isSubmittingAnimationRunning}
+                        // onAnimationFinish={stopAnimation}
+                        // isDisabled={shouldBlockSubmit}
                     />
-                    <OfflineWithFeedback
-                        errors={settlementAccountErrors}
-                        pendingAction={settlementAccountPendingAction}
-                        onClose={() => clearTravelInvoicingSettlementAccountErrors(workspaceAccountID, cardSettings?.previousPaymentBankAccountID ?? null)}
-                        errorRowStyles={styles.mh2half}
-                        errorRowTextStyles={styles.mr3}
-                    >
-                        <MenuItemWithTopDescription
-                            description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.settlementAccountLabel')}
-                            title={settlementAccountNumber}
-                            onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_ACCOUNT.getRoute(policyID))}
-                            wrapperStyle={[styles.sectionMenuItemTopDescription]}
-                            titleStyle={settlementAccountNumber ? styles.textNormalThemeText : styles.colorMuted}
-                            descriptionTextStyle={styles.textLabelSupportingNormal}
-                            shouldShowRightIcon
-                            brickRoadIndicator={hasSettlementAccountError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
-                        />
-                    </OfflineWithFeedback>
-                    <OfflineWithFeedback
-                        errors={settlementFrequencyErrors}
-                        pendingAction={cardSettings?.pendingFields?.monthlySettlementDate}
-                        onClose={() => clearTravelInvoicingSettlementFrequencyErrors(workspaceAccountID, cardSettings?.previousMonthlySettlementDate)}
-                        errorRowStyles={styles.mh2half}
-                        errorRowTextStyles={styles.mr3}
-                    >
-                        <MenuItemWithTopDescription
-                            description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.settlementFrequencyLabel')}
-                            title={localizedFrequency}
-                            onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_FREQUENCY.getRoute(policyID))}
-                            wrapperStyle={[styles.sectionMenuItemTopDescription]}
-                            titleStyle={styles.textNormalThemeText}
-                            descriptionTextStyle={styles.textLabelSupportingNormal}
-                            shouldShowRightIcon
-                            brickRoadIndicator={hasSettlementFrequencyError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
-                        />
-                    </OfflineWithFeedback>
-                </>
-            ),
-        },
-    ];
-
-    const renderOptionItem = (item: ToggleSettingOptionRowProps, index: number) => (
-        <Section
-            key={`toggleSettingOptionItem-${index}`}
-            isCentralPane
-        >
-            <ToggleSettingOptionRow
-                title={item.title}
-                titleStyle={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle]}
-                subtitle={item.subtitle}
-                switchAccessibilityLabel={item.switchAccessibilityLabel}
-                onToggle={item.onToggle}
-                disabled={item.disabled}
-                isActive={item.isActive}
-                pendingAction={item.pendingAction}
-                errors={item.errors}
-                onCloseError={item.onCloseError}
-                subMenuItems={item.subMenuItems}
+                </View>
+            </View>
+            <MenuItemWithTopDescription
+                description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelLimitLabel')}
+                title={formattedLimit}
+                wrapperStyle={[styles.sectionMenuItemTopDescription]}
+                titleStyle={styles.textNormalThemeText}
+                descriptionTextStyle={styles.textLabelSupportingNormal}
+                interactive={false}
             />
-        </Section>
+            <OfflineWithFeedback
+                errors={settlementAccountErrors}
+                pendingAction={settlementAccountPendingAction}
+                onClose={() => clearTravelInvoicingSettlementAccountErrors(workspaceAccountID, cardSettings?.previousPaymentBankAccountID ?? null)}
+                errorRowStyles={styles.mh2half}
+                errorRowTextStyles={styles.mr3}
+            >
+                <MenuItemWithTopDescription
+                    description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.settlementAccountLabel')}
+                    title={settlementAccountNumber}
+                    onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_ACCOUNT.getRoute(policyID))}
+                    wrapperStyle={[styles.sectionMenuItemTopDescription]}
+                    titleStyle={settlementAccountNumber ? styles.textNormalThemeText : styles.colorMuted}
+                    descriptionTextStyle={styles.textLabelSupportingNormal}
+                    shouldShowRightIcon
+                    brickRoadIndicator={hasSettlementAccountError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                />
+            </OfflineWithFeedback>
+            <OfflineWithFeedback
+                errors={settlementFrequencyErrors}
+                pendingAction={cardSettings?.pendingFields?.monthlySettlementDate}
+                onClose={() => clearTravelInvoicingSettlementFrequencyErrors(workspaceAccountID, cardSettings?.previousMonthlySettlementDate)}
+                errorRowStyles={styles.mh2half}
+                errorRowTextStyles={styles.mr3}
+            >
+                <MenuItemWithTopDescription
+                    description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.settlementFrequencyLabel')}
+                    title={localizedFrequency}
+                    onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_FREQUENCY.getRoute(policyID))}
+                    wrapperStyle={[styles.sectionMenuItemTopDescription]}
+                    titleStyle={styles.textNormalThemeText}
+                    descriptionTextStyle={styles.textLabelSupportingNormal}
+                    shouldShowRightIcon
+                    brickRoadIndicator={hasSettlementFrequencyError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                />
+            </OfflineWithFeedback>
+        </>
     );
 
     return (
         <>
-            <Section
-                title={translate('workspace.moreFeatures.travel.travelInvoicing.travelBookingSection.title')}
-                subtitle={translate('workspace.moreFeatures.travel.travelInvoicing.travelBookingSection.subtitle')}
-                subtitleStyles={styles.mb6}
-                isCentralPane
-                subtitleMuted
-            >
-                <MenuItem
-                    title={translate('workspace.moreFeatures.travel.travelInvoicing.travelBookingSection.manageTravelLabel')}
-                    onPress={singleExecution(() => openExternalLink(CONST.FOOTER.TRAVEL_URL))}
-                    disabled={isExecuting}
-                    wrapperStyle={styles.sectionMenuItemTopDescription}
-                    iconRight={icons.NewWindow}
-                    icon={icons.LuggageWithLines}
-                    shouldShowRightIcon
+            <Section isCentralPane>
+                <ToggleSettingOptionRow
+                    title={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.title')}
+                    titleStyle={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle]}
+                    subtitle={getCentralInvoicingSubtitle()}
+                    switchAccessibilityLabel={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subtitle')}
+                    onToggle={handleToggle}
+                    isActive={isTravelInvoicingEnabled}
+                    pendingAction={togglePendingAction}
+                    errors={toggleErrors}
+                    onCloseError={() => clearToggleTravelInvoicingErrors(workspaceAccountID)}
+                    subMenuItems={centralInvoicingSubMenuItems}
                 />
             </Section>
-            {optionItems.map(renderOptionItem)}
 
-            {/* Confirmation modal for disabling Travel Invoicing */}
             <ConfirmModal
                 title={translate('workspace.moreFeatures.travel.travelInvoicing.disableModal.title')}
                 isVisible={isDisableConfirmModalVisible}
@@ -310,7 +264,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 danger
             />
 
-            {/* Blocker modal for outstanding balance */}
             <ConfirmModal
                 title={translate('workspace.moreFeatures.travel.travelInvoicing.outstandingBalanceModal.title')}
                 isVisible={isOutstandingBalanceModalVisible}
