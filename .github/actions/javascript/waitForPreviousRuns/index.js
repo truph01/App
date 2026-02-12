@@ -11552,7 +11552,7 @@ async function getOlderActiveRuns(workflowID, currentRunID, queueLimit) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         per_page: queueLimit,
     });
-    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status));
+    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status ?? ''));
 }
 function run() {
     const workflowID = core.getInput('WORKFLOW_ID', { required: true });

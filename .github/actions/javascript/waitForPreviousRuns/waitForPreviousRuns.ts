@@ -17,7 +17,7 @@ async function getOlderActiveRuns(workflowID: string, currentRunID: number, queu
         per_page: queueLimit,
     });
 
-    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status));
+    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status ?? ''));
 }
 
 function run() {
