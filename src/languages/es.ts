@@ -1049,7 +1049,6 @@ const translations: TranslationDeepObject<typeof en> = {
         settledElsewhere: 'Pagado de otra forma',
         individual: 'Individual',
         business: 'Empresa',
-        settleExpensify: (formattedAmount) => (formattedAmount ? `Pagar ${formattedAmount} con Expensify` : `Pagar con Expensify`),
         settlePersonal: (formattedAmount) => (formattedAmount ? `Pago ${formattedAmount} como individuo` : `Pago con cuenta personal`),
         settleWallet: (formattedAmount) => (formattedAmount ? `Pagar ${formattedAmount} con billetera` : `con billetera`),
         settlePayment: (formattedAmount) => `Pagar ${formattedAmount}`,
