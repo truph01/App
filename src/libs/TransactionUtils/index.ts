@@ -418,7 +418,7 @@ function isPartialTransaction(transaction: OnyxEntry<Transaction>): boolean {
         return true;
     }
 
-    if (isAmountMissing(transaction) && isScanRequest(transaction)) {
+    if (getAmount(transaction) === 0 && isScanRequest(transaction) && isReceiptBeingScanned(transaction)) {
         return true;
     }
 
@@ -1776,9 +1776,13 @@ function getWaypointIndex(key: string): number {
 /**
  * Filters the waypoints which are valid and returns those
  */
-function getValidWaypoints(waypoints: WaypointCollection | undefined, reArrangeIndexes = false): WaypointCollection {
+function getValidWaypoints(waypoints: WaypointCollection | undefined, reArrangeIndexes = false, areWaypointsForGpsDistanceRequest = false): WaypointCollection {
     if (!waypoints) {
         return {};
+    }
+
+    if (areWaypointsForGpsDistanceRequest) {
+        return waypoints;
     }
 
     const sortedIndexes = Object.keys(waypoints)
