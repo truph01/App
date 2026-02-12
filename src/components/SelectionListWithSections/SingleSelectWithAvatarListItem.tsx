@@ -54,7 +54,7 @@ function SingleSelectWithAvatarListItem<TItem extends ListItem>({
         }
 
         const avatarElement = (
-            <View style={[styles.mr3]}>
+            <View>
                 <Avatar
                     source={icon.source}
                     size={CONST.AVATAR_SIZE.DEFAULT}
@@ -62,16 +62,16 @@ function SingleSelectWithAvatarListItem<TItem extends ListItem>({
                     avatarID={icon.id}
                     type={icon.type ?? CONST.ICON_TYPE_AVATAR}
                     fallbackIcon={icon.fallbackIcon}
-                    iconAdditionalStyles={[{width: variables.avatarSizeNormal, height: variables.avatarSizeNormal}]}
+                    iconAdditionalStyles={[{width: variables.avatarSizeNormal, height: variables.avatarSizeNormal}, styles.mr3]}
                 />
             </View>
         );
 
         return {
             itemWithAvatar: {...item, leftElement: avatarElement},
-            computedWrapperStyle: [wrapperStyle, styles.pv0, styles.mnh13],
+            computedWrapperStyle: [wrapperStyle, styles.optionRow, styles.pv0, styles.pv3, styles.w100],
         };
-    }, [icon, item, wrapperStyle, styles.mr3, styles.optionRowCompact, styles.pv0, styles.mnh13]);
+    }, [icon, item, wrapperStyle, styles.optionRowCompact, styles.optionRow, styles.pv0, styles.pv3, styles.w100]);
 
     return (
         <RadioListItem
