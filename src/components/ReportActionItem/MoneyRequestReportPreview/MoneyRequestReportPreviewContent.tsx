@@ -863,7 +863,7 @@ function MoneyRequestReportPreviewContent({
                                             <ActivityIndicator size={40} />
                                         </View>
                                     ) : (
-                                        <View style={[styles.flex1, styles.flexColumn, styles.overflowVisible, styles.minHeight55]}>
+                                        <View style={[styles.flex1, styles.flexColumn, styles.overflowVisible, styles.minHeight42]}>
                                             <FlashList
                                                 snapToAlignment="start"
                                                 decelerationRate="fast"
