@@ -4,7 +4,6 @@ import type {BlurEvent, StyleProp, TextStyle, ViewStyle} from 'react-native';
 import useCurrencyList from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
 import {convertToFrontendAmountAsString, getLocalizedCurrencySymbol} from '@libs/CurrencyUtils';
-import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
 import NumberWithSymbolForm from './NumberWithSymbolForm';
 import type {NumberWithSymbolFormRef} from './NumberWithSymbolForm';
@@ -261,7 +260,7 @@ function MoneyRequestAmountInput({
             toggleNegative={toggleNegative}
             clearNegative={clearNegative}
             onFocus={props.onFocus}
-            accessibilityLabel={getPlatform() === CONST.PLATFORM.WEB ? `${translate('iou.amount')} (${currency})` : undefined}
+            accessibilityLabel={`${translate('iou.amount')} (${currency})`}
         />
     );
 }
