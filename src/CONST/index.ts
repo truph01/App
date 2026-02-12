@@ -8454,9 +8454,6 @@ const CONST = {
             RESEND_CODE: 'ValidateCode-ResendCode',
             RECOVERY_CODE: 'ValidateCode-RecoveryCode',
         },
-        ONBOARDING: {
-            FEATURE_ITEM: 'Onboarding-FeatureItem',
-        },
     },
 
     DOMAIN: {
