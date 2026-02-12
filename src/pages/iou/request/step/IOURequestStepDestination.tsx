@@ -68,9 +68,8 @@ function IOURequestStepDestination({
     ref,
 }: IOURequestStepDestinationProps) {
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
-    const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, allPolicies);
     const reportPolicyID = getIOURequestPolicyID(transaction, report);
-    const policyID = reportPolicyID === CONST.POLICY.ID_FAKE ? perDiemOriginalPolicy?.id : reportPolicyID;
+    const policyID = reportPolicyID === CONST.POLICY.ID_FAKE ? getPolicyByCustomUnitID(transaction, allPolicies)?.id : reportPolicyID;
     const [policy, policyMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${explicitPolicyID ?? policyID}`, {
         canBeMissing: false,
     });
