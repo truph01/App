@@ -475,7 +475,7 @@ const translations = {
         auditor: 'Auditor',
         role: 'Role',
         roleCannotBeChanged: (workflowsLinkPage: string) =>
-            `Role cannot be changed because this member is a <a href="${workflowsLinkPage}">Payer</a> on this workspace.`,
+            `Role can't be changed because this member is a <a href="${workflowsLinkPage}">Payer</a> on this workspace.`,
         currency: 'Currency',
         groupCurrency: 'Group currency',
         rate: 'Rate',
