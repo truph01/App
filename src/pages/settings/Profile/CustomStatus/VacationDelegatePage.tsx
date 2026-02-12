@@ -58,6 +58,7 @@ function VacationDelegatePage() {
                     onSelectRow={onSelectRow}
                     headerTitle={translate('common.vacationDelegate')}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
+                    cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
                 />
             </ScreenWrapper>
             <ConfirmModal

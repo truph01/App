@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Button from '@components/Button';
+import DelegatorList from '@components/DelegatorList';
 import EmojiPickerButtonDropdown from '@components/EmojiPicker/EmojiPickerButtonDropdown';
 import FixedFooter from '@components/FixedFooter';
 import FormProvider from '@components/Form/FormProvider';
@@ -261,15 +262,23 @@ function StatusPage() {
                 </View>
                 <View style={[styles.mb2, styles.mt6]}>
                     <Text style={[styles.headerText, styles.mh5, styles.mb2]}>{translate('common.vacationDelegate')}</Text>
-                    {!hasActiveDelegations && <Text style={[styles.mh5, styles.mb1]}>{translate('statusPage.setVacationDelegate')}</Text>}
-                    <VacationDelegateMenuItem
-                        vacationDelegate={vacationDelegate}
-                        errors={vacationDelegate?.errors}
-                        pendingAction={vacationDelegate?.pendingAction}
-                        onCloseError={() => clearVacationDelegateError(vacationDelegate?.previousDelegate)}
-                        onPress={() => Navigation.navigate(ROUTES.SETTINGS_VACATION_DELEGATE)}
-                        cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
-                    />
+                    {hasActiveDelegations ? (
+                        <DelegatorList
+                            delegators={vacationDelegate?.delegatorFor}
+                            message={translate('statusPage.cannotSetVacationDelegate')}
+                        />
+                    ) : (
+                        <>
+                            <Text style={[styles.mh5, styles.mb1]}>{translate('statusPage.setVacationDelegate')}</Text>
+                            <VacationDelegateMenuItem
+                                vacationDelegate={vacationDelegate}
+                                errors={vacationDelegate?.errors}
+                                pendingAction={vacationDelegate?.pendingAction}
+                                onCloseError={() => clearVacationDelegateError(vacationDelegate?.previousDelegate)}
+                                onPress={() => Navigation.navigate(ROUTES.SETTINGS_VACATION_DELEGATE)}
+                            />
+                        </>
+                    )}
                 </View>
             </FormProvider>
 

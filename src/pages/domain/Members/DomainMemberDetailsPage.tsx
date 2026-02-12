@@ -3,6 +3,7 @@ import {personalDetailsSelector} from '@selectors/PersonalDetails';
 import React, {useState} from 'react';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
+import DelegatorList from '@components/DelegatorList';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import Text from '@components/Text';
 import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
@@ -110,15 +111,23 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 accountID={accountID}
                 avatarButton={avatarButton}
             >
-                {hasActiveDelegations && <Text style={[styles.headerText, styles.mh5, styles.mb2]}>{translate('common.vacationDelegate')}</Text>}
-                <VacationDelegateMenuItem
-                    vacationDelegate={vacationDelegate}
-                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
-                    pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
-                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
-                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, domainPendingActions?.member?.[memberLogin]?.vacationDelegate)}
-                    cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegateForMember', memberLogin)}
-                />
+                {hasActiveDelegations ? (
+                    <>
+                        <Text style={[styles.headerText, styles.mh5, styles.mb2]}>{translate('common.vacationDelegate')}</Text>
+                        <DelegatorList
+                            delegators={vacationDelegate?.delegatorFor}
+                            message={translate('statusPage.cannotSetVacationDelegateForMember', memberLogin)}
+                        />
+                    </>
+                ) : (
+                    <VacationDelegateMenuItem
+                        vacationDelegate={vacationDelegate}
+                        onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
+                        pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
+                        errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
+                        onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, domainPendingActions?.member?.[memberLogin]?.vacationDelegate)}
+                    />
+                )}
             </BaseDomainMemberDetailsComponent>
             <DecisionModal
                 title={translate('domain.members.closeAccount', {count: 1})}

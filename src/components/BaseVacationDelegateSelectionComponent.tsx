@@ -1,11 +1,8 @@
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
-import MenuItem from './MenuItem';
-import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import usePersonalDetailsByLogin from '@hooks/usePersonalDetailsByLogin';
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {searchInServer} from '@libs/actions/Report';
@@ -15,7 +12,8 @@ import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Participant} from '@src/types/onyx/IOU';
-import {type BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
+import type {BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
+import DelegatorList from './DelegatorList';
 import HeaderWithBackButton from './HeaderWithBackButton';
 import UserListItem from './SelectionList/ListItem/UserListItem';
 import SelectionList from './SelectionList/SelectionListWithSections';
@@ -32,9 +30,12 @@ type BaseVacationDelegateSelectionComponentProps = {
 
     /** Function to call when the back button is pressed */
     onBackButtonPress?: () => void;
+
+    /** Message to display when the user can't set a vacation delegate */
+    cannotSetDelegateMessage: string;
 };
 
-function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, headerTitle, onBackButtonPress}: BaseVacationDelegateSelectionComponentProps) {
+function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, headerTitle, onBackButtonPress, cannotSetDelegateMessage}: BaseVacationDelegateSelectionComponentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
@@ -44,7 +45,6 @@ function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, 
     const currentVacationDelegate = vacationDelegate?.delegate ?? '';
     const delegatePersonalDetails = getPersonalDetailByEmail(currentVacationDelegate);
     const hasActiveDelegations = !!vacationDelegate?.delegatorFor?.length;
-    const personalDetailsByLogin = usePersonalDetailsByLogin();
 
     const excludeLogins = {
         ...CONST.EXPENSIFY_EMAILS_OBJECT,
@@ -141,28 +141,6 @@ function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, 
         ),
     };
 
-    const renderDelegatorList = () => {
-        return vacationDelegate?.delegatorFor?.map((delegatorEmail) => {
-            const delegatorDetails = personalDetailsByLogin[delegatorEmail.toLowerCase()];
-            const formattedLogin = formatPhoneNumber(delegatorDetails?.login ?? '');
-            const displayLogin = formattedLogin || delegatorEmail;
-
-            return (
-                <MenuItem
-                    key={delegatorEmail}
-                    title={delegatorDetails?.displayName ?? displayLogin}
-                    description={displayLogin}
-                    avatarID={delegatorDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID}
-                    icon={delegatorDetails?.avatar ?? icons.FallbackAvatar}
-                    iconType={CONST.ICON_TYPE_AVATAR}
-                    numberOfLinesDescription={1}
-                    containerStyle={[styles.pr2, styles.mt1]}
-                    interactive={false}
-                />
-            );
-        });
-    };
-
     return (
         <>
             <HeaderWithBackButton
@@ -170,9 +148,11 @@ function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, 
                 onBackButtonPress={onBackButtonPress}
             />
             {hasActiveDelegations ? (
-                <View style={[styles.mb2, styles.mt6]}>
-                    <Text style={[styles.mh5, styles.mb4]}>{translate('statusPage.cannotSetVacationDelegate')}</Text>
-                    {renderDelegatorList()}
+                <View style={styles.mt6}>
+                    <DelegatorList
+                        delegators={vacationDelegate?.delegatorFor}
+                        message={cannotSetDelegateMessage}
+                    />
                 </View>
             ) : (
                 <View style={[styles.flex1, styles.w100, styles.pRelative]}>

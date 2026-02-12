@@ -1,5 +1,4 @@
 import React from 'react';
-import {View} from 'react-native';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import usePersonalDetailsByLogin from '@hooks/usePersonalDetailsByLogin';
@@ -32,55 +31,18 @@ type VacationDelegateSectionProps = {
      * Should navigate the user to the vacation delegate selection screen.
      */
     onPress: () => void;
-
-    /**
-     *
-     */
-    cannotSetDelegateMessage?: string;
 };
 
-function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCloseError, onPress, cannotSetDelegateMessage}: VacationDelegateSectionProps) {
+function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCloseError, onPress}: VacationDelegateSectionProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const personalDetailsByLogin = usePersonalDetailsByLogin();
 
     const hasVacationDelegate = !!vacationDelegate?.delegate;
-    const hasActiveDelegations = !!vacationDelegate?.delegatorFor?.length;
     const vacationDelegatePersonalDetails = personalDetailsByLogin[vacationDelegate?.delegate?.toLowerCase() ?? ''];
     const formattedDelegateLogin = formatPhoneNumber(vacationDelegatePersonalDetails?.login ?? '');
     const fallbackVacationDelegateLogin = formattedDelegateLogin === '' ? vacationDelegate?.delegate : formattedDelegateLogin;
-
-    const renderDelegatorList = () => {
-        return vacationDelegate?.delegatorFor?.map((delegatorEmail) => {
-            const delegatorDetails = personalDetailsByLogin[delegatorEmail.toLowerCase()];
-            const formattedLogin = formatPhoneNumber(delegatorDetails?.login ?? '');
-            const displayLogin = formattedLogin || delegatorEmail;
-
-            return (
-                <MenuItem
-                    key={delegatorEmail}
-                    title={delegatorDetails?.displayName ?? displayLogin}
-                    description={displayLogin}
-                    avatarID={delegatorDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID}
-                    icon={delegatorDetails?.avatar ?? icons.FallbackAvatar}
-                    iconType={CONST.ICON_TYPE_AVATAR}
-                    numberOfLinesDescription={1}
-                    containerStyle={[styles.pr2, styles.mt1]}
-                    interactive={false}
-                />
-            );
-        });
-    };
-
-    if (hasActiveDelegations) {
-        return (
-            <View>
-                <Text style={[styles.mh5, styles.mb4]}>{cannotSetDelegateMessage}</Text>
-                {renderDelegatorList()}
-            </View>
-        );
-    }
 
     return hasVacationDelegate ? (
         <>
