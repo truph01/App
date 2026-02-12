@@ -22,7 +22,7 @@ jest.mock('@libs/Navigation/Navigation', () => ({
 }));
 
 jest.mock('@react-navigation/native', () => ({
-    ...((): typeof NativeNavigation => jest.requireActual('@react-navigation/native'))(),
+    ...jest.requireActual<typeof NativeNavigation>('@react-navigation/native'),
     useNavigation: jest.fn(() => ({
         navigate: jest.fn(),
         addListener: jest.fn(() => jest.fn()),
@@ -49,6 +49,20 @@ const ACCOUNT_LOGIN = 'test@user.com';
 const TRANSACTION_ID = 'transaction-1';
 const REPORT_ID = 'report-1';
 const POLICY_ID = 'policy-1';
+
+function createPolicyWithTimeTracking(): Policy {
+    return {
+        ...createRandomPolicy(1, CONST.POLICY.TYPE.CORPORATE, 'Test Policy'),
+        id: POLICY_ID,
+        outputCurrency: CONST.CURRENCY.USD,
+        units: {
+            time: {
+                enabled: true,
+                rate: 50,
+            },
+        },
+    };
+}
 
 describe('IOURequestStepHours', () => {
     let setMoneyRequestAmountSpy: jest.SpyInstance;
@@ -83,21 +97,6 @@ describe('IOURequestStepHours', () => {
         });
         jest.restoreAllMocks();
     });
-
-    function createPolicyWithTimeTracking(): Policy {
-        const policy = createRandomPolicy(1, CONST.POLICY.TYPE.CORPORATE, 'Test Policy');
-        return {
-            ...policy,
-            id: POLICY_ID,
-            outputCurrency: CONST.CURRENCY.USD,
-            units: {
-                time: {
-                    enabled: true,
-                    rate: 50,
-                },
-            },
-        };
-    }
 
     function renderComponent(
         routeName: typeof SCREENS.MONEY_REQUEST.STEP_HOURS | typeof SCREENS.MONEY_REQUEST.STEP_HOURS_EDIT | typeof SCREENS.MONEY_REQUEST.CREATE = SCREENS.MONEY_REQUEST.STEP_HOURS,
