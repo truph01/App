@@ -1387,7 +1387,7 @@ describe('CardUtils', () => {
                 state: 3,
                 nameValuePairs: {
                     cardTitle: 'Marketing Team Card',
-                },
+                } as Card['nameValuePairs'],
             };
             const description = getCardDescription(card, translateLocal);
             expect(description).toBe('Marketing Team Card');
