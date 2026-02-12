@@ -2,19 +2,19 @@ import * as core from '@actions/core';
 import CONST from '@github/libs/CONST';
 import GithubUtils from '@github/libs/GithubUtils';
 
-const POLL_RATE_SECONDS = CONST.POLL_RATE / 1000;
-const QUEUE_LIMIT = 20;
+const DEFAULT_POLL_RATE_S = 20;
+const DEFAULT_QUEUE_LIMIT = 20;
 const MAX_API_RETRIES = 2;
 const ACTIVE_STATUSES = new Set(['in_progress', 'queued', 'waiting', 'requested', 'pending']);
 
-async function getOlderActiveRuns(workflowID: string, currentRunID: number) {
+async function getOlderActiveRuns(workflowID: string, currentRunID: number, queueLimit: number) {
     const response = await GithubUtils.octokit.actions.listWorkflowRuns({
         owner: CONST.GITHUB_OWNER,
         repo: CONST.APP_REPO,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         workflow_id: workflowID,
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        per_page: QUEUE_LIMIT,
+        per_page: queueLimit,
     });
 
     return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status));
@@ -23,9 +23,13 @@ async function getOlderActiveRuns(workflowID: string, currentRunID: number) {
 function run() {
     const workflowID = core.getInput('WORKFLOW_ID', {required: true});
     const currentRunID = Number(core.getInput('CURRENT_RUN_ID', {required: true}));
+    const pollRateSeconds = Number(core.getInput('POLL_RATE_SECONDS')) || DEFAULT_POLL_RATE_S;
+    const pollRateMs = pollRateSeconds * 1000;
+    const queueLimit = Number(core.getInput('QUEUE_LIMIT')) || DEFAULT_QUEUE_LIMIT;
 
     core.info(`Current run ID: ${currentRunID}`);
     core.info(`Workflow ID: ${workflowID}`);
+    core.info(`Poll rate: ${pollRateSeconds}s, Queue limit: ${queueLimit}`);
     core.info('Waiting for all earlier runs of this workflow to complete...');
 
     return new Promise<void>((resolve, reject) => {
@@ -42,13 +46,13 @@ function run() {
             isChecking = true;
             pollCount++;
 
-            getOlderActiveRuns(workflowID, currentRunID)
+            getOlderActiveRuns(workflowID, currentRunID, queueLimit)
                 .then((olderActiveRuns) => {
                     consecutiveErrors = 0;
                     maxQueueDepth = Math.max(maxQueueDepth, olderActiveRuns.length);
 
                     if (olderActiveRuns.length === 0) {
-                        core.notice(`Queue summary: maxRunsAhead=${maxQueueDepth}, iterations=${pollCount}, waitTime=${(pollCount - 1) * POLL_RATE_SECONDS}s`);
+                        core.notice(`Queue summary: maxRunsAhead=${maxQueueDepth}, iterations=${pollCount}, waitTime=${(pollCount - 1) * pollRateSeconds}s`);
                         core.info('No earlier runs in progress. Proceeding with build.');
                         clearInterval(intervalId);
                         resolve();
@@ -56,7 +60,7 @@ function run() {
                     }
 
                     const runIDs = olderActiveRuns.map((workflowRun) => `#${workflowRun.id} (${workflowRun.status})`).join(', ');
-                    core.info(`Waiting for ${olderActiveRuns.length} earlier run(s): ${runIDs}. Polling again in ${POLL_RATE_SECONDS}s...`);
+                    core.info(`Waiting for ${olderActiveRuns.length} earlier run(s): ${runIDs}. Polling again in ${pollRateSeconds}s...`);
                 })
                 .catch((error: unknown) => {
                     consecutiveErrors++;
@@ -74,7 +78,7 @@ function run() {
         };
 
         check();
-        intervalId = setInterval(check, CONST.POLL_RATE);
+        intervalId = setInterval(check, pollRateMs);
     });
 }
 

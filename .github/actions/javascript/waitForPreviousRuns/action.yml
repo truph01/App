@@ -10,6 +10,14 @@ inputs:
   CURRENT_RUN_ID:
     description: The current workflow run ID
     required: true
+  POLL_RATE_SECONDS:
+    description: Polling interval in seconds (default 20)
+    required: false
+    default: '20'
+  QUEUE_LIMIT:
+    description: Max number of recent workflow runs to fetch per poll (default 20)
+    required: false
+    default: '20'
 runs:
   using: 'node20'
   main: './index.js'

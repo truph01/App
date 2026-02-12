@@ -10,7 +10,8 @@ import asMutable from '@src/types/utils/asMutable';
 
 const CURRENT_RUN_ID = 1000;
 const WORKFLOW_ID = 'testBuildOnPush.yml';
-const TEST_POLL_RATE = 1;
+const TEST_POLL_RATE_S = '0.001';
+const TEST_QUEUE_LIMIT = '20';
 
 type WorkflowRun = {id: number; status: string};
 
@@ -51,12 +52,8 @@ function getErrorMessages(): string[] {
 jest.mock('@github/libs/CONST', () => ({
     __esModule: true,
     default: {
-        POLL_RATE: TEST_POLL_RATE,
-        RUN_STATUS: {
-            COMPLETED: 'completed',
-            IN_PROGRESS: 'in_progress',
-            QUEUED: 'queued',
-        },
+        GITHUB_OWNER: 'Expensify',
+        APP_REPO: 'App',
     },
 }));
 
@@ -69,6 +66,12 @@ beforeAll(() => {
         }
         if (name === 'CURRENT_RUN_ID') {
             return String(CURRENT_RUN_ID);
+        }
+        if (name === 'POLL_RATE_SECONDS') {
+            return TEST_POLL_RATE_S;
+        }
+        if (name === 'QUEUE_LIMIT') {
+            return TEST_QUEUE_LIMIT;
         }
         return '';
     });
