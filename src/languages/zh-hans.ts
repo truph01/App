@@ -981,8 +981,15 @@ const translations: TranslationDeepObject<typeof en> = {
                 cta: '审核',
             },
             ctaFix: '修复',
-            fixCompanyCardConnection: {title: ({feedName}: {feedName: string}) => (feedName ? `修复 ${feedName} 公司卡连接` : '修复公司卡连接'), subtitle: '工作区 > 公司卡片'},
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`, subtitle: '工作区 > 会计'},
+            fixCompanyCardConnection: {
+                title: ({feedName}: {feedName: string}) => (feedName ? `修复 ${feedName} 公司卡连接` : '修复公司卡连接'),
+                subtitle: '工作区 > 公司卡片',
+            },
+            fixAccountingConnection: {
+                title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`,
+                defaultSubtitle: '工作区 > 会计',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会计`,
+            },
         },
         announcements: '公告',
         discoverSection: {
@@ -1535,6 +1542,7 @@ const translations: TranslationDeepObject<typeof en> = {
             });
             return `${formatList(fragments)} 通过 <a href="${policyRulesRoute}">工作区规则</a>`;
         },
+        duplicateNonDefaultWorkspacePerDiemError: '您无法在不同工作区之间复制每日津贴报销，因为各工作区的补贴标准可能不同。',
     },
     transactionMerge: {
         listPage: {
@@ -2680,7 +2688,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
                 title: ({workspaceCategoriesLink}) => `设置[类别](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *设置类别*，让你的团队可以为报销分类，方便出具报表。
+                        *设置类别*，以便你的团队可以为报销分类，方便生成报表。
 
                         1. 点击 *工作区*。
                         2. 选择你的工作区。
@@ -2771,12 +2779,12 @@ ${
                 title: ({workspaceMembersLink}) => `邀请[您的团队](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *邀请您的团队* 使用 Expensify，这样他们今天就能开始记录报销。
+                        *邀请您的团队*加入 Expensify，让他们从今天开始跟踪报销费用。
 
-                        1. 点击 *Workspaces*。
+                        1. 点击 *工作区*。
                         2. 选择您的工作区。
-                        3. 点击 *Members* > *Invite member*。
-                        4. 输入邮箱地址或电话号码。
+                        3. 点击 *成员* > *邀请成员*。
+                        4. 输入邮箱或电话号码。
                         5. 如有需要，可添加自定义邀请消息！
 
                         [带我前往工作区成员页面](${workspaceMembersLink})。
@@ -2794,14 +2802,14 @@ ${
                 title: ({workspaceTagsLink}) => `设置[标签](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        使用标签来添加额外的报销明细，如项目、客户、地点和部门。如果你需要多级标签，可以升级到 Control 方案。
+                        使用标签添加更多报销详情，例如项目、客户、地点和部门。如果你需要多级标签，可以升级到 Control 方案。
 
                         1. 点击 *工作区*。
                         2. 选择你的工作区。
                         3. 点击 *更多功能*。
                         4. 启用 *标签*。
                         5. 在工作区编辑器中前往 *标签*。
-                        6. 点击 *+ 添加标签* 来创建你自己的标签。
+                        6. 点击 *+ 添加标签* 创建你自己的标签。
 
                         [带我前往更多功能](${workspaceMoreFeaturesLink})。
 
@@ -3068,6 +3076,7 @@ ${
         whenClearStatus: '我们应在何时清除你的状态？',
         vacationDelegate: '休假代理',
         setVacationDelegate: `设置一个休假代理人在你不在办公室时代你审批报销报告。`,
+        cannotSetVacationDelegate: `由于你目前是以下成员的代理人，因此无法设置休假代理人：`,
         vacationDelegateError: '更新你的休假代理时出错。',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `作为 ${nameOrEmail} 的休假代理`,
         toAsVacationDelegate: ({submittedToName, vacationDelegateName}: SubmittedToVacationDelegateParams) => `作为 ${vacationDelegateName} 的休假代理人提交给 ${submittedToName}`,
@@ -7379,10 +7388,12 @@ ${reportName}
             endReading: '结束阅读',
             saveForLater: '稍后保存',
             totalDistance: '总距离',
-            startTitle: '里程表起始照片',
-            endTitle: '里程表结束照片',
             startMessageWeb: '从行程<strong>开始</strong>时添加一张里程表照片。将文件拖到此处或选择一个文件上传。',
             endMessageWeb: '在行程<strong>结束</strong>时添加一张里程表照片。将文件拖到此处或选择一个文件上传。',
+            startTitle: '起始里程表照片',
+            endTitle: '结束里程表照片',
+            deleteOdometerPhoto: '删除里程表照片',
+            deleteOdometerPhotoConfirmation: '确定要删除这个里程表照片吗？',
         },
     },
     gps: {
@@ -8246,12 +8257,20 @@ ${reportName}
             findMember: '查找成员',
             addMember: '添加成员',
             email: '电子邮箱地址',
-            closeAccount: '关闭账户',
+            closeAccount: () => ({
+                one: '关闭账户',
+                other: '关闭账户',
+            }),
             closeAccountPrompt: '您确定吗？此操作是永久性的。',
-            forceCloseAccount: '强制关闭账户',
-            safeCloseAccount: '安全关闭账户',
-            closeAccountInfo:
-                '我们建议安全地关闭该账户，以便在存在以下情况时跳过关闭操作：<ul><li>待处理的审批</li><li>正在进行的报销</li><li>没有其他登录方式</li></ul>否则，您可以忽略上述安全预防措施并强制关闭所选账户。',
+            forceCloseAccount: () => ({one: '强制关闭账户', other: '强制关闭账户'}),
+            safeCloseAccount: () => ({
+                one: '安全关闭账户',
+                other: '安全关闭账户',
+            }),
+            closeAccountInfo: () => ({
+                one: '我们建议安全地关闭该账户，以便在存在以下情况时跳过关闭操作：<ul><li>待处理的审批</li><li>正在进行的报销</li><li>没有其他登录方式</li></ul>否则，您可以忽略上述安全预防措施并强制关闭所选账户。',
+                other: '我们建议安全地关闭该账户，以便在存在以下情况时跳过关闭操作：<ul><li>待处理的审批</li><li>正在进行的报销</li><li>没有其他登录方式</li></ul>否则，您可以忽略上述安全预防措施并强制关闭所选账户。',
+            }),
             error: {
                 removeMember: '无法移除此用户。请重试。',
                 addMember: '无法添加此成员。请重试。',

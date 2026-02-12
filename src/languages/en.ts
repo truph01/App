@@ -999,7 +999,8 @@ const translations = {
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Fix ${integrationName} connection`,
-                subtitle: 'Workspace > Accounting',
+                defaultSubtitle: 'Workspace > Accounting',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Accounting`,
             },
             addShippingAddress: {
                 title: 'We need your shipping address',
@@ -1581,6 +1582,7 @@ const translations = {
 
             return `${formatList(fragments)} via <a href="${policyRulesRoute}">workspace rules</a>`;
         },
+        duplicateNonDefaultWorkspacePerDiemError: "You can't duplicate per diem expenses across workspaces because the rates may differ between workspaces.",
     },
     transactionMerge: {
         listPage: {
@@ -3153,6 +3155,7 @@ const translations = {
         whenClearStatus: 'When should we clear your status?',
         vacationDelegate: 'Vacation delegate',
         setVacationDelegate: `Set a vacation delegate to approve reports on your behalf while you're out of office.`,
+        cannotSetVacationDelegate: `You can't set a vacation delegate because you're currently the delegate for the following members:`,
         vacationDelegateError: 'There was an error updating your vacation delegate.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `as ${nameOrEmail}'s vacation delegate`,
         toAsVacationDelegate: ({submittedToName, vacationDelegateName}: SubmittedToVacationDelegateParams) => `to ${submittedToName} as vacation delegate for ${vacationDelegateName}`,
@@ -7520,6 +7523,8 @@ const translations = {
             totalDistance: 'Total distance',
             startTitle: 'Odometer start photo',
             endTitle: 'Odometer end photo',
+            deleteOdometerPhoto: 'Delete odometer photo',
+            deleteOdometerPhotoConfirmation: 'Are you sure you want to delete this odometer photo?',
             startMessageWeb: 'Add a photo of your odometer from the <strong>start</strong> of your trip. Drag a file here or choose one to upload.',
             endMessageWeb: 'Add a photo of your odometer from the <strong>end</strong> of your trip. Drag a file here or choose one to upload.',
         },
@@ -8405,12 +8410,20 @@ const translations = {
             findMember: 'Find member',
             addMember: 'Add member',
             email: 'Email address',
-            closeAccount: 'Close account',
             closeAccountPrompt: 'Are you sure? This action is permanent.',
-            forceCloseAccount: 'Force close account',
-            safeCloseAccount: 'Close account safely',
-            closeAccountInfo:
-                'We recommend closing the account safely to skip closing it in case there are: <ul><li>Pending approvals</li><li>Active reimbursements</li><li>No alternative login methods</li></ul>Otherwise, you can ignore the safety precautions above and force close the selected account.',
+            forceCloseAccount: () => ({one: 'Force close account', other: 'Force close accounts'}),
+            safeCloseAccount: () => ({
+                one: 'Close account safely',
+                other: 'Close accounts safely',
+            }),
+            closeAccountInfo: () => ({
+                one: 'We recommend closing the account safely to skip closing it in case there are: <ul><li>Pending approvals</li><li>Active reimbursements</li><li>No alternative login methods</li></ul>Otherwise, you can ignore the safety precautions above and force close the selected account.',
+                other: 'We recommend closing the accounts safely to skip closing it in case there are: <ul><li>Pending approvals</li><li>Active reimbursements</li><li>No alternative login methods</li></ul>Otherwise, you can ignore the safety precautions above and force close the selected accounts.',
+            }),
+            closeAccount: () => ({
+                one: 'Close account',
+                other: 'Close accounts',
+            }),
             error: {
                 addMember: 'Unable to add this member. Please try again.',
                 removeMember: 'Unable to remove this user. Please try again.',
