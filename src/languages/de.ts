@@ -262,7 +262,7 @@ const translations: TranslationDeepObject<typeof en> = {
         wallet: 'Brieftasche',
         preferences: 'Einstellungen',
         view: 'Anzeigen',
-        review: (reviewParams?: ReviewParams) => `Überprüfen${reviewParams?.amount ? ` ${reviewParams?.amount}` : ''}`,
+        review: (reviewParams?: ReviewParams) => `Prüfen${reviewParams?.amount ? ` ${reviewParams?.amount}` : ''}`,
         not: 'Nicht',
         signIn: 'Anmelden',
         signInWithGoogle: 'Mit Google anmelden',
@@ -1271,8 +1271,8 @@ const translations: TranslationDeepObject<typeof en> = {
         settledElsewhere: 'Anderswo bezahlt',
         individual: 'Einzelperson',
         business: 'Business',
-        settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Bezahle ${formattedAmount} mit Expensify` : `Mit Expensify bezahlen`),
-        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} als Privatperson bezahlen` : `Mit privatem Konto bezahlen`),
+        settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} mit Expensify bezahlen` : `Mit Expensify bezahlen`),
+        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} als Privatperson bezahlen` : `Mit Privatkonto bezahlen`),
         settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} mit Wallet bezahlen` : `Mit Wallet bezahlen`),
         settlePayment: ({formattedAmount}: SettleExpensifyCardParams) => `${formattedAmount} bezahlen`,
         settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} als Unternehmen bezahlen` : `Mit Geschäftskonto bezahlen`),
@@ -1284,7 +1284,7 @@ const translations: TranslationDeepObject<typeof en> = {
             policyName,
         }: SettleExpensifyCardParams & {
             policyName: string;
-        }) => (formattedAmount ? `Zahle ${formattedAmount} über ${policyName}` : `Bezahlen über ${policyName}`),
+        }) => (formattedAmount ? `Bezahle ${formattedAmount} über ${policyName}` : `Bezahlen über ${policyName}`),
         businessBankAccount: (amount?: string, last4Digits?: string) => (amount ? `${amount} mit Bankkonto ${last4Digits} bezahlt` : `bezahlt mit Bankkonto ${last4Digits}`),
         automaticallyPaidWithBusinessBankAccount: (amount?: string, last4Digits?: string) =>
             `${amount ? `${amount} ` : ''} mit Bankkonto ${last4Digits} über <a href="${CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL}">Workspace-Regeln</a> bezahlt`,
@@ -1325,7 +1325,7 @@ const translations: TranslationDeepObject<typeof en> = {
         canceledRequest: (amount: string, submitterDisplayName: string) =>
             `${amount} Zahlung storniert, weil ${submitterDisplayName} ihr Expensify Wallet nicht innerhalb von 30 Tagen aktiviert hat`,
         settledAfterAddedBankAccount: ({submitterDisplayName, amount}: SettledAfterAddedBankAccountParams) =>
-            `${submitterDisplayName} hat ein Bankkonto hinzugefügt. Die Zahlung über ${amount} wurde durchgeführt.`,
+            `${submitterDisplayName} hat ein Bankkonto hinzugefügt. Die Zahlung über ${amount} wurde vorgenommen.`,
         paidElsewhere: ({payer, comment}: PaidElsewhereParams = {}) => `${payer ? `${payer} ` : ''}als bezahlt markiert${comment ? `und sagt „${comment}“` : ''}`,
         paidWithExpensify: (payer?: string) => `${payer ? `${payer} ` : ''}mit Wallet bezahlt`,
         automaticallyPaidWithExpensify: (payer?: string) =>
@@ -1333,7 +1333,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noReimbursableExpenses: 'Dieser Bericht enthält einen ungültigen Betrag',
         pendingConversionMessage: 'Die Gesamtsumme wird aktualisiert, sobald du wieder online bist',
         changedTheExpense: 'hat die Ausgabe geändert',
-        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `den ${valueName} in ${newValueToDisplay}`,
+        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `den Wert ${valueName} auf ${newValueToDisplay}`,
         setTheDistanceMerchant: ({translatedChangedField, newMerchant, newAmountToDisplay}: SetTheDistanceMerchantParams) =>
             `lege ${translatedChangedField} auf ${newMerchant} fest, wodurch der Betrag auf ${newAmountToDisplay} gesetzt wurde`,
         removedTheRequest: (valueName: string, oldValueToDisplay: string) => `der/die/das ${valueName} (zuvor ${oldValueToDisplay})`,
@@ -1531,7 +1531,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
         },
         chooseWorkspace: 'Wähle einen Arbeitsbereich',
-        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `Bericht aufgrund des benutzerdefinierten Genehmigungs-Workflows an ${to} weitergeleitet`,
+        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `Report aufgrund des benutzerdefinierten Genehmigungsworkflows an ${to} weitergeleitet`,
         timeTracking: {
             hoursAt: (hours: number, rate: string) => `${hours} ${hours === 1 ? 'Stunde' : 'Stunden'} @ ${rate} / Stunde`,
             hrs: 'Std.',
@@ -2834,8 +2834,7 @@ ${
                         5. Füge eine eigene Einladung hinzu, wenn du möchtest!
 
                         [Zu den Workspace-Mitgliedern](${workspaceMembersLink}).
-
-                    `),
+        `),
             },
             setupCategoriesAndTags: {
                 title: ({workspaceCategoriesLink, workspaceTagsLink}) => `Richte [Kategorien](${workspaceCategoriesLink}) und [Tags](${workspaceTagsLink}) ein`,
@@ -4684,7 +4683,7 @@ ${
                 importCustomFields: {
                     chooseOptionBelow: 'Wähle unten eine Option aus:',
                     label: (importedTypes: string[]) => `Importiert als ${importedTypes.join('und')}`,
-                    requiredFieldError: ({fieldName}: RequiredFieldParams) => `Bitte ${fieldName} eingeben`,
+                    requiredFieldError: ({fieldName}: RequiredFieldParams) => `Bitte gib ${fieldName} ein`,
                     customSegments: {
                         title: 'Benutzerdefinierte Segmente/Datensätze',
                         addText: 'Benutzerdefiniertes Segment/Datensatz hinzufügen',
@@ -4758,7 +4757,7 @@ _Für detailliertere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSUI
                             customRecordMappingTitle: 'Wie soll dieser benutzerdefinierte Datensatz in Expensify angezeigt werden?',
                         },
                         errors: {
-                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Ein benutzerdefiniertes Segment/Datensatz mit dieser ${fieldName?.toLowerCase()} ist bereits vorhanden`,
+                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Ein benutzerdefiniertes Segment/Datensatz mit dieser ${fieldName?.toLowerCase()} existiert bereits`,
                         },
                     },
                     customLists: {
@@ -5029,7 +5028,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             limit: 'Limit',
             currentBalance: 'Aktueller Kontostand',
             currentBalanceDescription: 'Der aktuelle Saldo ist die Summe aller verbuchten Expensify-Card-Transaktionen, die seit dem letzten Abrechnungsdatum stattgefunden haben.',
-            balanceWillBeSettledOn: ({settlementDate}: SettlementDateParams) => `Der Saldo wird am ${settlementDate} ausgeglichen`,
+            balanceWillBeSettledOn: ({settlementDate}: SettlementDateParams) => `Der Saldo wird am ${settlementDate} ausgeglichen.`,
             settleBalance: 'Saldo ausgleichen',
             cardLimit: 'Kartenlimit',
             remainingLimit: 'Verbleibendes Limit',
@@ -6472,7 +6471,7 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
                 },
                 defaultTaxRate: 'Standardsteuersatz',
                 enableWorkflows: ({moreFeaturesLink}: RulesEnableWorkflowsParams) =>
-                    `Gehe zu [Weitere Funktionen](${moreFeaturesLink}) und aktiviere Workflows, dann füge Genehmigungen hinzu, um diese Funktion freizuschalten.`,
+                    `Gehe zu [Weitere Funktionen](${moreFeaturesLink}) und aktiviere Workflows, füge dann Genehmigungen hinzu, um diese Funktion freizuschalten.`,
             },
             customRules: {
                 title: 'Spesenrichtlinie',
@@ -6537,7 +6536,7 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
         public_announceDescription: 'Jede Person kann diesen Raum finden',
         createRoom: 'Raum erstellen',
         roomAlreadyExistsError: 'Ein Raum mit diesem Namen existiert bereits',
-        roomNameReservedError: ({reservedName}: RoomNameReservedErrorParams) => `${reservedName} ist ein Standardraum in allen Workspaces. Bitte wähle einen anderen Namen.`,
+        roomNameReservedError: ({reservedName}: RoomNameReservedErrorParams) => `${reservedName} ist ein Standardraum in allen Arbeitsbereichen. Bitte wähle einen anderen Namen.`,
         roomNameInvalidError: 'Raumnamen dürfen nur Kleinbuchstaben, Zahlen und Bindestriche enthalten',
         pleaseEnterRoomName: 'Bitte gib einen Raumnamen ein',
         pleaseSelectWorkspace: 'Bitte wähle einen Workspace aus',
@@ -7547,7 +7546,11 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
             tryDifferentEmail: 'Bitte versuche eine andere E-Mail-Adresse',
         },
     },
-    cardTransactions: {notActivated: 'Nicht aktiviert', outOfPocket: 'Auslagen', companySpend: 'Unternehmensausgaben'},
+    cardTransactions: {
+        notActivated: 'Nicht aktiviert',
+        outOfPocket: 'Auslagen-Spend',
+        companySpend: 'Unternehmensausgaben',
+    },
     distance: {
         addStop: 'Stopp hinzufügen',
         address: 'Adresse',
@@ -8466,7 +8469,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             forceCloseAccount: 'Konto zwangsweise schließen',
             safeCloseAccount: 'Konto sicher schließen',
             closeAccountInfo:
-                'Wir empfehlen, das Konto sicher zu schließen, um das Schließen zu überspringen, falls Folgendes vorliegt: <ul><li>Ausstehende Genehmigungen</li><li>Aktive Erstattungen</li><li>Keine alternativen Anmeldemethoden</li></ul>Andernfalls kannst du die Sicherheitshinweise oben ignorieren und das ausgewählte Konto zwangsweise schließen.',
+                'Wir empfehlen, das Konto sicher zu schließen, um das Schließen zu überspringen, falls Folgendes vorliegt: <ul><li>Ausstehende Genehmigungen</li><li>Aktive Erstattungen</li><li>Keine alternativen Anmeldemethoden</li></ul>Andernfalls können Sie die oben genannten Sicherheitsvorkehrungen ignorieren und das ausgewählte Konto zwangsweise schließen.',
             error: {
                 removeMember: 'Dieser Benutzer kann nicht entfernt werden. Bitte versuche es erneut.',
                 addMember: 'Dieses Mitglied kann nicht hinzugefügt werden. Bitte versuche es erneut.',
