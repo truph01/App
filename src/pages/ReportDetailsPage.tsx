@@ -51,7 +51,6 @@ import Parser from '@libs/Parser';
 import Permissions from '@libs/Permissions';
 import {isPaidGroupPolicy, isPolicyAdmin as isPolicyAdminUtil, isPolicyEmployee as isPolicyEmployeeUtil, shouldShowPolicy} from '@libs/PolicyUtils';
 import {getOneTransactionThreadReportID, getOriginalMessage, getTrackExpenseActionableWhisper, isDeletedAction, isMoneyRequestAction, isTrackExpenseAction} from '@libs/ReportActionsUtils';
-import {getReportName as getReportNameFromReportNameUtils} from '@libs/ReportNameUtils';
 import {
     canDeleteCardTransactionByLiabilityType,
     canDeleteTransaction,
@@ -71,6 +70,7 @@ import {
     getReportDescription,
     getReportFieldKey,
     getReportForHeader,
+    getReportName as getReportNameFromReportUtils,
     isAdminOwnerApproverOrReportOwner,
     isArchivedNonExpenseReport,
     isCanceledTaskReport as isCanceledTaskReportUtil,
@@ -354,7 +354,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
 
     const reportForHeader = useMemo(() => getReportForHeader(report), [report]);
     const shouldParseFullTitle = parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat;
-    const rawReportName = getReportNameFromReportNameUtils(reportForHeader, reportAttributes);
+    const rawReportName = getReportNameFromReportUtils(reportForHeader, policy, parentReportAction, personalDetails);
     const reportName = shouldParseFullTitle ? Parser.htmlToText(rawReportName) : rawReportName;
     const additionalRoomDetails =
         (isPolicyExpenseChat && !!report?.isOwnPolicyExpenseChat) || isExpenseReportUtil(report) || isPolicyExpenseChat || isInvoiceRoom
