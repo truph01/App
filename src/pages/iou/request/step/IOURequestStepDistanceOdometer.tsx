@@ -400,7 +400,6 @@ function IOURequestStepDistanceOdometer({
             reportAttributesDerived,
             personalDetails,
             customUnitRateID,
-            manualDistance: calculatedDistance,
             currentUserLogin: currentUserEmailParam,
             currentUserAccountID: currentUserAccountIDParam,
             backToReport,
@@ -421,6 +420,7 @@ function IOURequestStepDistanceOdometer({
             policyForMovingExpenses,
             odometerStart: start,
             odometerEnd: end,
+            odometerDistance: calculatedDistance,
             betas,
         });
     };

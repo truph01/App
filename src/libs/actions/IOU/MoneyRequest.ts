@@ -141,6 +141,7 @@ type MoneyRequestStepDistanceNavigationParams = {
     gpsDistance?: number;
     odometerStart?: number;
     odometerEnd?: number;
+    odometerDistance?: number;
     betas: OnyxEntry<Beta[]>;
 };
 
@@ -526,13 +527,15 @@ function handleMoneyRequestStepDistanceNavigation({
     policyForMovingExpenses,
     odometerStart,
     odometerEnd,
+    odometerDistance,
     betas,
 }: MoneyRequestStepDistanceNavigationParams) {
     const isManualDistance = manualDistance !== undefined;
+    const isOdometerDistance = odometerDistance !== undefined;
     const isGPSDistance = gpsDistance !== undefined && gpsCoordinates !== undefined;
     const recentWaypoints = getRecentWaypoints();
 
-    if (transaction?.splitShares && !isManualDistance) {
+    if (transaction?.splitShares && !isManualDistance && !isOdometerDistance) {
         resetSplitShares(transaction);
     }
     if (backTo) {
@@ -564,7 +567,7 @@ function handleMoneyRequestStepDistanceNavigation({
                 transactionReportID: transaction?.reportID,
             });
 
-            const validWaypoints = !isManualDistance ? getValidWaypoints(waypoints, true, isGPSDistance) : undefined;
+            const validWaypoints = (!isManualDistance && !isOdometerDistance) ? getValidWaypoints(waypoints, true, isGPSDistance) : undefined;
 
             if (isCreatingTrackExpense && participant) {
                 trackExpense({
