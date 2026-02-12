@@ -190,4 +190,4 @@ If you're submitting to someone for the first time, their contact information wi
 
 ## Can I change the hourly rate when creating a Time expense?
 
-The hourly rate is set at the workspace level. If you need to change the rate, contact your Workspace Admin.
+Yes. The default hourly rate is set at the workspace level, but you can update the rate when creating a Time expense if a different rate is required.
