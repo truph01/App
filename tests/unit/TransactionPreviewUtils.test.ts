@@ -713,7 +713,7 @@ describe('TransactionPreviewUtils', () => {
                 transactionParams: {amount: 100, currency: 'USD', reportID: fakeReportID, comment: '', attendees: [], created: '2024-01-01'},
             });
 
-            const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], undefined, {}, fakeReport);
+            const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], undefined, undefined, {}, fakeReport);
             expect(route).toContain('duplicates/confirm');
         });
 
@@ -731,7 +731,7 @@ describe('TransactionPreviewUtils', () => {
                 merchant: 'Merchant B',
             };
 
-            const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], undefined, {}, fakeReport);
+            const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], undefined, undefined, {}, fakeReport);
             expect(route).toContain('duplicates/review/merchant');
         });
 
@@ -761,13 +761,9 @@ describe('TransactionPreviewUtils', () => {
                 tag: 'Marketing',
             };
 
-            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
-                id: 'fakePolicyID',
-                areTagsEnabled: true,
-            }).then(() => {
-                const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], undefined, policyTags, fakeReport);
-                expect(route).toContain('duplicates/review/tag');
-            });
+            const fakePolicy = {...createRandomPolicy(0), id: 'fakePolicyID', areTagsEnabled: true};
+            const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], fakePolicy, undefined, policyTags, fakeReport);
+            expect(route).toContain('duplicates/review/tag');
         });
 
         it('should skip tag review when policyTags filters out disabled tags', () => {
@@ -796,14 +792,10 @@ describe('TransactionPreviewUtils', () => {
                 tag: 'Marketing',
             };
 
-            return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}fakePolicyID`, {
-                id: 'fakePolicyID',
-                areTagsEnabled: true,
-            }).then(() => {
-                const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], undefined, policyTags, fakeReport);
-                // Since Marketing is disabled, only 1 enabled tag available, so tag review is skipped
-                expect(route).toContain('duplicates/confirm');
-            });
+            const fakePolicy = {...createRandomPolicy(0), id: 'fakePolicyID', areTagsEnabled: true};
+            const route = getReviewNavigationRoute(backTo, threadReportID, transaction1, [transaction2], fakePolicy, undefined, policyTags, fakeReport);
+            // Since Marketing is disabled, only 1 enabled tag available, so tag review is skipped
+            expect(route).toContain('duplicates/confirm');
         });
     });
 
