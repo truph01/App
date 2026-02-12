@@ -1132,6 +1132,7 @@ const translations = {
         noLongerHaveReportAccess: 'You no longer have access to your previous quick action destination. Pick a new one below.',
         updateDestination: 'Update destination',
         createReport: 'Create report',
+        createTimeExpense: 'Create time expense',
     },
     iou: {
         amount: 'Amount',
