@@ -2157,9 +2157,8 @@ function getTaxName(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transactio
 }
 
 /**
- * Checks if the transaction has a tax rate with a matching value to the transaction's tax value
+ * Checks if the tax rate with matching transaction's tax rate value exists in the policy tax rates
  */
-
 function hasTaxRateWithMatchingValue(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>) {
     if (!policy || !transaction) {
         return false;
