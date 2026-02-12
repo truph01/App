@@ -3490,8 +3490,7 @@ function getParticipantsAccountIDsForDisplay(
 }
 
 function getParticipantsList(report: Report, personalDetails: OnyxEntry<PersonalDetailsList>, isRoomMembersList = false, reportMetadata: OnyxEntry<ReportMetadata> = undefined): number[] {
-    const isReportGroupChat = isGroupChat(report);
-    const shouldExcludeHiddenParticipants = !isReportGroupChat && !isInvoiceReport(report) && !isMoneyRequestReport(report) && !isMoneyRequest(report);
+    const shouldExcludeHiddenParticipants = !isGroupChat(report) && !isInvoiceReport(report) && !isMoneyRequestReport(report) && !isMoneyRequest(report) && !isPolicyExpenseChat(report);
     const chatParticipants = getParticipantsAccountIDsForDisplay(report, isRoomMembersList || shouldExcludeHiddenParticipants, false, false, reportMetadata);
 
     return chatParticipants.filter((accountID) => {
@@ -12086,7 +12085,7 @@ function getFieldViolationTranslation(reportField: PolicyReportField, violation?
     switch (violation) {
         case 'fieldRequired':
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            return translateLocal('reportViolations.fieldRequired', {fieldName: reportField.name});
+            return translateLocal('reportViolations.fieldRequired', reportField.name);
         default:
             return '';
     }
