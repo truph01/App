@@ -1,4 +1,3 @@
-import {useMemo} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import {getCardFeedsForDisplayPerPolicy} from '@libs/CardFeedUtils';
 import {isCustomFeed} from '@libs/CardUtils';
@@ -28,7 +27,7 @@ const useCardFeedsForDisplay = () => {
     });
 
     const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(allFeeds, translate);
-    const eligiblePoliciesIDs = useMemo(() => new Set(eligiblePoliciesIDsArray), [eligiblePoliciesIDsArray]);
+    const eligiblePoliciesIDs = new Set(eligiblePoliciesIDsArray);
 
     let defaultCardFeed;
     if (eligiblePoliciesIDs) {
