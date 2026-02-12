@@ -21,7 +21,7 @@ import {fetchPerDiemRates} from '@libs/actions/Policy/PerDiem';
 import {setTransactionReport} from '@libs/actions/Transaction';
 import Navigation from '@libs/Navigation/Navigation';
 import {getPerDiemCustomUnit, isPolicyAdmin} from '@libs/PolicyUtils';
-import {getPolicyExpenseChat} from '@libs/ReportUtils';
+import {findSelfDMReportID, getPolicyExpenseChat} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import variables from '@styles/variables';
 import {
@@ -73,6 +73,9 @@ function IOURequestStepDestination({
     const {top} = useSafeAreaInsets();
     const customUnit = getPerDiemCustomUnit(policy);
     const selectedDestination = transaction?.comment?.customUnit?.customUnitRateID;
+    const [selfDMReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${findSelfDMReportID()}`, {canBeMissing: true});
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
     const {translate} = useLocalize();
@@ -108,7 +111,11 @@ function IOURequestStepDestination({
         if (selectedDestination !== destination.keyForList) {
             if (openedFromStartPage) {
                 setTransactionReport(transactionID, {reportID: targetReport?.reportID}, true);
-                setMoneyRequestParticipantsFromReport(transactionID, targetReport, accountID);
+                if (iouType === CONST.IOU.TYPE.TRACK) {
+                    setMoneyRequestParticipantsFromReport(transactionID, selfDMReport, currentUserPersonalDetails.accountID, false);
+                } else {
+                    setMoneyRequestParticipantsFromReport(transactionID, targetReport, accountID);
+                }
                 setCustomUnitID(transactionID, customUnit.customUnitID);
                 setMoneyRequestCategory(transactionID, customUnit?.defaultCategory ?? '', undefined);
             }
