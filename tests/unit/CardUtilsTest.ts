@@ -1887,7 +1887,7 @@ describe('CardUtils', () => {
                 nameValuePairs: {
                     frozen: true,
                 },
-            } as unknown as Card;
+            } as Card;
             expect(isCardFrozen(card)).toBe(true);
         });
 
@@ -1895,7 +1895,7 @@ describe('CardUtils', () => {
             const card = {
                 state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
                 nameValuePairs: {},
-            } as unknown as Card;
+            } as Card;
             expect(isCardFrozen(card)).toBe(false);
         });
 
@@ -1905,7 +1905,7 @@ describe('CardUtils', () => {
                 nameValuePairs: {
                     frozen: true,
                 },
-            } as unknown as Card;
+            } as Card;
             expect(isCardFrozen(card)).toBe(false);
         });
 
@@ -1917,7 +1917,7 @@ describe('CardUtils', () => {
             const card = {
                 state: CONST.EXPENSIFY_CARD.STATE.OPEN,
                 nameValuePairs: {},
-            } as unknown as Card;
+            } as Card;
             expect(isCardFrozen(card)).toBe(false);
         });
     });

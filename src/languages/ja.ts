@@ -995,7 +995,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName} 会社カード接続を修正` : '法人クレジットカードの接続を修正'),
                 subtitle: 'ワークスペース > 会社カード',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`, subtitle: 'ワークスペース > 会計'},
+            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`, subtitle: 'ワークスペース ＞ 会計'},
         },
         announcements: 'お知らせ',
         discoverSection: {
@@ -1265,12 +1265,12 @@ const translations: TranslationDeepObject<typeof en> = {
         settledElsewhere: '他で支払い済み',
         individual: '個人',
         business: 'ビジネス',
-        settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Expensifyで${formattedAmount}を支払う` : `Expensify で支払う`),
+        settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Expensify で ${formattedAmount} を支払う` : `Expensifyで支払う`),
         settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `個人として${formattedAmount}を支払う` : `個人アカウントで支払う`),
-        settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `ウォレットで ${formattedAmount} を支払う` : `ウォレットで支払う`),
+        settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `ウォレットで${formattedAmount}を支払う` : `ウォレットで支払う`),
         settlePayment: ({formattedAmount}: SettleExpensifyCardParams) => `${formattedAmount} を支払う`,
         settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} をビジネスとして支払う` : `ビジネスアカウントで支払う`),
-        payElsewhere: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} を支払済みにする` : `支払い済みにする`),
+        payElsewhere: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `${formattedAmount} を支払済みにする` : `支払済みにする`),
         settleInvoicePersonal: (amount?: string, last4Digits?: string) => (amount ? `個人アカウント（下4桁 ${last4Digits}）で ${amount} を支払いました` : `個人アカウントで支払い済み`),
         settleInvoiceBusiness: (amount?: string, last4Digits?: string) => (amount ? `ビジネス口座（末尾${last4Digits}）で${amount}を支払いました` : `ビジネスアカウントで支払済み`),
         payWithPolicy: ({
@@ -1523,7 +1523,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
         },
         chooseWorkspace: 'ワークスペースを選択',
-        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `カスタム承認ワークフローにより、レポートは${to}に回付されました`,
+        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `カスタム承認ワークフローによりレポートが${to}に回覧されました`,
         timeTracking: {
             hoursAt: (hours: number, rate: string) => `${hours} ${hours === 1 ? '時間' : '時間'} @ ${rate} / 時間`,
             hrs: '時間',
@@ -2025,7 +2025,7 @@ const translations: TranslationDeepObject<typeof en> = {
         twoFactorAuthEnabled: '2要素認証が有効になりました',
         whatIsTwoFactorAuth: '2要素認証（2FA）は、アカウントを安全に保つのに役立ちます。ログインする際、お好みの認証アプリで生成されたコードを入力する必要があります。',
         disableTwoFactorAuth: '2 要素認証を無効にする',
-        explainProcessToRemove: '2要素認証（2FA）を無効にするには、認証アプリから有効なコードを入力してください。',
+        explainProcessToRemove: '2 要素認証（2FA）を無効にするには、認証アプリから有効なコードを入力してください。',
         explainProcessToRemoveWithRecovery: '2 要素認証（2FA）を無効にするには、有効なリカバリーコードを入力してください。',
         disabled: '二要素認証は現在無効になっています',
         noAuthenticatorApp: '今後、Expensify にログインする際に認証アプリは不要になります。',
@@ -2262,6 +2262,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${date} の ${merchant} への ${amount}`,
         },
+        freezeCard: 'カードを一時停止',
     },
     workflowsPage: {
         workflowTitle: '支出',
@@ -4709,9 +4710,7 @@ _より詳細な手順については、[ヘルプサイトをご覧ください
                             customSegmentMappingTitle: 'このカスタムセグメントを Expensify でどのように表示しますか？',
                             customRecordMappingTitle: 'このカスタムレコードを Expensify ではどのように表示しますか？',
                         },
-                        errors: {
-                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `この ${fieldName?.toLowerCase()} を持つカスタムセグメント／レコードはすでに存在します`,
-                        },
+                        errors: {uniqueFieldError: ({fieldName}: RequiredFieldParams) => `この${fieldName?.toLowerCase()}を持つカスタムセグメント／レコードはすでに存在します`},
                     },
                     customLists: {
                         title: 'カスタムリスト',
@@ -5559,7 +5558,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 genericRemove: 'そのワークスペースメンバーを削除する際に問題が発生しました',
             },
             addedWithPrimary: '一部のメンバーは、プライマリーログインで追加されました。',
-            invitedBySecondaryLogin: ({secondaryLogin}: SecondaryLoginParams) => `セカンダリログイン${secondaryLogin}によって追加されました。`,
+            invitedBySecondaryLogin: ({secondaryLogin}: SecondaryLoginParams) => `セカンダリログイン ${secondaryLogin} によって追加されました。`,
             workspaceMembersCount: ({count}: WorkspaceMembersCountParams) => `ワークスペースメンバー合計：${count}`,
             importMembers: 'メンバーをインポート',
             removeMemberPromptApprover: ({approver, workspaceOwner}: {approver: string; workspaceOwner: string}) =>
@@ -6475,7 +6474,7 @@ ${reportName}
             const actor = actorName ? `${actorName} ` : '';
             return isExpenseReport ? `${actor}は"${oldName}"から"${newName}"に名前を変更しました` : `${actor}はこのルーム名を「${newName}」（以前は「${oldName}」）に変更しました`;
         },
-        roomRenamedTo: ({newName}: RoomRenamedToParams) => `ルーム名が${newName}に変更されました`,
+        roomRenamedTo: ({newName}: RoomRenamedToParams) => `ルーム名を${newName}に変更しました`,
         social: 'ソーシャル',
         selectAWorkspace: 'ワークスペースを選択',
         growlMessageOnRenameError: 'ワークスペースルームの名前を変更できません。接続を確認して、もう一度お試しください。',
@@ -7463,11 +7462,7 @@ ${reportName}
             tryDifferentEmail: '別のメールアドレスをお試しください',
         },
     },
-    cardTransactions: {
-        notActivated: '未有効化',
-        outOfPocket: '立替経費支出',
-        companySpend: '会社の支出',
-    },
+    cardTransactions: {notActivated: '未有効化', outOfPocket: '立替払い支出', companySpend: '会社の支出'},
     distance: {
         addStop: '経由地を追加',
         address: '住所',
@@ -7742,7 +7737,7 @@ ${reportName}
         noRoute: '有効な住所を選択してください',
     },
     reportViolations: {
-        [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}: RequiredFieldParams) => `${fieldName} は必須です`,
+        [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}: RequiredFieldParams) => `${fieldName}は必須です`,
         reportContainsExpensesWithViolations: 'レポートに違反のある経費が含まれています。',
     },
     violationDismissal: {
@@ -8373,10 +8368,10 @@ ${reportName}
             email: 'メールアドレス',
             closeAccount: 'アカウントを閉じる',
             closeAccountPrompt: '本当によろしいですか？この操作は元に戻せません。',
-            forceCloseAccount: 'アカウントを強制的に閉鎖',
+            forceCloseAccount: 'アカウントを強制閉鎖',
             safeCloseAccount: 'アカウントを安全に閉じる',
             closeAccountInfo:
-                '保留中の承認、処理中の精算、代替ログイン方法がない場合などでもアカウントを閉鎖できるように、安全にアカウントを閉鎖することを推奨します: <ul><li>保留中の承認</li><li>進行中の払い戻し</li><li>代替ログイン方法なし</li></ul>それ以外の場合は、上記の安全上の注意を無視して、選択したアカウントを強制的に閉鎖できます。',
+                '保留中の承認、進行中の払い戻し、代替ログイン方法がない場合を避けるため、安全にアカウントを閉鎖することをおすすめします。<ul><li>保留中の承認</li><li>進行中の払い戻し</li><li>代替ログイン方法がない</li></ul>それ以外の場合は、上記の安全対策を無視して、選択したアカウントを強制的に閉鎖できます。',
             error: {
                 removeMember: 'このユーザーを削除できません。もう一度お試しください。',
                 addMember: 'このメンバーを追加できませんでした。もう一度お試しください。',

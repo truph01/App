@@ -805,7 +805,7 @@ const translations: TranslationDeepObject<typeof en> = {
         phrase2: 'L’argent parle. Et maintenant que la messagerie et les paiements sont réunis au même endroit, c’est aussi simple.',
         phrase3: 'Vos paiements vous parviennent aussi vite que vous faites passer votre message.',
         enterPassword: 'Veuillez saisir votre mot de passe',
-        welcomeNewFace: ({login}: SignUpNewFaceCodeParams) => `${login}, c’est toujours un plaisir de voir un nouveau visage par ici !`,
+        welcomeNewFace: ({login}: SignUpNewFaceCodeParams) => `${login}, c’est toujours un plaisir de voir un nouveau visage parmi nous !`,
         welcomeEnterMagicCode: ({login}: WelcomeEnterMagicCodeParams) => `Veuillez saisir le code magique envoyé à ${login}. Il devrait arriver dans une minute ou deux.`,
     },
     login: {
@@ -1280,7 +1280,7 @@ const translations: TranslationDeepObject<typeof en> = {
         settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Payer ${formattedAmount} en tant que particulier` : `Payer avec un compte personnel`),
         settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Payer ${formattedAmount} avec le portefeuille` : `Payer avec le portefeuille`),
         settlePayment: ({formattedAmount}: SettleExpensifyCardParams) => `Payer ${formattedAmount}`,
-        settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Payer ${formattedAmount} en tant qu’entreprise` : `Payer avec le compte professionnel`),
+        settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Payer ${formattedAmount} en tant qu’entreprise` : `Payer avec un compte professionnel`),
         payElsewhere: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Marquer ${formattedAmount} comme payé` : `Marquer comme payé`),
         settleInvoicePersonal: (amount?: string, last4Digits?: string) => (amount ? `a payé ${amount} avec le compte personnel ${last4Digits}` : `Payé avec un compte personnel`),
         settleInvoiceBusiness: (amount?: string, last4Digits?: string) => (amount ? `a payé ${amount} avec le compte professionnel ${last4Digits}` : `Payé avec le compte professionnel`),
@@ -1338,7 +1338,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noReimbursableExpenses: 'Cette note de frais a un montant non valide',
         pendingConversionMessage: 'Le total sera mis à jour quand vous serez de nouveau en ligne',
         changedTheExpense: 'a modifié la dépense',
-        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `le ${valueName} sur ${newValueToDisplay}`,
+        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `le ${valueName} en ${newValueToDisplay}`,
         setTheDistanceMerchant: ({translatedChangedField, newMerchant, newAmountToDisplay}: SetTheDistanceMerchantParams) =>
             `défini le ${translatedChangedField} sur ${newMerchant}, ce qui a défini le montant sur ${newAmountToDisplay}`,
         removedTheRequest: (valueName: string, oldValueToDisplay: string) => `le ${valueName} (anciennement ${oldValueToDisplay})`,
@@ -1538,7 +1538,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
         },
         chooseWorkspace: 'Choisir un espace de travail',
-        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `note de frais transmise à ${to} en raison du flux d’approbation personnalisé`,
+        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `note de frais acheminée vers ${to} en raison d’un processus d’approbation personnalisé`,
         timeTracking: {
             hoursAt: (hours: number, rate: string) => `${hours} ${hours === 1 ? 'heure' : 'heures'} @ ${rate} / heure`,
             hrs: 'h',
@@ -2286,6 +2286,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} pour ${merchant} - ${date}`,
         },
+        freezeCard: 'Geler la carte',
     },
     workflowsPage: {
         workflowTitle: 'Dépense',
@@ -4690,7 +4691,7 @@ ${
                 importCustomFields: {
                     chooseOptionBelow: 'Choisissez une option ci-dessous :',
                     label: (importedTypes: string[]) => `Importé en tant que ${importedTypes.join('et')}`,
-                    requiredFieldError: ({fieldName}: RequiredFieldParams) => `Veuillez saisir le ${fieldName}`,
+                    requiredFieldError: ({fieldName}: RequiredFieldParams) => `Veuillez saisir le/la ${fieldName}`,
                     customSegments: {
                         title: 'Segments/enregistrements personnalisés',
                         addText: 'Ajouter un segment/enregistrement personnalisé',
@@ -4763,9 +4764,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                             customSegmentMappingTitle: 'Comment ce segment personnalisé doit-il être affiché dans Expensify ?',
                             customRecordMappingTitle: 'Comment cet enregistrement personnalisé doit-il être affiché dans Expensify ?',
                         },
-                        errors: {
-                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Un segment/enregistrement personnalisé avec ce ${fieldName?.toLowerCase()} existe déjà`,
-                        },
+                        errors: {uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Un segment/enregistrement personnalisé avec cet(te) ${fieldName?.toLowerCase()} existe déjà`},
                     },
                     customLists: {
                         title: 'Listes personnalisées',
@@ -6492,7 +6491,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
                 },
                 defaultTaxRate: 'Taux de taxe par défaut',
                 enableWorkflows: ({moreFeaturesLink}: RulesEnableWorkflowsParams) =>
-                    `Allez dans [Plus de fonctionnalités](${moreFeaturesLink}) et activez les workflows, puis ajoutez des approbations pour déverrouiller cette fonctionnalité.`,
+                    `Accédez à [Plus de fonctionnalités](${moreFeaturesLink}) et activez les workflows, puis ajoutez des approbations pour déverrouiller cette fonctionnalité.`,
             },
             customRules: {
                 title: 'Politique de dépenses',
@@ -7567,11 +7566,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             tryDifferentEmail: 'Veuillez essayer une autre adresse e-mail',
         },
     },
-    cardTransactions: {
-        notActivated: 'Non activé',
-        outOfPocket: 'Dépenses personnelles',
-        companySpend: 'Dépenses de l’entreprise',
-    },
+    cardTransactions: {notActivated: 'Non activé', outOfPocket: 'Dépenses à titre personnel', companySpend: 'Dépenses de l’entreprise'},
     distance: {
         addStop: 'Ajouter un arrêt',
         address: 'Adresse',
@@ -8486,10 +8481,10 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             email: 'Adresse e-mail',
             closeAccount: 'Fermer le compte',
             closeAccountPrompt: 'Êtes-vous sûr(e) ? Cette action est définitive.',
-            forceCloseAccount: 'Forcer la fermeture du compte',
+            forceCloseAccount: 'Forcer la clôture du compte',
             safeCloseAccount: 'Fermer le compte en toute sécurité',
             closeAccountInfo:
-                'Nous recommandons de fermer le compte en toute sécurité afin d’éviter de le fermer dans le cas où il y aurait : <ul><li>Des validations en attente</li><li>Des remboursements actifs</li><li>Aucune autre méthode de connexion</li></ul>Sinon, vous pouvez ignorer les précautions de sécurité ci-dessus et forcer la fermeture du compte sélectionné.',
+                'Nous vous recommandons de fermer le compte en toute sécurité pour éviter de le fermer dans les cas suivants : <ul><li>Approbations en attente</li><li>Remboursements actifs</li><li>Aucune autre méthode de connexion</li></ul>Sinon, vous pouvez ignorer les précautions de sécurité ci-dessus et forcer la fermeture du compte sélectionné.',
             error: {
                 removeMember: 'Impossible de supprimer cet utilisateur. Veuillez réessayer.',
                 addMember: 'Impossible d’ajouter ce membre. Veuillez réessayer.',

@@ -998,7 +998,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corrigir conexão do cartão corporativo ${feedName}` : 'Corrigir conexão do cartão corporativo'),
                 subtitle: 'Área de trabalho > Cartões corporativos',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Corrigir conexão com ${integrationName}`, subtitle: 'Espaço de trabalho > Contabilidade'},
+            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Corrigir conexão com ${integrationName}`, subtitle: 'Workspace > Contabilidade'},
         },
         announcements: 'Comunicados',
         discoverSection: {
@@ -1268,9 +1268,9 @@ const translations: TranslationDeepObject<typeof en> = {
         settledElsewhere: 'Pago em outro lugar',
         individual: 'Individual',
         business: 'Negócios',
-        settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pagar ${formattedAmount} com o Expensify` : `Pagar com Expensify`),
-        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pagar ${formattedAmount} como pessoa física` : `Pagar com conta pessoal`),
-        settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pagar ${formattedAmount} com a carteira` : `Pagar com carteira`),
+        settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pague ${formattedAmount} com o Expensify` : `Pague com Expensify`),
+        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pague ${formattedAmount} como pessoa física` : `Pagar com conta pessoal`),
+        settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pagar ${formattedAmount} com carteira` : `Pagar com carteira`),
         settlePayment: ({formattedAmount}: SettleExpensifyCardParams) => `Pagar ${formattedAmount}`,
         settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Pagar ${formattedAmount} como empresa` : `Pagar com conta empresarial`),
         payElsewhere: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Marcar ${formattedAmount} como pago` : `Marcar como pago`),
@@ -1321,7 +1321,7 @@ const translations: TranslationDeepObject<typeof en> = {
         adminCanceledRequest: 'cancelou o pagamento',
         canceledRequest: (amount: string, submitterDisplayName: string) => `cancelou o pagamento de ${amount} porque ${submitterDisplayName} não ativou a Carteira Expensify em 30 dias`,
         settledAfterAddedBankAccount: ({submitterDisplayName, amount}: SettledAfterAddedBankAccountParams) =>
-            `${submitterDisplayName} adicionou uma conta bancária. O pagamento de ${amount} foi efetuado.`,
+            `${submitterDisplayName} adicionou uma conta bancária. O pagamento de ${amount} foi realizado.`,
         paidElsewhere: ({payer, comment}: PaidElsewhereParams = {}) => `${payer ? `${payer} ` : ''}marcou como pago${comment ? `, dizendo "${comment}"` : ''}`,
         paidWithExpensify: (payer?: string) => `${payer ? `${payer} ` : ''}pago com carteira`,
         automaticallyPaidWithExpensify: (payer?: string) =>
@@ -1329,7 +1329,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noReimbursableExpenses: 'Este relatório tem um valor inválido',
         pendingConversionMessage: 'O total será atualizado quando você voltar a ficar online',
         changedTheExpense: 'alterou a despesa',
-        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `o(a) ${valueName} para ${newValueToDisplay}`,
+        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `o ${valueName} para ${newValueToDisplay}`,
         setTheDistanceMerchant: ({translatedChangedField, newMerchant, newAmountToDisplay}: SetTheDistanceMerchantParams) =>
             `definiu ${translatedChangedField} como ${newMerchant}, o que definiu o valor como ${newAmountToDisplay}`,
         removedTheRequest: (valueName: string, oldValueToDisplay: string) => `o ${valueName} (antes ${oldValueToDisplay})`,
@@ -2028,7 +2028,7 @@ const translations: TranslationDeepObject<typeof en> = {
         whatIsTwoFactorAuth:
             'A autenticação em duas etapas (2FA) ajuda a manter sua conta segura. Ao fazer login, você precisará inserir um código gerado pelo seu aplicativo autenticador preferido.',
         disableTwoFactorAuth: 'Desativar autenticação em duas etapas',
-        explainProcessToRemove: 'Para desativar a autenticação de dois fatores (2FA), insira um código válido do seu app de autenticação.',
+        explainProcessToRemove: 'Para desativar a autenticação em duas etapas (2FA), insira um código válido do seu app de autenticação.',
         explainProcessToRemoveWithRecovery: 'Para desativar a autenticação de dois fatores (2FA), insira um código de recuperação válido.',
         disabled: 'A autenticação em duas etapas está desativada agora',
         noAuthenticatorApp: 'Você não vai mais precisar de um app autenticador para entrar no Expensify.',
@@ -2269,6 +2269,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} para ${merchant} - ${date}`,
         },
+        freezeCard: 'Bloquear cartão',
     },
     workflowsPage: {
         workflowTitle: 'Gastos',
@@ -4728,9 +4729,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                             customSegmentMappingTitle: 'Como esse segmento personalizado deve ser exibido no Expensify?',
                             customRecordMappingTitle: 'Como este registro personalizado deve ser exibido no Expensify?',
                         },
-                        errors: {
-                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Já existe um segmento/registro personalizado com este ${fieldName?.toLowerCase()}`,
-                        },
+                        errors: {uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Um segmento/registro personalizado com este ${fieldName?.toLowerCase()} já existe`},
                     },
                     customLists: {
                         title: 'Listas personalizadas',
@@ -7504,11 +7503,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             tryDifferentEmail: 'Tente outro e-mail',
         },
     },
-    cardTransactions: {
-        notActivated: 'Não ativado',
-        outOfPocket: 'Gasto presencial',
-        companySpend: 'Gastos da empresa',
-    },
+    cardTransactions: {notActivated: 'Não ativado', outOfPocket: 'Gastos reembolsáveis', companySpend: 'Gastos da empresa'},
     distance: {
         addStop: 'Adicionar parada',
         address: 'Endereço',
@@ -8420,10 +8415,10 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             email: 'Endereço de e-mail',
             closeAccount: 'Encerrar conta',
             closeAccountPrompt: 'Tem certeza? Esta ação é permanente.',
-            forceCloseAccount: 'Forçar encerramento da conta',
+            forceCloseAccount: 'Encerrar conta à força',
             safeCloseAccount: 'Fechar conta com segurança',
             closeAccountInfo:
-                'Recomendamos fechar a conta com segurança para evitar o fechamento caso haja: <ul><li>aprovações pendentes</li><li>reembolsos ativos</li><li>nenhum método de login alternativo</li></ul>Caso contrário, você pode ignorar as precauções de segurança acima e forçar o fechamento da conta selecionada.',
+                'Recomendamos fechar a conta com segurança para evitar problemas caso haja: <ul><li>Aprovações pendentes</li><li>Reembolsos ativos</li><li>Nenhum método de login alternativo</li></ul>Caso contrário, você pode ignorar as precauções de segurança acima e forçar o fechamento da conta selecionada.',
             error: {
                 removeMember: 'Não foi possível remover este usuário. Tente novamente.',
                 addMember: 'Não foi possível adicionar este membro. Tente novamente.',

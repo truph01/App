@@ -1270,7 +1270,7 @@ const translations: TranslationDeepObject<typeof en> = {
         individual: 'Individueel',
         business: 'Zakelijk',
         settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Betaal ${formattedAmount} met Expensify` : `Betalen met Expensify`),
-        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Betaal ${formattedAmount} als individu` : `Betalen met persoonlijke rekening`),
+        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Betaal ${formattedAmount} als individu` : `Betalen met privérekening`),
         settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Betaal ${formattedAmount} met wallet` : `Betalen met wallet`),
         settlePayment: ({formattedAmount}: SettleExpensifyCardParams) => `Betaal ${formattedAmount}`,
         settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Betaal ${formattedAmount} als bedrijf` : `Betalen met zakelijke rekening`),
@@ -1282,7 +1282,7 @@ const translations: TranslationDeepObject<typeof en> = {
             policyName,
         }: SettleExpensifyCardParams & {
             policyName: string;
-        }) => (formattedAmount ? `Betaal ${formattedAmount} via ${policyName}` : `Betaal via ${policyName}`),
+        }) => (formattedAmount ? `Betaal ${formattedAmount} via ${policyName}` : `Betalen via ${policyName}`),
         businessBankAccount: (amount?: string, last4Digits?: string) => (amount ? `heeft ${amount} betaald met bankrekening ${last4Digits}` : `betaald met bankrekening ${last4Digits}`),
         automaticallyPaidWithBusinessBankAccount: (amount?: string, last4Digits?: string) =>
             `betaald ${amount ? `${amount} ` : ''} met bankrekening ${last4Digits} via <a href="${CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL}">werkruimteregels</a>`,
@@ -1291,7 +1291,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nextStep: 'Volgende stappen',
         finished: 'Voltooid',
         flip: 'Omkeren',
-        sendInvoice: ({amount}: RequestAmountParams) => `Verzend factuur van ${amount}`,
+        sendInvoice: ({amount}: RequestAmountParams) => `Factuur van ${amount} verzenden`,
         expenseAmount: (formattedAmount: string, comment?: string) => `${formattedAmount}${comment ? `voor ${comment}` : ''}`,
         submitted: ({memo}: SubmittedWithMemoParams) => `ingediend${memo ? `, met de omschrijving ${memo}` : ''}`,
         automaticallySubmitted: `ingediend via <a href="${CONST.SELECT_WORKFLOWS_HELP_URL}">uitgestelde indieningen</a>`,
@@ -1323,7 +1323,7 @@ const translations: TranslationDeepObject<typeof en> = {
         canceledRequest: (amount: string, submitterDisplayName: string) =>
             `heeft de betaling van ${amount} geannuleerd, omdat ${submitterDisplayName} hun Expensify Wallet niet binnen 30 dagen heeft geactiveerd`,
         settledAfterAddedBankAccount: ({submitterDisplayName, amount}: SettledAfterAddedBankAccountParams) =>
-            `${submitterDisplayName} heeft een bankrekening toegevoegd. De betaling van ${amount} is voltooid.`,
+            `${submitterDisplayName} heeft een bankrekening toegevoegd. De betaling van ${amount} is gedaan.`,
         paidElsewhere: ({payer, comment}: PaidElsewhereParams = {}) => `${payer ? `${payer} ` : ''}gemarkeerd als betaald${comment ? `, met de opmerking: "${comment}"` : ''}`,
         paidWithExpensify: (payer?: string) => `${payer ? `${payer} ` : ''}betaald met wallet`,
         automaticallyPaidWithExpensify: (payer?: string) =>
@@ -1528,7 +1528,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
         },
         chooseWorkspace: 'Kies een werkruimte',
-        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `rapport doorgestuurd naar ${to} vanwege aangepast goedkeuringsworkflow`,
+        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `rapport doorgestuurd naar ${to} vanwege aangepaste goedkeuringsworkflow`,
         timeTracking: {
             hoursAt: (hours: number, rate: string) => `${hours} ${hours === 1 ? 'uur' : 'uren'} @ ${rate} / uur`,
             hrs: 'uur',
@@ -2032,8 +2032,8 @@ const translations: TranslationDeepObject<typeof en> = {
         whatIsTwoFactorAuth:
             'Tweestapsverificatie (2FA) helpt je account veilig te houden. Bij het inloggen moet je een code invoeren die is gegenereerd door je voorkeursauthenticator-app.',
         disableTwoFactorAuth: 'Tweefactorauthenticatie uitschakelen',
-        explainProcessToRemove: 'Voer een geldige code uit je authenticatie-app in om tweeledige verificatie (2FA) uit te schakelen.',
-        explainProcessToRemoveWithRecovery: 'Voer een geldige herstelcode in om twee-factor-authenticatie (2FA) uit te schakelen.',
+        explainProcessToRemove: 'Voer een geldige code uit je verificatie-app in om twee-factor-authenticatie (2FA) uit te schakelen.',
+        explainProcessToRemoveWithRecovery: 'Voer een geldige herstelcode in om de dubbele authenticatie (2FA) uit te schakelen.',
         disabled: 'Tweeledige verificatie is nu uitgeschakeld',
         noAuthenticatorApp: 'Je hebt geen authenticator-app meer nodig om in te loggen bij Expensify.',
         stepCodes: 'Herstelcodes',
@@ -2276,6 +2276,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} voor ${merchant} - ${date}`,
         },
+        freezeCard: 'Kaart blokkeren',
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',
@@ -4736,9 +4737,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze helpwebsite](${CONST.NETSUIT
                             customSegmentMappingTitle: 'Hoe moet dit aangepaste segment worden weergegeven in Expensify?',
                             customRecordMappingTitle: 'Hoe moet dit aangepaste record in Expensify worden weergegeven?',
                         },
-                        errors: {
-                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Er bestaat al een aangepast segment/record met deze ${fieldName?.toLowerCase()}`,
-                        },
+                        errors: {uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Er bestaat al een aangepast segment/record met deze ${fieldName?.toLowerCase()}`},
                     },
                     customLists: {
                         title: 'Aangepaste lijsten',
@@ -5594,7 +5593,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 genericRemove: 'Er is een probleem opgetreden bij het verwijderen van dat werkpleklid',
             },
             addedWithPrimary: 'Sommige leden zijn toegevoegd met hun primaire login.',
-            invitedBySecondaryLogin: ({secondaryLogin}: SecondaryLoginParams) => `Toegevoegd door secundair login ${secondaryLogin}.`,
+            invitedBySecondaryLogin: ({secondaryLogin}: SecondaryLoginParams) => `Toegevoegd door secundaire login ${secondaryLogin}.`,
             workspaceMembersCount: ({count}: WorkspaceMembersCountParams) => `Totaal aantal werkruimteleden: ${count}`,
             importMembers: 'Leden importeren',
             removeMemberPromptApprover: ({approver, workspaceOwner}: {approver: string; workspaceOwner: string}) =>
@@ -6444,7 +6443,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 },
                 defaultTaxRate: 'Standaardbelastingtarief',
                 enableWorkflows: ({moreFeaturesLink}: RulesEnableWorkflowsParams) =>
-                    `Ga naar [Meer functies](${moreFeaturesLink}) en schakel workflows in, voeg daarna goedkeuringen toe om deze functie te ontgrendelen.`,
+                    `Ga naar [Meer functies](${moreFeaturesLink}) en schakel workflows in, voeg vervolgens goedkeuringen toe om deze functie te ontgrendelen.`,
             },
             customRules: {
                 title: 'Declaratiebeleid',
@@ -6509,7 +6508,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         public_announceDescription: 'Iedereen kan deze ruimte vinden',
         createRoom: 'Ruimte maken',
         roomAlreadyExistsError: 'Er bestaat al een kamer met deze naam',
-        roomNameReservedError: ({reservedName}: RoomNameReservedErrorParams) => `${reservedName} is een standaardruimte in alle werkruimtes. Kies een andere naam.`,
+        roomNameReservedError: ({reservedName}: RoomNameReservedErrorParams) => `${reservedName} is een standaardruimte in alle werkruimten. Kies een andere naam.`,
         roomNameInvalidError: 'Kamernamen mogen alleen kleine letters, cijfers en koppeltekens bevatten',
         pleaseEnterRoomName: 'Voer een kamernaam in',
         pleaseSelectWorkspace: 'Selecteer een werkruimte',
@@ -6517,7 +6516,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             const actor = actorName ? `${actorName} ` : '';
             return isExpenseReport ? `${actor}hernoemd naar "${newName}" (voorheen "${oldName}")` : `${actor}heeft deze ruimte hernoemd naar "${newName}" (voorheen "${oldName}")`;
         },
-        roomRenamedTo: ({newName}: RoomRenamedToParams) => `Chatruimte hernoemd naar ${newName}`,
+        roomRenamedTo: ({newName}: RoomRenamedToParams) => `Ruimte hernoemd naar ${newName}`,
         social: 'sociaal',
         selectAWorkspace: 'Selecteer een werkruimte',
         growlMessageOnRenameError: 'Kan de werkruimtekamer niet hernoemen. Controleer je verbinding en probeer het opnieuw.',
@@ -7519,11 +7518,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             tryDifferentEmail: 'Probeer een ander e-mailadres',
         },
     },
-    cardTransactions: {
-        notActivated: 'Niet geactiveerd',
-        outOfPocket: 'Uitgaven uit eigen zak',
-        companySpend: 'Uitgaven van het bedrijf',
-    },
+    cardTransactions: {notActivated: 'Niet geactiveerd', outOfPocket: 'Uit eigen zak uitgegeven', companySpend: 'Bedrijfskosten'},
     distance: {
         addStop: 'Stop toevoegen',
         address: 'Adres',
@@ -7799,7 +7794,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
     },
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}: RequiredFieldParams) => `${fieldName} is verplicht`,
-        reportContainsExpensesWithViolations: 'Rapport bevat onkosten met overtredingen.',
+        reportContainsExpensesWithViolations: 'Rapport bevat uitgaven met overtredingen.',
     },
     violationDismissal: {
         rter: {
@@ -8439,7 +8434,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             forceCloseAccount: 'Account geforceerd sluiten',
             safeCloseAccount: 'Account veilig sluiten',
             closeAccountInfo:
-                'We raden aan om de account veilig te sluiten om te vermijden dat je deze moet sluiten als er zijn: <ul><li>Openstaande goedkeuringen</li><li>Actieve terugbetalingen</li><li>Geen alternatieve inlogmethoden</li></ul>Anders kun je de bovenstaande veiligheidsmaatregelen negeren en de geselecteerde account geforceerd sluiten.',
+                'We raden aan om de account veilig te sluiten om het afsluiten over te slaan als er: <ul><li>Openstaande goedkeuringen zijn</li><li>Actieve terugbetalingen zijn</li><li>Geen alternatieve inlogmethoden zijn</li></ul>Anders kun je de bovenstaande veiligheidsmaatregelen negeren en de geselecteerde account geforceerd sluiten.',
             error: {
                 removeMember: 'Kan deze gebruiker niet verwijderen. Probeer het opnieuw.',
                 addMember: 'Kan dit lid niet toevoegen. Probeer het opnieuw.',

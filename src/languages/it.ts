@@ -262,7 +262,7 @@ const translations: TranslationDeepObject<typeof en> = {
         wallet: 'Portafoglio',
         preferences: 'Preferenze',
         view: 'Visualizza',
-        review: (reviewParams?: ReviewParams) => `Revisione${reviewParams?.amount ? ` ${reviewParams?.amount}` : ''}`,
+        review: (reviewParams?: ReviewParams) => `Revisiona${reviewParams?.amount ? ` ${reviewParams?.amount}` : ''}`,
         not: 'Non',
         signIn: 'Accedi',
         signInWithGoogle: 'Accedi con Google',
@@ -999,7 +999,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Correggi la connessione della carta aziendale ${feedName}` : 'Correggi connessione carta aziendale'),
                 subtitle: 'Spazio di lavoro > Carte aziendali',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Correggi connessione ${integrationName}`, subtitle: 'Spazio di lavoro > Contabilità'},
+            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Correggi connessione ${integrationName}`, subtitle: 'Area di lavoro > Contabilità'},
         },
         announcements: 'Annunci',
         discoverSection: {
@@ -1270,11 +1270,11 @@ const translations: TranslationDeepObject<typeof en> = {
         individual: 'Personale',
         business: 'Business',
         settleExpensify: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Paga ${formattedAmount} con Expensify` : `Paga con Expensify`),
-        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Paga ${formattedAmount} come persona fisica` : `Paga con conto personale`),
-        settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Paga ${formattedAmount} con il wallet` : `Paga con portafoglio`),
+        settlePersonal: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Paga ${formattedAmount} come individuo` : `Paga con conto personale`),
+        settleWallet: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Paga ${formattedAmount} con il portafoglio` : `Paga con portafoglio`),
         settlePayment: ({formattedAmount}: SettleExpensifyCardParams) => `Paga ${formattedAmount}`,
         settleBusiness: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Paga ${formattedAmount} come azienda` : `Paga con conto aziendale`),
-        payElsewhere: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Segna ${formattedAmount} come pagato` : `Segna come pagata`),
+        payElsewhere: ({formattedAmount}: SettleExpensifyCardParams) => (formattedAmount ? `Segna ${formattedAmount} come pagato` : `Contrassegna come pagato`),
         settleInvoicePersonal: (amount?: string, last4Digits?: string) => (amount ? `pagato ${amount} con conto personale ${last4Digits}` : `Pagato con conto personale`),
         settleInvoiceBusiness: (amount?: string, last4Digits?: string) => (amount ? `ha pagato ${amount} con il conto aziendale ${last4Digits}` : `Pagato con conto aziendale`),
         payWithPolicy: ({
@@ -1291,7 +1291,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nextStep: 'Prossimi passaggi',
         finished: 'Completato',
         flip: 'Ruota',
-        sendInvoice: ({amount}: RequestAmountParams) => `Invia fattura da ${amount}`,
+        sendInvoice: ({amount}: RequestAmountParams) => `Invia fattura di ${amount}`,
         expenseAmount: (formattedAmount: string, comment?: string) => `${formattedAmount}${comment ? `per ${comment}` : ''}`,
         submitted: ({memo}: SubmittedWithMemoParams) => `inviato${memo ? `, con nota: ${memo}` : ''}`,
         automaticallySubmitted: `inviato tramite <a href="${CONST.SELECT_WORKFLOWS_HELP_URL}">invio posticipato</a>`,
@@ -1331,7 +1331,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noReimbursableExpenses: 'Questo rendiconto contiene un importo non valido',
         pendingConversionMessage: 'Il totale verrà aggiornato quando torni online',
         changedTheExpense: 'ha modificato la spesa',
-        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `${valueName} a ${newValueToDisplay}`,
+        setTheRequest: ({valueName, newValueToDisplay}: SetTheRequestParams) => `il/la ${valueName} in ${newValueToDisplay}`,
         setTheDistanceMerchant: ({translatedChangedField, newMerchant, newAmountToDisplay}: SetTheDistanceMerchantParams) =>
             `imposta ${translatedChangedField} su ${newMerchant}, che ha impostato l’importo su ${newAmountToDisplay}`,
         removedTheRequest: (valueName: string, oldValueToDisplay: string) => `il/la ${valueName} (precedentemente ${oldValueToDisplay})`,
@@ -1528,7 +1528,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
         },
         chooseWorkspace: 'Scegli uno spazio di lavoro',
-        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `rendiconto instradato a ${to} a causa del flusso di approvazione personalizzato`,
+        routedDueToDEW: ({to}: RoutedDueToDEWParams) => `report indirizzato a ${to} a causa del flusso di approvazione personalizzato`,
         timeTracking: {
             hoursAt: (hours: number, rate: string) => `${hours} ${hours === 1 ? 'ora' : 'ore'} @ ${rate} / ora`,
             hrs: 'ore',
@@ -2031,7 +2031,7 @@ const translations: TranslationDeepObject<typeof en> = {
         whatIsTwoFactorAuth:
             'L’autenticazione a due fattori (2FA) contribuisce a mantenere il tuo account al sicuro. Quando effettui l’accesso, dovrai inserire un codice generato dalla tua app di autenticazione preferita.',
         disableTwoFactorAuth: 'Disattiva l’autenticazione a due fattori',
-        explainProcessToRemove: 'Per disattivare l’autenticazione a due fattori (2FA), inserisci un codice valido dalla tua app di autenticazione.',
+        explainProcessToRemove: 'Per disabilitare l’autenticazione a due fattori (2FA), inserisci un codice valido dalla tua app di autenticazione.',
         explainProcessToRemoveWithRecovery: 'Per disattivare l’autenticazione a due fattori (2FA), inserisci un codice di recupero valido.',
         disabled: "L'autenticazione a due fattori è ora disattivata",
         noAuthenticatorApp: 'Non sarà più necessaria un’app di autenticazione per accedere a Expensify.',
@@ -2274,6 +2274,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} per ${merchant} - ${date}`,
         },
+        freezeCard: 'Blocca carta',
     },
     workflowsPage: {
         workflowTitle: 'Spesa',
@@ -4666,7 +4667,7 @@ ${
                 importCustomFields: {
                     chooseOptionBelow: 'Scegli un’opzione qui sotto:',
                     label: (importedTypes: string[]) => `Importato come ${importedTypes.join('e')}`,
-                    requiredFieldError: ({fieldName}: RequiredFieldParams) => `Inserisci ${fieldName}`,
+                    requiredFieldError: ({fieldName}: RequiredFieldParams) => `Inserisci il/la ${fieldName}`,
                     customSegments: {
                         title: 'Segmenti/record personalizzati',
                         addText: 'Aggiungi segmento/record personalizzato',
@@ -4739,9 +4740,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                             customSegmentMappingTitle: 'Come deve essere visualizzato questo segmento personalizzato in Expensify?',
                             customRecordMappingTitle: 'Come deve essere visualizzato questo record personalizzato in Expensify?',
                         },
-                        errors: {
-                            uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Esiste già un segmento/record personalizzato con questo ${fieldName?.toLowerCase()}`,
-                        },
+                        errors: {uniqueFieldError: ({fieldName}: RequiredFieldParams) => `Un segmento/record personalizzato con questo ${fieldName?.toLowerCase()} esiste già`},
                     },
                     customLists: {
                         title: 'Elenchi personalizzati',
@@ -6456,7 +6455,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 },
                 defaultTaxRate: 'Aliquota fiscale predefinita',
                 enableWorkflows: ({moreFeaturesLink}: RulesEnableWorkflowsParams) =>
-                    `Vai su [Altre funzionalità](${moreFeaturesLink}) e abilita i flussi di lavoro, quindi aggiungi le approvazioni per sbloccare questa funzionalità.`,
+                    `Vai su [Altre funzionalità](${moreFeaturesLink}) e abilita i workflow, quindi aggiungi le approvazioni per sbloccare questa funzione.`,
             },
             customRules: {
                 title: 'Politica di spesa',
@@ -7533,11 +7532,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             tryDifferentEmail: 'Prova con un’altra email',
         },
     },
-    cardTransactions: {
-        notActivated: 'Non attivato',
-        outOfPocket: 'Spesa personale',
-        companySpend: 'Spese aziendali',
-    },
+    cardTransactions: {notActivated: 'Non attivato', outOfPocket: 'Spese vive', companySpend: 'Spese aziendali'},
     distance: {
         addStop: 'Aggiungi fermata',
         address: 'Indirizzo',
@@ -8451,10 +8446,10 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             email: 'Indirizzo email',
             closeAccount: 'Chiudi account',
             closeAccountPrompt: 'Sei sicuro? Questa azione è permanente.',
-            forceCloseAccount: 'Forza chiusura account',
-            safeCloseAccount: 'Chiudi il conto in sicurezza',
+            forceCloseAccount: 'Chiudi forzatamente l’account',
+            safeCloseAccount: 'Chiudi l’account in sicurezza',
             closeAccountInfo:
-                'Consigliamo di chiudere l’account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura dell’account selezionato.',
+                'Consigliamo di chiudere l’account in modo sicuro per evitare di chiuderlo quando sono presenti: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra e forzare la chiusura dell’account selezionato.',
             error: {
                 removeMember: 'Impossibile rimuovere questo utente. Riprova.',
                 addMember: 'Impossibile aggiungere questo membro. Riprova.',
