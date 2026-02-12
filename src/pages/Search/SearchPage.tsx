@@ -70,8 +70,8 @@ import type {SearchFullscreenNavigatorParamList} from '@libs/Navigation/types';
 import {getActiveAdminWorkspaces, hasDynamicExternalWorkflow, hasOnlyPersonalPolicies as hasOnlyPersonalPoliciesUtil, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
-    generateReportID,
     canEditMultipleTransactions,
+    generateReportID,
     getPolicyExpenseChat,
     getReportOrDraftReport,
     isBusinessInvoiceRoom,

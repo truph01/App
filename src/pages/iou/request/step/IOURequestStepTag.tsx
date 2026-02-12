@@ -21,7 +21,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getTagListName, getTagLists, hasDependentTags as hasDependentTagsPolicyUtils, isPolicyAdmin} from '@libs/PolicyUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import {getUpdatedTransactionTag, hasEnabledTags} from '@libs/TagsOptionsListUtils';
-import {getTag, getTagArrayFromName, isPerDiemRequest} from '@libs/TransactionUtils';
+import {getTag, isPerDiemRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
