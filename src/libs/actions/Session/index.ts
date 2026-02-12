@@ -697,7 +697,7 @@ function setupNewDotAfterTransitionFromOldDot(hybridAppSettings: HybridAppSettin
             const hybridAppUpdate = {
                 ...hybridApp,
                 closingReactNativeApp: false,
-                readyToShowAuthScreens: hybridApp?.useNewDotSignInPage ? !(hybridApp?.useNewDotSignInPage ?? false) : true,
+                readyToShowAuthScreens: !hybridApp?.useNewDotSignInPage,
             };
 
             const onyxUpdates: OnyxUpdate[] = [

@@ -5,7 +5,6 @@ import useOnyx from './hooks/useOnyx';
 import {getHybridAppSettings} from './libs/actions/HybridApp';
 import type HybridAppSettings from './libs/actions/HybridApp/types';
 import {setupNewDotAfterTransitionFromOldDot} from './libs/actions/Session';
-import Timing from './libs/actions/Timing';
 import Log from './libs/Log';
 import {endSpan, startSpan} from './libs/telemetry/activeSpans';
 import ONYXKEYS from './ONYXKEYS';

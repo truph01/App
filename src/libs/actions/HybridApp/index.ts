@@ -4,7 +4,6 @@ import Navigation from '@libs/Navigation/Navigation';
 import {setIsGPSInProgressModalOpen} from '@userActions/isGPSInProgressModalOpen';
 import CONFIG from '@src/CONFIG';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {HybridApp} from '@src/types/onyx';
 import type HybridAppSettings from './types';
 
 /*
