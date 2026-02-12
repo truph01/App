@@ -343,7 +343,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     let warningMessage = '';
     if (difference < 0) {
         warningMessage = translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(-difference, transactionDetails.currency)});
-    } else if (difference > 0) {
+    } else if (difference > 0 && isDistance) {
         warningMessage = translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(difference, transactionDetails?.currency)});
     }
 

@@ -1249,12 +1249,13 @@ function updateSplitTransactions({
         // For existing split transactions, update the field change messages
         // For new transactions, skip this step
         if (splitTransaction) {
-            const existing = getTransactionDetails(splitTransaction);
             const transactionChanges = {
                 ...currentSplit,
                 comment: currentSplit?.comment?.comment,
+                customUnitRateID: currentSplit?.customUnitRateID ?? CONST.CUSTOM_UNITS.FAKE_P2P_ID,
             } as TransactionChanges;
 
+            const existing = getTransactionDetails(splitTransaction);
             const oldTransactionChanges = {
                 ...existing,
                 quantity: splitTransaction.comment?.customUnit?.quantity ?? existing?.distance,
@@ -2253,10 +2254,8 @@ function updateSplitExpenseField(
             let quantity: number | undefined;
             if (splitExpenseDraftTransaction?.routes?.route0?.distance && splitExpenseDraftTransaction?.comment?.customUnit?.distanceUnit) {
                 quantity = DistanceRequestUtils.convertDistanceUnit(splitExpenseDraftTransaction?.routes?.route0?.distance, splitExpenseDraftTransaction?.comment?.customUnit?.distanceUnit);
-            } else if (splitExpenseDraftTransaction?.comment?.customUnit?.quantity) {
-                quantity = splitExpenseDraftTransaction?.comment?.customUnit?.quantity;
             } else {
-                quantity = undefined;
+                quantity = splitExpenseDraftTransaction?.comment?.customUnit?.quantity ?? 0;
             }
 
             const updatedItem: SplitExpense = {
@@ -2290,8 +2289,8 @@ function updateSplitExpenseField(
                             splitExpenseDraftTransaction.routes.route0.distance,
                             splitExpenseDraftTransaction.comment.customUnit.distanceUnit,
                         );
-                    } else if (splitExpenseDraftTransaction?.comment?.customUnit?.quantity) {
-                        distanceInUnits = splitExpenseDraftTransaction.comment.customUnit.quantity;
+                    } else {
+                        distanceInUnits = splitExpenseDraftTransaction?.comment?.customUnit?.quantity ?? 0;
                     }
 
                     if (distanceInUnits !== undefined) {

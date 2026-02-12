@@ -17,6 +17,7 @@ import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
 import usePrevious from '@hooks/usePrevious';
 import useThemeStyles from '@hooks/useThemeStyles';
+import type {ViolationField} from '@hooks/useViolations';
 import {initDraftSplitExpenseDataForEdit, removeSplitExpenseField, updateSplitExpenseField} from '@libs/actions/IOU/Split';
 import {openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import {openPolicyTagsPage} from '@libs/actions/Policy/Tag';
@@ -34,7 +35,7 @@ import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {getParsedComment, getReportOrDraftReport, getTransactionDetails} from '@libs/ReportUtils';
 import {getTagVisibility, hasEnabledTags} from '@libs/TagsOptionsListUtils';
-import {getDistanceInMeters, getTag, getTagForDisplay, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest} from '@libs/TransactionUtils';
+import {getDistanceInMeters, getRateID, getTag, getTagForDisplay, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -133,8 +134,22 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
     const {unit, rate} = DistanceRequestUtils.getRate({transaction: splitExpenseDraftTransaction, policy: currentPolicy});
     const distance = getDistanceInMeters(splitExpenseDraftTransaction, unit);
     const currency = splitExpenseDraftTransactionDetails.currency ?? CONST.CURRENCY.USD;
-    const rateToDisplay = DistanceRequestUtils.getRateForDisplay(unit, rate, currency, translate, toLocaleDigit, getCurrencySymbol, isOffline);
-    const distanceToDisplay = DistanceRequestUtils.getDistanceForDisplay(true, distance, unit, rate, translate);
+    const distanceToDisplay = DistanceRequestUtils.getDistanceForDisplay(true, distance, unit, rate, translate, false, isManualDistance);
+    const currentRateID = getRateID(splitExpenseDraftTransaction);
+    const rates = DistanceRequestUtils.getMileageRates(policy, false, currentRateID);
+
+    const isCustomUnitOutOfPolicy = !rates[currentRateID] || (isDistance && !rate);
+    const rateToDisplay = isCustomUnitOutOfPolicy
+        ? translate('common.rateOutOfPolicy')
+        : DistanceRequestUtils.getRateForDisplay(unit, rate, currency, translate, toLocaleDigit, getCurrencySymbol, isOffline);
+
+    const getErrorForField = (field: ViolationField) => {
+        if (isCustomUnitOutOfPolicy && field === 'customUnitRateID') {
+            return translate('violations.customUnitOutOfPolicy');
+        }
+
+        return '';
+    };
 
     const distanceRequestFields = isDistance ? (
         <>
@@ -184,6 +199,8 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
                 interactive
                 shouldShowRightIcon
                 titleStyle={styles.flex1}
+                brickRoadIndicator={getErrorForField('customUnitRateID') ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                errorText={getErrorForField('customUnitRateID')}
                 style={[styles.moneyRequestMenuItem]}
                 onPress={() => {
                     Navigation.navigate(
