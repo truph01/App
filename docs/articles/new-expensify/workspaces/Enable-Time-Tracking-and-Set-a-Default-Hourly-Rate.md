@@ -7,19 +7,18 @@ internalScope: Audience is Workspace Admins. Covers enabling Time Tracking and s
 
 # Enable Time Tracking and Set a Default Hourly Rate
 
-Time Tracking lets your workspace track billable hours and apply hourly rates automatically. It’s available on **Collect** and **Control** workspaces.
-
+Time Tracking lets workspace members log billable hours with automatic hourly rate calculations.
 Once enabled, members can log time directly in your workspace, helping you manage billable work and reimbursements more accurately.
 
 ---
 
-## Who can use time tracking
+## Who can enable and use Time Tracking
 
-Workspace Admins can enable or configure Time Tracking on a workspace and allow workspace members to create time expenses.
+Workspace Admins can enable or configure Time Tracking on a workspace to allow workspace members to create time expenses.
 
 ---
 
-## Where to find time tracking
+## Where to find Time Tracking in your workspace
 
 After Time Tracking is enabled, **Time** appears in the navigation tabs:
 
@@ -28,7 +27,7 @@ After Time Tracking is enabled, **Time** appears in the navigation tabs:
 
 ---
 
-## How to enable Time Tracking in a workspace
+## How to enable Time Tracking in your workspace
 
 Workspace Admins can enable Time Tracking from the workspace settings. This allows members to begin logging time and creating time expenses.
 
@@ -76,11 +75,11 @@ By setting a default hourly rate, you reduce manual edits and ensure consistent 
 
 ---
 
-## How to create Time Tracking expenses
+## How members create Time Tracking expenses
 
 Once Time Tracking is enabled, members can log time and create time expenses in the workspace.
 
-To learn how members log time and submit time expenses, see **Create Time Expenses**.
+To learn how members log time and submit time expenses, see [Create Time Expenses[(https://help.expensify.com/articles/new-expensify/reports-and-expenses/Create-an-Expense#how-to-create-a-time-expense).
 
 ---
 
@@ -90,9 +89,9 @@ To learn how members log time and submit time expenses, see **Create Time Expens
 
 The **Time** tab only appears after Time Tracking is enabled by a Workspace Admin. If you don’t see it, confirm that Time Tracking has been turned on in **Workspaces > Workspace Name > More Features**.
 
-## Can different members have different hourly rates?
+## Can different workspace members have different hourly rates?
 
-No, the default hourly rate applies to all time expenses created on the workspace.
+The default hourly rate applies workspace-wide. However, members can edit the rate when creating a Time expense if needed.
 
 ## Can I change the default hourly rate later?
 
