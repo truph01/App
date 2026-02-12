@@ -1516,31 +1516,15 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         correctDistanceRateError: '修复距离费率错误后请重试。',
         AskToExplain: `。<a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>说明</strong></a> ✨`,
-        policyRulesModifiedFields: (policyRulesModifiedFields: PolicyRulesModifiedFields, policyRulesRoute: string, formatList: (list: string[]) => string) => {
-            const entries = ObjectUtils.typedEntries(policyRulesModifiedFields);
-            const fragments = entries.map(([key, value], i) => {
-                const isFirst = i === 0;
-                if (key === 'reimbursable') {
-                    return value ? '已将该报销单标记为“可报销”' : '将该报销单标记为“不可报销”';
-                }
-                if (key === 'billable') {
-                    return value ? '将该报销标记为“可计费”' : '将该报销标记为“不可计费”';
-                }
-                if (key === 'tax') {
-                    const taxEntry = value as PolicyRulesModifiedFields['tax'];
-                    const taxRateName = taxEntry?.field_id_TAX.name ?? '';
-                    if (isFirst) {
-                        return `将税率设置为“${taxRateName}”`;
-                    }
-                    return `税率为“${taxRateName}”`;
-                }
-                const updatedValue = value as string | boolean;
-                if (isFirst) {
-                    return `将 ${translations.common[key].toLowerCase()} 设置为“${updatedValue}”`;
-                }
-                return `${translations.common[key].toLowerCase()} 至 “${updatedValue}”`;
-            });
-            return `${formatList(fragments)} 通过 <a href="${policyRulesRoute}">工作区规则</a>`;
+        policyRulesModifiedFields: {
+            reimbursable: (value: boolean) => (value ? '已将该报销单标记为“可报销”' : '将该报销单标记为“不可报销”'),
+            billable: (value: boolean) => (value ? '将该报销标记为“可计费”' : '将该报销标记为“不可计费”'),
+            tax: (value: string, isFirst: boolean) => (isFirst ? `将税率设置为“${value}”` : `税率为“${value}”`),
+            common: (key: keyof PolicyRulesModifiedFields, value: string, isFirst: boolean) => {
+                const field = translations.common[key].toLowerCase();
+                return isFirst ? `将 ${field} 设置为“${value}”` : `${field} 至 “${value}”`;
+            },
+            format: (fragments: string, route: string) => `${fragments} 通过 <a href="${route}">工作区规则</a>`,
         },
         duplicateNonDefaultWorkspacePerDiemError: '您无法在不同工作区之间复制每日津贴报销，因为各工作区的补贴标准可能不同。',
     },
