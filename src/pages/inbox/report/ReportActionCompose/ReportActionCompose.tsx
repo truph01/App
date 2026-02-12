@@ -38,6 +38,7 @@ import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import DomUtils from '@libs/DomUtils';
 import FS from '@libs/Fullstory';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import {rand64} from '@libs/NumberUtils';
 import Performance from '@libs/Performance';
 import {getLinkedTransactionID, getReportAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
@@ -91,7 +92,7 @@ type SuggestionsRef = {
 
 type ReportActionComposeProps = Pick<ComposerWithSuggestionsProps, 'reportID' | 'isComposerFullSize' | 'lastReportAction'> & {
     /** A method to call when the form is submitted */
-    onSubmit: (newComment: string) => void;
+    onSubmit: (newComment: string, reportActionID?: string) => void;
 
     /** The report currently being looked at */
     report: OnyxEntry<OnyxTypes.Report>;
@@ -364,7 +365,7 @@ function ReportActionCompose({
                         [CONST.TELEMETRY.ATTRIBUTE_MESSAGE_LENGTH]: newCommentTrimmed.length,
                     },
                 });
-                onSubmit(newCommentTrimmed);
+                onSubmit(newCommentTrimmed, rand64());
             }
         },
         [
