@@ -60,7 +60,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     showListEmptyContent = true,
     shouldShowTooltips = true,
     disableKeyboardShortcuts = false,
-    disableMaintainingScrollPosition = false,
+    disableMaintainingScrollPosition = true,
     shouldShowTextInput,
     shouldIgnoreFocus = false,
     shouldStopPropagation = false,
