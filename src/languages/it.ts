@@ -999,7 +999,11 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Correggi la connessione della carta aziendale ${feedName}` : 'Correggi connessione carta aziendale'),
                 subtitle: 'Spazio di lavoro > Carte aziendali',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Correggi connessione ${integrationName}`, subtitle: 'Spazio di lavoro > Contabilità'},
+            fixAccountingConnection: {
+                title: ({integrationName}: {integrationName: string}) => `Correggi connessione ${integrationName}`,
+                defaultSubtitle: 'Spazio di lavoro > Contabilità',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Contabilità`,
+            },
         },
         announcements: 'Annunci',
         discoverSection: {
@@ -2727,11 +2731,11 @@ ${amount} per ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `Configura le [categorie](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Configura le categorie* in modo che il tuo team possa classificare le spese per una rendicontazione più semplice.
+                        *Configura le categorie* in modo che il tuo team possa codificare le spese per creare report facilmente.
 
-                        1. Fai clic su *Workspaces*.
-                        2. Seleziona il tuo workspace.
-                        3. Fai clic su *Categories*.
+                        1. Fai clic su *Spazi di lavoro*.
+                        2. Seleziona il tuo spazio di lavoro.
+                        3. Fai clic su *Categorie*.
                         4. Disattiva le categorie di cui non hai bisogno.
                         5. Aggiungi le tue categorie in alto a destra.
 
@@ -2820,11 +2824,11 @@ ${
                     dedent(`
                         *Invita il tuo team* su Expensify così potrà iniziare a tracciare le spese oggi stesso.
 
-                        1. Fai clic su *Spazi di lavoro*.
-                        2. Seleziona il tuo spazio di lavoro.
-                        3. Fai clic su *Membri* > *Invita membro*.
+                        1. Fai clic su *Workspaces*.
+                        2. Seleziona il tuo workspace.
+                        3. Fai clic su *Members* > *Invite member*.
                         4. Inserisci email o numeri di telefono.
-                        5. Aggiungi un messaggio di invito personalizzato, se vuoi!
+                        5. Aggiungi un messaggio di invito personalizzato se vuoi!
 
                         [Portami ai membri dello spazio di lavoro](${workspaceMembersLink}).
                     `),
@@ -2841,16 +2845,16 @@ ${
                 title: ({workspaceTagsLink}) => `Configura i [tag](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Usa i tag per aggiungere dettagli extra alle spese, come progetti, clienti, sedi e reparti. Se ti servono più livelli di tag, puoi eseguire l’upgrade al piano Control.
+                        Usa i tag per aggiungere dettagli extra alle spese, come progetti, clienti, sedi e reparti. Se ti servono più livelli di tag, puoi passare al piano Control.
 
-                        1. Fai clic su *Workspaces*.
-                        2. Seleziona il tuo workspace.
-                        3. Fai clic su *More features*.
-                        4. Attiva *Tags*.
-                        5. Vai a *Tags* nell’editor del workspace.
-                        6. Fai clic su *+ Add tag* per crearne uno personalizzato.
+                        1. Fai clic su *Spazi di lavoro*.
+                        2. Seleziona il tuo spazio di lavoro.
+                        3. Fai clic su *Altre funzionalità*.
+                        4. Attiva *Tag*.
+                        5. Vai su *Tag* nell’editor dello spazio di lavoro.
+                        6. Fai clic su *+ Aggiungi tag* per creare i tuoi.
 
-                        [Portami a More features](${workspaceMoreFeaturesLink}).
+                        [Portami alle altre funzionalità](${workspaceMoreFeaturesLink}).
 
                     `),
             },
@@ -7562,10 +7566,12 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             endReading: 'Fine lettura',
             saveForLater: 'Salva per dopo',
             totalDistance: 'Distanza totale',
-            startTitle: 'Foto iniziale del contachilometri',
-            endTitle: 'Foto del contachilometri finale',
             startMessageWeb: 'Aggiungi una foto del contachilometri all’<strong>inizio</strong> del tuo viaggio. Trascina qui un file oppure scegli un file da caricare.',
             endMessageWeb: 'Aggiungi una foto del contachilometri scattata alla <strong>fine</strong> del viaggio. Trascina qui un file oppure scegli un file da caricare.',
+            startTitle: 'Foto iniziale del contachilometri',
+            endTitle: 'Foto contachilometri finale',
+            deleteOdometerPhoto: 'Elimina foto del contachilometri',
+            deleteOdometerPhotoConfirmation: 'Sei sicuro di voler eliminare questa foto del contachilometri?',
         },
     },
     gps: {
@@ -8452,12 +8458,20 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             findMember: 'Trova membro',
             addMember: 'Aggiungi membro',
             email: 'Indirizzo email',
-            closeAccount: 'Chiudi account',
+            closeAccount: () => ({
+                one: 'Chiudi account',
+                other: 'Chiudi account',
+            }),
             closeAccountPrompt: 'Sei sicuro? Questa azione è permanente.',
-            forceCloseAccount: 'Forza chiusura account',
-            safeCloseAccount: 'Chiudi il conto in sicurezza',
-            closeAccountInfo:
-                'Consigliamo di chiudere l’account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura dell’account selezionato.',
+            forceCloseAccount: () => ({one: 'Forza chiusura account', other: 'Forza chiusura account'}),
+            safeCloseAccount: () => ({
+                one: 'Chiudi il conto in sicurezza',
+                other: 'Chiudi i conti in sicurezza',
+            }),
+            closeAccountInfo: () => ({
+                one: 'Consigliamo di chiudere l’account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura dell’account selezionato.',
+                other: 'Consigliamo di chiudere gli account in modo sicuro per evitare problemi in caso di: <ul><li>Approvazioni in sospeso</li><li>Rimborsi attivi</li><li>Nessun metodo di accesso alternativo</li></ul>In caso contrario, puoi ignorare le precauzioni di sicurezza sopra indicate e forzare la chiusura degli account selezionati.',
+            }),
             error: {
                 removeMember: 'Impossibile rimuovere questo utente. Riprova.',
                 addMember: 'Impossibile aggiungere questo membro. Riprova.',

@@ -995,7 +995,11 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName} 会社カード接続を修正` : '法人クレジットカードの接続を修正'),
                 subtitle: 'ワークスペース > 会社カード',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`, subtitle: 'ワークスペース > 会計'},
+            fixAccountingConnection: {
+                title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`,
+                defaultSubtitle: 'ワークスペース > 会計',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会計`,
+            },
         },
         announcements: 'お知らせ',
         discoverSection: {
@@ -2714,13 +2718,13 @@ ${date} の ${merchant} への ${amount}`,
                 title: ({workspaceCategoriesLink}) => `[カテゴリ](${workspaceCategoriesLink})を設定`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        経費を簡単にレポートできるようにするため、チームが仕訳できるよう*カテゴリを設定*しましょう。
+                        経費をかんたんにレポートできるよう、チームが仕訳に使う*カテゴリを設定*しましょう。
 
                         1. *ワークスペース*をクリックします。
                         2. 自分のワークスペースを選択します。
                         3. *カテゴリ*をクリックします。
                         4. 不要なカテゴリを無効にします。
-                        5. 右上で独自のカテゴリを追加します。
+                        5. 右上から独自のカテゴリを追加します。
 
                         [ワークスペースのカテゴリ設定に移動](${workspaceCategoriesLink})。
                     `),
@@ -2805,13 +2809,13 @@ ${
                 title: ({workspaceMembersLink}) => `[チームを招待する](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *チームを招待*して、今日から経費の記録を始めましょう。
+                        *チームを招待*して、今すぐ経費の記録を始めてもらいましょう。
 
                         1. *ワークスペース*をクリックします。
-                        2. 自分のワークスペースを選択します。
+                        2. ワークスペースを選択します。
                         3. *メンバー* > *メンバーを招待* をクリックします。
                         4. メールアドレスまたは電話番号を入力します。
-                        5. 必要に応じて、招待メッセージを追加します。
+                        5. 必要に応じて、招待メッセージをカスタマイズしてください。
 
                         [ワークスペースのメンバー画面へ移動](${workspaceMembersLink})。
                     `),
@@ -2828,14 +2832,14 @@ ${
                 title: ({workspaceTagsLink}) => `[tag](${workspaceTagsLink})を設定`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        タグを使用して、プロジェクト、クライアント、所在地、部門などの経費の詳細を追加できます。タグを複数階層で使いたい場合は、Control プランにアップグレードできます。
+                        タグを使って、プロジェクト、クライアント、所在地、部署などの追加経費情報を管理しましょう。タグを複数階層で使いたい場合は、Control プランにアップグレードできます。
 
-                        1. 「ワークスペース」をクリックします。
+                        1. *Workspaces* をクリックします。
                         2. ワークスペースを選択します。
-                        3. 「その他の機能」をクリックします。
-                        4. 「タグ」を有効にします。
-                        5. ワークスペースエディタで「タグ」に移動します。
-                        6. 「+ タグを追加」をクリックして独自のタグを作成します。
+                        3. *More features* をクリックします。
+                        4. *Tags* を有効にします。
+                        5. ワークスペースエディタ内の *Tags* に移動します。
+                        6. *+ Add tag* をクリックして、独自のタグを作成します。
 
                         [その他の機能に移動](${workspaceMoreFeaturesLink})。
 
@@ -7492,10 +7496,12 @@ ${reportName}
             endReading: '読み終える',
             saveForLater: '後で保存',
             totalDistance: '合計距離',
-            startTitle: '走行距離計の開始写真',
-            endTitle: '走行距離計終了時の写真',
             startMessageWeb: '旅行の<strong>開始時</strong>のオドメーターの写真を追加してください。ここにファイルをドラッグするか、またはアップロードするファイルを選択してください。',
             endMessageWeb: '旅行の<strong>終了時</strong>の走行距離計の写真を追加してください。ここにファイルをドラッグするか、アップロードするファイルを選択してください。',
+            startTitle: '走行距離計の開始時の写真',
+            endTitle: '走行距離計（終了時）の写真',
+            deleteOdometerPhoto: '走行距離計の写真を削除',
+            deleteOdometerPhotoConfirmation: 'この走行距離計の写真を削除してもよろしいですか？',
         },
     },
     gps: {
@@ -8374,12 +8380,20 @@ ${reportName}
             findMember: 'メンバーを検索',
             addMember: 'メンバーを追加',
             email: 'メールアドレス',
-            closeAccount: 'アカウントを閉じる',
+            closeAccount: () => ({
+                one: 'アカウントを閉じる',
+                other: 'アカウントを閉じる',
+            }),
             closeAccountPrompt: '本当によろしいですか？この操作は元に戻せません。',
-            forceCloseAccount: 'アカウントを強制的に閉鎖',
-            safeCloseAccount: 'アカウントを安全に閉じる',
-            closeAccountInfo:
-                '保留中の承認、処理中の精算、代替ログイン方法がない場合などでもアカウントを閉鎖できるように、安全にアカウントを閉鎖することを推奨します: <ul><li>保留中の承認</li><li>進行中の払い戻し</li><li>代替ログイン方法なし</li></ul>それ以外の場合は、上記の安全上の注意を無視して、選択したアカウントを強制的に閉鎖できます。',
+            forceCloseAccount: () => ({one: 'アカウントを強制的に閉鎖', other: 'アカウントを強制的に閉鎖'}),
+            safeCloseAccount: () => ({
+                one: 'アカウントを安全に閉じる',
+                other: 'アカウントを安全に閉じる',
+            }),
+            closeAccountInfo: () => ({
+                one: '保留中の承認、処理中の精算、代替ログイン方法がない場合などでもアカウントを閉鎖できるように、安全にアカウントを閉鎖することを推奨します: <ul><li>保留中の承認</li><li>進行中の払い戻し</li><li>代替ログイン方法なし</li></ul>それ以外の場合は、上記の安全上の注意を無視して、選択したアカウントを強制的に閉鎖できます。',
+                other: '保留中の承認、処理中の精算、代替ログイン方法がない場合などでもアカウントを閉鎖できるように、安全にアカウントを閉鎖することを推奨します: <ul><li>保留中の承認</li><li>進行中の払い戻し</li><li>代替ログイン方法なし</li></ul>それ以外の場合は、上記の安全上の注意を無視して、選択したアカウントを強制的に閉鎖できます。',
+            }),
             error: {
                 removeMember: 'このユーザーを削除できません。もう一度お試しください。',
                 addMember: 'このメンバーを追加できませんでした。もう一度お試しください。',
