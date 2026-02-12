@@ -114,7 +114,6 @@ function IOURequestStepCompanyInfo({route, report, transaction}: IOURequestStepC
                     name={INPUT_IDS.COMPANY_NAME}
                     label={translate('iou.yourCompanyName')}
                     accessibilityLabel={translate('iou.yourCompanyName')}
-                    role={CONST.ROLE.PRESENTATION}
                     ref={inputCallbackRef}
                     containerStyles={styles.mv4}
                 />
@@ -125,7 +124,6 @@ function IOURequestStepCompanyInfo({route, report, transaction}: IOURequestStepC
                     inputMode={CONST.INPUT_MODE.URL}
                     label={translate('iou.yourCompanyWebsite')}
                     accessibilityLabel={translate('iou.yourCompanyWebsite')}
-                    role={CONST.ROLE.PRESENTATION}
                     hint={translate('iou.yourCompanyWebsiteNote')}
                     defaultValue={defaultWebsiteExample}
                 />
