@@ -1,6 +1,6 @@
 import {render} from '@testing-library/react-native';
 import React from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 import RenderHTML from '@components/RenderHTML';
 
 jest.mock('@hooks/useWindowDimensions', () => () => ({windowWidth: 400}));
@@ -21,9 +21,9 @@ describe('RenderHTML', () => {
         mockUseHasTextAncestor.mockReturnValue(true);
         expect(() =>
             render(
-                <View>
+                <Text>
                     <RenderHTML html="<p>test</p>" />
-                </View>,
+                </Text>,
             ),
         ).toThrow('RenderHTML must not be rendered inside a <Text> component');
     });
