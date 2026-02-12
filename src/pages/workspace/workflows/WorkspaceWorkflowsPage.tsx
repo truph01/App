@@ -208,7 +208,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const [workflowSearchInput, setWorkflowSearchInput, searchFilteredWorkflows] = useSearchResults(filteredApprovalWorkflows, filterWorkflow);
 
     useEffect(() => {
-        if (filteredApprovalWorkflows.length > CONST.STANDARD_LIST_ITEM_LIMIT) {
+        if (filteredApprovalWorkflows.length > CONST.APPROVAL_WORKFLOW_SEARCH_LIMIT) {
             return;
         }
         setWorkflowSearchInput('');
@@ -310,7 +310,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 </View>
                             </View>
                         )}
-                        {filteredApprovalWorkflows.length > CONST.STANDARD_LIST_ITEM_LIMIT && (
+                        {filteredApprovalWorkflows.length > CONST.APPROVAL_WORKFLOW_SEARCH_LIMIT && (
                             <SearchBar
                                 label={translate('workflowsPage.findWorkflow')}
                                 inputValue={workflowSearchInput}
