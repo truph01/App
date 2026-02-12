@@ -642,7 +642,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                 onConfirm={() => setDuplicateDistanceErrorModalVisible(false)}
                 onCancel={() => setDuplicateDistanceErrorModalVisible(false)}
                 confirmText={translate('common.buttonConfirm')}
-                prompt={translate('iou.correctDistanceRateError')}
+                prompt={translate('iou.correctRateError')}
                 shouldShowCancelButton={false}
             />
             <ConfirmModal
