@@ -10,6 +10,7 @@ import CardPreview from '@components/CardPreview';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
 import FormHelpMessage from '@components/FormHelpMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import {LockedAccountContext} from '@components/LockedAccountModalProvider';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
@@ -81,6 +82,22 @@ function getLimitTypeTranslationKeys(limitType: ValueOf<typeof CONST.EXPENSIFY_C
     }
 }
 
+const getCardHintText = (validFrom: string | undefined, validThru: string | undefined, assigneeTimeZone: SelectedTimezone | undefined, translate: LocalizedTranslate) => {
+    if (!validFrom || !validThru) {
+        return;
+    }
+    const formatDateForDisplay = (utcDateTime: string): string => {
+        const dateInTimezone = assigneeTimeZone ? DateUtils.formatUTCDateTimeToDateInTimezone(utcDateTime, assigneeTimeZone) : DateUtils.formatWithUTCTimeZone(utcDateTime, 'yyyy-MM-dd');
+        return dateInTimezone ? DateUtils.formatToReadableString(dateInTimezone) : '';
+    };
+    const startDate = formatDateForDisplay(validFrom);
+    const endDate = formatDateForDisplay(validThru);
+    if (!startDate || !endDate) {
+        return;
+    }
+    return translate('workspace.card.issueNewCard.validFromTo', {startDate, endDate});
+};
+
 function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const {cardID} = route.params;
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
@@ -147,22 +164,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const {limitNameKey, limitTitleKey} = getLimitTypeTranslationKeys(currentCard?.nameValuePairs?.limitType);
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
-
-    const getCardHintText = (validFrom: string | undefined, validThru: string | undefined, assigneeTimeZone: SelectedTimezone | undefined) => {
-        if (!validFrom || !validThru) {
-            return;
-        }
-        const formatDateForDisplay = (utcDateTime: string): string => {
-            const dateInTimezone = assigneeTimeZone ? DateUtils.formatUTCDateTimeToDateInTimezone(utcDateTime, assigneeTimeZone) : DateUtils.formatWithUTCTimeZone(utcDateTime, 'yyyy-MM-dd');
-            return dateInTimezone ? DateUtils.formatToReadableString(dateInTimezone) : '';
-        };
-        const startDate = formatDateForDisplay(validFrom);
-        const endDate = formatDateForDisplay(validThru);
-        if (!startDate || !endDate) {
-            return;
-        }
-        return translate('workspace.card.issueNewCard.validFromTo', {startDate, endDate});
-    };
 
     if (isNotFound) {
         return <NotFoundPage onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_WALLET)} />;
@@ -234,6 +235,13 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                             }
                                             Navigation.navigate(ROUTES.SETTINGS_WALLET_CARD_DIGITAL_DETAILS_UPDATE_ADDRESS.getRoute(domain));
                                         }}
+                                        isSingleUseCard={card?.nameValuePairs?.limitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE}
+                                        cardHintText={getCardHintText(
+                                            card?.nameValuePairs?.validFrom,
+                                            card?.nameValuePairs?.validThru,
+                                            personalDetails?.[card?.accountID ?? CONST.DEFAULT_NUMBER_ID]?.timezone?.selected,
+                                            translate,
+                                        )}
                                     />
                                 ) : (
                                     <>
@@ -281,6 +289,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                                     card?.nameValuePairs?.validFrom,
                                                     card?.nameValuePairs?.validThru,
                                                     personalDetails?.[card?.accountID ?? CONST.DEFAULT_NUMBER_ID]?.timezone?.selected,
+                                                    translate,
                                                 )}
                                             />
                                         )}

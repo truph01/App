@@ -34,9 +34,15 @@ type CardDetailsProps = {
 
     /** Callback to navigate to update address page */
     onUpdateAddressPress?: () => void;
+
+    /** Whether the card is virtual */
+    isSingleUseCard?: boolean;
+
+    /** Hint text for the card */
+    cardHintText?: string;
 };
 
-function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress}: CardDetailsProps) {
+function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress, isSingleUseCard = false, cardHintText}: CardDetailsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
@@ -51,6 +57,14 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress}
                     copyValue={pan}
                     copyable
                     forwardedFSClass={CONST.FULLSTORY.CLASS.MASK}
+                />
+            )}
+            {isSingleUseCard && (
+                <MenuItemWithTopDescription
+                    description={translate('workspace.card.issueNewCard.limitType')}
+                    title={translate('workspace.card.issueNewCard.singleUse')}
+                    interactive={false}
+                    hintText={cardHintText}
                 />
             )}
             {expiration?.length > 0 && (
