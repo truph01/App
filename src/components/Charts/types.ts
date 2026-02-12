@@ -14,8 +14,6 @@ type ChartDataPoint = {
 /**
  * Y-axis unit with font fallback support.
  * The chart checks if the font can render `value` and uses `fallback` if not.
- *
- * TODO: This is a temporary solution until we properly support rendering all currency symbols in the chart font.
  */
 type YAxisUnit = {value: string; fallback: string};
 
