@@ -14806,15 +14806,16 @@ describe('actions/IOU', () => {
             expect(() => {
                 convertBulkTrackedExpensesToIOU({
                     transactionIDs: [transactionID],
-                    iouReport: targetReportID,
-                    chatReport: false,
-                    isASAPSubmitBetaEnabled: currentUserAccountID,
-                    currentUserAccountIDParam: currentUserEmail,
-                    currentUserEmailParam: {},
-                    transactionViolations: [],
-                    policyRecentlyUsedCurrencies: undefined,
-                    quickAction: testPersonalDetails,
-                    personalDetails: [CONST.BETAS.ALL],
+                    iouReport,
+                    chatReport,
+                    isASAPSubmitBetaEnabled: false,
+                    currentUserAccountIDParam: currentUserAccountID,
+                    currentUserEmailParam: currentUserEmail,
+                    transactionViolations: {},
+                    policyRecentlyUsedCurrencies: [],
+                    quickAction: undefined,
+                    personalDetails: testPersonalDetails,
+                    betas: [CONST.BETAS.ALL],
                 });
             }).not.toThrow();
         });
@@ -14875,15 +14876,16 @@ describe('actions/IOU', () => {
             expect(() => {
                 convertBulkTrackedExpensesToIOU({
                     transactionIDs: [],
-                    iouReport: targetReportID,
-                    chatReport: false,
-                    isASAPSubmitBetaEnabled: currentUserAccountID,
-                    currentUserAccountIDParam: currentUserEmail,
-                    currentUserEmailParam: {},
-                    transactionViolations: [],
-                    policyRecentlyUsedCurrencies: undefined,
-                    quickAction: testPersonalDetails,
-                    personalDetails: [CONST.BETAS.ALL],
+                    iouReport,
+                    chatReport,
+                    isASAPSubmitBetaEnabled: false,
+                    currentUserAccountIDParam: currentUserAccountID,
+                    currentUserEmailParam: currentUserEmail,
+                    transactionViolations: {},
+                    policyRecentlyUsedCurrencies: [],
+                    quickAction: undefined,
+                    personalDetails: testPersonalDetails,
+                    betas: [CONST.BETAS.ALL],
                 });
             }).not.toThrow();
         });
@@ -14914,15 +14916,16 @@ describe('actions/IOU', () => {
             expect(() => {
                 convertBulkTrackedExpensesToIOU({
                     transactionIDs: [],
-                    iouReport: targetReportID,
-                    chatReport: false,
-                    isASAPSubmitBetaEnabled: currentUserAccountID,
-                    currentUserAccountIDParam: currentUserEmail,
-                    currentUserEmailParam: {},
-                    transactionViolations: [],
-                    policyRecentlyUsedCurrencies: undefined,
-                    quickAction: {},
-                    personalDetails: [CONST.BETAS.ALL],
+                    iouReport,
+                    chatReport,
+                    isASAPSubmitBetaEnabled: false,
+                    currentUserAccountIDParam: currentUserAccountID,
+                    currentUserEmailParam: currentUserEmail,
+                    transactionViolations: {},
+                    policyRecentlyUsedCurrencies: [],
+                    quickAction: undefined,
+                    personalDetails: undefined,
+                    betas: [CONST.BETAS.ALL],
                 });
             }).not.toThrow();
         });
@@ -14953,15 +14956,16 @@ describe('actions/IOU', () => {
             expect(() => {
                 convertBulkTrackedExpensesToIOU({
                     transactionIDs: [],
-                    iouReport: targetReportID,
-                    chatReport: false,
-                    isASAPSubmitBetaEnabled: currentUserAccountID,
-                    currentUserAccountIDParam: currentUserEmail,
-                    currentUserEmailParam: {},
-                    transactionViolations: [],
-                    policyRecentlyUsedCurrencies: undefined,
+                    iouReport,
+                    chatReport,
+                    isASAPSubmitBetaEnabled: false,
+                    currentUserAccountIDParam: currentUserAccountID,
+                    currentUserEmailParam: currentUserEmail,
+                    transactionViolations: {},
+                    policyRecentlyUsedCurrencies: [],
                     quickAction: undefined,
-                    personalDetails: [CONST.BETAS.ALL],
+                    personalDetails: undefined,
+                    betas: [CONST.BETAS.ALL],
                 });
             }).not.toThrow();
         });
