@@ -98,7 +98,7 @@ function SearchEditMultipleAmountPage() {
 
     return (
         <ScreenWrapper
-            includeSafeAreaPaddingBottom={false}
+            includeSafeAreaPaddingBottom
             shouldEnableMaxHeight
             testID="SearchEditMultipleAmountPage"
         >
