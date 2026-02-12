@@ -49,9 +49,6 @@ type ReportActionItemParentActionProps = {
     /** The transaction thread report associated with the current report, if any */
     transactionThreadReport: OnyxEntry<OnyxTypes.Report>;
 
-    /** Array of report actions for this report */
-    reportActions: OnyxTypes.ReportAction[];
-
     /** Report actions belonging to the report's parent */
     parentReportAction: OnyxEntry<OnyxTypes.ReportAction>;
 
@@ -97,7 +94,6 @@ function ReportActionItemParentAction({
     policies,
     report,
     transactionThreadReport,
-    reportActions,
     parentReportAction,
     index = 0,
     shouldHideThreadDividerLine = false,
@@ -192,7 +188,6 @@ function ReportActionItemParentAction({
                                 }
                                 parentReportAction={parentReportAction}
                                 report={ancestorReport}
-                                reportActions={reportActions}
                                 transactionThreadReport={transactionThreadReport}
                                 action={ancestorReportAction}
                                 displayAsGroup={false}
