@@ -605,11 +605,6 @@ function MoneyRequestView({
                             return;
                         }
 
-                        if (isExpenseSplit && isSplitAvailable) {
-                            initSplitExpense(allTransactions, allReports, transaction);
-                            return;
-                        }
-
                         if (isOdometerDistanceRequest) {
                             Navigation.navigate(
                                 ROUTES.MONEY_REQUEST_STEP_DISTANCE_ODOMETER.getRoute(CONST.IOU.ACTION.EDIT, iouType, transaction.transactionID, transactionThreadReport.reportID),
@@ -655,11 +650,6 @@ function MoneyRequestView({
                     titleStyle={styles.flex1}
                     onPress={() => {
                         if (!transaction?.transactionID || !transactionThreadReport?.reportID) {
-                            return;
-                        }
-
-                        if (isExpenseSplit && isSplitAvailable) {
-                            initSplitExpense(allTransactions, allReports, transaction);
                             return;
                         }
 
@@ -851,7 +841,7 @@ function MoneyRequestView({
                             }
 
                             if (isExpenseSplit && isSplitAvailable) {
-                                initSplitExpense(allTransactions, allReports, transaction);
+                                initSplitExpense(allTransactions, allReports, transaction, policy);
                                 return;
                             }
 
