@@ -701,14 +701,12 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                 <RenderHTML
                     html={
                         hasDependentTags
-                            ? `<muted-text>${translate('workspace.tags.subtitle')} ${translate(
-                                  'workspace.tags.dependentMultiLevelTagsSubtitle',
+                            ? translate(
+                                  'workspace.tags.subtitleWithDependentTags',
                                   isQuickSettingsFlow
                                       ? `${environmentURL}/${ROUTES.SETTINGS_TAGS_IMPORT.getRoute(policyID, ROUTES.SETTINGS_TAGS_ROOT.getRoute(policyID, backTo))}`
                                       : `${environmentURL}/${ROUTES.WORKSPACE_TAGS_IMPORT_OPTIONS.getRoute(policyID)}`,
                               )
-                                  .replace('<muted-text>', '')
-                                  .replace('</muted-text>', '')}</muted-text>`
                             : `<muted-text>${translate('workspace.tags.subtitle')}</muted-text>`
                     }
                 />
