@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import Text from '@components/Text';
 import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -50,6 +51,8 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
 
     const vacationDelegate = useVacationDelegate(domainAccountID, accountID);
+    const hasActiveDelegations = !!vacationDelegate?.delegatorFor?.length;
+
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
         canBeMissing: true,
     });
@@ -107,12 +110,14 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 accountID={accountID}
                 avatarButton={avatarButton}
             >
+                {hasActiveDelegations && <Text style={[styles.headerText, styles.mh5, styles.mb2]}>{translate('common.vacationDelegate')}</Text>}
                 <VacationDelegateMenuItem
                     vacationDelegate={vacationDelegate}
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
                     pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
                     errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
                     onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, domainPendingActions?.member?.[memberLogin]?.vacationDelegate)}
+                    cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegateForMember', memberLogin)}
                 />
             </BaseDomainMemberDetailsComponent>
             <DecisionModal

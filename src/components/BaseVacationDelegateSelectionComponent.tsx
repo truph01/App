@@ -1,8 +1,11 @@
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
+import MenuItem from './MenuItem';
+import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import usePersonalDetailsByLogin from '@hooks/usePersonalDetailsByLogin';
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {searchInServer} from '@libs/actions/Report';
@@ -12,13 +15,14 @@ import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Participant} from '@src/types/onyx/IOU';
+import {type BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
 import HeaderWithBackButton from './HeaderWithBackButton';
 import UserListItem from './SelectionList/ListItem/UserListItem';
 import SelectionList from './SelectionList/SelectionListWithSections';
 
 type BaseVacationDelegateSelectionComponentProps = {
-    /** Current vacation delegate login */
-    currentVacationDelegate?: string;
+    /** Current vacation delegate */
+    vacationDelegate?: BaseVacationDelegate;
 
     /** Callback when a row is selected */
     onSelectRow: (option: Participant) => void;
@@ -30,14 +34,17 @@ type BaseVacationDelegateSelectionComponentProps = {
     onBackButtonPress?: () => void;
 };
 
-function BaseVacationDelegateSelectionComponent({currentVacationDelegate, onSelectRow, headerTitle, onBackButtonPress}: BaseVacationDelegateSelectionComponentProps) {
+function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, headerTitle, onBackButtonPress}: BaseVacationDelegateSelectionComponentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE, {canBeMissing: false});
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {initWithStoredValues: false, canBeMissing: false});
 
-    const delegatePersonalDetails = getPersonalDetailByEmail(currentVacationDelegate ?? '');
+    const currentVacationDelegate = vacationDelegate?.delegate ?? '';
+    const delegatePersonalDetails = getPersonalDetailByEmail(currentVacationDelegate);
+    const hasActiveDelegations = !!vacationDelegate?.delegatorFor?.length;
+    const personalDetailsByLogin = usePersonalDetailsByLogin();
 
     const excludeLogins = {
         ...CONST.EXPENSIFY_EMAILS_OBJECT,
@@ -134,31 +141,60 @@ function BaseVacationDelegateSelectionComponent({currentVacationDelegate, onSele
         ),
     };
 
+    const renderDelegatorList = () => {
+        return vacationDelegate?.delegatorFor?.map((delegatorEmail) => {
+            const delegatorDetails = personalDetailsByLogin[delegatorEmail.toLowerCase()];
+            const formattedLogin = formatPhoneNumber(delegatorDetails?.login ?? '');
+            const displayLogin = formattedLogin || delegatorEmail;
+
+            return (
+                <MenuItem
+                    key={delegatorEmail}
+                    title={delegatorDetails?.displayName ?? displayLogin}
+                    description={displayLogin}
+                    avatarID={delegatorDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID}
+                    icon={delegatorDetails?.avatar ?? icons.FallbackAvatar}
+                    iconType={CONST.ICON_TYPE_AVATAR}
+                    numberOfLinesDescription={1}
+                    containerStyle={[styles.pr2, styles.mt1]}
+                    interactive={false}
+                />
+            );
+        });
+    };
+
     return (
         <>
             <HeaderWithBackButton
                 title={headerTitle}
                 onBackButtonPress={onBackButtonPress}
             />
-            <View style={[styles.flex1, styles.w100, styles.pRelative]}>
-                <SelectionList
-                    sections={areOptionsInitialized ? sections : []}
-                    ListItem={UserListItem}
-                    onSelectRow={(item) => {
-                        // Clear search to prevent "No results found" after selection
-                        setSearchTerm('');
+            {hasActiveDelegations ? (
+                <View style={[styles.mb2, styles.mt6]}>
+                    <Text style={[styles.mh5, styles.mb4]}>{translate('statusPage.cannotSetVacationDelegate')}</Text>
+                    {renderDelegatorList()}
+                </View>
+            ) : (
+                <View style={[styles.flex1, styles.w100, styles.pRelative]}>
+                    <SelectionList
+                        sections={areOptionsInitialized ? sections : []}
+                        ListItem={UserListItem}
+                        onSelectRow={(item) => {
+                            // Clear search to prevent "No results found" after selection
+                            setSearchTerm('');
 
-                        onSelectRow(item);
-                    }}
-                    textInputOptions={textInputOptions}
-                    showLoadingPlaceholder={!areOptionsInitialized}
-                    isLoadingNewOptions={!!isSearchingForReports}
-                    onEndReached={onListEndReached}
-                    disableMaintainingScrollPosition
-                    shouldSingleExecuteRowSelect
-                    shouldShowTextInput
-                />
-            </View>
+                            onSelectRow(item);
+                        }}
+                        textInputOptions={textInputOptions}
+                        showLoadingPlaceholder={!areOptionsInitialized}
+                        isLoadingNewOptions={!!isSearchingForReports}
+                        onEndReached={onListEndReached}
+                        disableMaintainingScrollPosition
+                        shouldSingleExecuteRowSelect
+                        shouldShowTextInput
+                    />
+                </View>
+            )}
         </>
     );
 }

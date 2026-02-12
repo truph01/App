@@ -59,6 +59,8 @@ function StatusPage() {
     const [brickRoadIndicator, setBrickRoadIndicator] = useState<ValueOf<typeof CONST.BRICK_ROAD_INDICATOR_STATUS>>();
 
     const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE, {canBeMissing: true});
+    const hasActiveDelegations = !!vacationDelegate?.delegatorFor?.length;
+    const isFormLoading = !!formState?.isLoading;
 
     const currentUserEmojiCode = currentUserPersonalDetails?.status?.emojiCode ?? '';
     const currentUserStatusText = currentUserPersonalDetails?.status?.text ?? '';
@@ -258,13 +260,15 @@ function StatusPage() {
                     )}
                 </View>
                 <View style={[styles.mb2, styles.mt6]}>
-                    <Text style={[styles.mh5, styles.mb1]}>{translate('statusPage.setVacationDelegate')}</Text>
+                    <Text style={[styles.headerText, styles.mh5, styles.mb2]}>{translate('common.vacationDelegate')}</Text>
+                    {!hasActiveDelegations && <Text style={[styles.mh5, styles.mb1]}>{translate('statusPage.setVacationDelegate')}</Text>}
                     <VacationDelegateMenuItem
                         vacationDelegate={vacationDelegate}
                         errors={vacationDelegate?.errors}
                         pendingAction={vacationDelegate?.pendingAction}
                         onCloseError={() => clearVacationDelegateError(vacationDelegate?.previousDelegate)}
                         onPress={() => Navigation.navigate(ROUTES.SETTINGS_VACATION_DELEGATE)}
+                        cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
                     />
                 </View>
             </FormProvider>

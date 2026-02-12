@@ -8274,7 +8274,7 @@ ${reportName}
             error: {
                 removeMember: '无法移除此用户。请重试。',
                 addMember: '无法添加此成员。请重试。',
-                vacationDelegate: '无法将此用户设置为休假代理人。请重试。'
+                vacationDelegate: '无法将此用户设置为休假代理人。请重试。',
             },
             forceTwoFactorAuth: '强制启用双重身份验证',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) => `<muted-text>请禁用<a href="${samlPageUrl}">SAML</a>以强制启用双重身份验证。</muted-text>`,

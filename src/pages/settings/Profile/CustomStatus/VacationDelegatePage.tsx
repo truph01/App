@@ -20,7 +20,6 @@ function VacationDelegatePage() {
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
 
     const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE, {canBeMissing: true});
-    const currentVacationDelegate = vacationDelegate?.delegate;
 
     const onSelectRow = useCallback(
         (option: Participant) => {
@@ -55,7 +54,7 @@ function VacationDelegatePage() {
                 testID="VacationDelegatePage"
             >
                 <BaseVacationDelegateSelectionComponent
-                    currentVacationDelegate={currentVacationDelegate}
+                    vacationDelegate={vacationDelegate}
                     onSelectRow={onSelectRow}
                     headerTitle={translate('common.vacationDelegate')}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
