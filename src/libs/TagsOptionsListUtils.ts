@@ -304,6 +304,7 @@ function getUpdatedTransactionTag({transactionTag, selectedTagName, currentTag, 
             tagParts.splice(tagListIndex, tagParts.length - tagListIndex, selectedTagName);
 
             const policyTagLists = getTagLists(policyTags);
+            // Auto-select subsequent tags if there is only one enabled tag
             for (let i = tagListIndex + 1; i < policyTagLists.length; i++) {
                 const availableNextLevelTags = getTagList(policyTags, i);
                 const enabledTags = Object.values(availableNextLevelTags.tags).filter((tag) => tag.enabled);
