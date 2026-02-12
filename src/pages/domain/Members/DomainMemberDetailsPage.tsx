@@ -47,7 +47,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
         selector: personalDetailsSelector(accountID),
     });
 
-    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: false, selector: domainNameSelector});
+    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
 
     const vacationDelegate = useVacationDelegate(domainAccountID, accountID);
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
@@ -63,13 +63,14 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
         }
 
         const result = await showConfirmModal({
-            title: translate('domain.members.closeAccount'),
+            title: translate('domain.members.closeAccount', {count: 1}),
             prompt: translate('domain.members.closeAccountPrompt'),
-            confirmText: translate('domain.members.closeAccount'),
+            confirmText: translate('domain.members.closeAccount', {count: 1}),
             cancelText: translate('common.cancel'),
             danger: true,
             shouldShowCancelButton: true,
         });
+
         if (result.action !== ModalActions.CONFIRM) {
             setIsModalVisible(true);
             setShouldForceCloseAccount(undefined);
@@ -92,7 +93,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
 
     const avatarButton = (
         <Button
-            text={translate('domain.members.closeAccount')}
+            text={translate('domain.members.closeAccount', {count: 1})}
             onPress={() => setIsModalVisible(true)}
             icon={icons.RemoveMembers}
             style={styles.mb5}
@@ -115,13 +116,13 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 />
             </BaseDomainMemberDetailsComponent>
             <DecisionModal
-                title={translate('domain.members.closeAccount')}
-                prompt={translate('domain.members.closeAccountInfo')}
+                title={translate('domain.members.closeAccount', {count: 1})}
+                prompt={translate('domain.members.closeAccountInfo', {count: 1})}
                 isSmallScreenWidth={isSmallScreenWidth}
                 onFirstOptionSubmit={handleForceCloseAccount}
                 onSecondOptionSubmit={handleSafeCloseAccount}
-                secondOptionText={translate('domain.members.safeCloseAccount')}
-                firstOptionText={translate('domain.members.forceCloseAccount')}
+                secondOptionText={translate('domain.members.safeCloseAccount', {count: 1})}
+                firstOptionText={translate('domain.members.forceCloseAccount', {count: 1})}
                 isVisible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
                 onModalHide={() => {

@@ -8,6 +8,9 @@ type BaseVacationDelegate = {
     /** Email of the vacation delegate */
     delegate?: string;
 
+    /** Array of emails for users that the current user is delegating for */
+    delegatorFor?: string[];
+
     /** Previous delegate for rollback on failure */
     previousDelegate?: string;
 };

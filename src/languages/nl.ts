@@ -1000,7 +1000,11 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Verbinding bedrijfskaart ${feedName} herstellen` : 'Verbinding van bedrijfskaart repareren'),
                 subtitle: 'Werkruimte > Bedrijfspassen',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Verbinding met ${integrationName} repareren`, subtitle: 'Werkruimte > Boekhouding'},
+            fixAccountingConnection: {
+                title: ({integrationName}: {integrationName: string}) => `Verbinding met ${integrationName} repareren`,
+                defaultSubtitle: 'Werkruimte > Boekhouding',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Boekhouding`,
+            },
         },
         announcements: 'Aankondigingen',
         discoverSection: {
@@ -1565,6 +1569,7 @@ const translations: TranslationDeepObject<typeof en> = {
             });
             return `${formatList(fragments)} via <a href="${policyRulesRoute}">werkruimte­regels</a>`;
         },
+        duplicateNonDefaultWorkspacePerDiemError: 'Je kunt dagvergoedingen niet dupliceren tussen werkruimtes, omdat de tarieven per werkruimte kunnen verschillen.',
     },
     transactionMerge: {
         listPage: {
@@ -2729,13 +2734,13 @@ ${amount} voor ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `[categorieën instellen](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Stel categorieën in* zodat je team onkosten kan coderen voor eenvoudige rapportage.
+                        *Stel categorieën in* zodat je team uitgaven kan coderen voor eenvoudige rapportage.
 
                         1. Klik op *Workspaces*.
                         2. Selecteer je workspace.
                         3. Klik op *Categories*.
-                        4. Schakel categorieën uit die je niet nodig hebt.
-                        5. Voeg je eigen categorieën toe rechtsboven.
+                        4. Schakel alle categorieën uit die je niet nodig hebt.
+                        5. Voeg rechtsboven je eigen categorieën toe.
 
                         [Breng me naar de categorie-instellingen van de workspace](${workspaceCategoriesLink}).
                     `),
@@ -2825,7 +2830,7 @@ ${
                         1. Klik op *Workspaces*.
                         2. Selecteer je workspace.
                         3. Klik op *Members* > *Invite member*.
-                        4. Voer e-mailadressen of telefoonnummers in.
+                        4. Voer e-mails of telefoonnummers in.
                         5. Voeg een aangepast uitnodigingsbericht toe als je wilt!
 
                         [Breng me naar workspaceleden](${workspaceMembersLink}).
@@ -2843,13 +2848,13 @@ ${
                 title: ({workspaceTagsLink}) => `[Tags](${workspaceTagsLink}) instellen`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Gebruik labels om extra details aan je uitgaven toe te voegen, zoals projecten, klanten, locaties en afdelingen. Als je meerdere niveaus van labels nodig hebt, kun je upgraden naar het Control-abonnement.
+                        Gebruik labels om extra details aan uitgaven toe te voegen, zoals projecten, klanten, locaties en afdelingen. Als je meerdere niveaus van labels nodig hebt, kun je upgraden naar het Control-abonnement.
 
                         1. Klik op *Workspaces*.
                         2. Selecteer je workspace.
                         3. Klik op *More features*.
                         4. Schakel *Tags* in.
-                        5. Ga in de workspace-editor naar *Tags*.
+                        5. Ga naar *Tags* in de workspace-editor.
                         6. Klik op *+ Add tag* om je eigen labels te maken.
 
                         [Breng me naar more features](${workspaceMoreFeaturesLink}).
@@ -3120,6 +3125,7 @@ ${
         clearAfter: 'Wissen na',
         whenClearStatus: 'Wanneer moeten we je status wissen?',
         setVacationDelegate: `Stel een vervangende fiatteur in om rapporten namens jou goed te keuren terwijl je afwezig bent.`,
+        cannotSetVacationDelegate: `Je kunt geen vakantiedelegaat instellen omdat je momenteel de delegaat bent voor de volgende leden:`,
         vacationDelegateError: 'Er is een fout opgetreden bij het bijwerken van je vervanger tijdens vakantie.',
         asVacationDelegate: ({nameOrEmail}: VacationDelegateParams) => `als vakantiewaarnemer van ${nameOrEmail}`,
         toAsVacationDelegate: ({submittedToName, vacationDelegateName}: SubmittedToVacationDelegateParams) =>
@@ -7546,10 +7552,12 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             endReading: 'Lezen beëindigen',
             saveForLater: 'Bewaren voor later',
             totalDistance: 'Totale afstand',
-            startTitle: 'Foto beginstand kilometerteller',
-            endTitle: 'Eindfoto kilometerteller',
             startMessageWeb: 'Voeg een foto toe van de kilometerteller aan het <strong>begin</strong> van je reis. Sleep een bestand hierheen of kies er een om te uploaden.',
             endMessageWeb: 'Voeg een foto toe van je kilometerteller aan het <strong>einde</strong> van je reis. Sleep hier een bestand naartoe of kies er één om te uploaden.',
+            startTitle: 'Kilometerstand beginfoto',
+            endTitle: 'Eindfoto kilometerteller',
+            deleteOdometerPhoto: 'Kilometerstandfoto verwijderen',
+            deleteOdometerPhotoConfirmation: 'Weet je zeker dat je deze kilometertellerfoto wilt verwijderen?',
         },
     },
     gps: {
@@ -8435,12 +8443,20 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             findMember: 'Lid zoeken',
             addMember: 'Lid toevoegen',
             email: 'E-mailadres',
-            closeAccount: 'Account sluiten',
+            closeAccount: () => ({
+                one: 'Account sluiten',
+                other: 'Accounts sluiten',
+            }),
             closeAccountPrompt: 'Weet je het zeker? Deze actie is permanent.',
-            forceCloseAccount: 'Account geforceerd sluiten',
-            safeCloseAccount: 'Account veilig sluiten',
-            closeAccountInfo:
-                'We raden aan om de account veilig te sluiten om te vermijden dat je deze moet sluiten als er zijn: <ul><li>Openstaande goedkeuringen</li><li>Actieve terugbetalingen</li><li>Geen alternatieve inlogmethoden</li></ul>Anders kun je de bovenstaande veiligheidsmaatregelen negeren en de geselecteerde account geforceerd sluiten.',
+            forceCloseAccount: () => ({one: 'Account geforceerd sluiten', other: 'Accounts geforceerd sluiten'}),
+            safeCloseAccount: () => ({
+                one: 'Account veilig sluiten',
+                other: 'Accounts veilig sluiten',
+            }),
+            closeAccountInfo: () => ({
+                one: 'We raden aan om de account veilig te sluiten om te vermijden dat je deze moet sluiten als er zijn: <ul><li>Openstaande goedkeuringen</li><li>Actieve terugbetalingen</li><li>Geen alternatieve inlogmethoden</li></ul>Anders kun je de bovenstaande veiligheidsmaatregelen negeren en de geselecteerde account geforceerd sluiten.',
+                other: 'We raden aan om de accounts veilig te sluiten om te vermijden dat je deze moet sluiten als er zijn: <ul><li>Openstaande goedkeuringen</li><li>Actieve terugbetalingen</li><li>Geen alternatieve inlogmethoden</li></ul>Anders kun je de bovenstaande veiligheidsmaatregelen negeren en de geselecteerde accounts geforceerd sluiten.',
+            }),
             error: {
                 removeMember: 'Kan deze gebruiker niet verwijderen. Probeer het opnieuw.',
                 addMember: 'Kan dit lid niet toevoegen. Probeer het opnieuw.',
