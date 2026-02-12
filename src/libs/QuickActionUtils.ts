@@ -21,6 +21,7 @@ const getQuickActionIcon = (
         case CONST.QUICK_ACTIONS.REQUEST_DISTANCE:
             return icons.Car;
         case CONST.QUICK_ACTIONS.PER_DIEM:
+        case CONST.QUICK_ACTIONS.TRACK_PER_DIEM:
             return icons.CalendarSolid;
         case CONST.QUICK_ACTIONS.SPLIT_MANUAL:
         case CONST.QUICK_ACTIONS.SPLIT_SCAN:
@@ -78,6 +79,7 @@ const getQuickActionTitle = (action: QuickActionName): TranslationPaths => {
         case CONST.QUICK_ACTIONS.TRACK_DISTANCE:
             return 'quickAction.recordDistance';
         case CONST.QUICK_ACTIONS.PER_DIEM:
+        case CONST.QUICK_ACTIONS.TRACK_PER_DIEM:
             return 'quickAction.perDiem';
         case CONST.QUICK_ACTIONS.SPLIT_MANUAL:
             return 'quickAction.splitBill';
@@ -106,7 +108,7 @@ const isQuickActionAllowed = (
     isReportArchived: boolean | undefined,
     isRestrictedToPreferredPolicy = false,
 ) => {
-    if (quickAction?.action === CONST.QUICK_ACTIONS.PER_DIEM) {
+    if (quickAction?.action === CONST.QUICK_ACTIONS.PER_DIEM || quickAction?.action === CONST.QUICK_ACTIONS.TRACK_PER_DIEM) {
         if (!quickActionPolicy?.arePerDiemRatesEnabled) {
             return false;
         }
