@@ -4,7 +4,6 @@ import type {ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import getPlatform from '@libs/getPlatform';
 import colors from '@styles/theme/colors';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
@@ -69,8 +68,6 @@ function InteractiveStepSubHeader({stepNames, startStepIndex = 0, onStepSelected
 
     const amountOfUnions = stepNames.length - 1;
 
-    const isWeb = getPlatform() === CONST.PLATFORM.WEB;
-
     return (
         <View
             style={[styles.interactiveStepHeaderContainer, containerWidthStyle]}
@@ -109,7 +106,7 @@ function InteractiveStepSubHeader({stepNames, startStepIndex = 0, onStepSelected
                             disabled={isLockedStep || !onStepSelected}
                             onPress={moveToStep}
                             accessible={false}
-                            aria-hidden={!isWeb}
+                            aria-hidden
                             role={CONST.ROLE.BUTTON}
                         >
                             {isCompletedStep ? (
