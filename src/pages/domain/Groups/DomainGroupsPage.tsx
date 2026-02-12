@@ -61,7 +61,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
             </View>
         );
 
-        return <View style={[styles.ph9, styles.pv3, styles.pb5]}>{header}</View>;
+        return <View style={styles.baseListHeaderWrapperStyle}>{header}</View>;
     };
 
     return (
@@ -70,7 +70,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                 enableEdgeToEdgeBottomSafeAreaPadding
                 shouldEnableMaxHeight
                 shouldShowOfflineIndicatorInWideScreen
-                testID={DomainGroupsPage.displayName}
+                testID="DomainGroupsPage"
             >
                 <HeaderWithBackButton
                     title={translate('domain.groups.title')}
@@ -89,7 +89,5 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
         </DomainNotFoundPageWrapper>
     );
 }
-
-DomainGroupsPage.displayName = 'DomainGroupsPage';
 
 export default DomainGroupsPage;
