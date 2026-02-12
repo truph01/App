@@ -31,8 +31,20 @@ function SearchEditMultipleTaxPage() {
     const selectedTaxRate = draftTransaction?.taxCode ? getTaxName(policy, draftTransaction) : '';
 
     const onSubmit = (taxes: TaxRatesOption) => {
+        const nextTaxCode = taxes.code ?? '';
+        const currentTaxCode = draftTransaction?.taxCode ?? '';
+
+        // If the selected tax rate is the same as the current one, clear it
+        if (nextTaxCode === currentTaxCode) {
+            updateBulkEditDraftTransaction({
+                taxCode: undefined,
+            });
+            Navigation.goBack();
+            return;
+        }
+
         updateBulkEditDraftTransaction({
-            taxCode: taxes.code,
+            taxCode: nextTaxCode,
         });
         Navigation.goBack();
     };
@@ -55,6 +67,7 @@ function SearchEditMultipleTaxPage() {
                     onDismiss={Navigation.goBack}
                     action={CONST.IOU.ACTION.EDIT}
                     iouType={CONST.IOU.TYPE.SUBMIT}
+                    allowDeselect
                 />
             </View>
         </ScreenWrapper>
