@@ -136,7 +136,7 @@ function SubscriptionPlanCardActionButton({subscriptionPlan, isFromComparisonMod
     const subscriptionType = isAnnual ? translate('subscription.subscriptionSettings.annual') : translate('subscription.details.payPerUse');
     const subscriptionSize = `${privateSubscription?.userCount ?? translate('subscription.subscriptionSettings.none')}`;
     const autoRenew = privateSubscription?.autoRenew ? translate('subscription.subscriptionSettings.on') : translate('subscription.subscriptionSettings.off');
-    const expensifyCode = privateSubscription?.expensifyCode ?? '';
+    const expensifyCode = privateSubscription?.isSecretPromoCode ? '' : (privateSubscription?.expensifyCode ?? '');
 
     return (
         <MenuItemWithTopDescription

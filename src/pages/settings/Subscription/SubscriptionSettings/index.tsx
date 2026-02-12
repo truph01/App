@@ -63,6 +63,7 @@ function SubscriptionSettings() {
     const [privateTaxExempt] = useOnyx(ONYXKEYS.NVP_PRIVATE_TAX_EXEMPT, {canBeMissing: true});
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
     const isExpensifyCodeApplied = !!privateSubscription?.expensifyCode;
+    const shouldShowExpensifyCodeSection = !privateSubscription?.isSecretPromoCode;
     const subscriptionPrice = getSubscriptionPrice(subscriptionPlan, preferredCurrency, privateSubscription?.type, hasTeam2025Pricing);
     const priceDetails = translate(`subscription.yourPlan.${subscriptionPlan === CONST.POLICY.TYPE.CORPORATE ? 'control' : 'collect'}.${isAnnual ? 'priceAnnual' : 'pricePayPerUse'}`, {
         lower: convertToShortDisplayString(subscriptionPrice, preferredCurrency),
@@ -269,15 +270,18 @@ function SubscriptionSettings() {
                         </OfflineWithFeedback>
                     </>
                 ) : null}
-                <MenuItemWithTopDescription
-                    description={translate('subscription.expensifyCode.title')}
-                    shouldShowRightIcon={!isExpensifyCodeApplied}
-                    onPress={onExpensifyCodePress}
-                    interactive={!isExpensifyCodeApplied}
-                    wrapperStyle={styles.sectionMenuItemTopDescription}
-                    style={styles.mt5}
-                    title={privateSubscription?.expensifyCode}
-                />
+
+                {shouldShowExpensifyCodeSection && (
+                    <MenuItemWithTopDescription
+                        description={translate('subscription.expensifyCode.title')}
+                        shouldShowRightIcon={!isExpensifyCodeApplied}
+                        onPress={onExpensifyCodePress}
+                        interactive={!isExpensifyCodeApplied}
+                        wrapperStyle={styles.sectionMenuItemTopDescription}
+                        style={styles.mt5}
+                        title={privateSubscription?.expensifyCode}
+                    />
+                )}
                 <MenuItemWithTopDescription
                     description={privateTaxExempt ? translate('subscription.details.taxExemptStatus') : undefined}
                     shouldShowRightIcon

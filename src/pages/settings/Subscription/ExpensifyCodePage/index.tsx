@@ -61,7 +61,7 @@ function ExpensifyCodePage() {
         Navigation.goBack();
     }, [hasSubmitted, isExpensifyCodeApplied]);
 
-    if (isExpensifyCodeApplied) {
+    if (isExpensifyCodeApplied || subscription?.isSecretPromoCode) {
         return <NotFoundPage />;
     }
 
