@@ -1414,6 +1414,7 @@ describe('actions/Policy', () => {
             // When deleting a workspace fails
             mockFetch?.fail?.();
             Policy.deleteWorkspace({
+                policies: {[`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`]: fakePolicy},
                 policyID: fakePolicy.id,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
@@ -1506,6 +1507,7 @@ describe('actions/Policy', () => {
             ]);
 
             Policy.deleteWorkspace({
+                policies: {},
                 policyID,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
@@ -1563,6 +1565,12 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             Policy.deleteWorkspace({
+                policies: {
+                    [`${ONYXKEYS.COLLECTION.POLICY}${personalPolicy.id}`]: personalPolicy,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${randomGroupPolicy.id}`]: randomGroupPolicy,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${randomGroupPolicy2.id}`]: randomGroupPolicy2,
+                    [`${ONYXKEYS.COLLECTION.POLICY}${mostRecentlyCreatedGroupPolicy.id}`]: mostRecentlyCreatedGroupPolicy,
+                },
                 policyID: randomGroupPolicy.id,
                 personalPolicyID: personalPolicy.id,
                 activePolicyID: randomGroupPolicy.id,
@@ -1600,6 +1608,7 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             Policy.deleteWorkspace({
+                policies: {[`${ONYXKEYS.COLLECTION.POLICY}${policyToDelete.id}`]: policyToDelete},
                 policyID: policyToDelete.id,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
@@ -1639,6 +1648,7 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             Policy.deleteWorkspace({
+                policies: {[`${ONYXKEYS.COLLECTION.POLICY}${policyToDelete.id}`]: policyToDelete},
                 policyID: policyToDelete.id,
                 personalPolicyID: undefined,
                 activePolicyID: undefined,
@@ -1684,7 +1694,7 @@ describe('actions/Policy', () => {
             });
 
             const workspaceName = Policy.generateDefaultWorkspaceName(TEST_NON_PUBLIC_DOMAIN_EMAIL);
-            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace}));
+            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', displayNameForWorkspace));
         });
 
         it('should generate a workspace name based on the display name when the domain is public and display name is available', () => {
@@ -1697,7 +1707,7 @@ describe('actions/Policy', () => {
             });
 
             const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL);
-            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace}));
+            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', displayNameForWorkspace));
         });
 
         it('should generate a workspace name based on the username when the domain is public and display name is not available', () => {
@@ -1712,7 +1722,7 @@ describe('actions/Policy', () => {
             });
 
             const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL_2);
-            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', {userName: displayNameForWorkspace}));
+            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', displayNameForWorkspace));
         });
 
         it('should generate a workspace name with an incremented number when there are existing policies with similar names', async () => {
@@ -1730,7 +1740,7 @@ describe('actions/Policy', () => {
             await Onyx.set(ONYXKEYS.COLLECTION.POLICY, existingPolicies);
 
             const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL);
-            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', {userName: TEST_DISPLAY_NAME, workspaceNumber: 2}));
+            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', TEST_DISPLAY_NAME, 2));
         });
 
         it('should return "My Group Workspace" when the domain is SMS', () => {
@@ -1763,7 +1773,7 @@ describe('actions/Policy', () => {
             await Onyx.set(ONYXKEYS.COLLECTION.POLICY, existingPolicies);
 
             const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL);
-            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', {userName: TEST_DISPLAY_NAME, workspaceNumber: 2}));
+            expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', TEST_DISPLAY_NAME, 2));
         });
     });
 
