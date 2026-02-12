@@ -8,6 +8,8 @@ import {registerAuthenticationKey} from './index';
 type ProcessResult = {
     success: boolean;
     reason: MultifactorAuthenticationReason;
+    httpStatus?: number;
+    message?: string;
 };
 
 /**
@@ -83,7 +85,7 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
         challenge: params.challenge,
     });
 
-    const {httpCode, reason} = await registerAuthenticationKey({
+    const {httpCode, reason, message} = await registerAuthenticationKey({
         keyInfo,
         authenticationMethod: params.authenticationMethod,
     });
@@ -93,6 +95,8 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
     return {
         success,
         reason,
+        httpStatus: httpCode,
+        message,
     };
 }
 
@@ -116,12 +120,14 @@ async function processScenarioAction(
         };
     }
 
-    const {httpCode, reason} = await action(params);
+    const {httpCode, reason, message} = await action(params);
     const success = isHttpSuccess(httpCode);
 
     return {
         success,
         reason,
+        httpStatus: httpCode,
+        message,
     };
 }
 

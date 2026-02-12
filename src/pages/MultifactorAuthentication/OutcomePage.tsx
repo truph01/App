@@ -1,20 +1,34 @@
 import React from 'react';
-import {DefaultFailureScreen} from '@components/MultifactorAuthentication/components/FailureScreen';
+import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/FailureScreen';
 import {useMultifactorAuthenticationState} from '@components/MultifactorAuthentication/Context';
+import type {ErrorState} from '@components/MultifactorAuthentication/Context/State';
+
+function isServerError(error: ErrorState): boolean {
+    return error.httpStatus !== undefined && String(error.httpStatus).startsWith('5');
+}
 
 function MultifactorAuthenticationOutcomePage() {
     const {state} = useMultifactorAuthenticationState();
     const {scenario} = state;
 
     if (!scenario) {
-        return <DefaultFailureScreen />;
+        return <DefaultClientFailureScreen />;
     }
 
     if (!state.error) {
         return scenario.successScreen;
     }
 
-    return scenario.failureScreens?.[state.error.reason] ?? scenario.defaultFailureScreen;
+    const reasonScreen = scenario.failureScreens?.[state.error.reason];
+    if (reasonScreen) {
+        return reasonScreen;
+    }
+
+    if (isServerError(state.error)) {
+        return scenario.defaultServerFailureScreen;
+    }
+
+    return scenario.defaultClientFailureScreen;
 }
 
 MultifactorAuthenticationOutcomePage.displayName = 'MultifactorAuthenticationOutcomePage';

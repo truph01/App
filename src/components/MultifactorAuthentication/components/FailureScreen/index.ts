@@ -1,2 +1,2 @@
 export {default as FailureScreenBase} from './FailureScreenBase';
-export {DefaultFailureScreen, OutOfTimeFailureScreen, NoEligibleMethodsFailureScreen, UnsupportedDeviceFailureScreen} from './defaultScreens';
+export {DefaultClientFailureScreen, DefaultServerFailureScreen, OutOfTimeFailureScreen, NoEligibleMethodsFailureScreen, UnsupportedDeviceFailureScreen} from './defaultScreens';

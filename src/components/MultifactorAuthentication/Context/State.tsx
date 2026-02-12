@@ -12,6 +12,7 @@ import CONST from '@src/CONST';
 
 type ErrorState = {
     reason: MultifactorAuthenticationReason;
+    httpStatus?: number;
     message?: string;
 };
 

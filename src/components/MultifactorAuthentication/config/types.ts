@@ -59,7 +59,8 @@ type FailureScreenOverrides = Partial<Record<MultifactorAuthenticationReason, Re
 type MultifactorAuthenticationUI = {
     MODALS: MultifactorAuthenticationModal;
     successScreen?: React.ReactElement;
-    defaultFailureScreen?: React.ReactElement;
+    defaultClientFailureScreen?: React.ReactElement;
+    defaultServerFailureScreen?: React.ReactElement;
     failureScreens?: FailureScreenOverrides;
 };
 
@@ -69,6 +70,7 @@ type MultifactorAuthenticationUI = {
 type MultifactorAuthenticationScenarioResponse = {
     httpCode: number;
     reason: MultifactorAuthenticationReason;
+    message: string | undefined;
 };
 
 /**
@@ -98,18 +100,19 @@ type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> =
      */
     pure?: true;
 } & MultifactorAuthenticationUI &
-    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultFailureScreen'>>;
+    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen'>>;
 
 /**
  * Scenario configuration for custom scenarios with optional overrides.
  */
 type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<
     MultifactorAuthenticationScenarioConfig<T>,
-    'MODALS' | 'failureScreens' | 'successScreen' | 'defaultFailureScreen'
+    'MODALS' | 'failureScreens' | 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen'
 > & {
     MODALS?: MultifactorAuthenticationModalOptional;
     successScreen?: React.ReactElement;
-    defaultFailureScreen?: React.ReactElement;
+    defaultClientFailureScreen?: React.ReactElement;
+    defaultServerFailureScreen?: React.ReactElement;
     failureScreens?: FailureScreenOverrides;
 };
 
@@ -117,7 +120,7 @@ type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unkn
  * Default UI configuration shared across scenarios.
  */
 type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS'> &
-    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultFailureScreen' | 'failureScreens'>>;
+    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen' | 'failureScreens'>>;
 
 /**
  * Record mapping all scenarios to their configurations.

@@ -11,6 +11,11 @@ export default {
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.BIOMETRICS_TEST,
     pure: true,
     failureScreens: {
-        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED]: <UnsupportedDeviceFailureScreen subtitle="multifactorAuthentication.biometricsTest.areYouSureToReject" />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: (
+            <UnsupportedDeviceFailureScreen
+                subtitle="multifactorAuthentication.biometricsTest.areYouSureToReject"
+                customSubtitle={undefined}
+            />
+        ),
     },
 } as const satisfies MultifactorAuthenticationScenarioCustomConfig;

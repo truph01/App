@@ -18,7 +18,8 @@ describe('MultifactorAuthentication Scenarios Config', () => {
             expect(cancelConfirmation).toHaveProperty('cancelButtonText');
 
             expect(scenarioConfig).toHaveProperty('successScreen');
-            expect(scenarioConfig).toHaveProperty('defaultFailureScreen');
+            expect(scenarioConfig).toHaveProperty('defaultClientFailureScreen');
+            expect(scenarioConfig).toHaveProperty('defaultServerFailureScreen');
         }
     });
 

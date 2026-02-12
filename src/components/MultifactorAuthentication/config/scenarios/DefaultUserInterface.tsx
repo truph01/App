@@ -1,5 +1,11 @@
 import React from 'react';
-import {DefaultFailureScreen, NoEligibleMethodsFailureScreen, OutOfTimeFailureScreen, UnsupportedDeviceFailureScreen} from '@components/MultifactorAuthentication/components/FailureScreen';
+import {
+    DefaultClientFailureScreen,
+    DefaultServerFailureScreen,
+    NoEligibleMethodsFailureScreen,
+    OutOfTimeFailureScreen,
+    UnsupportedDeviceFailureScreen,
+} from '@components/MultifactorAuthentication/components/FailureScreen';
 import {DefaultSuccessScreen} from '@components/MultifactorAuthentication/components/SuccessScreen';
 import type {MultifactorAuthenticationDefaultUIConfig, MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import CONST from '@src/CONST';
@@ -14,7 +20,8 @@ const DEFAULT_CONFIG = {
         },
     },
     successScreen: <DefaultSuccessScreen />,
-    defaultFailureScreen: <DefaultFailureScreen />,
+    defaultClientFailureScreen: <DefaultClientFailureScreen />,
+    defaultServerFailureScreen: <DefaultServerFailureScreen />,
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS]: <NoEligibleMethodsFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: <UnsupportedDeviceFailureScreen />,
@@ -37,7 +44,8 @@ function customConfig<const T extends MultifactorAuthenticationScenarioCustomCon
         ...config,
         MODALS,
         successScreen: config.successScreen ?? DEFAULT_CONFIG.successScreen,
-        defaultFailureScreen: config.defaultFailureScreen ?? DEFAULT_CONFIG.defaultFailureScreen,
+        defaultClientFailureScreen: config.defaultClientFailureScreen ?? DEFAULT_CONFIG.defaultClientFailureScreen,
+        defaultServerFailureScreen: config.defaultServerFailureScreen ?? DEFAULT_CONFIG.defaultServerFailureScreen,
         failureScreens: {...DEFAULT_CONFIG.failureScreens, ...config.failureScreens},
     } as const;
 }

@@ -29,6 +29,7 @@ function parseHttpRequest(
 ): {
     httpCode: number;
     reason: MultifactorAuthenticationReason;
+    message: string | undefined;
 } {
     const httpCode = Number(jsonCode ?? 0);
 
@@ -36,6 +37,7 @@ function parseHttpRequest(
         return {
             httpCode,
             reason: VALUES.REASON.BACKEND.UNKNOWN_RESPONSE,
+            message,
         };
     }
 
@@ -43,6 +45,7 @@ function parseHttpRequest(
         return {
             httpCode,
             reason: source[200],
+            message,
         };
     }
 
@@ -51,6 +54,7 @@ function parseHttpRequest(
     return {
         httpCode,
         reason: findMessageInSource(codes, message),
+        message,
     };
 }
 

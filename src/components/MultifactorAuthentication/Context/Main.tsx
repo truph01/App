@@ -202,6 +202,8 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                         type: 'SET_ERROR',
                         payload: {
                             reason: registrationResponse.reason,
+                            httpStatus: registrationResponse.httpStatus,
+                            message: registrationResponse.message,
                         },
                     });
                     return;
@@ -282,6 +284,8 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                             type: 'SET_ERROR',
                             payload: {
                                 reason: scenarioAPIResponse.reason,
+                                httpStatus: scenarioAPIResponse.httpStatus,
+                                message: scenarioAPIResponse.message,
                             },
                         });
                         return;
