@@ -114,8 +114,14 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should wait for older in-progress runs to finish', () => {
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
-        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 1000, status: 'in_progress'},
+        ]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
@@ -124,8 +130,14 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should wait for older queued runs to finish', () => {
-        mockPoll([{id: 800, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
-        mockPoll([{id: 800, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 800, status: 'queued'},
+            {id: 1000, status: 'in_progress'},
+        ]);
+        mockPoll([
+            {id: 800, status: 'completed'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
@@ -134,9 +146,18 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should wait across multiple polls until older run finishes', () => {
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
-        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 1000, status: 'in_progress'},
+        ]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 1000, status: 'in_progress'},
+        ]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getInfoMessages().filter((msg) => msg.includes('Waiting for 1 earlier run(s):')).length).toBe(2);
@@ -146,8 +167,16 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should ignore newer runs and only wait for older ones', () => {
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 2000, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
-        mockPoll([{id: 500, status: 'completed'}, {id: 2000, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 2000, status: 'queued'},
+            {id: 1000, status: 'in_progress'},
+        ]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 2000, status: 'queued'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
@@ -157,8 +186,14 @@ describe('waitForPreviousRuns', () => {
 
     test('Should retry on API error and proceed after recovery', () => {
         mockPollError();
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
-        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 1000, status: 'in_progress'},
+        ]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getWarningMessages().some((msg) => msg.includes('API error (attempt 1/2)'))).toBe(true);
@@ -191,9 +226,15 @@ describe('waitForPreviousRuns', () => {
 
     test('Should reset error count after a successful poll', () => {
         mockPollError();
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 1000, status: 'in_progress'},
+        ]);
         mockPollError();
-        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getWarningMessages().filter((msg) => msg.includes('API error (attempt 1/2)')).length).toBe(2);
@@ -203,11 +244,26 @@ describe('waitForPreviousRuns', () => {
 
     test('Should wait through a 4-run queue in FIFO order', () => {
         // #500 in_progress, #800 queued, #1200 queued (newer, ignored)
-        mockPoll([{id: 500, status: 'in_progress'}, {id: 800, status: 'queued'}, {id: 1200, status: 'queued'}, {id: 1000, status: 'queued'}]);
+        mockPoll([
+            {id: 500, status: 'in_progress'},
+            {id: 800, status: 'queued'},
+            {id: 1200, status: 'queued'},
+            {id: 1000, status: 'queued'},
+        ]);
         // #500 done, #800 now in progress
-        mockPoll([{id: 500, status: 'completed'}, {id: 800, status: 'in_progress'}, {id: 1200, status: 'queued'}, {id: 1000, status: 'queued'}]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 800, status: 'in_progress'},
+            {id: 1200, status: 'queued'},
+            {id: 1000, status: 'queued'},
+        ]);
         // #800 done
-        mockPoll([{id: 500, status: 'completed'}, {id: 800, status: 'completed'}, {id: 1200, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([
+            {id: 500, status: 'completed'},
+            {id: 800, status: 'completed'},
+            {id: 1200, status: 'queued'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 2 earlier run(s):'))).toBe(true);
