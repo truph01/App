@@ -53,7 +53,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
                     headerTitle={translate('common.vacationDelegate')}
                     onSelectRow={onSelectRow}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID))}
-                    cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegateForMember', getLoginByAccountID(accountID) ?? '')}
+                    cannotSetDelegateMessage={translate('domain.members.cannotSetVacationDelegateForMember', getLoginByAccountID(accountID) ?? '')}
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
