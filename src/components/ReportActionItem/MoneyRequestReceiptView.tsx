@@ -3,6 +3,7 @@ import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 import ConfirmModal from '@components/ConfirmModal';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ReceiptAudit, {ReceiptAuditMessages} from '@components/ReceiptAudit';
@@ -227,11 +228,8 @@ function MoneyRequestReceiptView({
 
         // Track expense creation errors to Sentry when the user dismisses them
         if (!isEmptyObject(errors)) {
-            let errorType: typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE.REPORT_CREATION_FAILED | typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE.TRANSACTION_MISSING;
-            let errorSource:
-                | typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.TRANSACTION
-                | typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_ACTION
-                | typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_CREATION;
+            let errorType: ValueOf<typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE>;
+            let errorSource: ValueOf<typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE>;
 
             if (!isEmptyObject(reportCreationError)) {
                 errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.REPORT_CREATION_FAILED;
