@@ -1,6 +1,3 @@
-/**
- * NOTE: This is a compiled file. DO NOT directly edit this file.
- */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -11540,19 +11537,19 @@ const core = __importStar(__nccwpck_require__(2186));
 const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const POLL_RATE_SECONDS = CONST_1.default.POLL_RATE / 1000;
-// Only check in_progress and queued — other statuses (waiting, requested, pending) were not
-// observed in testing. Keeping this minimal to avoid unnecessary GitHub API requests.
-const ACTIVE_STATUSES = [CONST_1.default.RUN_STATUS.IN_PROGRESS, CONST_1.default.RUN_STATUS.QUEUED];
+const QUEUE_LIMIT = 20;
+const MAX_API_RETRIES = 2;
+const ACTIVE_STATUSES = new Set(['in_progress', 'queued', 'waiting', 'requested', 'pending']);
 async function getOlderActiveRuns(workflowID, currentRunID) {
-    const responses = await Promise.all(ACTIVE_STATUSES.map((status) => GithubUtils_1.default.octokit.actions.listWorkflowRuns({
+    const response = await GithubUtils_1.default.octokit.actions.listWorkflowRuns({
         owner: CONST_1.default.GITHUB_OWNER,
         repo: CONST_1.default.APP_REPO,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         workflow_id: workflowID,
-        status,
-    })));
-    const allRuns = responses.flatMap((r) => r.data.workflow_runs);
-    return allRuns.filter((workflowRun) => workflowRun.id < currentRunID);
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        per_page: QUEUE_LIMIT,
+    });
+    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status));
 }
 function run() {
     const workflowID = core.getInput('WORKFLOW_ID', { required: true });
@@ -11560,39 +11557,41 @@ function run() {
     core.info(`Current run ID: ${currentRunID}`);
     core.info(`Workflow ID: ${workflowID}`);
     core.info('Waiting for all earlier runs of this workflow to complete...');
-    // GitHub API is eventually consistent — runs can briefly disappear from results
-    // between status transitions, then reappear on the next poll with the same status. 
-    // Multiple consecutive clean checks prevent premature release caused by these flickers.
-    const requiredCleanChecks = 3;
     return new Promise((resolve, reject) => {
         let intervalId;
         let isChecking = false;
-        let consecutiveCleanChecks = 0;
+        let consecutiveErrors = 0;
+        let pollCount = 0;
+        let maxQueueDepth = 0;
         const check = () => {
             if (isChecking) {
                 return;
             }
             isChecking = true;
+            pollCount++;
             getOlderActiveRuns(workflowID, currentRunID)
                 .then((olderActiveRuns) => {
+                consecutiveErrors = 0;
+                maxQueueDepth = Math.max(maxQueueDepth, olderActiveRuns.length);
                 if (olderActiveRuns.length === 0) {
-                    consecutiveCleanChecks++;
-                    if (consecutiveCleanChecks >= requiredCleanChecks) {
-                        core.info('No earlier runs in progress. Proceeding with build.');
-                        clearInterval(intervalId);
-                        resolve();
-                        return;
-                    }
-                    core.info(`No earlier runs found (${consecutiveCleanChecks}/${requiredCleanChecks} clean checks). Confirming in ${POLL_RATE_SECONDS}s...`);
+                    core.notice(`Queue summary: maxRunsAhead=${maxQueueDepth}, iterations=${pollCount}, waitTime=${(pollCount - 1) * POLL_RATE_SECONDS}s`);
+                    core.info('No earlier runs in progress. Proceeding with build.');
+                    clearInterval(intervalId);
+                    resolve();
                     return;
                 }
-                consecutiveCleanChecks = 0;
                 const runIDs = olderActiveRuns.map((workflowRun) => `#${workflowRun.id} (${workflowRun.status})`).join(', ');
                 core.info(`Waiting for ${olderActiveRuns.length} earlier run(s): ${runIDs}. Polling again in ${POLL_RATE_SECONDS}s...`);
             })
                 .catch((error) => {
-                clearInterval(intervalId);
-                reject(error);
+                consecutiveErrors++;
+                if (consecutiveErrors > MAX_API_RETRIES) {
+                    core.error(`API failed ${consecutiveErrors} times in a row. Giving up.`);
+                    clearInterval(intervalId);
+                    reject(error);
+                    return;
+                }
+                core.warning(`API error (attempt ${consecutiveErrors}/${MAX_API_RETRIES}). Retrying next poll...`);
             })
                 .finally(() => {
                 isChecking = false;

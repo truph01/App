@@ -11,42 +11,41 @@ import asMutable from '@src/types/utils/asMutable';
 const CURRENT_RUN_ID = 1000;
 const WORKFLOW_ID = 'testBuildOnPush.yml';
 const TEST_POLL_RATE = 1;
-const REQUIRED_CLEAN_CHECKS = 3;
 
 type WorkflowRun = {id: number; status: string};
-type MockListResponse = {data: {workflow_runs: WorkflowRun[]}};
-type MockedListFn = jest.MockedFunction<() => Promise<MockListResponse>>;
 
 const mockGetInput = jest.fn();
-const mockListInProgress: MockedListFn = jest.fn();
-const mockListQueued: MockedListFn = jest.fn();
-const mockListWorkflowRuns = jest.fn().mockImplementation((args: {status: string}) => {
-    if (args.status === 'in_progress') {
-        return mockListInProgress();
-    }
-    if (args.status === 'queued') {
-        return mockListQueued();
-    }
-    return Promise.resolve({data: {workflow_runs: []}});
-});
+const mockListWorkflowRuns = jest.fn();
+
+/** Mock a single poll response with the given runs. */
+function mockPoll(runs: WorkflowRun[]) {
+    mockListWorkflowRuns.mockResolvedValueOnce({data: {workflow_runs: runs}});
+}
+
+/** Mock a single poll that rejects with an error. */
+function mockPollError(message = 'API error') {
+    mockListWorkflowRuns.mockRejectedValueOnce(new Error(message));
+}
 
 const coreInfoSpy = jest.spyOn(core, 'info');
+const coreNoticeSpy = jest.spyOn(core, 'notice');
+const coreWarningSpy = jest.spyOn(core, 'warning');
+const coreErrorSpy = jest.spyOn(core, 'error');
 
 function getInfoMessages(): string[] {
     return coreInfoSpy.mock.calls.map((call) => String(call[0]));
 }
 
-/** Mock a single poll response. Defaults to empty for both statuses. */
-function mockPoll(inProgress: WorkflowRun[] = [], queued: WorkflowRun[] = []) {
-    mockListInProgress.mockResolvedValueOnce({data: {workflow_runs: inProgress}});
-    mockListQueued.mockResolvedValueOnce({data: {workflow_runs: queued}});
+function getWarningMessages(): string[] {
+    return coreWarningSpy.mock.calls.map((call) => String(call[0]));
 }
 
-/** Mock N consecutive empty polls (needed for requiredCleanChecks). */
-function mockEmptyPolls(count: number) {
-    for (let i = 0; i < count; i++) {
-        mockPoll();
-    }
+function getNoticeMessages(): string[] {
+    return coreNoticeSpy.mock.calls.map((call) => String(call[0]));
+}
+
+function getErrorMessages(): string[] {
+    return coreErrorSpy.mock.calls.map((call) => String(call[0]));
 }
 
 jest.mock('@github/libs/CONST', () => ({
@@ -54,6 +53,7 @@ jest.mock('@github/libs/CONST', () => ({
     default: {
         POLL_RATE: TEST_POLL_RATE,
         RUN_STATUS: {
+            COMPLETED: 'completed',
             IN_PROGRESS: 'in_progress',
             QUEUED: 'queued',
         },
@@ -85,25 +85,28 @@ beforeAll(() => {
 
 beforeEach(() => {
     coreInfoSpy.mockClear();
+    coreNoticeSpy.mockClear();
+    coreWarningSpy.mockClear();
+    coreErrorSpy.mockClear();
     mockListWorkflowRuns.mockClear();
-    mockListInProgress.mockClear();
-    mockListQueued.mockClear();
 });
 
 describe('waitForPreviousRuns', () => {
-    test('Should proceed after consecutive clean checks when no earlier runs exist', () => {
-        mockEmptyPolls(REQUIRED_CLEAN_CHECKS);
+    test('Should proceed immediately when no earlier runs exist', () => {
+        mockPoll([{id: 1000, status: 'in_progress'}]);
 
         return run().then(() => {
-            expect(getInfoMessages().some((msg) => msg.includes('1/3 clean checks'))).toBe(true);
-            expect(getInfoMessages().some((msg) => msg.includes('2/3 clean checks'))).toBe(true);
             expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
+            expect(getNoticeMessages().some((msg) => msg.includes('maxRunsAhead=0') && msg.includes('iterations=1'))).toBe(true);
         });
     });
 
-    test('Should proceed after consecutive clean checks when only newer runs exist', () => {
-        mockPoll([{id: 2000, status: 'in_progress'}], [{id: 3000, status: 'queued'}]);
-        mockEmptyPolls(REQUIRED_CLEAN_CHECKS);
+    test('Should proceed when only newer runs exist', () => {
+        mockPoll([
+            {id: 2000, status: 'in_progress'},
+            {id: 3000, status: 'queued'},
+            {id: 1000, status: 'in_progress'},
+        ]);
 
         return run().then(() => {
             expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
@@ -111,8 +114,8 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should wait for older in-progress runs to finish', () => {
-        mockPoll([{id: 500, status: 'in_progress'}]);
-        mockEmptyPolls(REQUIRED_CLEAN_CHECKS);
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
@@ -121,8 +124,8 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should wait for older queued runs to finish', () => {
-        mockPoll([], [{id: 800, status: 'queued'}]);
-        mockEmptyPolls(REQUIRED_CLEAN_CHECKS);
+        mockPoll([{id: 800, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([{id: 800, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
@@ -131,9 +134,20 @@ describe('waitForPreviousRuns', () => {
     });
 
     test('Should wait across multiple polls until older run finishes', () => {
-        mockPoll([{id: 500, status: 'in_progress'}]);
-        mockPoll([{id: 500, status: 'in_progress'}]);
-        mockEmptyPolls(REQUIRED_CLEAN_CHECKS);
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+
+        return run().then(() => {
+            expect(getInfoMessages().filter((msg) => msg.includes('Waiting for 1 earlier run(s):')).length).toBe(2);
+            expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
+            expect(getNoticeMessages().some((msg) => msg.includes('maxRunsAhead=1') && msg.includes('iterations=3'))).toBe(true);
+        });
+    });
+
+    test('Should ignore newer runs and only wait for older ones', () => {
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 2000, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([{id: 500, status: 'completed'}, {id: 2000, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
@@ -141,50 +155,66 @@ describe('waitForPreviousRuns', () => {
         });
     });
 
-    test('Should ignore newer runs and only wait for older ones', () => {
-        // Older run in progress, newer run queued
-        mockPoll([{id: 500, status: 'in_progress'}], [{id: 2000, status: 'queued'}]);
-        // Older run finished, newer still queued (ignored)
-        mockPoll([], [{id: 2000, status: 'queued'}]);
-        mockPoll([], [{id: 2000, status: 'queued'}]);
-        mockPoll([], [{id: 2000, status: 'queued'}]);
+    test('Should retry on API error and proceed after recovery', () => {
+        mockPollError();
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
+        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
 
         return run().then(() => {
-            expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
+            expect(getWarningMessages().some((msg) => msg.includes('API error (attempt 1/2)'))).toBe(true);
+            expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
+        });
+    });
+
+    test('Should retry twice on API errors and proceed after recovery', () => {
+        mockPollError();
+        mockPollError();
+        mockPoll([{id: 1000, status: 'in_progress'}]);
+
+        return run().then(() => {
+            expect(getWarningMessages().some((msg) => msg.includes('API error (attempt 1/2)'))).toBe(true);
+            expect(getWarningMessages().some((msg) => msg.includes('API error (attempt 2/2)'))).toBe(true);
+            expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
+        });
+    });
+
+    test('Should fail after 3 consecutive API errors', () => {
+        mockPollError();
+        mockPollError();
+        mockPollError('Final failure');
+
+        return run().catch((error: Error) => {
+            expect(error.message).toBe('Final failure');
+            expect(getErrorMessages().some((msg) => msg.includes('API failed 3 times in a row'))).toBe(true);
+        });
+    });
+
+    test('Should reset error count after a successful poll', () => {
+        mockPollError();
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 1000, status: 'in_progress'}]);
+        mockPollError();
+        mockPoll([{id: 500, status: 'completed'}, {id: 1000, status: 'in_progress'}]);
+
+        return run().then(() => {
+            expect(getWarningMessages().filter((msg) => msg.includes('API error (attempt 1/2)')).length).toBe(2);
             expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
         });
     });
 
     test('Should wait through a 4-run queue in FIFO order', () => {
-        // #500 in_progress, #800 and #1200 queued
-        mockPoll([{id: 500, status: 'in_progress'}], [{id: 800, status: 'queued'}, {id: 1200, status: 'queued'}]);
+        // #500 in_progress, #800 queued, #1200 queued (newer, ignored)
+        mockPoll([{id: 500, status: 'in_progress'}, {id: 800, status: 'queued'}, {id: 1200, status: 'queued'}, {id: 1000, status: 'queued'}]);
         // #500 done, #800 now in progress
-        mockPoll([{id: 800, status: 'in_progress'}], [{id: 1200, status: 'queued'}]);
-        // #800 done, only #1200 queued (newer, ignored) — 3 clean checks
-        mockPoll([], [{id: 1200, status: 'queued'}]);
-        mockPoll([], [{id: 1200, status: 'queued'}]);
-        mockPoll([], [{id: 1200, status: 'queued'}]);
+        mockPoll([{id: 500, status: 'completed'}, {id: 800, status: 'in_progress'}, {id: 1200, status: 'queued'}, {id: 1000, status: 'queued'}]);
+        // #800 done
+        mockPoll([{id: 500, status: 'completed'}, {id: 800, status: 'completed'}, {id: 1200, status: 'queued'}, {id: 1000, status: 'in_progress'}]);
 
         return run().then(() => {
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 2 earlier run(s):'))).toBe(true);
             expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
             expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
-            expect(getInfoMessages().some((msg) => msg.includes('1200'))).toBe(false);
-        });
-    });
-
-    test('Should reset clean check counter if an earlier run reappears (API flicker)', () => {
-        // Clean check 1
-        mockPoll();
-        // Run flickers back — resets counter
-        mockPoll([{id: 500, status: 'in_progress'}]);
-        // Need 3 fresh clean checks
-        mockEmptyPolls(REQUIRED_CLEAN_CHECKS);
-
-        return run().then(() => {
-            expect(getInfoMessages().some((msg) => msg.includes('1/3 clean checks'))).toBe(true);
-            expect(getInfoMessages().some((msg) => msg.includes('Waiting for 1 earlier run(s):'))).toBe(true);
-            expect(coreInfoSpy).toHaveBeenCalledWith('No earlier runs in progress. Proceeding with build.');
+            expect(getInfoMessages().some((msg) => msg.startsWith('Waiting') && msg.includes('1200'))).toBe(false);
+            expect(getNoticeMessages().some((msg) => msg.includes('maxRunsAhead=2') && msg.includes('iterations=3'))).toBe(true);
         });
     });
 });
