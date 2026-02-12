@@ -823,6 +823,10 @@ function SearchPage({route}: SearchPageProps) {
                                 return;
                             }
 
+                            if (shouldShowAccountingModal) {
+                                setAccountingExportModalVisible(true);
+                            }
+
                             if (hash) {
                                 clearSelectedTransactions();
                                 exportAction();

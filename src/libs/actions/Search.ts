@@ -748,19 +748,7 @@ function exportMultipleReportsToIntegration(hash: number, reportIDs: string[], c
         return;
     }
 
-    const optimisticActions: Record<string, OptimisticExportIntegrationAction> = {};
-    const successActions: Record<string, OptimisticExportIntegrationAction> = {};
     const optimisticReportActions: Record<string, string> = {};
-
-    for (const reportID of reportIDs) {
-        const optimisticAction = buildOptimisticExportIntegrationAction(connectionName);
-        const successAction: OptimisticExportIntegrationAction = {...optimisticAction, pendingAction: null};
-        const optimisticReportActionID = optimisticAction.reportActionID;
-
-        optimisticActions[reportID] = optimisticAction;
-        successActions[reportID] = successAction;
-        optimisticReportActions[reportID] = optimisticReportActionID;
-    }
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
         {
@@ -770,16 +758,6 @@ function exportMultipleReportsToIntegration(hash: number, reportIDs: string[], c
         },
     ];
 
-    for (const reportID of reportIDs) {
-        optimisticData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
-            value: {
-                [optimisticReportActions[reportID]]: optimisticActions[reportID],
-            },
-        });
-    }
-
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
@@ -787,26 +765,6 @@ function exportMultipleReportsToIntegration(hash: number, reportIDs: string[], c
             value: Object.fromEntries(reportIDs.map((reportID) => [`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {isActionLoading: false}])),
         },
     ];
-
-    for (const reportID of reportIDs) {
-        successData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
-            value: {
-                [optimisticReportActions[reportID]]: successActions[reportID],
-            },
-        });
-    }
-
-    if (currentSearchKey === CONST.SEARCH.SEARCH_KEYS.EXPORT) {
-        successData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
-            value: {
-                data: Object.fromEntries(reportIDs.map((reportID) => [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, null])),
-            },
-        });
-    }
 
     const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
@@ -817,11 +775,33 @@ function exportMultipleReportsToIntegration(hash: number, reportIDs: string[], c
     ];
 
     for (const reportID of reportIDs) {
+        const optimisticAction = buildOptimisticExportIntegrationAction(connectionName);
+        const successAction: OptimisticExportIntegrationAction = {...optimisticAction, pendingAction: null};
+        const optimisticReportActionID = optimisticAction.reportActionID;
+
+        optimisticReportActions[reportID] = optimisticReportActionID;
+
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
+            value: {
+                [optimisticReportActionID]: optimisticAction,
+            },
+        });
+
+        successData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
+            value: {
+                [optimisticReportActionID]: successAction,
+            },
+        });
+
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
             value: {
-                [optimisticReportActions[reportID]]: null,
+                [optimisticReportActionID]: null,
             },
         });
 
@@ -829,6 +809,16 @@ function exportMultipleReportsToIntegration(hash: number, reportIDs: string[], c
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
             value: {errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
+        });
+    }
+
+    if (currentSearchKey === CONST.SEARCH.SEARCH_KEYS.EXPORT) {
+        successData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
+            value: {
+                data: Object.fromEntries(reportIDs.map((reportID) => [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, null])),
+            },
         });
     }
 
