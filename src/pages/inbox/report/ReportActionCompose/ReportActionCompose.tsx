@@ -359,10 +359,11 @@ function ReportActionCompose({
                 });
                 attachmentFileRef.current = null;
             } else {
+                const reportActionID = rand64();
                 const isScrolledToBottom = !scrollPosition?.offset || scrollPosition.offset < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
                 if (isScrolledToBottom) {
                     Performance.markStart(CONST.TIMING.SEND_MESSAGE, {message: newCommentTrimmed});
-                    startSpan(CONST.TELEMETRY.SPAN_SEND_MESSAGE, {
+                    startSpan(`${CONST.TELEMETRY.SPAN_SEND_MESSAGE}_${reportActionID}`, {
                         name: 'send-message',
                         op: CONST.TELEMETRY.SPAN_SEND_MESSAGE,
                         attributes: {
@@ -371,7 +372,7 @@ function ReportActionCompose({
                         },
                     });
                 }
-                onSubmit(newCommentTrimmed, rand64());
+                onSubmit(newCommentTrimmed, reportActionID);
             }
         },
         [
