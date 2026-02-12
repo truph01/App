@@ -56,7 +56,7 @@ const TeachersUnite = 'TeachersUnite';
 const Abacus = 'Abacus';
 const Binoculars = 'Binoculars';
 const CompanyCard = 'CompanyCard';
-const ReceiptUpload = 'ReceiptUpload';
+const ReceiptStack = 'ReceiptStack';
 const ExpensifyCardIllustration = 'ExpensifyCardIllustration';
 const ExpensifyCardImage = 'ExpensifyCardImage';
 const MultiScan = 'MultiScan';
@@ -174,7 +174,7 @@ export {
     Abacus,
     Binoculars,
     CompanyCard,
-    ReceiptUpload,
+    ReceiptStack,
     ExpensifyCardIllustration,
     ExpensifyCardImage,
     MultiScan,
