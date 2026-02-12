@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/react-native';
+import type {ValueOf} from 'type-fest';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import Log from '@libs/Log';
 import CONST from '@src/CONST';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
-type ExpenseCreationErrorType = 'report_creation_failed' | 'transaction_missing' | 'api_error' | 'open_report_failed';
-type ErrorSource = 'transaction' | 'report_action' | 'report_creation' | 'api_response';
+type ExpenseCreationErrorType = ValueOf<typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE>;
+type ErrorSource = ValueOf<typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE>;
 
 const EXPENSE_COMMANDS = new Set<string>([WRITE_COMMANDS.REQUEST_MONEY, WRITE_COMMANDS.TRACK_EXPENSE]);
 
@@ -109,11 +110,11 @@ function trackExpenseApiError(context: ApiErrorContext): void {
             return;
         }
 
-        const errorType = isOpenReport ? 'open_report_failed' : 'api_error';
+        const errorType = isOpenReport ? CONST.TELEMETRY.EXPENSE_ERROR_TYPE.OPEN_REPORT_FAILED : CONST.TELEMETRY.EXPENSE_ERROR_TYPE.API_ERROR;
 
         const tags: Record<string, string> = {
             [CONST.TELEMETRY.TAG_EXPENSE_ERROR_TYPE]: errorType,
-            [CONST.TELEMETRY.TAG_EXPENSE_ERROR_SOURCE]: 'api_response',
+            [CONST.TELEMETRY.TAG_EXPENSE_ERROR_SOURCE]: CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.API_RESPONSE,
             [CONST.TELEMETRY.TAG_EXPENSE_COMMAND]: command,
             [CONST.TELEMETRY.TAG_EXPENSE_JSON_CODE]: String(jsonCode),
         };

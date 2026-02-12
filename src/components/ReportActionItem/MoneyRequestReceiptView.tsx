@@ -227,18 +227,21 @@ function MoneyRequestReceiptView({
 
         // Track expense creation errors to Sentry when the user dismisses them
         if (!isEmptyObject(errors)) {
-            let errorType: 'report_creation_failed' | 'transaction_missing';
-            let errorSource: 'transaction' | 'report_action' | 'report_creation';
+            let errorType: typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE.REPORT_CREATION_FAILED | typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE.TRANSACTION_MISSING;
+            let errorSource:
+                | typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.TRANSACTION
+                | typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_ACTION
+                | typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_CREATION;
 
             if (!isEmptyObject(reportCreationError)) {
-                errorType = 'report_creation_failed';
-                errorSource = 'report_creation';
+                errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.REPORT_CREATION_FAILED;
+                errorSource = CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_CREATION;
             } else if (parentReportAction?.errors && !isEmptyObject(parentReportAction.errors)) {
-                errorType = 'transaction_missing';
-                errorSource = 'report_action';
+                errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.TRANSACTION_MISSING;
+                errorSource = CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_ACTION;
             } else {
-                errorType = 'transaction_missing';
-                errorSource = 'transaction';
+                errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.TRANSACTION_MISSING;
+                errorSource = CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.TRANSACTION;
             }
 
             const errorValue = Object.values(errors).at(0);
