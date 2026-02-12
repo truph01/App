@@ -89,7 +89,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const isSettlementAccountPendingAction = cardSettings?.pendingFields?.paymentBankAccountID === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
 
     // Only show errors/pending under the toggle if it's a toggle action
-    const toggleErrors = isTogglePendingAction ? cardSettings?.errors : undefined;
+    const toggleErrors = cardSettings?.errors;
     const togglePendingAction = isTogglePendingAction ? cardSettings?.pendingAction : undefined;
 
     // Only show errors/pending under the settlement account if it's a settlement account action

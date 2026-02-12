@@ -15,9 +15,10 @@ function getTravelSettings(cardSettings: OnyxEntry<ExpensifyCardSettings>): Expe
     if (!cardSettings) {
         return undefined;
     }
-    // Prefer nested TRAVEL_US if it exists
+    // Prefer nested TRAVEL_US if it exists, but merge with root settings to ensure we have all properties.
+    // This handles optimistic updates where only a partial TRAVEL_US object (e.g. enabled state) is written.
     if (cardSettings.TRAVEL_US) {
-        return cardSettings.TRAVEL_US;
+        return {...cardSettings, ...cardSettings.TRAVEL_US};
     }
     // Fall back to root level (for optimistic updates and backward compat)
     return cardSettings;

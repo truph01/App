@@ -233,4 +233,38 @@ describe('TravelInvoicingUtils', () => {
             expect(result?.last4).toBe('');
         });
     });
+
+    describe('getTravelSettings (internal usage via other public methods)', () => {
+        // We test this via getTravelSettlementFrequency which relies on getTravelSettings
+        it('Should merge root settings with partial nested TRAVEL_US settings', () => {
+            const cardSettings = {
+                monthlySettlementDate: new Date('2024-01-01'), // Root level
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                TRAVEL_US: {
+                    isEnabled: true, // Nested level (partial)
+                },
+            } as ExpensifyCardSettings;
+
+            // Should get frequency from root (Monthly) even though TRAVEL_US doesn't have it
+            const result = getTravelSettlementFrequency(cardSettings);
+            expect(result).toBe(CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.MONTHLY);
+
+            // Should get enabled state from nested (true)
+            const isEnabled = getIsTravelInvoicingEnabled(cardSettings);
+            expect(isEnabled).toBe(true);
+        });
+
+        it('Should prioritize nested TRAVEL_US values over root values', () => {
+            const cardSettings = {
+                monthlySettlementDate: new Date('2024-01-01'), // Root level (Monthly)
+                [CONST.TRAVEL.PROGRAM_TRAVEL_US]: {
+                    monthlySettlementDate: null as Date | null, // Nested level (Daily)
+                },
+            } as ExpensifyCardSettings;
+
+            // Nested value (Daily) should win
+            const result = getTravelSettlementFrequency(cardSettings);
+            expect(result).toBe(CONST.EXPENSIFY_CARD.FREQUENCY_SETTING.DAILY);
+        });
+    });
 });
