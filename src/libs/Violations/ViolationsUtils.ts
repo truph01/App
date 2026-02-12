@@ -37,7 +37,7 @@ function filterReceiptViolations(violations: TransactionViolation[]): Transactio
 }
 
 function isMaxExpenseAmountRuleEnabled(maxAmount: number | undefined) {
-    return !!maxAmount && maxAmount !== CONST.DISABLED_MAX_EXPENSE_VALUE;
+    return typeof maxAmount === 'number' && maxAmount !== CONST.DISABLED_MAX_EXPENSE_VALUE;
 }
 
 /**
@@ -434,8 +434,8 @@ const ViolationsUtils = {
             canCalculateAmountViolations &&
             !isInvoiceTransaction &&
             typeof categoryMaxAmountNoReceipt === 'number' &&
-            expenseAmount > categoryMaxAmountNoReceipt &&
             isMaxExpenseAmountRuleEnabled(categoryMaxAmountNoReceipt) &&
+            expenseAmount > categoryMaxAmountNoReceipt &&
             !TransactionUtils.hasReceipt(updatedTransaction) &&
             isControlPolicy;
 
