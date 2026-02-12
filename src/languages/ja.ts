@@ -7748,7 +7748,7 @@ ${reportName}
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}: RequiredFieldParams) => `${fieldName} は必須です`,
         reportContainsExpensesWithViolations: 'レポートに違反のある経費が含まれています。',
-        reportContainsExportErrors: 'エクスポートに失敗した際の通常のエラーメッセージ',
+        reportContainsExportErrors: 'エクスポートに失敗した場合の通常のエラーメッセージ',
     },
     violationDismissal: {
         rter: {

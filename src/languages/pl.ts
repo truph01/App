@@ -7786,7 +7786,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}: RequiredFieldParams) => `Pole ${fieldName} jest wymagane`,
         reportContainsExpensesWithViolations: 'Raport zawiera wydatki z naruszeniami.',
-        reportContainsExportErrors: 'Nasz standardowy komunikat błędu w przypadku nieudanego eksportu',
+        reportContainsExportErrors: 'Nasz standardowy komunikat błędu dla nieudanych eksportów',
     },
     violationDismissal: {
         rter: {

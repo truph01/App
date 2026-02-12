@@ -7854,7 +7854,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: ({fieldName}: RequiredFieldParams) => `${fieldName} est obligatoire`,
         reportContainsExpensesWithViolations: 'La note de frais contient des dépenses avec des violations.',
-        reportContainsExportErrors: 'Notre message d’erreur habituel en cas d’échec de l’exportation',
+        reportContainsExportErrors: 'Notre message d’erreur habituel pour les exportations échouées',
     },
     violationDismissal: {
         rter: {
