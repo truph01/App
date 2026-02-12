@@ -12,11 +12,12 @@ type ChartDataPoint = {
 };
 
 /**
- * Y-axis unit can be either:
- * - A simple string (always displayed as-is)
- * - An object with value and fallback (chart checks if font can render value, uses fallback if not)
+ * Y-axis unit with font fallback support.
+ * The chart checks if the font can render `value` and uses `fallback` if not.
+ *
+ * TODO: This is a temporary solution until we properly support rendering all currency symbols in the chart font.
  */
-type YAxisUnit = string | {value: string; fallback: string};
+type YAxisUnit = {value: string; fallback: string};
 
 type YAxisUnitPosition = 'left' | 'right';
 
@@ -33,7 +34,7 @@ type CartesianChartProps = {
     /** Whether data is loading */
     isLoading?: boolean;
 
-    /** Symbol/unit for Y-axis labels. Can be a string or an object with value and fallback for font compatibility. */
+    /** Symbol/unit for Y-axis labels with font fallback support. */
     yAxisUnit?: YAxisUnit;
 
     /** Position of the unit symbol relative to the value. Defaults to 'left'. */

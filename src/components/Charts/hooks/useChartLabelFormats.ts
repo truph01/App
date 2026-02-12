@@ -17,8 +17,6 @@ type UseChartLabelFormatsProps = {
 /**
  * Checks if all characters in the text can be rendered by the font.
  * Returns true if all glyphs are supported (no glyph ID is 0).
- *
- * TODO: This is a temporary solution until we properly support rendering all currency symbols in the chart font.
  */
 function canFontRenderText(font: SkFont, text: string): boolean {
     const glyphIDs = font.getGlyphIDs(text);
@@ -27,20 +25,13 @@ function canFontRenderText(font: SkFont, text: string): boolean {
 
 /**
  * Resolves the display unit based on font support.
- * If yAxisUnit is a string, returns it directly.
- * If yAxisUnit is an object with value/fallback, checks if font can render the value.
+ * Checks if font can render the value and uses fallback if not.
  */
 function resolveDisplayUnit(font: SkFont | null, yAxisUnit: YAxisUnit | undefined): string | undefined {
     if (!yAxisUnit) {
         return undefined;
     }
 
-    // Simple string - use directly
-    if (typeof yAxisUnit === 'string') {
-        return yAxisUnit;
-    }
-
-    // Object with value/fallback - check font support
     if (!font) {
         return yAxisUnit.value;
     }

@@ -27,7 +27,7 @@ type SearchLineChartProps = {
     /** Whether data is loading */
     isLoading?: boolean;
 
-    /** Currency symbol for Y-axis labels. Can be a string or an object with value and fallback for font compatibility. */
+    /** Currency symbol for Y-axis labels with font fallback support. */
     yAxisUnit?: YAxisUnit;
 
     /** Position of currency symbol relative to value */
