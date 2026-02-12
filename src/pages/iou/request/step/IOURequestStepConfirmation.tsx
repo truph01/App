@@ -61,7 +61,8 @@ import {
     isReportOutstanding,
     isSelectedManagerMcTest,
 } from '@libs/ReportUtils';
-import {endSpan} from '@libs/telemetry/activeSpans';
+import {cancelSpan, endSpan, startSpan} from '@libs/telemetry/activeSpans';
+import markSubmitExpenseEnd from '@libs/telemetry/markSubmitExpenseEnd';
 import {
     getAttendees,
     getDefaultTaxCode,
@@ -323,6 +324,16 @@ function IOURequestStepConfirmation({
     useEffect(() => {
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
         Performance.markEnd(CONST.TIMING.OPEN_CREATE_EXPENSE_APPROVE);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            // Cancel submit expense span if user abandons the confirmation page without submitting
+            if (formHasBeenSubmitted.current) {
+                return;
+            }
+            cancelSpan(CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE);
+        };
     }, []);
 
     useEffect(() => {
@@ -977,8 +988,48 @@ function IOURequestStepConfirmation({
 
             formHasBeenSubmitted.current = true;
 
+            // Determine scenario for telemetry before branching
+            const hasReceiptFiles = Object.values(receiptFiles).some((receipt) => !!receipt);
+            const isFromGlobalCreate = transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton ?? false;
+
+            const {SUBMIT_EXPENSE_SCENARIO} = CONST.TELEMETRY;
+            let scenario: string = SUBMIT_EXPENSE_SCENARIO.REQUEST_MONEY_MANUAL;
+            if (iouType !== CONST.IOU.TYPE.TRACK && isDistanceRequest && !isMovingTransactionFromTrackExpense && !isUnreported) {
+                scenario = SUBMIT_EXPENSE_SCENARIO.DISTANCE;
+            } else if (iouType === CONST.IOU.TYPE.SPLIT) {
+                if (hasReceiptFiles) {
+                    scenario = SUBMIT_EXPENSE_SCENARIO.SPLIT_RECEIPT;
+                } else if (isFromGlobalCreate) {
+                    scenario = SUBMIT_EXPENSE_SCENARIO.SPLIT_GLOBAL;
+                } else {
+                    scenario = SUBMIT_EXPENSE_SCENARIO.SPLIT;
+                }
+            } else if (iouType === CONST.IOU.TYPE.INVOICE) {
+                scenario = SUBMIT_EXPENSE_SCENARIO.INVOICE;
+            } else if (iouType === CONST.IOU.TYPE.TRACK || isCategorizingTrackExpense || isSharingTrackExpense) {
+                scenario = SUBMIT_EXPENSE_SCENARIO.TRACK_EXPENSE;
+            } else if (isPerDiemRequest) {
+                scenario = SUBMIT_EXPENSE_SCENARIO.PER_DIEM;
+            } else if (hasReceiptFiles) {
+                scenario = SUBMIT_EXPENSE_SCENARIO.REQUEST_MONEY_SCAN;
+            }
+
+            Performance.markStart(CONST.TIMING.SUBMIT_EXPENSE);
+            startSpan(CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE, {
+                name: 'submit-expense',
+                op: CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE,
+                attributes: {
+                    [CONST.TELEMETRY.ATTRIBUTE_SCENARIO]: scenario,
+                    [CONST.TELEMETRY.ATTRIBUTE_HAS_RECEIPT]: hasReceiptFiles,
+                    [CONST.TELEMETRY.ATTRIBUTE_IS_FROM_GLOBAL_CREATE]: isFromGlobalCreate,
+                    [CONST.TELEMETRY.ATTRIBUTE_IOU_TYPE]: iouType,
+                    [CONST.TELEMETRY.ATTRIBUTE_IOU_REQUEST_TYPE]: requestType ?? 'unknown',
+                },
+            });
+
             if (iouType !== CONST.IOU.TYPE.TRACK && isDistanceRequest && !isMovingTransactionFromTrackExpense && !isUnreported) {
                 createDistanceRequest(iouType === CONST.IOU.TYPE.SPLIT ? splitParticipants : selectedParticipants, trimmedComment);
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1017,6 +1068,7 @@ function IOURequestStepConfirmation({
                         });
                     }
                 }
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1051,6 +1103,7 @@ function IOURequestStepConfirmation({
                         betas,
                     });
                 }
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1083,6 +1136,7 @@ function IOURequestStepConfirmation({
                         betas,
                     });
                 }
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1105,6 +1159,7 @@ function IOURequestStepConfirmation({
                     isFromGlobalCreate: transaction?.isFromFloatingActionButton ?? transaction?.isFromGlobalCreate,
                     policyRecentlyUsedTags,
                 });
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1117,6 +1172,7 @@ function IOURequestStepConfirmation({
                                 lat: userLocation.latitude,
                                 long: userLocation.longitude,
                             });
+                            markSubmitExpenseEnd();
                             return;
                         }
 
@@ -1126,11 +1182,13 @@ function IOURequestStepConfirmation({
                                     lat: successData.coords.latitude,
                                     long: successData.coords.longitude,
                                 });
+                                markSubmitExpenseEnd();
                             },
                             (errorData) => {
                                 Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, errorData);
                                 // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                                 trackExpense(selectedParticipants);
+                                markSubmitExpenseEnd();
                             },
                         );
                         return;
@@ -1138,14 +1196,17 @@ function IOURequestStepConfirmation({
 
                     // Otherwise, the money is being requested through the "Manual" flow with an attached image and the GPS coordinates are not needed.
                     trackExpense(selectedParticipants);
+                    markSubmitExpenseEnd();
                     return;
                 }
                 trackExpense(selectedParticipants);
+                markSubmitExpenseEnd();
                 return;
             }
 
             if (isPerDiemRequest) {
                 submitPerDiemExpense(selectedParticipants, trimmedComment, policyRecentlyUsedCategories);
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1163,6 +1224,7 @@ function IOURequestStepConfirmation({
                             lat: userLocation.latitude,
                             long: userLocation.longitude,
                         });
+                        markSubmitExpenseEnd();
                         return;
                     }
 
@@ -1172,11 +1234,13 @@ function IOURequestStepConfirmation({
                                 lat: successData.coords.latitude,
                                 long: successData.coords.longitude,
                             });
+                            markSubmitExpenseEnd();
                         },
                         (errorData) => {
                             Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, errorData);
                             // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                             requestMoney(selectedParticipants);
+                            markSubmitExpenseEnd();
                         },
                     );
                     return;
@@ -1184,10 +1248,12 @@ function IOURequestStepConfirmation({
 
                 // Otherwise, the money is being requested through the "Manual" flow with an attached image and the GPS coordinates are not needed.
                 requestMoney(selectedParticipants);
+                markSubmitExpenseEnd();
                 return;
             }
 
             requestMoney(selectedParticipants);
+            markSubmitExpenseEnd();
         },
         [
             iouType,
@@ -1222,6 +1288,7 @@ function IOURequestStepConfirmation({
             submitPerDiemExpense,
             policyRecentlyUsedCurrencies,
             reportID,
+            requestType,
             betas,
         ],
     );
