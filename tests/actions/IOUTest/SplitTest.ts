@@ -1795,7 +1795,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
         // After success, the report should be removed (set to null) since no split expenses remain in the same report
         const report = await new Promise<OnyxEntry<Report>>((resolve) => {
             const connection = Onyx.connect({
-                key: `${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${differentReportID}`,
                 callback: (val) => {
                     Onyx.disconnect(connection);
                     resolve(val);

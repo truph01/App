@@ -1422,10 +1422,7 @@ function updateSplitTransactions({
                 errors: null,
             },
         });
-        const singleSplitExpense = transactionData.splitExpenses.at(0) ?? undefined;
-        const isExpenseMovingToDifferentReport = !!singleSplitExpense?.reportID && singleSplitExpense.reportID !== transactionData.reportID;
-        const isLastTransactionInReport =
-            isExpenseMovingToDifferentReport || Object.values(allTransactionsList ?? {}).filter((itemTransaction) => itemTransaction?.reportID === transactionData.reportID).length === 0;
+        const isLastTransactionInReport = Object.values(allTransactionsList ?? {}).filter((itemTransaction) => itemTransaction?.reportID === expenseReportID).length === 1;
         if (isLastTransactionInReport) {
             optimisticData.push({
                 onyxMethod: Onyx.METHOD.MERGE,
