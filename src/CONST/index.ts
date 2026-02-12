@@ -8466,6 +8466,9 @@ const CONST = {
             SECONDARY_ACTIONS: {
                 SETTINGS: 'settings',
             },
+            BULK_ACTION_TYPES: {
+                CLOSE_ACCOUNT: 'closeAccount',
+            },
         },
     },
 
