@@ -347,7 +347,7 @@ function IOURequestStepDistanceOdometer({
         const calculatedDistance = roundToTwoDecimalPlaces(distance);
 
         // Store total distance in transaction.comment.customUnit.quantity
-        setMoneyRequestDistance(transactionID, calculatedDistance, isTransactionDraft);
+        setMoneyRequestDistance(transactionID, calculatedDistance, isTransactionDraft, unit);
 
         if (isEditing) {
             // Update existing transaction
@@ -390,6 +390,7 @@ function IOURequestStepDistanceOdometer({
             setShouldEnableDiscardConfirmation(false);
         }
 
+<<<<<<< HEAD
         handleMoneyRequestStepDistanceNavigation({
             iouType,
             report,
@@ -423,6 +424,35 @@ function IOURequestStepDistanceOdometer({
             odometerDistance: calculatedDistance,
             betas,
         });
+=======
+        // If there was no reportID, then that means the user started this flow from the global menu
+        // and an optimistic reportID was generated. In that case, the next step is to select the participants for this expense.
+        if (shouldUseDefaultExpensePolicy) {
+            const activePolicyExpenseChat = getPolicyExpenseChat(currentUserAccountIDParam, defaultExpensePolicy?.id);
+            const shouldAutoReport = !!defaultExpensePolicy?.autoReporting || !!personalPolicy?.autoReporting;
+            const transactionReportID = shouldAutoReport ? activePolicyExpenseChat?.reportID : CONST.REPORT.UNREPORTED_REPORT_ID;
+            const rateID = DistanceRequestUtils.getCustomUnitRateID({
+                reportID: transactionReportID,
+                isPolicyExpenseChat: true,
+                policy: defaultExpensePolicy,
+                lastSelectedDistanceRates,
+            });
+            setTransactionReport(transactionID, {reportID: transactionReportID}, true);
+            setCustomUnitRateID(transactionID, rateID, transaction, policy);
+            setMoneyRequestParticipantsFromReport(transactionID, activePolicyExpenseChat, currentUserPersonalDetails.accountID).then(() => {
+                Navigation.navigate(
+                    ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(
+                        CONST.IOU.ACTION.CREATE,
+                        iouType === CONST.IOU.TYPE.CREATE ? CONST.IOU.TYPE.SUBMIT : iouType,
+                        transactionID,
+                        activePolicyExpenseChat?.reportID,
+                    ),
+                );
+            });
+        } else if (transactionID && reportID) {
+            navigateToParticipantPage(iouType, transactionID, reportID);
+        }
+>>>>>>> main
     };
 
     // Handle form submission with validation
