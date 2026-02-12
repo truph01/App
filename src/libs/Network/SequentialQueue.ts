@@ -133,21 +133,17 @@ function process(): Promise<void> {
         return Promise.resolve();
     }
 
+    const persistedRequests = getAllPersistedRequests();
+
     Log.info('[SequentialQueue] process() called', false, {
-        persistedRequestsLength: getAllPersistedRequests().length,
+        persistedRequestsLength: persistedRequests.length,
         isSequentialQueueRunning,
     });
 
-    const persistedRequests = getAllPersistedRequests();
     if (persistedRequests.length === 0) {
         Log.info('[SequentialQueue] Unable to process. No requests to process.');
         return Promise.resolve();
     }
-
-    Log.info('[SequentialQueue] Processing queue', false, {
-        queueLength: persistedRequests.length,
-        queueCommands: getCommands(persistedRequests),
-    });
 
     const requestToProcess = processNextPersistedRequest();
     if (!requestToProcess) {
@@ -285,7 +281,8 @@ function flush(shouldResetPromise = true) {
         return;
     }
 
-    const persistedRequestsLength = getAllPersistedRequests().length;
+    const currentPersistedRequests = getAllPersistedRequests();
+    const persistedRequestsLength = currentPersistedRequests.length;
     const hasOnyxUpdates = !isEmpty();
 
     Log.info('[SequentialQueue] flush() called', false, {
@@ -316,7 +313,7 @@ function flush(shouldResetPromise = true) {
 
     Log.info('[SequentialQueue] Starting queue processing', false, {
         persistedRequestsLength,
-        persistedCommands: getCommands(getAllPersistedRequests()),
+        persistedCommands: getCommands(currentPersistedRequests),
     });
 
     isSequentialQueueRunning = true;
