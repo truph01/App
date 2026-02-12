@@ -1320,11 +1320,7 @@ describe('actions/Policy', () => {
             Policy.setWorkspaceApprovalMode(policyID, ESH_EMAIL, CONST.POLICY.APPROVAL_MODE.OPTIONAL);
             await waitForBatchedUpdates();
 
-            expect(apiWriteSpy).toHaveBeenCalledWith(
-                WRITE_COMMANDS.DISABLE_POLICY_APPROVALS,
-                expect.objectContaining({policyID}),
-                expect.anything(),
-            );
+            expect(apiWriteSpy).toHaveBeenCalledWith(WRITE_COMMANDS.DISABLE_POLICY_APPROVALS, expect.objectContaining({policyID}), expect.anything());
 
             apiWriteSpy.mockRestore();
         });
@@ -1349,11 +1345,7 @@ describe('actions/Policy', () => {
             Policy.setWorkspaceApprovalMode(policyID, ESH_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC);
             await waitForBatchedUpdates();
 
-            expect(apiWriteSpy).toHaveBeenCalledWith(
-                WRITE_COMMANDS.SET_WORKSPACE_APPROVAL_MODE,
-                expect.objectContaining({policyID}),
-                expect.anything(),
-            );
+            expect(apiWriteSpy).toHaveBeenCalledWith(WRITE_COMMANDS.SET_WORKSPACE_APPROVAL_MODE, expect.objectContaining({policyID}), expect.anything());
 
             apiWriteSpy.mockRestore();
         });
@@ -1497,9 +1489,11 @@ describe('actions/Policy', () => {
             Policy.setWorkspaceApprovalMode(policyID, ESH_EMAIL, CONST.POLICY.APPROVAL_MODE.OPTIONAL);
             await waitForBatchedUpdates();
 
-            const writeOptions = apiWriteSpy.mock.calls.at(0)?.at(2) as {
-                optimisticData?: Array<{key?: string; value?: {employeeList?: Record<string, unknown>}}>;
-            } | undefined;
+            const writeOptions = apiWriteSpy.mock.calls.at(0)?.at(2) as
+                | {
+                      optimisticData?: Array<{key?: string; value?: {employeeList?: Record<string, unknown>}}>;
+                  }
+                | undefined;
             const policyOptimisticData = writeOptions?.optimisticData?.find((u) => u?.key === `${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
             const optimisticEmployeeList = policyOptimisticData?.value?.employeeList as Record<string, Record<string, unknown>> | undefined;
 
@@ -1545,9 +1539,11 @@ describe('actions/Policy', () => {
             Policy.setWorkspaceApprovalMode(policyID, ESH_EMAIL, CONST.POLICY.APPROVAL_MODE.OPTIONAL);
             await waitForBatchedUpdates();
 
-            const writeOptions = apiWriteSpy.mock.calls.at(0)?.at(2) as {
-                optimisticData?: Array<{key?: string; value?: {employeeList?: Record<string, Record<string, unknown>>}}>;
-            } | undefined;
+            const writeOptions = apiWriteSpy.mock.calls.at(0)?.at(2) as
+                | {
+                      optimisticData?: Array<{key?: string; value?: {employeeList?: Record<string, Record<string, unknown>>}}>;
+                  }
+                | undefined;
             const policyOptimisticData = writeOptions?.optimisticData?.find((u) => u?.key === `${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
             const optimisticEmployeeList = policyOptimisticData?.value?.employeeList;
 
