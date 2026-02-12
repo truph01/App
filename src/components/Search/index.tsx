@@ -296,8 +296,6 @@ function Search({
 
     const savedSearchSelector = useCallback((searches: OnyxEntry<SaveSearch>) => searches?.[hash], [hash]);
     const [savedSearch] = useOnyx(ONYXKEYS.SAVED_SEARCHES, {canBeMissing: true, selector: savedSearchSelector});
-    const savedSearchTitle = savedSearch?.name === savedSearch?.query ? undefined : savedSearch?.name;
-    const suggestedSearchTitle = searchKey && suggestedSearches[searchKey] ? translate(suggestedSearches[searchKey].translationPath) : undefined;
 
     const handleDEWModalOpen = useCallback(() => {
         if (onDEWModalOpen) {
@@ -1431,6 +1429,14 @@ function Search({
     const shouldShowChartView = (view === CONST.SEARCH.VIEW.BAR || view === CONST.SEARCH.VIEW.LINE) && !!validGroupBy;
 
     if (shouldShowChartView && isGroupedItemArray(sortedData)) {
+        const chartTitle =
+            (() => {
+                if (savedSearch) {
+                    return savedSearch?.name === savedSearch?.query ? undefined : savedSearch?.name;
+                }
+                return searchKey && suggestedSearches[searchKey] ? translate(suggestedSearches[searchKey].translationPath) : undefined;
+            })() ?? translate(`search.chartTitles.${validGroupBy}`);
+
         return (
             <SearchScopeProvider>
                 <SearchChartView
@@ -1440,7 +1446,7 @@ function Search({
                     data={sortedData}
                     isLoading={shouldShowLoadingState}
                     onScroll={onSearchListScroll}
-                    title={suggestedSearchTitle ?? savedSearchTitle ?? translate(`search.chartTitles.${validGroupBy}`)}
+                    title={chartTitle}
                 />
             </SearchScopeProvider>
         );
