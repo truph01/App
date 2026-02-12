@@ -1180,7 +1180,7 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
-                WRITE_COMMANDS.SET_WORKSPACE_APPROVAL_MODE,
+                WRITE_COMMANDS.DISABLE_POLICY_APPROVALS,
                 expect.anything(),
                 expect.objectContaining({
                     optimisticData: expect.arrayContaining([
