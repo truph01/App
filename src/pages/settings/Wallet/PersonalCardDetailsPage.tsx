@@ -141,13 +141,13 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                     />
                 )}
                 <ConfirmModal
-                    title={translate('workspace.moreFeatures.companyCards.unassignCard')}
+                    title={translate('workspace.moreFeatures.companyCards.removeCard')}
                     isVisible={isUnassignModalVisible}
                     onConfirm={removeCardFromUser}
                     onCancel={() => setIsUnassignModalVisible(false)}
                     shouldSetModalVisibility={false}
-                    prompt={translate('workspace.moreFeatures.companyCards.unassignCardDescription')}
-                    confirmText={translate('workspace.moreFeatures.companyCards.unassign')}
+                    prompt={translate('workspace.moreFeatures.companyCards.removeCardDescription')}
+                    confirmText={translate('workspace.moreFeatures.companyCards.remove')}
                     cancelText={translate('common.cancel')}
                     danger
                 />
