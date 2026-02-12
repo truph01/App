@@ -58,7 +58,7 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         }
 
         loadPolicyCompanyCardsPage();
-    }, [policyID, loadPolicyCompanyCardsPage, isOffline]);
+    }, [loadPolicyCompanyCardsPage, isOffline]);
 
     const loadPolicyCompanyCardsFeed = useCallback(() => {
         if (isLoading || !bankName || isFeedPending) {
