@@ -88,7 +88,7 @@ import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import {isActionLoadingSetSelector} from '@src/selectors/ReportMetaData';
-import type {OutstandingReportsByPolicyIDDerivedValue, Transaction} from '@src/types/onyx';
+import type {OutstandingReportsByPolicyIDDerivedValue, SaveSearch, Transaction} from '@src/types/onyx';
 import type SearchResults from '@src/types/onyx/SearchResults';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import arraysEqual from '@src/utils/arraysEqual';
@@ -293,6 +293,11 @@ function Search({
     const previousReportActions = usePrevious(reportActions);
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
     const searchListRef = useRef<SelectionListHandle | null>(null);
+
+    const savedSearchSelector = useCallback((searches: OnyxEntry<SaveSearch>) => searches?.[hash], [hash]);
+    const [savedSearch] = useOnyx(ONYXKEYS.SAVED_SEARCHES, {canBeMissing: true, selector: savedSearchSelector});
+    const savedSearchTitle = savedSearch?.name === savedSearch?.query ? undefined : savedSearch?.name;
+    const suggestedSearchTitle = searchKey && suggestedSearches[searchKey] ? translate(suggestedSearches[searchKey].translationPath) : undefined;
 
     const handleDEWModalOpen = useCallback(() => {
         if (onDEWModalOpen) {
@@ -1435,6 +1440,7 @@ function Search({
                     data={sortedData}
                     isLoading={shouldShowLoadingState}
                     onScroll={onSearchListScroll}
+                    title={suggestedSearchTitle ?? savedSearchTitle ?? translate(`search.chartTitles.${validGroupBy}`)}
                 />
             </SearchScopeProvider>
         );
