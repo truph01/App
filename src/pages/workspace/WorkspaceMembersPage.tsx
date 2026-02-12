@@ -665,14 +665,13 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             options.push(adminOption);
         }
 
-        if(!shouldShowChangeRoleAction) {
+        if (!shouldShowChangeRoleAction) {
             return options;
         }
 
         if (hasAtLeastOneNonMemberRole) {
             options.push(memberOption);
         }
-
 
         if (hasAtLeastOneNonAuditorRole && isControlPolicy(policy)) {
             options.push(auditorOption);
