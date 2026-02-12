@@ -12,14 +12,15 @@ import Navigation from '@libs/Navigation/Navigation';
 // Spacing is needed for icon padding configuration
 // eslint-disable-next-line no-restricted-imports
 import spacing from '@styles/utils/spacing';
+import type {TranslationPaths} from '@src/languages/types';
 
 type SuccessScreenBaseProps = {
-    headerTitle: string;
+    headerTitle: TranslationPaths;
     icon: React.FC<SvgProps> | ImageSourcePropType;
     iconWidth: number;
     iconHeight: number;
-    title: string;
-    subtitle: string;
+    title: TranslationPaths;
+    subtitle: TranslationPaths;
 };
 
 function SuccessScreenBase({headerTitle, icon, iconWidth, iconHeight, title, subtitle}: SuccessScreenBaseProps) {
@@ -33,7 +34,7 @@ function SuccessScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
     return (
         <ScreenWrapper testID={SuccessScreenBase.displayName}>
             <HeaderWithBackButton
-                title={headerTitle}
+                title={translate(headerTitle)}
                 onBackButtonPress={onClose}
                 shouldShowBackButton
             />
@@ -43,9 +44,9 @@ function SuccessScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
                     contentFitImage="fill"
                     iconWidth={iconWidth}
                     iconHeight={iconHeight}
-                    title={title}
+                    title={translate(title)}
                     titleStyles={styles.mb2}
-                    subtitle={subtitle}
+                    subtitle={translate(subtitle)}
                     subtitleStyle={styles.textSupporting}
                     containerStyle={[styles.ph5, spacing.p2]}
                     testID={SuccessScreenBase.displayName}

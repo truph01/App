@@ -9,14 +9,15 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
+import type {TranslationPaths} from '@src/languages/types';
 
 type FailureScreenBaseProps = {
-    headerTitle: string;
+    headerTitle: TranslationPaths;
     icon: React.FC<SvgProps> | ImageSourcePropType;
     iconWidth: number;
     iconHeight: number;
-    title: string;
-    subtitle: string;
+    title: TranslationPaths;
+    subtitle: TranslationPaths;
     customSubtitle?: React.ReactElement;
 };
 
@@ -31,7 +32,7 @@ function FailureScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
     return (
         <ScreenWrapper testID={FailureScreenBase.displayName}>
             <HeaderWithBackButton
-                title={headerTitle}
+                title={translate(headerTitle)}
                 onBackButtonPress={onClose}
                 shouldShowBackButton
             />
@@ -41,9 +42,9 @@ function FailureScreenBase({headerTitle, icon, iconWidth, iconHeight, title, sub
                     contentFitImage="fill"
                     iconWidth={iconWidth}
                     iconHeight={iconHeight}
-                    title={title}
+                    title={translate(title)}
                     titleStyles={styles.mb2}
-                    subtitle={subtitle}
+                    subtitle={translate(subtitle)}
                     CustomSubtitle={customSubtitle}
                     subtitleStyle={styles.textSupporting}
                     containerStyle={styles.ph5}
