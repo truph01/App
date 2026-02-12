@@ -303,10 +303,13 @@ function isMatchingCard(card: Card, encryptedCardNumber: string, cardName: strin
         return false;
     }
 
-    // Normalize both strings to remove special characters (®, ™, ©, etc.)
-    // This handles differences between OAuth provider card names and stored card names
-    const normalize = (str: string) => str.replaceAll(/[^\w\s-]/g, '').trim();
-    return normalize(card.cardName) === normalize(cardName);
+    return normalizeCardName(card.cardName) === normalizeCardName(cardName);
+}
+
+// Normalize both strings to remove special characters (®, ™, ©, etc.)
+// This handles differences between OAuth provider card names and stored card names
+function normalizeCardName(cardName: string): string {
+    return cardName.replaceAll(/[^\w\s-]/g, '').trim();
 }
 
 function getMCardNumberString(cardNumber: string): string {
@@ -1148,6 +1151,7 @@ export {
     isSmartLimitEnabled,
     lastFourNumbersFromCardName,
     isMatchingCard,
+    normalizeCardName,
     hasIssuedExpensifyCard,
     isExpensifyCardFullySetUp,
     filterAllInactiveCards,
