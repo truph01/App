@@ -2721,10 +2721,10 @@ ${amount} dla ${merchant} - ${date}`,
                 title: ({workspaceCategoriesLink}) => `Skonfiguruj [kategorie](${workspaceCategoriesLink})`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Skonfiguruj kategorie*, aby Twój zespół mógł kategoryzować wydatki dla łatwiejszego raportowania.
+                        *Skonfiguruj kategorie*, aby Twój zespół mógł kategoryzować wydatki i ułatwić raportowanie.
 
                         1. Kliknij *Workspaces*.
-                        2. Wybierz swoje środowisko pracy.
+                        2. Wybierz swoją przestrzeń roboczą.
                         3. Kliknij *Categories*.
                         4. Wyłącz wszystkie kategorie, których nie potrzebujesz.
                         5. Dodaj własne kategorie w prawym górnym rogu.
@@ -2814,8 +2814,8 @@ ${
                     dedent(`
                         *Zaproś swój zespół* do Expensify, aby mógł zacząć śledzić wydatki już dziś.
 
-                        1. Kliknij *Workspace*.
-                        2. Wybierz swój workspace.
+                        1. Kliknij *Workspaces*.
+                        2. Wybierz swoją przestrzeń roboczą.
                         3. Kliknij *Members* > *Invite member*.
                         4. Wpisz adresy e-mail lub numery telefonów.
                         5. Dodaj własną wiadomość z zaproszeniem, jeśli chcesz!
@@ -2835,16 +2835,16 @@ ${
                 title: ({workspaceTagsLink}) => `Skonfiguruj [tagi](${workspaceTagsLink})`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Użyj tagów, aby dodać dodatkowe szczegóły wydatków, takie jak projekty, klienci, lokalizacje i działy. Jeśli potrzebujesz wielu poziomów tagów, możesz uaktualnić do planu Control.
+                        Używaj tagów, aby dodać dodatkowe szczegóły wydatków, takie jak projekty, klienci, lokalizacje i działy. Jeśli potrzebujesz wielu poziomów tagów, możesz przejść na plan Control.
 
                         1. Kliknij *Workspaces*.
-                        2. Wybierz swój workspace.
+                        2. Wybierz swoją przestrzeń roboczą.
                         3. Kliknij *More features*.
                         4. Włącz *Tags*.
-                        5. Przejdź do *Tags* w edytorze workspace’u.
-                        6. Kliknij *+ Add tag*, aby utworzyć własny.
+                        5. Przejdź do *Tags* w edytorze przestrzeni roboczej.
+                        6. Kliknij *+ Add tag*, aby utworzyć własne.
 
-                        [Przejdź do dodatkowych funkcji](${workspaceMoreFeaturesLink}).
+                        [Przejdź do opcji „More features”](${workspaceMoreFeaturesLink}).
 
                     `),
             },
@@ -7530,10 +7530,12 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             endReading: 'Zakończ czytanie',
             saveForLater: 'Zapisz na później',
             totalDistance: 'Całkowity dystans',
-            startTitle: 'Zdjęcie początku stanu licznika',
-            endTitle: 'Zdjęcie końcowe licznika przebiegu',
             startMessageWeb: 'Dodaj zdjęcie licznika kilometrów z <strong>początku</strong> swojej podróży. Przeciągnij tutaj plik lub wybierz go, aby przesłać.',
             endMessageWeb: 'Dodaj zdjęcie licznika przebiegu z <strong>końca</strong> swojej podróży. Przeciągnij tutaj plik lub wybierz jeden, aby go przesłać.',
+            startTitle: 'Zdjęcie licznika na początku',
+            endTitle: 'Końcowe zdjęcie licznika przebiegu',
+            deleteOdometerPhoto: 'Usuń zdjęcie licznika przebiegu',
+            deleteOdometerPhotoConfirmation: 'Na pewno chcesz usunąć to zdjęcie licznika?',
         },
     },
     gps: {
