@@ -15,7 +15,7 @@ import {isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {TaxRatesOption} from '@libs/TaxOptionsListUtils';
 import {calculateTaxAmount, getAmount, getCurrency, getTaxRateTitle, getTaxValue} from '@libs/TransactionUtils';
-import {setMoneyRequestTaxAmount, setMoneyRequestTaxRate, setMoneyRequestTaxRateValues, updateMoneyRequestTaxRate} from '@userActions/IOU';
+import {setMoneyRequestTaxRateValues, updateMoneyRequestTaxRate} from '@userActions/IOU';
 import {setDraftSplitTransaction} from '@userActions/IOU/Split';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
