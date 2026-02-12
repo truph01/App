@@ -583,7 +583,7 @@ function handleMoneyRequestStepDistanceNavigation({
                     },
                     transactionParams: {
                         amount: 0,
-                        distance: manualDistance ?? gpsDistance,
+                        distance: manualDistance ?? gpsDistance ?? odometerDistance,
                         currency: transaction?.currency ?? 'USD',
                         created: transaction?.created ?? '',
                         merchant: translate('iou.fieldPending'),
@@ -618,7 +618,7 @@ function handleMoneyRequestStepDistanceNavigation({
                 existingTransaction: transaction,
                 transactionParams: {
                     amount: 0,
-                    distance: manualDistance ?? gpsDistance,
+                    distance: manualDistance ?? gpsDistance ?? odometerDistance,
                     comment: '',
                     created: transaction?.created ?? '',
                     currency: transaction?.currency ?? 'USD',
