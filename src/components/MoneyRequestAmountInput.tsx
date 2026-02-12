@@ -1,8 +1,9 @@
 import type {ForwardedRef} from 'react';
 import React, {useCallback, useEffect, useRef} from 'react';
-import type {BlurEvent, KeyboardTypeOptions, StyleProp, TextStyle, ViewStyle} from 'react-native';
+import type {BlurEvent, StyleProp, TextStyle, ViewStyle} from 'react-native';
+import useCurrencyList from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
-import {convertToFrontendAmountAsString, getCurrencyDecimals, getLocalizedCurrencySymbol} from '@libs/CurrencyUtils';
+import {convertToFrontendAmountAsString, getLocalizedCurrencySymbol} from '@libs/CurrencyUtils';
 import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
 import NumberWithSymbolForm from './NumberWithSymbolForm';
@@ -123,9 +124,6 @@ type MoneyRequestAmountInputProps = {
 
     /** Reference to the outer element */
     ref?: ForwardedRef<BaseTextInputRef>;
-
-    /** Determines which keyboard to open */
-    keyboardType?: KeyboardTypeOptions;
 } & Pick<TextInputWithSymbolProps, 'autoGrowExtraSpace' | 'submitBehavior' | 'shouldUseDefaultLineHeightForPrefix' | 'onFocus' | 'onBlur'>;
 
 type Selection = {
@@ -172,6 +170,7 @@ function MoneyRequestAmountInput({
     ...props
 }: MoneyRequestAmountInputProps) {
     const {preferredLocale, translate} = useLocalize();
+    const {getCurrencyDecimals} = useCurrencyList();
     const textInput = useRef<BaseTextInputRef | null>(null);
     const numberFormRef = useRef<NumberWithSymbolFormRef | null>(null);
     const decimals = getCurrencyDecimals(currency);
@@ -263,7 +262,6 @@ function MoneyRequestAmountInput({
             clearNegative={clearNegative}
             onFocus={props.onFocus}
             accessibilityLabel={getPlatform() === CONST.PLATFORM.WEB ? `${translate('iou.amount')} (${currency})` : undefined}
-            keyboardType={props.keyboardType}
         />
     );
 }
