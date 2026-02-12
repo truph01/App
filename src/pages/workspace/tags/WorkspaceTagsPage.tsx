@@ -686,27 +686,27 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                         customTagName={policyTagLists.at(0)?.name ?? ''}
                         shouldShow={!hasDependentTags && !hasIndependentTags}
                     />
-                ) : (
+                ) : !hasDependentTags && !hasIndependentTags && !!policyTagLists.at(0)?.name ? (
                     <Text style={[styles.textNormal, styles.colorMuted]}>
-                        {!hasDependentTags && !hasIndependentTags && !!policyTagLists.at(0)?.name ? (
-                            <EmployeesSeeTagsAsText customTagName={policyTagLists.at(0)?.name ?? ''} />
-                        ) : (
-                            translate('workspace.tags.subtitle')
-                        )}
-
-                        {hasDependentTags && (
-                            <View style={[styles.renderHTML]}>
-                                <RenderHTML
-                                    html={translate(
-                                        'workspace.tags.dependentMultiLevelTagsSubtitle',
-                                        isQuickSettingsFlow
-                                            ? `${environmentURL}/${ROUTES.SETTINGS_TAGS_IMPORT.getRoute(policyID, ROUTES.SETTINGS_TAGS_ROOT.getRoute(policyID, backTo))}`
-                                            : `${environmentURL}/${ROUTES.WORKSPACE_TAGS_IMPORT_OPTIONS.getRoute(policyID)}`,
-                                    )}
-                                />
-                            </View>
-                        )}
+                        <EmployeesSeeTagsAsText customTagName={policyTagLists.at(0)?.name ?? ''} />
                     </Text>
+                ) : (
+                    <View style={[styles.renderHTML]}>
+                        <RenderHTML
+                            html={
+                                hasDependentTags
+                                    ? `<muted-text>${translate('workspace.tags.subtitle')} ${translate(
+                                          'workspace.tags.dependentMultiLevelTagsSubtitle',
+                                          isQuickSettingsFlow
+                                              ? `${environmentURL}/${ROUTES.SETTINGS_TAGS_IMPORT.getRoute(policyID, ROUTES.SETTINGS_TAGS_ROOT.getRoute(policyID, backTo))}`
+                                              : `${environmentURL}/${ROUTES.WORKSPACE_TAGS_IMPORT_OPTIONS.getRoute(policyID)}`,
+                                      )
+                                          .replace('<muted-text>', '')
+                                          .replace('</muted-text>', '')}</muted-text>`
+                                    : `<muted-text>${translate('workspace.tags.subtitle')}</muted-text>`
+                            }
+                        />
+                    </View>
                 )}
             </View>
             {tagList.length > CONST.SEARCH_ITEM_LIMIT && (
