@@ -104,6 +104,7 @@ function InternationalDepositAccountContent({
         goBack();
     }, [goBack]);
 
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const {
         componentToRender: SubStep,
         isEditing,
