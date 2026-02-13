@@ -17,6 +17,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type Transaction from '@src/types/onyx/Transaction';
+import EReceiptBody from './EReceiptBody';
 import Icon from './Icon';
 import ImageSVG from './ImageSVG';
 import type {TransactionListItemType} from './SelectionListWithSections/types';
@@ -44,7 +45,7 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false}:
     const {translate} = useLocalize();
     const {getCurrencySymbol} = useCurrencyList();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptBody', 'ExpensifyWordmark']);
+    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: true});
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`, {canBeMissing: true});
 
@@ -91,10 +92,7 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false}:
                 </View>
                 <View style={styles.eReceiptContentContainer}>
                     <View>
-                        <ImageSVG
-                            src={icons.ReceiptBody}
-                            contentFit="fill"
-                        />
+                        <EReceiptBody />
                         <View style={styles.eReceiptContentWrapper}>
                             <View style={[StyleUtils.getBackgroundColorStyle(theme.textColorfulBackground), styles.alignItemsCenter, styles.justifyContentCenter, styles.h100]}>
                                 <View
