@@ -590,7 +590,6 @@ function IOURequestStepDistanceOdometer({
                         </View>
                         {!isEditing && (
                             <PressableWithFeedback
-                                accessible
                                 accessibilityRole="button"
                                 accessibilityLabel={translate('distance.odometer.startTitle')}
                                 sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_START}
@@ -639,7 +638,6 @@ function IOURequestStepDistanceOdometer({
                         </View>
                         {!isEditing && (
                             <PressableWithFeedback
-                                accessible
                                 accessibilityRole="button"
                                 accessibilityLabel={translate('distance.odometer.endTitle')}
                                 sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_END}
