@@ -166,6 +166,9 @@ type MenuItemBaseProps = ForwardedFSClassProps &
         /** Component to be displayed on the right */
         rightComponent?: ReactNode;
 
+        /** Component to be displayed on the left */
+        leftComponent?: ReactNode;
+
         /** A description text to show under the title */
         description?: string;
 
@@ -422,6 +425,9 @@ type MenuItemBaseProps = ForwardedFSClassProps &
 
         /** Whether item should be focusable with keyboard */
         tabIndex?: 0 | -1;
+
+        /** Additional styles for the right icon wrapper */
+        rightIconWrapperStyle?: StyleProp<ViewStyle>;
     };
 
 type MenuItemProps = (IconProps | AvatarProps | NoIcon) & MenuItemBaseProps;
@@ -505,6 +511,7 @@ function MenuItem({
     shouldShowDescriptionOnTop = false,
     shouldShowRightComponent = false,
     rightComponent,
+    leftComponent,
     rightIconReportID,
     avatarSize = CONST.AVATAR_SIZE.DEFAULT,
     isSmallAvatarSubscriptMenu = false,
@@ -559,6 +566,7 @@ function MenuItem({
     role = CONST.ROLE.MENUITEM,
     shouldBeAccessible = true,
     tabIndex = 0,
+    rightIconWrapperStyle,
 }: MenuItemProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FallbackAvatar', 'DotIndicator', 'Checkmark']);
     const theme = useTheme();
@@ -785,6 +793,7 @@ function MenuItem({
                                                     </View>
                                                 )}
                                                 <View style={[styles.flexRow, styles.pointerEventsAuto, disabled && !shouldUseDefaultCursorWhenDisabled && styles.cursorDisabled]}>
+                                                    {!!leftComponent && <View style={[styles.mr3]}>{leftComponent}</View>}
                                                     {/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */}
                                                     {isIDPassed && (
                                                         <ReportActionAvatars
@@ -1028,6 +1037,7 @@ function MenuItem({
                                                             disabled && !shouldUseDefaultCursorWhenDisabled && styles.cursorDisabled,
                                                             hasSubMenuItems && styles.opacitySemiTransparent,
                                                             hasSubMenuItems && styles.pl6,
+                                                            rightIconWrapperStyle,
                                                         ]}
                                                     >
                                                         <Icon
