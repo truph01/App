@@ -15,6 +15,7 @@ import {canUseTouchScreen, hasHoverSupport} from '@libs/DeviceCapabilities';
 import {containsCustomEmoji, containsOnlyCustomEmoji} from '@libs/EmojiUtils';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
 import getButtonState from '@libs/getButtonState';
+import getOperatingSystem from '@libs/getOperatingSystem';
 import getPlatform from '@libs/getPlatform';
 import mergeRefs from '@libs/mergeRefs';
 import Parser from '@libs/Parser';
@@ -709,6 +710,10 @@ function MenuItem({
 
     const isIDPassed = !!iconReportID || !!iconAccountID || iconAccountID === CONST.DEFAULT_NUMBER_ID;
 
+    const platform = getPlatform(true);
+    // This is required because we are preventing the Talkback to announce "double tap to activate" on Android web
+    const isAndroidWeb = platform === CONST.PLATFORM.MOBILE_WEB && getOperatingSystem() === CONST.OS.ANDROID;
+
     return (
         <View
             style={rootWrapperStyle}
@@ -762,7 +767,8 @@ function MenuItem({
                                 role={role}
                                 accessibilityLabel={accessibilityLabel ?? defaultAccessibilityLabel}
                                 accessible={shouldBeAccessible}
-                                tabIndex={getPlatform() !== CONST.PLATFORM.WEB && !interactive ? -1 : tabIndex}
+                                tabIndex={platform === CONST.PLATFORM.ANDROID && !interactive ? -1 : tabIndex}
+                                fullDisabled={!interactive && isAndroidWeb}
                                 onFocus={onFocus}
                                 sentryLabel={sentryLabel}
                             >

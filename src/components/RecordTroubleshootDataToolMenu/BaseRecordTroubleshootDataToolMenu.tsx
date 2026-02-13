@@ -165,7 +165,10 @@ function BaseRecordTroubleshootDataToolMenu({
 
     return (
         <>
-            <TestToolRow title={translate('initialSettingsPage.troubleshoot.recordTroubleshootData')}>
+            <TestToolRow
+                title={translate('initialSettingsPage.troubleshoot.recordTroubleshootData')}
+                isTitleAccessible={false}
+            >
                 <Switch
                     accessibilityLabel={translate('initialSettingsPage.troubleshoot.recordTroubleshootData')}
                     isOn={!!shouldRecordTroubleshootData}

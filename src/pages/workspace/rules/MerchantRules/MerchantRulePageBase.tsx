@@ -271,7 +271,21 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
                     enabledWhenOffline
                     shouldRenderFooterAboveSubmit
                     footerContent={
-                        isEditing ? (
+                        <>
+                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.mb4]}>
+                                <Text
+                                    style={[styles.textNormal]}
+                                    accessible={false}
+                                    aria-hidden
+                                >
+                                    {translate('workspace.rules.merchantRules.applyToExistingUnsubmittedExpenses')}
+                                </Text>
+                                <Switch
+                                    accessibilityLabel={translate('workspace.rules.merchantRules.applyToExistingUnsubmittedExpenses')}
+                                    isOn={shouldUpdateMatchingTransactions}
+                                    onToggle={setShouldUpdateMatchingTransactions}
+                                />
+                            </View>
                             <Button
                                 text={translate('workspace.rules.merchantRules.deleteRule')}
                                 onPress={() => setIsDeleteModalVisible(true)}
