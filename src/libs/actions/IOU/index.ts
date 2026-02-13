@@ -13957,7 +13957,7 @@ function clearBulkEditDraftTransaction() {
 /**
  * Updates the draft transaction for bulk editing multiple expenses
  */
-function updateBulkEditDraftTransaction(transactionChanges: Partial<OnyxTypes.Transaction>) {
+function updateBulkEditDraftTransaction(transactionChanges: NullishDeep<OnyxTypes.Transaction>) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_BULK_EDIT_TRANSACTION_ID}`, transactionChanges);
 }
 

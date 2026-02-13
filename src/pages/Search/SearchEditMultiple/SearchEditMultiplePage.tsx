@@ -154,7 +154,7 @@ function SearchEditMultiplePage() {
         }
 
         updateMultipleMoneyRequests(selectedTransactionIDs, changes, policy, allReports, allTransactions, allReportActions);
-        clearSelectedTransactions();
+        clearSelectedTransactions(true);
 
         Navigation.dismissToPreviousRHP();
     };

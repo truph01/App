@@ -28,7 +28,7 @@ function SearchEditMultipleCategoryPage() {
         const nextCategory = item.searchText ?? '';
         if (!nextCategory || nextCategory === currentCategory) {
             updateBulkEditDraftTransaction({
-                category: undefined,
+                category: null,
             });
             Navigation.goBack();
             return;
