@@ -224,6 +224,7 @@ describe('QuickActionUtils', () => {
                             units: {time: {enabled: true, rate: 1}},
                         } as Policy,
                         false,
+                        [CONST.BETAS.ALL],
                         false,
                     ),
                 ).toBe(true);
@@ -245,6 +246,7 @@ describe('QuickActionUtils', () => {
                             id: '1',
                         } as Policy,
                         false,
+                        [CONST.BETAS.ALL],
                         false,
                     ),
                 ).toBe(false);
