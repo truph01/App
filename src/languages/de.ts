@@ -1000,7 +1000,11 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName}-Firmenkartenverbindung reparieren` : 'Firmenkarte reparieren Verbindung der Firmenkarte reparieren'),
                 subtitle: 'Workspace > Unternehmenskarten',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `${integrationName}-Verbindung reparieren`, subtitle: 'Arbeitsbereich > Buchhaltung'},
+            fixAccountingConnection: {
+                title: ({integrationName}: {integrationName: string}) => `${integrationName}-Verbindung reparieren`,
+                defaultSubtitle: 'Arbeitsbereich > Buchhaltung',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Buchhaltung`,
+            },
         },
         announcements: 'Ankündigungen',
         discoverSection: {
@@ -2735,13 +2739,13 @@ ${amount} für ${merchant} – ${date}`,
                 title: ({workspaceCategoriesLink}) => `Richte [Kategorien](${workspaceCategoriesLink}) ein`,
                 description: ({workspaceCategoriesLink}) =>
                     dedent(`
-                        *Richte Kategorien ein*, damit dein Team Ausgaben für eine einfache Auswertung zuordnen kann.
+                        *Richten Sie Kategorien ein*, damit Ihr Team Ausgaben für eine einfache Berichterstattung verschlüsseln kann.
 
-                        1. Klicke auf *Workspaces*.
-                        2. Wähle deinen Workspace aus.
-                        3. Klicke auf *Categories*.
-                        4. Deaktiviere alle Kategorien, die du nicht benötigst.
-                        5. Füge oben rechts deine eigenen Kategorien hinzu.
+                        1. Klicken Sie auf *Workspaces*.
+                        2. Wählen Sie Ihren Workspace aus.
+                        3. Klicken Sie auf *Categories*.
+                        4. Deaktivieren Sie alle Kategorien, die Sie nicht benötigen.
+                        5. Fügen Sie oben rechts Ihre eigenen Kategorien hinzu.
 
                         [Zu den Workspace-Kategorieneinstellungen](${workspaceCategoriesLink}).
                     `),
@@ -2826,13 +2830,13 @@ ${
                 title: ({workspaceMembersLink}) => `[your team](${workspaceMembersLink}) einladen`,
                 description: ({workspaceMembersLink}) =>
                     dedent(`
-                        *Lade dein Team* zu Expensify ein, damit es noch heute mit der Spesenerfassung beginnen kann.
+                        *Lade dein Team* zu Expensify ein, damit alle noch heute mit der Spesenerfassung starten können.
 
                         1. Klicke auf *Workspaces*.
                         2. Wähle deinen Workspace aus.
                         3. Klicke auf *Members* > *Invite member*.
                         4. Gib E-Mail-Adressen oder Telefonnummern ein.
-                        5. Füge eine eigene Einladung hinzu, wenn du möchtest!
+                        5. Füge eine individuelle Einladung hinzu, wenn du möchtest!
 
                         [Zu den Workspace-Mitgliedern](${workspaceMembersLink}).
 
@@ -2850,14 +2854,14 @@ ${
                 title: ({workspaceTagsLink}) => `Richte [Tags](${workspaceTagsLink}) ein`,
                 description: ({workspaceMoreFeaturesLink}) =>
                     dedent(`
-                        Verwende Tags, um zusätzliche Spesendetails wie Projekte, Kunden, Standorte und Abteilungen hinzuzufügen. Wenn du mehrere Tag-Ebenen benötigst, kannst du auf den Control-Tarif upgraden.
+                        Verwende Tags, um zusätzliche Ausgabendetails wie Projekte, Kunden, Standorte und Abteilungen hinzuzufügen. Wenn du mehrere Tag-Ebenen benötigst, kannst du auf den Control-Tarif upgraden.
 
                         1. Klicke auf *Workspaces*.
                         2. Wähle deinen Workspace aus.
-                        3. Klicke auf *More features*.
+                        3. Klicke auf *Weitere Funktionen*.
                         4. Aktiviere *Tags*.
                         5. Navigiere im Workspace-Editor zu *Tags*.
-                        6. Klicke auf *+ Add tag*, um eigene zu erstellen.
+                        6. Klicke auf *+ Tag hinzufügen*, um eigene Tags zu erstellen.
 
                         [Zu den zusätzlichen Funktionen](${workspaceMoreFeaturesLink}).
                     `),
@@ -7576,10 +7580,12 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
             endReading: 'Lesen beenden',
             saveForLater: 'Für später speichern',
             totalDistance: 'Gesamtdistanz',
-            startTitle: 'Foto des Kilometerzähler-Starts',
-            endTitle: 'Kilometerzähler-Endfoto',
             startMessageWeb: 'Füge ein Foto deines Kilometerzählers vom <strong>Beginn</strong> deiner Fahrt hinzu. Ziehe eine Datei hierher oder wähle eine zum Hochladen aus.',
             endMessageWeb: 'Fügen Sie ein Foto Ihres Kilometerzählers vom <strong>Ende</strong> Ihrer Fahrt hinzu. Ziehen Sie eine Datei hierher oder wählen Sie eine zum Hochladen aus.',
+            startTitle: 'Foto des Kilometerzähler-Starts',
+            endTitle: 'Kilometerzähler-Endfoto',
+            deleteOdometerPhoto: 'Kilometerzähler-Foto löschen',
+            deleteOdometerPhotoConfirmation: 'Möchtest du dieses Kilometerzählerfoto wirklich löschen?',
         },
     },
     gps: {

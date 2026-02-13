@@ -769,7 +769,8 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Reconectar con ${integrationName}`,
-                subtitle: 'Espacio de trabajo > Contabilidad',
+                defaultSubtitle: 'Espacio de trabajo > Contabilidad',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Contabilidad`,
             },
             addShippingAddress: {
                 title: 'Necesitamos tu dirección de envío',
@@ -7768,6 +7769,8 @@ ${amount} para ${merchant} - ${date}`,
             totalDistance: 'Distancia total',
             startTitle: 'Foto inicial del odómetro',
             endTitle: 'Foto final del odómetro',
+            deleteOdometerPhoto: 'Eliminar foto del odómetro',
+            deleteOdometerPhotoConfirmation: '¿Estás seguro de que deseas eliminar esta foto del odómetro?',
             startMessageWeb: 'Añade una foto de tu odómetro al <strong>inicio</strong> de tu viaje. Arrastra un archivo aquí o elige uno para subirlo.',
             endMessageWeb: 'Añade una foto de tu odómetro al <strong>final</strong> de tu viaje. Arrastra un archivo aquí o elige uno para subirlo.',
         },
