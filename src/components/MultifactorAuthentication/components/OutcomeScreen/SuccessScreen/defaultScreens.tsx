@@ -1,6 +1,6 @@
 import React from 'react';
-import createScreenWithDefaults from '../createScreenWithDefaults';
 import variables from '@styles/variables';
+import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
 import SuccessScreenBase from './SuccessScreenBase';
 import type {SuccessScreenBaseProps} from './SuccessScreenBase';
 
