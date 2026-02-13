@@ -2405,7 +2405,6 @@ ${date} の ${merchant} への ${amount}`,
     },
     expenseRulesPage: {
         title: '経費ルール',
-        subtitle: 'これらのルールはあなたの経費に適用されます。ワークスペースに提出した場合は、そのワークスペースのルールがこれらより優先されることがあります。',
         findRule: 'ルールを検索',
         emptyRules: {
             title: 'まだルールを作成していません',
@@ -2451,6 +2450,7 @@ ${date} の ${merchant} への ${amount}`,
             deleteSinglePrompt: 'このルールを削除してもよろしいですか？',
             deleteMultiplePrompt: 'これらのルールを削除してもよろしいですか？',
         },
+        subtitle: 'これらのルールはあなたの経費に適用されます。',
     },
     preferencesPage: {
         appSection: {

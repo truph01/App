@@ -2439,7 +2439,7 @@ const translations = {
     },
     expenseRulesPage: {
         title: 'Expense rules',
-        subtitle: 'These rules will apply to your expenses. If you submit to a workspace, then the workspace rules may override them.',
+        subtitle: 'These rules will apply to your expenses.',
         findRule: 'Find rule',
         emptyRules: {
             title: "You haven't created any rules",
