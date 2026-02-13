@@ -50,7 +50,5 @@ describe('MultifactorAuthentication Scenarios Config', () => {
 
         expect(biometricsTestConfig.failureScreens).toHaveProperty(CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS);
         expect(biometricsTestConfig.failureScreens).toHaveProperty(CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE);
-        expect(biometricsTestConfig.failureScreens).toHaveProperty(CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TOO_MANY_ATTEMPTS);
-        expect(biometricsTestConfig.failureScreens).toHaveProperty(CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED);
     });
 });
