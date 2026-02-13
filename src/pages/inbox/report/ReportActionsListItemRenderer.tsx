@@ -21,9 +21,6 @@ type ReportActionsListItemRendererProps = {
     /** Array of report actions for the report */
     reportActions: ReportAction[];
 
-    /** All the data of the transaction collection */
-    transactions?: Array<OnyxEntry<Transaction>>;
-
     /** The report's parentReportAction */
     parentReportAction: OnyxEntry<ReportAction>;
 
@@ -110,7 +107,6 @@ function ReportActionsListItemRenderer({
     policies,
     reportAction,
     reportActions = [],
-    transactions,
     parentReportAction,
     index,
     report,
@@ -253,7 +249,6 @@ function ReportActionsListItemRenderer({
             reportActions={reportActions}
             linkedReportActionID={linkedReportActionID}
             displayAsGroup={displayAsGroup}
-            transactions={transactions}
             shouldDisplayNewMarker={shouldDisplayNewMarker}
             isMostRecentIOUReportAction={reportAction.reportActionID === mostRecentIOUReportActionID}
             index={index}
