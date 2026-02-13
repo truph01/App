@@ -1,5 +1,6 @@
 import React from 'react';
-import {UnsupportedDeviceFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
+import AuthenticationMethodDescription from '@components/MultifactorAuthentication/components/AuthenticationMethodDescription';
+import {DefaultSuccessScreen, UnsupportedDeviceFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import type {MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import {troubleshootMultifactorAuthentication} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';
@@ -10,6 +11,7 @@ export default {
     action: troubleshootMultifactorAuthentication,
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.BIOMETRICS_TEST,
     pure: true,
+    successScreen: <DefaultSuccessScreen customSubtitle={<AuthenticationMethodDescription />} />,
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: (
             <UnsupportedDeviceFailureScreen

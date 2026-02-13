@@ -1,7 +1,7 @@
 import React from 'react';
+import NoEligibleMethodsDescription from '@components/MultifactorAuthentication/components/NoEligibleMethodsDescription';
 import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
-import NoEligibleMethodsDescription from '@components/MultifactorAuthentication/NoEligibleMethodsDescription';
-import UnsupportedDeviceDescription from '@components/MultifactorAuthentication/UnsupportedDeviceDescription';
+import UnsupportedDeviceDescription from '@components/MultifactorAuthentication/components/UnsupportedDeviceDescription';
 import variables from '@styles/variables';
 import FailureScreenBase from './FailureScreenBase';
 
