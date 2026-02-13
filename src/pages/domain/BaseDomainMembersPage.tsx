@@ -131,6 +131,7 @@ function BaseDomainMembersPage({
             pendingAction: customProps?.pendingAction,
             isInteractive: !isPendingActionDelete && !details?.isOptimisticPersonalDetail,
             isDisabled: isPendingActionDelete,
+            isDisabledCheckbox: isPendingActionDelete || !!details?.isOptimisticPersonalDetail,
             brickRoadIndicator: customProps?.brickRoadIndicator,
         };
     });
