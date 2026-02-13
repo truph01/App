@@ -414,7 +414,10 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
 
         return (
             <View style={[menuItemsData.sectionStyle, styles.pb4, styles.mh3]}>
-                <Text style={styles.sectionTitle} accessibilityRole="header">
+                <Text
+                    style={styles.sectionTitle}
+                    accessibilityRole="header"
+                >
                     {translate(menuItemsData.sectionTranslationKey)}
                 </Text>
                 {menuItemsData.items.map((item) => {

@@ -175,7 +175,10 @@ function ToggleSettingOptionRow({
             )}
             {customTitle ?? (
                 <View style={[styles.flexColumn, styles.flex1]}>
-                    <Text style={[styles.textNormal, styles.lh20, titleStyle]} accessibilityRole={titleAccessibilityRole}>
+                    <Text
+                        style={[styles.textNormal, styles.lh20, titleStyle]}
+                        accessibilityRole={titleAccessibilityRole}
+                    >
                         {title}
                     </Text>
                     {!shouldPlaceSubtitleBelowSwitch && subtitle && subTitleView}

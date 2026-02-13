@@ -248,7 +248,12 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
                     <View style={[styles.pb4, styles.mh3, styles.gap4]}>
                         {typeMenuSections.map((section, sectionIndex) => (
                             <View key={section.translationPath}>
-                                <Text style={styles.sectionTitle} accessibilityRole="header">{translate(section.translationPath)}</Text>
+                                <Text
+                                    style={styles.sectionTitle}
+                                    accessibilityRole="header"
+                                >
+                                    {translate(section.translationPath)}
+                                </Text>
 
                                 {section.translationPath === 'search.savedSearchesMenuItemTitle' ? (
                                     renderSavedSearchesSection(savedSearchesMenuItems)
