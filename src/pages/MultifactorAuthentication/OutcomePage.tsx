@@ -1,5 +1,5 @@
 import React from 'react';
-import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/FailureScreen';
+import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import {useMultifactorAuthenticationState} from '@components/MultifactorAuthentication/Context';
 import type {ErrorState} from '@components/MultifactorAuthentication/Context/State';
 

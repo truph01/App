@@ -2,10 +2,10 @@ import React from 'react';
 import {
     DefaultClientFailureScreen,
     DefaultServerFailureScreen,
+    DefaultSuccessScreen,
     NoEligibleMethodsFailureScreen,
     UnsupportedDeviceFailureScreen,
-} from '@components/MultifactorAuthentication/components/FailureScreen';
-import {DefaultSuccessScreen} from '@components/MultifactorAuthentication/components/SuccessScreen';
+} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import type {MultifactorAuthenticationDefaultUIConfig, MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import CONST from '@src/CONST';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {UnsupportedDeviceFailureScreen} from '@components/MultifactorAuthentication/components/FailureScreen';
+import {UnsupportedDeviceFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import type {MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import {troubleshootMultifactorAuthentication} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';

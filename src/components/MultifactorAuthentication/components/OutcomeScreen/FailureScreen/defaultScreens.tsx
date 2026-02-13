@@ -1,5 +1,5 @@
 import React from 'react';
-import createScreenWithDefaults from '@components/MultifactorAuthentication/components/createScreenWithDefaults';
+import createScreenWithDefaults from '../createScreenWithDefaults';
 import NoEligibleMethodsDescription from '@components/MultifactorAuthentication/NoEligibleMethodsDescription';
 import UnsupportedDeviceDescription from '@components/MultifactorAuthentication/UnsupportedDeviceDescription';
 import variables from '@styles/variables';
