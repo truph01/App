@@ -409,9 +409,9 @@ function MoneyReportHeader({
 
     const isInvoiceReport = isInvoiceReportUtil(moneyRequestReport);
 
+    const [rateErrorModalVisible, setRateErrorModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);
     const [isHoldEducationalModalVisible, setIsHoldEducationalModalVisible] = useState(false);
-    const [duplicateDistanceErrorModalVisible, setDuplicateDistanceErrorModalVisible] = useState(false);
     const [duplicatePerDiemErrorModalVisible, setDuplicatePerDiemErrorModalVisible] = useState(false);
     const [rejectModalAction, setRejectModalAction] = useState<ValueOf<
         typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD | typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT | typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT_BULK
@@ -1403,7 +1403,7 @@ function MoneyReportHeader({
             value: CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE,
             onSelected: () => {
                 if (hasCustomUnitOutOfPolicyViolation) {
-                    setDuplicateDistanceErrorModalVisible(true);
+                    setRateErrorModalVisible(true);
                     return;
                 }
 
@@ -1895,11 +1895,11 @@ function MoneyReportHeader({
             />
             <ConfirmModal
                 title={translate('common.duplicateExpense')}
-                isVisible={duplicateDistanceErrorModalVisible}
-                onConfirm={() => setDuplicateDistanceErrorModalVisible(false)}
-                onCancel={() => setDuplicateDistanceErrorModalVisible(false)}
+                isVisible={rateErrorModalVisible}
+                onConfirm={() => setRateErrorModalVisible(false)}
+                onCancel={() => setRateErrorModalVisible(false)}
                 confirmText={translate('common.buttonConfirm')}
-                prompt={translate('iou.correctDistanceRateError')}
+                prompt={translate('iou.correctRateError')}
                 shouldShowCancelButton={false}
             />
             <ConfirmModal

@@ -1318,7 +1318,7 @@ const translations: TranslationDeepObject<typeof en> = {
             ratePreview: (rate: string) => `${rate} / hora`,
             amountTooLargeError: 'El importe total es demasiado alto. Reduce las horas o disminuye la tasa.',
         },
-        correctDistanceRateError: 'Corrige el error de la tasa de distancia y vuelve a intentarlo.',
+        correctRateError: 'Corrige el error de la tasa y vuelve a intentarlo.',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Explicar</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'marcó el gasto como "reembolsable"' : 'marcó el gasto como "no reembolsable"'),

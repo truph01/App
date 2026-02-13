@@ -1525,7 +1525,7 @@ const translations = {
             ratePreview: (rate: string) => `${rate} / hour`,
             amountTooLargeError: 'The total amount is too large. Lower the hours or reduce the rate.',
         },
-        correctDistanceRateError: 'Fix the distance rate error and try again.',
+        correctRateError: 'Fix the rate error and try again.',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Explain</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'marked the expense as "reimbursable"' : 'marked the expense as "non-reimbursable"'),
