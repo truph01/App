@@ -1864,7 +1864,6 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: 'Invalidar com atraso',
             leftHandNavCache: 'Cache da navegação à esquerda',
             clearleftHandNavCache: 'Limpar',
-            recordTroubleshootData: 'Registrar dados de diagnóstico',
             softKillTheApp: 'Encerrar o app suavemente',
             kill: 'Matar',
             sentryDebug: 'Depuração do Sentry',

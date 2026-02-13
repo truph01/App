@@ -1903,7 +1903,6 @@ const translations = {
             invalidateWithDelay: 'Invalidate with delay',
             leftHandNavCache: 'Left Hand Nav cache',
             clearleftHandNavCache: 'Clear',
-            recordTroubleshootData: 'Record Troubleshoot Data',
             softKillTheApp: 'Soft kill the app',
             kill: 'Kill',
             sentryDebug: 'Sentry debug',

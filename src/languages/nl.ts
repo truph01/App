@@ -1868,7 +1868,6 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: 'Ongeldig maken met vertraging',
             leftHandNavCache: 'Cache linkernavigatie',
             clearleftHandNavCache: 'Wissen',
-            recordTroubleshootData: 'Probleemopsporingsgegevens opnemen',
             softKillTheApp: 'App zacht afsluiten',
             kill: 'Doden',
             sentryDebug: 'Sentry-debug',
