@@ -8,6 +8,7 @@ const defaultCurrencyListStateContextValue: CurrencyListStateContextType = {
 
 const defaultCurrencyListActionsContextValue: CurrencyListActionsContextType = {
     getCurrencySymbol: () => undefined,
+    getCurrencyDecimals: () => 2,
 };
 
 export {defaultCurrencyListStateContextValue, defaultCurrencyListActionsContextValue};

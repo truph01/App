@@ -19,6 +19,14 @@ function CurrencyListContextProvider({children}: React.PropsWithChildren) {
         return currencyListRef.current[currencyCode]?.symbol;
     }, []);
 
+    const getCurrencyDecimals = useCallback(
+        (currencyCode: string | undefined): number => {
+            const decimals = currencyList[currencyCode ?? '']?.decimals;
+            return decimals ?? 2;
+        },
+        [currencyList],
+    );
+
     const stateValue = useMemo<CurrencyListStateContextType>(
         () => ({
             currencyList,
@@ -29,8 +37,9 @@ function CurrencyListContextProvider({children}: React.PropsWithChildren) {
     const actionsValue = useMemo<CurrencyListActionsContextType>(
         () => ({
             getCurrencySymbol,
+            getCurrencyDecimals,
         }),
-        [getCurrencySymbol],
+        [getCurrencySymbol, getCurrencyDecimals],
     );
 
     return (
