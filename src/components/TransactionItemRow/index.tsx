@@ -1,3 +1,4 @@
+import reportsSelector from '@selectors/Attributes';
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
@@ -45,7 +46,6 @@ import {
     isUnreportedAndHasInvalidDistanceRateTransaction,
 } from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
-import reportsSelector from '@selectors/Attributes';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetails, Policy, Report, ReportAction, TransactionViolation} from '@src/types/onyx';
