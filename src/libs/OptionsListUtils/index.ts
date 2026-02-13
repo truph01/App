@@ -78,6 +78,7 @@ import {
     isActionOfType,
     isAddCommentAction,
     isClosedAction,
+    isCreatedAction,
     isCreatedTaskReportAction,
     isDeletedParentAction,
     isDynamicExternalWorkflowApproveFailedAction,
@@ -934,6 +935,13 @@ function getLastMessageTextForReport({
     // If the last action differs from last original action, it means there's a hidden action (like a whisper), then use getLastVisibleMessage to get the preview text
     if (!lastMessageTextFromReport && !lastReportAction && !!lastOriginalReportAction) {
         return lastVisibleMessage?.lastMessageText ?? '';
+    }
+
+    // When CREATED is the only visible action left (e.g. after cross-device expense
+    // deletion), return empty string so the LHN shows the welcome message instead of
+    // stale report.lastMessageText.
+    if (!lastMessageTextFromReport && isCreatedAction(lastReportAction)) {
+        return '';
     }
 
     // When the derived visibility cache is hydrated and we computed a non-empty preview, use it.
