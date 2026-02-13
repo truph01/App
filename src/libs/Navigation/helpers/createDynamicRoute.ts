@@ -11,7 +11,7 @@ const combinePathAndSuffix = (path: string, suffix: string): Route => {
         throw new Error('Path is undefined or empty');
     }
 
-    let newPath = `${normalizedPath}/${suffix}`;
+    let newPath = normalizedPath === '/' ? `/${suffix}` : `${normalizedPath}/${suffix}`;
 
     if (query) {
         newPath += `?${query}`;
