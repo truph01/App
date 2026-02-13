@@ -6,7 +6,7 @@ keywords: [New Expensify, approvals, report approvals, approving reports, approv
 
 Each Expensify workspace can be configured to require additional approvals for reports before payments are authorized. When approvals are enabled, admins can set a default approval workflow for all members or create custom workflows for individual members.
 
-Once a member submits an report, it must be approved by each person in their workflow before it can be paid. You can also add an additional approver that is only required when a report exceeds a specific dollar amount.
+Once a member submits a report, it must be approved by each person in their workflow before it can be paid. You can also add an additional approver that is only required when a report exceeds a specific dollar amount.
 
 ---
 
@@ -57,6 +57,7 @@ Set up default or custom approval workflows to route expenses through one or mor
 9. Click **Add workflow** to save.
 
 **Note:** Custom workflows are only available on the Control plan. To enable custom workflows, upgrade to the Control plan in Settings > Billing & Subscriptions.
+
 ---
 
 ## Edit or Delete Approval Workflows
