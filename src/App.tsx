@@ -74,8 +74,6 @@ function App() {
     useDefaultDragAndDrop();
     OnyxUpdateManager();
 
-    // temporary testing
-
     return (
         <StrictModeWrapper>
             <SplashScreenStateContextProvider>
