@@ -9,9 +9,9 @@ import type {FailureScreenBaseProps} from './FailureScreenBase';
 const DefaultClientFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
     <FailureScreenBase
         headerTitle="multifactorAuthentication.biometricsTest.biometricsAuthentication"
-        illustration="BrokenMagnifyingGlass"
-        iconWidth={variables.errorPageIconWidth}
-        iconHeight={variables.errorPageIconHeight}
+        illustration="MagnifyingGlassSpyMouthClosed"
+        iconWidth={variables.magnifyingGlassSpyMouthClosedWidth}
+        iconHeight={variables.magnifyingGlassSpyMouthClosedHeight}
         title="multifactorAuthentication.oops"
         subtitle="multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful"
     />,
