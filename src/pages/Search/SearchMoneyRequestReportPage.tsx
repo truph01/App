@@ -33,6 +33,7 @@ import {
     isMoneyRequestAction,
 } from '@libs/ReportActionsUtils';
 import {isValidReportIDFromPath} from '@libs/ReportUtils';
+import {cancelSpansByPrefix} from '@libs/telemetry/activeSpans';
 import {isDefaultAvatar, isLetterAvatar, isPresetAvatar} from '@libs/UserAvatarUtils';
 import Navigation from '@navigation/Navigation';
 import ReactionListWrapper from '@pages/inbox/ReactionListWrapper';
@@ -194,6 +195,11 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
 
     useEffect(() => {
         hasCreatedLegacyThreadRef.current = false;
+
+        return () => {
+            // Cancel any pending send-message spans to prevent orphaned spans when navigating away
+            cancelSpansByPrefix(CONST.TELEMETRY.SPAN_SEND_MESSAGE);
+        };
     }, [reportIDFromRoute]);
 
     // Create transaction thread for legacy transactions that don't have one yet.
