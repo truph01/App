@@ -891,7 +891,6 @@ function SearchAutocompleteList({
                 flatIndex++;
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [areOptionsInitialized, firstRecentReportKey, shouldUseNarrowLayout]);
 
     useEffect(() => {
