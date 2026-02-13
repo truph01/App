@@ -247,11 +247,11 @@ function WorkspacesListPage() {
     };
 
     const confirmLeaveAndHideModal = () => {
-        if (!policyIDToLeave) {
+        if (!policyToLeave) {
             return;
         }
 
-        leaveWorkspace(policyIDToLeave);
+        leaveWorkspace(policyToLeave);
         setIsLeaveModalOpen(false);
     };
 

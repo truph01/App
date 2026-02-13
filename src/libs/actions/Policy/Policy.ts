@@ -1139,19 +1139,18 @@ function setWorkspaceReimbursement({
     API.write(WRITE_COMMANDS.SET_WORKSPACE_REIMBURSEMENT, params, {optimisticData, failureData, successData});
 }
 
-function leaveWorkspace(policyID?: string) {
-    if (!policyID) {
+function leaveWorkspace(policy: OnyxEntry<Policy>) {
+    if (!policy) {
         return;
     }
-    const policy = deprecatedAllPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
-    const workspaceChats = ReportUtils.getAllWorkspaceReports(policyID);
+    const workspaceChats = ReportUtils.getAllWorkspaceReports(policy.id);
 
     const optimisticData: Array<
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS>
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
             value: {
                 pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                 employeeList: {
@@ -1166,14 +1165,14 @@ function leaveWorkspace(policyID?: string) {
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY | typeof ONYXKEYS.COLLECTION.REPORT_METADATA>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
             value: null,
         },
     ];
     const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS | typeof ONYXKEYS.COLLECTION.REPORT_METADATA>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
             value: {
                 pendingAction: policy?.pendingAction ?? null,
                 employeeList: {
@@ -1248,7 +1247,7 @@ function leaveWorkspace(policyID?: string) {
     }
 
     const params: LeavePolicyParams = {
-        policyID,
+        policyID: policy.id,
         email: deprecatedSessionEmail,
     };
     API.write(WRITE_COMMANDS.LEAVE_POLICY, params, {optimisticData, successData, failureData});

@@ -275,14 +275,14 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     ]);
 
     const handleLeaveWorkspace = useCallback(() => {
-        if (!policyID) {
+        if (!policy) {
             return;
         }
 
-        leaveWorkspace(policyID);
+        leaveWorkspace(policy);
         setIsLeaveModalOpen(false);
         goBackFromInvalidPolicy();
-    }, [policyID]);
+    }, [policy]);
 
     const hideDeleteWorkspaceErrorModal = () => {
         setIsDeleteWorkspaceErrorModalOpen(false);
