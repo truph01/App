@@ -345,7 +345,7 @@ function MoneyRequestConfirmationList({
     const prevCurrency = usePrevious(currency);
     const prevSubRates = usePrevious(subRates);
 
-    const {shouldSelectPolicy} = usePolicyForMovingExpenses();
+    const {shouldSelectPolicy, policyForMovingExpenses} = usePolicyForMovingExpenses();
 
     // A flag for showing the categories field
     const shouldShowCategories = isTrackExpense
