@@ -66,12 +66,6 @@ Onyx.connect({
     callback: (value) => (amountOwed = value),
 });
 
-let ownerBillingGraceEndPeriod: OnyxEntry<number>;
-Onyx.connect({
-    key: ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END,
-    callback: (value) => (ownerBillingGraceEndPeriod = value),
-});
-
 let deprecatedUserBillingGraceEndPeriodCollection: OnyxCollection<BillingGraceEndPeriod>;
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END,
@@ -91,7 +85,7 @@ Onyx.connect({
  * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
  */
 function getOverdueGracePeriodDate(gracePeriodEnd?: OnyxEntry<number>): OnyxEntry<number> {
-    return gracePeriodEnd ?? ownerBillingGraceEndPeriod;
+    return gracePeriodEnd;
 }
 
 /**
@@ -99,7 +93,7 @@ function getOverdueGracePeriodDate(gracePeriodEnd?: OnyxEntry<number>): OnyxEntr
  * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
  */
 function hasOverdueGracePeriod(gracePeriodEnd?: OnyxEntry<number>): boolean {
-    const value = gracePeriodEnd ?? ownerBillingGraceEndPeriod;
+    const value = gracePeriodEnd;
     return !!value;
 }
 
@@ -108,7 +102,7 @@ function hasOverdueGracePeriod(gracePeriodEnd?: OnyxEntry<number>): boolean {
  * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
  */
 function hasGracePeriodOverdue(gracePeriodEnd?: OnyxEntry<number>): boolean {
-    const value = gracePeriodEnd ?? ownerBillingGraceEndPeriod;
+    const value = gracePeriodEnd;
     return !!value && Date.now() > new Date(value).getTime();
 }
 
@@ -526,7 +520,7 @@ function shouldRestrictUserBillableActions(
     }
 
     // Use provided parameter or fallback to Onyx.connect() value for backward compatibility
-    const gracePeriodEnd = ownerBillingGraceEndPeriodParam ?? ownerBillingGraceEndPeriod;
+    const gracePeriodEnd = ownerBillingGraceEndPeriodParam;
 
     // If it reached here it means that the user is actually the workspace's owner.
     // We should restrict the workspace's owner actions if it's past its grace period end date and it's owing some amount.
