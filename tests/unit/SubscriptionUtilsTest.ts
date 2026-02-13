@@ -369,7 +369,7 @@ describe('SubscriptionUtils', () => {
             });
 
             // Pass overdue ownerBillingGraceEndPeriod as parameter instead of Onyx
-            expect(shouldRestrictUserBillableActions(policyID, GRACE_PERIOD_DATE_OVERDUE)).toBeTruthy();
+            expect(shouldRestrictUserBillableActions(policyID, undefined, GRACE_PERIOD_DATE_OVERDUE)).toBeTruthy();
         });
 
         it('should return false when future grace period is passed as parameter (not yet past due)', async () => {
@@ -386,7 +386,7 @@ describe('SubscriptionUtils', () => {
             });
 
             // Pass future ownerBillingGraceEndPeriod as parameter - should return false (not past due)
-            expect(shouldRestrictUserBillableActions(policyID, GRACE_PERIOD_DATE)).toBeFalsy();
+            expect(shouldRestrictUserBillableActions(policyID, undefined, GRACE_PERIOD_DATE)).toBeFalsy();
         });
 
         it('should return false when no grace period is passed and none is set in Onyx', async () => {
@@ -422,7 +422,7 @@ describe('SubscriptionUtils', () => {
             });
 
             // Pass overdue date as parameter - should use parameter and return true
-            expect(shouldRestrictUserBillableActions(policyID, GRACE_PERIOD_DATE_OVERDUE)).toBeTruthy();
+            expect(shouldRestrictUserBillableActions(policyID, undefined, GRACE_PERIOD_DATE_OVERDUE)).toBeTruthy();
         });
 
         it('should fall back to Onyx value when parameter is undefined', async () => {
