@@ -2420,7 +2420,6 @@ ${amount} per ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Regole spese',
-        subtitle: 'Queste regole saranno applicate alle tue spese. Se le invii a un workspace, le regole del workspace potrebbero sostituirle.',
         findRule: 'Trova regola',
         emptyRules: {
             title: 'Non hai creato alcuna regola',
@@ -2466,6 +2465,7 @@ ${amount} per ${merchant} - ${date}`,
             deleteSinglePrompt: 'Sei sicuro di voler eliminare questa regola?',
             deleteMultiplePrompt: 'Sei sicuro di voler eliminare queste regole?',
         },
+        subtitle: 'Queste regole verranno applicate alle tue spese.',
     },
     preferencesPage: {
         appSection: {

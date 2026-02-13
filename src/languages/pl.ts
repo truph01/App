@@ -2413,7 +2413,6 @@ ${amount} dla ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Reguły wydatków',
-        subtitle: 'Te zasady będą miały zastosowanie do Twoich wydatków. Jeśli wyślesz je do przestrzeni roboczej, zasady tej przestrzeni mogą je zastąpić.',
         findRule: 'Znajdź regułę',
         emptyRules: {
             title: 'Nie utworzono żadnych reguł',
@@ -2459,6 +2458,7 @@ ${amount} dla ${merchant} - ${date}`,
             deleteSinglePrompt: 'Czy na pewno chcesz usunąć tę regułę?',
             deleteMultiplePrompt: 'Czy na pewno chcesz usunąć te reguły?',
         },
+        subtitle: 'Te zasady będą miały zastosowanie do Twoich wydatków.',
     },
     preferencesPage: {
         appSection: {

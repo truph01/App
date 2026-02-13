@@ -2426,7 +2426,6 @@ ${amount} für ${merchant} – ${date}`,
     },
     expenseRulesPage: {
         title: 'Ausgabenregeln',
-        subtitle: 'Diese Regeln gelten für deine Ausgaben. Wenn du bei einem Workspace einreichst, können die Workspace-Regeln sie außer Kraft setzen.',
         findRule: 'Regel finden',
         emptyRules: {
             title: 'Du hast noch keine Regeln erstellt',
@@ -2472,6 +2471,7 @@ ${amount} für ${merchant} – ${date}`,
             deleteSinglePrompt: 'Sind Sie sicher, dass Sie diese Regel löschen möchten?',
             deleteMultiplePrompt: 'Möchtest du diese Regeln wirklich löschen?',
         },
+        subtitle: 'Diese Regeln gelten für deine Ausgaben.',
     },
     preferencesPage: {
         appSection: {
