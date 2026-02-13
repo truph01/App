@@ -31,7 +31,7 @@ type BaseImageProps = {
     /** Priorities for completing loads. If more than one load is queued at a time,
      *  the load with the higher priority will be started first.
      *  Maps to SDWebImageHighPriority (iOS) and Glide.Priority.IMMEDIATE (Android). */
-    priority?: 'low' | 'normal' | 'high' | null;
+    priority?: ValueOf<typeof CONST.IMAGE_LOADING_PRIORITY> | null;
 };
 
 type ImageOwnProps = BaseImageProps & {

@@ -243,12 +243,12 @@ function Lightbox({attachmentID, isAuthTokenRequired = false, uri, onScaleChange
 
     const imagePriority = useMemo(() => {
         if (isActive) {
-            return 'high' as const;
+            return CONST.IMAGE_LOADING_PRIORITY.HIGH;
         }
         if (isLightboxVisible) {
-            return 'normal' as const;
+            return CONST.IMAGE_LOADING_PRIORITY.NORMAL;
         }
-        return 'low' as const;
+        return CONST.IMAGE_LOADING_PRIORITY.LOW;
     }, [isActive, isLightboxVisible]);
 
     const isALocalFile = isLocalFile(uri);
