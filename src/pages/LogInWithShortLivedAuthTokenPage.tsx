@@ -43,10 +43,15 @@ function LogInWithShortLivedAuthTokenPage({route}: LogInWithShortLivedAuthTokenP
         if (token && !account?.isLoading) {
             Log.info('LogInWithShortLivedAuthTokenPage - Successfully received shortLivedAuthToken. Signing in...');
             signInWithShortLivedAuthToken(token, isSAML);
-            Navigation.isNavigationReady().then(() => {
-                // We must replace to remove /transition route from history
-                Navigation.navigate(ROUTES.HOME, {forceReplace: true});
-            });
+            // For SAML sign-ins, navigate to HOME explicitly since the SAML flow
+            // doesn't use exitTo deep link routing. For non-SAML flows, let the
+            // navigation system handle exitTo routing naturally via setUpPoliciesAndNavigate.
+            if (isSAML) {
+                Navigation.isNavigationReady().then(() => {
+                    // We must replace to remove /transition route from history
+                    Navigation.navigate(ROUTES.HOME, {forceReplace: true});
+                });
+            }
             return;
         }
 
