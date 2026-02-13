@@ -2215,7 +2215,6 @@ ${amount} para ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Reglas de gastos',
-        subtitle: 'Estas reglas se aplicarán a tus gastos. Si los envías a un espacio de trabajo, las reglas del espacio de trabajo pueden anularlas.',
         findRule: 'Encontrar regla',
         emptyRules: {
             title: 'Aún no has creado ninguna regla',

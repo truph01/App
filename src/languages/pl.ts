@@ -2411,7 +2411,6 @@ ${amount} dla ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Reguły wydatków',
-        subtitle: 'Te zasady będą miały zastosowanie do Twoich wydatków. Jeśli wyślesz je do przestrzeni roboczej, zasady tej przestrzeni mogą je zastąpić.',
         findRule: 'Znajdź regułę',
         emptyRules: {
             title: 'Nie utworzono żadnych reguł',

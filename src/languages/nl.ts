@@ -2419,7 +2419,6 @@ ${amount} voor ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Declaratieregels',
-        subtitle: 'Deze regels zijn van toepassing op je uitgaven. Als je bij een werkruimte indient, kunnen de regels van die werkruimte deze overschrijven.',
         findRule: 'Regel zoeken',
         emptyRules: {
             title: 'Je hebt nog geen regels gemaakt',

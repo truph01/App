@@ -2376,7 +2376,6 @@ ${amount}，商户：${merchant} - 日期：${date}`,
     },
     expenseRulesPage: {
         title: '报销规则',
-        subtitle: '这些规则将适用于你的报销。如果你提交到某个工作区，则该工作区的规则可能会覆盖这些规则。',
         findRule: '查找规则',
         emptyRules: {
             title: '您尚未创建任何规则',

@@ -2412,7 +2412,6 @@ ${amount} para ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Regras de despesas',
-        subtitle: 'Essas regras serão aplicadas às suas despesas. Se você enviar para um espaço de trabalho, as regras desse espaço de trabalho poderão substituí-las.',
         findRule: 'Encontrar regra',
         emptyRules: {
             title: 'Você não criou nenhuma regra',

@@ -2430,7 +2430,6 @@ ${amount} pour ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Règles de dépenses',
-        subtitle: 'Ces règles s’appliqueront à vos dépenses. Si vous soumettez dans un espace de travail, alors les règles de cet espace de travail peuvent les remplacer.',
         findRule: 'Rechercher une règle',
         emptyRules: {
             title: 'Vous n’avez créé aucune règle',

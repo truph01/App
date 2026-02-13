@@ -2418,7 +2418,6 @@ ${amount} per ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Regole spese',
-        subtitle: 'Queste regole saranno applicate alle tue spese. Se le invii a un workspace, le regole del workspace potrebbero sostituirle.',
         findRule: 'Trova regola',
         emptyRules: {
             title: 'Non hai creato alcuna regola',

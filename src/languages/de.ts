@@ -2424,7 +2424,6 @@ ${amount} für ${merchant} – ${date}`,
     },
     expenseRulesPage: {
         title: 'Ausgabenregeln',
-        subtitle: 'Diese Regeln gelten für deine Ausgaben. Wenn du bei einem Workspace einreichst, können die Workspace-Regeln sie außer Kraft setzen.',
         findRule: 'Regel finden',
         emptyRules: {
             title: 'Du hast noch keine Regeln erstellt',
