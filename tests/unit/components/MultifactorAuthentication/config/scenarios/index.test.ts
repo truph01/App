@@ -101,12 +101,11 @@ describe('MultifactorAuthentication Scenarios Config', () => {
         }
     });
 
-    it('should have default callback that returns SHOW_OUTCOME_SCREEN', () => {
+    it('should have default callback that returns SHOW_OUTCOME_SCREEN', async () => {
         const config = MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG as MultifactorAuthenticationScenarioConfigRecord;
         const biometricsTestConfig = config[CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.BIOMETRICS_TEST];
 
-        // The default callback should return SHOW_OUTCOME_SCREEN
-        const callbackResult = biometricsTestConfig.callback?.(true, {
+        const callbackResult = await biometricsTestConfig.callback?.(true, {
             httpCode: 200,
             message: CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.AUTHORIZATION_SUCCESSFUL,
             body: {},
