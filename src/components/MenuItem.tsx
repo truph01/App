@@ -719,7 +719,7 @@ function MenuItem({
     const isIDPassed = !!iconReportID || !!iconAccountID || iconAccountID === CONST.DEFAULT_NUMBER_ID;
 
     const platform = getPlatform(true);
-    // This is required because we are preventing the Talkback to announce "double tap to activate" on Android web
+    // This is required because we are preventing the "double tap to activate" announcement on Android web
     const isAndroidWeb = platform === CONST.PLATFORM.MOBILE_WEB && getOperatingSystem() === CONST.OS.ANDROID;
 
     return (
