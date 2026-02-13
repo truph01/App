@@ -12,7 +12,13 @@ import useRootNavigationState from './useRootNavigationState';
  * @returns The back path without the dynamic route suffix, or HOME if path is null/undefined
  */
 function useDynamicBackPath(dynamicRouteSuffix: DynamicRouteSuffix): Route {
-    const path = useRootNavigationState((state) => getPathFromState(state as State));
+    const path = useRootNavigationState((state) => {
+        if (!state) {
+            return undefined;
+        }
+
+        return getPathFromState(state as State);
+    });
 
     if (!path) {
         return ROUTES.HOME;
