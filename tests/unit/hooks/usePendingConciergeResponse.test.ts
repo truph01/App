@@ -10,7 +10,7 @@ import waitForBatchedUpdates from '../../utils/waitForBatchedUpdates';
 const REPORT_ID = '1';
 const REPORT_ACTION_ID = '100';
 
-/** Short delay for real-timer tests (ms) */
+/** Short delay used for tests where we need the timer to actually fire (ms) */
 const SHORT_DELAY = 80;
 
 const fakeConciergeAction = {
@@ -76,11 +76,11 @@ describe('usePendingConciergeResponse', () => {
         // Given a pending concierge response with a longer delay
         await Onyx.merge(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}`, {
             reportAction: fakeConciergeAction,
-            displayAfter: Date.now() + 5000,
+            displayAfter: Date.now() + SHORT_DELAY,
         });
         await waitForBatchedUpdates();
 
-        renderHook(() => usePendingConciergeResponse(REPORT_ID));
+        const {unmount} = renderHook(() => usePendingConciergeResponse(REPORT_ID));
         await waitForBatchedUpdates();
 
         // When checked immediately (well before the delay)
@@ -91,6 +91,9 @@ describe('usePendingConciergeResponse', () => {
         // And the pending response should still exist
         const pendingResponse = await getOnyxValue(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}` as const);
         expect(pendingResponse).not.toBeUndefined();
+
+        // Clean up to avoid dangling timer
+        unmount();
     });
 
     it('should cancel the timer on unmount and not apply the action', async () => {
@@ -114,6 +117,10 @@ describe('usePendingConciergeResponse', () => {
         // Then the action should NOT be in REPORT_ACTIONS (timer was cleaned up)
         const reportActions = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}` as const);
         expect(reportActions?.[REPORT_ACTION_ID]).toBeUndefined();
+
+        // And the pending response should still exist (nothing consumed it)
+        const pendingResponse = await getOnyxValue(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}` as const);
+        expect(pendingResponse).not.toBeUndefined();
     });
 
     it('should fire immediately when displayAfter is already in the past', async () => {
@@ -141,6 +148,36 @@ describe('usePendingConciergeResponse', () => {
         // And pending response should be cleared
         const pendingResponse = await getOnyxValue(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}` as const);
         expect(pendingResponse).toBeUndefined();
+    });
+
+    it('should discard stale pending responses instead of displaying them', async () => {
+        // Given a pending concierge response from a previous session (well past the stale threshold)
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}`, {
+            reportAction: fakeConciergeAction,
+            displayAfter: Date.now() - 30_000,
+        });
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${REPORT_ID}`, {
+            [CONST.ACCOUNT_ID.CONCIERGE]: true,
+        });
+        await waitForBatchedUpdates();
+
+        renderHook(() => usePendingConciergeResponse(REPORT_ID));
+        await waitForBatchedUpdates();
+
+        await delay(50);
+        await waitForBatchedUpdates();
+
+        // Then the action should NOT be in REPORT_ACTIONS (stale response was discarded)
+        const reportActions = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}` as const);
+        expect(reportActions?.[REPORT_ACTION_ID]).toBeUndefined();
+
+        // And the pending response should be cleared
+        const pendingResponse = await getOnyxValue(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}` as const);
+        expect(pendingResponse).toBeUndefined();
+
+        // And the typing indicator should be cleared
+        const typingStatus = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${REPORT_ID}` as const);
+        expect(typingStatus?.[CONST.ACCOUNT_ID.CONCIERGE]).toBe(false);
     });
 
     it('should do nothing when there is no pending response', async () => {

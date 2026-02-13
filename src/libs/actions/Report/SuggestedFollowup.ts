@@ -91,7 +91,7 @@ function resolveSuggestedFollowup(
 
 /**
  * Queues an optimistic concierge response for delayed display.
- * Writes action to Onyx — the usePendingConciergeResponse component
+ * Writes action to Onyx — the usePendingConciergeResponse hook
  * handles the actual delay and moves the action to REPORT_ACTIONS
  * when the time arrives, with proper lifecycle cleanup.
  */
@@ -115,4 +115,47 @@ function addOptimisticConciergeActionWithDelay(reportID: string, optimisticConci
     ]);
 }
 
-export {resolveSuggestedFollowup, CONCIERGE_RESPONSE_DELAY_MS};
+/**
+ * Discards a stale pending concierge response and clears the typing indicator.
+ * Called when the response has been pending too long (e.g. app was killed and restarted).
+ */
+function discardPendingConciergeAction(reportID: string) {
+    Onyx.update([
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: `${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`,
+            value: null,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`,
+            value: {[CONST.ACCOUNT_ID.CONCIERGE]: false},
+        },
+    ]);
+}
+
+/**
+ * Applies a pending concierge response by moving it to REPORT_ACTIONS
+ * and clearing the pending state and typing indicator.
+ */
+function applyPendingConciergeAction(reportID: string, reportAction: ReportAction) {
+    Onyx.update([
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: `${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`,
+            value: null,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`,
+            value: {[CONST.ACCOUNT_ID.CONCIERGE]: false},
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
+            value: {[reportAction.reportActionID]: reportAction},
+        },
+    ]);
+}
+
+export {resolveSuggestedFollowup, discardPendingConciergeAction, applyPendingConciergeAction, CONCIERGE_RESPONSE_DELAY_MS};

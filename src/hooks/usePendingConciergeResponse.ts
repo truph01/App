@@ -1,16 +1,15 @@
 import {useEffect} from 'react';
-import Onyx from 'react-native-onyx';
-import CONST from '@src/CONST';
+import {applyPendingConciergeAction, discardPendingConciergeAction} from '@libs/actions/Report/SuggestedFollowup';
 import ONYXKEYS from '@src/ONYXKEYS';
 import useOnyx from './useOnyx';
+
+/** If displayAfter is more than this far in the past, the response is stale (e.g. app was killed and restarted) */
+const STALE_THRESHOLD_MS = 10_000;
 
 /**
  * Processes pending concierge responses stored in Onyx for a given report.
  * When a pending response exists, schedules the action to be moved to REPORT_ACTIONS
  * after the remaining delay, with automatic cleanup on unmount via useEffect.
- *
- * This keeps the action layer free of timers — all scheduling state lives in Onyx
- * and the delay is managed by React component lifecycle.
  */
 function usePendingConciergeResponse(reportID: string) {
     const [pendingResponse] = useOnyx(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`, {canBeMissing: true});
@@ -20,30 +19,21 @@ function usePendingConciergeResponse(reportID: string) {
             return;
         }
 
-        const remaining = Math.max(0, pendingResponse.displayAfter - Date.now());
+        const remaining = pendingResponse.displayAfter - Date.now();
 
-        const timer = setTimeout(() => {
-            Onyx.update([
-                // Clear the pending response
-                {
-                    onyxMethod: Onyx.METHOD.SET,
-                    key: `${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`,
-                    value: null,
-                },
-                // Clear the typing indicator
-                {
-                    onyxMethod: Onyx.METHOD.MERGE,
-                    key: `${ONYXKEYS.COLLECTION.REPORT_USER_IS_TYPING}${reportID}`,
-                    value: {[CONST.ACCOUNT_ID.CONCIERGE]: false},
-                },
-                // Add the concierge action to report actions
-                {
-                    onyxMethod: Onyx.METHOD.MERGE,
-                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
-                    value: {[pendingResponse.reportAction.reportActionID]: pendingResponse.reportAction},
-                },
-            ]);
-        }, remaining);
+        // If the pending response is stale (e.g. app was killed/restarted), discard it
+        // instead of displaying a phantom message that was never confirmed by the server.
+        if (remaining < -STALE_THRESHOLD_MS) {
+            discardPendingConciergeAction(reportID);
+            return;
+        }
+
+        const timer = setTimeout(
+            () => {
+                applyPendingConciergeAction(reportID, pendingResponse.reportAction);
+            },
+            Math.max(0, remaining),
+        );
 
         return () => clearTimeout(timer);
     }, [pendingResponse, reportID]);
