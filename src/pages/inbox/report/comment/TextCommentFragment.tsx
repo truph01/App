@@ -65,10 +65,12 @@ function TextCommentFragment({fragment, styleAsDeleted, reportActionID, styleAsM
 
     useEffect(() => {
         Performance.markEnd(CONST.TIMING.SEND_MESSAGE, {message: text});
+    }, [text]);
+    useEffect(() => {
         if (reportActionID) {
             endSpan(`${CONST.TELEMETRY.SPAN_SEND_MESSAGE}_${reportActionID}`);
         }
-    }, [text, reportActionID]);
+    }, [reportActionID]);
 
     // If the only difference between fragment.text and fragment.html is <br /> tags and emoji tag
     // on native, we render it as text, not as html
