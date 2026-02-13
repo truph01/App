@@ -72,10 +72,10 @@ Onyx.connect({
     callback: (value) => (ownerBillingGraceEndPeriod = value),
 });
 
-let userBillingGraceEndPeriodCollection: OnyxCollection<BillingGraceEndPeriod>;
+let deprecatedUserBillingGraceEndPeriodCollection: OnyxCollection<BillingGraceEndPeriod>;
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END,
-    callback: (value) => (userBillingGraceEndPeriodCollection = value),
+    callback: (value) => (deprecatedUserBillingGraceEndPeriodCollection = value),
     waitForCollectionCallback: true,
 });
 
@@ -500,7 +500,11 @@ function doesUserHavePaymentCardAdded(userBillingFundID: number | undefined): bo
  * Whether the user's billable actions should be restricted.
  * @param ownerBillingGraceEndPeriodParam - Optional parameter to use instead of module-level value (for pure function usage).
  */
-function shouldRestrictUserBillableActions(policyID: string, ownerBillingGraceEndPeriodParam?: OnyxEntry<number>): boolean {
+function shouldRestrictUserBillableActions(
+    policyID: string,
+    userBillingGraceEndPeriodCollection: OnyxCollection<BillingGraceEndPeriod> = deprecatedUserBillingGraceEndPeriodCollection,
+    ownerBillingGraceEndPeriodParam?: OnyxEntry<number>,
+): boolean {
     const currentDate = new Date();
 
     const policy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
