@@ -1,4 +1,5 @@
 import {useIsFocused} from '@react-navigation/native';
+import {feedKeysWithAssignedCardsSelector} from '@selectors/Card';
 import {accountIDSelector} from '@selectors/Session';
 import {deepEqual} from 'fast-equals';
 import isEmpty from 'lodash/isEmpty';
@@ -21,6 +22,7 @@ import {isSearchQueryItem} from '@components/SelectionListWithSections/Search/Se
 import type {SelectionListHandle} from '@components/SelectionListWithSections/types';
 import SidePanelButton from '@components/SidePanel/SidePanelButton';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
@@ -56,6 +58,7 @@ function SearchPageHeaderInput({queryJSON, searchRouterListVisible, hideSearchRo
     const [showPopupButton, setShowPopupButton] = useState(true);
     const styles = useThemeStyles();
     const theme = useTheme();
+    const {translate} = useLocalize();
     const {shouldUseNarrowLayout: displayNarrowHeader} = useResponsiveLayout();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
     const personalDetails = usePersonalDetails();
@@ -64,9 +67,22 @@ function SearchPageHeaderInput({queryJSON, searchRouterListVisible, hideSearchRo
     const taxRates = useMemo(() => getAllTaxRates(policies), [policies]);
     const [nonPersonalAndWorkspaceCards] = useOnyx(ONYXKEYS.DERIVED.NON_PERSONAL_AND_WORKSPACE_CARD_LIST, {canBeMissing: true});
     const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER, {canBeMissing: true});
+    const [feedKeysWithCards] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {selector: feedKeysWithAssignedCardsSelector, canBeMissing: true});
     const {inputQuery: originalInputQuery} = queryJSON;
     const [currentUserAccountID = -1] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector, canBeMissing: false});
-    const queryText = buildUserReadableQueryString(queryJSON, personalDetails, reports, taxRates, nonPersonalAndWorkspaceCards, allFeeds, policies, currentUserAccountID, true);
+    const queryText = buildUserReadableQueryString({
+        queryJSON,
+        PersonalDetails: personalDetails,
+        reports,
+        taxRates,
+        cardList: nonPersonalAndWorkspaceCards,
+        cardFeeds: allFeeds,
+        policies,
+        currentUserAccountID,
+        autoCompleteWithSpace: true,
+        translate,
+        feedKeysWithCards,
+    });
 
     const [searchContext] = useOnyx(ONYXKEYS.SEARCH_CONTEXT, {canBeMissing: true});
     const shouldShowQuery = searchContext?.shouldShowSearchQuery ?? false;
@@ -113,9 +129,19 @@ function SearchPageHeaderInput({queryJSON, searchRouterListVisible, hideSearchRo
     }, [queryText, shouldShowQuery]);
 
     useEffect(() => {
-        const substitutionsMap = buildSubstitutionsMap(originalInputQuery, personalDetails, reports, taxRates, nonPersonalAndWorkspaceCards, allFeeds, policies, currentUserAccountID);
+        const substitutionsMap = buildSubstitutionsMap(
+            originalInputQuery,
+            personalDetails,
+            reports,
+            taxRates,
+            nonPersonalAndWorkspaceCards,
+            allFeeds,
+            policies,
+            currentUserAccountID,
+            translate,
+        );
         setAutocompleteSubstitutions(substitutionsMap);
-    }, [allFeeds, nonPersonalAndWorkspaceCards, originalInputQuery, personalDetails, reports, taxRates, policies, currentUserAccountID]);
+    }, [allFeeds, nonPersonalAndWorkspaceCards, originalInputQuery, personalDetails, reports, taxRates, policies, currentUserAccountID, translate]);
 
     useEffect(() => {
         if (searchRouterListVisible) {
