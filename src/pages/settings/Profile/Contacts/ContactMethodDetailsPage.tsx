@@ -162,6 +162,7 @@ function ContactMethodDetailsPage({route}: ContactMethodDetailsPageProps) {
             // Set flag to navigate when screen regains focus
             setShouldNavigateOnFocus(true);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [prevValidatedDate, loginData?.validatedDate, isDefaultContactMethod, backTo]);
 
     // Handle navigation when screen regains focus and flag is set

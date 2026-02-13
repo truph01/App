@@ -1,4 +1,4 @@
-import {act, render, screen} from '@testing-library/react-native';
+import {act, render} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import HTMLEngineProvider from '@components/HTMLEngineProvider';
 // eslint-disable-next-line no-restricted-syntax
@@ -7,7 +7,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import ContactMethodDetailsPage from '@pages/settings/Profile/Contacts/ContactMethodDetailsPage';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {MockFetch} from '../utils/TestHelper';
-import {getGlobalFetchMock, translateLocal} from '../utils/TestHelper';
+import {getGlobalFetchMock} from '../utils/TestHelper';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
