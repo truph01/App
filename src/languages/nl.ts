@@ -1000,6 +1000,10 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Verbinding bedrijfskaart ${feedName} herstellen` : 'Verbinding van bedrijfskaart repareren'),
                 subtitle: 'Werkruimte > Bedrijfspassen',
             },
+            fixPersonalCardConnection: {
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Repareer de persoonlijke kaartverbinding van ${cardName}` : 'Repareer de persoonlijke kaartverbinding'),
+                subtitle: 'Portemonnee > Toegewezen kaarten',
+            },
             fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Verbinding met ${integrationName} repareren`, subtitle: 'Werkruimte > Boekhouding'},
         },
         announcements: 'Aankondigingen',

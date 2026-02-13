@@ -775,6 +775,10 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Reconectar la tarjeta corporativa de ${feedName}` : 'Reconectar la tarjeta corporativa'),
                 subtitle: 'Espacio de trabajo > Tarjetas de empresa',
             },
+            fixPersonalCardConnection: {
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Corregir la conexión de la tarjeta personal de ${cardName}` : 'Corregir la conexión de la tarjeta personal'),
+                subtitle: 'Monedero > Tarjetas asignadas',
+            },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Reconectar con ${integrationName}`,
                 subtitle: 'Espacio de trabajo > Contabilidad',

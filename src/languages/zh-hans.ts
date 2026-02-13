@@ -983,6 +983,10 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             ctaFix: '修复',
             fixCompanyCardConnection: {title: ({feedName}: {feedName: string}) => (feedName ? `修复 ${feedName} 公司卡连接` : '修复公司卡连接'), subtitle: '工作区 > 公司卡片'},
+            fixPersonalCardConnection: {
+                title: ({cardName}: {cardName?: string}) => (cardName ? `修复 ${cardName} 个人卡连接` : '修复个人卡连接'),
+                subtitle: '钱包 > 已分配卡片',
+            },
             fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`, subtitle: '工作区 > 会计'},
         },
         announcements: '公告',

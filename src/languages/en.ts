@@ -998,6 +998,10 @@ const translations = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Fix ${feedName} company card connection` : 'Fix company card connection'),
                 subtitle: 'Workspace > Company cards',
             },
+            fixPersonalCardConnection: {
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Fix ${cardName} personal card connection` : 'Fix personal card connection'),
+                subtitle: 'Wallet > Assigned cards',
+            },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Fix ${integrationName} connection`,
                 subtitle: 'Workspace > Accounting',

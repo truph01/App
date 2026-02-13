@@ -999,6 +999,10 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corrigir conexão do cartão corporativo ${feedName}` : 'Corrigir conexão do cartão corporativo'),
                 subtitle: 'Área de trabalho > Cartões corporativos',
             },
+            fixPersonalCardConnection: {
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Corrigir conexão do cartão pessoal ${cardName}` : 'Corrigir conexão do cartão pessoal'),
+                subtitle: 'Carteira > Cartões atribuídos',
+            },
             fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Corrigir conexão com ${integrationName}`, subtitle: 'Espaço de trabalho > Contabilidade'},
         },
         announcements: 'Comunicados',

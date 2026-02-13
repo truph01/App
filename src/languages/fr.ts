@@ -1005,6 +1005,10 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corriger la connexion de la carte d'entreprise ${feedName}` : 'Corriger la connexion de la carte entreprise'),
                 subtitle: 'Espace de travail > Cartes d’entreprise',
             },
+            fixPersonalCardConnection: {
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Corriger la connexion de la carte personnelle ${cardName}` : 'Corriger la connexion de la carte personnelle'),
+                subtitle: 'Portefeuille > Cartes attribuées',
+            },
             fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Corriger la connexion ${integrationName}`, subtitle: 'Espace de travail > Comptabilité'},
         },
         announcements: 'Annonces',
