@@ -376,8 +376,6 @@ const ONYXKEYS = {
     /** Is the test tools modal open? */
     IS_TEST_TOOLS_MODAL_OPEN: 'isTestToolsModalOpen',
 
-    /** Is app in profiling mode */
-    APP_PROFILING_IN_PROGRESS: 'isProfilingInProgress',
 
     /** Stores information about active wallet transfer amount, selectedAccountID, status, etc */
     WALLET_TRANSFER: 'walletTransfer',
@@ -461,11 +459,6 @@ const ONYXKEYS = {
     /** Indicates whether an forced reset is required. Used in emergency situations where we must completely erase the Onyx data in the client because it is in a bad state. This will clear Onyx data without signing the user out. */
     RESET_REQUIRED: 'resetRequired',
 
-    /** Indicates whether we should record troubleshoot data or not */
-    SHOULD_RECORD_TROUBLESHOOT_DATA: 'shouldRecordTroubleshootData',
-
-    /** Timestamp when troubleshoot recording was started (for auto-off after 10 minutes) */
-    TROUBLESHOOT_RECORDING_START_TIME: 'troubleshootRecordingStartTime',
 
     /** Indicates whether we should mask fragile user data while exporting onyx state or not */
     SHOULD_MASK_ONYX_STATE: 'shouldMaskOnyxState',
@@ -1315,7 +1308,6 @@ type OnyxValuesMapping = {
     [ONYXKEYS.IS_LOADING_POLICY_CODING_RULES_PREVIEW]: boolean;
     [ONYXKEYS.IS_LOADING_REPORT_DATA]: boolean;
     [ONYXKEYS.IS_TEST_TOOLS_MODAL_OPEN]: boolean;
-    [ONYXKEYS.APP_PROFILING_IN_PROGRESS]: boolean;
     [ONYXKEYS.IS_LOADING_APP]: boolean;
     [ONYXKEYS.HAS_LOADED_APP]: boolean;
     [ONYXKEYS.WALLET_TRANSFER]: OnyxTypes.WalletTransfer;
@@ -1348,8 +1340,6 @@ type OnyxValuesMapping = {
     [ONYXKEYS.RESET_REQUIRED]: boolean;
     [ONYXKEYS.PLAID_CURRENT_EVENT]: string;
     [ONYXKEYS.NVP_PRIVATE_TAX_EXEMPT]: boolean;
-    [ONYXKEYS.SHOULD_RECORD_TROUBLESHOOT_DATA]: boolean;
-    [ONYXKEYS.TROUBLESHOOT_RECORDING_START_TIME]: number | null;
     [ONYXKEYS.SHOULD_MASK_ONYX_STATE]: boolean;
     [ONYXKEYS.SHOULD_USE_STAGING_SERVER]: boolean;
     [ONYXKEYS.IS_DEBUG_MODE_ENABLED]: boolean;
