@@ -8,7 +8,7 @@ import useOriginalReportID from '@hooks/useOriginalReportID';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactions from '@hooks/useReportTransactions';
-import {getForReportAction, getMovedReportID} from '@libs/ModifiedExpenseMessage';
+import {getForReportActionTemp, getMovedReportID} from '@libs/ModifiedExpenseMessage';
 import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     chatIncludesChronosWithID,
@@ -97,7 +97,14 @@ function ReportActionItem({
     const originalReportID = useOriginalReportID(reportID, action);
     const originalReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`];
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
-    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const {accountID: currentUserAccountID, email: currentUserEmail} = useCurrentUserPersonalDetails();
+    const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
+    // When an expense is moved from a self-DM to a workspace, the report's policyID is temporarily
+    // set to a fake placeholder (CONST.POLICY.OWNER_EMAIL_FAKE). Looking up POLICY_TAGS with that
+    // fake ID would return nothing, so we fall back to policyForMovingExpensesID (the actual
+    // destination workspace) to fetch the correct tag list for display.
+    const policyIDForTags = report?.policyID === CONST.POLICY.OWNER_EMAIL_FAKE && policyForMovingExpensesID ? policyForMovingExpensesID : report?.policyID;
+    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyIDForTags}`, {canBeMissing: true});
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
     const [allTransactionDrafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {canBeMissing: true});
     const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {canBeMissing: true});
@@ -107,7 +114,6 @@ function ReportActionItem({
     const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`];
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
-    const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
     const reportAction = reportActions[parseInt(reportActionID)];
     const transactionID = isMoneyRequestAction(reportAction) && getOriginalMessage(reportAction)?.IOUTransactionID;
@@ -166,12 +172,14 @@ function ReportActionItem({
                 action as OnyxEntry<ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.REIMBURSEMENT_DEQUEUED | typeof CONST.REPORT.ACTIONS.TYPE.REIMBURSEMENT_ACH_CANCELED>>,
                 report,
             )}
-            modifiedExpenseMessage={getForReportAction({
+            modifiedExpenseMessage={getForReportActionTemp({
+                translate,
                 reportAction: action,
-                policyID: report?.policyID,
+                policy,
                 movedFromReport,
                 movedToReport,
-                policyForMovingExpensesID,
+                policyTags: policyTags ?? CONST.POLICY.DEFAULT_TAG_LIST,
+                currentUserLogin: currentUserEmail ?? '',
             })}
             getTransactionsWithReceipts={getTransactionsWithReceipts}
             clearError={clearError}
