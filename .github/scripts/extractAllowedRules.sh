@@ -13,11 +13,11 @@ if [[ ! -d "$RULES_DIR" ]]; then
 fi
 
 # Extract ruleId from YAML frontmatter of each non-underscore .md file
-# Frontmatter is between --- delimiters; ruleId is on its own line
+# Use multi-hyphen regex to validate rule ID format (e.g., PERF-1, CLEAN-REACT-PATTERNS-1)
 true > "$OUTPUT_FILE"
 for file in "$RULES_DIR"/[!_]*.md; do
     [[ -f "$file" ]] || continue
-    grep -m1 '^ruleId:' "$file" | sed 's/^ruleId:[[:space:]]*//' >> "$OUTPUT_FILE" || true
+    grep -m1 '^ruleId:' "$file" | grep -oE '[A-Z]+(-[A-Z]+)*-[0-9]+' >> "$OUTPUT_FILE" || true
 done
 
 sort -u -o "$OUTPUT_FILE" "$OUTPUT_FILE"
