@@ -23,7 +23,6 @@ import UserSelectPopup from '@components/Search/FilterDropdowns/UserSelectPopup'
 import {useSearchContext} from '@components/Search/SearchContext';
 import type {BankAccountMenuItem, SearchDateFilterKeys, SearchQueryJSON, SingularSearchStatus} from '@components/Search/types';
 import SearchFiltersSkeleton from '@components/Skeletons/SearchFiltersSkeleton';
-import useActiveAdminPolicies from '@hooks/useActiveAdminPolicies';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import useCurrencyList from '@hooks/useCurrencyList';
 import useFilterFormValues from '@hooks/useFilterFormValues';
@@ -33,6 +32,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useSortedActiveAdminPolicies from '@hooks/useSortedActiveAdminPolicies';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {close} from '@libs/actions/Modal';
@@ -103,7 +103,7 @@ function SearchFiltersBar({
     const isCurrentSelectedExpenseReport = isExpenseReport(currentSelectedReportID);
     const theme = useTheme();
     const styles = useThemeStyles();
-    const {translate, localeCompare} = useLocalize();
+    const {translate} = useLocalize();
     const kycWallRef = useContext(KYCWallContext);
 
     const {isOffline} = useNetwork();
@@ -287,8 +287,7 @@ function SearchFiltersBar({
         const value = options.find((option) => option.value === searchAdvancedFiltersForm.withdrawalType) ?? null;
         return [options, value];
     }, [translate, searchAdvancedFiltersForm.withdrawalType]);
-    const activeAdminPoliciesUnsorted = useActiveAdminPolicies();
-    const activeAdminPolicies = useMemo(() => activeAdminPoliciesUnsorted?.sort((a, b) => localeCompare(a.name || '', b.name || '')) ?? [], [activeAdminPoliciesUnsorted, localeCompare]);
+    const activeAdminPolicies = useSortedActiveAdminPolicies();
 
     const updateFilterForm = useCallback(
         (values: Partial<SearchAdvancedFiltersForm>) => {

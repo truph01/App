@@ -19,7 +19,6 @@ import {useSearchContext} from '@components/Search/SearchContext';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {PaymentData, SearchParams} from '@components/Search/types';
 import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
-import useActiveAdminPolicies from '@hooks/useActiveAdminPolicies';
 import useAllTransactions from '@hooks/useAllTransactions';
 import useBulkPayOptions from '@hooks/useBulkPayOptions';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -37,6 +36,7 @@ import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchShouldCalculateTotals from '@hooks/useSearchShouldCalculateTotals';
 import useSelfDMReport from '@hooks/useSelfDMReport';
+import useSortedActiveAdminPolicies from '@hooks/useSortedActiveAdminPolicies';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
@@ -165,8 +165,7 @@ function SearchPage({route}: SearchPageProps) {
 
     const queryJSON = useMemo(() => buildSearchQueryJSON(route.params.q, route.params.rawQuery), [route.params.q, route.params.rawQuery]);
     const {saveScrollOffset} = useContext(ScrollOffsetContext);
-    const activeAdminPoliciesUnsorted = useActiveAdminPolicies();
-    const activeAdminPolicies = useMemo(() => activeAdminPoliciesUnsorted?.sort((a, b) => localeCompare(a.name || '', b.name || '')) ?? [], [activeAdminPoliciesUnsorted, localeCompare]);
+    const activeAdminPolicies = useSortedActiveAdminPolicies();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Export',
         'Table',
