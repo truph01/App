@@ -9,7 +9,7 @@ import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactions from '@hooks/useReportTransactions';
 import {getForReportAction, getMovedReportID} from '@libs/ModifiedExpenseMessage';
-import {getIOUReportIDFromReportActionPreview, getOriginalMessage} from '@libs/ReportActionsUtils';
+import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     chatIncludesChronosWithID,
     createDraftTransactionAndNavigateToParticipantSelector,
@@ -59,9 +59,6 @@ type ReportActionItemProps = Omit<
     /** User wallet tierName */
     userWalletTierName: string | undefined;
 
-    /** Linked transaction route error */
-    linkedTransactionRouteError?: OnyxEntry<Errors>;
-
     /** Whether the user is validated */
     isUserValidated: boolean | undefined;
 
@@ -70,6 +67,9 @@ type ReportActionItemProps = Omit<
 
     /** User billing fund ID */
     userBillingFundID: number | undefined;
+
+    /** The report action id */
+    reportActionID: string;
 
     /** Did the user dismiss trying out NewDot? If true, it means they prefer using OldDot */
     isTryNewDotNVPDismissed?: boolean;
@@ -85,7 +85,8 @@ function ReportActionItem({
     userWalletTierName,
     isUserValidated,
     personalDetails,
-    linkedTransactionRouteError,
+    reportActionID,
+    reportActions,
     userBillingFundID,
     isTryNewDotNVPDismissed,
     ...props
@@ -108,6 +109,9 @@ function ReportActionItem({
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
+    const reportAction = reportActions[parseInt(reportActionID)];
+    const transactionID = isMoneyRequestAction(reportAction) && getOriginalMessage(reportAction)?.IOUTransactionID;
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => transaction?.errorFields?.route ?? undefined});
 
     // The app would crash due to subscribing to the entire report collection if parentReportID is an empty string. So we should have a fallback ID here.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -124,6 +128,7 @@ function ReportActionItem({
         <PureReportActionItem
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
+            reportActions={reportActions}
             allReports={allReports}
             introSelected={introSelected}
             allTransactionDrafts={allTransactionDrafts}

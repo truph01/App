@@ -8,7 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
-import {isTripPreview} from '@libs/ReportActionsUtils';
+import {getOriginalMessage, isMoneyRequestAction, isTripPreview} from '@libs/ReportActionsUtils';
 import {
     canCurrentUserOpenReport,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
@@ -79,9 +79,6 @@ type ReportActionItemParentActionProps = {
     /** All emoji reactions collection */
     allEmojiReactions?: OnyxCollection<OnyxTypes.ReportActionReactions>;
 
-    /** Linked transaction route error */
-    linkedTransactionRouteError?: OnyxEntry<Errors>;
-
     /** User billing fund ID */
     userBillingFundID: number | undefined;
 
@@ -90,12 +87,16 @@ type ReportActionItemParentActionProps = {
 
     /** Whether the report is archived */
     isReportArchived: boolean;
+
+    /** The report action ID */
+    reportActionID: string;
 };
 
 function ReportActionItemParentAction({
     allReports,
     policies,
     report,
+    reportActionID,
     transactionThreadReport,
     reportActions,
     parentReportAction,
@@ -109,7 +110,6 @@ function ReportActionItemParentAction({
     personalDetails,
     allDraftMessages,
     allEmojiReactions,
-    linkedTransactionRouteError,
     userBillingFundID,
     isTryNewDotNVPDismissed = false,
     isReportArchived = false,
@@ -118,6 +118,9 @@ function ReportActionItemParentAction({
     const ancestors = useAncestors(report, shouldExcludeAncestorReportAction);
     const {isOffline} = useNetwork();
     const {isInNarrowPaneModal} = useResponsiveLayout();
+    const reportAction = reportActions[parseInt(reportActionID)];
+    const transactionID = isMoneyRequestAction(reportAction) && getOriginalMessage(reportAction)?.IOUTransactionID;
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => transaction?.errorFields?.route ?? undefined});
 
     const ancestorReportNameValuePairsSelector = useCallback(
         (allReportNameValuePairs: OnyxCollection<OnyxTypes.ReportNameValuePairs>) => {
@@ -183,6 +186,7 @@ function ReportActionItemParentAction({
                                 />
                             )}
                             <ReportActionItem
+                                reportActionID={reportActionID}
                                 allReports={allReports}
                                 policies={policies}
                                 onPress={

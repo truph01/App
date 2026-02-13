@@ -214,6 +214,7 @@ function ReportActionsListItemRenderer({
                 parentReportAction={parentReportAction}
                 reportID={report.reportID}
                 report={report}
+                reportActionID={reportAction.reportActionID}
                 reportActions={reportActions}
                 transactionThreadReport={transactionThreadReport}
                 index={index}
@@ -233,6 +234,7 @@ function ReportActionsListItemRenderer({
 
     return (
         <ReportActionItem
+            reportActionID={reportAction.reportActionID}
             allReports={allReports}
             policies={policies}
             shouldHideThreadDividerLine={shouldHideThreadDividerLine}
