@@ -431,7 +431,7 @@ function IOURequestStepConfirmation({
             return;
         }
         if (isPerDiemRequest) {
-            if (isMovingTransactionFromTrackExpense) {
+            if (isMovingTransactionFromTrackExpense || isCreatingTrackExpense) {
                 Navigation.goBack();
                 return;
             }
