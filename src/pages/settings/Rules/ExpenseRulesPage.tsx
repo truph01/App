@@ -201,6 +201,9 @@ function ExpenseRulesPage() {
 
     const headerContent = (
         <>
+            <View style={[styles.ph5, styles.pb5, styles.pt3, shouldUseNarrowLayout && styles.workspaceSectionMobile]}>
+                <Text style={[styles.textNormal, styles.colorMuted]}>{translate('expenseRulesPage.subtitle')}</Text>
+            </View>
             {rulesList.length > CONST.SEARCH_ITEM_LIMIT && (
                 <SearchBar
                     label={translate('expenseRulesPage.findRule')}

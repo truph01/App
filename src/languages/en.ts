@@ -2437,6 +2437,7 @@ const translations = {
     },
     expenseRulesPage: {
         title: 'Expense rules',
+        subtitle: 'These rules will apply to your expenses.',
         findRule: 'Find rule',
         emptyRules: {
             title: "You haven't created any rules",
