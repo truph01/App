@@ -20107,8 +20107,10 @@ const core = __importStar(__nccwpck_require__(2186));
 const compressSvg_1 = __importDefault(__nccwpck_require__(6482));
 async function run() {
     try {
-        const token = core.getInput('GITHUB_TOKEN', { required: true });
-        const summary = await (0, compressSvg_1.default)('pullRequest', { token });
+        const token = core.getInput("GITHUB_TOKEN", { required: true });
+        const summary = await (0, compressSvg_1.default)("pullRequest", {
+            token,
+        });
         if (summary.totalSavings) {
             throw new Error(`SVG ${summary.totalCompressedFilesLength} file(s) were not compressed. Run 'npm run compress-svg' locally and check results on all platforms.`);
         }
@@ -20118,7 +20120,7 @@ async function run() {
             core.setFailed(error);
             return;
         }
-        core.setFailed('An unknown error occurred.');
+        core.setFailed("An unknown error occurred.");
     }
 }
 if (require.main === require.cache[eval('__filename')]) {
@@ -20135,56 +20137,56 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -20192,10 +20194,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -20454,11 +20456,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',
@@ -20909,44 +20914,44 @@ const path = __importStar(__nccwpck_require__(1017));
 const svgo_1 = __nccwpck_require__(2456);
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 // Suffix for files to be ignored from compression eg. file-ignore-compression.svg
-const IGNORE_SUFFIX = '-ignore-compression';
+const IGNORE_SUFFIX = "-ignore-compression";
 // SVGO Default plugins
 const svgoConfig = {
     plugins: [
-        'removeDoctype',
-        'removeXMLProcInst',
-        'removeComments',
-        'removeDeprecatedAttrs',
-        'removeMetadata',
-        'removeEditorsNSData',
-        'cleanupAttrs',
-        'mergeStyles',
+        "removeDoctype",
+        "removeXMLProcInst",
+        "removeComments",
+        "removeDeprecatedAttrs",
+        "removeMetadata",
+        "removeEditorsNSData",
+        "cleanupAttrs",
+        "mergeStyles",
         // 'inlineStyles', // Cause issues with fill on Android
-        'minifyStyles',
-        'cleanupIds',
-        'removeUselessDefs',
-        'cleanupNumericValues',
-        'convertColors',
-        'removeNonInheritableGroupAttrs',
-        'removeUnknownsAndDefaults',
-        'removeUselessStrokeAndFill',
-        'cleanupEnableBackground',
-        'removeHiddenElems',
-        'removeEmptyText',
-        'convertShapeToPath',
-        'convertEllipseToCircle',
-        'moveElemsAttrsToGroup',
-        'moveGroupAttrsToElems',
-        'collapseGroups',
-        'convertPathData',
-        'convertTransform',
-        'removeEmptyAttrs',
-        'removeEmptyContainers',
-        'mergePaths',
-        'removeUnusedNS',
-        'sortAttrs',
-        'sortDefsChildren',
-        'removeDesc',
+        "minifyStyles",
+        "cleanupIds",
+        "removeUselessDefs",
+        "cleanupNumericValues",
+        "convertColors",
+        "removeNonInheritableGroupAttrs",
+        "removeUnknownsAndDefaults",
+        "removeUselessStrokeAndFill",
+        "cleanupEnableBackground",
+        "removeHiddenElems",
+        "removeEmptyText",
+        "convertShapeToPath",
+        "convertEllipseToCircle",
+        "moveElemsAttrsToGroup",
+        "moveGroupAttrsToElems",
+        "collapseGroups",
+        "convertPathData",
+        "convertTransform",
+        "removeEmptyAttrs",
+        "removeEmptyContainers",
+        "mergePaths",
+        "removeUnusedNS",
+        "sortAttrs",
+        "sortDefsChildren",
+        "removeDesc",
     ],
 };
 function findSvgFiles(dir) {
@@ -20958,7 +20963,8 @@ function findSvgFiles(dir) {
             if (item.isDirectory()) {
                 scanDirectory(fullPath);
             }
-            else if (item.isFile() && path.extname(item.name).toLowerCase() === '.svg') {
+            else if (item.isFile() &&
+                path.extname(item.name).toLowerCase() === ".svg") {
                 svgFiles.push(fullPath);
             }
         }
@@ -20970,8 +20976,8 @@ function formatBytes(bytes) {
     return (bytes / 1024).toFixed(2);
 }
 function compressSvgFile(filePath, isSavingFile) {
-    const originalContent = fs.readFileSync(filePath, 'utf8');
-    const originalSize = Buffer.byteLength(originalContent, 'utf8');
+    const originalContent = fs.readFileSync(filePath, "utf8");
+    const originalSize = Buffer.byteLength(originalContent, "utf8");
     try {
         let currentContent = originalContent;
         let currentSize = originalSize;
@@ -20985,7 +20991,7 @@ function compressSvgFile(filePath, isSavingFile) {
                 ...svgoConfig,
             });
             const compressedContent = result.data;
-            const compressedSize = Buffer.byteLength(compressedContent, 'utf8');
+            const compressedSize = Buffer.byteLength(compressedContent, "utf8");
             const passSavings = currentSize - compressedSize;
             if (passSavings <= 0) {
                 break;
@@ -20999,7 +21005,7 @@ function compressSvgFile(filePath, isSavingFile) {
         }
         const finalSavingsPercent = originalSize > 0 ? (totalSavings / originalSize) * 100 : 0;
         if (isSavingFile) {
-            fs.writeFileSync(filePath, currentContent, 'utf8');
+            fs.writeFileSync(filePath, currentContent, "utf8");
         }
         return {
             filePath,
@@ -21034,18 +21040,18 @@ function validateSvgFiles(filePaths) {
             errors.push(`❌ Not a file: ${filePath}`);
             continue;
         }
-        if (path.extname(filePath).toLowerCase() !== '.svg') {
+        if (path.extname(filePath).toLowerCase() !== ".svg") {
             errors.push(`❌ Not an SVG file: ${filePath}`);
             continue;
         }
         validFiles.push(resolvedPath);
     }
     if (errors.length) {
-        console.error('Validation errors:');
+        console.error("Validation errors:");
         for (const error of errors) {
             console.error(`   ${error}`);
         }
-        throw new Error('SVG file validation failed');
+        throw new Error("SVG file validation failed");
     }
     return validFiles;
 }
@@ -21074,18 +21080,18 @@ function logIgnoredFiles(ignoredFiles) {
     if (!ignoredFiles.length) {
         return;
     }
-    console.log('\nFiles skipped (ignore-compression):');
+    console.log("\nFiles skipped (ignore-compression):");
     for (const filePath of ignoredFiles) {
         console.log(`${filePath}: ⏭️  Skipped`);
     }
 }
 function logSummary(summary) {
-    const { totalFiles, totalCompressedFilesLength, totalOriginalSize, totalCompressedSize, totalSavings, totalSavingsPercent, results, ignoredFiles } = summary;
+    const { totalFiles, totalCompressedFilesLength, totalOriginalSize, totalCompressedSize, totalSavings, totalSavingsPercent, results, ignoredFiles, } = summary;
     logIgnoredFiles(ignoredFiles);
     if (totalCompressedFilesLength) {
-        console.log('\nFiles compressed:');
+        console.log("\nFiles compressed:");
         for (const result of results) {
-            const { compressedSize, originalSize, savings, savingsPercent, filePath } = result;
+            const { compressedSize, originalSize, savings, savingsPercent, filePath, } = result;
             if (!result.savings) {
                 continue;
             }
@@ -21104,7 +21110,7 @@ function logSummary(summary) {
         console.log(`Files compressed: ${totalCompressedFilesLength}`);
         console.log(`Files ignored: ${ignoreFilesLength}`);
         console.log(getSummarySavingString({
-            prefix: 'Savings:',
+            prefix: "Savings:",
             originalSize: totalOriginalSize,
             compressedSize: totalCompressedSize,
             savings: totalSavings,
@@ -21112,15 +21118,15 @@ function logSummary(summary) {
         }));
     }
     else {
-        console.log('\n✅ All files already compressed');
+        console.log("\n✅ All files already compressed");
     }
 }
 function logSummaryCheck(summary) {
     const { totalFiles, totalCompressedFilesLength, results, ignoredFiles } = summary;
-    console.log('');
+    console.log("");
     for (const result of results) {
         const { filePath, savings } = result;
-        console.log(`${filePath}: ${savings > 0 ? 'Not properly compressed ❌' : 'Compressed ✅'}`);
+        console.log(`${filePath}: ${savings > 0 ? "Not properly compressed ❌" : "Compressed ✅"}`);
     }
     logIgnoredFiles(ignoredFiles);
     console.log(`\nFiles processed: ${totalFiles}`);
@@ -21153,38 +21159,38 @@ async function getChangedSvgFilesFromGithub() {
     try {
         const pullRequestNumber = github.context.payload.pull_request?.number;
         if (!pullRequestNumber) {
-            console.log('No pull request number found');
+            console.log("No pull request number found");
             return [];
         }
         const changedFiles = await GithubUtils_1.default.getPullRequestChangedSVGFileNames(pullRequestNumber);
         const svgFiles = changedFiles
-            .filter((file) => path.extname(file.toLowerCase()) === '.svg')
+            .filter((file) => path.extname(file.toLowerCase()) === ".svg")
             .map((file) => path.resolve(file))
             .filter((file) => fs.existsSync(file));
         console.log(`Found ${svgFiles.length} changed SVG file(s) in PR`);
         return svgFiles;
     }
     catch (error) {
-        console.error('❌ Error getting files from GitHub:', error);
+        console.error("❌ Error getting files from GitHub:", error);
         return [];
     }
 }
 function logHelp() {
-    console.log('');
-    console.log('Usage:');
-    console.log('  Mode 1 - Directory scan:');
-    console.log('    npm run compress-svg -- --dir assets/images');
-    console.log('');
-    console.log('  Mode 2 - Specific files:');
-    console.log('    npm run compress-svg -- --files file1.svg file2.svg ...');
-    console.log('');
-    console.log('Options:');
-    console.log('  --help, -h    Show this help message');
-    console.log('  --dir         Compress all SVG files in specified directory');
-    console.log('  --files       Compress specified SVG files');
-    console.log('');
+    console.log("");
+    console.log("Usage:");
+    console.log("  Mode 1 - Directory scan:");
+    console.log("    npm run compress-svg -- --dir assets/images");
+    console.log("");
+    console.log("  Mode 2 - Specific files:");
+    console.log("    npm run compress-svg -- --files file1.svg file2.svg ...");
+    console.log("");
+    console.log("Options:");
+    console.log("  --help, -h    Show this help message");
+    console.log("  --dir         Compress all SVG files in specified directory");
+    console.log("  --files       Compress specified SVG files");
+    console.log("");
     console.log('To ignore compression for a file, add "-ignore-compression" to the file name: file-ignore-compression.svg');
-    console.log('');
+    console.log("");
 }
 function splitFilesBySuffix(files) {
     const regularFiles = [];
@@ -21201,34 +21207,34 @@ function splitFilesBySuffix(files) {
     return { regular: regularFiles, ignored: ignoredFiles };
 }
 async function run(mode, options) {
-    console.log('🔍 Searching for SVG files...');
+    console.log("🔍 Searching for SVG files...");
     switch (mode) {
-        case 'directory': {
+        case "directory": {
             if (!options?.targetDir) {
-                throw new Error('targetDir is required for directory mode');
+                throw new Error("targetDir is required for directory mode");
             }
             const svgFiles = findSvgFiles(options.targetDir);
             if (!svgFiles.length) {
-                console.log('❌ No SVG files found in the specified directory.');
+                console.log("❌ No SVG files found in the specified directory.");
             }
             const { regular: regularSvgFiles, ignored: ignoredFiles } = splitFilesBySuffix(svgFiles);
             return compressSvgFiles(regularSvgFiles, ignoredFiles);
         }
-        case 'files': {
+        case "files": {
             if (!options?.filePaths?.length) {
-                throw new Error('filePaths is required for files mode');
+                throw new Error("filePaths is required for files mode");
             }
             const svgFiles = validateSvgFiles(options.filePaths);
             if (!svgFiles.length) {
-                console.log('❌ No valid SVG files provided.');
+                console.log("❌ No valid SVG files provided.");
             }
             const { regular: regularSvgFiles, ignored: ignoredFiles } = splitFilesBySuffix(svgFiles);
             return compressSvgFiles(regularSvgFiles, ignoredFiles);
         }
-        case 'pullRequest': {
+        case "pullRequest": {
             const svgFiles = await getChangedSvgFilesFromGithub();
             if (!svgFiles.length) {
-                console.log('❌ No changed SVG files found in Pull Request');
+                console.log("❌ No changed SVG files found in Pull Request");
             }
             const { regular: regularSvgFiles, ignored: ignoredFiles } = splitFilesBySuffix(svgFiles);
             return checkCompressedSvgFiles(regularSvgFiles, ignoredFiles);

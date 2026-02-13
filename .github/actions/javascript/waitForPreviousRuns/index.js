@@ -11542,7 +11542,13 @@ const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const DEFAULT_POLL_RATE_S = 20;
 const DEFAULT_QUEUE_LIMIT = 20;
 const MAX_API_RETRIES = 2;
-const ACTIVE_STATUSES = new Set(['in_progress', 'queued', 'waiting', 'requested', 'pending']);
+const ACTIVE_STATUSES = new Set([
+    "in_progress",
+    "queued",
+    "waiting",
+    "requested",
+    "pending",
+]);
 async function getOlderActiveRuns(workflowID, currentRunID, queueLimit) {
     const response = await GithubUtils_1.default.octokit.actions.listWorkflowRuns({
         owner: CONST_1.default.GITHUB_OWNER,
@@ -11552,18 +11558,19 @@ async function getOlderActiveRuns(workflowID, currentRunID, queueLimit) {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         per_page: queueLimit,
     });
-    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID && ACTIVE_STATUSES.has(workflowRun.status ?? ''));
+    return response.data.workflow_runs.filter((workflowRun) => workflowRun.id < currentRunID &&
+        ACTIVE_STATUSES.has(workflowRun.status ?? ""));
 }
 function run() {
-    const workflowID = core.getInput('WORKFLOW_ID', { required: true });
-    const currentRunID = Number(core.getInput('CURRENT_RUN_ID', { required: true }));
-    const pollRateSeconds = Number(core.getInput('POLL_RATE_SECONDS')) || DEFAULT_POLL_RATE_S;
+    const workflowID = core.getInput("WORKFLOW_ID", { required: true });
+    const currentRunID = Number(core.getInput("CURRENT_RUN_ID", { required: true }));
+    const pollRateSeconds = Number(core.getInput("POLL_RATE_SECONDS")) || DEFAULT_POLL_RATE_S;
     const pollRateMs = pollRateSeconds * 1000;
-    const queueLimit = Number(core.getInput('QUEUE_LIMIT')) || DEFAULT_QUEUE_LIMIT;
+    const queueLimit = Number(core.getInput("QUEUE_LIMIT")) || DEFAULT_QUEUE_LIMIT;
     core.info(`Current run ID: ${currentRunID}`);
     core.info(`Workflow ID: ${workflowID}`);
     core.info(`Poll rate: ${pollRateSeconds}s, Queue limit: ${queueLimit}`);
-    core.info('Waiting for all earlier runs of this workflow to complete...');
+    core.info("Waiting for all earlier runs of this workflow to complete...");
     return new Promise((resolve, reject) => {
         let intervalId;
         let isChecking = false;
@@ -11582,12 +11589,14 @@ function run() {
                 maxQueueDepth = Math.max(maxQueueDepth, olderActiveRuns.length);
                 if (olderActiveRuns.length === 0) {
                     core.notice(`Queue summary: maxRunsAhead=${maxQueueDepth}, iterations=${pollCount}, waitTime=${(pollCount - 1) * pollRateSeconds}s`);
-                    core.info('No earlier runs in progress. Proceeding with build.');
+                    core.info("No earlier runs in progress. Proceeding with build.");
                     clearInterval(intervalId);
                     resolve();
                     return;
                 }
-                const runIDs = olderActiveRuns.map((workflowRun) => `#${workflowRun.id} (${workflowRun.status})`).join(', ');
+                const runIDs = olderActiveRuns
+                    .map((workflowRun) => `#${workflowRun.id} (${workflowRun.status})`)
+                    .join(", ");
                 core.info(`Waiting for ${olderActiveRuns.length} earlier run(s): ${runIDs}. Polling again in ${pollRateSeconds}s...`);
             })
                 .catch((error) => {
@@ -11622,56 +11631,56 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -11679,10 +11688,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -11941,11 +11950,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',

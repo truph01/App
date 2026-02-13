@@ -11585,31 +11585,31 @@ const github_1 = __nccwpck_require__(5438);
 const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 function getTestBuildMessage(appPr, mobileExpensifyPr) {
-    const inputs = ['ANDROID', 'IOS', 'WEB'];
+    const inputs = ["ANDROID", "IOS", "WEB"];
     const names = {
-        [inputs[0]]: 'Android',
-        [inputs[1]]: 'iOS',
-        [inputs[2]]: 'Web',
+        [inputs[0]]: "Android",
+        [inputs[1]]: "iOS",
+        [inputs[2]]: "Web",
     };
     const result = inputs.reduce((acc, platform) => {
         const input = core.getInput(platform, { required: false });
         if (!input) {
-            acc[platform] = { link: 'N/A', qrCode: 'N/A' };
+            acc[platform] = { link: "N/A", qrCode: "N/A" };
             return acc;
         }
-        let link = '';
-        let qrCode = '';
+        let link = "";
+        let qrCode = "";
         switch (input) {
-            case 'success':
+            case "success":
                 link = core.getInput(`${platform}_LINK`);
                 qrCode = `![${names[platform]}](https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${link})`;
                 break;
-            case 'skipped':
-                link = '⏩ SKIPPED ⏩';
+            case "skipped":
+                link = "⏩ SKIPPED ⏩";
                 qrCode = `The build for ${names[platform]} was skipped`;
                 break;
             default:
-                link = '❌ FAILED ❌';
+                link = "❌ FAILED ❌";
                 qrCode = `The QR code can't be generated, because the ${names[platform]} build failed`;
         }
         acc[platform] = {
@@ -11618,8 +11618,8 @@ function getTestBuildMessage(appPr, mobileExpensifyPr) {
         };
         return acc;
     }, {});
-    const message = `:test_tube::test_tube: Use the links below to test this adhoc build on Android, iOS${appPr ? ', and Web' : ''}. Happy testing! :test_tube::test_tube:
-Built from${appPr ? ` App PR Expensify/App#${appPr}` : ''}${mobileExpensifyPr ? ` Mobile-Expensify PR Expensify/Mobile-Expensify#${mobileExpensifyPr}` : ''}.
+    const message = `:test_tube::test_tube: Use the links below to test this adhoc build on Android, iOS${appPr ? ", and Web" : ""}. Happy testing! :test_tube::test_tube:
+Built from${appPr ? ` App PR Expensify/App#${appPr}` : ""}${mobileExpensifyPr ? ` Mobile-Expensify PR Expensify/Mobile-Expensify#${mobileExpensifyPr}` : ""}.
 | Android :robot:  | iOS :apple: |
 | ------------- | ------------- |
 | ${result.ANDROID.link}  | ${result.IOS.link}  |
@@ -11651,14 +11651,15 @@ async function commentPR(REPO, PR, message) {
     }
 }
 async function run() {
-    const APP_PR_NUMBER = Number(core.getInput('APP_PR_NUMBER', { required: false }));
-    const MOBILE_EXPENSIFY_PR_NUMBER = Number(core.getInput('MOBILE_EXPENSIFY_PR_NUMBER', { required: false }));
-    const REPO = String(core.getInput('REPO', { required: true }));
+    const APP_PR_NUMBER = Number(core.getInput("APP_PR_NUMBER", { required: false }));
+    const MOBILE_EXPENSIFY_PR_NUMBER = Number(core.getInput("MOBILE_EXPENSIFY_PR_NUMBER", { required: false }));
+    const REPO = String(core.getInput("REPO", { required: true }));
     if (REPO !== CONST_1.default.APP_REPO && REPO !== CONST_1.default.MOBILE_EXPENSIFY_REPO) {
         core.setFailed(`Invalid repository used to place output comment: ${REPO}`);
         return;
     }
-    if ((REPO === CONST_1.default.APP_REPO && !APP_PR_NUMBER) || (REPO === CONST_1.default.MOBILE_EXPENSIFY_REPO && !MOBILE_EXPENSIFY_PR_NUMBER)) {
+    if ((REPO === CONST_1.default.APP_REPO && !APP_PR_NUMBER) ||
+        (REPO === CONST_1.default.MOBILE_EXPENSIFY_REPO && !MOBILE_EXPENSIFY_PR_NUMBER)) {
         core.setFailed(`Please provide ${REPO} pull request number`);
         return;
     }
@@ -11671,9 +11672,9 @@ async function run() {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         per_page: 100,
     }, (response) => response.data);
-    const testBuildComment = comments.find((comment) => comment.body?.startsWith(':test_tube::test_tube: Use the links below to test this adhoc build'));
+    const testBuildComment = comments.find((comment) => comment.body?.startsWith(":test_tube::test_tube: Use the links below to test this adhoc build"));
     if (testBuildComment) {
-        console.log('Found previous build comment, hiding it', testBuildComment);
+        console.log("Found previous build comment, hiding it", testBuildComment);
         await GithubUtils_1.default.graphql(`
             mutation {
               minimizeComment(input: {classifier: OUTDATED, subjectId: "${testBuildComment.node_id}"}) {
@@ -11700,56 +11701,56 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -11757,10 +11758,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -12019,11 +12020,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',

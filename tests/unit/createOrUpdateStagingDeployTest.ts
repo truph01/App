@@ -342,7 +342,9 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashBefore, closedStagingDeployCash]});
+                    return Promise.resolve({
+                        data: [openStagingDeployCashBefore, closedStagingDeployCash],
+                    });
                 }
 
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
@@ -421,7 +423,9 @@ describe('createOrUpdateStagingDeployCash', () => {
             });
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashBefore, closedStagingDeployCash]});
+                    return Promise.resolve({
+                        data: [openStagingDeployCashBefore, closedStagingDeployCash],
+                    });
                 }
 
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
@@ -497,7 +501,9 @@ describe('createOrUpdateStagingDeployCash', () => {
             });
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashBefore, closedStagingDeployCash]});
+                    return Promise.resolve({
+                        data: [openStagingDeployCashBefore, closedStagingDeployCash],
+                    });
                 }
 
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
@@ -561,17 +567,33 @@ describe('createOrUpdateStagingDeployCash', () => {
                 number: 29,
                 labels: [LABELS.STAGING_DEPLOY_CASH],
                 PRList: [
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`, number: 6, isVerified: true},
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`, number: 8, isVerified: true},
+                    {
+                        url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`,
+                        number: 6,
+                        isVerified: true,
+                    },
+                    {
+                        url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`,
+                        number: 8,
+                        isVerified: true,
+                    },
                 ],
                 PRListMobileExpensify: [
-                    {url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/20`, number: 20, isVerified: true},
-                    {url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/22`, number: 22, isVerified: true},
+                    {
+                        url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/20`,
+                        number: 20,
+                        isVerified: true,
+                    },
+                    {
+                        url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/22`,
+                        number: 22,
+                        isVerified: true,
+                    },
                 ],
                 deployBlockers: [],
                 internalQAPRList: [],
                 isTimingDashboardChecked: true,
-                isFirebaseChecked: true,
+                isSentryChecked: true,
                 isGHStatusChecked: true,
                 version: '1.0.2-1',
                 tag: '1.0.2-1-staging',
@@ -630,14 +652,22 @@ describe('createOrUpdateStagingDeployCash', () => {
                 number: 29,
                 labels: [LABELS.STAGING_DEPLOY_CASH],
                 PRList: [
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`, number: 6, isVerified: true},
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`, number: 8, isVerified: true},
+                    {
+                        url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`,
+                        number: 6,
+                        isVerified: true,
+                    },
+                    {
+                        url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`,
+                        number: 8,
+                        isVerified: true,
+                    },
                 ],
                 PRListMobileExpensify: [], // No Mobile-Expensify PRs in previous checklist
                 deployBlockers: [],
                 internalQAPRList: [],
                 isTimingDashboardChecked: true,
-                isFirebaseChecked: true,
+                isSentryChecked: true,
                 isGHStatusChecked: true,
                 tag: '1.0.2-1-staging',
                 version: '1.0.2-1',

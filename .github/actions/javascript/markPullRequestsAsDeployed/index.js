@@ -12760,13 +12760,13 @@ const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
  */
 function getDeployTableMessage(platformResult) {
     switch (platformResult) {
-        case 'success':
+        case "success":
             return `${platformResult} ✅`;
-        case 'cancelled':
+        case "cancelled":
             return `${platformResult} 🔪`;
-        case 'skipped':
+        case "skipped":
             return `${platformResult} 🚫`;
-        case 'failure':
+        case "failure":
         default:
             return `${platformResult} ❌`;
     }
@@ -12808,7 +12808,9 @@ async function commentStagingDeployPRs(prList, repoName, recentTags, getDeployMe
                     });
                     const prNumForCPMergeCommit = commit.message.match(/Merge pull request #(\d+)[\S\s]*\(cherry picked from commit .*\)/);
                     if (prNumForCPMergeCommit?.at(1) === String(prNumber)) {
-                        const cpActor = commit.message.match(/.*\(cherry-picked to .* by (.*)\)/)?.at(1);
+                        const cpActor = commit.message
+                            .match(/.*\(cherry-picked to .* by (.*)\)/)
+                            ?.at(1);
                         if (cpActor) {
                             deployer = cpActor;
                         }
@@ -12817,14 +12819,18 @@ async function commentStagingDeployPRs(prList, repoName, recentTags, getDeployMe
                 }
             }
             const title = pr.title;
-            const deployMessage = deployer ? getDeployMessage(deployer, isCP ? 'Cherry-picked' : 'Deployed', title) : '';
+            const deployMessage = deployer
+                ? getDeployMessage(deployer, isCP ? "Cherry-picked" : "Deployed", title)
+                : "";
             await commentPR(prNumber, deployMessage, repoName);
         }
         catch (error) {
             if (error.status === 404) {
                 console.log(`Unable to comment on ${repoName} PR #${prNumber}. GitHub responded with 404.`);
             }
-            else if (repoName === CONST_1.default.MOBILE_EXPENSIFY_REPO && process.env.GITHUB_REPOSITORY !== `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
+            else if (repoName === CONST_1.default.MOBILE_EXPENSIFY_REPO &&
+                process.env.GITHUB_REPOSITORY !==
+                    `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
                 console.warn(`Unable to comment on ${repoName} PR #${prNumber} from forked repository. This is expected.`);
             }
             else {
@@ -12834,18 +12840,22 @@ async function commentStagingDeployPRs(prList, repoName, recentTags, getDeployMe
     }
 }
 async function run() {
-    const prList = ActionUtils.getJSONInput('PR_LIST', { required: true }).map((num) => Number.parseInt(num, 10));
-    const mobileExpensifyPRListInput = ActionUtils.getJSONInput('MOBILE_EXPENSIFY_PR_LIST', { required: false });
-    const mobileExpensifyPRList = Array.isArray(mobileExpensifyPRListInput) ? mobileExpensifyPRListInput.map((num) => Number.parseInt(num, 10)) : [];
-    const isProd = ActionUtils.getJSONInput('IS_PRODUCTION_DEPLOY', { required: true });
-    const version = core.getInput('DEPLOY_VERSION', { required: true });
-    const androidResult = getDeployTableMessage(core.getInput('ANDROID', { required: true }));
-    const iOSResult = getDeployTableMessage(core.getInput('IOS', { required: true }));
-    const webResult = getDeployTableMessage(core.getInput('WEB', { required: true }));
-    const date = core.getInput('DATE');
-    const note = core.getInput('NOTE');
+    const prList = ActionUtils.getJSONInput("PR_LIST", { required: true }).map((num) => Number.parseInt(num, 10));
+    const mobileExpensifyPRListInput = ActionUtils.getJSONInput("MOBILE_EXPENSIFY_PR_LIST", { required: false });
+    const mobileExpensifyPRList = Array.isArray(mobileExpensifyPRListInput)
+        ? mobileExpensifyPRListInput.map((num) => Number.parseInt(num, 10))
+        : [];
+    const isProd = ActionUtils.getJSONInput("IS_PRODUCTION_DEPLOY", {
+        required: true,
+    });
+    const version = core.getInput("DEPLOY_VERSION", { required: true });
+    const androidResult = getDeployTableMessage(core.getInput("ANDROID", { required: true }));
+    const iOSResult = getDeployTableMessage(core.getInput("IOS", { required: true }));
+    const webResult = getDeployTableMessage(core.getInput("WEB", { required: true }));
+    const date = core.getInput("DATE");
+    const note = core.getInput("NOTE");
     function getDeployMessage(deployer, deployVerb) {
-        let message = `🚀 [${deployVerb}](${workflowURL}) to ${isProd ? 'production' : 'staging'}`;
+        let message = `🚀 [${deployVerb}](${workflowURL}) to ${isProd ? "production" : "staging"}`;
         message += ` by https://github.com/${deployer} in version: ${version} `;
         if (date) {
             message += `on ${date}`;
@@ -12865,16 +12875,16 @@ async function run() {
             owner: CONST_1.default.GITHUB_OWNER,
             repo: CONST_1.default.APP_REPO,
             labels: CONST_1.default.LABELS.STAGING_DEPLOY,
-            state: 'closed',
+            state: "closed",
         });
         const previousChecklistID = deployChecklists.at(0)?.number;
         if (!previousChecklistID) {
-            throw new Error('Could not find the previous checklist ID');
+            throw new Error("Could not find the previous checklist ID");
         }
         // who closed the last deploy checklist?
         const deployer = await GithubUtils_1.default.getActorWhoClosedIssue(previousChecklistID);
         // Create comment on each pull request (one at a time to avoid throttling issues)
-        const deployMessage = getDeployMessage(deployer, 'Deployed');
+        const deployMessage = getDeployMessage(deployer, "Deployed");
         for (const pr of prList) {
             await commentPR(pr, deployMessage);
         }
@@ -12905,11 +12915,12 @@ async function run() {
             mobileExpensifyRecentTags = response.data;
         }
         catch (error) {
-            if (process.env.GITHUB_REPOSITORY !== `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
-                console.warn('Unable to fetch Mobile-Expensify tags from forked repository. This is expected.');
+            if (process.env.GITHUB_REPOSITORY !==
+                `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
+                console.warn("Unable to fetch Mobile-Expensify tags from forked repository. This is expected.");
             }
             else {
-                console.error('Failed to fetch Mobile-Expensify tags:', error);
+                console.error("Failed to fetch Mobile-Expensify tags:", error);
             }
         }
     }
@@ -13002,9 +13013,9 @@ function getStringInput(name, options, defaultValue) {
  */
 function convertToNumber(value) {
     switch (typeof value) {
-        case 'number':
+        case "number":
             return value;
-        case 'string':
+        case "string":
             if (!Number.isNaN(Number(value))) {
                 return Number(value);
             }
@@ -13023,56 +13034,56 @@ function convertToNumber(value) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -13080,10 +13091,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -13342,11 +13353,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',

@@ -2737,19 +2737,19 @@ const core = __importStar(__nccwpck_require__(186));
 const fs_1 = __importDefault(__nccwpck_require__(147));
 const run = () => {
     // Prefix path to the graphite metric
-    const GRAPHITE_PATH = 'reassure';
-    const PR_NUMBER = core.getInput('PR_NUMBER', { required: true });
+    const GRAPHITE_PATH = "reassure";
+    const PR_NUMBER = core.getInput("PR_NUMBER", { required: true });
     // Read the contents of the file, the file is in the JSONL format
-    const regressionFile = fs_1.default.readFileSync('.reassure/baseline.perf', 'utf8');
+    const regressionFile = fs_1.default.readFileSync(".reassure/baseline.perf", "utf8");
     // Split file contents by newline to get individual JSON entries
-    const regressionEntries = regressionFile.split('\n');
+    const regressionEntries = regressionFile.split("\n");
     // Initialize string to store Graphite metrics
-    let graphiteString = '';
+    let graphiteString = "";
     let timestamp = null;
     // Iterate over each entry
     for (const entry of regressionEntries) {
         // Skip empty lines
-        if (entry.trim() === '') {
+        if (entry.trim() === "") {
             continue;
         }
         try {
@@ -2758,8 +2758,11 @@ const run = () => {
             if (current.metadata?.creationDate) {
                 timestamp = Math.floor(new Date(current.metadata.creationDate).getTime() / 1000);
             }
-            if (current.name && current.meanDuration && current.meanCount && timestamp) {
-                const formattedName = current.name.split(' ').join('-');
+            if (current.name &&
+                current.meanDuration &&
+                current.meanCount &&
+                timestamp) {
+                const formattedName = current.name.split(" ").join("-");
                 const renderDurationString = `${GRAPHITE_PATH}.${formattedName}.renderDuration ${current.meanDuration} ${timestamp}`;
                 const renderCountString = `${GRAPHITE_PATH}.${formattedName}.renderCount ${current.meanCount} ${timestamp}`;
                 const renderPRNumberString = `${GRAPHITE_PATH}.${formattedName}.prNumber ${PR_NUMBER} ${timestamp}`;
@@ -2768,13 +2771,13 @@ const run = () => {
             }
         }
         catch (e) {
-            const error = new Error('Error parsing baseline.perf JSON file');
+            const error = new Error("Error parsing baseline.perf JSON file");
             console.error(error.message);
             core.setFailed(error);
         }
     }
     // Set generated graphite string to the github variable
-    core.setOutput('GRAPHITE_STRING', graphiteString);
+    core.setOutput("GRAPHITE_STRING", graphiteString);
 };
 if (require.main === require.cache[eval('__filename')]) {
     run();

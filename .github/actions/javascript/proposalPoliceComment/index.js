@@ -11600,37 +11600,42 @@ function isCommentEditedEvent(payload) {
 async function run() {
     // Capture the timestamp immediately at the start of the run
     const now = Date.now();
-    const zonedDate = (0, date_fns_tz_1.toZonedTime)(now, 'UTC');
+    const zonedDate = (0, date_fns_tz_1.toZonedTime)(now, "UTC");
     const formattedDate = (0, date_fns_1.format)(zonedDate, "yyyy-MM-dd HH:mm:ss 'UTC'");
     // Verify this is running for an expected webhook event
     if (github_1.context.eventName !== CONST_1.default.EVENTS.ISSUE_COMMENT) {
-        throw new Error('ProposalPolice™ only supports the issue_comment webhook event');
+        throw new Error("ProposalPolice™ only supports the issue_comment webhook event");
     }
     const payload = github_1.context.payload;
     // Return early unless issue is open AND has the "Help Wanted" label
-    if (payload.issue?.state !== CONST_1.default.STATE.OPEN || !payload.issue?.labels.some((issueLabel) => issueLabel.name === CONST_1.default.LABELS.HELP_WANTED)) {
+    if (payload.issue?.state !== CONST_1.default.STATE.OPEN ||
+        !payload.issue?.labels.some((issueLabel) => issueLabel.name === CONST_1.default.LABELS.HELP_WANTED)) {
         console.log('Issue is not open or does not have the "Help Wanted" label, skipping checks.');
         return;
     }
     // Verify that the comment is not empty and contains the case sensitive `Proposal` keyword
-    if (!payload.comment?.body.trim() || !payload.comment?.body.includes(CONST_1.default.PROPOSAL_KEYWORD)) {
+    if (!payload.comment?.body.trim() ||
+        !payload.comment?.body.includes(CONST_1.default.PROPOSAL_KEYWORD)) {
         console.log('Comment body is either empty or doesn\'t contain the keyword "Proposal": ', payload.comment?.body);
         return;
     }
     // If event is `edited` and comment was already edited by the bot, return early
-    if (isCommentEditedEvent(payload) && payload.comment?.body.trim().includes('Edited by **proposal-police**')) {
-        console.log('Comment was already edited by proposal-police once.\n', payload.comment?.body);
+    if (isCommentEditedEvent(payload) &&
+        payload.comment?.body.trim().includes("Edited by **proposal-police**")) {
+        console.log("Comment was already edited by proposal-police once.\n", payload.comment?.body);
         return;
     }
-    console.log('ProposalPolice™ Action triggered for comment:', payload.comment?.body);
-    console.log('-> GitHub Action Type: ', payload.action?.toUpperCase());
+    console.log("ProposalPolice™ Action triggered for comment:", payload.comment?.body);
+    console.log("-> GitHub Action Type: ", payload.action?.toUpperCase());
     if (!isCommentCreatedEvent(payload) && !isCommentEditedEvent(payload)) {
-        console.error('Unsupported action type:', payload?.action);
+        console.error("Unsupported action type:", payload?.action);
         (0, core_1.setFailed)(new Error(`Unsupported action type ${payload?.action}`));
         return;
     }
-    const apiKey = (0, core_1.getInput)('PROPOSAL_POLICE_API_KEY', { required: true });
-    const assistantID = (0, core_1.getInput)('PROPOSAL_POLICE_ASSISTANT_ID', { required: true });
+    const apiKey = (0, core_1.getInput)("PROPOSAL_POLICE_API_KEY", { required: true });
+    const assistantID = (0, core_1.getInput)("PROPOSAL_POLICE_ASSISTANT_ID", {
+        required: true,
+    });
     const openAI = new OpenAIUtils_1.default(apiKey);
     /* eslint-disable rulesdir/no-default-id-values */
     const issueNumber = payload.issue?.number ?? -1;
@@ -11638,15 +11643,15 @@ async function run() {
     const commentID = payload.comment?.id ?? -1;
     // DUPLICATE PROPOSAL DETECTION
     if (isCommentCreatedEvent(payload)) {
-        console.log('Starting DUPLICATE PROPOSAL DETECTION Check');
+        console.log("Starting DUPLICATE PROPOSAL DETECTION Check");
         const newProposalCreatedAt = new Date(payload.comment.created_at).getTime();
         const newProposalBody = payload.comment.body;
         const newProposalAuthor = payload.comment.user.login;
         // Fetch all comments in the issue
-        console.log('Get comments for issue #', issueNumber);
+        console.log("Get comments for issue #", issueNumber);
         const commentsResponse = await GithubUtils_1.default.getAllCommentDetails(issueNumber);
-        core.startGroup('Comments Response');
-        console.log('commentsResponse', commentsResponse);
+        core.startGroup("Comments Response");
+        console.log("commentsResponse", commentsResponse);
         core.endGroup();
         let didFindDuplicate = false;
         let originalProposal;
@@ -11657,7 +11662,8 @@ async function run() {
             if (!isProposal || previousProposalCreatedAt >= newProposalCreatedAt) {
                 continue;
             }
-            const isAuthorBot = previousProposal.user?.login === CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS || previousProposal.user?.type === CONST_1.default.COMMENT.TYPE_BOT;
+            const isAuthorBot = previousProposal.user?.login === CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS ||
+                previousProposal.user?.type === CONST_1.default.COMMENT.TYPE_BOT;
             // Skip prompting if comment author is the GH bot
             if (isAuthorBot) {
                 continue;
@@ -11666,8 +11672,8 @@ async function run() {
             const duplicateCheckResponse = await openAI.promptAssistant(assistantID, duplicateCheckPrompt);
             let similarityPercentage = 0;
             const parsedDuplicateCheckResponse = openAI.parseAssistantResponse(duplicateCheckResponse);
-            core.startGroup('Parsed Duplicate Check Response');
-            console.log('parsedDuplicateCheckResponse: ', parsedDuplicateCheckResponse);
+            core.startGroup("Parsed Duplicate Check Response");
+            console.log("parsedDuplicateCheckResponse: ", parsedDuplicateCheckResponse);
             core.endGroup();
             if (parsedDuplicateCheckResponse) {
                 const { similarity = 0 } = parsedDuplicateCheckResponse ?? {};
@@ -11684,7 +11690,7 @@ async function run() {
             const duplicateCheckWithdrawMessage = proposalPolice_1.default.getDuplicateCheckWithdrawMessage();
             const duplicateCheckNoticeMessage = proposalPolice_1.default.getDuplicateCheckNoticeMessage(newProposalAuthor, originalProposal?.html_url);
             // If a duplicate proposal is detected, update the comment to withdraw it
-            console.log('ProposalPolice™ withdrawing duplicated proposal...');
+            console.log("ProposalPolice™ withdrawing duplicated proposal...");
             await GithubUtils_1.default.octokit.issues.updateComment({
                 ...github_1.context.repo,
                 /* eslint-disable @typescript-eslint/naming-convention */
@@ -11692,9 +11698,9 @@ async function run() {
                 body: duplicateCheckWithdrawMessage,
             });
             // Post a comment to notify the user about the withdrawn duplicated proposal
-            console.log('ProposalPolice™ notifying contributor of withdrawn proposal...');
+            console.log("ProposalPolice™ notifying contributor of withdrawn proposal...");
             await GithubUtils_1.default.createComment(CONST_1.default.APP_REPO, issueNumber, duplicateCheckNoticeMessage);
-            console.log('DUPLICATE PROPOSAL DETECTION Check Completed, returning early.');
+            console.log("DUPLICATE PROPOSAL DETECTION Check Completed, returning early.");
             return;
         }
     }
@@ -11703,31 +11709,31 @@ async function run() {
         : proposalPolice_1.default.getPromptForEditedProposal(payload.changes.body?.from, payload.comment?.body);
     const assistantResponse = await openAI.promptAssistant(assistantID, prompt);
     const parsedAssistantResponse = openAI.parseAssistantResponse(assistantResponse);
-    core.startGroup('Parsed Assistant Response');
-    console.log('parsedAssistantResponse: ', parsedAssistantResponse);
+    core.startGroup("Parsed Assistant Response");
+    console.log("parsedAssistantResponse: ", parsedAssistantResponse);
     core.endGroup();
     // fallback to empty strings to avoid crashing in case parsing fails
-    const { action = '', message = '' } = parsedAssistantResponse ?? {};
+    const { action = "", message = "" } = parsedAssistantResponse ?? {};
     const isNoAction = action.trim() === CONST_1.default.NO_ACTION;
     const isActionEdit = action.trim() === CONST_1.default.ACTION_EDIT;
     const isActionRequired = action.trim() === CONST_1.default.ACTION_REQUIRED;
     // If assistant response is NO_ACTION and there's no message, return early
     if (isNoAction && !message) {
-        console.log('Detected NO_ACTION for comment, returning early.');
+        console.log("Detected NO_ACTION for comment, returning early.");
         return;
     }
     if (isCommentCreatedEvent(payload) && isActionRequired) {
         const formattedResponse = message
             // replace {user} from response template with @username
-            .replaceAll('{user}', `@${payload.comment?.user.login}`);
+            .replaceAll("{user}", `@${payload.comment?.user.login}`);
         // Create a comment with the assistant's response
-        console.log('ProposalPolice™ commenting on issue...');
+        console.log("ProposalPolice™ commenting on issue...");
         await GithubUtils_1.default.createComment(CONST_1.default.APP_REPO, issueNumber, formattedResponse);
         // edit comment if assistant detected substantial changes
     }
     else if (isActionEdit) {
-        const formattedResponse = message.replace('{updated_timestamp}', formattedDate);
-        console.log('ProposalPolice™ editing issue comment...', commentID);
+        const formattedResponse = message.replace("{updated_timestamp}", formattedDate);
+        console.log("ProposalPolice™ editing issue comment...", commentID);
         await GithubUtils_1.default.octokit.issues.updateComment({
             ...github_1.context.repo,
             /* eslint-disable @typescript-eslint/naming-convention */
@@ -11819,9 +11825,9 @@ function getStringInput(name, options, defaultValue) {
  */
 function convertToNumber(value) {
     switch (typeof value) {
-        case 'number':
+        case "number":
             return value;
-        case 'string':
+        case "string":
             if (!Number.isNaN(Number(value))) {
                 return Number(value);
             }
@@ -11840,56 +11846,56 @@ function convertToNumber(value) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -11897,10 +11903,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -12159,11 +12165,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',
@@ -12577,30 +12586,30 @@ function sanitizeJSONStringValues(inputString) {
     function replacer(str) {
         return ({
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            '\\': '\\\\',
+            "\\": "\\\\",
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            '\t': '\\t',
+            "\t": "\\t",
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            '\n': '\\n',
+            "\n": "\\n",
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            '\r': '\\r',
+            "\r": "\\r",
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            '\f': '\\f',
+            "\f": "\\f",
             // eslint-disable-next-line @typescript-eslint/naming-convention
             '"': '\\"',
-        }[str] ?? '');
+        }[str] ?? "");
     }
     try {
         const parsed = JSON.parse(inputString);
         // Function to recursively sanitize string values in an object
         const sanitizeValues = (obj) => {
-            if (typeof obj === 'string') {
+            if (typeof obj === "string") {
                 return obj.replaceAll(/\\|\t|\n|\r|\f|"/g, replacer);
             }
             if (Array.isArray(obj)) {
                 return obj.map((item) => sanitizeValues(item));
             }
-            if (obj && typeof obj === 'object') {
+            if (obj && typeof obj === "object") {
                 const result = {};
                 for (const key of Object.keys(obj)) {
                     result[key] = sanitizeValues(obj[key]);
@@ -12612,7 +12621,7 @@ function sanitizeJSONStringValues(inputString) {
         return JSON.stringify(sanitizeValues(parsed));
     }
     catch (e) {
-        throw new Error('Invalid JSON input.');
+        throw new Error("Invalid JSON input.");
     }
 }
 
@@ -12640,10 +12649,12 @@ const PROPOSAL_POLICE_TEMPLATES = {
         return `I NEED HELP WITH CASE (2.) WHEN A USER THAT POSTED AN INITIAL PROPOSAL OR COMMENT (UNEDITED) THEN EDITS THE COMMENT - WE NEED TO CLASSIFY THE COMMENT BASED IN THE GIVEN INSTRUCTIONS AND IF TEMPLATE IS FOLLOWED AS PER INSTRUCTIONS. IT IS MANDATORY THAT YOU RESPOND ONLY WITH "${CONST_1.default.NO_ACTION}" IN CASE THE COMMENT IS NOT A PROPOSAL. \n\nPrevious comment content: ${previousBody}.\n\nEdited comment content: ${editedBody}`;
     },
     getDuplicateCheckWithdrawMessage: () => {
-        return '#### 🚫 Duplicated proposal withdrawn by 🤖 ProposalPolice.';
+        return "#### 🚫 Duplicated proposal withdrawn by 🤖 ProposalPolice.";
     },
     getDuplicateCheckNoticeMessage: (proposalAuthor, originalProposalURL) => {
-        const existingProposalWithURL = originalProposalURL ? `[existing proposal](${originalProposalURL})` : 'existing proposal';
+        const existingProposalWithURL = originalProposalURL
+            ? `[existing proposal](${originalProposalURL})`
+            : "existing proposal";
         return `⚠️ @${proposalAuthor} Your proposal is a duplicate of an already ${existingProposalWithURL} and has been automatically withdrawn to prevent spam. Please review the existing proposals before submitting a new one.`;
     },
 };
@@ -12676,15 +12687,15 @@ class OpenAIUtils {
     /**
      * The role of the `user` in the OpenAI model.
      */
-    static USER = 'user';
+    static USER = "user";
     /**
      * The role of the `assistant` in the OpenAI model.
      */
-    static ASSISTANT = 'assistant';
+    static ASSISTANT = "assistant";
     /**
      * The status of a completed run in the OpenAI model.
      */
-    static OPENAI_RUN_COMPLETED = 'completed';
+    static OPENAI_RUN_COMPLETED = "completed";
     /**
      * The maximum number of requests to make when polling for thread completion.
      */
@@ -12699,7 +12710,7 @@ class OpenAIUtils {
     /**
      * Prompt the Responses API with optional prompt caching.
      */
-    async promptResponses({ input, instructions, promptCacheKey, model = 'gpt-5.1', }) {
+    async promptResponses({ input, instructions, promptCacheKey, model = "gpt-5.1", }) {
         const response = await (0, retryWithBackoff_1.default)(() => this.client.responses.create({
             model,
             input,
@@ -12707,11 +12718,11 @@ class OpenAIUtils {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             prompt_cache_key: promptCacheKey,
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            prompt_cache_retention: '24h',
+            prompt_cache_retention: "24h",
         }), { isRetryable: (err) => OpenAIUtils.isRetryableError(err) });
         const result = response.output_text?.trim();
         if (!result) {
-            throw new Error('Error getting response from OpenAI Responses API');
+            throw new Error("Error getting response from OpenAI Responses API");
         }
         return {
             text: result,
@@ -12736,11 +12747,13 @@ class OpenAIUtils {
             assistant_id: assistantID,
         }), { isRetryable: (err) => OpenAIUtils.isRetryableError(err) });
         // 3. Poll for completion
-        let response = '';
+        let response = "";
         let count = 0;
         while (!response && count < OpenAIUtils.MAX_POLL_COUNT) {
             // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-deprecated
-            run = await this.client.beta.threads.runs.retrieve(run.id, { thread_id: thread.id });
+            run = await this.client.beta.threads.runs.retrieve(run.id, {
+                thread_id: thread.id,
+            });
             if (run.status !== OpenAIUtils.OPENAI_RUN_COMPLETED) {
                 count++;
                 await new Promise((resolve) => {
@@ -12754,19 +12767,20 @@ class OpenAIUtils {
                     continue;
                 }
                 response += message.content
-                    .map((contentBlock) => OpenAIUtils.isTextContentBlock(contentBlock) && contentBlock.text.value)
-                    .join('\n')
+                    .map((contentBlock) => OpenAIUtils.isTextContentBlock(contentBlock) &&
+                    contentBlock.text.value)
+                    .join("\n")
                     .trim();
-                console.log('Parsed assistant response:', response);
+                console.log("Parsed assistant response:", response);
             }
             if (!response) {
-                throw new Error('Assistant response is empty or had no text content. This is unexpected.');
+                throw new Error("Assistant response is empty or had no text content. This is unexpected.");
             }
         }
         return response;
     }
     static isTextContentBlock(block) {
-        return block.type === 'text';
+        return block.type === "text";
     }
     static isRetryableError(error) {
         // Handle known/predictable API errors
@@ -12778,7 +12792,7 @@ class OpenAIUtils {
             }
             // Retry conversation_locked errors (another process is still operating on this conversation)
             // This can happen when a previous request is still being processed by OpenAI
-            if ('code' in error && error.code === 'conversation_locked') {
+            if ("code" in error && error.code === "conversation_locked") {
                 return true;
             }
             return false;
@@ -12786,16 +12800,16 @@ class OpenAIUtils {
         // Handle random/unpredictable network errors
         if (error instanceof Error) {
             const msg = error.message.toLowerCase();
-            return (msg.includes('timeout') ||
-                msg.includes('socket hang up') ||
-                msg.includes('fetch failed') ||
-                msg.includes('network error') ||
-                msg.includes('connection reset') ||
-                msg.includes('connection aborted') ||
-                msg.includes('ecconnrefused') || // Node-fetch errors
-                msg.includes('dns') ||
-                msg.includes('econn') ||
-                msg.includes('request to') // node-fetch errors often include this
+            return (msg.includes("timeout") ||
+                msg.includes("socket hang up") ||
+                msg.includes("fetch failed") ||
+                msg.includes("network error") ||
+                msg.includes("connection reset") ||
+                msg.includes("connection aborted") ||
+                msg.includes("ecconnrefused") || // Node-fetch errors
+                msg.includes("dns") ||
+                msg.includes("econn") ||
+                msg.includes("request to") // node-fetch errors often include this
             );
         }
         return false;
@@ -12810,11 +12824,13 @@ class OpenAIUtils {
             parsed = JSON.parse(sanitized);
         }
         catch (e) {
-            console.error('Failed to parse AI response as JSON:', response);
+            console.error("Failed to parse AI response as JSON:", response);
             return null;
         }
-        if (typeof parsed !== 'object' || typeof parsed.action !== 'string' || typeof parsed.message !== 'string') {
-            console.error('AI response missing required fields:', parsed);
+        if (typeof parsed !== "object" ||
+            typeof parsed.action !== "string" ||
+            typeof parsed.message !== "string") {
+            console.error("AI response missing required fields:", parsed);
             return null;
         }
         return parsed;
@@ -12842,7 +12858,7 @@ function sleep(ms) {
 /**
  * Attempt an asynchronous operation (such as a network request) with exponential backoff, up to a certain number of retries.
  */
-async function retryWithBackoff(fn, { maxRetries = 5, initialDelayMs = 1000, factor = 2, isRetryable = () => true } = {}) {
+async function retryWithBackoff(fn, { maxRetries = 5, initialDelayMs = 1000, factor = 2, isRetryable = () => true, } = {}) {
     let attempt = 0;
     let delay = initialDelayMs;
     let lastError;

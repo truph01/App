@@ -11598,7 +11598,7 @@ function extractCoverageDeltaTable(body) {
     const startIndex = tableMatch.index ?? 0;
     // Find the table by looking for the header line and extracting everything until we hit the "New features" section or two consecutive newlines
     const remainingText = body.slice(startIndex);
-    const lines = remainingText.split('\n');
+    const lines = remainingText.split("\n");
     const tableLines = [];
     let emptyLineCount = 0;
     let foundTableStart = false;
@@ -11606,7 +11606,7 @@ function extractCoverageDeltaTable(body) {
         const trimmedLine = line.trim();
         // Skip lines until we find the actual table header (line starting with |)
         if (!foundTableStart) {
-            if (trimmedLine.startsWith('|') && trimmedLine.includes('Coverage Δ')) {
+            if (trimmedLine.startsWith("|") && trimmedLine.includes("Coverage Δ")) {
                 foundTableStart = true;
             }
             else {
@@ -11614,11 +11614,13 @@ function extractCoverageDeltaTable(body) {
             }
         }
         // Stop at the "New features" section (can be emoji or <details> tag)
-        if (trimmedLine.includes('🚀 New features') || trimmedLine.includes(':rocket: New features') || trimmedLine.startsWith('<details>')) {
+        if (trimmedLine.includes("🚀 New features") ||
+            trimmedLine.includes(":rocket: New features") ||
+            trimmedLine.startsWith("<details>")) {
             break;
         }
         // Track empty lines
-        if (trimmedLine === '') {
+        if (trimmedLine === "") {
             emptyLineCount++;
             // Stop if we hit 2 consecutive empty lines
             if (emptyLineCount >= 2) {
@@ -11632,8 +11634,8 @@ function extractCoverageDeltaTable(body) {
         tableLines.push(line);
     }
     // Filter out any empty or whitespace-only lines to ensure proper table formatting
-    const cleanedLines = tableLines.filter((line) => line.trim() !== '');
-    const result = cleanedLines.join('\n').trim();
+    const cleanedLines = tableLines.filter((line) => line.trim() !== "");
+    const result = cleanedLines.join("\n").trim();
     // Return null if no valid table content was found
     return result.length > 0 ? result : null;
 }
@@ -11642,7 +11644,7 @@ function extractCoverageDeltaTable(body) {
  */
 function hasDecreasedCoverage(body) {
     // Check for both emoji and markdown syntax
-    return body.includes('⬇️') || body.includes(':arrow_down:');
+    return body.includes("⬇️") || body.includes(":arrow_down:");
 }
 /**
  * Extracts the header from a CodeCov comment (preserves the markdown link)
@@ -11654,7 +11656,7 @@ function extractCodeCovHeader(body) {
         return headerMatch[0];
     }
     // Fallback to plain header
-    return '## Codecov Report';
+    return "## Codecov Report";
 }
 /**
  * Formats a CodeCov comment for the "all lines covered" case (no table)
@@ -11663,30 +11665,32 @@ function formatAllLinesCoveredComment(originalBody) {
     // Extract the original header
     const header = extractCodeCovHeader(originalBody);
     // Extract everything between the header and the "New features" section
-    const lines = originalBody.split('\n');
+    const lines = originalBody.split("\n");
     const contentLines = [];
     let foundHeader = false;
     for (const line of lines) {
         const trimmedLine = line.trim();
         // Skip until we find content after the header
         if (!foundHeader) {
-            if (trimmedLine.startsWith('##') && trimmedLine.includes('Codecov')) {
+            if (trimmedLine.startsWith("##") && trimmedLine.includes("Codecov")) {
                 foundHeader = true;
             }
             continue;
         }
         // Stop at "New features" section
-        if (trimmedLine.includes(':rocket:') || trimmedLine.includes('🚀') || trimmedLine.startsWith('<details>')) {
+        if (trimmedLine.includes(":rocket:") ||
+            trimmedLine.includes("🚀") ||
+            trimmedLine.startsWith("<details>")) {
             break;
         }
         // Skip empty lines at the start
-        if (contentLines.length === 0 && trimmedLine === '') {
+        if (contentLines.length === 0 && trimmedLine === "") {
             continue;
         }
         contentLines.push(line);
     }
     // Clean up content and build the formatted comment
-    const content = contentLines.join('\n').trim();
+    const content = contentLines.join("\n").trim();
     return `${header}\n${content}`;
 }
 /**
@@ -11696,8 +11700,8 @@ function formatCodeCovComment(originalBody) {
     // Extract the original header to preserve the link
     const header = extractCodeCovHeader(originalBody);
     // Check if this is the "all lines covered" case (no table)
-    if (originalBody.includes('All modified and coverable lines are covered by tests')) {
-        const hasCoverageTable = originalBody.includes('Coverage Δ');
+    if (originalBody.includes("All modified and coverable lines are covered by tests")) {
+        const hasCoverageTable = originalBody.includes("Coverage Δ");
         if (!hasCoverageTable) {
             // Format it by removing "New features" section but keeping the rest
             return formatAllLinesCoveredComment(originalBody);
@@ -11715,7 +11719,8 @@ function formatCodeCovComment(originalBody) {
             "❌ Looks like you've decreased code coverage for some files. Please write tests to increase, or at least maintain, the existing level of code coverage. See our documentation [here](https://github.com/Expensify/App/blob/main/contributingGuides/CodeCov.md) for how to interpret this table.";
     }
     else {
-        message = '✅ Changes either increased or maintained existing code coverage, great job!';
+        message =
+            "✅ Changes either increased or maintained existing code coverage, great job!";
     }
     // Build the new comment body with the original header
     const newBody = `${header}
@@ -11728,8 +11733,8 @@ ${coverageTable}`;
 async function run() {
     try {
         // Check if this is a comment event
-        if (github_1.context.eventName !== 'issue_comment') {
-            console.log('This action only runs on issue_comment events');
+        if (github_1.context.eventName !== "issue_comment") {
+            console.log("This action only runs on issue_comment events");
             return;
         }
         const commentId = github_1.context.payload.comment?.id;
@@ -11737,33 +11742,37 @@ async function run() {
         const commentUser = github_1.context.payload.comment?.user;
         const commentAuthor = commentUser?.login;
         // Validate required fields
-        if (!commentBody || !commentId || typeof commentBody !== 'string' || typeof commentId !== 'number') {
-            console.log('Missing or invalid comment data');
+        if (!commentBody ||
+            !commentId ||
+            typeof commentBody !== "string" ||
+            typeof commentId !== "number") {
+            console.log("Missing or invalid comment data");
             return;
         }
-        if (commentAuthor !== 'codecov[bot]') {
+        if (commentAuthor !== "codecov[bot]") {
             console.log(`Comment is not from CodeCov (author: ${commentAuthor})`);
             return;
         }
         // Check if the comment is a CodeCov report
         // CodeCov header format: ## [Codecov](url) Report or ## Codecov Report
-        const isCodeCovReport = commentBody.includes('Codecov') &&
-            commentBody.includes('Report') &&
-            (commentBody.includes('Coverage Δ') || commentBody.includes('All modified and coverable lines are covered by tests'));
+        const isCodeCovReport = commentBody.includes("Codecov") &&
+            commentBody.includes("Report") &&
+            (commentBody.includes("Coverage Δ") ||
+                commentBody.includes("All modified and coverable lines are covered by tests"));
         if (!isCodeCovReport) {
-            console.log('Comment does not appear to be a CodeCov report');
+            console.log("Comment does not appear to be a CodeCov report");
             return;
         }
-        console.log('Found a CodeCov comment, formatting...');
+        console.log("Found a CodeCov comment, formatting...");
         // Format the comment
         const formattedBody = formatCodeCovComment(commentBody);
-        if (!formattedBody || formattedBody.trim() === '') {
-            console.log('Comment should remain unchanged or formatting failed');
+        if (!formattedBody || formattedBody.trim() === "") {
+            console.log("Comment should remain unchanged or formatting failed");
             return;
         }
         // Safety check: Don't update if formatted body is identical to original
         if (formattedBody === commentBody) {
-            console.log('Formatted body is identical to original, no update needed');
+            console.log("Formatted body is identical to original, no update needed");
             return;
         }
         // Update the comment
@@ -11774,10 +11783,10 @@ async function run() {
             comment_id: commentId,
             body: formattedBody,
         });
-        console.log('Successfully formatted CodeCov comment! 🎉');
+        console.log("Successfully formatted CodeCov comment! 🎉");
     }
     catch (error) {
-        console.error('Error formatting CodeCov comment:', error);
+        console.error("Error formatting CodeCov comment:", error);
         if (error instanceof Error) {
             core.setFailed(error.message);
         }
@@ -11797,56 +11806,56 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -11854,10 +11863,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -12116,11 +12125,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',

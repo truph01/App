@@ -11588,9 +11588,9 @@ const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const GitUtils_1 = __importDefault(__nccwpck_require__(1547));
 async function run() {
     try {
-        const inputTag = core.getInput('TAG', { required: true });
-        const isProductionDeploy = !!(0, ActionUtils_1.getJSONInput)('IS_PRODUCTION_DEPLOY', { required: false }, false);
-        const deployEnv = isProductionDeploy ? 'production' : 'staging';
+        const inputTag = core.getInput("TAG", { required: true });
+        const isProductionDeploy = !!(0, ActionUtils_1.getJSONInput)("IS_PRODUCTION_DEPLOY", { required: false }, false);
+        const deployEnv = isProductionDeploy ? "production" : "staging";
         console.log(`Looking for PRs deployed to ${deployEnv} in ${inputTag}...`);
         let priorTag;
         let foundCurrentRelease = false;
@@ -11602,7 +11602,9 @@ async function run() {
         }, ({ data }, done) => {
             // For production deploys, look only at other production deploys.
             // staging deploys can be compared with other staging deploys or production deploys.
-            const filteredData = isProductionDeploy ? data.filter((release) => !release.prerelease) : data;
+            const filteredData = isProductionDeploy
+                ? data.filter((release) => !release.prerelease)
+                : data;
             // Release was in the last page, meaning the previous release is the first item in this page
             if (foundCurrentRelease) {
                 priorTag = data.at(0)?.tag_name;
@@ -11626,29 +11628,30 @@ async function run() {
             return filteredData;
         });
         if (!priorTag) {
-            throw new Error('Something went wrong and the prior tag could not be found.');
+            throw new Error("Something went wrong and the prior tag could not be found.");
         }
         console.log(`Looking for PRs deployed to ${deployEnv} between ${priorTag} and ${inputTag}`);
         const prList = await GitUtils_1.default.getPullRequestsDeployedBetween(priorTag, inputTag, CONST_1.default.APP_REPO);
-        console.log('Found the pull request list: ', prList);
-        core.setOutput('PR_LIST', prList);
+        console.log("Found the pull request list: ", prList);
+        core.setOutput("PR_LIST", prList);
         // Get Mobile-Expensify PRs deployed between the same tags
         let mobileExpensifyPRList = [];
         try {
             mobileExpensifyPRList = await GitUtils_1.default.getPullRequestsDeployedBetween(priorTag, inputTag, CONST_1.default.MOBILE_EXPENSIFY_REPO);
-            console.log('Found Mobile-Expensify pull request list: ', mobileExpensifyPRList);
+            console.log("Found Mobile-Expensify pull request list: ", mobileExpensifyPRList);
         }
         catch (error) {
             // Check if this is a forked repository
-            if (process.env.GITHUB_REPOSITORY !== `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
+            if (process.env.GITHUB_REPOSITORY !==
+                `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
                 console.warn("⚠️ Unable to fetch Mobile-Expensify PRs because this workflow is running on a forked repository and secrets aren't accessible. This is expected for development/testing on forks.");
             }
             else {
-                console.error('Failed to fetch Mobile-Expensify PRs from main repository:', error);
+                console.error("Failed to fetch Mobile-Expensify PRs from main repository:", error);
                 // Don't fail the entire workflow, just skip Mobile-Expensify PRs
             }
         }
-        core.setOutput('MOBILE_EXPENSIFY_PR_LIST', mobileExpensifyPRList);
+        core.setOutput("MOBILE_EXPENSIFY_PR_LIST", mobileExpensifyPRList);
     }
     catch (error) {
         console.error(error.message);
@@ -11736,9 +11739,9 @@ function getStringInput(name, options, defaultValue) {
  */
 function convertToNumber(value) {
     switch (typeof value) {
-        case 'number':
+        case "number":
             return value;
-        case 'string':
+        case "string":
             if (!Number.isNaN(Number(value))) {
                 return Number(value);
             }
@@ -11757,56 +11760,56 @@ function convertToNumber(value) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
+const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
-    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
-    DEFAULT_BASE_REF: 'main',
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
+    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
+    DEFAULT_BASE_REF: "main",
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: 'applausebot',
-    OS_BOTIFY: 'OSBotify',
+    APPLAUSE_BOT: "applausebot",
+    OS_BOTIFY: "OSBotify",
     LABELS: {
-        STAGING_DEPLOY: 'StagingDeployCash',
-        DEPLOY_BLOCKER: 'DeployBlockerCash',
-        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
-        INTERNAL_QA: 'InternalQA',
-        HELP_WANTED: 'Help Wanted',
-        CP_STAGING: 'CP Staging',
+        STAGING_DEPLOY: "StagingDeployCash",
+        DEPLOY_BLOCKER: "DeployBlockerCash",
+        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
+        INTERNAL_QA: "InternalQA",
+        HELP_WANTED: "Help Wanted",
+        CP_STAGING: "CP Staging",
     },
     STATE: {
-        OPEN: 'open',
+        OPEN: "open",
     },
     COMMENT: {
-        TYPE_BOT: 'Bot',
-        NAME_GITHUB_ACTIONS: 'github-actions',
+        TYPE_BOT: "Bot",
+        NAME_GITHUB_ACTIONS: "github-actions",
     },
     ACTIONS: {
-        CREATED: 'created',
-        EDITED: 'edited',
+        CREATED: "created",
+        EDITED: "edited",
     },
     EVENTS: {
-        ISSUE_COMMENT: 'issue_comment',
+        ISSUE_COMMENT: "issue_comment",
     },
     RUN_EVENT: {
-        PULL_REQUEST: 'pull_request',
-        PULL_REQUEST_TARGET: 'pull_request_target',
-        PUSH: 'push',
+        PULL_REQUEST: "pull_request",
+        PULL_REQUEST_TARGET: "pull_request_target",
+        PUSH: "push",
     },
     RUN_STATUS: {
-        COMPLETED: 'completed',
-        IN_PROGRESS: 'in_progress',
-        QUEUED: 'queued',
+        COMPLETED: "completed",
+        IN_PROGRESS: "in_progress",
+        QUEUED: "queued",
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: 'success',
+        SUCCESS: "success",
     },
-    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
-    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
-    PROPOSAL_KEYWORD: 'Proposal',
-    DATE_FORMAT_STRING: 'yyyy-MM-dd',
+    TEST_WORKFLOW_NAME: "Jest Unit Tests",
+    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
+    PROPOSAL_KEYWORD: "Proposal",
+    DATE_FORMAT_STRING: "yyyy-MM-dd",
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -11814,10 +11817,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: 'NO_ACTION',
-    ACTION_EDIT: 'ACTION_EDIT',
-    ACTION_REQUIRED: 'ACTION_REQUIRED',
-    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
+    NO_ACTION: "NO_ACTION",
+    ACTION_EDIT: "ACTION_EDIT",
+    ACTION_REQUIRED: "ACTION_REQUIRED",
+    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
 };
 exports["default"] = CONST;
 
@@ -11877,7 +11880,7 @@ const versionUpdater_1 = __nccwpck_require__(8982);
 function tagExists(tag) {
     try {
         // Check if the tag exists locally
-        (0, child_process_1.execSync)(`git show-ref --tags ${tag}`, { stdio: 'ignore' });
+        (0, child_process_1.execSync)(`git show-ref --tags ${tag}`, { stdio: "ignore" });
         return true; // Tag exists locally
     }
     catch (error) {
@@ -11890,15 +11893,17 @@ function tagExists(tag) {
                 if (needsRepack) {
                     // We have seen some scenarios where this fixes the git fetch.
                     // Why? Who knows... https://github.com/Expensify/App/pull/31459
-                    (0, child_process_1.execSync)('git repack -d', { stdio: 'inherit' });
+                    (0, child_process_1.execSync)("git repack -d", { stdio: "inherit" });
                 }
-                (0, child_process_1.execSync)(`git ls-remote --exit-code --tags origin ${tag}`, { stdio: 'ignore' });
+                (0, child_process_1.execSync)(`git ls-remote --exit-code --tags origin ${tag}`, {
+                    stdio: "ignore",
+                });
                 doesTagExist = true;
                 shouldRetry = false;
             }
             catch (e) {
                 if (!needsRepack) {
-                    console.log('Attempting to repack and retry...');
+                    console.log("Attempting to repack and retry...");
                     needsRepack = true;
                 }
                 else {
@@ -11918,7 +11923,7 @@ function tagExists(tag) {
  * @param level the Semver level to step backward by
  */
 function getPreviousExistingTag(tag, level) {
-    let previousVersion = (0, versionUpdater_1.getPreviousVersion)(tag.replace('-staging', ''), level);
+    let previousVersion = (0, versionUpdater_1.getPreviousVersion)(tag.replace("-staging", ""), level);
     let tagExistsForPreviousVersion = false;
     while (!tagExistsForPreviousVersion) {
         if (tagExists(previousVersion)) {
@@ -11969,8 +11974,8 @@ async function getPullRequestsDeployedBetween(fromTag, toTag, repositoryName) {
     const apiCommitList = await GithubUtils_1.default.getCommitHistoryBetweenTags(fromTag, toTag, repositoryName);
     const apiPullRequestNumbers = getValidMergedPRs(apiCommitList).sort((a, b) => a - b);
     console.log(`Found ${apiCommitList.length} commits.`);
-    core.startGroup('Parsed PRs:');
-    core.info(apiPullRequestNumbers.join(', '));
+    core.startGroup("Parsed PRs:");
+    core.info(apiPullRequestNumbers.join(", "));
     core.endGroup();
     return apiPullRequestNumbers;
 }
@@ -12235,11 +12240,14 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '') {
+    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
+                url: pr.html_url,
+                mergerLogin,
+            })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',
@@ -12652,10 +12660,10 @@ exports.incrementPatch = exports.incrementMinor = exports.SEMANTIC_VERSION_LEVEL
 exports.isValidSemverLevel = isValidSemverLevel;
 exports.getPreviousVersion = getPreviousVersion;
 const SEMANTIC_VERSION_LEVELS = {
-    MAJOR: 'MAJOR',
-    MINOR: 'MINOR',
-    PATCH: 'PATCH',
-    BUILD: 'BUILD',
+    MAJOR: "MAJOR",
+    MINOR: "MINOR",
+    PATCH: "PATCH",
+    BUILD: "BUILD",
 };
 exports.SEMANTIC_VERSION_LEVELS = SEMANTIC_VERSION_LEVELS;
 const MAX_INCREMENTS = 99;
@@ -12667,9 +12675,14 @@ function isValidSemverLevel(str) {
  * Transforms a versions string into a number
  */
 const getVersionNumberFromString = (versionString) => {
-    const [version, build] = versionString.split('-');
-    const [major, minor, patch] = version.split('.').map((n) => Number(n));
-    return [major, minor, patch, Number.isInteger(Number(build)) ? Number(build) : 0];
+    const [version, build] = versionString.split("-");
+    const [major, minor, patch] = version.split(".").map((n) => Number(n));
+    return [
+        major,
+        minor,
+        patch,
+        Number.isInteger(Number(build)) ? Number(build) : 0,
+    ];
 };
 exports.getVersionNumberFromString = getVersionNumberFromString;
 /**
