@@ -592,7 +592,7 @@ function IOURequestStepDistanceOdometer({
                             <PressableWithFeedback
                                 accessible
                                 accessibilityRole="button"
-                                accessibilityLabel={odometerStartImage ? translate('distance.odometer.viewImage') : translate('distance.odometer.captureImage')}
+                                accessibilityLabel={translate('distance.odometer.startTitle')}
                                 sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_START}
                                 onPress={() => {
                                     if (odometerStartImage) {
@@ -641,7 +641,7 @@ function IOURequestStepDistanceOdometer({
                             <PressableWithFeedback
                                 accessible
                                 accessibilityRole="button"
-                                accessibilityLabel={odometerEndImage ? translate('distance.odometer.viewImage') : translate('distance.odometer.captureImage')}
+                                accessibilityLabel={translate('distance.odometer.endTitle')}
                                 sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_END}
                                 onPress={() => {
                                     if (odometerEndImage) {
