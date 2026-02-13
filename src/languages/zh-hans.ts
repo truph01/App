@@ -7595,7 +7595,6 @@ ${reportName}
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} 为必填项`,
         reportContainsExpensesWithViolations: '报表包含有违规的报销。',
-        reportContainsExportErrors: '导出失败时的常规错误消息',
     },
     violationDismissal: {
         rter: {

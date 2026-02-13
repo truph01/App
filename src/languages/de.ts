@@ -7794,7 +7794,6 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} ist erforderlich`,
         reportContainsExpensesWithViolations: 'Der Bericht enthält Ausgaben mit Verstößen.',
-        reportContainsExportErrors: 'Unsere übliche Fehlermeldung bei fehlgeschlagenen Exporten',
     },
     violationDismissal: {
         rter: {

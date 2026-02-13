@@ -7750,7 +7750,6 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} é obrigatório`,
         reportContainsExpensesWithViolations: 'O relatório contém despesas com violações.',
-        reportContainsExportErrors: 'Nossa mensagem de erro padrão para exportações com falha',
     },
     violationDismissal: {
         rter: {

@@ -7781,7 +7781,6 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} è obbligatorio`,
         reportContainsExpensesWithViolations: 'Il report contiene spese con violazioni.',
-        reportContainsExportErrors: 'Il nostro messaggio di errore abituale per le esportazioni non riuscite',
     },
     violationDismissal: {
         rter: {

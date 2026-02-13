@@ -7765,7 +7765,6 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} is verplicht`,
         reportContainsExpensesWithViolations: 'Rapport bevat onkosten met overtredingen.',
-        reportContainsExportErrors: 'Onze gebruikelijke foutmelding bij mislukte exporten',
     },
     violationDismissal: {
         rter: {

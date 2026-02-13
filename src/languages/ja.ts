@@ -7708,7 +7708,6 @@ ${reportName}
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} は必須です`,
         reportContainsExpensesWithViolations: 'レポートに違反のある経費が含まれています。',
-        reportContainsExportErrors: 'エクスポートに失敗した場合の通常のエラーメッセージ',
     },
     violationDismissal: {
         rter: {

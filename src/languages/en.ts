@@ -7734,7 +7734,6 @@ const translations = {
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} is required`,
         reportContainsExpensesWithViolations: 'Report contains expenses with violations.',
-        reportContainsExportErrors: 'Our regular error message for failed to export',
     },
     violationDismissal: {
         rter: {
