@@ -127,10 +127,13 @@ function TimeSensitiveSection() {
     const hasBrokenCompanyCards = brokenCompanyCardConnections.length > 0;
     const hasBrokenPersonalCards = brokenPersonalCardConnections.length > 0;
     const hasBrokenAccountingConnections = brokenAccountingConnections.length > 0;
+    // This guard must exactly match the conditions used to render each widget below.
+    // If a widget has additional conditions in the render (e.g. && !!discountInfo), those
+    // must be reflected here to avoid showing an empty "Time sensitive" section.
     const hasAnyTimeSensitiveContent =
         shouldShowReviewCardFraud ||
         shouldShow50off ||
-        shouldShow25off ||
+        (shouldShow25off && !!discountInfo) ||
         hasBrokenCompanyCards ||
         hasBrokenPersonalCards ||
         hasBrokenAccountingConnections ||
