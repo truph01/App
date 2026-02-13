@@ -66,13 +66,14 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
 
     const isErrorMessage = type === 'error';
     const receiptError = uniqueMessages.find(isReceiptError);
+    const receiptFailureMessageShort = translate('iou.error.receiptFailureMessageShort');
     const errorIconLabel = isErrorMessage
         ? [
               CONST.ACCESSIBILITY_LABELS.ERROR,
               ...uniqueMessages
                   .map((message) => {
                       if (isReceiptError(message)) {
-                          return translate('iou.error.receiptFailureMessageShort');
+                          return receiptFailureMessageShort;
                       }
                       if (isTranslationKeyError(message)) {
                           return translate(message.translationKey);
