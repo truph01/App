@@ -904,7 +904,17 @@ function MoneyReportHeader({
 
     const addExpenseDropdownOptions = useMemo(
         () =>
-            getAddExpenseDropdownOptions(translate, expensifyIcons, moneyRequestReport?.reportID, policy, userBillingGraceEndPeriodCollection, undefined, undefined, lastDistanceExpenseType, ownerBillingGraceEndPeriod),
+            getAddExpenseDropdownOptions(
+                translate,
+                expensifyIcons,
+                moneyRequestReport?.reportID,
+                policy,
+                userBillingGraceEndPeriodCollection,
+                undefined,
+                undefined,
+                lastDistanceExpenseType,
+                ownerBillingGraceEndPeriod,
+            ),
         [moneyRequestReport?.reportID, policy, userBillingGraceEndPeriodCollection, lastDistanceExpenseType, expensifyIcons, translate],
     );
 
