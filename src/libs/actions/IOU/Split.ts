@@ -118,6 +118,7 @@ type UpdateSplitTransactionsParams = {
     policyRecentlyUsedCurrencies: string[];
     iouReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
+    isFromSplitExpensesFlow?: boolean;
 };
 
 type SplitBillActionsParams = {
@@ -1030,6 +1031,7 @@ function updateSplitTransactions({
     quickAction,
     policyRecentlyUsedCurrencies,
     iouReportNextStep,
+    isFromSplitExpensesFlow,
     betas,
 }: UpdateSplitTransactionsParams) {
     const transactionReport = getReportOrDraftReport(transactionData?.reportID);
@@ -1063,7 +1065,7 @@ function updateSplitTransactions({
     const customUnitRateID = originalTransaction?.comment?.customUnit?.customUnitRateID;
     const isPerDiem = isPerDiemRequestTransactionUtils(originalTransaction);
 
-    if (customUnitRateID && policy && !isPerDiem && isCreationOfSplits) {
+    if (customUnitRateID && policy && !isPerDiem && isCreationOfSplits && !isFromSplitExpensesFlow) {
         const customUnitRate = getDistanceRateCustomUnitRate(policy, customUnitRateID);
 
         // If the rate doesn't exist or is disabled, show an error and return early
@@ -1606,7 +1608,7 @@ function updateSplitTransactions({
 }
 
 function updateSplitTransactionsFromSplitExpensesFlow(params: UpdateSplitTransactionsParams) {
-    updateSplitTransactions(params);
+    updateSplitTransactions({...params, isFromSplitExpensesFlow: true});
     const transactionReport = getReportOrDraftReport(params.transactionData?.reportID);
     const parentTransactionReport = getReportOrDraftReport(transactionReport?.parentReportID);
     const expenseReport = transactionReport?.type === CONST.REPORT.TYPE.EXPENSE ? transactionReport : parentTransactionReport;

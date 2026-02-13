@@ -39,6 +39,7 @@ import {
 import {convertToBackendAmount, convertToDisplayString} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getLatestErrorMessage} from '@libs/ErrorUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {calculateSplitAmountFromPercentage, calculateSplitPercentagesFromAmounts} from '@libs/IOUUtils';
@@ -136,9 +137,27 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
 
     const {isBetaEnabled} = usePermissions();
 
+    const isInitialSplit = childTransactions.length === 0;
+
     // Check if the transaction has customUnitOutOfPolicy violation (distance rate error)
     const currentTransactionViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`] ?? [];
     const hasCustomUnitOutOfPolicyViolation = currentTransactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY);
+
+    let isUnitRateIDOutOfPolicy = false;
+    for (const splitExpense of splitExpenses) {
+        const splitTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(splitExpense.transactionID)}`] ?? transaction;
+        if (splitTransaction && currentPolicy) {
+            const isSplitDistance = isDistanceRequest(splitTransaction);
+            if (isSplitDistance) {
+                const currentRateID = splitExpense?.customUnit?.customUnitRateID ?? '';
+                const rates = DistanceRequestUtils.getMileageRates(currentPolicy, false, currentRateID);
+                const {rate} = DistanceRequestUtils.getRate({transaction: splitTransaction, policy: currentPolicy});
+                if (!rates[currentRateID] || !rate) {
+                    isUnitRateIDOutOfPolicy = true;
+                }
+            }
+        }
+    }
 
     useEffect(() => {
         const errorString = getLatestErrorMessage(draftTransaction ?? {});
@@ -167,10 +186,19 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     };
 
     const onSaveSplitExpense = () => {
-        if (hasCustomUnitOutOfPolicyViolation) {
+        if (isPerDiemRequest(transaction) && hasCustomUnitOutOfPolicyViolation) {
             showConfirmModal({
                 title: translate('iou.splitExpense'),
-                prompt: isPerDiemRequest(transaction) ? translate('iou.splitExpensePerDiemRateErrorModalDescription') : translate('iou.splitExpenseDistanceErrorModalDescription'),
+                prompt: translate('iou.splitExpensePerDiemRateErrorModalDescription'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
+            return;
+        }
+        if (isUnitRateIDOutOfPolicy) {
+            showConfirmModal({
+                title: translate('iou.splitExpense'),
+                prompt: translate('iou.splitExpenseDistanceErrorModalDescription'),
                 confirmText: translate('common.buttonConfirm'),
                 shouldShowCancelButton: false,
             });
@@ -315,8 +343,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
                 isSplitAction(currentItemReport, [currentTransaction], originalTransaction, currentUserPersonalDetails.login ?? '', currentUserPersonalDetails.accountID, currentItemPolicy),
         };
     });
-
-    const isInitialSplit = childTransactions.length === 0;
 
     const listFooterContent = (
         <View style={[styles.w100, styles.flexColumn, styles.mt1, shouldUseNarrowLayout && styles.mb3]}>
