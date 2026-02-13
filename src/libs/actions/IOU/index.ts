@@ -1134,6 +1134,13 @@ function handleNavigateAfterExpenseCreate({
     if (!shouldHandleNavigation) {
         return;
     }
+
+    Performance.markStart(CONST.TIMING.NAVIGATE_AFTER_EXPENSE_CREATE);
+    startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE, {
+        name: 'navigate-after-expense-create',
+        op: CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE,
+    });
+
     const queryString = buildCannedSearchQuery({type});
     Navigation.isNavigationReady().then(() => {
         if (getIsNarrowLayout()) {
