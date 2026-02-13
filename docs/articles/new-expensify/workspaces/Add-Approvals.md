@@ -88,6 +88,6 @@ No. Each employee can only be assigned one approval workflow per workspace.
 
 You’ll need to be on the Control plan, as this feature isn’t available on Collect.
 
-## Does an over-limit approver replace the existing approver?
+## What happens when a report exceeds the over-limit threshold?
 
-No. An over-limit approver adds another level to the approval workflow when the report exceeds the set dollar amount. The original approver is still required.
+If a report exceeds the configured dollar amount in the Report amount field, it is automatically forwarded to the selected Additional approver for another review step.
