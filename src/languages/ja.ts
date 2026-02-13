@@ -972,7 +972,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: '修正',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName} 会社カード接続を修正` : '法人クレジットカードの接続を修正'),
-                subtitle: 'ワークスペース > 会社カード',
+                defaultSubtitle: 'ワークスペース > 会社カード',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会社カード`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`,
