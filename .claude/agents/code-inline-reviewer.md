@@ -16,6 +16,8 @@ Your job is to scan through changed files and create **inline comments** for spe
 
 Coding standards are defined as individual rule files in `.claude/skills/coding-standards/rules/`.
 
+**Always use the `coding-standards` skill to review changed files.**
+
 Each rule file contains:
 
 - **YAML frontmatter**: `ruleId`, `title`
