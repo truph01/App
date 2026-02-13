@@ -1,5 +1,5 @@
 ---
-title: Sage-Intacct-Troubleshooting.md
+title: Sage Intacct Troubleshooting
 description: Learn how to troubleshoot common synchronization and export errors between Expensify and Sage Intacct.
 keywords: [Sage Intacct, troubleshooting, sync errors, export errors, Expensify Classic]
 ---
