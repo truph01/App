@@ -22,7 +22,8 @@ export default {
         android: platformAndroid({sourceDir: isHybrid ? './Mobile-Expensify/Android' : './android'}),
     },
     fingerprint: {
-        env: ['USE_WEB_PROXY', 'PUSHER_DEV_SUFFIX', 'SECURE_NGROK_URL', 'NGROK_URL', 'USE_NGROK'],
+        // TODO: Remove FINGERPRINT_BUST before merging — forces native rebuild for testing
+        env: ['USE_WEB_PROXY', 'PUSHER_DEV_SUFFIX', 'SECURE_NGROK_URL', 'NGROK_URL', 'USE_NGROK', 'FINGERPRINT_BUST'],
         ignorePaths: ['Mobile-Expensify/Android/assets/app/shared/bundle.js'],
     },
     // Forces React Native to build from source to include our custom patches
