@@ -47,6 +47,7 @@ import {
     isExpensifyCard,
     isExpensifyCardFullySetUp,
     isMatchingCard,
+    isPersonalCard,
     lastFourNumbersFromCardName,
     maskCardNumber,
     sortCardsByCardholderName,
@@ -2136,6 +2137,47 @@ describe('CardUtils', () => {
             };
             const description = getCardDescription(card, translateLocal);
             expect(description).toBe(CONST.EXPENSIFY_CARD.BANK);
+        });
+    });
+
+    describe('PersonalCard (isPersonalCard)', () => {
+        it('should return true when card has no fundID or fundID is "0"', () => {
+            const cardWithNoFundID: Card = {
+                accountID: 1,
+                bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                cardID: 1,
+                cardName: 'Personal Visa',
+                domainName: '',
+                fraud: 'none',
+                lastFourPAN: '1234',
+                lastScrape: '',
+                lastUpdated: '',
+                state: 3,
+            };
+            expect(isPersonalCard(cardWithNoFundID)).toBe(true);
+
+            const cardWithZeroFundID: Card = {
+                ...cardWithNoFundID,
+                fundID: '0',
+            };
+            expect(isPersonalCard(cardWithZeroFundID)).toBe(true);
+        });
+
+        it('should return true when card is CSV imported personal card (bank is PERSONAL_CARD.BANK_NAME.CSV)', () => {
+            const csvPersonalCard: Card = {
+                accountID: 1,
+                bank: CONST.PERSONAL_CARD.BANK_NAME.CSV,
+                cardID: 2,
+                cardName: 'My Imported Card',
+                domainName: '',
+                fraud: 'none',
+                fundID: '1',
+                lastFourPAN: '5678',
+                lastScrape: '',
+                lastUpdated: '',
+                state: 3,
+            };
+            expect(isPersonalCard(csvPersonalCard)).toBe(true);
         });
     });
 

@@ -120,11 +120,11 @@ function getCardDescription(card: Card | undefined, translate: LocalizedTranslat
         return '';
     }
     const isPlaid = !!getPlaidInstitutionId(card.bank);
-    const isPersonalOrCSVCard = isPersonalCard(card);
-    const bankName = isPlaid || isPersonalOrCSVCard ? card?.cardName : getBankName(card.bank);
+    const isPersonal = isPersonalCard(card);
+    const bankName = isPlaid || isPersonal ? card?.cardName : getBankName(card.bank);
     const cardDescriptor = card.state === CONST.EXPENSIFY_CARD.STATE.NOT_ACTIVATED ? translate('cardTransactions.notActivated') : card.lastFourPAN;
     const humanReadableBankName = card.bank === CONST.EXPENSIFY_CARD.BANK ? CONST.EXPENSIFY_CARD.BANK : bankName;
-    return cardDescriptor && !isPlaid && !isPersonalOrCSVCard ? `${humanReadableBankName} - ${cardDescriptor}` : `${humanReadableBankName}`;
+    return cardDescriptor && !isPlaid && !isPersonal ? `${humanReadableBankName} - ${cardDescriptor}` : `${humanReadableBankName}`;
 }
 
 /**
