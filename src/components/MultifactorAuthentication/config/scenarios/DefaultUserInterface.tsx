@@ -3,7 +3,6 @@ import {
     DefaultClientFailureScreen,
     DefaultServerFailureScreen,
     NoEligibleMethodsFailureScreen,
-    OutOfTimeFailureScreen,
     UnsupportedDeviceFailureScreen,
 } from '@components/MultifactorAuthentication/components/FailureScreen';
 import {DefaultSuccessScreen} from '@components/MultifactorAuthentication/components/SuccessScreen';
@@ -25,7 +24,6 @@ const DEFAULT_CONFIG = {
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS]: <NoEligibleMethodsFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: <UnsupportedDeviceFailureScreen />,
-        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TOO_MANY_ATTEMPTS]: <OutOfTimeFailureScreen />,
     },
 } as const satisfies MultifactorAuthenticationDefaultUIConfig;
 
