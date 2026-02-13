@@ -13,6 +13,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getSearchValueForConnection} from '@libs/AccountingUtils';
 import Navigation from '@libs/Navigation/Navigation';
+import {getValidConnectedIntegration} from '@libs/PolicyUtils';
 import {getIntegrationIcon} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import {getExportTemplates, updateAdvancedFilters} from '@userActions/Search';
@@ -40,9 +41,26 @@ function SearchFiltersExportedToPage() {
     const policy = policyIDs?.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDs.at(0)}`] : undefined;
 
     const predefinedConnectionNamesList = Object.values(CONST.POLICY.CONNECTIONS.NAME);
+    const connectedAccountingIntegrationNames = useMemo((): Set<string> => {
+        if (!policies) {
+            return new Set();
+        }
+        const connectedIntegrationNames = new Set<string>();
+        const hasWorkspaceFilter = policyIDs.length > 0;
+        // If workspace filter is applied, consider only the selected workspaces to check connected integration, otherwise consider all workspaces.
+        const policyIDsToCheck = hasWorkspaceFilter ? policyIDs : (Object.values(policies) ?? []).map((policy) => policy?.id).filter((id) => id != null);
+        for (const policyID of policyIDsToCheck) {
+            const currentPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
+            const connectedIntegration = getValidConnectedIntegration(currentPolicy);
+            if (connectedIntegration) {
+                connectedIntegrationNames.add(connectedIntegration);
+            }
+        }
+        return connectedIntegrationNames;
+    }, [policyIDs, policies]);
 
     const items = useMemo((): SearchMultipleSelectionPickerItem[] => {
-        const predefinedConnectionNamesSet = new Set<string>(predefinedConnectionNamesList);
+        const predefinedConnectionNames = new Set<string>(predefinedConnectionNamesList);
         const defaultExportOptionIcon = (
             <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter, StyleUtils.getWidthAndHeightStyle(variables.w28, variables.h28)]}>
                 <Icon
@@ -54,33 +72,35 @@ function SearchFiltersExportedToPage() {
             </View>
         );
 
-        const integrationItems: SearchMultipleSelectionPickerItem[] = predefinedConnectionNamesList.map((connectionName) => {
-            const icon = getIntegrationIcon(connectionName, expensifyIcons);
-            const leftElement = icon ? (
-                <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter]}>
-                    <Icon
-                        src={icon}
-                        width={variables.iconSizeXLarge}
-                        height={variables.iconSizeXLarge}
-                        additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.ICON_TYPE_AVATAR)]}
-                    />
-                </View>
-            ) : (
-                defaultExportOptionIcon
-            );
-            return {
-                name: CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName],
-                value: getSearchValueForConnection(connectionName),
-                leftElement,
-            };
-        });
+        const integrationItems: SearchMultipleSelectionPickerItem[] = predefinedConnectionNamesList
+            .filter((connectionName) => connectedAccountingIntegrationNames.has(connectionName))
+            .map((connectionName) => {
+                const icon = getIntegrationIcon(connectionName, expensifyIcons);
+                const leftElement = icon ? (
+                    <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter]}>
+                        <Icon
+                            src={icon}
+                            width={variables.iconSizeXLarge}
+                            height={variables.iconSizeXLarge}
+                            additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.ICON_TYPE_AVATAR)]}
+                        />
+                    </View>
+                ) : (
+                    defaultExportOptionIcon
+                );
+                return {
+                    name: CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName],
+                    value: getSearchValueForConnection(connectionName),
+                    leftElement,
+                };
+            });
         const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, policy, true);
 
         const customItems: SearchMultipleSelectionPickerItem[] = [];
         const standardItems: SearchMultipleSelectionPickerItem[] = [];
 
         for (const template of exportTemplates) {
-            if (!template.templateName || predefinedConnectionNamesSet.has(template.templateName)) {
+            if (!template.templateName || predefinedConnectionNames.has(template.templateName)) {
                 continue;
             }
 
@@ -102,7 +122,19 @@ function SearchFiltersExportedToPage() {
         customItems.sort((a, b) => localeCompare(a.name, b.name));
 
         return [...integrationItems, ...customItems, ...standardItems];
-    }, [integrationsExportTemplates, csvExportLayouts, policy, expensifyIcons, styles, StyleUtils, theme, translate, predefinedConnectionNamesList, localeCompare]);
+    }, [
+        integrationsExportTemplates,
+        csvExportLayouts,
+        policy,
+        expensifyIcons,
+        styles,
+        StyleUtils,
+        theme,
+        translate,
+        predefinedConnectionNamesList,
+        localeCompare,
+        connectedAccountingIntegrationNames,
+    ]);
 
     const initiallySelectedItems = useMemo((): SearchMultipleSelectionPickerItem[] | undefined => {
         const selectedValues = searchAdvancedFiltersForm?.exportedTo ?? [];
