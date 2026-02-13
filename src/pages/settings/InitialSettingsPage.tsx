@@ -1,16 +1,17 @@
 import {findFocusedRoute, useNavigationState, useRoute} from '@react-navigation/native';
+import {filterOutPersonalCards} from '@selectors/Card';
 import {differenceInDays} from 'date-fns';
 import {stopLocationUpdatesAsync} from 'expo-location';
-import React, {useContext, useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useLayoutEffect, useRef} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type {GestureResponderEvent, ScrollView as RNScrollView, ScrollViewProps, StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import AccountSwitcher from '@components/AccountSwitcher';
 import AccountSwitcherSkeletonView from '@components/AccountSwitcherSkeletonView';
-import ConfirmModal from '@components/ConfirmModal';
 import Icon from '@components/Icon';
 import MenuItem from '@components/MenuItem';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import NavigationTabBar from '@components/Navigation/NavigationTabBar';
 import NAVIGATION_TABS from '@components/Navigation/NavigationTabBar/NAVIGATION_TABS';
 import {PressableWithFeedback} from '@components/Pressable';
@@ -22,6 +23,7 @@ import Tooltip from '@components/Tooltip';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import useCardFeedErrors from '@hooks/useCardFeedErrors';
+import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -36,14 +38,14 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {resetExitSurveyForm} from '@libs/actions/ExitSurvey';
 import {closeReactNativeApp} from '@libs/actions/HybridApp';
 import {hasPartiallySetupBankAccount} from '@libs/BankAccountUtils';
-import {filterPersonalCards, hasPendingExpensifyCardAction} from '@libs/CardUtils';
+import {hasPendingExpensifyCardAction} from '@libs/CardUtils';
 import {convertToDisplayString} from '@libs/CurrencyUtils';
 import useIsSidebarRouteActive from '@libs/Navigation/helpers/useIsSidebarRouteActive';
 import Navigation from '@libs/Navigation/Navigation';
 import {getFreeTrialText, hasSubscriptionRedDotError} from '@libs/SubscriptionUtils';
 import {getProfilePageBrickRoadIndicator} from '@libs/UserUtils';
 import type SETTINGS_TO_RHP from '@navigation/linkingConfig/RELATIONS/SETTINGS_TO_RHP';
-import {showContextMenu} from '@pages/home/report/ContextMenu/ReportActionContextMenu';
+import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import {BACKGROUND_LOCATION_TRACKING_TASK_NAME} from '@pages/iou/request/step/IOURequestStepDistanceGPS/const';
 import variables from '@styles/variables';
 import {confirmReadyToOpenApp} from '@userActions/App';
@@ -58,16 +60,17 @@ import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
-import type {GpsDraftDetails} from '@src/types/onyx';
+import {isTrackingSelector} from '@src/selectors/GPSDraftDetails';
 import type {Icon as TIcon} from '@src/types/onyx/OnyxCommon';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 
 type InitialSettingsPageProps = WithCurrentUserPersonalDetailsProps;
 
 type SettingsTopLevelScreens = keyof typeof SETTINGS_TO_RHP;
 
-type MenuData = {
+type MenuData = WithSentryLabel & {
     translationKey: TranslationPaths;
     icon: IconAsset;
     screenName?: SettingsTopLevelScreens;
@@ -88,8 +91,6 @@ type MenuData = {
 };
 
 type Menu = {sectionStyle: StyleProp<ViewStyle>; sectionTranslationKey: TranslationPaths; items: MenuData[]};
-
-const isTrackingSelector = (gpsDraftDetails?: GpsDraftDetails) => gpsDraftDetails?.isTracking;
 
 function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPageProps) {
     const icons = useMemoizedLazyExpensifyIcons([
@@ -116,7 +117,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST, {canBeMissing: true});
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
     const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE, {canBeMissing: true});
-    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterPersonalCards, canBeMissing: true});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: true});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const [stripeCustomerId] = useOnyx(ONYXKEYS.NVP_PRIVATE_STRIPE_CUSTOMER_ID, {canBeMissing: true});
     const [session] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: false});
@@ -125,6 +126,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const [billingDisputePending] = useOnyx(ONYXKEYS.NVP_PRIVATE_BILLING_DISPUTE_PENDING, {canBeMissing: true});
     const [retryBillingFailed] = useOnyx(ONYXKEYS.SUBSCRIPTION_RETRY_BILLING_STATUS_FAILED, {canBeMissing: true});
     const [billingStatus] = useOnyx(ONYXKEYS.NVP_PRIVATE_BILLING_STATUS, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const network = useNetwork();
     const theme = useTheme();
@@ -137,15 +139,13 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const isScreenFocused = useIsSidebarRouteActive(NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR, shouldUseNarrowLayout);
     const hasActivatedWallet = ([CONST.WALLET.TIER_NAME.GOLD, CONST.WALLET.TIER_NAME.PLATINUM] as string[]).includes(userWallet?.tierName ?? '');
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, {canBeMissing: true});
-    const [isTrackingGPS] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {canBeMissing: true, selector: isTrackingSelector});
+    const [isTrackingGPS = false] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {canBeMissing: true, selector: isTrackingSelector});
     const [lastDayFreeTrial] = useOnyx(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, {canBeMissing: true});
     const [unsharedBankAccount] = useOnyx(ONYXKEYS.UNSHARE_BANK_ACCOUNT, {canBeMissing: true});
     const privateSubscription = usePrivateSubscription();
     const subscriptionPlan = useSubscriptionPlan();
     const previousUserPersonalDetails = usePrevious(currentUserPersonalDetails);
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {canBeMissing: true});
-
-    const shouldLogout = useRef(false);
 
     const freeTrialText = getFreeTrialText(translate, policies, introSelected, firstDayFreeTrial, lastDayFreeTrial);
 
@@ -169,8 +169,6 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         walletBrickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.INFO;
     }
 
-    const [shouldShowSignoutConfirmModal, setShouldShowSignoutConfirmModal] = useState(false);
-
     const hasAccountBeenSwitched = currentUserPersonalDetails.accountID !== previousUserPersonalDetails.accountID;
 
     useEffect(() => {
@@ -186,17 +184,36 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         confirmReadyToOpenApp();
     }, []);
 
-    const toggleSignoutConfirmModal = (value: boolean) => {
-        setShouldShowSignoutConfirmModal(value);
+    const {showConfirmModal} = useConfirmModal();
+    const confirmModalTitle = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.title') : translate('common.areYouSure');
+    const confirmModalPrompt = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.prompt') : translate('initialSettingsPage.signOutConfirmationText');
+    const confirmModalConfirmText = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.confirm') : translate('initialSettingsPage.signOut');
+
+    const showSignOutModal = () => {
+        return showConfirmModal({
+            title: confirmModalTitle,
+            prompt: confirmModalPrompt,
+            confirmText: confirmModalConfirmText,
+            cancelText: translate('common.cancel'),
+            shouldShowCancelButton: true,
+            danger: true,
+        });
     };
 
-    const signOut = (shouldForceSignout = false) => {
+    const signOut = async (shouldForceSignout = false) => {
         if ((!network.isOffline && !isTrackingGPS) || shouldForceSignout) {
             return signOutAndRedirectToSignIn();
         }
 
         // When offline, warn the user that any actions they took while offline will be lost if they sign out
-        toggleSignoutConfirmModal(true);
+        const result = await showSignOutModal();
+        if (result.action !== ModalActions.CONFIRM) {
+            return;
+        }
+        if (isTrackingGPS) {
+            stopLocationUpdatesAsync(BACKGROUND_LOCATION_TRACKING_TASK_NAME).catch((error) => console.error('[GPS distance request] Failed to stop location tracking', error));
+        }
+        signOut(true);
     };
 
     const surveyThresholdInDays = 30;
@@ -217,6 +234,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             icon: icons.Profile,
             screenName: SCREENS.SETTINGS.PROFILE.ROOT,
             brickRoadIndicator: profileBrickRoadIndicator,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.PROFILE,
             action: () => Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute()),
         },
         {
@@ -224,19 +242,29 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             icon: icons.Wallet,
             screenName: SCREENS.SETTINGS.WALLET.ROOT,
             brickRoadIndicator: walletBrickRoadIndicator,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.WALLET,
             action: () => Navigation.navigate(ROUTES.SETTINGS_WALLET),
             badgeText: hasActivatedWallet ? convertToDisplayString(userWallet?.currentBalance) : undefined,
+        },
+        {
+            translationKey: 'expenseRulesPage.title',
+            icon: icons.Bolt,
+            screenName: SCREENS.SETTINGS.RULES.ROOT,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.RULES,
+            action: () => Navigation.navigate(ROUTES.SETTINGS_RULES),
         },
         {
             translationKey: 'common.preferences',
             icon: icons.Gear,
             screenName: SCREENS.SETTINGS.PREFERENCES.ROOT,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.PREFERENCES,
             action: () => Navigation.navigate(ROUTES.SETTINGS_PREFERENCES),
         },
         {
             translationKey: 'initialSettingsPage.security',
             icon: icons.Lock,
             screenName: SCREENS.SETTINGS.SECURITY,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.SECURITY,
             action: () => Navigation.navigate(ROUTES.SETTINGS_SECURITY),
         },
     ];
@@ -247,11 +275,13 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             icon: icons.CreditCard,
             screenName: SCREENS.SETTINGS.SUBSCRIPTION.ROOT,
             brickRoadIndicator:
-                !!privateSubscription?.errors || hasSubscriptionRedDotError(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus)
+                !!privateSubscription?.errors ||
+                hasSubscriptionRedDotError(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, ownerBillingGraceEndPeriod)
                     ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR
                     : undefined,
             badgeText: freeTrialText,
             badgeStyle: freeTrialText ? styles.badgeSuccess : undefined,
+            sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.SUBSCRIPTION,
             action: () => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION.route),
         });
     }
@@ -271,7 +301,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             icon: icons.ExpensifyLogoNew,
             ...(CONFIG.IS_HYBRID_APP
                 ? {
-                      action: () => closeReactNativeApp({shouldSetNVP: true}),
+                      action: () => closeReactNativeApp({shouldSetNVP: true, isTrackingGPS}),
                   }
                 : {
                       action() {
@@ -409,6 +439,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                             onSecondaryInteraction={item.link ? (event) => openPopover(item.link, event) : undefined}
                             focused={isFocused}
                             isPaneMenu
+                            sentryLabel={item.sentryLabel}
                             iconRight={item.iconRight}
                             shouldShowRightIcon={item.shouldShowRightIcon}
                             shouldIconUseAutoWidthStyle
@@ -434,6 +465,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
                             accessibilityLabel={emojiCode ? `${translate('statusPage.status')}: ${emojiCode}` : translate('statusPage.status')}
                             accessibilityRole="button"
                             accessible
+                            sentryLabel={CONST.SENTRY_LABEL.ACCOUNT.STATUS_PICKER}
                             onPress={() => Navigation.navigate(ROUTES.SETTINGS_STATUS)}
                         >
                             <View style={styles.primaryMediumIcon}>
@@ -476,10 +508,6 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         scrollViewRef.current.scrollTo({y: scrollOffset, animated: false});
     }, [getScrollOffset, route]);
 
-    const confirmModalTitle = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.title') : translate('common.areYouSure');
-    const confirmModalPrompt = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.prompt') : translate('initialSettingsPage.signOutConfirmationText');
-    const confirmModalConfirmText = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.confirm') : translate('initialSettingsPage.signOut');
-
     return (
         <ScreenWrapper
             includeSafeAreaPaddingBottom
@@ -498,30 +526,6 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             >
                 {accountMenuItems}
                 {generalMenuItems}
-                <ConfirmModal
-                    danger
-                    title={confirmModalTitle}
-                    prompt={confirmModalPrompt}
-                    confirmText={confirmModalConfirmText}
-                    cancelText={translate('common.cancel')}
-                    isVisible={shouldShowSignoutConfirmModal}
-                    onConfirm={() => {
-                        if (isTrackingGPS) {
-                            stopLocationUpdatesAsync(BACKGROUND_LOCATION_TRACKING_TASK_NAME).catch((error) =>
-                                console.error('[GPS distance request] Failed to stop location tracking', error),
-                            );
-                        }
-                        toggleSignoutConfirmModal(false);
-                        shouldLogout.current = true;
-                    }}
-                    onCancel={() => toggleSignoutConfirmModal(false)}
-                    onModalHide={() => {
-                        if (!shouldLogout.current) {
-                            return;
-                        }
-                        signOut(true);
-                    }}
-                />
             </ScrollView>
         </ScreenWrapper>
     );
