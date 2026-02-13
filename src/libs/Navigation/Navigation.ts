@@ -460,6 +460,11 @@ function goBack(backToRoute?: Route, options?: GoBackOptions) {
         return;
     }
 
+    if (shouldPopToSidebar) {
+        popToSidebar();
+        return;
+    }
+
     if (!navigationRef.current?.canGoBack()) {
         Log.hmmm('[Navigation] Unable to go back');
         return;
@@ -753,19 +758,6 @@ const dismissModalWithReport = ({reportID, reportActionID, referrer, backTo}: Re
     });
 };
 
-/**
- * Returns to the first screen in the stack, dismissing all the others, only if the global variable shouldPopToSidebar is set to true.
- */
-function popToTop() {
-    if (!shouldPopToSidebar) {
-        goBack();
-        return;
-    }
-
-    shouldPopToSidebar = false;
-    navigationRef.current?.dispatch(StackActions.popToTop());
-}
-
 function popRootToTop() {
     const rootState = navigationRef.getRootState();
     navigationRef.current?.dispatch({...StackActions.popToTop(), target: rootState.key});
@@ -934,7 +926,6 @@ export default {
     goBackToHome,
     closeRHPFlow,
     setNavigationActionToMicrotaskQueue,
-    popToTop,
     popRootToTop,
     pop,
     removeScreenFromNavigationState,
