@@ -410,10 +410,12 @@ jobs:
         with:
           ref: ${{ inputs.APP_REF }}
 
-      - name: Get Mobile-Expensify submodule SHA
-        id: getSubmoduleSHA
+      - name: Get Mobile-Expensify ref
+        id: getMobileExpensifySHA
         run: |
-          if [ -d "Mobile-Expensify" ]; then
+          if [ -n "${{ inputs.MOBILE_EXPENSIFY_REF }}" ]; then
+            echo "SHA=${{ inputs.MOBILE_EXPENSIFY_REF }}" >> "$GITHUB_OUTPUT"
+          elif [ -d "Mobile-Expensify" ]; then
             SUBMODULE_SHA=$(git ls-tree HEAD Mobile-Expensify | awk '{print $3}')
             echo "SHA=$SUBMODULE_SHA" >> "$GITHUB_OUTPUT"
           fi
@@ -428,7 +430,7 @@ jobs:
             const webLink = prNumber && '${{ needs.web.result }}' === 'success' ? `https://${prNumber}.pr-testing.expensify.com` : '';
             const androidLink = '${{ needs.androidHybrid.outputs.ROCK_ANDROID_ADHOC_INDEX_URL }}' || '';
             const iosLink = '${{ needs.iosHybrid.outputs.ROCK_IOS_ADHOC_INDEX_URL }}' || '';
-            const submoduleSHA = '${{ steps.getSubmoduleSHA.outputs.SHA }}' || '';
+            const mobileExpensifySHA = '${{ steps.getMobileExpensifySHA.outputs.SHA }}' || '';
 
             const webStatus = webLink ? '✅ Success' : '${{ needs.web.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
             const androidStatus = androidLink ? '✅ Success' : '${{ needs.androidHybrid.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
@@ -454,9 +456,10 @@ jobs:
                 ],
               ]);
 
-            if (submoduleSHA) {
-              const submoduleUrl = `https://github.com/Expensify/Mobile-Expensify/commit/${submoduleSHA}`;
-              summary.addRaw(`\n**Mobile-Expensify Submodule SHA:** [${submoduleSHA}](${submoduleUrl})`);
+            if (mobileExpensifySHA) {
+              const mobileExpensifyUrl = `https://github.com/Expensify/Mobile-Expensify/commit/${mobileExpensifySHA}`;
+              const label = '${{ inputs.MOBILE_EXPENSIFY_REF }}' ? 'Mobile-Expensify SHA (Custom)' : 'Mobile-Expensify Submodule SHA';
+              summary.addRaw(`\n**${label}:** [${mobileExpensifySHA}](${mobileExpensifyUrl})`);
             }
 
             if (prNumber) {
