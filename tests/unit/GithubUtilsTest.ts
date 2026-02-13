@@ -422,11 +422,10 @@ describe('GithubUtils', () => {
         const assignOctocat = ' - @octocat';
         const deployerVerificationsHeader = '\r\n**Deployer verifications:**';
         // eslint-disable-next-line max-len
-        const firebaseVerificationCurrentRelease =
-            'I checked [Firebase Crashlytics](https://console.firebase.google.com/u/0/project/expensify-mobile-app/crashlytics/app/ios:com.expensify.expensifylite/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).';
         // eslint-disable-next-line max-len
-        const firebaseVerificationPreviousRelease =
-            'I checked [Firebase Crashlytics](https://console.firebase.google.com/u/0/project/expensify-mobile-app/crashlytics/app/android:org.me.mobiexpensifyg/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount) for **the previous release version** and verified that the release did not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).';
+        const sentryVerificationCurrentRelease = `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
+        // eslint-disable-next-line max-len
+        const sentryVerificationPreviousRelease = `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40/?project=app) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
         // eslint-disable-next-line max-len
         const ghVerification = 'I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.';
 
@@ -458,8 +457,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${openCheckbox}${PRListMobileExpensify.at(1)}` +
                         `${lineBreak}${openCheckbox}${PRListMobileExpensify.at(2)}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
@@ -503,8 +502,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${closedCheckbox}${basePRList.at(4)}` +
                         `${lineBreak}${closedCheckbox}${basePRList.at(5)}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
@@ -521,8 +520,8 @@ describe('GithubUtils', () => {
                 expect(issue.issueBody).toBe(
                     `${allVerifiedExpectedOutput}` +
                         `${lineBreak}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
@@ -542,8 +541,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(0)}` +
                         `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(1)}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}${lineBreak}` +
                         `${lineBreak}${ccApplauseLeads}`,
                 );
@@ -563,8 +562,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
                         `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(1)}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
@@ -588,8 +587,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
                         `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(1)}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
@@ -619,8 +618,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${openCheckbox}${internalQAPRList.at(0)}${assignOctocat}` +
                         `${lineBreak}${openCheckbox}${internalQAPRList.at(1)}${assignOctocat}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
@@ -645,8 +644,8 @@ describe('GithubUtils', () => {
                         `${lineBreak}${closedCheckbox}${internalQAPRList.at(0)}${assignOctocat}` +
                         `${lineBreak}${openCheckbox}${internalQAPRList.at(1)}${assignOctocat}` +
                         `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${firebaseVerificationPreviousRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
                         `${lineBreak}${openCheckbox}${ghVerification}` +
                         `${lineBreakDouble}${ccApplauseLeads}`,
                 );
