@@ -36,7 +36,6 @@ import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchShouldCalculateTotals from '@hooks/useSearchShouldCalculateTotals';
 import useSelfDMReport from '@hooks/useSelfDMReport';
-import useSortedActiveAdminPolicies from '@hooks/useSortedActiveAdminPolicies';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
@@ -165,7 +164,6 @@ function SearchPage({route}: SearchPageProps) {
 
     const queryJSON = useMemo(() => buildSearchQueryJSON(route.params.q, route.params.rawQuery), [route.params.q, route.params.rawQuery]);
     const {saveScrollOffset} = useContext(ScrollOffsetContext);
-    const activeAdminPolicies = useSortedActiveAdminPolicies();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Export',
         'Table',
@@ -232,7 +230,6 @@ function SearchPage({route}: SearchPageProps) {
     const {bulkPayButtonOptions, latestBankItems} = useBulkPayOptions({
         selectedPolicyID: selectedPolicyIDs.at(0),
         selectedReportID: selectedTransactionReportIDs.at(0) ?? selectedReportIDs.at(0),
-        activeAdminPolicies,
         isCurrencySupportedWallet: isCurrencySupportedBulkWallet,
         currency: selectedBulkCurrency,
         formattedAmount: totalFormattedAmount,
