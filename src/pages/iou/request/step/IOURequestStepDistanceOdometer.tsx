@@ -575,7 +575,7 @@ function IOURequestStepDistanceOdometer({
             <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween, styles.ph5, styles.pt5, styles.mb5]}>
                 <View>
                     {/* Start Reading */}
-                    <View style={[styles.mb6, !isEditing && [styles.flexRow, styles.alignItemsCenter, styles.gap3]]}>
+                    <View style={[styles.mb6, styles.flexRow, !isEditing && [styles.alignItemsCenter, styles.gap3]]}>
                         <View style={[styles.flex1]}>
                             <TextInput
                                 key={`start-${inputKey}`}
@@ -623,7 +623,7 @@ function IOURequestStepDistanceOdometer({
                         )}
                     </View>
                     {/* End Reading */}
-                    <View style={[styles.mb6, !isEditing && [styles.flexRow, styles.alignItemsCenter, styles.gap3]]}>
+                    <View style={[styles.mb6, styles.flexRow, !isEditing && [styles.alignItemsCenter, styles.gap3]]}>
                         <View style={[styles.flex1]}>
                             <TextInput
                                 key={`end-${inputKey}`}
