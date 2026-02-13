@@ -1,19 +1,18 @@
 import type StopRecordingParams from './handleStopRecording.types';
 
-type FinalizeStopRecordingParams = Pick<StopRecordingParams, 'infoFileName' | 'appInfo' | 'logsWithParsedMessages' | 'onDisableLogging' | 'cleanupAfterDisable' | 'zipRef' | 'onDownloadZip'>;
+type FinalizeStopRecordingParams = Pick<StopRecordingParams, 'infoFileName' | 'appInfo' | 'onCompleteRecording' | 'cleanupAfterDisable' | 'zipRef' | 'onDownloadZip'>;
 
 export default async function finalizeStopRecording({
     infoFileName,
     appInfo,
-    logsWithParsedMessages,
-    onDisableLogging,
+    onCompleteRecording,
     cleanupAfterDisable,
     zipRef,
     onDownloadZip,
 }: FinalizeStopRecordingParams): Promise<void> {
     zipRef.current?.file(infoFileName, appInfo);
 
-    await onDisableLogging(logsWithParsedMessages);
+    await onCompleteRecording();
     cleanupAfterDisable();
     onDownloadZip?.();
 }

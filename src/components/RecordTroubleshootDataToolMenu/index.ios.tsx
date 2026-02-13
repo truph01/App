@@ -61,7 +61,7 @@ function RecordTroubleshootDataToolMenu() {
         <BaseRecordTroubleshootDataToolMenu
             file={file}
             onEnableLogging={() => setFile(undefined)}
-            onDisableLogging={createFile}
+            onCompleteRecording={createFile}
             pathToBeUsed={RNFS.DocumentDirectoryPath}
             showShareButton
             zipRef={zipRef}

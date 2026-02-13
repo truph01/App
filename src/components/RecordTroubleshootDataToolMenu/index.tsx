@@ -14,24 +14,19 @@ function RecordTroubleshootDataToolMenu() {
 
     const zipRef = useRef(new JSZip());
 
-    const onDisableLogging = (logs: Array<Record<string, unknown>>) => {
-        const data = JSON.stringify(logs, null, 2);
-        const newFileName = appendTimeToFileName('logs.txt');
-        zipRef.current.file(newFileName, data);
-
-        return ExportOnyxState.readFromOnyxDatabase()
+    const onCompleteRecording = () =>
+        ExportOnyxState.readFromOnyxDatabase()
             .then((value: Record<string, unknown>) => {
                 const dataToShare = JSON.stringify(ExportOnyxState.maskOnyxState(value, shouldMaskOnyxState));
                 zipRef.current.file(CONST.DEFAULT_ONYX_DUMP_FILE_NAME, dataToShare);
             })
             .then(() => {
                 setFile({
-                    path: './logs',
-                    newFileName: 'logs',
-                    size: data.length,
+                    path: './troubleshoot',
+                    newFileName: 'troubleshoot',
+                    size: 0,
                 });
             });
-    };
 
     const hideShareButton = () => {
         setFile(undefined);
@@ -60,7 +55,7 @@ function RecordTroubleshootDataToolMenu() {
         <BaseRecordTroubleshootDataToolMenu
             zipRef={zipRef}
             file={file}
-            onDisableLogging={onDisableLogging}
+            onCompleteRecording={onCompleteRecording}
             onEnableLogging={hideShareButton}
             pathToBeUsed=""
             onDownloadZip={onDownloadZip}

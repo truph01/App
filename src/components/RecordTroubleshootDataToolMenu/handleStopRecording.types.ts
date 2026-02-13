@@ -7,8 +7,7 @@ type StopRecordingParams = {
     infoFileName: string;
     profileFileName: string;
     appInfo: string;
-    logsWithParsedMessages: Array<Record<string, unknown>>;
-    onDisableLogging: (logs: Array<Record<string, unknown>>) => Promise<void>;
+    onCompleteRecording: () => Promise<void>;
     cleanupAfterDisable: () => void;
     zipRef: RefObject<InstanceType<typeof JSZip>>;
     pathToBeUsed: string;

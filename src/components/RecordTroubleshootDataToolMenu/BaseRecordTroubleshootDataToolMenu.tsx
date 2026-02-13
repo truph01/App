@@ -28,20 +28,28 @@ type File = {
 type BaseRecordTroubleshootDataToolMenuProps = {
     /** Locally created file */
     file?: File;
-    /** Action to run when disabling the switch */
-    onDisableLogging: (logs: Array<Record<string, unknown>>) => Promise<void>;
+
+    /** Called when recording is stopped to add Onyx dump to zip and update share UI */
+    onCompleteRecording: () => Promise<void>;
+
     /** Action to run when enabling logging */
     onEnableLogging?: () => void;
+
     /** Path used to save the file */
     pathToBeUsed: string;
+
     /** Whether to show the share button */
     showShareButton?: boolean;
+
     /** Zip ref */
     zipRef: RefObject<InstanceType<typeof JSZip>>;
+
     /** A method to download the zip archive */
     onDownloadZip?: () => void;
+
     /** It's a desktop-only prop, as it's impossible to download two files simultaneously */
     showDownloadButton?: boolean;
+
     /** Path used to display location of saved file */
     displayPath?: string;
 };
@@ -66,7 +74,7 @@ const newFileName = `Profile_trace_for_${pkg.version}.cpuprofile`;
 
 function BaseRecordTroubleshootDataToolMenu({
     file,
-    onDisableLogging,
+    onCompleteRecording,
     onEnableLogging,
     showShareButton = false,
     pathToBeUsed,
@@ -119,8 +127,7 @@ function BaseRecordTroubleshootDataToolMenu({
                 infoFileName,
                 profileFileName: newFileName,
                 appInfo,
-                logsWithParsedMessages: [],
-                onDisableLogging,
+                onCompleteRecording,
                 cleanupAfterDisable,
                 zipRef,
                 pathToBeUsed,
