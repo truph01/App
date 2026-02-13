@@ -17,7 +17,7 @@ jest.mock('@react-navigation/native', () => {
     return {
         ...actualNav,
         useIsFocused: () => true,
-        useRoute: jest.fn(() => ({name: 'ContactMethodDetails', key: 'test-key', params: {}})),
+        useRoute: jest.fn(() => ({name: '', key: '', params: {}})),
         usePreventRemove: jest.fn(),
     };
 });
