@@ -108,6 +108,7 @@ function InteractiveStepSubHeader({stepNames, startStepIndex = 0, onStepSelected
                             accessible={false}
                             aria-hidden
                             role={CONST.ROLE.BUTTON}
+                            sentryLabel={CONST.SENTRY_LABEL.INTERACTIVE_STEP_SUB_HEADER.STEP_BUTTON}
                         >
                             {isCompletedStep ? (
                                 <Icon

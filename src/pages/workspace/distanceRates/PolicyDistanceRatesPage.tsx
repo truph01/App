@@ -253,7 +253,7 @@ function PolicyDistanceRatesPage({
                     ),
                 };
             }),
-        [canDisableOrDeleteRate, customUnitRates, translate, customUnit?.attributes?.unit, customUnit?.pendingFields?.attributes, policy?.pendingAction, updateDistanceRateEnabled],
+        [canDisableOrDeleteRate, customUnitRates, unitTranslation, customUnit?.pendingFields?.attributes, policy?.pendingAction, updateDistanceRateEnabled],
     );
 
     const filterRate = useCallback((rate: RateForList, searchInput: string) => {
