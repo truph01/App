@@ -1,5 +1,4 @@
-import type { TelemetryBeforeSend } from './index';
-
+import type {TelemetryBeforeSend} from './index';
 
 /**
  * Middleware that filters out cancelled HTTP client spans.
