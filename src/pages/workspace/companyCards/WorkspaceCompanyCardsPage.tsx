@@ -10,6 +10,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import {getDomainOrWorkspaceAccountID} from '@libs/CardUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
+import {getMemberAccountIDsForWorkspace} from '@libs/PolicyUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import WorkspacePageWithSections from '@pages/workspace/WorkspacePageWithSections';
 import {openPolicyCompanyCardsFeed, openPolicyCompanyCardsPage} from '@userActions/CompanyCards';
@@ -43,8 +44,9 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
     const domainOrWorkspaceAccountID = getDomainOrWorkspaceAccountID(workspaceAccountID, selectedFeed);
 
     const loadPolicyCompanyCardsPage = useCallback(() => {
-        openPolicyCompanyCardsPage(policyID, domainOrWorkspaceAccountID, translate);
-    }, [domainOrWorkspaceAccountID, policyID, translate]);
+        const emailList = Object.keys(getMemberAccountIDsForWorkspace(policy?.employeeList));
+        openPolicyCompanyCardsPage(policyID, domainOrWorkspaceAccountID, emailList, translate);
+    }, [domainOrWorkspaceAccountID, policyID, policy?.employeeList, translate]);
 
     const {isOffline} = useNetwork({
         onReconnect: loadPolicyCompanyCardsPage,
