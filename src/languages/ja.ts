@@ -984,7 +984,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `${cardName} 個人カード接続を修正` : '個人カード接続を修正'),
                 subtitle: 'ウォレット > 割り当てられたカード',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`, subtitle: 'ワークスペース > 会計'},
         },
         announcements: 'お知らせ',
         discoverSection: {

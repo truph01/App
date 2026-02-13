@@ -988,7 +988,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `Repareer de persoonlijke kaartverbinding van ${cardName}` : 'Repareer de persoonlijke kaartverbinding'),
                 subtitle: 'Portemonnee > Toegewezen kaarten',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Verbinding met ${integrationName} repareren`, subtitle: 'Werkruimte > Boekhouding'},
         },
         announcements: 'Aankondigingen',
         discoverSection: {

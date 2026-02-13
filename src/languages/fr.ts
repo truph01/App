@@ -993,7 +993,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `Corriger la connexion de la carte personnelle ${cardName}` : 'Corriger la connexion de la carte personnelle'),
                 subtitle: 'Portefeuille > Cartes attribuées',
             },
-            fixAccountingConnection: {title: ({integrationName}: {integrationName: string}) => `Corriger la connexion ${integrationName}`, subtitle: 'Espace de travail > Comptabilité'},
         },
         announcements: 'Annonces',
         discoverSection: {
