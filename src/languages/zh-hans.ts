@@ -1098,6 +1098,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: '您已无法访问之前的快捷操作目标。请在下方选择一个新的目标。',
         updateDestination: '更新目的地',
         createReport: '创建报表',
+        createTimeExpense: '创建工时报销',
     },
     iou: {
         amount: '金额',
