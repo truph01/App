@@ -466,6 +466,7 @@ function IOURequestStepConfirmation({
     }, [
         action,
         isPerDiemRequest,
+        isCreatingTrackExpense,
         transaction?.isFromGlobalCreate,
         transaction?.receipt?.isTestReceipt,
         transaction?.receipt?.isTestDriveReceipt,
