@@ -429,7 +429,7 @@ jobs:
 
       - name: Rock Remote Build - iOS
         id: rock-remote-build-ios
-        uses: callstackincubator/ios@d638bd25c764655baeeced3232c692f1698cf72b
+        uses: callstackincubator/ios@dd30f7e53eee2ea6a59509793d0a30fbb5c91216
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -457,7 +457,7 @@ jobs:
               }
             ]
           comment-bot: false
-          custom-ref: ${{ needs.prep.outputs.APP_REF }}
+          custom-identifier: ${{ needs.prep.outputs.APP_REF }}
 
       - name: Set artifact URL output
         id: set-artifact-url
