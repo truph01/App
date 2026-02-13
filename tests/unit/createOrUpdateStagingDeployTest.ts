@@ -149,7 +149,7 @@ const sentryVerificationCurrentRelease = (version: string) =>
     `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${version}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
 // eslint-disable-next-line max-len
 const sentryVerificationPreviousRelease = (version: string) =>
-    `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${version}/?project=app) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
+    `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${version}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
 // eslint-disable-next-line max-len
 const ghVerification = 'I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.';
 const ccApplauseLeads = `cc @Expensify/applauseleads\r\n`;
