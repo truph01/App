@@ -1586,8 +1586,8 @@ describe('ReportActionsUtils', () => {
             const expectedCustomFieldMessage = translateLocal('report.actions.type.updatedCustomField1', formattedEmail, customFieldNewValue, customFieldOldValue);
             const expectedRoleMessage = translateLocal('report.actions.type.updateRole', {
                 email: formattedEmail,
-                newRole: translateLocal('workspace.common.roleName', {role: newRole}).toLowerCase(),
-                currentRole: translateLocal('workspace.common.roleName', {role: previousRole}).toLowerCase(),
+                newRole: translateLocal('workspace.common.roleName', newRole).toLowerCase(),
+                currentRole: translateLocal('workspace.common.roleName', previousRole).toLowerCase(),
             });
 
             const actual = ReportActionsUtils.getPolicyChangeLogUpdateEmployee(translateLocal, action);
@@ -1611,7 +1611,7 @@ describe('ReportActionsUtils', () => {
             };
 
             const actual = ReportActionsUtils.getPolicyChangeLogDeleteMemberMessage(translateLocal, action);
-            const expected = translateLocal('report.actions.type.removeMember', formatPhoneNumber(email), translateLocal('workspace.common.roleName', {role}).toLowerCase());
+            const expected = translateLocal('report.actions.type.removeMember', formatPhoneNumber(email), translateLocal('workspace.common.roleName', role).toLowerCase());
             expect(actual).toBe(expected);
         });
     });
@@ -2650,7 +2650,7 @@ describe('ReportActionsUtils', () => {
             const actual = ReportActionsUtils.getDynamicExternalWorkflowRoutedMessage(action, translateLocal);
 
             // Then it should return the routed due to DEW message with the correct "to" value
-            const expected = translateLocal('iou.routedDueToDEW', {to});
+            const expected = translateLocal('iou.routedDueToDEW', to);
             expect(actual).toBe(expected);
         });
     });
