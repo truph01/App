@@ -16,16 +16,16 @@ import AmountCell from '@components/SelectionListWithSections/Search/TotalCell';
 import UserInfoCell from '@components/SelectionListWithSections/Search/UserInfoCell';
 import WorkspaceCell from '@components/SelectionListWithSections/Search/WorkspaceCell';
 import Text from '@components/Text';
-import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isCategoryMissing} from '@libs/CategoryUtils';
 import getBase62ReportID from '@libs/getBase62ReportID';
-import {computeReportName} from '@libs/ReportNameUtils';
+import {getReportName} from '@libs/ReportNameUtils';
 import {isExpenseReport, isIOUReport, isSettled} from '@libs/ReportUtils';
 import StringUtils from '@libs/StringUtils';
 import {
@@ -45,7 +45,9 @@ import {
     isUnreportedAndHasInvalidDistanceRateTransaction,
 } from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
+import reportsSelector from '@selectors/Attributes';
 import type {TranslationPaths} from '@src/languages/types';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetails, Policy, Report, ReportAction, TransactionViolation} from '@src/types/onyx';
 import type {SearchTransactionAction} from '@src/types/onyx/SearchResults';
 import CategoryCell from './DataCells/CategoryCell';
@@ -194,7 +196,7 @@ function TransactionItemRow({
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const {isLargeScreenWidth} = useResponsiveLayout();
-    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
     const hasCategoryOrTag = !isCategoryMissing(transactionItem?.category) || !!transactionItem.tag;
     const createdAt = getTransactionCreated(transactionItem);
     const expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
@@ -562,11 +564,7 @@ function TransactionItemRow({
             [CONST.SEARCH.TABLE_COLUMNS.TITLE]: (
                 <View style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TITLE)]}>
                     <TextCell
-                        text={
-                            computeReportName(transactionItem.report, undefined, undefined, undefined, undefined, undefined, undefined, currentUserAccountID) ??
-                            transactionItem.report?.reportName ??
-                            ''
-                        }
+                        text={getReportName(transactionItem.report, reportAttributes)}
                         isLargeScreenWidth={isLargeScreenWidth}
                     />
                 </View>
@@ -614,7 +612,7 @@ function TransactionItemRow({
             isAmountColumnWide,
             isTaxAmountColumnWide,
             isLargeScreenWidth,
-            currentUserAccountID,
+            reportAttributes,
             reportActions,
         ],
     );
