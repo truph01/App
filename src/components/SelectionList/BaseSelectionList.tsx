@@ -80,6 +80,7 @@ function BaseSelectionList<TItem extends ListItem>({
     shouldStopPropagation = false,
     shouldHeaderBeInsideList = false,
     shouldScrollToFocusedIndex = true,
+    stayAtTopOnMount = false,
     shouldDebounceScrolling = false,
     shouldUpdateFocusedIndex = false,
     shouldSingleExecuteRowSelect = false,
@@ -526,7 +527,7 @@ function BaseSelectionList<TItem extends ListItem>({
                         onEndReachedThreshold={onEndReachedThreshold}
                         style={style?.listStyle}
                         contentContainerStyle={styles.pb3}
-                        initialScrollIndex={initialFocusedIndex}
+                        initialScrollIndex={stayAtTopOnMount ? undefined : initialFocusedIndex}
                         onScrollBeginDrag={onScrollBeginDrag}
                         maintainVisibleContentPosition={{disabled: disableMaintainingScrollPosition}}
                         ListHeaderComponent={

@@ -76,6 +76,9 @@ type BaseSelectionListProps<TItem extends ListItem> = {
     /** Whether to scroll to the focused item */
     shouldScrollToFocusedIndex?: boolean;
 
+    /** When true, prevents scrolling to the focused item on mount and keeps the list at the top. Use when the header content should remain visible. */
+    stayAtTopOnMount?: boolean;
+
     /** Whether keyboard shortcuts should be disabled */
     disableKeyboardShortcuts?: boolean;
 

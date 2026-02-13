@@ -293,6 +293,7 @@ function IOURequestEditReportCommon({
                 }}
                 shouldSingleExecuteRowSelect
                 initiallyFocusedItemKey={selectedReportID}
+                stayAtTopOnMount={!!createReportOption}
                 ListItem={InviteMemberListItem}
                 customListHeaderContent={createReportOption}
                 listFooterContent={
