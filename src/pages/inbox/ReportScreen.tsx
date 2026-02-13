@@ -1081,7 +1081,8 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
                                                 isReportTransactionThread={isTransactionThreadView}
                                             />
                                         ) : null}
-                                        {!!report && shouldDisplayMoneyRequestActionsList && !shouldWaitForTransactions ? (
+                                        {/* {!!report && shouldDisplayMoneyRequestActionsList && !shouldWaitForTransactions ? (
+                                            // Path
                                             <MoneyRequestReportActionsList
                                                 report={report}
                                                 hasPendingDeletionTransaction={hasPendingDeletionTransaction}
@@ -1095,7 +1096,7 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
                                                 showReportActionsLoadingState={showReportActionsLoadingState}
                                                 reportPendingAction={reportPendingAction}
                                             />
-                                        ) : null}
+                                        ) : null} */}
                                         {isCurrentReportLoadedFromOnyx ? (
                                             <ReportFooter
                                                 report={report}
