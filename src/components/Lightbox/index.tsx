@@ -24,6 +24,16 @@ const FALLBACK_OFFSET = 2;
 
 const cachedImageDimensions = new Map<string, Dimensions | undefined>();
 
+function getImagePriority(isActive: boolean, isLightboxVisible: boolean) {
+    if (isActive) {
+        return CONST.IMAGE_LOADING_PRIORITY.HIGH;
+    }
+    if (isLightboxVisible) {
+        return CONST.IMAGE_LOADING_PRIORITY.NORMAL;
+    }
+    return CONST.IMAGE_LOADING_PRIORITY.LOW;
+}
+
 type LightboxProps = Pick<Attachment, 'attachmentID'> & {
     /** Whether source url requires authentication */
     isAuthTokenRequired?: boolean;
@@ -150,12 +160,7 @@ function Lightbox({attachmentID, isAuthTokenRequired = false, uri, onScaleChange
     // Limits fallback image rendering to only a few pages around the active page.
     // This prevents distant carousel items from queuing unnecessary image downloads,
     // which would starve the active image of network bandwidth.
-    const isFallbackInRange = useMemo(() => {
-        if (!hasSiblingCarouselItems) {
-            return true;
-        }
-        return Math.abs(page - activePage) <= FALLBACK_OFFSET;
-    }, [activePage, hasSiblingCarouselItems, page]);
+    const isFallbackInRange = !hasSiblingCarouselItems || Math.abs(page - activePage) <= FALLBACK_OFFSET;
 
     const [isLightboxImageLoaded, setLightboxImageLoaded] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -241,21 +246,14 @@ function Lightbox({attachmentID, isAuthTokenRequired = false, uri, onScaleChange
         [onScaleChangedContext, onScaleChangedProp],
     );
 
-    const imagePriority = useMemo(() => {
-        if (isActive) {
-            return CONST.IMAGE_LOADING_PRIORITY.HIGH;
-        }
-        if (isLightboxVisible) {
-            return CONST.IMAGE_LOADING_PRIORITY.NORMAL;
-        }
-        return CONST.IMAGE_LOADING_PRIORITY.LOW;
-    }, [isActive, isLightboxVisible]);
+    const imagePriority = getImagePriority(isActive, isLightboxVisible);
 
     const isALocalFile = isLocalFile(uri);
     const shouldShowOfflineIndicator = isOffline && !isLoading && !isALocalFile;
 
     return (
         <View
+            testID="lightbox-wrapper"
             style={[StyleSheet.absoluteFill, style]}
             onLayout={updateCanvasSize}
         >
