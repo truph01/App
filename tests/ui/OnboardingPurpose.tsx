@@ -13,7 +13,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import createPlatformStackNavigator from '@libs/Navigation/PlatformStackNavigation/createPlatformStackNavigator';
 import type {OnboardingModalNavigatorParamList} from '@libs/Navigation/types';
 import OnboardingPurpose from '@pages/OnboardingPurpose';
-import * as Report from '@userActions/Report';
+import {completeOnboarding} from '@userActions/Report';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -21,6 +21,18 @@ import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import * as TestHelper from '../utils/TestHelper';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
+
+const mockCompleteOnboarding = jest.mocked(completeOnboarding);
+
+jest.mock('@userActions/Report', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const actual = jest.requireActual('@userActions/Report');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return {
+        ...actual,
+        completeOnboarding: jest.fn(),
+    };
+});
 
 TestHelper.setupGlobalFetchMock();
 
@@ -125,8 +137,6 @@ describe('OnboardingPurpose Page', () => {
     });
 
     it('should call completeOnboarding with introSelected when user is from private domain and selects a direct-complete choice', async () => {
-        const completeOnboardingSpy = jest.spyOn(Report, 'completeOnboarding').mockImplementation(jest.fn());
-
         await TestHelper.signInWithTestUser();
 
         const introSelectedValue = {
@@ -158,7 +168,7 @@ describe('OnboardingPurpose Page', () => {
         await user.press(chatSplitOption);
 
         await waitFor(() => {
-            expect(completeOnboardingSpy).toHaveBeenCalledWith(
+            expect(mockCompleteOnboarding).toHaveBeenCalledWith(
                 expect.objectContaining({
                     engagementChoice: CONST.ONBOARDING_CHOICES.CHAT_SPLIT,
                     firstName: 'Test',
@@ -168,7 +178,7 @@ describe('OnboardingPurpose Page', () => {
             );
         });
 
-        completeOnboardingSpy.mockRestore();
+        mockCompleteOnboarding.mockClear();
         unmount();
         await waitForBatchedUpdatesWithAct();
     });
