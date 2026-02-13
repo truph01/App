@@ -845,8 +845,8 @@ function deleteMoneyRequestOnSearch(hash: number, transactionIDList: string[], t
     const {optimisticData: loadingOptimisticData, finallyData} = getOnyxLoadingData(hash);
 
     const optimisticData: OnyxUpdate[] = [...(loadingOptimisticData ?? [])];
-    const failureData: OnyxUpdate[] = [];
-    const successData: OnyxUpdate[] = [];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [];
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [];
 
     let pendingDeleteTransactionsCount = transactionIDList.length;
 
