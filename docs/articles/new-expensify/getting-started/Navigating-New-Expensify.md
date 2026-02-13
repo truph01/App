@@ -34,7 +34,7 @@ Tabs include:
 
 The **Home** tab is the first screen you see when you sign in.
 
-Use Home to get oriented and see whether anything needs attention. From there, you can navigate to Inbox, Reports, or Workspaces as needed.
+Use Home to get oriented and see whether anything needs attention. From the Home tab, you can navigate to Inbox, Reports, or Workspaces as needed.
 
 For a full breakdown of what appears on Home, see the **Expensify Home Overview** article.
 
@@ -116,7 +116,7 @@ In addition to the navigation tabs, you’ll see two primary action buttons:
 - The green **Receipt** button  to scan or manually add an expense.
 - The grey **➕ Create** button to start actions like creating a report, sending money, requesting money, or tracking distance.
 
-These buttons are available from all screens so you can quickly take action.
+The Receipt and Create buttons are available from all screens so you can quickly take action.
 
 ---
 
@@ -129,8 +129,6 @@ If you’re not sure where to go:
 - Use **Reports** to view or filter expense reports.
 - Use **Workspaces** to manage workspace settings.
 - Use **Account** to update personal settings or subscription details.
-
-You can switch between these areas at any time using the navigation tabs.
 
 ---
 
