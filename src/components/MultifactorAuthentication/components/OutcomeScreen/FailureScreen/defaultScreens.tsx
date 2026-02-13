@@ -11,7 +11,7 @@ const DefaultClientFailureScreen = createScreenWithDefaults(
         illustration: 'MagnifyingGlassSpyMouthClosed',
         iconWidth: variables.magnifyingGlassSpyMouthClosedWidth,
         iconHeight: variables.magnifyingGlassSpyMouthClosedHeight,
-        title: 'multifactorAuthentication.oops',
+        title: 'multifactorAuthentication.verificationFailed',
         subtitle: 'multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful',
     },
     'DefaultClientFailureScreen',
