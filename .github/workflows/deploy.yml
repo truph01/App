@@ -403,6 +403,10 @@ jobs:
           APPLE_DEMO_PASSWORD: ${{ secrets.APPLE_DEMO_PASSWORD }}
           APPLE_ID: ${{ vars.APPLE_ID }}
 
+      - name: Upload DSYMs to Firebase for HybridApp
+        if: ${{ fromJSON(env.IS_APP_REPO) && fromJSON(env.SHOULD_BUILD_APP) }}
+        run: bundle exec fastlane ios upload_dsyms_hybrid
+
       - name: Submit previous production build to 100%
         if: ${{ github.ref == 'refs/heads/production' }}
         run: bundle exec fastlane ios complete_hybrid_rollout
