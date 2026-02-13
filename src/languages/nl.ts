@@ -2464,6 +2464,7 @@ ${amount} voor ${merchant} - ${date}`,
             deleteSinglePrompt: 'Weet je zeker dat je deze regel wilt verwijderen?',
             deleteMultiplePrompt: 'Weet je zeker dat je deze regels wilt verwijderen?',
         },
+        subtitle: 'Deze regels zijn van toepassing op je uitgaven.',
     },
     preferencesPage: {
         appSection: {

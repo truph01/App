@@ -2457,6 +2457,7 @@ ${amount} para ${merchant} - ${date}`,
             deleteSinglePrompt: 'Tem certeza de que deseja excluir esta regra?',
             deleteMultiplePrompt: 'Tem certeza de que deseja excluir essas regras?',
         },
+        subtitle: 'Essas regras serão aplicadas às suas despesas.',
     },
     preferencesPage: {
         appSection: {
