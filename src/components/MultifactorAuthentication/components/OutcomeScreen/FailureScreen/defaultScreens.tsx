@@ -4,54 +4,58 @@ import NoEligibleMethodsDescription from '@components/MultifactorAuthentication/
 import UnsupportedDeviceDescription from '@components/MultifactorAuthentication/UnsupportedDeviceDescription';
 import variables from '@styles/variables';
 import FailureScreenBase from './FailureScreenBase';
-import type {FailureScreenBaseProps} from './FailureScreenBase';
 
-const DefaultClientFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
-    <FailureScreenBase
-        illustration="MagnifyingGlassSpyMouthClosed"
-        iconWidth={variables.magnifyingGlassSpyMouthClosedWidth}
-        iconHeight={variables.magnifyingGlassSpyMouthClosedHeight}
-        title="multifactorAuthentication.oops"
-        subtitle="multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful"
-    />,
+const DefaultClientFailureScreen = createScreenWithDefaults(
+    FailureScreenBase,
+    {
+        illustration: 'MagnifyingGlassSpyMouthClosed',
+        iconWidth: variables.magnifyingGlassSpyMouthClosedWidth,
+        iconHeight: variables.magnifyingGlassSpyMouthClosedHeight,
+        title: 'multifactorAuthentication.oops',
+        subtitle: 'multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful',
+    },
     'DefaultClientFailureScreen',
 );
 
-const DefaultServerFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
-    <FailureScreenBase
-        illustration="HumptyDumpty"
-        iconWidth={variables.humptyDumptyWidth}
-        iconHeight={variables.humptyDumptyHeight}
-        title="multifactorAuthentication.oops"
-        subtitle="multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful"
-    />,
+const DefaultServerFailureScreen = createScreenWithDefaults(
+    FailureScreenBase,
+    {
+        illustration: 'HumptyDumpty',
+        iconWidth: variables.humptyDumptyWidth,
+        iconHeight: variables.humptyDumptyHeight,
+        title: 'multifactorAuthentication.oops',
+        subtitle: 'multifactorAuthentication.biometricsTest.yourAttemptWasUnsuccessful',
+    },
     'DefaultServerFailureScreen',
 );
 
-const OutOfTimeFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
-    <FailureScreenBase
-        illustration="RunOutOfTime"
-        iconWidth={variables.runOutOfTimeWidth}
-        iconHeight={variables.runOutOfTimeHeight}
-        title="multifactorAuthentication.youRanOutOfTime"
-        subtitle="multifactorAuthentication.looksLikeYouRanOutOfTime"
-    />,
+const OutOfTimeFailureScreen = createScreenWithDefaults(
+    FailureScreenBase,
+    {
+        illustration: 'RunOutOfTime',
+        iconWidth: variables.runOutOfTimeWidth,
+        iconHeight: variables.runOutOfTimeHeight,
+        title: 'multifactorAuthentication.youRanOutOfTime',
+        subtitle: 'multifactorAuthentication.looksLikeYouRanOutOfTime',
+    },
     'OutOfTimeFailureScreen',
 );
 
-const NoEligibleMethodsFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
-    <DefaultClientFailureScreen
-        title="multifactorAuthentication.biometricsTest.youCouldNotBeAuthenticated"
-        customSubtitle={<NoEligibleMethodsDescription />}
-    />,
+const NoEligibleMethodsFailureScreen = createScreenWithDefaults(
+    DefaultClientFailureScreen,
+    {
+        title: 'multifactorAuthentication.biometricsTest.youCouldNotBeAuthenticated',
+        customSubtitle: <NoEligibleMethodsDescription />,
+    },
     'NoEligibleMethodsFailureScreen',
 );
 
-const UnsupportedDeviceFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
-    <DefaultClientFailureScreen
-        title="multifactorAuthentication.unsupportedDevice.unsupportedDevice"
-        customSubtitle={<UnsupportedDeviceDescription />}
-    />,
+const UnsupportedDeviceFailureScreen = createScreenWithDefaults(
+    DefaultClientFailureScreen,
+    {
+        title: 'multifactorAuthentication.unsupportedDevice.unsupportedDevice',
+        customSubtitle: <UnsupportedDeviceDescription />,
+    },
     'UnsupportedDeviceFailureScreen',
 );
 
