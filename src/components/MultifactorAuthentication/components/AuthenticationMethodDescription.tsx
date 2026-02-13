@@ -9,11 +9,9 @@ function AuthenticationMethodDescription() {
     const {translate} = useLocalize();
     const {state} = useMultifactorAuthenticationState();
 
-    return (
-        <Text style={[styles.textAlignCenter, styles.textSupporting]}>
-            {translate('multifactorAuthentication.biometricsTest.successfullyAuthenticatedUsing', {authType: state.authenticationMethod?.name})}
-        </Text>
-    );
+    const authType = state.authenticationMethod?.name ?? 'Unknown';
+
+    return <Text style={[styles.textAlignCenter, styles.textSupporting]}>{translate('multifactorAuthentication.biometricsTest.successfullyAuthenticatedUsing', {authType})}</Text>;
 }
 
 AuthenticationMethodDescription.displayName = 'AuthenticationMethodDescription';

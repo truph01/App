@@ -2,9 +2,10 @@ import React from 'react';
 import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import {useMultifactorAuthenticationState} from '@components/MultifactorAuthentication/Context';
 import type {ErrorState} from '@components/MultifactorAuthentication/Context/State';
+import CONST from '@src/CONST';
 
 function isServerError(error: ErrorState): boolean {
-    return error.httpStatus !== undefined && String(error.httpStatus).startsWith('5');
+    return error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.UNKNOWN_RESPONSE || (error.httpStatus !== undefined && String(error.httpStatus).startsWith('5'));
 }
 
 function MultifactorAuthenticationOutcomePage() {

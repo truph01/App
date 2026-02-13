@@ -11,5 +11,10 @@ export default {
     action: troubleshootMultifactorAuthentication,
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.BIOMETRICS_TEST,
     pure: true,
-    successScreen: <DefaultSuccessScreen customSubtitle={<AuthenticationMethodDescription />} />,
+    successScreen: (
+        <DefaultSuccessScreen
+            subtitle={undefined}
+            customSubtitle={<AuthenticationMethodDescription />}
+        />
+    ),
 } as const satisfies MultifactorAuthenticationScenarioCustomConfig;
