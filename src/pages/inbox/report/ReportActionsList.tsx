@@ -2,7 +2,7 @@ import type {ListRenderItemInfo} from '@react-native/virtualized-lists/Lists/Vir
 import {useIsFocused, useRoute} from '@react-navigation/native';
 import {isUserValidatedSelector} from '@selectors/Account';
 import {tierNameSelector} from '@selectors/UserWallet';
-import React, {memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {DeviceEventEmitter, InteractionManager, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -61,6 +61,7 @@ import {
 } from '@libs/ReportUtils';
 import Visibility from '@libs/Visibility';
 import type {ReportsSplitNavigatorParamList} from '@navigation/types';
+import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import variables from '@styles/variables';
 import {openReport, readNewestAction, subscribeToNewActionEvent} from '@userActions/Report';
 import CONST from '@src/CONST';
@@ -172,6 +173,7 @@ function ReportActionsList({
     const {isOffline, lastOfflineAt, lastOnlineAt} = useNetworkWithOfflineStatus();
     const route = useRoute<PlatformStackRouteProp<ReportsSplitNavigatorParamList, typeof SCREENS.REPORT>>();
     const reportScrollManager = useReportScrollManager();
+    const {scrollOffsetRef} = useContext(ActionListContext);
     const userActiveSince = useRef<string>(DateUtils.getDBTime());
     const lastMessageTime = useRef<string | null>(null);
     const [isVisible, setIsVisible] = useState(Visibility.isVisible);
@@ -365,6 +367,7 @@ function ReportActionsList({
         isInverted: true,
         onTrackScrolling: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
             scrollingVerticalOffset.current = event.nativeEvent.contentOffset.y;
+            scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
             onScroll?.(event);
             if (shouldScrollToEndAfterLayout && (!hasCreatedActionAdded || isOffline)) {
                 setShouldScrollToEndAfterLayout(false);

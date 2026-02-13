@@ -1,7 +1,6 @@
 import {PortalHost} from '@gorhom/portal';
 import {useIsFocused} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import type {FlatList} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import DragAndDropProvider from '@components/DragAndDrop/Provider';
@@ -10,6 +9,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import {useSearchContext} from '@components/Search/SearchContext';
 import useShowSuperWideRHPVersion from '@components/WideRHPContextProvider/useShowSuperWideRHPVersion';
 import WideRHPOverlayWrapper from '@components/WideRHPOverlayWrapper';
+import useActionListContextValue from '@hooks/useActionListContextValue';
 import useIsReportReadyToDisplay from '@hooks/useIsReportReadyToDisplay';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -36,7 +36,6 @@ import {isValidReportIDFromPath} from '@libs/ReportUtils';
 import {isDefaultAvatar, isLetterAvatar, isPresetAvatar} from '@libs/UserAvatarUtils';
 import Navigation from '@navigation/Navigation';
 import ReactionListWrapper from '@pages/inbox/ReactionListWrapper';
-import type {ActionListContextType, ScrollPosition} from '@pages/inbox/ReportScreenContext';
 import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import {createTransactionThreadReport, openReport, updateLastVisitTime} from '@userActions/Report';
 import CONST from '@src/CONST';
@@ -99,9 +98,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
 
     const {isEditingDisabled, isCurrentReportLoadedFromOnyx} = useIsReportReadyToDisplay(report, reportIDFromRoute, isReportArchived);
 
-    const [scrollPosition, setScrollPosition] = useState<ScrollPosition>({});
-    const flatListRef = useRef<FlatList>(null);
-    const actionListValue = useMemo((): ActionListContextType => ({flatListRef, scrollPosition, setScrollPosition}), [flatListRef, scrollPosition, setScrollPosition]);
+    const actionListValue = useActionListContextValue();
 
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`, {canBeMissing: true});
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});

@@ -167,7 +167,7 @@ function ReportActionCompose({
         canBeMissing: true,
     });
     const ancestors = useAncestors(transactionThreadReport ?? report);
-    const {scrollPosition} = useContext(ActionListContext);
+    const {scrollOffsetRef} = useContext(ActionListContext);
 
     /**
      * Updates the Highlight state of the composer
@@ -360,7 +360,9 @@ function ReportActionCompose({
                 attachmentFileRef.current = null;
             } else {
                 const reportActionID = rand64();
-                const isScrolledToBottom = !scrollPosition?.offset || scrollPosition.offset < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
+
+                // The list is inverted, so an offset near 0 means the user is at the bottom (newest messages visible).
+                const isScrolledToBottom = scrollOffsetRef.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
                 if (isScrolledToBottom) {
                     Performance.markStart(CONST.TIMING.SEND_MESSAGE, {message: newCommentTrimmed});
                     startSpan(`${CONST.TELEMETRY.SPAN_SEND_MESSAGE}_${reportActionID}`, {
@@ -386,7 +388,7 @@ function ReportActionCompose({
             personalDetail.timezone,
             isInSidePanel,
             onSubmit,
-            scrollPosition,
+            scrollOffsetRef,
         ],
     );
 

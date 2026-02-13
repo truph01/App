@@ -21,10 +21,11 @@ type ActionListContextType = {
     flatListRef: FlatListRefType;
     scrollPosition: ScrollPosition | null;
     setScrollPosition: (position: {offset: number}) => void;
+    scrollOffsetRef: RefObject<number>;
 };
 type ReactionListContextType = RefObject<ReactionListRef | null> | null;
 
-const ActionListContext = createContext<ActionListContextType>({flatListRef: null, scrollPosition: null, setScrollPosition: () => {}});
+const ActionListContext = createContext<ActionListContextType>({flatListRef: null, scrollPosition: null, setScrollPosition: () => {}, scrollOffsetRef: {current: 0}});
 const ReactionListContext = createContext<ReactionListContextType>(null);
 
 export {ActionListContext, ReactionListContext};
