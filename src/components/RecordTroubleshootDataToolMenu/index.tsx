@@ -5,7 +5,6 @@ import ExportOnyxState from '@libs/ExportOnyxState';
 import {appendTimeToFileName} from '@libs/fileDownload/FileUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Log} from '@src/types/onyx';
 import BaseRecordTroubleshootDataToolMenu from './BaseRecordTroubleshootDataToolMenu';
 import type {File} from './BaseRecordTroubleshootDataToolMenu';
 
@@ -15,7 +14,7 @@ function RecordTroubleshootDataToolMenu() {
 
     const zipRef = useRef(new JSZip());
 
-    const onDisableLogging = (logs: Log[]) => {
+    const onDisableLogging = (logs: Array<Record<string, unknown>>) => {
         const data = JSON.stringify(logs, null, 2);
         const newFileName = appendTimeToFileName('logs.txt');
         zipRef.current.file(newFileName, data);
@@ -33,6 +32,7 @@ function RecordTroubleshootDataToolMenu() {
                 });
             });
     };
+
     const hideShareButton = () => {
         setFile(undefined);
     };

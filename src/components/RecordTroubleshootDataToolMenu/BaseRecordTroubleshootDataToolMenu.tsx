@@ -1,7 +1,6 @@
 import type JSZip from 'jszip';
 import type {RefObject} from 'react';
 import React, {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
 import Button from '@components/Button';
 import Switch from '@components/Switch';
 import TestToolRow from '@components/TestToolRow';
@@ -9,14 +8,12 @@ import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {cleanupAfterDisable, disableRecording, enableRecording, stopProfilingAndGetData} from '@libs/actions/Troubleshoot';
+import {cleanupAfterDisable, enableRecording, stopProfilingAndGetData} from '@libs/actions/Troubleshoot';
 import type {ProfilingData} from '@libs/actions/Troubleshoot';
-import {parseStringifiedMessages} from '@libs/Console';
 import getPlatform from '@libs/getPlatform';
 import getMemoryInfo from '@libs/telemetry/getMemoryInfo';
 import CONFIG from '@src/CONFIG';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Log as OnyxLog} from '@src/types/onyx';
 import pkg from '../../../package.json';
 import handleStopRecording from './handleStopRecording';
 import type StopRecordingParams from './handleStopRecording.types';
@@ -32,7 +29,7 @@ type BaseRecordTroubleshootDataToolMenuProps = {
     /** Locally created file */
     file?: File;
     /** Action to run when disabling the switch */
-    onDisableLogging: (logs: OnyxLog[]) => Promise<void>;
+    onDisableLogging: (logs: Array<Record<string, unknown>>) => Promise<void>;
     /** Action to run when enabling logging */
     onEnableLogging?: () => void;
     /** Path used to save the file */
@@ -81,7 +78,6 @@ function BaseRecordTroubleshootDataToolMenu({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const [shouldRecordTroubleshootData] = useOnyx(ONYXKEYS.SHOULD_RECORD_TROUBLESHOOT_DATA, {canBeMissing: true});
-    const [capturedLogs] = useOnyx(ONYXKEYS.LOGS, {canBeMissing: true});
     const [shareUrls, setShareUrls] = useState<string[]>();
     const [isDisabled, setIsDisabled] = useState<boolean>(false);
     const [profileTracePath, setProfileTracePath] = useState<string>();
@@ -112,15 +108,6 @@ function BaseRecordTroubleshootDataToolMenu({
 
         setIsDisabled(true);
 
-        if (!capturedLogs) {
-            Alert.alert(translate('initialSettingsPage.troubleshoot.noLogsToShare'));
-            disableRecording();
-            return;
-        }
-
-        const logs = Object.values(capturedLogs);
-        const logsWithParsedMessages = parseStringifiedMessages(logs);
-
         const infoFileName = `App_Info_${pkg.version}.json`;
 
         try {
@@ -132,7 +119,7 @@ function BaseRecordTroubleshootDataToolMenu({
                 infoFileName,
                 profileFileName: newFileName,
                 appInfo,
-                logsWithParsedMessages,
+                logsWithParsedMessages: [],
                 onDisableLogging,
                 cleanupAfterDisable,
                 zipRef,
