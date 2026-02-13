@@ -51,7 +51,12 @@ type UseCompanyCardsResult = Partial<{
  * Builds a list of card entries by starting from assignedCards (source of truth for assignments),
  * then filling in remaining unassigned cards from accountList/cardList.
  */
-function buildCompanyCardEntries(accountList: string[] | undefined, cardList: AssignableCardsList | undefined, assignedCards: CardList): CompanyCardEntry[] {
+function buildCompanyCardEntries(
+    accountList: string[] | undefined,
+    cardList: AssignableCardsList | undefined,
+    assignedCards: CardList,
+    feedName?: CompanyCardFeedWithDomainID,
+): CompanyCardEntry[] {
     const entries: CompanyCardEntry[] = [];
     const coveredNames = new Set<string>();
     const coveredEncrypted = new Set<string>();
@@ -79,7 +84,12 @@ function buildCompanyCardEntries(accountList: string[] | undefined, cardList: As
         coveredEncrypted.add(encryptedCardNumber);
     }
 
-    for (const name of accountList ?? []) {
+    // For Amex Direct (FDX) feeds, accountList[0] is the parent card (primary account holder)
+    // which aggregates child accounts and should not be assignable.
+    const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
+    const unassignedAccountList = isAmexDirectFeed ? (accountList ?? []).slice(1) : (accountList ?? []);
+
+    for (const name of unassignedAccountList) {
         if (coveredNames.has(normalizeCardName(name))) {
             continue;
         }
@@ -107,7 +117,7 @@ function useCompanyCards({policyID, feedName: feedNameProp}: UseCompanyCardsProp
     const selectedFeed = feedName && companyCardFeeds[feedName];
 
     const {cardList, ...assignedCards} = cardsList ?? {};
-    const companyCardEntries = buildCompanyCardEntries(selectedFeed?.accountList, cardList, assignedCards);
+    const companyCardEntries = buildCompanyCardEntries(selectedFeed?.accountList, cardList, assignedCards, feedName);
 
     const onyxMetadata = {
         cardListMetadata,

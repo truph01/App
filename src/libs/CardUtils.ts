@@ -791,7 +791,12 @@ function isSelectedFeedExpired(cardFeed: CombinedCardFeed | undefined): boolean 
  *
  * @returns Array of UnassignedCard objects with consistent displayName and cardIdentifier properties
  */
-function getFilteredCardList(list: WorkspaceCardsList | undefined, accountList: string[] | undefined, workspaceCardFeeds: OnyxCollection<WorkspaceCardsList>): UnassignedCard[] {
+function getFilteredCardList(
+    list: WorkspaceCardsList | undefined,
+    accountList: string[] | undefined,
+    workspaceCardFeeds: OnyxCollection<WorkspaceCardsList>,
+    feedName?: CompanyCardFeedWithDomainID,
+): UnassignedCard[] {
     const {cardList: customFeedCardsToAssign, ...cards} = list ?? {};
     const assignedCards = new Set(Object.values(cards).map((card) => card.cardName));
 
@@ -812,7 +817,13 @@ function getFilteredCardList(list: WorkspaceCardsList | undefined, accountList: 
 
     // For direct feeds (Plaid/OAuth): displayName === cardIdentifier
     if (accountList) {
+        // For Amex Direct (FDX) feeds, accountList[0] is the parent card (primary account holder)
+        // which aggregates child accounts and should not be assignable.
+        const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
+        const startIndex = isAmexDirectFeed ? 1 : 0;
+
         return accountList
+            .slice(startIndex)
             .filter((cardName) => !assignedCards.has(cardName) && !allWorkspaceAssignedCards.has(cardName))
             .map((cardName) => ({
                 cardName,
