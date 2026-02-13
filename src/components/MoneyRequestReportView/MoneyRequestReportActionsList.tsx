@@ -4,6 +4,7 @@ import {useIsFocused, useRoute} from '@react-navigation/native';
 import {isUserValidatedSelector} from '@selectors/Account';
 import {tierNameSelector} from '@selectors/UserWallet';
 import isEmpty from 'lodash/isEmpty';
+import type {ValueOf} from 'type-fest';
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {DeviceEventEmitter, InteractionManager, View} from 'react-native';
@@ -65,6 +66,7 @@ import ReportActionsListItemRenderer from '@pages/inbox/report/ReportActionsList
 import shouldDisplayNewMarkerOnReportAction from '@pages/inbox/report/shouldDisplayNewMarkerOnReportAction';
 import useReportUnreadMessageScrollTracking from '@pages/inbox/report/useReportUnreadMessageScrollTracking';
 import variables from '@styles/variables';
+import {dismissRejectUseExplanation} from '@userActions/IOU';
 import {openReport, readNewestAction, subscribeToNewActionEvent} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -72,6 +74,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
+import HoldOrRejectEducationalModal from '@components/HoldOrRejectEducationalModal';
 import MoneyRequestReportTransactionList from './MoneyRequestReportTransactionList';
 import MoneyRequestViewReportFields from './MoneyRequestViewReportFields';
 import ReportActionsListLoadingSkeleton from './ReportActionsListLoadingSkeleton';
@@ -224,7 +227,7 @@ function MoneyRequestReportActionsList({
     );
 
     const {
-        options: selectedTransactionsOptions,
+        options: originalSelectedTransactionsOptions,
         handleDeleteTransactions,
         handleDeleteTransactionsWithNavigation,
         isDeleteModalVisible,
@@ -239,6 +242,38 @@ function MoneyRequestReportActionsList({
         policy,
         beginExportWithTemplate: (templateName, templateType, transactionIDList) => beginExportWithTemplate(templateName, templateType, transactionIDList),
     });
+
+    const [dismissedRejectUseExplanation] = useOnyx(ONYXKEYS.NVP_DISMISSED_REJECT_USE_EXPLANATION, {canBeMissing: true});
+
+    const [rejectModalAction, setRejectModalAction] = useState<ValueOf<typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS> | null>(null);
+
+    const selectedTransactionsOptions = useMemo(() => {
+        return originalSelectedTransactionsOptions.map((option) => {
+            if (option.value === CONST.REPORT.SECONDARY_ACTIONS.REJECT) {
+                return {
+                    ...option,
+                    onSelected: () => {
+                        if (dismissedRejectUseExplanation) {
+                            option.onSelected?.();
+                        } else {
+                            setRejectModalAction(CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT_BULK);
+                        }
+                    },
+                };
+            }
+            return option;
+        });
+    }, [originalSelectedTransactionsOptions, dismissedRejectUseExplanation]);
+
+    const dismissRejectModalBasedOnAction = useCallback(() => {
+        if (rejectModalAction === CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT_BULK) {
+            dismissRejectUseExplanation();
+            if (report?.reportID) {
+                Navigation.navigate(ROUTES.SEARCH_MONEY_REQUEST_REPORT_REJECT_TRANSACTIONS.getRoute({reportID: report.reportID}));
+            }
+        }
+        setRejectModalAction(null);
+    }, [rejectModalAction, report?.reportID]);
 
     // We are reversing actions because in this View we are starting at the top and don't use Inverted list
     const visibleReportActions = useMemo(() => {
@@ -850,6 +885,12 @@ function MoneyRequestReportActionsList({
                 confirmText={translate('common.buttonConfirm')}
                 shouldShowCancelButton={false}
             />
+            {!!rejectModalAction && (
+                <HoldOrRejectEducationalModal
+                    onClose={dismissRejectModalBasedOnAction}
+                    onConfirm={dismissRejectModalBasedOnAction}
+                />
+            )}
         </View>
     );
 }
