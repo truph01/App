@@ -57,6 +57,7 @@ const REASON = {
         UNSUPPORTED_DEVICE: 'Unsupported device',
         BAD_REQUEST: 'Bad request',
         LOCAL_REGISTRATION_COMPLETE: 'Local registration complete',
+        UNHANDLED_ERROR: 'An unhandled error occurred',
     },
     KEYSTORE: {
         KEY_DELETED: 'Key successfully deleted from SecureStore',

@@ -319,7 +319,15 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             return;
         }
 
-        process();
+        process().catch((error: unknown) => {
+            dispatch({
+                type: 'SET_ERROR',
+                payload: {
+                    reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNHANDLED_ERROR,
+                    message: error instanceof Error ? error.message : String(error),
+                },
+            });
+        });
         // We intentionally omit `process` and `state` from dependencies.
         // Including them would cause infinite re-renders since `process` is recreated on every state change.
         // Instead, we list only the specific state fields that should trigger a re-run of the MFA flow.
