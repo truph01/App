@@ -1,12 +1,7 @@
-/* eslint-disable no-unused-vars */
-import {log as crashlyticsLog, getCrashlytics} from '@react-native-firebase/crashlytics';
 import type {Log} from './types';
 
-const crashlytics = getCrashlytics();
-
-const log: Log = (action: string) => {
-    crashlyticsLog(crashlytics, action);
-};
+/** Firebase Crashlytics has been removed; logging is now handled by Sentry */
+const log: Log = () => {};
 
 export default {
     log,
