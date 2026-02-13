@@ -4,8 +4,6 @@ import type {ReportAttributes} from '@src/types/onyx/DerivedValues';
 
 const reportsSelector = (attributes: OnyxEntry<ReportAttributesDerivedValue>) => attributes?.reports;
 
-const reportAttributesByReportIDSelector = (reportID: string) => (attributes: OnyxEntry<ReportAttributesDerivedValue>) => attributes?.reports?.[reportID];
-
 const reportByIDsSelector = (reportIDs: string[]) => (attributes: OnyxEntry<ReportAttributesDerivedValue>) =>
     reportIDs.reduce(
         (acc, reportID) => {
@@ -18,5 +16,5 @@ const reportByIDsSelector = (reportIDs: string[]) => (attributes: OnyxEntry<Repo
         {} as Record<string, ReportAttributes>,
     );
 
-export {reportAttributesByReportIDSelector, reportByIDsSelector};
+export {reportByIDsSelector};
 export default reportsSelector;
