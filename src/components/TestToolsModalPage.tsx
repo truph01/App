@@ -4,7 +4,6 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import PressableWithoutFeedback from './Pressable/PressableWithoutFeedback';
-import RecordTroubleshootDataToolMenu from './RecordTroubleshootDataToolMenu';
 import SafeAreaConsumer from './SafeAreaConsumer';
 import ScrollView from './ScrollView';
 import TestToolMenu from './TestToolMenu';
@@ -35,7 +34,6 @@ function TestToolsModalPage() {
                             >
                                 {translate('initialSettingsPage.troubleshoot.releaseOptions')}
                             </Text>
-                            <RecordTroubleshootDataToolMenu />
                             <TestToolMenu />
                         </PressableWithoutFeedback>
                     </ScrollView>
