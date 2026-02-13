@@ -1,7 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
-import {View} from 'react-native';
+import {AccessibilityInfo, View} from 'react-native';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -39,6 +39,8 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
     const theme = useTheme();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Exclamation']);
+    const previousAnnouncedMessageRef = useRef('');
+    const isIOS = getPlatform() === CONST.PLATFORM.IOS;
     const isWeb = getPlatform() === CONST.PLATFORM.WEB;
     const shouldAnnounceError = isError && typeof message === 'string' && !!message && !shouldRenderMessageAsHTML && children == null;
 
@@ -55,6 +57,19 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
 
         return `<muted-text-label>${replacedText}</muted-text-label>`;
     }, [isError, message, shouldRenderMessageAsHTML]);
+
+    useEffect(() => {
+        if (!isIOS || !shouldAnnounceError || typeof message !== 'string' || !message.trim()) {
+            return;
+        }
+
+        if (previousAnnouncedMessageRef.current === message) {
+            return;
+        }
+
+        previousAnnouncedMessageRef.current = message;
+        AccessibilityInfo.announceForAccessibility(message);
+    }, [isIOS, message, shouldAnnounceError]);
 
     if (isEmpty(message) && isEmpty(children)) {
         return null;
