@@ -731,6 +731,7 @@ const translations = {
             end: '.',
         },
         oops: 'Oops, something went wrong',
+        verificationFailed: 'Verification failed',
         looksLikeYouRanOutOfTime: 'Looks like you ran out of time! Please try again at the merchant.',
         youRanOutOfTime: 'You ran out of time',
         letsVerifyItsYou: 'Let’s verify it’s you',

@@ -1,14 +1,13 @@
 import React from 'react';
+import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
 import NoEligibleMethodsDescription from '@components/MultifactorAuthentication/NoEligibleMethodsDescription';
 import UnsupportedDeviceDescription from '@components/MultifactorAuthentication/UnsupportedDeviceDescription';
 import variables from '@styles/variables';
-import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
 import FailureScreenBase from './FailureScreenBase';
 import type {FailureScreenBaseProps} from './FailureScreenBase';
 
 const DefaultClientFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
     <FailureScreenBase
-        headerTitle="multifactorAuthentication.biometricsTest.biometricsAuthentication"
         illustration="MagnifyingGlassSpyMouthClosed"
         iconWidth={variables.magnifyingGlassSpyMouthClosedWidth}
         iconHeight={variables.magnifyingGlassSpyMouthClosedHeight}
@@ -20,7 +19,6 @@ const DefaultClientFailureScreen = createScreenWithDefaults<FailureScreenBasePro
 
 const DefaultServerFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
     <FailureScreenBase
-        headerTitle="multifactorAuthentication.biometricsTest.biometricsAuthentication"
         illustration="HumptyDumpty"
         iconWidth={variables.humptyDumptyWidth}
         iconHeight={variables.humptyDumptyHeight}
@@ -32,7 +30,6 @@ const DefaultServerFailureScreen = createScreenWithDefaults<FailureScreenBasePro
 
 const OutOfTimeFailureScreen = createScreenWithDefaults<FailureScreenBaseProps>(
     <FailureScreenBase
-        headerTitle="multifactorAuthentication.biometricsTest.biometricsAuthentication"
         illustration="RunOutOfTime"
         iconWidth={variables.runOutOfTimeWidth}
         iconHeight={variables.runOutOfTimeHeight}

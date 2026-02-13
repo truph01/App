@@ -58,6 +58,7 @@ type FailureScreenOverrides = Partial<Record<MultifactorAuthenticationReason, Re
 
 type MultifactorAuthenticationUI = {
     MODALS: MultifactorAuthenticationModal;
+    failureHeaderTitle?: TranslationPaths;
     successScreen?: React.ReactElement;
     defaultClientFailureScreen?: React.ReactElement;
     defaultServerFailureScreen?: React.ReactElement;
@@ -120,7 +121,7 @@ type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unkn
  * Default UI configuration shared across scenarios.
  */
 type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS'> &
-    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen' | 'failureScreens'>>;
+    Required<Pick<MultifactorAuthenticationUI, 'failureHeaderTitle' | 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen' | 'failureScreens'>>;
 
 /**
  * Record mapping all scenarios to their configurations.
