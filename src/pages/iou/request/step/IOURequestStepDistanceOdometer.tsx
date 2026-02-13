@@ -590,7 +590,7 @@ function IOURequestStepDistanceOdometer({
                         </View>
                         {!isEditing && (
                             <PressableWithFeedback
-                                accessible={false}
+                                accessible
                                 accessibilityRole="button"
                                 sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_START}
                                 onPress={() => {
@@ -638,7 +638,7 @@ function IOURequestStepDistanceOdometer({
                         </View>
                         {!isEditing && (
                             <PressableWithFeedback
-                                accessible={false}
+                                accessible
                                 accessibilityRole="button"
                                 sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_END}
                                 onPress={() => {
