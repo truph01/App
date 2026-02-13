@@ -104,16 +104,9 @@ function InternationalDepositAccountContent({
         goBack();
     }, [goBack]);
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const {
-        componentToRender: SubStep,
-        isEditing,
-        nextScreen,
-        prevScreen,
-        screenIndex,
-        moveTo,
-        resetScreenIndex,
-    } = useSubStep<CustomSubStepProps>({bodyContent: formSteps, startFrom, onFinished: handleFinishStep, skipSteps: skippedSteps});
+    const {componentToRender: SubStep, isEditing, nextScreen, prevScreen, screenIndex, moveTo, resetScreenIndex} =
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        useSubStep<CustomSubStepProps>({bodyContent: formSteps, startFrom, onFinished: handleFinishStep, skipSteps: skippedSteps});
 
     const handleBackButtonPress = () => {
         if (isEditing) {
