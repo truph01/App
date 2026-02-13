@@ -11,7 +11,7 @@ import type {Timezone} from '@src/types/onyx/PersonalDetails';
 import {addComment, buildOptimisticResolvedFollowups} from '.';
 
 /** Delay before showing pre-generated Concierge response (in milliseconds) */
-const CONCIERGE_RESPONSE_DELAY_MS = 3000;
+const CONCIERGE_RESPONSE_DELAY_MS = 4000;
 
 /**
  * Resolves a suggested followup by posting the selected question as a comment
