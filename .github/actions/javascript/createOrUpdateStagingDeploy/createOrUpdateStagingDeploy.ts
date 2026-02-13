@@ -114,8 +114,9 @@ async function run(): Promise<IssuesCreateResponse | void> {
                 [], // deployBlockers
                 [], // resolvedDeployBlockers
                 [], // resolvedInternalQAPRs
-                false, // isFirebaseChecked
+                false, // isSentryChecked
                 false, // isGHStatusChecked
+                previousChecklistData.version, // previousTag
             );
             if (stagingDeployCashBodyAndAssignees) {
                 checklistBody = stagingDeployCashBodyAndAssignees.issueBody;
@@ -190,8 +191,9 @@ async function run(): Promise<IssuesCreateResponse | void> {
                 deployBlockers.map((blocker) => blocker.url),
                 deployBlockers.filter((blocker) => blocker.isResolved).map((blocker) => blocker.url),
                 currentChecklistData?.internalQAPRList.filter((pr) => pr.isResolved).map((pr) => pr.url),
-                didVersionChange ? false : currentChecklistData.isFirebaseChecked,
+                didVersionChange ? false : currentChecklistData.isSentryChecked,
                 didVersionChange ? false : currentChecklistData.isGHStatusChecked,
+                previousChecklistData.version, // previousTag
             );
             if (stagingDeployCashBodyAndAssignees) {
                 checklistBody = stagingDeployCashBodyAndAssignees.issueBody;

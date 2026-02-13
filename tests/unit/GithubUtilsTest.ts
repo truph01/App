@@ -131,7 +131,7 @@ describe('GithubUtils', () => {
             number: 29,
             deployBlockers: [],
             internalQAPRList: [],
-            isFirebaseChecked: false,
+            isSentryChecked: false,
             isGHStatusChecked: false,
         };
         const expectedResponseWithDeployBlockers = {...baseExpectedResponse};
