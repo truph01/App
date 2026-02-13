@@ -10,6 +10,16 @@ import {getGlobalFetchMock} from '../utils/TestHelper';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
+jest.mock('@react-navigation/native', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
+    const actualNav = jest.requireActual('@react-navigation/native');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return {
+        ...actualNav,
+        useIsFocused: () => true,
+    };
+});
+
 jest.mock('@libs/Navigation/Navigation', () => ({
     goBack: jest.fn(),
 }));
