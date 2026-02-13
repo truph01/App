@@ -154,11 +154,16 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
             >
-                <HeaderWithBackButton title={`${rateValueToDisplay} / ${translate(`common.${customUnit?.attributes?.unit ?? CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES}`)}`} />
+                <HeaderWithBackButton title={rate.name ?? `${rateValueToDisplay} / ${unitToDisplay}`} />
                 <ScrollView
                     contentContainerStyle={styles.flexGrow1}
                     addBottomSafeAreaPadding
                 >
+                    <Text
+                        style={[styles.visuallyHidden]}
+                        accessibilityRole="header"
+                        accessibilityLabel={translate('workspace.common.distanceRates')}
+                    />
                     <OfflineWithFeedback
                         errors={getLatestErrorField(rate ?? {}, 'enabled')}
                         pendingAction={rate?.pendingFields?.enabled}

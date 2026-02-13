@@ -256,6 +256,7 @@ function WorkspaceReportFieldsPage({
                                 switchAccessibilityLabel={reportFieldsAccessibilityLabel}
                                 subtitle={getHeaderText()}
                                 titleStyle={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle, styles.mb1]}
+                                titleAccessibilityRole="header"
                                 isActive={!!policy?.areReportFieldsEnabled}
                                 onToggle={(isEnabled) => {
                                     if (!isEnabled) {

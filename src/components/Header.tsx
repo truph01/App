@@ -78,6 +78,7 @@ function Header({title = '', subtitle = '', textStyles = [], style, containerSty
                               numberOfLines={numberOfTitleLines}
                               style={[styles.headerText, styles.textLarge, styles.lineHeightXLarge, textStyles]}
                               accessibilityRole="header"
+                              accessibilityLabel={title}
                           >
                               {title}
                           </Text>
