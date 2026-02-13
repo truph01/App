@@ -12204,15 +12204,15 @@ const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const promiseWhile_1 = __nccwpck_require__(9438);
 function run() {
-    const tag = (0, ActionUtils_1.getStringInput)("TAG", { required: false });
+    const tag = (0, ActionUtils_1.getStringInput)('TAG', { required: false });
     let currentStagingDeploys = [];
     const throttleFunc = () => Promise.all([
         // These are active deploys
         GithubUtils_1.default.octokit.actions.listWorkflowRuns({
             owner: CONST_1.default.GITHUB_OWNER,
             repo: CONST_1.default.APP_REPO,
-            workflow_id: "deploy.yml",
-            event: "push",
+            workflow_id: 'deploy.yml',
+            event: 'push',
             branch: tag,
         }),
         // These have the potential to become active deploys, so we need to wait for them to finish as well (unless we're looking for a specific tag)
@@ -12221,21 +12221,21 @@ function run() {
             GithubUtils_1.default.octokit.actions.listWorkflowRuns({
                 owner: CONST_1.default.GITHUB_OWNER,
                 repo: CONST_1.default.APP_REPO,
-                workflow_id: "preDeploy.yml",
+                workflow_id: 'preDeploy.yml',
             }),
     ])
         .then((responses) => {
         const workflowRuns = responses[0].data.workflow_runs;
-        if (!tag && typeof responses[1] === "object") {
+        if (!tag && typeof responses[1] === 'object') {
             workflowRuns.push(...responses[1].data.workflow_runs);
         }
         return workflowRuns;
     })
-        .then((workflowRuns) => (currentStagingDeploys = workflowRuns.filter((workflowRun) => workflowRun.status !== "completed")))
+        .then((workflowRuns) => (currentStagingDeploys = workflowRuns.filter((workflowRun) => workflowRun.status !== 'completed')))
         .then(() => {
         console.log(!currentStagingDeploys.length
-            ? "No current staging deploys found"
-            : `Found ${currentStagingDeploys.length} staging deploy${currentStagingDeploys.length > 1 ? "s" : ""} still running...`);
+            ? 'No current staging deploys found'
+            : `Found ${currentStagingDeploys.length} staging deploy${currentStagingDeploys.length > 1 ? 's' : ''} still running...`);
     });
     return (0, promiseWhile_1.promiseDoWhile)(() => !!currentStagingDeploys.length, (0, throttle_1.default)(throttleFunc, 
     // Poll every 60 seconds instead of every 10 seconds
@@ -12322,9 +12322,9 @@ function getStringInput(name, options, defaultValue) {
  */
 function convertToNumber(value) {
     switch (typeof value) {
-        case "number":
+        case 'number':
             return value;
-        case "string":
+        case 'string':
             if (!Number.isNaN(Number(value))) {
                 return Number(value);
             }
@@ -12343,56 +12343,56 @@ function convertToNumber(value) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
+const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
-    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
-    DEFAULT_BASE_REF: "main",
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
+    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
+    DEFAULT_BASE_REF: 'main',
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: "applausebot",
-    OS_BOTIFY: "OSBotify",
+    APPLAUSE_BOT: 'applausebot',
+    OS_BOTIFY: 'OSBotify',
     LABELS: {
-        STAGING_DEPLOY: "StagingDeployCash",
-        DEPLOY_BLOCKER: "DeployBlockerCash",
-        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
-        INTERNAL_QA: "InternalQA",
-        HELP_WANTED: "Help Wanted",
-        CP_STAGING: "CP Staging",
+        STAGING_DEPLOY: 'StagingDeployCash',
+        DEPLOY_BLOCKER: 'DeployBlockerCash',
+        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
+        INTERNAL_QA: 'InternalQA',
+        HELP_WANTED: 'Help Wanted',
+        CP_STAGING: 'CP Staging',
     },
     STATE: {
-        OPEN: "open",
+        OPEN: 'open',
     },
     COMMENT: {
-        TYPE_BOT: "Bot",
-        NAME_GITHUB_ACTIONS: "github-actions",
+        TYPE_BOT: 'Bot',
+        NAME_GITHUB_ACTIONS: 'github-actions',
     },
     ACTIONS: {
-        CREATED: "created",
-        EDITED: "edited",
+        CREATED: 'created',
+        EDITED: 'edited',
     },
     EVENTS: {
-        ISSUE_COMMENT: "issue_comment",
+        ISSUE_COMMENT: 'issue_comment',
     },
     RUN_EVENT: {
-        PULL_REQUEST: "pull_request",
-        PULL_REQUEST_TARGET: "pull_request_target",
-        PUSH: "push",
+        PULL_REQUEST: 'pull_request',
+        PULL_REQUEST_TARGET: 'pull_request_target',
+        PUSH: 'push',
     },
     RUN_STATUS: {
-        COMPLETED: "completed",
-        IN_PROGRESS: "in_progress",
-        QUEUED: "queued",
+        COMPLETED: 'completed',
+        IN_PROGRESS: 'in_progress',
+        QUEUED: 'queued',
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: "success",
+        SUCCESS: 'success',
     },
-    TEST_WORKFLOW_NAME: "Jest Unit Tests",
-    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
-    PROPOSAL_KEYWORD: "Proposal",
-    DATE_FORMAT_STRING: "yyyy-MM-dd",
+    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
+    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
+    PROPOSAL_KEYWORD: 'Proposal',
+    DATE_FORMAT_STRING: 'yyyy-MM-dd',
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -12400,10 +12400,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: "NO_ACTION",
-    ACTION_EDIT: "ACTION_EDIT",
-    ACTION_REQUIRED: "ACTION_REQUIRED",
-    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
+    NO_ACTION: 'NO_ACTION',
+    ACTION_EDIT: 'ACTION_EDIT',
+    ACTION_REQUIRED: 'ACTION_REQUIRED',
+    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
 };
 exports["default"] = CONST;
 

@@ -2736,12 +2736,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const fs_1 = __importDefault(__nccwpck_require__(147));
 const run = () => {
-    const regressionOutput = JSON.parse(fs_1.default.readFileSync(".reassure/output.json", "utf8"));
-    const countDeviation = Number(core.getInput("COUNT_DEVIATION", { required: true }));
-    const durationDeviation = Number(core.getInput("DURATION_DEVIATION_PERCENTAGE", { required: true }));
-    if (regressionOutput.countChanged === undefined ||
-        regressionOutput.countChanged.length === 0) {
-        console.log("No countChanged data available. Exiting...");
+    const regressionOutput = JSON.parse(fs_1.default.readFileSync('.reassure/output.json', 'utf8'));
+    const countDeviation = Number(core.getInput('COUNT_DEVIATION', { required: true }));
+    const durationDeviation = Number(core.getInput('DURATION_DEVIATION_PERCENTAGE', { required: true }));
+    if (regressionOutput.countChanged === undefined || regressionOutput.countChanged.length === 0) {
+        console.log('No countChanged data available. Exiting...');
         return true;
     }
     console.log(`Processing ${regressionOutput.countChanged.length} measurements...`);
@@ -2761,8 +2760,7 @@ const run = () => {
         else {
             console.log(`Render count difference ${renderCountDiff} is within the allowed deviation range of ${countDeviation}.`);
         }
-        const increasePercentage = ((current.meanDuration - baseline.meanDuration) / baseline.meanDuration) *
-            100;
+        const increasePercentage = ((current.meanDuration - baseline.meanDuration) / baseline.meanDuration) * 100;
         if (increasePercentage > durationDeviation) {
             core.setFailed(`Duration increase percentage exceeded the allowed deviation of ${durationDeviation}%. Current percentage: ${increasePercentage}%`);
             break;

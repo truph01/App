@@ -399,7 +399,7 @@ describe('createOrUpdateStagingDeployCash', () => {
                     `${lineBreak}${openCheckbox}${baseIssueList.at(1)}${lineBreak}` +
                     `${lineBreakDouble}${deployerVerificationsHeader}` +
                     // Note: these will be unchecked with a new app version, and that's intentional
-                    `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease('1.0.2-1')}` +
+                    `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease('1.0.2-2')}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease('1.0.1-0')}` +
                     `${lineBreak}${openCheckbox}${ghVerification}` +
                     `${lineBreakDouble}${ccApplauseLeads}`,

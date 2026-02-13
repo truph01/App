@@ -11542,7 +11542,7 @@ const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const isEmptyObject_1 = __nccwpck_require__(6497);
 const run = function () {
-    const issueNumber = Number(core.getInput("ISSUE_NUMBER", { required: true }));
+    const issueNumber = Number(core.getInput('ISSUE_NUMBER', { required: true }));
     console.log(`Fetching issue number ${issueNumber}`);
     return GithubUtils_1.default.octokit.issues
         .get({
@@ -11551,12 +11551,12 @@ const run = function () {
         issue_number: issueNumber,
     })
         .then(({ data }) => {
-        console.log("Checking for unverified PRs or unresolved deploy blockers", data);
+        console.log('Checking for unverified PRs or unresolved deploy blockers', data);
         // Check the issue description to see if there are any unfinished/un-QAed items in the checklist.
         const uncheckedBoxRegex = /-\s\[\s]\s/;
-        if (uncheckedBoxRegex.test(data.body ?? "")) {
-            console.log("An unverified PR or unresolved deploy blocker was found.");
-            core.setOutput("HAS_DEPLOY_BLOCKERS", true);
+        if (uncheckedBoxRegex.test(data.body ?? '')) {
+            console.log('An unverified PR or unresolved deploy blocker was found.');
+            core.setOutput('HAS_DEPLOY_BLOCKERS', true);
             return;
         }
         return GithubUtils_1.default.octokit.issues.listComments({
@@ -11567,7 +11567,7 @@ const run = function () {
         });
     })
         .then((comments) => {
-        console.log("Checking the last comment for the :shipit: seal of approval", comments);
+        console.log('Checking the last comment for the :shipit: seal of approval', comments);
         // If comments is undefined that means we found an unchecked QA item in the
         // issue description, so there's nothing more to do but return early.
         if (comments === undefined) {
@@ -11575,24 +11575,24 @@ const run = function () {
         }
         // If there are no comments, then we have not yet gotten the :shipit: seal of approval.
         if ((0, isEmptyObject_1.isEmptyObject)(comments.data)) {
-            console.log("No comments found on issue");
-            core.setOutput("HAS_DEPLOY_BLOCKERS", true);
+            console.log('No comments found on issue');
+            core.setOutput('HAS_DEPLOY_BLOCKERS', true);
             return;
         }
-        console.log("Verifying that the last comment is the :shipit: seal of approval");
+        console.log('Verifying that the last comment is the :shipit: seal of approval');
         const lastComment = comments.data.pop();
         const shipItRegex = /^:shipit:/g;
-        if (!shipItRegex.exec(lastComment?.body ?? "")) {
-            console.log("The last comment on the issue was not :shipit");
-            core.setOutput("HAS_DEPLOY_BLOCKERS", true);
+        if (!shipItRegex.exec(lastComment?.body ?? '')) {
+            console.log('The last comment on the issue was not :shipit');
+            core.setOutput('HAS_DEPLOY_BLOCKERS', true);
         }
         else {
-            console.log("Everything looks good, there are no deploy blockers!");
-            core.setOutput("HAS_DEPLOY_BLOCKERS", false);
+            console.log('Everything looks good, there are no deploy blockers!');
+            core.setOutput('HAS_DEPLOY_BLOCKERS', false);
         }
     })
         .catch((error) => {
-        console.error("A problem occurred while trying to communicate with the GitHub API", error);
+        console.error('A problem occurred while trying to communicate with the GitHub API', error);
         core.setFailed(error);
     });
 };
@@ -11610,56 +11610,56 @@ exports["default"] = run;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
+const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
-    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
-    DEFAULT_BASE_REF: "main",
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
+    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
+    DEFAULT_BASE_REF: 'main',
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: "applausebot",
-    OS_BOTIFY: "OSBotify",
+    APPLAUSE_BOT: 'applausebot',
+    OS_BOTIFY: 'OSBotify',
     LABELS: {
-        STAGING_DEPLOY: "StagingDeployCash",
-        DEPLOY_BLOCKER: "DeployBlockerCash",
-        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
-        INTERNAL_QA: "InternalQA",
-        HELP_WANTED: "Help Wanted",
-        CP_STAGING: "CP Staging",
+        STAGING_DEPLOY: 'StagingDeployCash',
+        DEPLOY_BLOCKER: 'DeployBlockerCash',
+        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
+        INTERNAL_QA: 'InternalQA',
+        HELP_WANTED: 'Help Wanted',
+        CP_STAGING: 'CP Staging',
     },
     STATE: {
-        OPEN: "open",
+        OPEN: 'open',
     },
     COMMENT: {
-        TYPE_BOT: "Bot",
-        NAME_GITHUB_ACTIONS: "github-actions",
+        TYPE_BOT: 'Bot',
+        NAME_GITHUB_ACTIONS: 'github-actions',
     },
     ACTIONS: {
-        CREATED: "created",
-        EDITED: "edited",
+        CREATED: 'created',
+        EDITED: 'edited',
     },
     EVENTS: {
-        ISSUE_COMMENT: "issue_comment",
+        ISSUE_COMMENT: 'issue_comment',
     },
     RUN_EVENT: {
-        PULL_REQUEST: "pull_request",
-        PULL_REQUEST_TARGET: "pull_request_target",
-        PUSH: "push",
+        PULL_REQUEST: 'pull_request',
+        PULL_REQUEST_TARGET: 'pull_request_target',
+        PUSH: 'push',
     },
     RUN_STATUS: {
-        COMPLETED: "completed",
-        IN_PROGRESS: "in_progress",
-        QUEUED: "queued",
+        COMPLETED: 'completed',
+        IN_PROGRESS: 'in_progress',
+        QUEUED: 'queued',
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: "success",
+        SUCCESS: 'success',
     },
-    TEST_WORKFLOW_NAME: "Jest Unit Tests",
-    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
-    PROPOSAL_KEYWORD: "Proposal",
-    DATE_FORMAT_STRING: "yyyy-MM-dd",
+    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
+    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
+    PROPOSAL_KEYWORD: 'Proposal',
+    DATE_FORMAT_STRING: 'yyyy-MM-dd',
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -11667,10 +11667,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: "NO_ACTION",
-    ACTION_EDIT: "ACTION_EDIT",
-    ACTION_REQUIRED: "ACTION_REQUIRED",
-    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
+    NO_ACTION: 'NO_ACTION',
+    ACTION_EDIT: 'ACTION_EDIT',
+    ACTION_REQUIRED: 'ACTION_REQUIRED',
+    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
 };
 exports["default"] = CONST;
 

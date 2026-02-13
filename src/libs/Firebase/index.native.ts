@@ -1,7 +1,9 @@
+import * as Sentry from '@sentry/react-native';
 import type {Log} from './types';
 
-/** Firebase Crashlytics has been removed; logging is now handled by Sentry */
-const log: Log = () => {};
+const log: Log = (action: string) => {
+    Sentry.addBreadcrumb({message: action, category: 'firebase'});
+};
 
 export default {
     log,

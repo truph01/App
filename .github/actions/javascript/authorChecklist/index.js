@@ -15284,8 +15284,8 @@ const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const newComponentCategory_1 = __importDefault(__nccwpck_require__(9032));
 const pathToAuthorChecklist = `https://raw.githubusercontent.com/${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}/main/.github/PULL_REQUEST_TEMPLATE.md`;
-const checklistStartsWith = "### PR Author Checklist";
-const checklistEndsWith = "\r\n### Screenshots/Videos";
+const checklistStartsWith = '### PR Author Checklist';
+const checklistEndsWith = '\r\n### Screenshots/Videos';
 const prNumber = github.context.payload.pull_request?.number;
 const CHECKLIST_CATEGORIES = {
     NEW_COMPONENT: newComponentCategory_1.default,
@@ -15329,15 +15329,12 @@ async function getNumberOfItemsFromAuthorChecklist() {
     return numberOfChecklistItems;
 }
 function checkPRForCompletedChecklist(expectedNumberOfChecklistItems, checklist) {
-    const numberOfFinishedChecklistItems = (checklist.match(/- \[x\]/gi) ?? [])
-        .length;
-    const numberOfUnfinishedChecklistItems = (checklist.match(/- \[ \]/g) ?? [])
-        .length;
+    const numberOfFinishedChecklistItems = (checklist.match(/- \[x\]/gi) ?? []).length;
+    const numberOfUnfinishedChecklistItems = (checklist.match(/- \[ \]/g) ?? []).length;
     const minCompletedItems = expectedNumberOfChecklistItems - 2;
     console.log(`You completed ${numberOfFinishedChecklistItems} out of ${expectedNumberOfChecklistItems} checklist items with ${numberOfUnfinishedChecklistItems} unfinished items`);
-    if (numberOfFinishedChecklistItems >= minCompletedItems &&
-        numberOfUnfinishedChecklistItems === 0) {
-        console.log("PR Author checklist is complete 🎉");
+    if (numberOfFinishedChecklistItems >= minCompletedItems && numberOfUnfinishedChecklistItems === 0) {
+        console.log('PR Author checklist is complete 🎉');
         return;
     }
     console.log(`Make sure you are using the most up to date checklist found here: ${pathToAuthorChecklist}`);
@@ -15345,11 +15342,11 @@ function checkPRForCompletedChecklist(expectedNumberOfChecklistItems, checklist)
 }
 async function generateDynamicChecksAndCheckForCompletion() {
     // Generate dynamic checks
-    console.log("Generating dynamic checks...");
+    console.log('Generating dynamic checks...');
     const dynamicChecks = await getChecklistCategoriesForPullRequest();
     let isPassing = true;
     let didChecklistChange = false;
-    const body = github.context.payload.pull_request?.body ?? "";
+    const body = github.context.payload.pull_request?.body ?? '';
     // eslint-disable-next-line prefer-const
     let [contentBeforeChecklist, checklist, contentAfterChecklist] = partitionWithChecklist(body);
     for (const check of dynamicChecks) {
@@ -15357,16 +15354,16 @@ async function generateDynamicChecksAndCheckForCompletion() {
         const regex = new RegExp(`- \\[([ x])] ${(0, escapeRegExp_1.default)(check)}`);
         const match = regex.exec(checklist);
         if (!match) {
-            console.log("Adding check to the checklist:", check);
+            console.log('Adding check to the checklist:', check);
             // Add it to the PR body
             isPassing = false;
             checklist += `- [ ] ${check}\r\n`;
             didChecklistChange = true;
         }
         else {
-            const isChecked = match[1] === "x";
+            const isChecked = match[1] === 'x';
             if (!isChecked) {
-                console.log("Found unchecked checklist item:", check);
+                console.log('Found unchecked checklist item:', check);
                 isPassing = false;
             }
         }
@@ -15379,28 +15376,24 @@ async function generateDynamicChecksAndCheckForCompletion() {
             const match = regex.exec(checklist);
             if (match) {
                 // Remove it from the PR body
-                console.log("Check has been removed from the checklist:", check);
-                checklist = checklist.replace(match[0], "");
+                console.log('Check has been removed from the checklist:', check);
+                checklist = checklist.replace(match[0], '');
                 didChecklistChange = true;
             }
         }
     }
     // Put the PR body back together, need to add the markers back in
-    const newBody = contentBeforeChecklist +
-        checklistStartsWith +
-        checklist +
-        checklistEndsWith +
-        contentAfterChecklist;
+    const newBody = contentBeforeChecklist + checklistStartsWith + checklist + checklistEndsWith + contentAfterChecklist;
     // Update the PR body
     if (didChecklistChange && prNumber !== undefined) {
-        console.log("Checklist changed, updating PR...");
+        console.log('Checklist changed, updating PR...');
         await GithubUtils_1.default.octokit.pulls.update({
             owner: CONST_1.default.GITHUB_OWNER,
             repo: CONST_1.default.APP_REPO,
             pull_number: prNumber,
             body: newBody,
         });
-        console.log("Updated PR checklist");
+        console.log('Updated PR checklist');
     }
     if (!isPassing) {
         const err = new Error("New checks were added into checklist. Please check every box to verify you've thought about the item.");
@@ -15478,27 +15471,27 @@ const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const promiseSome_1 = __importDefault(__nccwpck_require__(8534));
 const items = [
     "I verified that similar component doesn't exist in the codebase",
-    "I verified that all props are defined accurately and each prop has a `/** comment above it */`",
-    "I verified that each file is named correctly",
-    "I verified that each component has a clear name that is non-ambiguous and the purpose of the component can be inferred from the name alone",
-    "I verified that the only data being stored in component state is data necessary for rendering and nothing else",
+    'I verified that all props are defined accurately and each prop has a `/** comment above it */`',
+    'I verified that each file is named correctly',
+    'I verified that each component has a clear name that is non-ambiguous and the purpose of the component can be inferred from the name alone',
+    'I verified that the only data being stored in component state is data necessary for rendering and nothing else',
     "In component if we are not using the full Onyx data that we loaded, I've added the proper selector in order to ensure the component only re-renders when the data it is using changes",
-    "For Class Components, any internal methods passed to components event handlers are bound to `this` properly so there are no scoping issues (i.e. for `onClick={this.submit}` the method `this.submit` should be bound to `this` in the constructor)",
-    "I verified that component internal methods bound to `this` are necessary to be bound (i.e. avoid `this.submit = this.submit.bind(this);` if `this.submit` is never passed to a component event handler like `onClick`)",
-    "I verified that all JSX used for rendering exists in the render method",
-    "I verified that each component has the minimum amount of code necessary for its purpose, and it is broken down into smaller components in order to separate concerns and functions",
+    'For Class Components, any internal methods passed to components event handlers are bound to `this` properly so there are no scoping issues (i.e. for `onClick={this.submit}` the method `this.submit` should be bound to `this` in the constructor)',
+    'I verified that component internal methods bound to `this` are necessary to be bound (i.e. avoid `this.submit = this.submit.bind(this);` if `this.submit` is never passed to a component event handler like `onClick`)',
+    'I verified that all JSX used for rendering exists in the render method',
+    'I verified that each component has the minimum amount of code necessary for its purpose, and it is broken down into smaller components in order to separate concerns and functions',
 ];
 function isComponentOrPureComponent(name) {
-    return name === "Component" || name === "PureComponent";
+    return name === 'Component' || name === 'PureComponent';
 }
 function detectReactComponent(code, filename) {
     if (!code) {
-        console.error("failed to get code from a filename", code, filename);
+        console.error('failed to get code from a filename', code, filename);
         return;
     }
     const ast = (0, parser_1.parse)(code, {
-        sourceType: "module",
-        plugins: ["jsx", "typescript"], // enable jsx plugin
+        sourceType: 'module',
+        plugins: ['jsx', 'typescript'], // enable jsx plugin
     });
     let isReactComponent = false;
     (0, traverse_1.default)(ast, {
@@ -15506,9 +15499,7 @@ function detectReactComponent(code, filename) {
             if (isReactComponent) {
                 return;
             }
-            if (path.isFunctionDeclaration() ||
-                path.isArrowFunctionExpression() ||
-                path.isFunctionExpression()) {
+            if (path.isFunctionDeclaration() || path.isArrowFunctionExpression() || path.isFunctionExpression()) {
                 path.traverse({
                     // eslint-disable-next-line @typescript-eslint/naming-convention
                     JSXElement() {
@@ -15522,10 +15513,7 @@ function detectReactComponent(code, filename) {
         ClassDeclaration(path) {
             const { superClass } = path.node;
             if (superClass &&
-                ((superClass.object &&
-                    superClass.object.name === "React" &&
-                    isComponentOrPureComponent(superClass.property.name)) ||
-                    isComponentOrPureComponent(superClass.name))) {
+                ((superClass.object && superClass.object.name === 'React' && isComponentOrPureComponent(superClass.property.name)) || isComponentOrPureComponent(superClass.name))) {
                 isReactComponent = true;
                 path.stop();
             }
@@ -15534,7 +15522,7 @@ function detectReactComponent(code, filename) {
     return isReactComponent;
 }
 function nodeBase64ToUtf8(data) {
-    return Buffer.from(data, "base64").toString("utf-8");
+    return Buffer.from(data, 'base64').toString('utf-8');
 }
 async function detectReactComponentInFile(filename) {
     const params = {
@@ -15545,18 +15533,15 @@ async function detectReactComponentInFile(filename) {
     };
     try {
         const { data } = await GithubUtils_1.default.octokit.repos.getContent(params);
-        const content = nodeBase64ToUtf8("content" in data ? (data?.content ?? "") : "");
+        const content = nodeBase64ToUtf8('content' in data ? (data?.content ?? '') : '');
         return detectReactComponent(content, filename);
     }
     catch (error) {
-        console.error("An unknown error occurred with the GitHub API: ", error, params);
+        console.error('An unknown error occurred with the GitHub API: ', error, params);
     }
 }
 async function detect(changedFiles) {
-    const filteredFiles = changedFiles.filter(({ filename, status }) => status === "added" &&
-        (filename.endsWith(".js") ||
-            filename.endsWith(".ts") ||
-            filename.endsWith(".tsx")));
+    const filteredFiles = changedFiles.filter(({ filename, status }) => status === 'added' && (filename.endsWith('.js') || filename.endsWith('.ts') || filename.endsWith('.tsx')));
     try {
         await (0, promiseSome_1.default)(filteredFiles.map(({ filename }) => detectReactComponentInFile(filename)), (result) => !!result);
         return true;
@@ -15580,56 +15565,56 @@ exports["default"] = newComponentCategory;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const GITHUB_BASE_URL_REGEX = new RegExp("https?://(?:github\\.com|api\\.github\\.com)");
+const GITHUB_BASE_URL_REGEX = new RegExp('https?://(?:github\\.com|api\\.github\\.com)');
 const GIT_CONST = {
-    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? "Expensify",
-    APP_REPO: (process.env.GITHUB_REPOSITORY ?? "Expensify/App").split("/").at(1) ?? "",
-    MOBILE_EXPENSIFY_REPO: "Mobile-Expensify",
-    DEFAULT_BASE_REF: "main",
+    GITHUB_OWNER: process.env.GITHUB_REPOSITORY_OWNER ?? 'Expensify',
+    APP_REPO: (process.env.GITHUB_REPOSITORY ?? 'Expensify/App').split('/').at(1) ?? '',
+    MOBILE_EXPENSIFY_REPO: 'Mobile-Expensify',
+    DEFAULT_BASE_REF: 'main',
 };
 const CONST = {
     ...GIT_CONST,
-    APPLAUSE_BOT: "applausebot",
-    OS_BOTIFY: "OSBotify",
+    APPLAUSE_BOT: 'applausebot',
+    OS_BOTIFY: 'OSBotify',
     LABELS: {
-        STAGING_DEPLOY: "StagingDeployCash",
-        DEPLOY_BLOCKER: "DeployBlockerCash",
-        LOCK_DEPLOY: "🔐 LockCashDeploys 🔐",
-        INTERNAL_QA: "InternalQA",
-        HELP_WANTED: "Help Wanted",
-        CP_STAGING: "CP Staging",
+        STAGING_DEPLOY: 'StagingDeployCash',
+        DEPLOY_BLOCKER: 'DeployBlockerCash',
+        LOCK_DEPLOY: '🔐 LockCashDeploys 🔐',
+        INTERNAL_QA: 'InternalQA',
+        HELP_WANTED: 'Help Wanted',
+        CP_STAGING: 'CP Staging',
     },
     STATE: {
-        OPEN: "open",
+        OPEN: 'open',
     },
     COMMENT: {
-        TYPE_BOT: "Bot",
-        NAME_GITHUB_ACTIONS: "github-actions",
+        TYPE_BOT: 'Bot',
+        NAME_GITHUB_ACTIONS: 'github-actions',
     },
     ACTIONS: {
-        CREATED: "created",
-        EDITED: "edited",
+        CREATED: 'created',
+        EDITED: 'edited',
     },
     EVENTS: {
-        ISSUE_COMMENT: "issue_comment",
+        ISSUE_COMMENT: 'issue_comment',
     },
     RUN_EVENT: {
-        PULL_REQUEST: "pull_request",
-        PULL_REQUEST_TARGET: "pull_request_target",
-        PUSH: "push",
+        PULL_REQUEST: 'pull_request',
+        PULL_REQUEST_TARGET: 'pull_request_target',
+        PUSH: 'push',
     },
     RUN_STATUS: {
-        COMPLETED: "completed",
-        IN_PROGRESS: "in_progress",
-        QUEUED: "queued",
+        COMPLETED: 'completed',
+        IN_PROGRESS: 'in_progress',
+        QUEUED: 'queued',
     },
     RUN_STATUS_CONCLUSION: {
-        SUCCESS: "success",
+        SUCCESS: 'success',
     },
-    TEST_WORKFLOW_NAME: "Jest Unit Tests",
-    TEST_WORKFLOW_PATH: ".github/workflows/test.yml",
-    PROPOSAL_KEYWORD: "Proposal",
-    DATE_FORMAT_STRING: "yyyy-MM-dd",
+    TEST_WORKFLOW_NAME: 'Jest Unit Tests',
+    TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
+    PROPOSAL_KEYWORD: 'Proposal',
+    DATE_FORMAT_STRING: 'yyyy-MM-dd',
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
     ISSUE_OR_PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/(?:pull|issues)/([0-9]+).*`),
@@ -15637,10 +15622,10 @@ const CONST = {
     APP_REPO_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}`,
     APP_REPO_GIT_URL: `git@github.com:${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.APP_REPO}.git`,
     MOBILE_EXPENSIFY_URL: `https://github.com/${GIT_CONST.GITHUB_OWNER}/${GIT_CONST.MOBILE_EXPENSIFY_REPO}`,
-    NO_ACTION: "NO_ACTION",
-    ACTION_EDIT: "ACTION_EDIT",
-    ACTION_REQUIRED: "ACTION_REQUIRED",
-    ACTION_HIDE_DUPLICATE: "ACTION_HIDE_DUPLICATE",
+    NO_ACTION: 'NO_ACTION',
+    ACTION_EDIT: 'ACTION_EDIT',
+    ACTION_REQUIRED: 'ACTION_REQUIRED',
+    ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
 };
 exports["default"] = CONST;
 
