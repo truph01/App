@@ -27,6 +27,7 @@ function TestToolsModalPage() {
                         <PressableWithoutFeedback
                             accessible={false}
                             style={[styles.cursorDefault]}
+                            sentryLabel="TestToolsModalPage-ReleaseOptions"
                         >
                             <Text
                                 style={[styles.textLabelSupporting, styles.mt5, styles.mb3]}

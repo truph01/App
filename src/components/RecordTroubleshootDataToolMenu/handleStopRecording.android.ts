@@ -6,7 +6,6 @@ export default async function handleStopRecording({
     profilingData,
     infoFileName,
     appInfo,
-    logsWithParsedMessages,
     onCompleteRecording,
     cleanupAfterDisable,
     zipRef,
@@ -28,7 +27,6 @@ export default async function handleStopRecording({
     await finalizeStopRecording({
         infoFileName,
         appInfo,
-        logsWithParsedMessages,
         onCompleteRecording,
         cleanupAfterDisable,
         zipRef,

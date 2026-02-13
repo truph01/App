@@ -8,7 +8,6 @@ export default async function handleStopRecording({
     infoFileName,
     profileFileName,
     appInfo,
-    logsWithParsedMessages,
     onCompleteRecording,
     cleanupAfterDisable,
     zipRef,
@@ -31,7 +30,7 @@ export default async function handleStopRecording({
             await RNFS.unlink(newFilePath);
             Log.hmmm('[ProfilingToolMenu] existing file deleted successfully');
         }
-    } catch (error) {
+    } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
         Log.hmmm('[ProfilingToolMenu] error checking/deleting existing file: ', message);
     }
@@ -41,7 +40,6 @@ export default async function handleStopRecording({
         await finalizeStopRecording({
             infoFileName,
             appInfo,
-            logsWithParsedMessages,
             onCompleteRecording,
             cleanupAfterDisable,
             zipRef,
@@ -50,7 +48,7 @@ export default async function handleStopRecording({
 
         setProfileTracePath?.(newFilePath);
         Log.hmmm('[ProfilingToolMenu] file copied successfully');
-    } catch (error) {
+    } catch (error: unknown) {
         const message = error instanceof Error ? error.message : String(error);
         Log.hmmm('[ProfilingToolMenu] error copying file: ', message);
     }
