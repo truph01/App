@@ -533,7 +533,6 @@ function SearchPage({route}: SearchPageProps) {
                         );
                     }
                 } else {
-                    const reportTransactions = allTransactions ? Object.fromEntries(Object.entries(allTransactions).filter((entry): entry is [string, Transaction] => !!entry[1])) : {};
                     const transactionsViolations = allTransactionViolations
                         ? Object.fromEntries(Object.entries(allTransactionViolations).filter((entry): entry is [string, TransactionViolations] => !!entry[1]))
                         : {};
@@ -544,7 +543,7 @@ function SearchPage({route}: SearchPageProps) {
                         selectedTransactions,
                         currentUserPersonalDetails.email ?? '',
                         accountID,
-                        reportTransactions,
+                        validTransactions,
                         transactionsViolations,
                         bankAccountList,
                         transactions,
@@ -563,7 +562,6 @@ function SearchPage({route}: SearchPageProps) {
         allTransactionViolations,
         accountID,
         selectedTransactions,
-        currentUserPersonalDetails.email,
         bankAccountList,
         clearSelectedTransactions,
         transactions,
