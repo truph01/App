@@ -1438,13 +1438,14 @@ function Search({
     const shouldShowChartView = (view === CONST.SEARCH.VIEW.BAR || view === CONST.SEARCH.VIEW.LINE) && !!validGroupBy;
 
     if (shouldShowChartView && isGroupedItemArray(sortedData)) {
-        const chartTitle =
-            (() => {
-                if (savedSearch) {
-                    return savedSearch?.name === savedSearch?.query ? undefined : savedSearch?.name;
-                }
-                return searchKey && suggestedSearches[searchKey] ? translate(suggestedSearches[searchKey].translationPath) : undefined;
-            })() ?? translate(`search.chartTitles.${validGroupBy}`);
+        let chartTitle = translate(`search.chartTitles.${validGroupBy}`);
+        if (savedSearch) {
+            if (savedSearch.name !== savedSearch.query) {
+                chartTitle = savedSearch.name;
+            }
+        } else if (searchKey && suggestedSearches[searchKey]) {
+            chartTitle = translate(suggestedSearches[searchKey].translationPath);
+        }
 
         return (
             <SearchScopeProvider>

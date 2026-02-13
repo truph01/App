@@ -127,7 +127,7 @@ type SearchChartViewProps = {
     /** Scroll handler for hiding the top bar on mobile */
     onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 
-    /* Title to be displayed on the chart */
+    /** Title to be displayed on the chart */
     title: string;
 };
 
