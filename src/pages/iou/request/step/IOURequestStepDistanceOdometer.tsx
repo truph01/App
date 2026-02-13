@@ -613,7 +613,7 @@ function IOURequestStepDistanceOdometer({
                                     thumbnailContainerStyles={styles.bgTransparent}
                                     isAuthTokenRequired
                                     fallbackIcon={GalleryPlus}
-                                    fallbackIconSize={20}
+                                    fallbackIconSize={variables.iconSizeNormal}
                                     fallbackIconColor={theme.icon}
                                     iconSize="x-small"
                                     loadingIconSize="small"
@@ -661,7 +661,7 @@ function IOURequestStepDistanceOdometer({
                                     thumbnailContainerStyles={styles.bgTransparent}
                                     isAuthTokenRequired
                                     fallbackIcon={GalleryPlus}
-                                    fallbackIconSize={20}
+                                    fallbackIconSize={variables.iconSizeNormal}
                                     fallbackIconColor={theme.icon}
                                     iconSize="x-small"
                                     loadingIconSize="small"
