@@ -14,6 +14,7 @@ type ProcessResult = {
     success: boolean;
     reason: MultifactorAuthenticationReason;
     httpCode: number | undefined;
+
     /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
     body?: Record<string, unknown>;
 };
@@ -133,6 +134,7 @@ async function processScenario<T extends MultifactorAuthenticationScenario>(
             reason: VALUES.REASON.GENERIC.SIGNATURE_MISSING,
         };
     }
+
     const {httpCode, reason, body} = await currentScenario.action(params);
     const success = isHttpSuccess(httpCode);
 

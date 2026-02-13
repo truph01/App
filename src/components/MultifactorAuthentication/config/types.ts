@@ -141,6 +141,7 @@ type MultifactorAuthenticationOutcomeSuffixes<T extends MultifactorAuthenticatio
 type MultifactorAuthenticationScenarioResponse = {
     httpCode: number | undefined;
     reason: MultifactorAuthenticationReason;
+
     /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
     body?: Record<string, unknown>;
 };
