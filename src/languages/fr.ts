@@ -1848,8 +1848,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Vider le cache et redémarrer',
-            viewConsole: 'Afficher la console de débogage',
-            debugConsole: 'Console de débogage',
             description:
                 '<muted-text>Utilisez les outils ci-dessous pour vous aider à diagnostiquer les problèmes avec Expensify. Si vous rencontrez des problèmes, veuillez <concierge-link>soumettre un bug</concierge-link>.</muted-text>',
             confirmResetDescription: 'Tous les brouillons de messages non envoyés seront perdus, mais le reste de vos données est en sécurité.',
@@ -1888,17 +1886,6 @@ const translations: TranslationDeepObject<typeof en> = {
             sentryDebugDescription: 'Journaliser les requêtes Sentry dans la console',
             sentryHighlightedSpanOps: 'Noms de segments surlignés',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.clic, navigation, ui.chargement',
-        },
-        debugConsole: {
-            saveLog: 'Enregistrer le journal',
-            shareLog: 'Partager le journal',
-            enterCommand: 'Saisissez la commande',
-            execute: 'Exécuter',
-            noLogsAvailable: 'Aucun journal disponible',
-            logSizeTooLarge: (size: number) =>
-                `La taille du journal dépasse la limite de ${size} Mo. Veuillez utiliser « Enregistrer le journal » pour télécharger le fichier journal à la place.`,
-            logs: 'Journaux',
-            viewConsole: 'Afficher la console',
         },
         security: 'Sécurité',
         signOut: 'Se déconnecter',

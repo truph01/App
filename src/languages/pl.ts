@@ -1836,8 +1836,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Wyczyść pamięć podręczną i uruchom ponownie',
-            viewConsole: 'Wyświetl konsolę debugowania',
-            debugConsole: 'Konsola debugowania',
             description:
                 '<muted-text>Użyj poniższych narzędzi, aby rozwiązać problemy z działaniem Expensify. Jeśli napotkasz jakiekolwiek problemy, prosimy <concierge-link>zgłosić błąd</concierge-link>.</muted-text>',
             confirmResetDescription: 'Wszystkie niewysłane szkice wiadomości zostaną utracone, ale reszta Twoich danych jest bezpieczna.',
@@ -1876,16 +1874,6 @@ const translations: TranslationDeepObject<typeof en> = {
             sentryDebugDescription: 'Rejestruj żądania Sentry w konsoli',
             sentryHighlightedSpanOps: 'Wyróżnione nazwy zakresów',
             sentryHighlightedSpanOpsPlaceholder: 'kliknięcie interfejsu, nawigacja, ładowanie interfejsu',
-        },
-        debugConsole: {
-            saveLog: 'Zapisz dziennik',
-            shareLog: 'Udostępnij dziennik',
-            enterCommand: 'Wpisz polecenie',
-            execute: 'Wykonaj',
-            noLogsAvailable: 'Brak dostępnych dzienników',
-            logSizeTooLarge: (size: number) => `Rozmiar dziennika przekracza limit ${size} MB. Użyj proszę opcji „Zapisz dziennik”, aby zamiast tego pobrać plik dziennika.`,
-            logs: 'Dzienniki',
-            viewConsole: 'Wyświetl konsolę',
         },
         security: 'Bezpieczeństwo',
         signOut: 'Wyloguj się',

@@ -1831,8 +1831,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'キャッシュをクリアして再起動',
-            viewConsole: 'デバッグコンソールを表示',
-            debugConsole: 'デバッグコンソール',
             description:
                 '<muted-text>以下のツールを使用して、Expensify のご利用状況のトラブルシューティングに役立ててください。問題が発生した場合は、<concierge-link>バグを報告</concierge-link>してください。</muted-text>',
             confirmResetDescription: '送信されていない下書きメッセージはすべて失われますが、その他のデータは安全です。',
@@ -1871,16 +1869,6 @@ const translations: TranslationDeepObject<typeof en> = {
             sentryDebugDescription: 'Sentry リクエストをコンソールに記録',
             sentryHighlightedSpanOps: '強調表示されたスパン名',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.click、ナビゲーション、ui.load',
-        },
-        debugConsole: {
-            saveLog: 'ログを保存',
-            shareLog: 'ログを共有',
-            enterCommand: 'コマンドを入力',
-            execute: '実行',
-            noLogsAvailable: 'ログはありません',
-            logSizeTooLarge: (size: number) => `ログサイズが上限の ${size} MB を超えています。"ログを保存" を使用してログファイルをダウンロードしてください。`,
-            logs: 'ログ',
-            viewConsole: 'コンソールを表示',
         },
         security: 'セキュリティ',
         signOut: 'サインアウト',

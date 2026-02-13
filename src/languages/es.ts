@@ -1651,8 +1651,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Borrar caché y reiniciar',
-            viewConsole: 'Ver la consola de depuración',
-            debugConsole: 'Consola de depuración',
             description:
                 '<muted-text>Utilice las herramientas que aparecen a continuación para solucionar los problemas de Expensify. Si tiene algún problema, por favor <concierge-link>envíe un informe de error</concierge-link>.</muted-text>',
             confirmResetDescription: 'Todos los borradores no enviados se perderán, pero el resto de tus datos estarán a salvo.',
@@ -1691,16 +1689,6 @@ const translations: TranslationDeepObject<typeof en> = {
             sentryDebugDescription: 'Registrar las solicitudes de Sentry en la consola',
             sentryHighlightedSpanOps: 'Nombres de spans resaltados',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.click, navigation, ui.load',
-        },
-        debugConsole: {
-            saveLog: 'Guardar registro',
-            shareLog: 'Compartir registro',
-            enterCommand: 'Introducir comando',
-            execute: 'Ejecutar',
-            noLogsAvailable: 'No hay registros disponibles',
-            logSizeTooLarge: (size) => `El tamaño del registro excede el límite de ${size} MB. Utilice "Guardar registro" para descargar el archivo de registro.`,
-            logs: 'Logs',
-            viewConsole: 'Ver consola',
         },
         security: 'Seguridad',
         restoreStashed: 'Restablecer login guardado',

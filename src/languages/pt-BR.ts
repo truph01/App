@@ -1833,8 +1833,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Limpar cache e reiniciar',
-            viewConsole: 'Ver console de depuração',
-            debugConsole: 'Console de depuração',
             description:
                 '<muted-text>Use as ferramentas abaixo para ajudar a solucionar problemas na experiência do Expensify. Se você encontrar algum problema, por favor, <concierge-link>envie um bug</concierge-link>.</muted-text>',
             confirmResetDescription: 'Todas as mensagens de rascunho não enviadas serão perdidas, mas o restante dos seus dados está seguro.',
@@ -1873,16 +1871,6 @@ const translations: TranslationDeepObject<typeof en> = {
             sentryDebugDescription: 'Registrar solicitações do Sentry no console',
             sentryHighlightedSpanOps: 'Nomes de trechos destacados',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.click, navegação, ui.carregar',
-        },
-        debugConsole: {
-            saveLog: 'Salvar log',
-            shareLog: 'Compartilhar registro',
-            enterCommand: 'Inserir comando',
-            execute: 'Executar',
-            noLogsAvailable: 'Nenhum registro disponível',
-            logSizeTooLarge: (size: number) => `O tamanho do log excede o limite de ${size} MB. Use “Salvar log” para baixar o arquivo de log.`,
-            logs: 'Logs',
-            viewConsole: 'Ver console',
         },
         security: 'Segurança',
         signOut: 'Sair',

@@ -1837,8 +1837,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Cache wissen en opnieuw starten',
-            viewConsole: 'Debugconsole bekijken',
-            debugConsole: 'Debugconsole',
             description:
                 '<muted-text>Gebruik de onderstaande tools om problemen met de Expensify-ervaring op te lossen. Als je problemen tegenkomt, <concierge-link>dien dan een bug in</concierge-link>.</muted-text>',
             confirmResetDescription: 'Alle niet-verzonden conceptberichten gaan verloren, maar de rest van je gegevens is veilig.',
@@ -1877,16 +1875,6 @@ const translations: TranslationDeepObject<typeof en> = {
             sentryDebugDescription: 'Sentry-aanvragen naar console loggen',
             sentryHighlightedSpanOps: 'Gemarkeerde span-namen',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interactie.klik, navigatie, ui.laden',
-        },
-        debugConsole: {
-            saveLog: 'Log opslaan',
-            shareLog: 'Log delen',
-            enterCommand: 'Voer opdracht in',
-            execute: 'Uitvoeren',
-            noLogsAvailable: 'Geen logs beschikbaar',
-            logSizeTooLarge: (size: number) => `Loggrootte overschrijdt de limiet van ${size} MB. Gebruik alstublieft "Log opslaan" om het logbestand te downloaden.`,
-            logs: 'Logboeken',
-            viewConsole: 'Console bekijken',
         },
         security: 'Beveiliging',
         signOut: 'Afmelden',
