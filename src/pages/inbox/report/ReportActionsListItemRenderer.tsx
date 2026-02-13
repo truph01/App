@@ -72,9 +72,6 @@ type ReportActionsListItemRendererProps = {
     /** User wallet tierName */
     userWalletTierName: string | undefined;
 
-    /** Linked transaction route error */
-    linkedTransactionRouteError?: OnyxEntry<Errors>;
-
     /** Whether the user is validated */
     isUserValidated: boolean | undefined;
 
@@ -124,7 +121,6 @@ function ReportActionsListItemRenderer({
     draftMessage,
     emojiReactions,
     userWalletTierName,
-    linkedTransactionRouteError,
     isUserValidated,
     userBillingFundID,
     personalDetails,
@@ -228,7 +224,6 @@ function ReportActionsListItemRenderer({
                 personalDetails={personalDetails}
                 allDraftMessages={allDraftMessages}
                 allEmojiReactions={allEmojiReactions}
-                linkedTransactionRouteError={linkedTransactionRouteError}
                 userBillingFundID={userBillingFundID}
                 isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
                 isReportArchived={isReportArchived}
@@ -260,7 +255,6 @@ function ReportActionsListItemRenderer({
             personalDetails={personalDetails}
             draftMessage={draftMessage}
             emojiReactions={emojiReactions}
-            linkedTransactionRouteError={linkedTransactionRouteError}
             userBillingFundID={userBillingFundID}
             isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
             reportNameValuePairsOrigin={reportNameValuePairsOrigin}

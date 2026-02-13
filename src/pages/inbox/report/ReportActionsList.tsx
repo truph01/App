@@ -686,9 +686,6 @@ function ReportActionsList({
             const matchingDraftMessageString = matchingDraftMessage?.message;
 
             const actionEmojiReactions = emojiReactions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${reportAction.reportActionID}`];
-            const transactionID = isMoneyRequestAction(reportAction) && getOriginalMessage(reportAction)?.IOUTransactionID;
-            const transaction = transactionID ? transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`] : undefined;
-            const actionLinkedTransactionRouteError = transaction?.errorFields?.route ?? undefined;
 
             return (
                 <ReportActionsListItemRenderer
@@ -720,7 +717,6 @@ function ReportActionsList({
                     allDraftMessages={draftMessage}
                     allEmojiReactions={emojiReactions}
                     isReportArchived={isReportArchived}
-                    linkedTransactionRouteError={actionLinkedTransactionRouteError}
                     userBillingFundID={userBillingFundID}
                     isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
                     reportNameValuePairsOrigin={reportNameValuePairs?.origin}
