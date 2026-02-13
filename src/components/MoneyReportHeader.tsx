@@ -248,7 +248,7 @@ function MoneyReportHeader({
         'Table',
         'Info',
         'Export',
-        'Document',
+        'Download',
         'XeroSquare',
         'QBOSquare',
         'NetSuiteSquare',
@@ -1244,7 +1244,7 @@ function MoneyReportHeader({
         [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF,
             text: translate('common.downloadAsPDF'),
-            icon: expensifyIcons.Document,
+            icon: expensifyIcons.Download,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.DOWNLOAD_PDF,
             onSelected: () => {
                 if (!moneyRequestReport) {
