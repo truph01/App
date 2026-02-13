@@ -139,7 +139,7 @@ type MultifactorAuthenticationOutcomeSuffixes<T extends MultifactorAuthenticatio
  * Response from a multifactor authentication scenario action.
  */
 type MultifactorAuthenticationScenarioResponse = {
-    httpCode?: number;
+    httpCode: number | undefined;
     reason: MultifactorAuthenticationReason;
     /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
     body?: Record<string, unknown>;
@@ -175,26 +175,24 @@ type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> =
     /**
      * Callback function that is invoked after the API call completes (success or failure).
      * The callback receives the success status and input containing HTTP code, message, and response body.
-     * Returns a response that determines whether to show the outcome screen:
-     * - SKIP_OUTCOME_SCREEN: The callback handles navigation itself
-     * - SHOW_OUTCOME_SCREEN: Continue with normal flow and show the outcome screen
+     * Returns a MultifactorAuthenticationCallbackResponse value that determines the post-callback behavior
+     * (e.g., whether to show the outcome screen or let the callback handle navigation).
      */
-    callback: MultifactorAuthenticationScenarioCallback;
+    callback?: MultifactorAuthenticationScenarioCallback;
 } & MultifactorAuthenticationUI;
 
 /**
  * Scenario configuration for custom scenarios with optional overrides.
  */
-type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<MultifactorAuthenticationScenarioConfig<T>, 'MODALS' | 'OUTCOMES' | 'callback'> & {
+type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<MultifactorAuthenticationScenarioConfig<T>, 'MODALS' | 'OUTCOMES'> & {
     MODALS?: MultifactorAuthenticationModalOptional;
     OUTCOMES: MultifactorAuthenticationOutcomeOptional;
-    callback?: MultifactorAuthenticationScenarioCallback;
 };
 
 /**
  * Default UI configuration shared across scenarios.
  */
-type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS' | 'OUTCOMES'>;
+type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS' | 'OUTCOMES' | 'callback'>;
 
 /**
  * Record mapping all scenarios to their configurations.

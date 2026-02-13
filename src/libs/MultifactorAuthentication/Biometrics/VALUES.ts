@@ -195,6 +195,7 @@ const MULTIFACTOR_AUTHENTICATION_VALUES = {
         REGISTRATION: 'registration',
         AUTHENTICATION: 'authentication',
     },
+
     /**
      * One of these parameters are always present in any MFA request.
      * Validate code in the registration and signedChallenge in the authentication.
@@ -205,6 +206,7 @@ const MULTIFACTOR_AUTHENTICATION_VALUES = {
     },
     API_RESPONSE_MAP,
     REASON,
+
     /**
      * Specifically meaningful values for `multifactorAuthenticationPublicKeyIDs` in the `account` Onyx key.
      * Casting `[] as string[]` is necessary to allow us to actually store the value in Onyx. Otherwise the
@@ -221,6 +223,7 @@ const MULTIFACTOR_AUTHENTICATION_VALUES = {
     CALLBACK_RESPONSE: {
         /** Skip the outcome screen - the callback handles navigation itself */
         SKIP_OUTCOME_SCREEN: 'SKIP_OUTCOME_SCREEN',
+
         /** Show the outcome screen - continue with normal flow */
         SHOW_OUTCOME_SCREEN: 'SHOW_OUTCOME_SCREEN',
     },

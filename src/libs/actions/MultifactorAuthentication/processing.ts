@@ -11,9 +11,9 @@ import Base64URL from '@src/utils/Base64URL';
 import {registerAuthenticationKey} from './index';
 
 type ProcessResult = {
-    isSuccess: boolean;
+    success: boolean;
     reason: MultifactorAuthenticationReason;
-    httpCode?: number;
+    httpCode: number | undefined;
     /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
     body?: Record<string, unknown>;
 };
@@ -81,7 +81,8 @@ function createKeyInfoObject({publicKey, challenge}: {publicKey: string; challen
 async function processRegistration(params: RegistrationParams): Promise<ProcessResult> {
     if (!params.challenge) {
         return {
-            isSuccess: false,
+            success: false,
+            httpCode: undefined,
             reason: VALUES.REASON.CHALLENGE.CHALLENGE_MISSING,
         };
     }
@@ -96,11 +97,12 @@ async function processRegistration(params: RegistrationParams): Promise<ProcessR
         authenticationMethod: params.authenticationMethod,
     });
 
-    const isSuccess = isHttpSuccess(httpCode);
+    const success = isHttpSuccess(httpCode);
 
     return {
-        isSuccess,
+        success,
         reason,
+        httpCode,
     };
 }
 
@@ -126,15 +128,16 @@ async function processScenario<T extends MultifactorAuthenticationScenario>(
 
     if (!params.signedChallenge) {
         return {
-            isSuccess: false,
+            success: false,
+            httpCode: undefined,
             reason: VALUES.REASON.GENERIC.SIGNATURE_MISSING,
         };
     }
     const {httpCode, reason, body} = await currentScenario.action(params);
-    const isSuccess = isHttpSuccess(httpCode);
+    const success = isHttpSuccess(httpCode);
 
     return {
-        isSuccess,
+        success,
         reason,
         httpCode,
         body,

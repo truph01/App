@@ -104,9 +104,11 @@ type MultifactorAuthenticationCallbackResponse = ValueOf<typeof VALUES.CALLBACK_
  */
 type MultifactorAuthenticationCallbackInput = {
     /** The HTTP status code of the API response, if applicable */
-    httpCode?: number;
+    httpCode: number | undefined;
+
     /** The HTTP status message or a pre-defined reason if the error occurred on the front-end */
     message?: string;
+
     /** Object containing the data that is relevant to the Scenario (e.g., {pin: number} for PIN scenarios) */
     body?: Record<string, unknown>;
 };
@@ -116,10 +118,7 @@ type MultifactorAuthenticationCallbackInput = {
  * Called after the API call completes (success or failure).
  * Returns a response that determines whether to show the outcome screen.
  */
-type MultifactorAuthenticationScenarioCallback = (
-    isSuccess: boolean,
-    callbackInput: MultifactorAuthenticationCallbackInput,
-) => MultifactorAuthenticationCallbackResponse | Promise<MultifactorAuthenticationCallbackResponse>;
+type MultifactorAuthenticationScenarioCallback = (isSuccessful: boolean, callbackInput: MultifactorAuthenticationCallbackInput) => Promise<MultifactorAuthenticationCallbackResponse>;
 
 export type {
     MultifactorAuthenticationResponseMap,
