@@ -751,6 +751,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: '名前、メールアドレス、または電話番号',
         findMember: 'メンバーを検索',
         searchForSomeone: '誰かを検索',
+        userSelected: (username: string) => `${username} 選択された`,
     },
     customApprovalWorkflow: {
         title: 'カスタム承認ワークフロー',
@@ -1111,6 +1112,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: '以前のクイック操作の宛先にはアクセスできなくなりました。下から新しい宛先を選択してください。',
         updateDestination: '送信先を更新',
         createReport: 'レポートを作成',
+        createTimeExpense: '時間経費を作成',
     },
     iou: {
         amount: '金額',
@@ -3014,10 +3016,7 @@ ${
     detailsPage: {
         localTime: '現地時間',
     },
-    newChatPage: {
-        startGroup: 'グループを開始',
-        addToGroup: 'グループに追加',
-    },
+    newChatPage: {startGroup: 'グループを開始', addToGroup: 'グループに追加', addUserToGroup: (username: string) => `${username} をグループに追加`},
     yearPickerPage: {
         year: '年',
         selectYear: '年を選択してください',
@@ -6416,6 +6415,7 @@ ${reportName}
             symbols: '記号',
             flags: 'フラグ',
         },
+        emojiNotSelected: '絵文字が選択されていません',
     },
     newRoomPage: {
         newRoom: '新しいルーム',

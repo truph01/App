@@ -770,6 +770,7 @@ const translations = {
         nameEmailOrPhoneNumber: 'Name, email, or phone number',
         findMember: 'Find a member',
         searchForSomeone: 'Search for someone',
+        userSelected: (username: string) => `${username} selected`,
     },
     customApprovalWorkflow: {
         title: 'Custom approval workflow',
@@ -1132,6 +1133,7 @@ const translations = {
         noLongerHaveReportAccess: 'You no longer have access to your previous quick action destination. Pick a new one below.',
         updateDestination: 'Update destination',
         createReport: 'Create report',
+        createTimeExpense: 'Create time expense',
     },
     iou: {
         amount: 'Amount',
@@ -3058,6 +3060,7 @@ const translations = {
     newChatPage: {
         startGroup: 'Start group',
         addToGroup: 'Add to group',
+        addUserToGroup: (username: string) => `Add ${username} to group`,
     },
     yearPickerPage: {
         year: 'Year',
@@ -6405,6 +6408,7 @@ const translations = {
         onboardingHelp: 'Onboarding help',
     },
     emojiPicker: {
+        emojiNotSelected: 'Emoji not selected',
         skinTonePickerLabel: 'Change default skin tone',
         headers: {
             frequentlyUsed: 'Frequently Used',

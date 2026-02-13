@@ -754,6 +754,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: 'Nome, e-mail ou número de telefone',
         findMember: 'Encontrar membro',
         searchForSomeone: 'Buscar alguém',
+        userSelected: (username: string) => `${username} selecionado`,
     },
     customApprovalWorkflow: {
         title: 'Fluxo de aprovação personalizado',
@@ -1114,6 +1115,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: 'Você não tem mais acesso ao seu destino anterior de ação rápida. Escolha um novo abaixo.',
         updateDestination: 'Atualizar destino',
         createReport: 'Criar relatório',
+        createTimeExpense: 'Criar despesa de tempo',
     },
     iou: {
         amount: 'Valor',
@@ -3020,10 +3022,7 @@ ${
     detailsPage: {
         localTime: 'Hora local',
     },
-    newChatPage: {
-        startGroup: 'Iniciar grupo',
-        addToGroup: 'Adicionar ao grupo',
-    },
+    newChatPage: {startGroup: 'Iniciar grupo', addToGroup: 'Adicionar ao grupo', addUserToGroup: (username: string) => `Adicionar ${username} ao grupo`},
     yearPickerPage: {
         year: 'Ano',
         selectYear: 'Selecione um ano',
@@ -6453,6 +6452,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             symbols: 'Símbolos',
             flags: 'Bandeiras',
         },
+        emojiNotSelected: 'Emoji não selecionado',
     },
     newRoomPage: {
         newRoom: 'Nova sala',

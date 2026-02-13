@@ -754,6 +754,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: 'Naam, e-mail of telefoonnummer',
         findMember: 'Lid zoeken',
         searchForSomeone: 'Iemand zoeken',
+        userSelected: (username: string) => `${username} geselecteerd`,
     },
     customApprovalWorkflow: {
         title: 'Aangepaste goedkeuringsworkflow',
@@ -1115,6 +1116,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: 'Je hebt geen toegang meer tot je vorige snelkoppelingsbestemming. Kies hieronder een nieuwe.',
         updateDestination: 'Bestemming bijwerken',
         createReport: 'Rapport maken',
+        createTimeExpense: 'Tijdkosten aanmaken',
     },
     iou: {
         amount: 'Bedrag',
@@ -3028,10 +3030,7 @@ ${
     detailsPage: {
         localTime: 'Lokale tijd',
     },
-    newChatPage: {
-        startGroup: 'Groep starten',
-        addToGroup: 'Aan groep toevoegen',
-    },
+    newChatPage: {startGroup: 'Groep starten', addToGroup: 'Aan groep toevoegen', addUserToGroup: (username: string) => `${username} aan groep toevoegen`},
     yearPickerPage: {
         year: 'Jaar',
         selectYear: 'Selecteer een jaar',
@@ -6459,6 +6458,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             symbols: 'Symbolen',
             flags: 'Vlaggen',
         },
+        emojiNotSelected: 'Emoji niet geselecteerd',
     },
     newRoomPage: {
         newRoom: 'Nieuwe ruimte',
