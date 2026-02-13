@@ -16,7 +16,7 @@ import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
-import {clearToggleTwoFactorAuthRequiredForDomainError, toggleTwoFactorAuthRequiredForDomain} from '@userActions/Domain';
+import {clearValidateTwoFactorAuthCodeError, toggleTwoFactorAuthRequiredForDomain} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -84,12 +84,12 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
                             }}
                             shouldAutoFocus={false}
                             onInputChange={() => {
-                                if (isEmptyObject(domainErrors?.setTwoFactorAuthRequiredError)) {
+                                if (isEmptyObject(domainErrors?.validateTwoFactorAuthCodeError)) {
                                     return;
                                 }
-                                clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID);
+                                clearValidateTwoFactorAuthCodeError(domainAccountID);
                             }}
-                            errorMessage={getLatestErrorMessage({errors: domainErrors?.setTwoFactorAuthRequiredError})}
+                            errorMessage={getLatestErrorMessage({errors: domainErrors?.validateTwoFactorAuthCodeError})}
                         />
                     </View>
                 </ScrollView>
