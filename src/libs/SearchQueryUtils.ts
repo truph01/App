@@ -33,6 +33,7 @@ import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFilte
 import type * as OnyxTypes from '@src/types/onyx';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import arraysEqual from '@src/utils/arraysEqual';
+import {getSearchValueForConnection} from './AccountingUtils';
 import {getCardFeedsForDisplay} from './CardFeedUtils';
 import {getCardDescription} from './CardUtils';
 import {convertToBackendAmount, convertToFrontendAmountAsInteger} from './CurrencyUtils';
@@ -42,7 +43,7 @@ import {getPreservedNavigatorState} from './Navigation/AppNavigator/createSplitN
 import navigationRef from './Navigation/navigationRef';
 import type {SearchFullscreenNavigatorParamList} from './Navigation/types';
 import {getDisplayNameOrDefault, getPersonalDetailByEmail} from './PersonalDetailsUtils';
-import {getCleanedTagName, getTagNamesFromTagsLists} from './PolicyUtils';
+import {getCleanedTagName, getConnectedIntegrationNamesForPolicies, getTagNamesFromTagsLists} from './PolicyUtils';
 import {getReportName} from './ReportUtils';
 import {parse as parseSearchQuery} from './SearchParser/searchParser';
 import StringUtils from './StringUtils';
@@ -817,6 +818,7 @@ function buildFilterFormValuesFromQuery(
     cardList: OnyxTypes.CardList | undefined,
     reports: OnyxCollection<OnyxTypes.Report>,
     taxRates: Record<string, string[]>,
+    policies?: OnyxCollection<OnyxTypes.Policy>,
 ) {
     const filters = queryJSON.flatFilters;
     const filtersForm = {} as Partial<SearchAdvancedFiltersForm>;
@@ -885,7 +887,13 @@ function buildFilterFormValuesFromQuery(
             filtersForm[key as typeof filterKey] = filterValues;
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO) {
-            filtersForm[key as typeof filterKey] = filterValues;
+            const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies);
+            const displayNameByLowercase = new Map<string, string>();
+            for (const connectionName of connectedIntegrationNames) {
+                const displayName = getSearchValueForConnection(connectionName as Parameters<typeof getSearchValueForConnection>[0]);
+                displayNameByLowercase.set(displayName.toLowerCase(), displayName);
+            }
+            filtersForm[key as typeof filterKey] = filterValues.map((value) => displayNameByLowercase.get(value.toLowerCase())).filter((value): value is string => value != null);
         }
 
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.PAYER) {

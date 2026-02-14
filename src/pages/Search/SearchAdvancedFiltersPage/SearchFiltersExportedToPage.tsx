@@ -13,7 +13,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getSearchValueForConnection} from '@libs/AccountingUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {getValidConnectedIntegration} from '@libs/PolicyUtils';
+import {getConnectedIntegrationNamesForPolicies} from '@libs/PolicyUtils';
 import {getIntegrationIcon} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import {getExportTemplates, updateAdvancedFilters} from '@userActions/Search';
@@ -36,28 +36,12 @@ function SearchFiltersExportedToPage() {
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {canBeMissing: true});
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
-    const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
+    const policyIDs = useMemo(() => searchAdvancedFiltersForm?.policyID ?? [], [searchAdvancedFiltersForm?.policyID]);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const policy = policyIDs?.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDs.at(0)}`] : undefined;
 
     const predefinedConnectionNamesList = Object.values(CONST.POLICY.CONNECTIONS.NAME);
-    const connectedAccountingIntegrationNames = useMemo((): Set<string> => {
-        if (!policies) {
-            return new Set();
-        }
-        const connectedIntegrationNames = new Set<string>();
-        const hasWorkspaceFilter = policyIDs.length > 0;
-        // If workspace filter is applied, consider only the selected workspaces to check connected integration, otherwise consider all workspaces.
-        const policyIDsToCheck = hasWorkspaceFilter ? policyIDs : (Object.values(policies) ?? []).map((policy) => policy?.id).filter((id) => id != null);
-        for (const policyID of policyIDsToCheck) {
-            const currentPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
-            const connectedIntegration = getValidConnectedIntegration(currentPolicy);
-            if (connectedIntegration) {
-                connectedIntegrationNames.add(connectedIntegration);
-            }
-        }
-        return connectedIntegrationNames;
-    }, [policyIDs, policies]);
+    const connectedIntegrationNames = useMemo(() => getConnectedIntegrationNamesForPolicies(policies, policyIDs.length > 0 ? policyIDs : undefined), [policyIDs, policies]);
 
     const items = useMemo((): SearchMultipleSelectionPickerItem[] => {
         const predefinedConnectionNames = new Set<string>(predefinedConnectionNamesList);
@@ -73,7 +57,7 @@ function SearchFiltersExportedToPage() {
         );
 
         const integrationItems: SearchMultipleSelectionPickerItem[] = predefinedConnectionNamesList
-            .filter((connectionName) => connectedAccountingIntegrationNames.has(connectionName))
+            .filter((connectionName) => connectedIntegrationNames.has(connectionName))
             .map((connectionName) => {
                 const icon = getIntegrationIcon(connectionName, expensifyIcons);
                 const leftElement = icon ? (
@@ -133,7 +117,7 @@ function SearchFiltersExportedToPage() {
         translate,
         predefinedConnectionNamesList,
         localeCompare,
-        connectedAccountingIntegrationNames,
+        connectedIntegrationNames,
     ]);
 
     const initiallySelectedItems = useMemo((): SearchMultipleSelectionPickerItem[] | undefined => {

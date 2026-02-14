@@ -27,7 +27,7 @@ const useFilterFormValues = (queryJSON?: SearchQueryJSON) => {
     const allCards = useMemo(() => mergeCardListWithWorkspaceFeeds(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, userCardList), [workspaceCardFeeds, userCardList]);
 
     const formValues = queryJSON
-        ? buildFilterFormValuesFromQuery(queryJSON, policyCategories, policyTagsLists, currencyList, personalDetails, allCards, allReports, taxRates)
+        ? buildFilterFormValuesFromQuery(queryJSON, policyCategories, policyTagsLists, currencyList, personalDetails, allCards, allReports, taxRates, policies)
         : getEmptyObject<Partial<SearchAdvancedFiltersForm>>();
 
     return formValues;

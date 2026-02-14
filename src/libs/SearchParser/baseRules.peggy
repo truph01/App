@@ -101,7 +101,7 @@ columnsValues
   / bankAccount
   / reportId
   / base62ReportId
-  / exportedTo
+  / exportedToColumnValue
   / exchangeRate
   / reimbursableTotal
   / nonReimbursableTotal
@@ -131,9 +131,11 @@ withdrawalId            = "withdrawal-id"i &wordBoundary            { return "wi
 bankAccount             = "bank-account"i &wordBoundary             { return "bankAccount"; }
 reportId                = "long-report-id"i &wordBoundary           { return "reportID"; }
 base62ReportId          = "report-id"i &wordBoundary                { return "base62ReportID"; }
+exportedToColumnValue   = "exported-to"i &wordBoundary              { return "exportedto"; }
+exportedToKeyEnd = wordBoundary / _ (":" / "=")
 exportedTo
-  = "exportedTo"i &wordBoundary { return "exportedTo"; }
-  / "exported-to"i &wordBoundary { return "exportedTo"; }
+  = "exportedTo"i &exportedToKeyEnd { return "exportedTo"; }
+  / "exported-to"i &exportedToKeyEnd { return "exportedTo"; }
 exchangeRate            = "exchange-rate"i &wordBoundary            { return "exchangeRate"; }
 reimbursableTotal       = "reimbursable-total"i &wordBoundary       { return "reimbursableTotal"; }
 nonReimbursableTotal    = "non-reimbursable-total"i &wordBoundary   { return "nonReimbursableTotal"; }
@@ -209,5 +211,5 @@ validClosingCondition
   / [,] // Case 3: Followed by a comma
 
 wordBoundary
-  = [ \t\n\r\xA0,:=<>!]  // whitespace, comma, or operator (so "exported-to:" is recognized)
+  = [ \t\n\r\xA0,]  // whitespace or comma
   / !.              // or end of input

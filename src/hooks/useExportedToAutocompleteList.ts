@@ -1,10 +1,10 @@
 import {useMemo} from 'react';
-import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import {getStandardExportTemplateDisplayName} from '@libs/AccountingUtils';
 import {getExportTemplates} from '@libs/actions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import useLocalize from './useLocalize';
+import useOnyx from './useOnyx';
 
 /**
  * Hook that returns the list of export template names for the "exported-to:" search autocomplete.
