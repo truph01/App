@@ -78,6 +78,7 @@ function SubscriptionSizePage() {
                     onBackButtonPress={onBackButtonPress}
                 />
                 <CurrentPage
+                    isEditing
                     onNext={nextPage}
                     onMove={moveTo}
                 />
