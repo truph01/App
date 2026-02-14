@@ -4510,7 +4510,7 @@ describe('actions/Report', () => {
                 [TEST_USER_ACCOUNT_ID]: {
                     accountID: TEST_USER_ACCOUNT_ID,
                     login: TEST_USER_LOGIN,
-                    displayName: 'Participant One',
+                    displayName: 'Test user account',
                 },
                 [PARTICIPANT_1_ACCOUNT_ID]: {
                     accountID: PARTICIPANT_1_ACCOUNT_ID,
@@ -4545,6 +4545,80 @@ describe('actions/Report', () => {
             const participantAccountIDs = Object.keys(newGroupChatReport?.participants ?? {}).map(Number);
             expect(participantAccountIDs).toContain(TEST_USER_ACCOUNT_ID);
             expect(participantAccountIDs).toContain(PARTICIPANT_1_ACCOUNT_ID);
+        });
+    });
+
+    describe('navigateToAndOpenReport', () => {
+        it('should create new chat when no existing chat with participant', async () => {
+            // Given a test user with initial data
+            const TEST_USER_ACCOUNT_ID = 1;
+            const TEST_USER_LOGIN = 'test@user.com';
+            const PARTICIPANT_LOGIN = 'participant@test.com';
+            const PARTICIPANT_ACCOUNT_ID = 2;
+
+            await TestHelper.signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
+            await TestHelper.setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID);
+            await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [PARTICIPANT_ACCOUNT_ID]: {
+                    accountID: PARTICIPANT_ACCOUNT_ID,
+                    login: PARTICIPANT_LOGIN,
+                    displayName: 'Participant',
+                },
+            });
+
+            // When navigateToAndOpenReport is called with a participant that doesn't have an existing chat
+            Report.navigateToAndOpenReport([PARTICIPANT_LOGIN], TEST_USER_ACCOUNT_ID);
+            await waitForBatchedUpdates();
+
+            // Then verify OpenReport API was called
+            TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.OPEN_REPORT, 1);
+
+            // Then verify navigation was called
+            expect(Navigation.navigate).toHaveBeenCalled();
+        });
+
+        it('should not create new chat when there is an existing chat with the participant', async () => {
+            // Given a test user with initial data
+            const TEST_USER_ACCOUNT_ID = 1;
+            const TEST_USER_LOGIN = 'test@user.com';
+            const PARTICIPANT_LOGIN = 'participant@test.com';
+            const PARTICIPANT_ACCOUNT_ID = 2;
+            const EXISTING_REPORT_ID = '123';
+
+            await TestHelper.signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
+            await TestHelper.setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID);
+            await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [PARTICIPANT_ACCOUNT_ID]: {
+                    accountID: PARTICIPANT_ACCOUNT_ID,
+                    login: PARTICIPANT_LOGIN,
+                    displayName: 'Participant',
+                },
+            });
+
+            // When there is an existing chat report with the participant
+            const existingReport: OnyxTypes.Report = {
+                reportID: EXISTING_REPORT_ID,
+                type: CONST.REPORT.TYPE.CHAT,
+                participants: {
+                    [TEST_USER_ACCOUNT_ID]: {
+                        notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+                    },
+                    [PARTICIPANT_ACCOUNT_ID]: {
+                        notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+                    },
+                },
+            };
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${EXISTING_REPORT_ID}`, existingReport);
+
+            // When navigateToAndOpenReport is called with the participant that has an existing chat
+            Report.navigateToAndOpenReport([PARTICIPANT_LOGIN], TEST_USER_ACCOUNT_ID);
+            await waitForBatchedUpdates();
+
+            // Then verify OpenReport API was NOT called since the chat already exists
+            TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.OPEN_REPORT, 0);
+
+            // Then verify navigation was called to the existing report
+            expect(Navigation.navigate).toHaveBeenCalled();
         });
     });
 });
