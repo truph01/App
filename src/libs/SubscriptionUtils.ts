@@ -277,7 +277,7 @@ function getSubscriptionStatus(
     retryBillingFailed: boolean | undefined,
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
-    ownerBillingGraceEndPeriod?: OnyxEntry<number>,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): SubscriptionStatus | undefined {
     if (hasOverdueGracePeriod(ownerBillingGraceEndPeriod)) {
         if (hasAmountOwed()) {
@@ -382,7 +382,7 @@ function hasSubscriptionRedDotError(
     retryBillingFailed: boolean | undefined,
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
-    ownerBillingGraceEndPeriod?: OnyxEntry<number>,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     return getSubscriptionStatus(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, ownerBillingGraceEndPeriod)?.isError ?? false;
 }
@@ -397,7 +397,7 @@ function hasSubscriptionGreenDotInfo(
     retryBillingFailed: boolean | undefined,
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
-    ownerBillingGraceEndPeriod?: OnyxEntry<number>,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     return getSubscriptionStatus(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, ownerBillingGraceEndPeriod)?.isError === false;
 }
@@ -488,7 +488,7 @@ function doesUserHavePaymentCardAdded(userBillingFundID: number | undefined): bo
 function shouldRestrictUserBillableActions(
     policyID: string,
     userBillingGraceEndPeriodCollection: OnyxCollection<BillingGraceEndPeriod> = deprecatedUserBillingGraceEndPeriodCollection,
-    ownerBillingGraceEndPeriod?: OnyxEntry<number>,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     const currentDate = new Date();
 

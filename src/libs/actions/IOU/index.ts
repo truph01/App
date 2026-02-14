@@ -11936,7 +11936,7 @@ function payMoneyRequest(params: PayMoneyRequestFunctionParams) {
         betas,
         ownerBillingGraceEndPeriod,
     } = params;
-    if (chatReport.policyID && shouldRestrictUserBillableActions(chatReport.policyID)) {
+    if (chatReport.policyID && shouldRestrictUserBillableActions(chatReport.policyID, undefined, ownerBillingGraceEndPeriod)) {
         Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(chatReport.policyID));
         return;
     }
