@@ -342,7 +342,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             />
                             <MenuItemWithTopDescription
                                 disabled={isSelectedMemberOwner || isSelectedMemberCurrentUser}
-                                title={translate(`workspace.common.roleName`, {role: member?.role})}
+                                title={translate(`workspace.common.roleName`, member?.role)}
                                 interactive={!isReimburser}
                                 description={translate('common.role')}
                                 shouldShowRightIcon={!isReimburser}
