@@ -7,13 +7,13 @@ import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
-import type {SubStepProps} from '@hooks/useSubStep/types';
+import type {SubPageProps} from '@hooks/useSubPage/types';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getNewSubscriptionRenewalDate} from '@pages/settings/Subscription/utils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/SubscriptionSizeForm';
 
-type ConfirmationProps = SubStepProps;
+type ConfirmationProps = SubPageProps;
 
 function Confirmation({onNext}: ConfirmationProps) {
     const {translate} = useLocalize();
