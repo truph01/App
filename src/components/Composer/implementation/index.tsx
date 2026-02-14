@@ -60,7 +60,7 @@ function Composer({
     const encryptedAuthToken = session?.encryptedAuthToken ?? '';
     // The addAuthTokenToImageURL is created on every render without memoization.
     // This causes the RNMarkdownTextInput component to receive a new function reference on every render, potentially causing unnecessary re-renders
-    // So we need to use useCallback  to manual memoize the function. Without this, we hit the issue https://github.com/Expensify/App/issues/82465
+    // So we need to use useCallback to manual memoize the function. Without this, we hit the issue https://github.com/Expensify/App/issues/82465
     const addAuthTokenToImageURL = useCallback((url: string) => addEncryptedAuthTokenToURL(url, encryptedAuthToken), [encryptedAuthToken]);
     const markdownStyle = useMarkdownStyle(textContainsOnlyEmojis, !isGroupPolicyReport ? excludeReportMentionStyle : excludeNoStyles);
     const StyleUtils = useStyleUtils();
