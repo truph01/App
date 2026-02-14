@@ -14,13 +14,13 @@ jest.mock('@libs/Navigation/Navigation', () => ({
 }));
 
 jest.mock('@libs/PaymentUtils', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const actual = jest.requireActual('@libs/PaymentUtils');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const PAYMENT_TYPE = require('@src/CONST').default.IOU.PAYMENT_TYPE;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return {
         ...actual,
         getActivePaymentType: jest.fn().mockReturnValue({
-            paymentType: PAYMENT_TYPE.ELSEWHERE,
+            paymentType: 'Elsewhere',
             policyFromPaymentMethod: undefined,
             policyFromContext: undefined,
             shouldSelectPaymentMethod: false,
