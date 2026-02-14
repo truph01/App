@@ -99,6 +99,7 @@ function IOURequestStepDistance({
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
 
     const transactionWaypoints = transaction?.comment?.waypoints;
     const areTransactionWaypointsEmpty = !transactionWaypoints || Object.values(transactionWaypoints).every((w) => isEmptyObject(w));
@@ -327,6 +328,7 @@ function IOURequestStepDistance({
             selfDMReport,
             policyForMovingExpenses,
             betas,
+            ownerBillingGraceEndPeriod,
         });
     }, [
         iouType,
@@ -360,6 +362,7 @@ function IOURequestStepDistance({
         policyForMovingExpenses,
         selfDMReport,
         betas,
+        ownerBillingGraceEndPeriod,
     ]);
 
     const getError = () => {

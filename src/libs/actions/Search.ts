@@ -1307,6 +1307,7 @@ function handleBulkPayItemSelected(params: {
     isDelegateAccessRestricted: boolean;
     showDelegateNoAccessModal: () => void;
     confirmPayment?: (paymentType: PaymentMethodType | undefined, additionalData?: Record<string, unknown>) => void;
+    ownerBillingGraceEndPeriod?: OnyxEntry<number>;
 }) {
     const {
         item,
@@ -1320,6 +1321,7 @@ function handleBulkPayItemSelected(params: {
         isDelegateAccessRestricted,
         showDelegateNoAccessModal,
         confirmPayment,
+        ownerBillingGraceEndPeriod,
     } = params;
     const {paymentType, policyFromPaymentMethod, policyFromContext, shouldSelectPaymentMethod} = getActivePaymentType(item.key, activeAdminPolicies, latestBankItems, policy?.id);
     // Early return if item is not a valid payment method and not a policy-based payment option
@@ -1337,7 +1339,7 @@ function handleBulkPayItemSelected(params: {
         return;
     }
 
-    if (policy && shouldRestrictUserBillableActions(policy?.id)) {
+    if (policy && shouldRestrictUserBillableActions(policy?.id, undefined, ownerBillingGraceEndPeriod)) {
         Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy?.id));
         return;
     }

@@ -90,6 +90,7 @@ function IOURequestStepDistanceManual({
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
     const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
 
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isCreatingNewRequest = !(backTo || isEditing);
@@ -98,7 +99,10 @@ function IOURequestStepDistanceManual({
     const currentUserAccountIDParam = currentUserPersonalDetails.accountID;
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
 
-    const shouldUseDefaultExpensePolicy = useMemo(() => shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy), [iouType, defaultExpensePolicy]);
+    const shouldUseDefaultExpensePolicy = useMemo(
+        () => shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy, ownerBillingGraceEndPeriod),
+        [iouType, defaultExpensePolicy, ownerBillingGraceEndPeriod],
+    );
 
     const customUnitRateID = getRateID(transaction);
     // to make sure the correct distance amount and unit will be shown we use distance unit
@@ -220,6 +224,7 @@ function IOURequestStepDistanceManual({
                 selfDMReport,
                 policyForMovingExpenses,
                 betas,
+                ownerBillingGraceEndPeriod,
             });
         },
         [
@@ -261,6 +266,7 @@ function IOURequestStepDistanceManual({
             unit,
             selfDMReport,
             betas,
+            ownerBillingGraceEndPeriod,
         ],
     );
 

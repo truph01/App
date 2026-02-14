@@ -111,6 +111,7 @@ function IOURequestStepDistanceOdometer({
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const [selectedTab, selectedTabResult] = useOnyx(`${ONYXKEYS.COLLECTION.SELECTED_TAB}${CONST.TAB.DISTANCE_REQUEST_TYPE}`, {canBeMissing: true});
     const isLoadingSelectedTab = isLoadingOnyxValue(selectedTabResult);
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
 
     // isEditing: we're changing an already existing odometer expense; isEditingConfirmation: we navigated here by pressing 'Distance' field from the confirmation step during the creation of a new odometer expense to adjust the input before submitting
     const isEditing = action === CONST.IOU.ACTION.EDIT;
@@ -121,7 +122,10 @@ function IOURequestStepDistanceOdometer({
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
     const [shouldEnableDiscardConfirmation, setShouldEnableDiscardConfirmation] = useState(!isEditingConfirmation && !isEditing);
 
-    const shouldUseDefaultExpensePolicy = useMemo(() => shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy), [iouType, defaultExpensePolicy]);
+    const shouldUseDefaultExpensePolicy = useMemo(
+        () => shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy, ownerBillingGraceEndPeriod),
+        [iouType, defaultExpensePolicy, ownerBillingGraceEndPeriod],
+    );
     const customUnitRateID = getRateID(transaction);
 
     const unit = DistanceRequestUtils.getRate({transaction, policy: shouldUseDefaultExpensePolicy ? defaultExpensePolicy : policy}).unit;
@@ -422,6 +426,7 @@ function IOURequestStepDistanceOdometer({
             odometerEnd: end,
             odometerDistance: calculatedDistance,
             betas,
+            ownerBillingGraceEndPeriod,
         });
     };
 

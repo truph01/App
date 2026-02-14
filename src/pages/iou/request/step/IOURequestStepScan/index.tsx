@@ -120,6 +120,7 @@ function IOURequestStepScan({
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const [isSelfTourViewed = false] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {canBeMissing: true, selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
     const [transactions, optimisticTransactions] = useOptimisticDraftTransactions(initialTransaction);
 
@@ -350,6 +351,7 @@ function IOURequestStepScan({
                 policyForMovingExpenses,
                 isSelfTourViewed,
                 betas,
+                ownerBillingGraceEndPeriod,
             });
         },
         [
@@ -387,6 +389,7 @@ function IOURequestStepScan({
             policyForMovingExpenses,
             isSelfTourViewed,
             betas,
+            ownerBillingGraceEndPeriod,
         ],
     );
 

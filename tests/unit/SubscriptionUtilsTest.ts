@@ -2,6 +2,7 @@ import {act} from '@testing-library/react-native';
 import {addDays, addMinutes, format as formatDate, getUnixTime, subDays} from 'date-fns';
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
+import shouldUseDefaultExpensePolicy from '@libs/shouldUseDefaultExpensePolicy';
 import {
     calculateRemainingFreeTrialDays,
     doesUserHavePaymentCardAdded,
@@ -32,6 +33,10 @@ const billingGraceEndPeriod: BillingGraceEndPeriod = {
 
 const GRACE_PERIOD_DATE = new Date().getTime() + 1000 * 3600;
 const GRACE_PERIOD_DATE_OVERDUE = new Date().getTime() - 1000;
+
+// Unix second timestamps for shouldRestrictUserBillableActions tests (which uses fromUnixTime internally)
+const OWNER_GRACE_PERIOD_OVERDUE_UNIX = getUnixTime(subDays(new Date(), 3)); // 3 days ago in Unix seconds
+const OWNER_GRACE_PERIOD_FUTURE_UNIX = getUnixTime(addDays(new Date(), 3)); // 3 days from now in Unix seconds
 
 const AMOUNT_OWED = 100;
 const stripeCustomerId = STRIPE_CUSTOMER_ID;
@@ -368,8 +373,8 @@ describe('SubscriptionUtils', () => {
                 },
             });
 
-            // Pass overdue ownerBillingGraceEndPeriod as parameter instead of Onyx
-            expect(shouldRestrictUserBillableActions(policyID, undefined, GRACE_PERIOD_DATE_OVERDUE)).toBeTruthy();
+            // Pass overdue ownerBillingGraceEndPeriod as parameter (Unix seconds) instead of Onyx
+            expect(shouldRestrictUserBillableActions(policyID, undefined, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeTruthy();
         });
 
         it('should return false when future grace period is passed as parameter (not yet past due)', async () => {
@@ -385,8 +390,8 @@ describe('SubscriptionUtils', () => {
                 },
             });
 
-            // Pass future ownerBillingGraceEndPeriod as parameter - should return false (not past due)
-            expect(shouldRestrictUserBillableActions(policyID, undefined, GRACE_PERIOD_DATE)).toBeFalsy();
+            // Pass future ownerBillingGraceEndPeriod as parameter (Unix seconds) - should return false (not past due)
+            expect(shouldRestrictUserBillableActions(policyID, undefined, OWNER_GRACE_PERIOD_FUTURE_UNIX)).toBeFalsy();
         });
 
         it('should return false when no grace period is passed and none is set in Onyx', async () => {
@@ -414,15 +419,15 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.SESSION]: {email: '', accountID},
                 [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 8010,
                 // Set Onyx to future date (would return false)
-                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: GRACE_PERIOD_DATE,
+                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: OWNER_GRACE_PERIOD_FUTURE_UNIX,
                 [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: {
                     ...createRandomPolicy(Number(policyID)),
                     ownerAccountID: accountID,
                 },
             });
 
-            // Pass overdue date as parameter - should use parameter and return true
-            expect(shouldRestrictUserBillableActions(policyID, undefined, GRACE_PERIOD_DATE_OVERDUE)).toBeTruthy();
+            // Pass overdue date as parameter (Unix seconds) - should use parameter and return true
+            expect(shouldRestrictUserBillableActions(policyID, undefined, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeTruthy();
         });
 
         it('should fall back to Onyx value when parameter is undefined', async () => {
@@ -432,8 +437,8 @@ describe('SubscriptionUtils', () => {
             await Onyx.multiSet({
                 [ONYXKEYS.SESSION]: {email: '', accountID},
                 [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 8010,
-                // Set Onyx to overdue date
-                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: GRACE_PERIOD_DATE_OVERDUE,
+                // Set Onyx to overdue date (Unix seconds)
+                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: OWNER_GRACE_PERIOD_OVERDUE_UNIX,
                 [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: {
                     ...createRandomPolicy(Number(policyID)),
                     ownerAccountID: accountID,
@@ -442,6 +447,208 @@ describe('SubscriptionUtils', () => {
 
             // No parameter passed - should fall back to Onyx value and return true
             expect(shouldRestrictUserBillableActions(policyID, undefined)).toBeTruthy();
+        });
+    });
+
+    describe('shouldUseDefaultExpensePolicy - pure function behavior', () => {
+        beforeEach(async () => {
+            await Onyx.clear();
+        });
+
+        it('should return false when iouType is not CREATE', async () => {
+            const policyID = '1001';
+            const defaultExpensePolicy = {
+                ...createRandomPolicy(Number(policyID)),
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.TEAM,
+            };
+            // Even with no restriction, non-CREATE types should return false
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.SUBMIT, defaultExpensePolicy, undefined)).toBeFalsy();
+        });
+
+        it('should return false when billable actions are restricted with explicit ownerBillingGraceEndPeriod', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+            const defaultExpensePolicy = {
+                ...createRandomPolicy(Number(policyID)),
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.TEAM,
+                ownerAccountID: accountID,
+            };
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: '', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 8010,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: defaultExpensePolicy,
+            });
+
+            // Passing explicit overdue ownerBillingGraceEndPeriod (Unix seconds) should restrict billable actions
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeFalsy();
+        });
+
+        it('should return true when billable actions are NOT restricted with explicit ownerBillingGraceEndPeriod', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+            const defaultExpensePolicy = {
+                ...createRandomPolicy(Number(policyID)),
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.TEAM,
+                ownerAccountID: accountID,
+            };
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: '', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 8010,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: defaultExpensePolicy,
+            });
+
+            // Passing explicit future ownerBillingGraceEndPeriod (Unix seconds) should NOT restrict (grace period not yet overdue)
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_FUTURE_UNIX)).toBeTruthy();
+        });
+
+        it('should use passed ownerBillingGraceEndPeriod instead of Onyx global state', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+            const defaultExpensePolicy = {
+                ...createRandomPolicy(Number(policyID)),
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.TEAM,
+                ownerAccountID: accountID,
+            };
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: '', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 8010,
+                // Set Onyx to future date (Unix seconds, would NOT restrict)
+                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: OWNER_GRACE_PERIOD_FUTURE_UNIX,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: defaultExpensePolicy,
+            });
+
+            // Pass overdue date as parameter (Unix seconds) - should use parameter value (restrict) instead of Onyx value
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeFalsy();
+        });
+    });
+
+    describe('shouldUseDefaultExpensePolicy - functional test', () => {
+        beforeEach(async () => {
+            await Onyx.clear();
+        });
+
+        it('should work as a pure function when ownerBillingGraceEndPeriod is explicitly passed and Onyx has no data', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+            const defaultExpensePolicy = {
+                ...createRandomPolicy(Number(policyID)),
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.TEAM,
+                ownerAccountID: accountID,
+            };
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: '', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 8010,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: defaultExpensePolicy,
+                // Intentionally NOT setting NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END in Onyx
+            });
+
+            // When ownerBillingGraceEndPeriod is passed explicitly (overdue, Unix seconds), shouldRestrictUserBillableActions returns true,
+            // so shouldUseDefaultExpensePolicy should return false (restrictions apply)
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeFalsy();
+
+            // When ownerBillingGraceEndPeriod is passed explicitly (future, Unix seconds), shouldRestrictUserBillableActions returns false,
+            // so shouldUseDefaultExpensePolicy should return true (no restrictions)
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_FUTURE_UNIX)).toBeTruthy();
+
+            // When ownerBillingGraceEndPeriod is undefined and Onyx has no data, the function should not restrict
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, undefined)).toBeTruthy();
+        });
+    });
+
+    describe('shouldRestrictUserBillableActions - QA test scenarios', () => {
+        beforeEach(async () => {
+            await Onyx.clear();
+        });
+
+        it('QA: workspace owner with overdue grace period should be restricted', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: 'test@test.com', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 5000,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: {
+                    ...createRandomPolicy(Number(policyID)),
+                    ownerAccountID: accountID,
+                },
+            });
+
+            // Scenario: User is workspace owner with overdue billing grace period (Unix seconds)
+            expect(shouldRestrictUserBillableActions(policyID, undefined, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeTruthy();
+        });
+
+        it('QA: workspace owner with future grace period should NOT be restricted', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: 'test@test.com', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 5000,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: {
+                    ...createRandomPolicy(Number(policyID)),
+                    ownerAccountID: accountID,
+                },
+            });
+
+            // Scenario: User is workspace owner with billing grace period that hasn't expired yet (Unix seconds)
+            expect(shouldRestrictUserBillableActions(policyID, undefined, OWNER_GRACE_PERIOD_FUTURE_UNIX)).toBeFalsy();
+        });
+
+        it('QA: non-owner should be restricted when workspace owner has overdue grace period', async () => {
+            const accountID = 1;
+            const ownerAccountID = 2001;
+            const policyID = '1001';
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: 'test@test.com', accountID},
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: {
+                    ...createRandomPolicy(Number(policyID)),
+                    ownerAccountID,
+                },
+            });
+
+            // Scenario: Non-owner user in a workspace where the owner has overdue billing
+            expect(
+                shouldRestrictUserBillableActions(policyID, {
+                    [`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END}${ownerAccountID}`]: {
+                        ...billingGraceEndPeriod,
+                        value: getUnixTime(subDays(new Date(), 3)), // past due
+                    },
+                }),
+            ).toBeTruthy();
+        });
+
+        it('QA: createDraftExpense flow - shouldUseDefaultExpensePolicy should return false when owner is restricted', async () => {
+            const accountID = 1;
+            const policyID = '1001';
+            const defaultExpensePolicy = {
+                ...createRandomPolicy(Number(policyID)),
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.TEAM,
+                ownerAccountID: accountID,
+            };
+
+            await Onyx.multiSet({
+                [ONYXKEYS.SESSION]: {email: 'test@test.com', accountID},
+                [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: 5000,
+                [`${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const]: defaultExpensePolicy,
+            });
+
+            // Scenario: When creating an expense (CREATE flow), the default expense policy
+            // should NOT be used if the owner has overdue billing (Unix seconds)
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_OVERDUE_UNIX)).toBeFalsy();
+
+            // But should be used if billing is not overdue (Unix seconds)
+            expect(shouldUseDefaultExpensePolicy(CONST.IOU.TYPE.CREATE, defaultExpensePolicy, OWNER_GRACE_PERIOD_FUTURE_UNIX)).toBeTruthy();
         });
     });
 

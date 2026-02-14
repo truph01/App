@@ -58,6 +58,7 @@ function IOURequestStepDistanceGPS({
     const selfDMReport = useSelfDMReport();
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isCreatingNewRequest = !isEditing;
     // eslint-disable-next-line rulesdir/no-negated-variables
@@ -73,7 +74,7 @@ function IOURequestStepDistanceGPS({
     const currentUserAccountIDParam = currentUserPersonalDetails.accountID;
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
 
-    const shouldUseDefaultExpensePolicy = shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy);
+    const shouldUseDefaultExpensePolicy = shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy, ownerBillingGraceEndPeriod);
 
     const customUnitRateID = getRateID(transaction);
     const unit = DistanceRequestUtils.getRate({transaction, policy: shouldUseDefaultExpensePolicy ? defaultExpensePolicy : policy}).unit;
@@ -120,6 +121,7 @@ function IOURequestStepDistanceGPS({
             selfDMReport,
             policyForMovingExpenses,
             betas,
+            ownerBillingGraceEndPeriod,
         });
     };
 

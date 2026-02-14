@@ -105,6 +105,7 @@ function IOURequestStepAmount({
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const [isSelfTourViewed = false] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {canBeMissing: true, selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const defaultExpensePolicy = useDefaultExpensePolicy();
     const personalPolicy = usePersonalPolicy();
     const {duplicateTransactions, duplicateTransactionViolations} = useDuplicateTransactionsAndViolations(transactionID ? [transactionID] : []);
@@ -319,7 +320,7 @@ function IOURequestStepAmount({
         const firstParticipant = transaction?.participants?.at(0);
         const isP2PChat = isParticipantP2P(firstParticipant, currentUserPersonalDetails.accountID);
         const isNegativeAmount = convertToBackendAmount(Number.parseFloat(amount)) < 0;
-        if (shouldUseDefaultExpensePolicy(iouType, defaultExpensePolicy)) {
+        if (shouldUseDefaultExpensePolicy(iouType, defaultExpensePolicy, ownerBillingGraceEndPeriod)) {
             const shouldAutoReport = !!defaultExpensePolicy?.autoReporting || !!personalPolicy?.autoReporting;
             const targetReport = shouldAutoReport ? getPolicyExpenseChat(currentUserAccountIDParam, defaultExpensePolicy?.id) : selfDMReport;
             const transactionReportID = isSelfDM(targetReport) ? CONST.REPORT.UNREPORTED_REPORT_ID : targetReport?.reportID;

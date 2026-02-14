@@ -40,6 +40,7 @@ function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, cu
     const kycWallRef = useContext(KYCWallContext);
     const currentPolicy = usePolicy(currentSelectedPolicyID);
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector, canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const isCurrentSelectedExpenseReport = isExpenseReport(currentSelectedReportID);
     const {isAccountLocked, showLockedAccountModal} = useContext(LockedAccountContext);
     // Stores an option to execute after modal closes when using deferred execution
@@ -89,6 +90,7 @@ function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, cu
                                 isDelegateAccessRestricted,
                                 showDelegateNoAccessModal,
                                 confirmPayment,
+                                ownerBillingGraceEndPeriod,
                             })
                         }
                         success

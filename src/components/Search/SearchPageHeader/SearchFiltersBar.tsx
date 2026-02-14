@@ -122,6 +122,7 @@ function SearchFiltersBar({
     const [hasMultipleOutputCurrency] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: hasMultipleOutputCurrenciesSelector, canBeMissing: true});
     const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER, {canBeMissing: true});
     const [feedKeysWithCards] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {selector: feedKeysWithAssignedCardsSelector, canBeMissing: true});
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const {isAccountLocked, showLockedAccountModal} = useContext(LockedAccountContext);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Filter', 'Columns']);
     const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
@@ -916,6 +917,7 @@ function SearchFiltersBar({
                                         isDelegateAccessRestricted,
                                         showDelegateNoAccessModal,
                                         confirmPayment,
+                                        ownerBillingGraceEndPeriod,
                                     })
                                 }
                                 isSplitButton={false}
