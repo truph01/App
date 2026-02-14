@@ -208,6 +208,8 @@ function IOURequestStepScan({
         [initialTransactionID, policy, policyCategories, backTo],
     );
 
+    const getSource = useCallback((file: FileObject) => file.uri ?? '', []);
+
     // Shared business logic from useReceiptScan hook
     const {
         isEditing,
@@ -240,6 +242,7 @@ function IOURequestStepScan({
         isStartingScan,
         setIsMultiScanEnabled,
         updateScanAndNavigate,
+        getSource,
     });
 
     /**

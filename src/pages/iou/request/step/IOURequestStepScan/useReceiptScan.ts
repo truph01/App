@@ -68,6 +68,9 @@ type UseReceiptScanParams = {
 
     /** Callback to replace receipt and navigate back when editing */
     updateScanAndNavigate: (file: FileObject, source: string) => void;
+
+    /** Returns a source URL for the file based on platform */
+    getSource: (file: FileObject) => string;
 };
 
 function useReceiptScan({
@@ -84,6 +87,7 @@ function useReceiptScan({
     isStartingScan = false,
     setIsMultiScanEnabled,
     updateScanAndNavigate,
+    getSource,
 }: UseReceiptScanParams) {
     const {isBetaEnabled} = usePermissions();
     const {shouldStartLocationPermissionFlow} = useIOUUtils();
@@ -297,12 +301,7 @@ function useReceiptScan({
     );
 
     const {validateFiles, PDFValidationComponent, ErrorModal} = useFilesValidation((files: FileObject[]) => {
-        processReceipts(files, (file) => {
-            if (file.uri) {
-                return file.uri;
-            }
-            return URL.createObjectURL(file as Blob);
-        });
+        processReceipts(files, getSource);
     });
 
     const submitReceipts = useCallback(

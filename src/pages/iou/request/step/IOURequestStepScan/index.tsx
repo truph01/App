@@ -92,6 +92,8 @@ function IOURequestStepScan({
         [initialTransactionID, navigateBack, policy, policyCategories],
     );
 
+    const getSource = useCallback((file: FileObject) => file.uri ?? URL.createObjectURL(file as Blob), []);
+
     // Shared business logic from useReceiptScan hook
     const {
         transactions,
@@ -126,6 +128,7 @@ function IOURequestStepScan({
         isStartingScan,
         setIsMultiScanEnabled,
         updateScanAndNavigate,
+        getSource,
     });
 
     const [videoConstraints, setVideoConstraints] = useState<MediaTrackConstraints>();
