@@ -2,7 +2,7 @@ import type {ComponentType} from 'react';
 
 type SubStepProps = {
     /** value indicating whether user is editing one of the sub steps */
-    isEditing: boolean;
+    isEditing?: boolean;
 
     /** continues to next sub step */
     onNext: (data?: unknown) => void;
