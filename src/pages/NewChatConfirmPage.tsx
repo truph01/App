@@ -20,7 +20,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getParticipantsOption} from '@libs/OptionsListUtils';
 import {getGroupChatName} from '@libs/ReportNameUtils';
 import {generateReportID, getDefaultGroupAvatar} from '@libs/ReportUtils';
-import {navigateToAndOpenGroupChat, setGroupDraft} from '@userActions/Report';
+import {navigateToAndCreateGroupChat, setGroupDraft} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -99,7 +99,7 @@ function NewChatConfirmPage() {
         }
 
         const logins: string[] = (newGroupDraft.participants ?? []).map((participant) => participant.login).filter((login): login is string => !!login);
-        navigateToAndOpenGroupChat(logins, newGroupDraft.reportName ?? '', personalData.login ?? '', newGroupDraft.avatarUri ?? '', avatarFile, optimisticReportID.current);
+        navigateToAndCreateGroupChat(logins, newGroupDraft.reportName ?? '', personalData.login ?? '', optimisticReportID.current, newGroupDraft.avatarUri ?? '', avatarFile);
     }, [newGroupDraft, avatarFile, personalData.login]);
 
     const stashedLocalAvatarImage = newGroupDraft?.avatarUri;

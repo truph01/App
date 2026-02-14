@@ -4494,4 +4494,57 @@ describe('actions/Report', () => {
             expect(updatedReport?.participants?.[TEST_CURRENT_USER_ACCOUNT_ID]?.notificationPreference).toBe(CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
         });
     });
+
+    describe('navigateToAndCreateGroupChat', () => {
+        it('should create a group chat and navigate to it', async () => {
+            // Given a test user with initial data
+            const TEST_USER_ACCOUNT_ID = 1;
+            const TEST_USER_LOGIN = 'test@user.com';
+            const PARTICIPANT_1_LOGIN = 'participant1@test.com';
+            const PARTICIPANT_1_ACCOUNT_ID = 2;
+            const GROUP_CHAT_NAME = 'Test Group';
+            const GROUP_CHAT_REPORT_ID = '12345';
+
+            await TestHelper.signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
+            await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [TEST_USER_ACCOUNT_ID]: {
+                    accountID: TEST_USER_ACCOUNT_ID,
+                    login: TEST_USER_LOGIN,
+                    displayName: 'Participant One',
+                },
+                [PARTICIPANT_1_ACCOUNT_ID]: {
+                    accountID: PARTICIPANT_1_ACCOUNT_ID,
+                    login: PARTICIPANT_1_LOGIN,
+                    displayName: 'Participant One',
+                },
+            });
+
+            // When create group chat is called
+            Report.navigateToAndCreateGroupChat([TEST_USER_LOGIN, PARTICIPANT_1_LOGIN], GROUP_CHAT_NAME, TEST_USER_LOGIN, GROUP_CHAT_REPORT_ID);
+            await waitForBatchedUpdates();
+
+            // Then it should create a new group chat report in Onyx
+            let newGroupChatReport: OnyxEntry<OnyxTypes.Report>;
+            await new Promise<void>((resolve) => {
+                const connection = Onyx.connect({
+                    key: `${ONYXKEYS.COLLECTION.REPORT}${GROUP_CHAT_REPORT_ID}`,
+                    callback: (report) => {
+                        Onyx.disconnect(connection);
+                        newGroupChatReport = report;
+                        resolve();
+                    },
+                });
+            });
+
+            // Then verify the group chat was created with correct properties
+            expect(newGroupChatReport).not.toBeNull();
+            expect(newGroupChatReport?.reportName).toBe(GROUP_CHAT_NAME);
+            expect(newGroupChatReport?.chatType).toBe(CONST.REPORT.CHAT_TYPE.GROUP);
+
+            // Then verify the participants were added to the group chat
+            const participantAccountIDs = Object.keys(newGroupChatReport?.participants ?? {}).map(Number);
+            expect(participantAccountIDs).toContain(TEST_USER_ACCOUNT_ID);
+            expect(participantAccountIDs).toContain(PARTICIPANT_1_ACCOUNT_ID);
+        });
+    });
 });

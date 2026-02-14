@@ -1486,7 +1486,7 @@ function openReport(
 }
 
 /**
- * Opens a group chat report. Simplified version specifically for group chats without unnecessary logic.
+ * Create a group chat report. Simplified version specifically for group chats without unnecessary logic.
  *
  * @param reportID The ID of the group chat report to open
  * @param participantLoginList The list of user logins included in the group chat
@@ -1774,13 +1774,13 @@ function navigateToAndOpenReport(userLogins: string[], shouldDismissModal = true
     }, 0);
 }
 
-function navigateToAndOpenGroupChat(
+function navigateToAndCreateGroupChat(
     userLogins: string[],
     reportName: string,
     currentUserLogin: string,
+    optimisticReportID: string,
     avatarUri?: string,
     avatarFile?: File | CustomRNImageManipulatorResult | undefined,
-    optimisticReportID?: string,
 ) {
     const participantAccountIDs = PersonalDetailsUtils.getAccountIDsByLogins(userLogins);
 
@@ -6819,7 +6819,7 @@ export {
     createChildReport,
     navigateToAndOpenReport,
     navigateToAndOpenReportWithAccountIDs,
-    navigateToAndOpenGroupChat,
+    navigateToAndCreateGroupChat,
     navigateToConciergeChat,
     navigateToConciergeChatAndDeleteReport,
     clearCreateChatError,
