@@ -453,7 +453,8 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE]: {
             text: isDuplicateActive ? translate('common.duplicateExpense') : translate('common.duplicated'),
-            icon: isDuplicateActive ? Expensicons.ExpenseCopy : Expensicons.CheckmarkCircle,
+            icon: isDuplicateActive ? Expensicons.ExpenseCopy : Expensicons.Checkmark,
+            iconFill: isDuplicateActive ? undefined : theme.icon,
             value: CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE,
             onSelected: () => {
                 if (hasCustomUnitOutOfPolicyViolation) {
