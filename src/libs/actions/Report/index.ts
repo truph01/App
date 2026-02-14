@@ -1494,19 +1494,14 @@ function openReport(
  * @param currentUserLogin The login of the current user
  * @param avatar The avatar file to upload for the group chat (optional)
  */
-function createGroupChat(
-    reportID: string,
-    participantLoginList: string[],
-    newReportObject: OptimisticChatReport,
-    currentUserLogin:string,
-    avatar?: File | CustomRNImageManipulatorResult,
-) {
-
+function createGroupChat(reportID: string, participantLoginList: string[], newReportObject: OptimisticChatReport, currentUserLogin: string, avatar?: File | CustomRNImageManipulatorResult) {
     const optimisticReport = {
         reportName: CONST.REPORT.DEFAULT_REPORT_NAME,
     };
 
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>> = [
+    const optimisticData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>
+    > = [
         {
             onyxMethod: Onyx.METHOD.SET,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
@@ -1528,7 +1523,9 @@ function createGroupChat(
         },
     ];
 
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>> = [
+    const successData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>
+    > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
@@ -1565,16 +1562,12 @@ function createGroupChat(
     ];
 
     // Create optimistic created action
-    const emailCreatingAction = allPersonalDetails?.[newReportObject.ownerAccountID ?? -1]?.login ?? CONST.REPORT.OWNER_EMAIL_FAKE;
-    const optimisticCreatedAction = buildOptimisticCreatedReportAction(emailCreatingAction);
-
-    optimisticData.push(
-        {
-            onyxMethod: Onyx.METHOD.SET,
-            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
-            value: {[optimisticCreatedAction.reportActionID]: {...optimisticCreatedAction, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}},
-        }
-    );
+    const optimisticCreatedAction = buildOptimisticCreatedReportAction(CONST.REPORT.OWNER_EMAIL_FAKE);
+    optimisticData.push({
+        onyxMethod: Onyx.METHOD.SET,
+        key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
+        value: {[optimisticCreatedAction.reportActionID]: {...optimisticCreatedAction, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}},
+    });
 
     successData.push({
         onyxMethod: Onyx.METHOD.MERGE,
@@ -1644,7 +1637,7 @@ function createGroupChat(
     InteractionManager.runAfterInteractions(() => {
         clearGroupChat();
     });
-    
+
     // eslint-disable-next-line rulesdir/no-multiple-api-calls
     API.paginate(CONST.API_REQUEST_TYPE.WRITE, WRITE_COMMANDS.OPEN_REPORT, parameters, {optimisticData, successData, failureData}, paginationConfig, {
         checkAndFixConflictingRequest: (persistedRequests) => resolveOpenReportDuplicationConflictAction(persistedRequests, parameters),
@@ -1784,7 +1777,7 @@ function navigateToAndOpenReport(userLogins: string[], shouldDismissModal = true
 function navigateToAndOpenGroupChat(
     userLogins: string[],
     reportName: string,
-    currentUserLogin:string,
+    currentUserLogin: string,
     avatarUri?: string,
     avatarFile?: File | CustomRNImageManipulatorResult | undefined,
     optimisticReportID?: string,
@@ -1793,7 +1786,7 @@ function navigateToAndOpenGroupChat(
 
     // If we are creating a group chat then participantAccountIDs is expected to contain currentUserAccountID
     const newChat = buildOptimisticGroupChatReport(participantAccountIDs, reportName, avatarUri ?? '', optimisticReportID, CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
-    createGroupChat(newChat.reportID, userLogins, newChat,currentUserLogin, avatarFile);
+    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin, avatarFile);
 
     Navigation.dismissModal({
         callback: () => {
