@@ -442,10 +442,10 @@ describe('PersonalDetailOptionsListUtils', () => {
             const option = createOption(PERSONAL_DETAILS['1'], REPORTS['3'], formatPhoneNumber);
             expect(option).toEqual({
                 accountID: 1,
-                allReportErrors: {},
+                allReportErrors: undefined,
                 alternateText: 'reedrichards@expensify.com',
                 text: 'Mister Fantastic',
-                brickRoadIndicator: '',
+                brickRoadIndicator: null,
                 icons: [
                     {
                         id: 1,
