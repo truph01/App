@@ -64,7 +64,6 @@ function IOURequestStepScan({
 }: Omit<IOURequestStepScanProps, 'user'>) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const navigateBack = useCallback(() => Navigation.goBack(backTo), [backTo]);
     // we need to use isSmallScreenWidth instead of shouldUseNarrowLayout because drag and drop is not supported on mobile
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
@@ -81,6 +80,9 @@ function IOURequestStepScan({
     const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan', 'Hand', 'ReceiptStack', 'Shutter']);
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash', 'ReplaceReceipt', 'SmartScan']);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
+    const navigateBack = useCallback(() => {
+        Navigation.goBack(backTo);
+    }, [backTo]);
 
     const updateScanAndNavigate = useCallback(
         (file: FileObject, source: string) => {
@@ -293,6 +295,17 @@ function IOURequestStepScan({
         validateFiles(files, Array.from(e.dataTransfer?.items ?? []));
     };
 
+    /**
+     * Sets a test receipt from CONST.TEST_RECEIPT_URL and navigates to the confirmation step
+     */
+    const setTestReceiptAndNavigate = useCallback(() => {
+        setTestReceipt(TestReceipt, 'png', (source, file, filename) => {
+            setMoneyRequestReceipt(initialTransactionID, source, filename, !isEditing, CONST.TEST_RECEIPT.FILE_TYPE, true);
+            removeDraftTransactions(true);
+            navigateToConfirmationStep([{file, source, transactionID: initialTransactionID}], false, true);
+        });
+    }, [initialTransactionID, isEditing, navigateToConfirmationStep]);
+
     const setupCameraPermissionsAndCapabilities = (stream: MediaStream) => {
         setCameraPermissionState('granted');
 
@@ -415,17 +428,6 @@ function IOURequestStepScan({
         },
         [],
     );
-
-    /**
-     * Sets a test receipt from CONST.TEST_RECEIPT_URL and navigates to the confirmation step
-     */
-    const setTestReceiptAndNavigate = useCallback(() => {
-        setTestReceipt(TestReceipt, 'png', (source, file, filename) => {
-            setMoneyRequestReceipt(initialTransactionID, source, filename, !isEditing, CONST.TEST_RECEIPT.FILE_TYPE, true);
-            removeDraftTransactions(true);
-            navigateToConfirmationStep([{file, source, transactionID: initialTransactionID}], false, true);
-        });
-    }, [initialTransactionID, isEditing, navigateToConfirmationStep]);
 
     const mobileCameraView = () => (
         <>
