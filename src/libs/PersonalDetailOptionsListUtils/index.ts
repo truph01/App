@@ -27,11 +27,10 @@ function createOption(
     reportAttributesDerived?: ReportAttributes,
     isReportArchived?: string,
 ): OptionData {
-    const {selected = false, isSelected = false, isDisabled = false} = config ?? {};
+    const {selected = false, isSelected = false, isDisabled = false, shouldStoreReportErrors = false, shouldShowBrickRoadIndicator = false} = config ?? {};
     const result: OptionData = {
         text: '',
         alternateText: undefined,
-        // pendingAction: undefined,
         allReportErrors: undefined,
         brickRoadIndicator: null,
         icons: undefined,
@@ -52,9 +51,8 @@ function createOption(
     result.isOptimisticPersonalDetail = personalDetail.isOptimisticPersonalDetail ?? false;
     if (report) {
         result.private_isArchived = isReportArchived;
-        result.allReportErrors = reportAttributesDerived?.reportErrors ?? {};
-        result.brickRoadIndicator = reportAttributesDerived?.brickRoadStatus ?? '';
-        // result.pendingAction = report.pendingFields ? report.pendingFields.createChat : undefined;
+        result.allReportErrors = shouldStoreReportErrors ? (reportAttributesDerived?.reportErrors ?? {}) : undefined;
+        result.brickRoadIndicator = shouldShowBrickRoadIndicator ? (reportAttributesDerived?.brickRoadStatus ?? '') : null;
         result.reportID = report.reportID;
 
         result.tooltipText = String(personalDetail.accountID);
@@ -145,16 +143,22 @@ const recentReportComparator = (option: OptionData) => {
  */
 function optionsOrderBy<T = OptionData>(options: T[], comparator: (option: T) => number | string, limit?: number, filter?: (option: T) => boolean | undefined, reversed = false): T[] {
     const heap = reversed ? new MaxHeap<T>(comparator) : new MinHeap<T>(comparator);
+
+    // If a limit is 0 or negative, return an empty array
+    if (limit !== undefined && limit <= 0) {
+        return [];
+    }
+
     for (const option of options) {
         if (filter && !filter(option)) {
             continue;
         }
-        if (limit && heap.size() >= limit) {
+        if (limit !== undefined && heap.size() >= limit) {
             const peekedValue = heap.peek();
             if (!peekedValue) {
                 throw new Error('Heap is empty, cannot peek value');
             }
-            if (comparator(option) > comparator(peekedValue)) {
+            if (reversed ? comparator(option) < comparator(peekedValue) : comparator(option) > comparator(peekedValue)) {
                 heap.pop();
                 heap.push(option);
             }
@@ -426,6 +430,7 @@ function createOptionList(
     reportAttributesDerived: ReportAttributesDerivedValue['reports'] | undefined,
     allReportNameValuePairs: OnyxCollection<ReportNameValuePairs>,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    config?: PreviewConfig,
 ) {
     if (isEmptyObject(personalDetails)) {
         return {
@@ -444,7 +449,7 @@ function createOptionList(
         const report = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
         const reportAttributes = report?.reportID ? reportAttributesDerived?.[report.reportID] : undefined;
         const isReportArchived = allReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`]?.private_isArchived;
-        const option = createOption(personalDetail, report, formatPhoneNumber, undefined, reportAttributes, isReportArchived);
+        const option = createOption(personalDetail, report, formatPhoneNumber, config, reportAttributes, isReportArchived);
         if (option.accountID === currentUserAccountID) {
             currentUserRef.current = option;
         }

@@ -15,6 +15,10 @@ import useOnyx from './useOnyx';
 type UseFilteredOptionsConfig = {
     /** Whether the hook should be enabled (default: true) */
     enabled?: boolean;
+    /* Whether to include report errors in the option data (default: false) */
+    shouldStoreReportErrors?: boolean;
+    /* Whether to include brick road indicator status in the option data (default: false) */
+    shouldShowBrickRoadIndicator?: boolean;
 };
 
 type UseFilteredOptionsResult = {
@@ -74,7 +78,7 @@ const rNVPSelector = (rNVPCollection: OnyxCollection<ReportNameValuePairs>, repo
         if (!rNVP) {
             return acc;
         }
-        if (reportIDsSet.has(reportID)) {
+        if (reportIDsSet.has(reportID.replace(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, ''))) {
             acc[reportID] = {private_isArchived: rNVP.private_isArchived};
         }
         return acc;
@@ -111,7 +115,7 @@ const reportAttributesSelector = (reportAttributes: OnyxEntry<ReportAttributesDe
  * />
  */
 function usePersonalDetailOptions(config: UseFilteredOptionsConfig = {}): UseFilteredOptionsResult {
-    const {enabled = true} = config;
+    const {enabled = true, shouldStoreReportErrors = false, shouldShowBrickRoadIndicator = false} = config;
 
     const {accountID} = useCurrentUserPersonalDetails();
     const {formatPhoneNumber} = useLocalize();
@@ -119,7 +123,11 @@ function usePersonalDetailOptions(config: UseFilteredOptionsConfig = {}): UseFil
         canBeMissing: true,
         selector: reportsSelector,
     });
-    const reportIDsSet = new Set(Object.keys(reports ?? {}));
+    const reportIDsSet = new Set(
+        Object.entries(reports ?? {})
+            .filter(([, report]) => report)
+            .map(([key]) => key.replace(ONYXKEYS.COLLECTION.REPORT, '')),
+    );
     const reportAttributesSelectorWithReportIDs = (reportAttributes: OnyxEntry<ReportAttributesDerivedValue>) => reportAttributesSelector(reportAttributes, reportIDsSet);
     const rNVPSelectorWithReportIDs = (rNVPCollection: OnyxCollection<ReportNameValuePairs>) => rNVPSelector(rNVPCollection, reportIDsSet);
     const [reportAttributes, reportAttributesMetadata] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportAttributesSelectorWithReportIDs});
@@ -132,7 +140,12 @@ function usePersonalDetailOptions(config: UseFilteredOptionsConfig = {}): UseFil
     const isLoading = !enabled || isLoadingOnyxValue(reportsMetadata, reportAttributesMetadata, reportNameValuePairsMetadata);
 
     const accountIDToReportIDMap = generateAccountIDToReportIDMap(reports, accountID);
-    const optionsData = !isLoading ? createOptionList(accountID, personalDetails, accountIDToReportIDMap, reports, reportAttributes, reportNameValuePairs, formatPhoneNumber) : undefined;
+    const optionsData = !isLoading
+        ? createOptionList(accountID, personalDetails, accountIDToReportIDMap, reports, reportAttributes, reportNameValuePairs, formatPhoneNumber, {
+              shouldStoreReportErrors,
+              shouldShowBrickRoadIndicator,
+          })
+        : undefined;
 
     return {
         options: optionsData?.options,

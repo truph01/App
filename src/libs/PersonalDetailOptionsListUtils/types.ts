@@ -27,9 +27,11 @@ type OptionData = {
 };
 
 type PreviewConfig = {
-    isDisabled?: boolean | null;
     selected?: boolean;
     isSelected?: boolean;
+    isDisabled?: boolean;
+    shouldStoreReportErrors?: boolean;
+    shouldShowBrickRoadIndicator?: boolean;
 };
 
 type GetOptionsConfig = {
