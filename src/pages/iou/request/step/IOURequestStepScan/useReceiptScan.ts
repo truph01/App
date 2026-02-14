@@ -92,14 +92,14 @@ function useReceiptScan({
     const {isBetaEnabled} = usePermissions();
     const {shouldStartLocationPermissionFlow} = useIOUUtils();
 
-    const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`, {canBeMissing: true});
     const policy = usePolicy(report?.policyID);
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const personalPolicy = usePersonalPolicy();
+    const defaultExpensePolicy = useDefaultExpensePolicy();
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: false});
     const [skipConfirmation] = useOnyx(`${ONYXKEYS.COLLECTION.SKIP_CONFIRMATION}${initialTransactionID}`, {canBeMissing: true});
-    const defaultExpensePolicy = useDefaultExpensePolicy();
     const [dismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {canBeMissing: true});
+    const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`, {canBeMissing: true});
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE, {canBeMissing: true});
     const [reportAttributesDerived] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
     const [policyRecentlyUsedCurrencies] = useOnyx(ONYXKEYS.RECENTLY_USED_CURRENCIES, {canBeMissing: true});
@@ -231,7 +231,7 @@ function useReceiptScan({
      * Processes receipt files and navigates to confirmation step
      */
     const processReceipts = useCallback(
-        (files: FileObject[], getSource: (file: FileObject) => string) => {
+        (files: FileObject[], getFileSource: (file: FileObject) => string) => {
             if (files.length === 0) {
                 return;
             }
@@ -243,7 +243,7 @@ function useReceiptScan({
                 if (!file) {
                     return;
                 }
-                const source = getSource(file);
+                const source = getFileSource(file);
                 setMoneyRequestReceipt(initialTransactionID, source, file.name ?? '', !isEditing, file.type);
                 updateScanAndNavigate(file, source);
                 return;
@@ -254,7 +254,7 @@ function useReceiptScan({
             }
 
             for (const [index, file] of files.entries()) {
-                const source = getSource(file);
+                const source = getFileSource(file);
                 const transaction = shouldReuseInitialTransaction(initialTransaction, shouldAcceptMultipleFiles, index, isMultiScanEnabled, transactions)
                     ? (initialTransaction as Partial<Transaction>)
                     : buildOptimisticTransactionAndCreateDraft({
