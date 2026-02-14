@@ -74,6 +74,17 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
     const platform = getPlatform();
     const isWeb = useMemo(() => platform === CONST.PLATFORM.WEB || platform === CONST.PLATFORM.MOBILE_WEB, [platform]);
 
+    /**
+     * Handles the completion of a multifactor authentication scenario.
+     * Invokes the scenario's callback function and navigates to the appropriate outcome screen.
+     * This function is called after the MFA flow completes (either successfully or with failure).
+     * It provides the scenario callback with relevant information (HTTP codes, error messages, response body)
+     * and then either:
+     * 1. Allows the callback to handle navigation (if it returns SKIP_OUTCOME_SCREEN)
+     * 2. Navigates to the success/failure outcome screen
+     *
+     * @param isSuccessful - Whether the authentication scenario completed successfully
+     */
     const handleCallback = useCallback(
         async (isSuccessful: boolean) => {
             const {error, scenario, scenarioResponse, outcomePaths} = state;
