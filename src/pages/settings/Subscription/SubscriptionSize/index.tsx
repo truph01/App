@@ -16,8 +16,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import INPUT_IDS from '@src/types/form/SubscriptionSizeForm';
-import Confirmation from './subpages/Confirmation';
-import Size from './subpages/Size';
+import Confirmation from './subPages/Confirmation';
+import Size from './subPages/Size';
 
 const pages = [
     {pageName: CONST.SUBSCRIPTION_SIZE.PAGE_NAME.SIZE, component: Size},
