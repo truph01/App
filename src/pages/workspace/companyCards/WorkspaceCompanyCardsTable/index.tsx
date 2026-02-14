@@ -116,7 +116,7 @@ function WorkspaceCompanyCardsTable({
     const isLoadingPage = !isOffline && (isLoadingFeed || isLoadingOnyxValue(personalDetailsMetadata) || areWorkspaceCardFeedsLoading);
 
     // If we already have fetched cards, then do not show skeleton loader (let the remaining updates refresh in the background), else show it
-    const hasCards = Object.keys(cardNamesToEncryptedCardNumberMapping ?? {}).length > 0;
+    const hasCards = (companyCardEntries ?? []).length > 0;
     const isLoading = (!hasCards && isLoadingPage) || (isLoadingFeed && !hasCards);
 
     const showCards = !isInitiallyLoadingFeeds && !isFeedPending && !isNoFeed && !hasFeedErrors && (hasCards || !isLoadingFeed);
