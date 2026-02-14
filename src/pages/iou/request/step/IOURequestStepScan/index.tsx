@@ -78,7 +78,7 @@ function IOURequestStepScan({
     const [isQueriedPermissionState, setIsQueriedPermissionState] = useState(false);
     const getScreenshotTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const policy = usePolicy(report?.policyID);
-    const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan', 'Hand', 'ReceiptUpload', 'Shutter']);
+    const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan', 'Hand', 'ReceiptStack', 'Shutter']);
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash', 'ReplaceReceipt', 'SmartScan']);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
 
@@ -460,6 +460,7 @@ function IOURequestStepScan({
                             accessibilityLabel={translate('common.continue')}
                             style={[styles.p9, styles.pt5]}
                             onPress={capturePhoto}
+                            sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.SCAN_SUBMIT_BUTTON}
                         />
                     </View>
                 )}
@@ -627,7 +628,7 @@ function IOURequestStepScan({
         >
             {PDFValidationComponent}
             <Icon
-                src={lazyIllustrations.ReceiptUpload}
+                src={lazyIllustrations.ReceiptStack}
                 width={CONST.RECEIPT.ICON_SIZE}
                 height={CONST.RECEIPT.ICON_SIZE}
             />
@@ -654,6 +655,7 @@ function IOURequestStepScan({
                                 onPicked: (data) => validateFiles(data),
                             });
                         }}
+                        sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.SCAN_SUBMIT_BUTTON}
                     />
                 )}
             </AttachmentPicker>
