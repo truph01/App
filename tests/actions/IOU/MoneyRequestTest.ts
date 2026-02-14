@@ -694,6 +694,30 @@ describe('MoneyRequest', () => {
                 ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(baseParams.iouType, baseParams.initialTransaction.transactionID, baseParams.reportID),
             );
         });
+
+        it('should pass ownerBillingGraceEndPeriod to shouldUseDefaultExpensePolicy when provided', async () => {
+            const defaultExpensePolicy = {
+                ...fakePolicy,
+                autoReporting: false,
+                type: CONST.POLICY.TYPE.TEAM,
+                isPolicyExpenseChatEnabled: true,
+            };
+
+            handleMoneyRequestStepScanParticipants({
+                ...baseParams,
+                defaultExpensePolicy,
+                ownerBillingGraceEndPeriod: undefined,
+            });
+
+            await waitForBatchedUpdates();
+
+            // With no ownerBillingGraceEndPeriod restriction, the function should proceed normally
+            // and navigate to confirmation page (same as track expense flow with auto reporting disabled)
+            const draftTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${fakeTransaction.transactionID}`);
+            expect(draftTransaction).toMatchObject({
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            });
+        });
     });
 
     describe('handleMoneyRequestStepDistanceNavigation', () => {
@@ -1077,6 +1101,29 @@ describe('MoneyRequest', () => {
             });
 
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(CONST.IOU.TYPE.CREATE, baseParams.transactionID, baseParams.reportID));
+        });
+
+        it('should pass ownerBillingGraceEndPeriod to shouldUseDefaultExpensePolicy when provided', async () => {
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`, fakePolicy);
+
+            const defaultExpensePolicy = {
+                ...fakePolicy,
+                autoReporting: false,
+                isPolicyExpenseChatEnabled: true,
+            };
+
+            handleMoneyRequestStepDistanceNavigation({
+                ...baseParams,
+                report: undefined,
+                defaultExpensePolicy,
+                iouType: CONST.IOU.TYPE.CREATE,
+                ownerBillingGraceEndPeriod: undefined,
+            });
+            await waitForBatchedUpdates();
+
+            // With no ownerBillingGraceEndPeriod restriction, the function should proceed normally
+            const updatedTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${baseParams.transactionID}`);
+            expect(updatedTransaction?.reportID).toBe(CONST.REPORT.UNREPORTED_REPORT_ID);
         });
     });
 });
