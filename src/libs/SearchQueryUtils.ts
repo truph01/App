@@ -31,6 +31,7 @@ import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import FILTER_KEYS, {ALLOWED_TYPE_FILTERS, AMOUNT_FILTER_KEYS, DATE_FILTER_KEYS} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import type * as OnyxTypes from '@src/types/onyx';
+import type {PolicyConnectionName} from '@src/types/onyx/Policy';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import arraysEqual from '@src/utils/arraysEqual';
 import {getSearchValueForConnection} from './AccountingUtils';
@@ -887,13 +888,12 @@ function buildFilterFormValuesFromQuery(
             filtersForm[key as typeof filterKey] = filterValues;
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO) {
-            const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies);
-            const displayNameByLowercase = new Map<string, string>();
+            const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyID?.length ? policyID : undefined);
+            const validExportedToValues = new Set<string>(Object.values(CONST.REPORT.EXPORT_OPTION_LABELS));
             for (const connectionName of connectedIntegrationNames) {
-                const displayName = getSearchValueForConnection(connectionName as Parameters<typeof getSearchValueForConnection>[0]);
-                displayNameByLowercase.set(displayName.toLowerCase(), displayName);
+                validExportedToValues.add(getSearchValueForConnection(connectionName as PolicyConnectionName));
             }
-            filtersForm[key as typeof filterKey] = filterValues.map((value) => displayNameByLowercase.get(value.toLowerCase())).filter((value): value is string => value != null);
+            filtersForm[key as typeof filterKey] = filterValues.filter((value) => validExportedToValues.has(value));
         }
 
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.PAYER) {

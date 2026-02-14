@@ -19,7 +19,10 @@ export default function useExportedToAutocompleteList(): string[] {
         const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
         const customNames = exportTemplates.flatMap((template) => {
             const templateDisplayName = getStandardExportTemplateDisplayName(template.templateName);
-            return [template.templateName, templateDisplayName].filter(Boolean);
+            if (templateDisplayName !== template.templateName) {
+                return [templateDisplayName];
+            }
+            return [template.templateName].filter(Boolean);
         });
 
         return Array.from(new Set([...CONST.POLICY.CONNECTIONS.EXPORTED_TO_INTEGRATION_DISPLAY_NAMES, ...customNames]));
