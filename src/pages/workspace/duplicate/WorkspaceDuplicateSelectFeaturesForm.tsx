@@ -359,6 +359,8 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
                             style={[styles.userSelectNone, styles.alignItemsCenter]}
                             onPress={toggleAllItems}
                             accessible={false}
+                            accessibilityElementsHidden
+                            importantForAccessibility="no-hide-descendants"
                             tabIndex={-1}
                             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                             sentryLabel={CONST.SENTRY_LABEL.DUPLICATE_WORKSPACE.SELECT_ALL_LABEL}
