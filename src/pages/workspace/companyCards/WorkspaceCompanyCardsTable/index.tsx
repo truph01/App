@@ -119,7 +119,7 @@ function WorkspaceCompanyCardsTable({
 
     const isLoading = isLoadingPage || isLoadingFeed;
 
-    const showCards = !isInitiallyLoadingFeeds && !isFeedPending && !isNoFeed && !hasFeedErrors && (hasCards || !isLoadingFeed);
+    const showCards = !isInitiallyLoadingFeeds && !isFeedPending && !isNoFeed && !isLoadingFeed && !hasFeedErrors;
     const showTableControls = showCards && !!selectedFeed && !isLoadingCards && !hasFeedErrors;
     const showTableHeaderButtons = (showTableControls || isLoadingPage || isFeedPending || feedErrorKey === CONST.COMPANY_CARDS.FEED_LOAD_ERROR) && !!feedName;
 
