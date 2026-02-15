@@ -596,7 +596,6 @@ const translations = {
         week: 'Week',
         year: 'Year',
         quarter: 'Quarter',
-        progressBar: ({progress}: {progress: number}) => `Progress: ${progress} percent`,
         expensifyLogo: 'Expensify logo',
     },
     socials: {
@@ -1798,9 +1797,8 @@ const translations = {
         contactMethods: 'Contact methods',
         featureRequiresValidate: 'This feature requires you to validate your account.',
         validateAccount: 'Validate your account',
-        helpTextLine1: 'Add more ways to log in and send receipts to Expensify.',
-        helpTextBeforeEmail: 'Add an email address to forward receipts to ',
-        helpTextAfterEmail: ' or add a phone number to text receipts to 47777 (US numbers only).',
+        helpText: ({email}: {email: string}) =>
+            `Add more ways to log in and send receipts to Expensify.<br/><br/>Add an email address to forward receipts to <a href="mailto:${email}">${email}</a> or add a phone number to text receipts to 47777 (US numbers only).`,
         pleaseVerify: 'Please verify this contact method.',
         getInTouch: "We'll use this method to contact you.",
         enterMagicCode: (contactMethod: string) => `Please enter the magic code sent to ${contactMethod}. It should arrive within a minute or two.`,

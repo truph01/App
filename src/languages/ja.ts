@@ -576,7 +576,6 @@ const translations: TranslationDeepObject<typeof en> = {
         week: '週',
         year: '年',
         quarter: '四半期',
-        progressBar: ({progress}: {progress: number}) => `進捗: ${progress}パーセント`,
         expensifyLogo: 'Expensifyロゴ',
     },
     socials: {
@@ -1759,9 +1758,8 @@ const translations: TranslationDeepObject<typeof en> = {
         contactMethods: '連絡方法',
         featureRequiresValidate: 'この機能を利用するには、アカウントの認証が必要です。',
         validateAccount: 'アカウントを認証する',
-        helpTextLine1: 'Expensify へのログイン方法とレシート送信方法をさらに追加しましょう。',
-        helpTextBeforeEmail: 'レシートを ',
-        helpTextAfterEmail: ' に転送するメールアドレスを追加するか、レシートを 47777（米国の電話番号のみ）宛てにテキスト送信する電話番号を追加してください。',
+        helpText: ({email}: {email: string}) =>
+            `Expensify へのログイン方法とレシート送信方法をさらに追加しましょう。<br/><br/>レシートを <a href="mailto:${email}">${email}</a> に転送するメールアドレスを追加するか、レシートを 47777（米国の電話番号のみ）宛てにテキスト送信する電話番号を追加してください。`,
         pleaseVerify: 'この連絡方法を確認してください。',
         getInTouch: '今後のご連絡にはこの方法を使用します。',
         enterMagicCode: (contactMethod: string) => `${contactMethod} に送信されたマジックコードを入力してください。1～2分以内に届きます。`,

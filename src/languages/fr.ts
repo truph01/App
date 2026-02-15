@@ -577,7 +577,6 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Semaine',
         year: 'Année',
         quarter: 'Trimestre',
-        progressBar: ({progress}: {progress: number}) => `Progression: ${progress} pour cent`,
         expensifyLogo: 'Logo Expensify',
     },
     socials: {
@@ -1775,9 +1774,8 @@ const translations: TranslationDeepObject<typeof en> = {
         contactMethods: 'Moyens de contact',
         featureRequiresValidate: 'Cette fonctionnalité exige que vous validiez votre compte.',
         validateAccount: 'Validez votre compte',
-        helpTextLine1: 'Ajoutez d\u2019autres moyens de vous connecter et d\u2019envoyer des reçus à Expensify.',
-        helpTextBeforeEmail: 'Ajoutez une adresse e-mail pour transférer des reçus à ',
-        helpTextAfterEmail: ' ou ajoutez un numéro de téléphone pour envoyer des reçus par SMS au 47777 (numéros américains uniquement).',
+        helpText: ({email}: {email: string}) =>
+            `Ajoutez d'autres moyens de vous connecter et d'envoyer des reçus à Expensify.<br/><br/>Ajoutez une adresse e-mail pour transférer des reçus à <a href="mailto:${email}">${email}</a> ou ajoutez un numéro de téléphone pour envoyer des reçus par SMS au 47777 (numéros américains uniquement).`,
         pleaseVerify: 'Veuillez vérifier cette méthode de contact.',
         getInTouch: 'Nous utiliserons cette méthode pour vous contacter.',
         enterMagicCode: (contactMethod: string) => `Veuillez saisir le code magique envoyé à ${contactMethod}. Il devrait arriver d'ici une à deux minutes.`,
