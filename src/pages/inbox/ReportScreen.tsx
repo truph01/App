@@ -109,6 +109,7 @@ import SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
 import {getEmptyObject, isEmptyObject} from '@src/types/utils/EmptyObject';
 import HeaderView from './HeaderView';
+import useAutoNavigateForDeletedLinkedAction from './hooks/useAutoNavigateForDeletedLinkedAction';
 import useReportWasDeleted from './hooks/useReportWasDeleted';
 import ReactionListWrapper from './ReactionListWrapper';
 import ReportActionsView from './report/ReportActionsView';
@@ -971,11 +972,7 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
 
     const lastRoute = usePrevious(route);
 
-    useEffect(() => {
-        if (shouldShowNotFoundPage && shouldShowNotFoundLinkedAction) {
-            navigateToEndOfReport();
-        }
-    }, [shouldShowNotFoundLinkedAction]);
+    useAutoNavigateForDeletedLinkedAction(shouldShowNotFoundPage, shouldShowNotFoundLinkedAction, navigateToEndOfReport);
 
     // wrapping into useMemo to stabilize children re-renders as reportMetadata is changed frequently
     const showReportActionsLoadingState = useMemo(
