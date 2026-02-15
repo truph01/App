@@ -963,7 +963,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: '修复',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `修复 ${feedName} 公司卡连接` : '修复公司卡连接'),
-                subtitle: '工作区 > 公司卡片',
+                defaultSubtitle: '工作区 > 公司卡片',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > 公司卡片`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`,

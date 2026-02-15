@@ -978,7 +978,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Beheben',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName}-Firmenkartenverbindung reparieren` : 'Firmenkarte reparieren Verbindung der Firmenkarte reparieren'),
-                subtitle: 'Workspace > Unternehmenskarten',
+                defaultSubtitle: 'Workspace > Unternehmenskarten',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Unternehmenskarten`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `${integrationName}-Verbindung reparieren`,

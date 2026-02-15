@@ -976,7 +976,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Corrigir',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corrigir conexão do cartão corporativo ${feedName}` : 'Corrigir conexão do cartão corporativo'),
-                subtitle: 'Área de trabalho > Cartões corporativos',
+                defaultSubtitle: 'Área de trabalho > Cartões corporativos',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Cartões corporativos`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Corrigir conexão com ${integrationName}`,
