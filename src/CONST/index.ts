@@ -8122,6 +8122,9 @@ const CONST = {
             NEW_WORKSPACE: 'FABMenu-NewWorkspace',
             QUICK_ACTION: 'FABMenu-QuickAction',
         },
+        DUPLICATE_WORKSPACE: {
+            SELECT_ALL_LABEL: 'DuplicateWorkspace-SelectAllLabel',
+        },
         ODOMETER_EXPENSE: {
             CAPTURE_IMAGE_START: 'IOURequestStepDistanceOdometer-CaptureStartImage',
             CAPTURE_IMAGE_END: 'IOURequestStepDistanceOdometer-CaptureEndImage',
