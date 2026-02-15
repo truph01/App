@@ -58,28 +58,42 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
     const renderBenefits = () => {
         const amountOfRows = Math.ceil(benefits.length / benefitsColumns);
 
-        return Array.from({length: amountOfRows}).map((_, rowIndex) => (
-            <View
-                // eslint-disable-next-line react/no-array-index-key
-                key={`row-${rowIndex}`}
-                style={styles.flexRow}
-            >
-                {benefits.slice(rowIndex * benefitsColumns, (rowIndex + 1) * benefitsColumns).map((item) => (
+        return (
+            <View role={CONST.ROLE.LIST}>
+                {Array.from({length: amountOfRows}).map((_, rowIndex) => (
                     <View
-                        key={item}
-                        style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4]}
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={`row-${rowIndex}`}
+                        style={styles.flexRow}
+                        role={CONST.ROLE.PRESENTATION}
                     >
-                        <Icon
-                            src={Expensicons.Checkmark}
-                            fill={theme.iconSuccessFill}
-                            width={variables.iconSizeSmall}
-                            height={variables.iconSizeSmall}
-                        />
-                        <Text style={[styles.textLabelSupporting, styles.ml2]}>{item}</Text>
+                        {benefits.slice(rowIndex * benefitsColumns, (rowIndex + 1) * benefitsColumns).map((item) => (
+                            <View
+                                key={item}
+                                style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4]}
+                                role={CONST.ROLE.LISTITEM}
+                                accessible
+                                accessibilityLabel={item}
+                            >
+                                <View
+                                    style={[styles.flexRow, styles.alignItemsCenter]}
+                                    importantForAccessibility="no-hide-descendants"
+                                    aria-hidden
+                                >
+                                    <Icon
+                                        src={Expensicons.Checkmark}
+                                        fill={theme.iconSuccessFill}
+                                        width={variables.iconSizeSmall}
+                                        height={variables.iconSizeSmall}
+                                    />
+                                    <Text style={[styles.textLabelSupporting, styles.ml2]}>{item}</Text>
+                                </View>
+                            </View>
+                        ))}
                     </View>
                 ))}
             </View>
-        ));
+        );
     };
 
     const shouldHideSubscriptionSettingsButton =
