@@ -971,6 +971,12 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
 
     const lastRoute = usePrevious(route);
 
+    useEffect(() => {
+        if (shouldShowNotFoundPage && shouldShowNotFoundLinkedAction) {
+            navigateToEndOfReport();
+        }
+    }, [shouldShowNotFoundLinkedAction]);
+
     // wrapping into useMemo to stabilize children re-renders as reportMetadata is changed frequently
     const showReportActionsLoadingState = useMemo(
         () => reportMetadata?.isLoadingInitialReportActions && !reportMetadata?.hasOnceLoadedReportActions,
