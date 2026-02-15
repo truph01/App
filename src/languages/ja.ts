@@ -8361,6 +8361,7 @@ ${reportName}
             forceTwoFactorAuthError: '2要素認証の強制設定を変更できませんでした。後でもう一度お試しください。',
         },
         common: {settings: '設定'},
+        groups: {title: 'グループ', memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`})},
     },
 };
 export default translations;

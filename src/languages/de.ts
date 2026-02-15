@@ -8457,6 +8457,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             forceTwoFactorAuthError: 'Die Erzwingung der Zwei-Faktor-Authentifizierung konnte nicht geändert werden. Bitte versuche es später erneut.',
         },
         common: {settings: 'Einstellungen'},
+        groups: {title: 'Gruppen', memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`})},
     },
 };
 export default translations;

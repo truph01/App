@@ -8425,6 +8425,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             forceTwoFactorAuthError: 'Verplichte twee-factor-authenticatie kon niet worden gewijzigd. Probeer het later opnieuw.',
         },
         common: {settings: 'Instellingen'},
+        groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
     },
 };
 export default translations;

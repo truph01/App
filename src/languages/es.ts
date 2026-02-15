@@ -8600,6 +8600,15 @@ ${amount} para ${merchant} - ${date}`,
         common: {
             settings: 'Configuración',
         },
+        groups: {
+            title: 'Grupos',
+            memberCount: () => {
+                return {
+                    one: '1 miembro',
+                    other: (count: number) => `${count} miembros`,
+                };
+            },
+        },
     },
     gps: {
         disclaimer: 'Utiliza el GPS para crear un gasto a partir de tu trayecto. Toca Iniciar a continuación para comenzar el seguimiento.',

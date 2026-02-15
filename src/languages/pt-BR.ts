@@ -8409,6 +8409,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             forceTwoFactorAuthError: 'Não foi possível alterar a exigência de autenticação em duas etapas. Tente novamente mais tarde.',
         },
         common: {settings: 'Configurações'},
+        groups: {title: 'Grupos', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`})},
     },
 };
 export default translations;

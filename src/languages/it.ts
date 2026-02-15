@@ -8441,6 +8441,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             forceTwoFactorAuthError: 'Impossibile modificare l’impostazione “Forza l’autenticazione a due fattori”. Riprova più tardi.',
         },
         common: {settings: 'Impostazioni'},
+        groups: {title: 'Gruppi', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`})},
     },
 };
 export default translations;

@@ -8405,6 +8405,7 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             forceTwoFactorAuthError: 'Nie udało się zmienić wymuszania uwierzytelniania dwuskładnikowego. Spróbuj ponownie później.',
         },
         common: {settings: 'Ustawienia'},
+        groups: {title: 'Grupy', memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`})},
     },
 };
 export default translations;

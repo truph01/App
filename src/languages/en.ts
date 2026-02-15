@@ -8394,6 +8394,15 @@ const translations = {
         common: {
             settings: 'Settings',
         },
+        groups: {
+            title: 'Groups',
+            memberCount: () => {
+                return {
+                    one: '1 member',
+                    other: (count: number) => `${count} members`,
+                };
+            },
+        },
     },
 };
 

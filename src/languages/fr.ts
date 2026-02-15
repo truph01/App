@@ -8480,6 +8480,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
         },
         common: {settings: 'Paramètres'},
+        groups: {title: 'Groupes', memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`})},
     },
 };
 export default translations;

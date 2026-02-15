@@ -8239,6 +8239,7 @@ ${reportName}
             forceTwoFactorAuthError: '无法更改强制启用双重身份验证设置。请稍后再试。',
         },
         common: {settings: '设置'},
+        groups: {title: '群组', memberCount: () => ({one: '1 名成员', other: (count: number) => `${count} 名成员`})},
     },
 };
 export default translations;
