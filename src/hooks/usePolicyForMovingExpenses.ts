@@ -41,7 +41,6 @@ function usePolicyForMovingExpenses(isPerDiemRequest?: boolean, expensePolicyID?
     const session = useSession();
     const login = session?.email ?? '';
 
-
     // Creating a track distance request always uses the P2P custom unit, so we don't use the active policy
     if (isTrackDistanceRequest && !isMovingFromTrackExpense) {
         return {policyForMovingExpensesID: undefined, policyForMovingExpenses: undefined, shouldSelectPolicy: false};
