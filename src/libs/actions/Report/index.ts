@@ -1029,6 +1029,92 @@ function clearAvatarErrors(reportID: string) {
     });
 }
 
+type GuidedSetupOptimisticOnyxUpdate = OnyxUpdate<
+    typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.NVP_INTRO_SELECTED | typeof ONYXKEYS.NVP_ONBOARDING | typeof ONYXKEYS.COLLECTION.POLICY
+>;
+
+type GuidedSetupSuccessOnyxUpdate = OnyxUpdate<
+    typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.POLICY | typeof ONYXKEYS.PERSONAL_DETAILS_LIST | typeof ONYXKEYS.NVP_ONBOARDING
+>;
+
+type GuidedSetupFailureOnyxUpdate = OnyxUpdate<
+    | typeof ONYXKEYS.COLLECTION.REPORT
+    | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+    | typeof ONYXKEYS.NVP_INTRO_SELECTED
+    | typeof ONYXKEYS.NVP_ONBOARDING
+    | typeof ONYXKEYS.COLLECTION.POLICY
+    | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
+>;
+
+type GuidedSetupDataForOpenReport = {
+    optimisticData: GuidedSetupOptimisticOnyxUpdate[];
+    successData: GuidedSetupSuccessOnyxUpdate[];
+    failureData: GuidedSetupFailureOnyxUpdate[];
+    guidedSetupData: string;
+};
+
+/**
+ * Prepares guided setup data for an OpenReport request when onboarding is not yet completed.
+ * Returns the onyx data arrays and guidedSetupData string to include in the API parameters,
+ * or undefined if no guided setup is needed.
+ */
+function getGuidedSetupDataForOpenReport(introSelected: OnyxEntry<IntroSelected>): GuidedSetupDataForOpenReport | undefined {
+    const isInviteOnboardingComplete = introSelected?.isInviteOnboardingComplete ?? false;
+    const isOnboardingCompleted = onboarding?.hasCompletedGuidedSetupFlow ?? false;
+
+    // Some cases we can have two open report requests with guide setup data because isInviteOnboardingComplete is not updated completely.
+    // Then we need to check the list request and prevent the guided setup data from being duplicated.
+    const allPersistedRequests = getAll();
+    const hasOpenReportWithGuidedSetupData = allPersistedRequests.some((request) => request.command === WRITE_COMMANDS.OPEN_REPORT && request.data?.guidedSetupData);
+
+    // Prepare guided setup data only when nvp_introSelected is set and onboarding is not completed
+    // OldDot users will never have nvp_introSelected set, so they will not see guided setup messages
+    if (!introSelected || isOnboardingCompleted || isInviteOnboardingComplete || hasOpenReportWithGuidedSetupData) {
+        return undefined;
+    }
+
+    const {choice, inviteType} = introSelected;
+    const isInviteIOUorInvoice = inviteType === CONST.ONBOARDING_INVITE_TYPES.IOU || inviteType === CONST.ONBOARDING_INVITE_TYPES.INVOICE;
+    const isInviteChoiceCorrect = choice === CONST.ONBOARDING_CHOICES.ADMIN || choice === CONST.ONBOARDING_CHOICES.SUBMIT || choice === CONST.ONBOARDING_CHOICES.CHAT_SPLIT;
+
+    if (!isInviteChoiceCorrect || isInviteIOUorInvoice) {
+        return undefined;
+    }
+
+    const onboardingMessage = getOnboardingMessages().onboardingMessages[choice];
+    if (choice === CONST.ONBOARDING_CHOICES.CHAT_SPLIT) {
+        const updatedTasks = onboardingMessage.tasks.map((task) => (task.type === 'startChat' ? {...task, autoCompleted: true} : task));
+        onboardingMessage.tasks = updatedTasks;
+    }
+
+    const onboardingData = prepareOnboardingOnyxData({
+        introSelected,
+        engagementChoice: choice,
+        onboardingMessage,
+        companySize: introSelected?.companySize as OnboardingCompanySize,
+    });
+
+    if (!onboardingData) {
+        return undefined;
+    }
+
+    return {
+        optimisticData: [
+            ...onboardingData.optimisticData,
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.NVP_INTRO_SELECTED,
+                value: {
+                    isInviteOnboardingComplete: true,
+                },
+            },
+        ]as GuidedSetupOptimisticOnyxUpdate[],
+        successData: onboardingData.successData as GuidedSetupSuccessOnyxUpdate[],
+        failureData: onboardingData.failureData as GuidedSetupFailureOnyxUpdate[],
+        guidedSetupData: JSON.stringify(onboardingData.guidedSetupData),
+    };
+}
+
 /**
  * Gets the latest page of report actions and updates the last read message
  * If a chat with the passed reportID is not found, we will create a chat based on the passed participantList
@@ -1284,51 +1370,12 @@ function openReport(
         });
     }
 
-    const isInviteOnboardingComplete = introSelected?.isInviteOnboardingComplete ?? false;
-    const isOnboardingCompleted = onboarding?.hasCompletedGuidedSetupFlow ?? false;
-
-    // Some cases we can have two open report requests with guide setup data because isInviteOnboardingComplete is not updated completely.
-    // Then we need to check the list request and prevent the guided setup data from being duplicated.
-    const allPersistedRequests = getAll();
-    const hasOpenReportWithGuidedSetupData = allPersistedRequests.some((request) => request.command === WRITE_COMMANDS.OPEN_REPORT && request.data?.guidedSetupData);
-
-    // Prepare guided setup data only when nvp_introSelected is set and onboarding is not completed
-    // OldDot users will never have nvp_introSelected set, so they will not see guided setup messages
-    if (introSelected && !isOnboardingCompleted && !isInviteOnboardingComplete && !hasOpenReportWithGuidedSetupData) {
-        const {choice, inviteType} = introSelected;
-        const isInviteIOUorInvoice = inviteType === CONST.ONBOARDING_INVITE_TYPES.IOU || inviteType === CONST.ONBOARDING_INVITE_TYPES.INVOICE;
-        const isInviteChoiceCorrect = choice === CONST.ONBOARDING_CHOICES.ADMIN || choice === CONST.ONBOARDING_CHOICES.SUBMIT || choice === CONST.ONBOARDING_CHOICES.CHAT_SPLIT;
-
-        if (isInviteChoiceCorrect && !isInviteIOUorInvoice) {
-            const onboardingMessage = getOnboardingMessages().onboardingMessages[choice];
-            if (choice === CONST.ONBOARDING_CHOICES.CHAT_SPLIT) {
-                const updatedTasks = onboardingMessage.tasks.map((task) => (task.type === 'startChat' ? {...task, autoCompleted: true} : task));
-                onboardingMessage.tasks = updatedTasks;
-            }
-
-            const onboardingData = prepareOnboardingOnyxData({
-                introSelected,
-                engagementChoice: choice,
-                onboardingMessage,
-                companySize: introSelected?.companySize as OnboardingCompanySize,
-            });
-
-            if (onboardingData) {
-                optimisticData.push(...onboardingData.optimisticData, {
-                    onyxMethod: Onyx.METHOD.MERGE,
-                    key: ONYXKEYS.NVP_INTRO_SELECTED,
-                    value: {
-                        isInviteOnboardingComplete: true,
-                    },
-                });
-
-                successData.push(...onboardingData.successData);
-
-                failureData.push(...onboardingData.failureData);
-
-                parameters.guidedSetupData = JSON.stringify(onboardingData.guidedSetupData);
-            }
-        }
+    const guidedSetup = getGuidedSetupDataForOpenReport(introSelected);
+    if (guidedSetup) {
+        optimisticData.push(...guidedSetup.optimisticData);
+        successData.push(...guidedSetup.successData);
+        failureData.push(...guidedSetup.failureData);
+        parameters.guidedSetupData = guidedSetup.guidedSetupData;
     }
 
     if (isFromDeepLink) {
@@ -1494,13 +1541,21 @@ function openReport(
  * @param currentUserLogin The login of the current user
  * @param avatar The avatar file to upload for the group chat (optional)
  */
-function createGroupChat(reportID: string, participantLoginList: string[], newReportObject: OptimisticChatReport, currentUserLogin: string, avatar?: File | CustomRNImageManipulatorResult) {
+function createGroupChat(reportID: string, participantLoginList: string[], newReportObject: OptimisticChatReport, currentUserLogin: string,introSelected: OnyxEntry<IntroSelected>, avatar?: File | CustomRNImageManipulatorResult) {
     const optimisticReport = {
         reportName: CONST.REPORT.DEFAULT_REPORT_NAME,
     };
 
     const optimisticData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
+            | typeof ONYXKEYS.NVP_ONBOARDING
+            | typeof ONYXKEYS.COLLECTION.POLICY
+            | typeof ONYXKEYS.NVP_INTRO_SELECTED
+        >
     > = [
         {
             onyxMethod: Onyx.METHOD.SET,
@@ -1524,7 +1579,14 @@ function createGroupChat(reportID: string, participantLoginList: string[], newRe
     ];
 
     const successData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.POLICY
+            | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
+            | typeof ONYXKEYS.NVP_ONBOARDING
+        >
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -1551,7 +1613,17 @@ function createGroupChat(reportID: string, participantLoginList: string[], newRe
         },
     ];
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.PERSONAL_DETAILS_LIST | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
+    const failureData: Array<
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
+            | typeof ONYXKEYS.NVP_INTRO_SELECTED
+            | typeof ONYXKEYS.NVP_ONBOARDING
+            | typeof ONYXKEYS.COLLECTION.POLICY
+            | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+        >
+    > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`,
@@ -1626,6 +1698,15 @@ function createGroupChat(reportID: string, participantLoginList: string[], newRe
     // Include avatar if provided
     if (avatar) {
         parameters.file = avatar;
+    }
+
+    // Preserve guided setup data when creating group chats
+    const guidedSetup = getGuidedSetupDataForOpenReport(deprecatedIntroSelected);
+    if (guidedSetup) {
+        optimisticData.push(...guidedSetup.optimisticData);
+        successData.push(...guidedSetup.successData);
+        failureData.push(...guidedSetup.failureData);
+        parameters.guidedSetupData = guidedSetup.guidedSetupData;
     }
 
     const paginationConfig = {
@@ -1780,6 +1861,7 @@ function navigateToAndCreateGroupChat(
     reportName: string,
     currentUserLogin: string,
     optimisticReportID: string,
+    introSelected: OnyxEntry<IntroSelected>,
     avatarUri?: string,
     avatarFile?: File | CustomRNImageManipulatorResult | undefined,
 ) {
@@ -1787,7 +1869,7 @@ function navigateToAndCreateGroupChat(
 
     // If we are creating a group chat then participantAccountIDs is expected to contain currentUserAccountID
     const newChat = buildOptimisticGroupChatReport(participantAccountIDs, reportName, avatarUri ?? '', optimisticReportID, CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
-    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin, avatarFile);
+    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin,introSelected, avatarFile);
 
     Navigation.dismissModal({
         callback: () => {
