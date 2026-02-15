@@ -57,6 +57,7 @@ import {
     getIOUActionForReportID,
     getOneTransactionThreadReportID,
     isCreatedAction,
+    isDeletedAction,
     isDeletedParentAction,
     isMoneyRequestAction,
     isSentMoneyReportAction,
@@ -88,7 +89,6 @@ import {
     isValidReportIDFromPath,
 } from '@libs/ReportUtils';
 import {cancelSpan} from '@libs/telemetry/activeSpans';
-import {doesDeleteNavigateBackUrlIncludeDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
 import {isNumeric} from '@libs/ValidationUtils';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 import {setShouldShowComposeInput} from '@userActions/Composer';
@@ -109,6 +109,7 @@ import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
 import {getEmptyObject, isEmptyObject} from '@src/types/utils/EmptyObject';
+import {doesDeleteNavigateBackUrlIncludeDuplicatesReview} from '@libs/TransactionNavigationUtils';
 import HeaderView from './HeaderView';
 import useReportWasDeleted from './hooks/useReportWasDeleted';
 import ReactionListWrapper from './ReactionListWrapper';
@@ -486,23 +487,19 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
     );
     const [deleteTransactionNavigateBackUrl] = useOnyx(ONYXKEYS.NVP_DELETE_TRANSACTION_NAVIGATE_BACK_URL, {canBeMissing: true});
     const hasLoadedParentReportActions =
-        !!parentReportMetadata && ((parentReportMetadata?.hasOnceLoadedReportActions ?? parentReportMetadata?.isLoadingInitialReportActions === false) || isOffline);
-    const {isParentActionMissingAfterLoad, isParentActionDeleted} = getParentReportActionDeletionStatus({
-        parentReportID: report?.parentReportID,
-        parentReportActionID: report?.parentReportActionID,
-        parentReportAction,
-        hasLoadedParentReportActions,
-    });
+        !!parentReportMetadata && (parentReportMetadata?.hasOnceLoadedReportActions === true || parentReportMetadata?.isLoadingInitialReportActions === false || isOffline);
+    const isParentActionMissingAfterLoad = !!report?.parentReportID && !!report?.parentReportActionID && hasLoadedParentReportActions && !parentReportAction;
+    const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
     const isDeletedTransactionThread = isReportTransactionThread(report) && (isParentActionDeleted || isParentActionMissingAfterLoad);
 
     useEffect(() => {
-        if (isFocused || !deleteTransactionNavigateBackUrl) {
+        if (!isFocused || !deleteTransactionNavigateBackUrl) {
             return;
         }
         if (doesDeleteNavigateBackUrlIncludeDuplicatesReview(deleteTransactionNavigateBackUrl)) {
             return;
         }
-        // Clear the URL only after we navigate away to avoid a brief Not Found flash.
+        // Clear the URL after all interactions are processed to ensure all updates are completed before hiding the skeleton
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             requestAnimationFrame(() => {
