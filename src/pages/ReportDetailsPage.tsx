@@ -312,7 +312,6 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
     const {currentSearchHash} = useSearchContext();
     const isCardTransactionCanBeDeleted = canDeleteCardTransactionByLiabilityType(iouTransaction);
     const shouldShowDeleteButton = shouldShowTaskDeleteButton || (canDeleteRequest && isCardTransactionCanBeDeleted) || isDemoTransaction(iouTransaction);
-    const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
     const isWorkspaceChat = useMemo(() => isWorkspaceChatUtil(report?.chatType ?? ''), [report?.chatType]);
 
     useEffect(() => {
@@ -354,6 +353,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
 
     const reportForHeader = useMemo(() => getReportForHeader(report), [report]);
     const shouldParseFullTitle = parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat;
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const rawReportName = getReportNameFromReportUtils(reportForHeader, policy, parentReportAction, personalDetails);
     const reportName = shouldParseFullTitle ? Parser.htmlToText(rawReportName) : rawReportName;
     const additionalRoomDetails =
