@@ -1,15 +1,24 @@
 import CONST from '@src/CONST';
-import type {OnyxInputOrEntry, ReportAction} from '@src/types/onyx';
+import type {OnyxInputOrEntry, ReportAction, ReportMetadata} from '@src/types/onyx';
 import {isDeletedAction} from './ReportActionsUtils';
 
 type ParentReportActionDeletionStatusParams = {
-    hasLoadedParentReportActions: boolean;
+    hasLoadedParentReportActions?: boolean;
+    isOffline?: boolean;
     parentReportAction: OnyxInputOrEntry<ReportAction>;
     parentReportActionID?: string;
     parentReportID?: string;
+    parentReportMetadata?: OnyxInputOrEntry<ReportMetadata>;
     shouldRequireParentReportActionID?: boolean;
     shouldTreatMissingParentReportAsDeleted?: boolean;
 };
+
+function hasLoadedReportActions(reportMetadata: OnyxInputOrEntry<ReportMetadata>, isOffline = false): boolean {
+    if (!reportMetadata) {
+        return false;
+    }
+    return (reportMetadata?.hasOnceLoadedReportActions ?? reportMetadata?.isLoadingInitialReportActions === false) || isOffline;
+}
 
 function decodeDeleteNavigateBackUrl(url: string): string {
     try {
@@ -36,19 +45,22 @@ function doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview(url?: string, 
 
 function getParentReportActionDeletionStatus({
     hasLoadedParentReportActions,
+    isOffline = false,
     parentReportAction,
     parentReportActionID,
     parentReportID,
+    parentReportMetadata,
     shouldRequireParentReportActionID = true,
     shouldTreatMissingParentReportAsDeleted = false,
 }: ParentReportActionDeletionStatusParams) {
+    const hasLoadedParentReportActionsValue = hasLoadedParentReportActions ?? hasLoadedReportActions(parentReportMetadata, isOffline);
     const canUseParentActionIDForMissingCheck = !shouldRequireParentReportActionID || !!parentReportActionID;
-    const isParentActionMissingAfterLoad = !!parentReportID && canUseParentActionIDForMissingCheck && hasLoadedParentReportActions && !parentReportAction;
+    const isParentActionMissingAfterLoad = !!parentReportID && canUseParentActionIDForMissingCheck && hasLoadedParentReportActionsValue && !parentReportAction;
     const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
     const isMissingParentReport = shouldTreatMissingParentReportAsDeleted && !parentReportID && !parentReportAction?.reportActionID;
     const wasParentActionDeleted = isParentActionDeleted || isParentActionMissingAfterLoad || isMissingParentReport;
 
-    return {isParentActionMissingAfterLoad, isParentActionDeleted, wasParentActionDeleted};
+    return {hasLoadedParentReportActions: hasLoadedParentReportActionsValue, isParentActionMissingAfterLoad, isParentActionDeleted, wasParentActionDeleted};
 }
 
 export {doesDeleteNavigateBackUrlIncludeDuplicatesReview, doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus};

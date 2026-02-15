@@ -146,13 +146,12 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     const isReportPendingDeletion = isMoneyRequestReportPendingDeletion(report);
     const hasLoadedThreadReportActions = !!reportMetadata && (reportMetadata.hasOnceLoadedReportActions ?? reportMetadata.isLoadingInitialReportActions === false);
     const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
-    const hasLoadedParentReportActions =
-        !!parentReportMetadata && ((parentReportMetadata?.hasOnceLoadedReportActions ?? parentReportMetadata?.isLoadingInitialReportActions === false) || isOffline);
     const {wasParentActionDeleted} = getParentReportActionDeletionStatus({
         parentReportID: report?.parentReportID,
         parentReportActionID: report?.parentReportActionID,
         parentReportAction,
-        hasLoadedParentReportActions,
+        parentReportMetadata,
+        isOffline,
     });
     const ownerAccountID = report?.ownerAccountID;
     const ownerPersonalDetailsSelector = useCallback(

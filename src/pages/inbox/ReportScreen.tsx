@@ -57,7 +57,6 @@ import {
     getIOUActionForReportID,
     getOneTransactionThreadReportID,
     isCreatedAction,
-    isDeletedAction,
     isDeletedParentAction,
     isMoneyRequestAction,
     isSentMoneyReportAction,
@@ -109,7 +108,7 @@ import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
 import {getEmptyObject, isEmptyObject} from '@src/types/utils/EmptyObject';
-import {doesDeleteNavigateBackUrlIncludeDuplicatesReview} from '@libs/TransactionNavigationUtils';
+import {doesDeleteNavigateBackUrlIncludeDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
 import HeaderView from './HeaderView';
 import useReportWasDeleted from './hooks/useReportWasDeleted';
 import ReactionListWrapper from './ReactionListWrapper';
@@ -486,10 +485,13 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
         [currentUserAccountID, linkedAction],
     );
     const [deleteTransactionNavigateBackUrl] = useOnyx(ONYXKEYS.NVP_DELETE_TRANSACTION_NAVIGATE_BACK_URL, {canBeMissing: true});
-    const hasLoadedParentReportActions =
-        !!parentReportMetadata && (parentReportMetadata?.hasOnceLoadedReportActions === true || parentReportMetadata?.isLoadingInitialReportActions === false || isOffline);
-    const isParentActionMissingAfterLoad = !!report?.parentReportID && !!report?.parentReportActionID && hasLoadedParentReportActions && !parentReportAction;
-    const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
+    const {isParentActionMissingAfterLoad, isParentActionDeleted} = getParentReportActionDeletionStatus({
+        parentReportID: report?.parentReportID,
+        parentReportActionID: report?.parentReportActionID,
+        parentReportAction,
+        parentReportMetadata,
+        isOffline,
+    });
     const isDeletedTransactionThread = isReportTransactionThread(report) && (isParentActionDeleted || isParentActionMissingAfterLoad);
 
     useEffect(() => {

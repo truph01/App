@@ -126,19 +126,17 @@ function TransactionDuplicateReview() {
     }, [transactionID]);
 
     const hasLoadedThreadReportActions = !!reportMetadata && ((reportMetadata?.hasOnceLoadedReportActions ?? reportMetadata?.isLoadingInitialReportActions === false) || isOffline);
-    const hasLoadedParentReportActions =
-        !!parentReportMetadata && ((parentReportMetadata?.hasOnceLoadedReportActions ?? parentReportMetadata?.isLoadingInitialReportActions === false) || isOffline);
     const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
-    const {wasParentActionDeleted} = getParentReportActionDeletionStatus({
+    const {hasLoadedParentReportActions, wasParentActionDeleted} = getParentReportActionDeletionStatus({
         parentReportID: report?.parentReportID,
         parentReportActionID: report?.parentReportActionID,
         parentReportAction: reportAction,
-        hasLoadedParentReportActions,
+        parentReportMetadata,
+        isOffline,
         shouldRequireParentReportActionID: false,
         shouldTreatMissingParentReportAsDeleted: true,
     });
-    const isReportActionPendingDelete = reportAction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-    const wasTransactionDeleted = isThreadReportDeleted || wasParentActionDeleted || isReportActionPendingDelete;
+    const wasTransactionDeleted = isThreadReportDeleted || wasParentActionDeleted;
     const isLoadingPage =
         (!report?.reportID && !hasLoadedThreadReportActions && !isThreadReportDeleted) ||
         (!reportAction?.reportActionID && !hasLoadedParentReportActions && !wasParentActionDeleted && !isThreadReportDeleted);
