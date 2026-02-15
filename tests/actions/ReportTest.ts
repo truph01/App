@@ -4507,7 +4507,7 @@ describe('actions/Report', () => {
             const CONCIERGE_REPORT_ID = '99999';
 
             await TestHelper.signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
-            
+
             // Create a Concierge chat for guided setup
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${CONCIERGE_REPORT_ID}`, {
                 reportID: CONCIERGE_REPORT_ID,
@@ -4550,7 +4550,7 @@ describe('actions/Report', () => {
             await waitForBatchedUpdates();
 
             // Then it should create a new group chat report in Onyx
-          const newGroupChatReport: OnyxEntry<OnyxTypes.Report>=  await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${GROUP_CHAT_REPORT_ID}`);
+            const newGroupChatReport: OnyxEntry<OnyxTypes.Report> = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${GROUP_CHAT_REPORT_ID}`);
 
             // Then verify the group chat was created with correct properties
             expect(newGroupChatReport).not.toBeNull();

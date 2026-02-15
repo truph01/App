@@ -1108,7 +1108,7 @@ function getGuidedSetupDataForOpenReport(introSelected: OnyxEntry<IntroSelected>
                     isInviteOnboardingComplete: true,
                 },
             },
-        ]as GuidedSetupOptimisticOnyxUpdate[],
+        ] as GuidedSetupOptimisticOnyxUpdate[],
         successData: onboardingData.successData as GuidedSetupSuccessOnyxUpdate[],
         failureData: onboardingData.failureData as GuidedSetupFailureOnyxUpdate[],
         guidedSetupData: JSON.stringify(onboardingData.guidedSetupData),
@@ -1541,7 +1541,14 @@ function openReport(
  * @param currentUserLogin The login of the current user
  * @param avatar The avatar file to upload for the group chat (optional)
  */
-function createGroupChat(reportID: string, participantLoginList: string[], newReportObject: OptimisticChatReport, currentUserLogin: string,introSelected: OnyxEntry<IntroSelected>, avatar?: File | CustomRNImageManipulatorResult) {
+function createGroupChat(
+    reportID: string,
+    participantLoginList: string[],
+    newReportObject: OptimisticChatReport,
+    currentUserLogin: string,
+    introSelected: OnyxEntry<IntroSelected>,
+    avatar?: File | CustomRNImageManipulatorResult,
+) {
     const optimisticReport = {
         reportName: CONST.REPORT.DEFAULT_REPORT_NAME,
     };
@@ -1869,7 +1876,7 @@ function navigateToAndCreateGroupChat(
 
     // If we are creating a group chat then participantAccountIDs is expected to contain currentUserAccountID
     const newChat = buildOptimisticGroupChatReport(participantAccountIDs, reportName, avatarUri ?? '', optimisticReportID, CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
-    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin,introSelected, avatarFile);
+    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin, introSelected, avatarFile);
 
     Navigation.dismissModal({
         callback: () => {
