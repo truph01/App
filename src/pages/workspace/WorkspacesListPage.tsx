@@ -338,8 +338,6 @@ function WorkspacesListPage() {
      */
     const getWorkspaceMenuItem = useCallback(
         ({item, index}: GetWorkspaceMenuItem) => {
-            // When this callback runs, filteredWorkspaces.length > 0 is guaranteed (workspace item exists in data).
-            // So shouldApplyTableRole simplifies to just !isLessThanMediumScreen here.
             const isTableActive = !isLessThanMediumScreen;
             const isAdmin = isPolicyAdmin(item as unknown as PolicyType, session?.email);
             const isOwner = item.ownerAccountID === session?.accountID;
@@ -473,10 +471,7 @@ function WorkspacesListPage() {
                         onKeyDown={
                             isTableActive
                                 ? (event: React.KeyboardEvent<Element>) => {
-                                      // Space key doesn't trigger onPress for role="row" in RNW
-                                      // (PressResponder.isValidKeyPress only allows Space for button-like roles).
-                                      // Handle it explicitly to preserve keyboard activation.
-                                      if (event.key !== ' ' && event.key !== 'Spacebar') {
+                                      if (event.key !== ' ') {
                                           return;
                                       }
                                       event.preventDefault();
