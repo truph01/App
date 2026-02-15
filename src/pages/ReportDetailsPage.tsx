@@ -1,5 +1,4 @@
 import {StackActions} from '@react-navigation/native';
-import reportsSelector from '@selectors/Attributes';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
