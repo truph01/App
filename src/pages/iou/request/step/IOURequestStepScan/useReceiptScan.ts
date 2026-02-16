@@ -1,5 +1,4 @@
 import TestReceipt from '@assets/images/fake-receipt.png';
-import reportsSelector from '@selectors/Attributes';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
 import {useEffect, useState} from 'react';
 import {InteractionManager} from 'react-native';
@@ -17,6 +16,7 @@ import {handleMoneyRequestStepScanParticipants} from '@libs/actions/IOU/MoneyReq
 import setTestReceipt from '@libs/actions/setTestReceipt';
 import {dismissProductTraining} from '@libs/actions/Welcome';
 import DateUtils from '@libs/DateUtils';
+import useReportAttributes from '@hooks/useReportAttributes';
 import HapticFeedback from '@libs/HapticFeedback';
 import {isArchivedReport, isPolicyExpenseChat} from '@libs/ReportUtils';
 import {getDefaultTaxCode, hasReceipt, shouldReuseInitialTransaction} from '@libs/TransactionUtils';
@@ -25,7 +25,6 @@ import {buildOptimisticTransactionAndCreateDraft, removeDraftTransactions, remov
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type Transaction from '@src/types/onyx/Transaction';
-
 import type {FileObject} from '@src/types/utils/Attachment';
 import type {ReceiptFile, UseReceiptScanParams} from './types';
 
@@ -78,7 +77,7 @@ function useReceiptScan({
     const [dismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {canBeMissing: true});
     const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`, {canBeMissing: true});
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE, {canBeMissing: true});
-    const [reportAttributesDerived] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
+    const reportAttributesDerived = useReportAttributes();
     const [policyRecentlyUsedCurrencies] = useOnyx(ONYXKEYS.RECENTLY_USED_CURRENCIES, {canBeMissing: true});
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});

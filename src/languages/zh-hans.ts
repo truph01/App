@@ -963,7 +963,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: '修复',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `修复 ${feedName} 公司卡连接` : '修复公司卡连接'),
-                subtitle: '工作区 > 公司卡片',
+                defaultSubtitle: '工作区 > 公司卡片',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > 公司卡片`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`,
@@ -3068,6 +3069,11 @@ ${
         toGetStarted: '添加一个银行账户，用于报销费用、发放 Expensify 卡、收取发票款项并在同一处支付账单。',
         plaidBodyCopy: '为员工提供更便捷的方式来支付并报销公司费用。',
         checkHelpLine: '您的路由号码和账号可以在该账户的支票上找到。',
+        bankAccountPurposeTitle: '您想用您的银行账户做什么？',
+        getReimbursed: '获得报销',
+        getReimbursedDescription: '由雇主或其他人报销',
+        makePayments: '进行付款',
+        makePaymentsDescription: '支付费用或发行Expensify卡',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `要连接银行账户，请先<a href="${contactMethodRoute}">添加一个邮箱作为您的主要登录方式</a>，然后重试。您可以将手机号添加为次要登录方式。`,
         hasBeenThrottledError: '添加您的银行账户时出错。请稍等几分钟后重试。',
@@ -5270,8 +5276,8 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             editTags: '编辑标签',
             findTag: '查找标签',
             subtitle: '标签可用于以更细致的方式分类成本。',
-            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
-                `<muted-text>标签可用于以更细致的方式分类成本。您正在使用<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">依赖标签</a>。您可以<a href="${importSpreadsheetLink}">重新导入电子表格</a>来更新您的标签。</muted-text>`,
+            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
+                `<muted-text>您正在使用<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">依赖标签</a>。您可以<a href="${importSpreadsheetLink}">重新导入电子表格</a>来更新您的标签。</muted-text>`,
             emptyTags: {
                 title: '你还没有创建任何标签',
                 subtitle: '添加标签，以跟踪项目、地点、部门等。',
@@ -7831,10 +7837,19 @@ ${reportName}
             security: 'Expensify 符合 PCI-DSS 标准，使用银行级加密，并采用冗余基础设施来保护您的数据。',
             learnMoreAboutSecurity: '详细了解我们的安全措施。',
         },
+        expensifyCode: {
+            title: 'Expensify代码',
+            discountCode: '折扣代码',
+            enterCode: '输入Expensify代码以应用于您的订阅。',
+            apply: '应用',
+            error: {
+                invalid: '此代码无效',
+            },
+        },
         subscriptionSettings: {
             title: '订阅设置',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `订阅类型：${subscriptionType}，订阅规模：${subscriptionSize}，自动续订：${autoRenew}，年度席位自动增加：${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `订阅类型：${subscriptionType}，订阅规模：${subscriptionSize}${expensifyCode ? `，Expensify代码：${expensifyCode}` : ''}，自动续订：${autoRenew}，年度席位自动增加：${autoIncrease}`,
             none: '无',
             on: '开在',
             off: '关关闭',
@@ -8238,6 +8253,7 @@ ${reportName}
             forceTwoFactorAuthError: '无法更改强制启用双重身份验证设置。请稍后再试。',
         },
         common: {settings: '设置'},
+        groups: {title: '群组', memberCount: () => ({one: '1 名成员', other: (count: number) => `${count} 名成员`})},
     },
 };
 export default translations;

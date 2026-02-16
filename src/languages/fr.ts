@@ -982,7 +982,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Corriger',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corriger la connexion de la carte d'entreprise ${feedName}` : 'Corriger la connexion de la carte entreprise'),
-                subtitle: 'Espace de travail > Cartes d’entreprise',
+                defaultSubtitle: 'Espace de travail > Cartes d’entreprise',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Cartes d'entreprise`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Corriger la connexion ${integrationName}`,
@@ -3137,6 +3138,11 @@ ${
             'Ajoutez un compte bancaire pour rembourser des dépenses, émettre des cartes Expensify, encaisser des paiements de factures et payer des factures, le tout à partir d’un seul endroit.',
         plaidBodyCopy: 'Offrez à vos employés un moyen plus simple de payer – et d’être remboursés – pour les dépenses de l’entreprise.',
         checkHelpLine: 'Votre numéro de routage et votre numéro de compte se trouvent sur un chèque lié à ce compte.',
+        bankAccountPurposeTitle: 'Que voulez-vous faire avec votre compte bancaire?',
+        getReimbursed: 'Être remboursé',
+        getReimbursedDescription: "Par l'employeur ou d'autres",
+        makePayments: 'Effectuer des paiements',
+        makePaymentsDescription: 'Payer les dépenses ou émettre des cartes Expensify',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Pour connecter un compte bancaire, veuillez <a href="${contactMethodRoute}">ajouter une adresse e-mail comme identifiant principal</a> puis réessayer. Vous pouvez ajouter votre numéro de téléphone comme identifiant secondaire.`,
         hasBeenThrottledError: 'Une erreur s’est produite lors de l’ajout de votre compte bancaire. Veuillez patienter quelques minutes, puis réessayer.',
@@ -5419,8 +5425,8 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             editTags: 'Modifier les tags',
             findTag: 'Trouver un tag',
             subtitle: 'Les tags ajoutent des moyens plus détaillés de classer les coûts.',
-            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
-                `<muted-text>Les tags ajoutent des moyens plus détaillés de classer les coûts. Vous utilisez des <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tags dépendants</a>. Vous pouvez <a href="${importSpreadsheetLink}">réimporter une feuille de calcul</a> pour mettre à jour vos tags.</muted-text>`,
+            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
+                `<muted-text>Vous utilisez des <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tags dépendants</a>. Vous pouvez <a href="${importSpreadsheetLink}">réimporter une feuille de calcul</a> pour mettre à jour vos tags.</muted-text>`,
             emptyTags: {
                 title: 'Vous n’avez créé aucun tag',
                 subtitle: 'Ajoutez un tag pour suivre les projets, les lieux, les services et plus encore.',
@@ -8064,10 +8070,19 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             security: 'Expensify est conforme à la norme PCI-DSS, utilise un chiffrement de niveau bancaire et une infrastructure redondante pour protéger vos données.',
             learnMoreAboutSecurity: 'En savoir plus sur notre sécurité.',
         },
+        expensifyCode: {
+            title: 'Code Expensify',
+            discountCode: 'Code de réduction',
+            enterCode: 'Saisissez un code Expensify à appliquer à votre abonnement.',
+            apply: 'Appliquer',
+            error: {
+                invalid: "Ce code n'est pas valide",
+            },
+        },
         subscriptionSettings: {
             title: 'Paramètres d’abonnement',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}${expensifyCode ? `, Code Expensify : ${expensifyCode}` : ''}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
             none: 'aucun',
             on: 'activé',
             off: 'désactivé',
@@ -8479,6 +8494,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
         },
         common: {settings: 'Paramètres'},
+        groups: {title: 'Groupes', memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`})},
     },
 };
 export default translations;
