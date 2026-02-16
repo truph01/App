@@ -31,6 +31,7 @@ import Parser from './Parser';
 import {getDisplayNameOrDefault} from './PersonalDetailsUtils';
 import {getCleanedTagName, isPolicyAdmin, isPolicyFieldListEmpty} from './PolicyUtils';
 import {
+    getCreatedReportForUnapprovedTransactionsMessage,
     getActionableCardFraudAlertResolutionMessage,
     getAutoPayApprovedReportsEnabledMessage,
     getAutoReimbursementMessage,
@@ -836,9 +837,28 @@ function computeReportName(
  * @param report
  * @param reportAttributesDerivedValue
  */
-function getReportName(report?: Report, reportAttributesDerivedValue?: ReportAttributesDerivedValue['reports']): string {
+function getReportName(
+    report?: Report,
+    reportAttributesDerivedValue?: ReportAttributesDerivedValue['reports'],
+    reports?: OnyxCollection<Report>,
+    reportActions?: OnyxCollection<ReportActions>,
+    parentReportActionParam?: OnyxEntry<ReportAction> | null,
+): string {
     if (!report || !report.reportID) {
         return '';
+    }
+
+    const parentReportAction =
+        parentReportActionParam ?? (isThread(report) ? reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`]?.[report.parentReportActionID] : undefined);
+    if (isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.CREATED_REPORT_FOR_UNAPPROVED_TRANSACTIONS)) {
+        const {originalID} = getOriginalMessage(parentReportAction) ?? {};
+        const originalReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalID}`];
+        const originalReportName = originalReport ? getReportName(originalReport, reportAttributesDerivedValue) : '';
+        return getCreatedReportForUnapprovedTransactionsMessage(originalID, originalReportName, translateLocal);
+    }
+
+    if (isInvoiceRoom(report)) {
+        return getInvoicesChatName({report, receiverPolicy: undefined, personalDetails: allPersonalDetails});
     }
 
     return reportAttributesDerivedValue?.[report.reportID]?.reportName ?? report.reportName ?? '';
