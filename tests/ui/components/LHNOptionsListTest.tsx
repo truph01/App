@@ -14,6 +14,35 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, ReportAction} from '@src/types/onyx';
 import {getFakeReport} from '../../utils/LHNTestUtils';
 
+// Mock dynamic imports that break without --experimental-vm-modules
+jest.mock('@src/languages/IntlStore', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const en = require('@src/languages/en').default;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const flattenObject = require('@src/languages/flattenObject').default;
+
+    const cache = new Map([['en', flattenObject(en)]]);
+
+    return {
+        __esModule: true,
+        default: {
+            getCurrentLocale: () => 'en',
+            load: () => Promise.resolve(),
+            get: (key: string, locale?: string) => {
+                const translations = cache.get(locale ?? 'en');
+                return translations?.[key] ?? null;
+            },
+        },
+    };
+});
+jest.mock('@assets/emojis', () => ({
+    importEmojiLocale: jest.fn(() => Promise.resolve()),
+    getEmojiCodeWithSkinColor: jest.fn(),
+}));
+jest.mock('@libs/EmojiTrie', () => ({
+    buildEmojisTrie: jest.fn(),
+}));
+
 // Mock the context menu
 jest.mock('@pages/inbox/report/ContextMenu/ReportActionContextMenu', () => ({
     showContextMenu: jest.fn(),
