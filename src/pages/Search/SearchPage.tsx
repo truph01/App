@@ -4,7 +4,6 @@ import {InteractionManager, View} from 'react-native';
 import Animated from 'react-native-reanimated';
 import type {ValueOf} from 'type-fest';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
-import ConfirmModal from '@components/ConfirmModal';
 import DecisionModal from '@components/DecisionModal';
 import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
@@ -154,7 +153,6 @@ function SearchPage({route}: SearchPageProps) {
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);
-    const [accountingExportModalVisible, setAccountingExportModalVisible] = useState(false);
     const [searchRequestResponseStatusCode, setSearchRequestResponseStatusCode] = useState<number | null>(null);
     const {showConfirmModal} = useConfirmModal();
     const {isBetaEnabled} = usePermissions();
@@ -805,33 +803,42 @@ function SearchPage({route}: SearchPageProps) {
                 const connectionNameFriendly = CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectedIntegration];
                 const integrationIcon = getIntegrationIcon(connectedIntegration, expensifyIcons);
 
-                const handleExportAction = (exportAction: () => void, shouldShowAccountingModal = false) => {
+                const handleExportAction = (exportAction: () => void) => {
                     if (isOffline) {
                         setIsOfflineModalVisible(true);
                         return;
                     }
 
-                    let exportedReportName = '';
-                    const areAnyReportsExported = selectedReportIDs.some((reportID) => {
+                    const exportedReportNames: string[] = [];
+                    let areAnyReportsExported = false;
+
+                    for (const reportID of selectedReportIDs) {
                         const unfilteredReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
+
                         if (!unfilteredReportActions) {
-                            return false;
+                            continue;
                         }
 
                         const reportActions = getFilteredReportActionsForReportView(Object.values(unfilteredReportActions));
+
                         const isExported = isExportedUtils(reportActions);
-                        if (isExported && !exportedReportName) {
-                            exportedReportName = getReportOrDraftReport(reportID)?.reportName ?? '';
+
+                        if (isExported) {
+                            areAnyReportsExported = true;
+
+                            const reportName = getReportOrDraftReport(reportID)?.reportName ?? '';
+                            if (reportName) {
+                                exportedReportNames.push(reportName);
+                            }
                         }
-                        return isExported;
-                    });
+                    }
 
                     if (areAnyReportsExported) {
                         showConfirmModal({
                             title: translate('workspace.exportAgainModal.title'),
                             prompt: translate('workspace.exportAgainModal.description', {
                                 connectionName: connectedIntegration,
-                                reportName: exportedReportName,
+                                reportName: exportedReportNames.join('\n'),
                             }),
                             confirmText: translate('workspace.exportAgainModal.confirmText'),
                             cancelText: translate('workspace.exportAgainModal.cancelText'),
@@ -840,19 +847,12 @@ function SearchPage({route}: SearchPageProps) {
                                 return;
                             }
 
-                            if (shouldShowAccountingModal) {
-                                setAccountingExportModalVisible(true);
-                            }
-
                             if (hash) {
                                 clearSelectedTransactions();
                                 exportAction();
                             }
                         });
                     } else if (hash) {
-                        if (shouldShowAccountingModal) {
-                            setAccountingExportModalVisible(true);
-                        }
                         exportAction();
                         clearSelectedTransactions();
                     }
@@ -862,7 +862,7 @@ function SearchPage({route}: SearchPageProps) {
                     {
                         text: connectionNameFriendly,
                         icon: integrationIcon,
-                        onSelected: () => handleExportAction(() => exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration), true),
+                        onSelected: () => handleExportAction(() => exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration)),
                         shouldCloseModalOnSelect: true,
                         shouldCallAfterModalHide: true,
                     },
@@ -1501,18 +1501,6 @@ function SearchPage({route}: SearchPageProps) {
                             onConfirm={dismissModalAndUpdateUseHold}
                         />
                     )}
-
-                    <ConfirmModal
-                        isVisible={accountingExportModalVisible}
-                        onConfirm={() => {
-                            setAccountingExportModalVisible(false);
-                        }}
-                        onCancel={() => setAccountingExportModalVisible(false)}
-                        title={translate('export.exportInProgress')}
-                        prompt={translate('export.conciergeWillNotifyOnExportFailure')}
-                        confirmText={translate('common.buttonConfirm')}
-                        shouldShowCancelButton={false}
-                    />
                 </View>
             )}
             <DecisionModal
