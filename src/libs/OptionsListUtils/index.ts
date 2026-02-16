@@ -944,9 +944,11 @@ function getLastMessageTextForReport({
         return '';
     }
 
-    // When the derived visibility cache is hydrated and we computed a non-empty preview, use it.
-    // Otherwise fall back to report.lastMessageText — the computed text can be empty for action
-    // types not handled above or when the cache isn't hydrated yet.
+    // Fallback: use the action's own message text if not handled above.
+    if (!lastMessageTextFromReport && lastReportAction) {
+        lastMessageTextFromReport = lastVisibleMessage?.lastMessageText ?? '';
+    }
+
     return lastMessageTextFromReport || (report?.lastMessageText ?? '');
 }
 
