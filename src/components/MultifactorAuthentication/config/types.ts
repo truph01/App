@@ -8,6 +8,7 @@ import type {
     MultifactorAuthenticationActionParams,
     MultifactorAuthenticationKeyInfo,
     MultifactorAuthenticationReason,
+    MultifactorAuthenticationScenarioCallback,
 } from '@libs/MultifactorAuthentication/Biometrics/types';
 import type CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -63,9 +64,12 @@ type MultifactorAuthenticationOutcomeScreens = {
  * Response from a multifactor authentication scenario action.
  */
 type MultifactorAuthenticationScenarioResponse = {
-    httpCode: number;
+    httpCode: number | undefined;
     reason: MultifactorAuthenticationReason;
     message: string | undefined;
+
+    /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
+    body?: Record<string, unknown>;
 };
 
 /**
@@ -94,6 +98,14 @@ type MultifactorAuthenticationScenarioBase<T extends Record<string, unknown> = E
      * so the absence of payload will be tolerated at the run-time.
      */
     pure?: true;
+
+    /**
+     * Callback function that is invoked after the API call completes (success or failure).
+     * The callback receives the success status and input containing HTTP code, message, and response body.
+     * Returns a MultifactorAuthenticationCallbackResponse value that determines the post-callback behavior
+     * (e.g., whether to show the outcome screen or let the callback handle navigation).
+     */
+    callback?: MultifactorAuthenticationScenarioCallback;
 };
 
 /**

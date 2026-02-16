@@ -8,8 +8,11 @@ import {registerAuthenticationKey} from './index';
 type ProcessResult = {
     success: boolean;
     reason: MultifactorAuthenticationReason;
-    httpStatus?: number;
     message?: string;
+    httpStatus?: number;
+
+    /** Optional response body containing scenario-specific data (e.g., {pin: number} for PIN reveal) */
+    body?: Record<string, unknown>;
 };
 
 /**
@@ -120,7 +123,7 @@ async function processScenarioAction(
         };
     }
 
-    const {httpCode, reason, message} = await action(params);
+    const {httpCode, reason, message, body} = await action(params);
     const success = isHttpSuccess(httpCode);
 
     return {
@@ -128,6 +131,7 @@ async function processScenarioAction(
         reason,
         httpStatus: httpCode,
         message,
+        body,
     };
 }
 

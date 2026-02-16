@@ -52,6 +52,9 @@ type MultifactorAuthenticationState = {
 
     /** Authentication method used (e.g., 'BIOMETRIC_FACE', 'BIOMETRIC_FINGERPRINT') */
     authenticationMethod: AuthTypeInfo | undefined;
+
+    /** Response from the scenario API call, stored for callback invocation at outcome navigation */
+    scenarioResponse: MultifactorAuthenticationScenarioResponse | undefined;
 };
 
 type MultifactorAuthenticationStateContextValue = {
@@ -72,6 +75,7 @@ const DEFAULT_STATE: MultifactorAuthenticationState = {
     isAuthorizationComplete: false,
     isFlowComplete: false,
     authenticationMethod: undefined,
+    scenarioResponse: undefined,
 };
 
 type InitPayload = {
@@ -92,6 +96,7 @@ type Action =
     | {type: 'SET_AUTHORIZATION_COMPLETE'; payload: boolean}
     | {type: 'SET_FLOW_COMPLETE'; payload: boolean}
     | {type: 'SET_AUTHENTICATION_METHOD'; payload: AuthTypeInfo | undefined}
+    | {type: 'SET_SCENARIO_RESPONSE'; payload: MultifactorAuthenticationScenarioResponse | undefined}
     | {type: 'INIT'; payload: InitPayload}
     | {type: 'REREGISTER'}
     | {type: 'RESET'};
@@ -143,6 +148,8 @@ function stateReducer(state: MultifactorAuthenticationState, action: Action): Mu
             return {...state, isFlowComplete: action.payload};
         case 'SET_AUTHENTICATION_METHOD':
             return {...state, authenticationMethod: action.payload};
+        case 'SET_SCENARIO_RESPONSE':
+            return {...state, scenarioResponse: action.payload};
         case 'INIT':
             return {
                 ...DEFAULT_STATE,
