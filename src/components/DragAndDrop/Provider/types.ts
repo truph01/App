@@ -26,7 +26,4 @@ type DragAndDropActionsContextType = {
     setOnDropHandler: (callback: SetOnDropHandlerCallback) => void;
 };
 
-/** @deprecated Use DragAndDropStateContextType and DragAndDropActionsContextType with hooks instead. */
-type DragAndDropContextParams = DragAndDropStateContextType & DragAndDropActionsContextType;
-
-export type {DragAndDropProviderProps, SetOnDropHandlerCallback, DragAndDropStateContextType, DragAndDropActionsContextType, DragAndDropContextParams};
+export type {DragAndDropProviderProps, SetOnDropHandlerCallback, DragAndDropStateContextType, DragAndDropActionsContextType};

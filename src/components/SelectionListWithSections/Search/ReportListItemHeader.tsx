@@ -161,6 +161,7 @@ function HeaderFirstRow<TItem extends ListItem>({
                             style={[styles.pl3, styles.justifyContentCenter, styles.alignItemsEnd]}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={isExpanded ? CONST.ACCESSIBILITY_LABELS.COLLAPSE : CONST.ACCESSIBILITY_LABELS.EXPAND}
+                            sentryLabel={CONST.SENTRY_LABEL.SEARCH.REPORT_EXPAND_COLLAPSE}
                         >
                             {({hovered}) => (
                                 <Icon
