@@ -149,6 +149,7 @@ function ActionCell({
                 link={isChildListItem}
                 shouldUseDefaultHover={!isChildListItem}
                 isNested
+                sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_VIEW}
             />
         ) : null;
     }
@@ -174,6 +175,7 @@ function ActionCell({
                     shouldStayNormalOnDisable={shouldDisablePointerEvents}
                     isLoading={isLoading}
                     onlyShowPayElsewhere={shouldOnlyShowElsewhere}
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_PAY}
                 />
             </SearchScopeProvider>
         );
@@ -191,6 +193,7 @@ function ActionCell({
             isDisabled={isOffline || shouldDisablePointerEvents}
             shouldStayNormalOnDisable={shouldDisablePointerEvents}
             isNested
+            sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_ACTION}
         />
     );
 }

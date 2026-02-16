@@ -66,9 +66,10 @@ import FILTER_KEYS, {AMOUNT_FILTER_KEYS, DATE_FILTER_KEYS} from '@src/types/form
 import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import type {SearchHeaderOptionValue} from './SearchPageHeader';
 
-type FilterItem = {
+type FilterItem = WithSentryLabel & {
     label: string;
     PopoverComponent: (props: PopoverComponentProps) => ReactNode;
     value: string | string[] | null;
@@ -578,6 +579,7 @@ function SearchFiltersBar({
                 PopoverComponent: typeComponent,
                 value: type?.text ?? null,
                 filterKey: FILTER_KEYS.TYPE,
+                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_TYPE,
             },
             ...(shouldDisplayGroupByFilter
                 ? [
@@ -586,6 +588,7 @@ function SearchFiltersBar({
                           PopoverComponent: groupByComponent,
                           value: groupBy?.text ?? null,
                           filterKey: FILTER_KEYS.GROUP_BY,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_GROUP_BY,
                       },
                   ]
                 : []),
@@ -596,6 +599,7 @@ function SearchFiltersBar({
                           PopoverComponent: groupCurrencyComponent,
                           value: groupCurrency?.value ?? null,
                           filterKey: FILTER_KEYS.GROUP_CURRENCY,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_GROUP_CURRENCY,
                       },
                   ]
                 : []),
@@ -606,6 +610,7 @@ function SearchFiltersBar({
                           PopoverComponent: feedComponent,
                           value: feed.map((option) => option.text),
                           filterKey: FILTER_KEYS.FEED,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_FEED,
                       },
                   ]
                 : []),
@@ -616,6 +621,7 @@ function SearchFiltersBar({
                           PopoverComponent: postedPickerComponent,
                           value: displayPosted,
                           filterKey: FILTER_KEYS.POSTED_ON,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_POSTED,
                       },
                   ]
                 : []),
@@ -626,6 +632,7 @@ function SearchFiltersBar({
                           PopoverComponent: withdrawalTypeComponent,
                           value: withdrawalType?.text ?? null,
                           filterKey: FILTER_KEYS.WITHDRAWAL_TYPE,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WITHDRAWAL_TYPE,
                       },
                   ]
                 : []),
@@ -636,6 +643,7 @@ function SearchFiltersBar({
                           PopoverComponent: withdrawnPickerComponent,
                           value: displayWithdrawn,
                           filterKey: FILTER_KEYS.WITHDRAWN_ON,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WITHDRAWN,
                       },
                   ]
                 : []),
@@ -644,6 +652,7 @@ function SearchFiltersBar({
                 PopoverComponent: statusComponent,
                 value: status.map((option) => option.text),
                 filterKey: FILTER_KEYS.STATUS,
+                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_STATUS,
             },
             ...(type?.value === CONST.SEARCH.DATA_TYPES.CHAT
                 ? [
@@ -652,6 +661,7 @@ function SearchFiltersBar({
                           PopoverComponent: hasComponent,
                           value: has.map((option) => option.text),
                           filterKey: FILTER_KEYS.HAS,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_HAS,
                       },
                   ]
                 : []),
@@ -662,6 +672,7 @@ function SearchFiltersBar({
                           PopoverComponent: isComponent,
                           value: is.map((option) => option.text),
                           filterKey: FILTER_KEYS.IS,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_IS,
                       },
                   ]
                 : []),
@@ -670,12 +681,14 @@ function SearchFiltersBar({
                 PopoverComponent: datePickerComponent,
                 value: displayDate,
                 filterKey: FILTER_KEYS.DATE_ON,
+                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_DATE,
             },
             {
                 label: translate('common.from'),
                 PopoverComponent: userPickerComponent,
                 value: fromValue,
                 filterKey: FILTER_KEYS.FROM,
+                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_FROM,
             },
             ...(shouldDisplayWorkspaceFilter
                 ? [
@@ -684,6 +697,7 @@ function SearchFiltersBar({
                           PopoverComponent: workspaceComponent,
                           value: workspaceValue,
                           filterKey: FILTER_KEYS.POLICY_ID,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WORKSPACE,
                       },
                   ]
                 : []),
@@ -694,6 +708,7 @@ function SearchFiltersBar({
                           PopoverComponent: viewComponent,
                           value: viewValue?.text ?? null,
                           filterKey: FILTER_KEYS.VIEW,
+                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_VIEW,
                       },
                   ]
                 : []),
@@ -805,6 +820,7 @@ function SearchFiltersBar({
                 label={item.label}
                 value={item.value}
                 PopoverComponent={item.PopoverComponent}
+                sentryLabel={item.sentryLabel}
             />
         ),
         [],
@@ -830,6 +846,7 @@ function SearchFiltersBar({
                     icon={expensifyIcons.Filter}
                     textStyles={[styles.textMicroBold]}
                     onPress={openAdvancedFilters}
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.ADVANCED_FILTERS_BUTTON}
                 />
                 {shouldShowColumnsButton && (
                     <Button
@@ -842,6 +859,7 @@ function SearchFiltersBar({
                         icon={expensifyIcons.Columns}
                         textStyles={[styles.textMicroBold]}
                         onPress={openSearchColumns}
+                        sentryLabel={CONST.SENTRY_LABEL.SEARCH.COLUMNS_BUTTON}
                     />
                 )}
             </View>
@@ -913,6 +931,7 @@ function SearchFiltersBar({
                                     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
                                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
                                 }}
+                                sentryLabel={CONST.SENTRY_LABEL.SEARCH.BULK_ACTIONS_DROPDOWN}
                             />
                             {!areAllMatchingItemsSelected && showSelectAllMatchingItems && (
                                 <Button
@@ -922,6 +941,7 @@ function SearchFiltersBar({
                                     innerStyles={styles.p0}
                                     onPress={() => selectAllMatchingItems(true)}
                                     text={translate('search.exportAll.selectAllMatchingItems')}
+                                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.SELECT_ALL_MATCHING_BUTTON}
                                 />
                             )}
                         </View>
