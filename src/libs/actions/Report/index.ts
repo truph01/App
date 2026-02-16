@@ -1726,7 +1726,6 @@ function createGroupChat(
         clearGroupChat();
     });
 
-    // eslint-disable-next-line rulesdir/no-multiple-api-calls
     API.paginate(CONST.API_REQUEST_TYPE.WRITE, WRITE_COMMANDS.OPEN_REPORT, parameters, {optimisticData, successData, failureData}, paginationConfig, {
         checkAndFixConflictingRequest: (persistedRequests) => resolveOpenReportDuplicationConflictAction(persistedRequests, parameters),
     });
@@ -1823,6 +1822,32 @@ function createTransactionThreadReport(
 }
 
 /**
+ * Navigates to a report, handling modal dismissal and delayed navigation for composer focus.
+ *
+ * @param reportID The ID of the report to navigate to
+ * @param shouldDismissModal Whether to dismiss the modal before navigating
+ */
+function navigateToReport(reportID: string | undefined, shouldDismissModal = true) {
+    if (shouldDismissModal) {
+        Navigation.dismissModal({
+            callback: () => {
+                if (!reportID) {
+                    return;
+                }
+
+                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
+            },
+        });
+    } else if (reportID) {
+        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
+    }
+    // In some cases when RHP modal gets hidden and then we navigate to report Composer focus breaks, wrapping navigation in setTimeout fixes this
+    setTimeout(() => {
+        Navigation.isNavigationReady().then(() => Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID)));
+    }, 0);
+}
+
+/**
  * This will find an existing chat, or create a new one if none exists, for the given user or set of users. It will then navigate to this chat.
  *
  * @param userLogins list of user logins to start a chat report with.
@@ -1844,23 +1869,7 @@ function navigateToAndOpenReport(userLogins: string[], currentUserAccountID: num
     }
     const report = isEmptyObject(chat) ? newChat : chat;
 
-    if (shouldDismissModal) {
-        Navigation.dismissModal({
-            callback: () => {
-                if (!report?.reportID) {
-                    return;
-                }
-
-                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report.reportID));
-            },
-        });
-    } else if (report?.reportID) {
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report.reportID));
-    }
-    // In some cases when RHP modal gets hidden and then we navigate to report Composer focus breaks, wrapping navigation in setTimeout fixes this
-    setTimeout(() => {
-        Navigation.isNavigationReady().then(() => Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report?.reportID)));
-    }, 0);
+    navigateToReport(report?.reportID, shouldDismissModal);
 }
 
 function navigateToAndCreateGroupChat(
@@ -1878,19 +1887,7 @@ function navigateToAndCreateGroupChat(
     const newChat = buildOptimisticGroupChatReport(participantAccountIDs, reportName, avatarUri ?? '', optimisticReportID, CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
     createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin, introSelected, avatarFile);
 
-    Navigation.dismissModal({
-        callback: () => {
-            if (!newChat.reportID) {
-                return;
-            }
-
-            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(newChat.reportID));
-        },
-    });
-    // In some cases when RHP modal gets hidden and then we navigate to report Composer focus breaks, wrapping navigation in setTimeout fixes this
-    setTimeout(() => {
-        Navigation.isNavigationReady().then(() => Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(newChat.reportID)));
-    }, 0);
+    navigateToReport(newChat.reportID);
 }
 
 /**
