@@ -5,7 +5,6 @@ import {InteractionManager} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
 import useFilesValidation from '@hooks/useFilesValidation';
-import useIOUUtils from '@hooks/useIOUUtils';
 import useOnyx from '@hooks/useOnyx';
 import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
 import usePermissions from '@hooks/usePermissions';
@@ -16,6 +15,7 @@ import useSelfDMReport from '@hooks/useSelfDMReport';
 import {handleMoneyRequestStepScanParticipants} from '@libs/actions/IOU/MoneyRequest';
 import {dismissProductTraining} from '@libs/actions/Welcome';
 import {isArchivedReport, isPolicyExpenseChat} from '@libs/ReportUtils';
+import DateUtils from '@libs/DateUtils';
 import {getDefaultTaxCode, hasReceipt, shouldReuseInitialTransaction} from '@libs/TransactionUtils';
 import {setMoneyRequestReceipt} from '@userActions/IOU';
 import {buildOptimisticTransactionAndCreateDraft, removeDraftTransactions, removeTransactionReceipt} from '@userActions/TransactionEdit';
@@ -90,7 +90,15 @@ function useReceiptScan({
     getSource,
 }: UseReceiptScanParams) {
     const {isBetaEnabled} = usePermissions();
-    const {shouldStartLocationPermissionFlow} = useIOUUtils();
+    const [lastLocationPermissionPrompt] = useOnyx(ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT, {canBeMissing: true});
+
+    const shouldStartLocationPermissionFlow = useCallback(
+        () =>
+            !lastLocationPermissionPrompt ||
+            (DateUtils.isValidDateString(lastLocationPermissionPrompt ?? '') &&
+                DateUtils.getDifferenceInDaysFromNow(new Date(lastLocationPermissionPrompt ?? '')) > CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS),
+        [lastLocationPermissionPrompt],
+    );
 
     const policy = usePolicy(report?.policyID);
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
