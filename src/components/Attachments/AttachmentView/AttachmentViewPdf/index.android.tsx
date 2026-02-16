@@ -80,7 +80,7 @@ function AttachmentViewPdf(props: AttachmentViewPdfProps) {
             collapsable={false}
             style={styles.flex1}
         >
-            {attachmentCarouselPagerContext === null ? (
+            {carouselPagerState === null ? (
                 Content
             ) : (
                 <GestureDetector gesture={Pan}>
