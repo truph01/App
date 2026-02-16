@@ -35,7 +35,7 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
         canBeMissing: false,
         selector: domainMemberSettingsSelector,
     });
-    const [validateDomainTwoFactorCode] = useOnyx(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, {
+    const [validateDomainTwoFactorCodeErrors] = useOnyx(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, {
         canBeMissing: true,
     });
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
@@ -43,9 +43,21 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
     });
 
     const baseTwoFactorAuthRef = useRef<BaseTwoFactorAuthFormRef>(null);
+    const isUnmounted = useRef(false);
 
     useEffect(() => {
-        clearValidateDomainTwoFactorCodeError();
+        return () => {
+            isUnmounted.current = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            if (!isUnmounted.current) {
+                return;
+            }
+            clearValidateDomainTwoFactorCodeError();
+        };
     }, []);
 
     useEffect(() => {
@@ -88,12 +100,12 @@ function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageP
                             }}
                             shouldAutoFocus={false}
                             onInputChange={() => {
-                                if (isEmptyObject(validateDomainTwoFactorCode?.errors)) {
+                                if (isEmptyObject(validateDomainTwoFactorCodeErrors?.errors)) {
                                     return;
                                 }
                                 clearValidateDomainTwoFactorCodeError();
                             }}
-                            errorMessage={getLatestErrorMessage({errors: validateDomainTwoFactorCode?.errors})}
+                            errorMessage={getLatestErrorMessage({errors: validateDomainTwoFactorCodeErrors?.errors})}
                         />
                     </View>
                 </ScrollView>
