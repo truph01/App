@@ -9,7 +9,7 @@ import type {ReceiptFile} from '@pages/iou/request/step/IOURequestStepScan/types
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {QuickAction} from '@src/types/onyx';
+import type {QuickAction, RecentWaypoint} from '@src/types/onyx';
 import type {SplitShares} from '@src/types/onyx/Transaction';
 import * as IOU from '../../../src/libs/actions/IOU';
 import * as Split from '../../../src/libs/actions/IOU/Split';
@@ -78,6 +78,7 @@ describe('MoneyRequest', () => {
         };
 
         const selfDMReport = createSelfDM(Number(SELF_DM_REPORT_ID), TEST_USER_ACCOUNT_ID);
+        let recentWaypoints: RecentWaypoint[] = [];
 
         const baseParams = {
             transactions: [fakeTransaction],
@@ -95,7 +96,13 @@ describe('MoneyRequest', () => {
             isSelfTourViewed: false,
             betas: [CONST.BETAS.ALL],
             personalDetails: {},
+            recentWaypoints,
         };
+
+        Onyx.connect({
+            key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
+            callback: (val) => (recentWaypoints = val ?? []),
+        });
 
         afterEach(() => {
             jest.clearAllMocks();
