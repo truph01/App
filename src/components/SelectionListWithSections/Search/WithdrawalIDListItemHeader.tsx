@@ -116,6 +116,18 @@ function WithdrawalIDListItemHeader<TItem extends ListItem>({
                 />
             </View>
         ),
+        [CONST.SEARCH.TABLE_COLUMNS.STATUS]: (
+            <View
+                key={CONST.SEARCH.TABLE_COLUMNS.STATUS}
+                style={StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.STATUS)}
+            >
+                {!!badgeProps && (
+                    <View style={[styles.reportStatusContainer, badgeProps.badgeStyles]}>
+                        <Text style={[styles.reportStatusText, badgeProps.textStyles]}>{badgeProps.text}</Text>
+                    </View>
+                )}
+            </View>
+        ),
         [CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWAL_ID]: (
             <View
                 key={CONST.SEARCH.TABLE_COLUMNS.WITHDRAWAL_ID}
