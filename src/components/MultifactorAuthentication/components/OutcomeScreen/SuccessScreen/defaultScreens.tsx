@@ -10,7 +10,6 @@ const DefaultSuccessScreen = createScreenWithDefaults(
         iconWidth: variables.openPadlockWidth,
         iconHeight: variables.openPadlockHeight,
         title: 'multifactorAuthentication.biometricsTest.authenticationSuccessful',
-        subtitle: 'multifactorAuthentication.biometricsTest.successfullyAuthenticatedUsing',
     },
     'DefaultSuccessScreen',
 );
