@@ -18,7 +18,6 @@ import CONST from '@src/CONST';
 import type {Country} from '@src/CONST';
 import type OriginalMessage from '@src/types/onyx/OriginalMessage';
 import type {OriginalMessageSettlementAccountLocked, PolicyRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
-import ObjectUtils from '@src/types/utils/ObjectUtils';
 import type en from './en';
 import type {
     AddBudgetParams,
@@ -752,6 +751,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: '名前、メールアドレス、または電話番号',
         findMember: 'メンバーを検索',
         searchForSomeone: '誰かを検索',
+        userSelected: (username: string) => `${username} 選択された`,
     },
     customApprovalWorkflow: {
         title: 'カスタム承認ワークフロー',
@@ -973,7 +973,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: '修正',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName} 会社カード接続を修正` : '法人クレジットカードの接続を修正'),
-                subtitle: 'ワークスペース > 会社カード',
+                defaultSubtitle: 'ワークスペース > 会社カード',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会社カード`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`,
@@ -1112,6 +1113,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: '以前のクイック操作の宛先にはアクセスできなくなりました。下から新しい宛先を選択してください。',
         updateDestination: '送信先を更新',
         createReport: 'レポートを作成',
+        createTimeExpense: '時間経費を作成',
     },
     iou: {
         amount: '金額',
@@ -1508,33 +1510,17 @@ const translations: TranslationDeepObject<typeof en> = {
             ratePreview: (rate: string) => `${rate} / 時間`,
             amountTooLargeError: '合計金額が大きすぎます。時間を減らすか、レートを下げてください。',
         },
-        correctDistanceRateError: '距離レートのエラーを修正して、もう一度お試しください。',
+        correctRateError: 'レートのエラーを修正して、もう一度お試しください。',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>説明</strong></a> &#x2728;`,
-        policyRulesModifiedFields: (policyRulesModifiedFields: PolicyRulesModifiedFields, policyRulesRoute: string, formatList: (list: string[]) => string) => {
-            const entries = ObjectUtils.typedEntries(policyRulesModifiedFields);
-            const fragments = entries.map(([key, value], i) => {
-                const isFirst = i === 0;
-                if (key === 'reimbursable') {
-                    return value ? '経費を「精算対象」としてマークしました' : '経費を「非精算」としてマークしました';
-                }
-                if (key === 'billable') {
-                    return value ? '経費を「請求可能」に設定しました' : '経費を「請求不可」としてマークしました';
-                }
-                if (key === 'tax') {
-                    const taxEntry = value as PolicyRulesModifiedFields['tax'];
-                    const taxRateName = taxEntry?.field_id_TAX.name ?? '';
-                    if (isFirst) {
-                        return `税率を「${taxRateName}」に設定する`;
-                    }
-                    return `税率を「${taxRateName}」に`;
-                }
-                const updatedValue = value as string | boolean;
-                if (isFirst) {
-                    return `${translations.common[key].toLowerCase()} を「${updatedValue}」に設定する`;
-                }
-                return `${translations.common[key].toLowerCase()} から「${updatedValue}」へ`;
-            });
-            return `${formatList(fragments)}（<a href="${policyRulesRoute}">ワークスペースルール</a>経由）`;
+        policyRulesModifiedFields: {
+            reimbursable: (value: boolean) => (value ? '経費を「精算対象」としてマークしました' : '経費を「非精算」としてマークしました'),
+            billable: (value: boolean) => (value ? '経費を「請求可能」に設定しました' : '経費を「請求不可」としてマークしました'),
+            tax: (value: string, isFirst: boolean) => (isFirst ? `税率を「${value}」に設定する` : `税率を「${value}」に`),
+            common: (key: keyof PolicyRulesModifiedFields, value: string, isFirst: boolean) => {
+                const field = translations.common[key].toLowerCase();
+                return isFirst ? `${field} を「${value}」に設定する` : `${field} から「${value}」へ`;
+            },
+            format: (fragments: string, route: string) => `${fragments}（<a href="${route}">ワークスペースルール</a>経由）`,
         },
         duplicateNonDefaultWorkspacePerDiemError: 'ワークスペースごとに日当レートが異なる場合があるため、日当経費をワークスペース間で複製することはできません。',
     },
@@ -2420,7 +2406,6 @@ ${date} の ${merchant} への ${amount}`,
     },
     expenseRulesPage: {
         title: '経費ルール',
-        subtitle: 'これらのルールはあなたの経費に適用されます。ワークスペースに提出した場合は、そのワークスペースのルールがこれらより優先されることがあります。',
         findRule: 'ルールを検索',
         emptyRules: {
             title: 'まだルールを作成していません',
@@ -2466,6 +2451,7 @@ ${date} の ${merchant} への ${amount}`,
             deleteSinglePrompt: 'このルールを削除してもよろしいですか？',
             deleteMultiplePrompt: 'これらのルールを削除してもよろしいですか？',
         },
+        subtitle: 'これらのルールはあなたの経費に適用されます。',
     },
     preferencesPage: {
         appSection: {
@@ -3031,10 +3017,7 @@ ${
     detailsPage: {
         localTime: '現地時間',
     },
-    newChatPage: {
-        startGroup: 'グループを開始',
-        addToGroup: 'グループに追加',
-    },
+    newChatPage: {startGroup: 'グループを開始', addToGroup: 'グループに追加', addUserToGroup: (username: string) => `${username} をグループに追加`},
     yearPickerPage: {
         year: '年',
         selectYear: '年を選択してください',
@@ -5356,8 +5339,8 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             editTags: 'タグを編集',
             findTag: 'タグを検索',
             subtitle: 'タグを使うと、コストをより詳しく分類できます。',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>タグを使うと、コストをより詳しく分類できます。あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
             emptyTags: {
                 title: 'タグがまだ作成されていません',
                 subtitle: 'タグを追加して、プロジェクト、所在地、部署などを追跡しましょう。',
@@ -6434,6 +6417,7 @@ ${reportName}
             symbols: '記号',
             flags: 'フラグ',
         },
+        emojiNotSelected: '絵文字が選択されていません',
     },
     newRoomPage: {
         newRoom: '新しいルーム',
@@ -8378,6 +8362,7 @@ ${reportName}
             forceTwoFactorAuthError: '2要素認証の強制設定を変更できませんでした。後でもう一度お試しください。',
         },
         common: {settings: '設定'},
+        groups: {title: 'グループ', memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`})},
     },
 };
 export default translations;

@@ -18,7 +18,6 @@ import CONST from '@src/CONST';
 import type {Country} from '@src/CONST';
 import type OriginalMessage from '@src/types/onyx/OriginalMessage';
 import type {OriginalMessageSettlementAccountLocked, PolicyRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
-import ObjectUtils from '@src/types/utils/ObjectUtils';
 import type en from './en';
 import type {
     AddBudgetParams,
@@ -756,6 +755,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: 'Nome, email o numero di telefono',
         findMember: 'Trova un membro',
         searchForSomeone: 'Cerca qualcuno',
+        userSelected: (username: string) => `${username} selezionato`,
     },
     customApprovalWorkflow: {
         title: 'Flusso di approvazione personalizzato',
@@ -977,7 +977,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Correggi',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Correggi la connessione della carta aziendale ${feedName}` : 'Correggi connessione carta aziendale'),
-                subtitle: 'Spazio di lavoro > Carte aziendali',
+                defaultSubtitle: 'Spazio di lavoro > Carte aziendali',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Carte aziendali`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Correggi connessione ${integrationName}`,
@@ -1116,6 +1117,7 @@ const translations: TranslationDeepObject<typeof en> = {
         noLongerHaveReportAccess: 'Non hai più accesso alla precedente destinazione dell’azione rapida. Selezionane una nuova qui sotto.',
         updateDestination: 'Aggiorna destinazione',
         createReport: 'Crea resoconto',
+        createTimeExpense: 'Crea nota spese tempo',
     },
     iou: {
         amount: 'Importo',
@@ -1514,33 +1516,17 @@ const translations: TranslationDeepObject<typeof en> = {
             ratePreview: (rate: string) => `${rate} / ora`,
             amountTooLargeError: 'L’importo totale è troppo alto. Riduci le ore o abbassa la tariffa.',
         },
-        correctDistanceRateError: 'Correggi l’errore nella tariffa distanza e riprova.',
+        correctRateError: 'Correggi l’errore di tariffa e riprova.',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Spiega</strong></a> &#x2728;`,
-        policyRulesModifiedFields: (policyRulesModifiedFields: PolicyRulesModifiedFields, policyRulesRoute: string, formatList: (list: string[]) => string) => {
-            const entries = ObjectUtils.typedEntries(policyRulesModifiedFields);
-            const fragments = entries.map(([key, value], i) => {
-                const isFirst = i === 0;
-                if (key === 'reimbursable') {
-                    return value ? 'ha contrassegnato la spesa come "rimborsabile"' : 'ha contrassegnato la spesa come "non rimborsabile"';
-                }
-                if (key === 'billable') {
-                    return value ? 'ha contrassegnato la spesa come "fatturabile"' : 'ha contrassegnato la spesa come "non fatturabile"';
-                }
-                if (key === 'tax') {
-                    const taxEntry = value as PolicyRulesModifiedFields['tax'];
-                    const taxRateName = taxEntry?.field_id_TAX.name ?? '';
-                    if (isFirst) {
-                        return `imposta l’aliquota fiscale su "${taxRateName}"`;
-                    }
-                    return `aliquota fiscale a "${taxRateName}"`;
-                }
-                const updatedValue = value as string | boolean;
-                if (isFirst) {
-                    return `imposta ${translations.common[key].toLowerCase()} su "${updatedValue}"`;
-                }
-                return `${translations.common[key].toLowerCase()} a "${updatedValue}"`;
-            });
-            return `${formatList(fragments)} tramite le <a href="${policyRulesRoute}">regole dello spazio di lavoro</a>`;
+        policyRulesModifiedFields: {
+            reimbursable: (value: boolean) => (value ? 'ha contrassegnato la spesa come "rimborsabile"' : 'ha contrassegnato la spesa come "non rimborsabile"'),
+            billable: (value: boolean) => (value ? 'ha contrassegnato la spesa come "fatturabile"' : 'ha contrassegnato la spesa come "non fatturabile"'),
+            tax: (value: string, isFirst: boolean) => (isFirst ? `imposta l’aliquota fiscale su "${value}"` : `aliquota fiscale a "${value}"`),
+            common: (key: keyof PolicyRulesModifiedFields, value: string, isFirst: boolean) => {
+                const field = translations.common[key].toLowerCase();
+                return isFirst ? `imposta ${field} su "${value}"` : `${field} a "${value}"`;
+            },
+            format: (fragments: string, route: string) => `${fragments} tramite le <a href="${route}">regole dello spazio di lavoro</a>`,
         },
         duplicateNonDefaultWorkspacePerDiemError: 'Non puoi duplicare le spese di diaria tra diversi spazi di lavoro perché le tariffe potrebbero essere diverse tra gli spazi di lavoro.',
     },
@@ -2435,7 +2421,6 @@ ${amount} per ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Regole spese',
-        subtitle: 'Queste regole saranno applicate alle tue spese. Se le invii a un workspace, le regole del workspace potrebbero sostituirle.',
         findRule: 'Trova regola',
         emptyRules: {
             title: 'Non hai creato alcuna regola',
@@ -2481,6 +2466,7 @@ ${amount} per ${merchant} - ${date}`,
             deleteSinglePrompt: 'Sei sicuro di voler eliminare questa regola?',
             deleteMultiplePrompt: 'Sei sicuro di voler eliminare queste regole?',
         },
+        subtitle: 'Queste regole verranno applicate alle tue spese.',
     },
     preferencesPage: {
         appSection: {
@@ -3045,10 +3031,7 @@ ${
     detailsPage: {
         localTime: 'Ora locale',
     },
-    newChatPage: {
-        startGroup: 'Avvia gruppo',
-        addToGroup: 'Aggiungi al gruppo',
-    },
+    newChatPage: {startGroup: 'Avvia gruppo', addToGroup: 'Aggiungi al gruppo', addUserToGroup: (username: string) => `Aggiungi ${username} al gruppo`},
     yearPickerPage: {
         year: 'Anno',
         selectYear: 'Seleziona un anno',
@@ -5403,8 +5386,8 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             editTags: 'Modifica tag',
             findTag: 'Trova tag',
             subtitle: 'I tag aggiungono modi più dettagliati per classificare i costi.',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Stai usando i <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tag dipendenti</a>. Puoi <a href="${importSpreadsheetLink}">importare nuovamente un foglio di calcolo</a> per aggiornare i tuoi tag.</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>I tag aggiungono modi più dettagliati per classificare i costi. Stai usando i <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tag dipendenti</a>. Puoi <a href="${importSpreadsheetLink}">importare nuovamente un foglio di calcolo</a> per aggiornare i tuoi tag.</muted-text>`,
             emptyTags: {
                 title: 'Non hai creato alcun tag',
                 subtitle: 'Aggiungi un tag per tenere traccia di progetti, sedi, reparti e altro ancora.',
@@ -6490,6 +6473,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             symbols: 'Simboli',
             flags: 'Segnalazioni',
         },
+        emojiNotSelected: 'Emoji non selezionata',
     },
     newRoomPage: {
         newRoom: 'Nuova stanza',
@@ -8458,6 +8442,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             forceTwoFactorAuthError: 'Impossibile modificare l’impostazione “Forza l’autenticazione a due fattori”. Riprova più tardi.',
         },
         common: {settings: 'Impostazioni'},
+        groups: {title: 'Gruppi', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`})},
     },
 };
 export default translations;
