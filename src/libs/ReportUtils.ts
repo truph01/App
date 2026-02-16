@@ -8731,7 +8731,7 @@ type ReportEmptyStateSummary = Pick<
 > &
     Pick<Report, 'reportID'>;
 
-function toReportEmptyStateSummary(report: Report | ReportEmptyStateSummary | undefined): ReportEmptyStateSummary | undefined {
+function toReportEmptyStateSummary(report: Report | null | undefined): ReportEmptyStateSummary | undefined {
     if (!report) {
         return undefined;
     }
@@ -8751,15 +8751,14 @@ function toReportEmptyStateSummary(report: Report | ReportEmptyStateSummary | un
     };
 }
 
-function getReportSummariesForEmptyCheck(reports: OnyxCollection<Report> | Array<Report | ReportEmptyStateSummary | null | undefined> | undefined): ReportEmptyStateSummary[] {
+function getReportSummariesForEmptyCheck(reports: OnyxCollection<Report> | undefined): ReportEmptyStateSummary[] {
     if (!reports) {
         return [];
     }
 
-    const reportsArray = Array.isArray(reports) ? reports : Object.values(reports);
     const result: ReportEmptyStateSummary[] = [];
-    for (const report of reportsArray) {
-        const summary = toReportEmptyStateSummary(report as Report | ReportEmptyStateSummary | undefined);
+    for (const report of Object.values(reports)) {
+        const summary = toReportEmptyStateSummary(report);
 
         if (summary) {
             result.push(summary);
@@ -8768,15 +8767,13 @@ function getReportSummariesForEmptyCheck(reports: OnyxCollection<Report> | Array
     return result;
 }
 
-const reportSummariesOnyxSelector = (reports: Parameters<typeof getReportSummariesForEmptyCheck>[0]) => getReportSummariesForEmptyCheck(reports);
-
 /**
  * Checks if there are any empty (no transactions) open expense reports for a specific policy and user.
  * An empty report is defined as having zero transactions.
  * This excludes reports that are being deleted or have errors.
  */
 function hasEmptyReportsForPolicy(
-    reports: OnyxCollection<Report> | Array<Report | ReportEmptyStateSummary | null | undefined> | undefined,
+    reports: OnyxCollection<Report> | undefined,
     policyID: string | undefined,
     accountID?: number,
     reportsTransactionsParam: Record<string, Transaction[]> = reportsTransactions,
@@ -8819,7 +8816,7 @@ function hasEmptyReportsForPolicy(
  * This excludes reports that are being deleted or have errors.
  */
 function getPolicyIDsWithEmptyReportsForAccount(
-    reports: OnyxCollection<Report> | Array<Report | ReportEmptyStateSummary | null | undefined> | undefined,
+    reports: OnyxCollection<Report> | undefined,
     accountID?: number,
     reportsTransactionsParam: Record<string, Transaction[]> = reportsTransactions,
 ): Record<string, boolean> {
@@ -13016,7 +13013,6 @@ export {
     getHarvestOriginalReportID,
     getPayeeName,
     getReportSummariesForEmptyCheck,
-    reportSummariesOnyxSelector,
     getPolicyIDsWithEmptyReportsForAccount,
     hasActionWithErrorsForTransaction,
     hasAutomatedExpensifyAccountIDs,

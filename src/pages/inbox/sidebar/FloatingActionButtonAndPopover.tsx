@@ -16,6 +16,7 @@ import PopoverMenu from '@components/PopoverMenu';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCreateEmptyReportConfirmation from '@hooks/useCreateEmptyReportConfirmation';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useHasEmptyReportsForPolicy from '@hooks/useHasEmptyReportsForPolicy';
 import useIsPaidPolicyAdmin from '@hooks/useIsPaidPolicyAdmin';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -51,10 +52,8 @@ import {
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     getReportName,
     getWorkspaceChats,
-    hasEmptyReportsForPolicy,
     hasViolations as hasViolationsReportUtils,
     isPolicyExpenseChat,
-    reportSummariesOnyxSelector,
 } from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import isOnSearchMoneyRequestReportPage from '@navigation/helpers/isOnSearchMoneyRequestReportPage';
@@ -70,7 +69,6 @@ import {isTrackingSelector} from '@src/selectors/GPSDraftDetails';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {QuickActionName} from '@src/types/onyx/QuickAction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import getEmptyArray from '@src/types/utils/getEmptyArray';
 
 type PolicySelector = Pick<OnyxTypes.Policy, 'type' | 'role' | 'isPolicyExpenseChatEnabled' | 'pendingAction' | 'avatarURL' | 'name' | 'id' | 'areInvoicesEnabled'>;
 
@@ -142,10 +140,6 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
     const [quickActionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${quickAction?.chatReportID}`, {canBeMissing: true});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
-    const [reportSummaries = getEmptyArray<ReturnType<typeof reportSummariesOnyxSelector>[number]>()] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
-        canBeMissing: true,
-        selector: reportSummariesOnyxSelector,
-    });
     const [allTransactionDrafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {canBeMissing: true});
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`, {canBeMissing: true});
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
@@ -227,12 +221,10 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
 
     const defaultChatEnabledPolicyID = defaultChatEnabledPolicy?.id;
 
+    const hasEmptyReport = useHasEmptyReportsForPolicy(defaultChatEnabledPolicyID);
     const [hasDismissedEmptyReportsConfirmation] = useOnyx(ONYXKEYS.NVP_EMPTY_REPORTS_CONFIRMATION_DISMISSED, {canBeMissing: true});
 
-    const shouldShowEmptyReportConfirmationForDefaultChatEnabledPolicy = useMemo(
-        () => hasEmptyReportsForPolicy(reportSummaries, defaultChatEnabledPolicyID, session?.accountID) && hasDismissedEmptyReportsConfirmation !== true,
-        [defaultChatEnabledPolicyID, hasDismissedEmptyReportsConfirmation, reportSummaries, session?.accountID],
-    );
+    const shouldShowEmptyReportConfirmationForDefaultChatEnabledPolicy = hasEmptyReport && hasDismissedEmptyReportsConfirmation !== true;
 
     const handleCreateWorkspaceReport = useCallback(
         (shouldDismissEmptyReportsConfirmation?: boolean) => {
