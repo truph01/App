@@ -10,7 +10,7 @@ import {getTravelInvoicingCard} from '@libs/TravelInvoicingUtils';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider';
+import {useTravelCVV} from './TravelCVVContextProvider';
 
 /**
  * TravelCVVVerifyAccountPage - Handles magic code verification for Travel CVV reveal.
@@ -22,8 +22,7 @@ function TravelCVVVerifyAccountPage() {
     const [cardList] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {canBeMissing: true});
 
     // Get state and actions from context
-    const {isLoading, validateError} = useTravelCVVState();
-    const {setCvv, setIsLoading, setValidateError} = useTravelCVVActions();
+    const {isLoading, validateError, setCvv, setIsLoading, setValidateError} = useTravelCVV();
 
     const primaryLogin = account?.primaryLogin ?? '';
     const travelCard = getTravelInvoicingCard(cardList);

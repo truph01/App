@@ -1,4 +1,4 @@
-import React, {useCallback, useContext} from 'react';
+import React, {useCallback, useContext, useEffect} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
@@ -21,7 +21,7 @@ import {shouldShowMissingDetailsPage} from '@libs/PersonalDetailsUtils';
 import {getTravelInvoicingCard} from '@libs/TravelInvoicingUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import {useTravelCVVState} from './TravelCVVContextProvider';
+import {useTravelCVV} from './TravelCVVContextProvider';
 
 /**
  * TravelCVVPage - Displays the Travel CVV reveal interface.
@@ -40,7 +40,11 @@ function TravelCVVPage() {
     const {isAccountLocked, showLockedAccountModal} = useContext(LockedAccountContext);
 
     // Get CVV from context - shared with TravelCVVVerifyAccountPage
-    const {cvv} = useTravelCVVState();
+    const {cvv, setCvv} = useTravelCVV();
+
+    // Clear CVV when the page unmounts (e.g. backdrop close) so it doesn't
+    // remain visible the next time the page is opened
+    useEffect(() => () => setCvv(null), [setCvv]);
 
     const travelCard = getTravelInvoicingCard(cardList);
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
