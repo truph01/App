@@ -53,9 +53,9 @@ function cancelAllSpans() {
 }
 
 function cancelSpansByPrefix(prefix: string) {
-    for (const [spanId] of activeSpans.entries()) {
-        if (spanId.startsWith(prefix)) {
-            cancelSpan(spanId);
+    for (const [spanID] of activeSpans.entries()) {
+        if (spanID.startsWith(prefix)) {
+            cancelSpan(spanID);
         }
     }
 }
