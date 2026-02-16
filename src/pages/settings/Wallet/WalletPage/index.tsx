@@ -23,6 +23,7 @@ import Section from '@components/Section';
 import Text from '@components/Text';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -85,6 +86,8 @@ function WalletPage() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
+    useDocumentTitle(`${translate('common.settings')} - ${translate('common.wallet')}`);
     const network = useNetwork();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isBetaEnabled} = usePermissions();

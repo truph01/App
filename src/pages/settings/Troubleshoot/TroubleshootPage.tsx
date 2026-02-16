@@ -17,6 +17,7 @@ import SentryDebugToolMenu from '@components/SentryDebugToolMenu';
 import Switch from '@components/Switch';
 import TestToolMenu from '@components/TestToolMenu';
 import TestToolRow from '@components/TestToolRow';
+import useDocumentTitle from '@hooks/useDocumentTitle';
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -54,6 +55,8 @@ function TroubleshootPage() {
     const troubleshootIllustration = useTroubleshootSectionIllustration();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
+    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.aboutPage.troubleshoot')}`);
     const {isProduction, isDevelopment} = useEnvironment();
     const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
     const waitForNavigate = useWaitForNavigation();

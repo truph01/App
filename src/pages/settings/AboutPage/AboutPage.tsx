@@ -10,6 +10,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
 import Text from '@components/Text';
+import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -55,6 +56,8 @@ function AboutPage() {
     const illustrations = useMemoizedLazyIllustrations(['PalmTree']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
+    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.about')}`);
     const popoverAnchor = useRef<View>(null);
     const waitForNavigate = useWaitForNavigation();
     const {shouldUseNarrowLayout} = useResponsiveLayout();

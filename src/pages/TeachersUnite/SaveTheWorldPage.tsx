@@ -5,6 +5,7 @@ import MenuItemList from '@components/MenuItemList';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
+import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -25,6 +26,8 @@ function SaveTheWorldPage() {
     const theme = useTheme();
     const illustrations = useMemoizedLazyIllustrations(['TeachersUnite']);
     const saveTheWorldIllustration = useSaveTheWorldSectionIllustration();
+    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
+    useDocumentTitle(`${translate('common.settings')} - ${translate('sidebarScreen.saveTheWorld')}`);
     const menuItems = useMemo(() => {
         const baseMenuItems = [
             {
