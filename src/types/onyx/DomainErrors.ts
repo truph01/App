@@ -43,11 +43,6 @@ type DomainErrors = {
      * Errors related to the 2FA toggle
      */
     setTwoFactorAuthRequiredError?: OnyxCommon.Errors;
-
-    /**
-     * Errors related to 2FA code validation
-     */
-    validateTwoFactorAuthCodeError?: OnyxCommon.Errors;
 };
 
 export default DomainErrors;

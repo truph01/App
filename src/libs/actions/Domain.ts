@@ -1068,8 +1068,12 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 setTwoFactorAuthRequiredError: null,
-                validateTwoFactorAuthCodeError: null,
             },
+        },
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
+            value: null,
         },
     ];
     const successData: OnyxUpdate[] = [
@@ -1085,8 +1089,12 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 setTwoFactorAuthRequiredError: null,
-                validateTwoFactorAuthCodeError: null,
             },
+        },
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
+            value: null,
         },
     ];
     const failureData: OnyxUpdate[] = [
@@ -1104,9 +1112,19 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 setTwoFactorAuthRequiredError: twoFactorAuthCode ? null : getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
-                validateTwoFactorAuthCodeError: twoFactorAuthCode ? getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError') : null,
             },
         },
+        ...(twoFactorAuthCode
+            ? [
+                  {
+                      onyxMethod: Onyx.METHOD.MERGE as const,
+                      key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
+                      value: {
+                          errors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
+                      },
+                  },
+              ]
+            : []),
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -1132,10 +1150,8 @@ function clearToggleTwoFactorAuthRequiredForDomainError(domainAccountID: number)
     });
 }
 
-function clearValidateTwoFactorAuthCodeError(domainAccountID: number) {
-    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
-        validateTwoFactorAuthCodeError: null,
-    });
+function clearValidateDomainTwoFactorCodeError() {
+    Onyx.set(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, null);
 }
 
 export {
@@ -1166,5 +1182,5 @@ export {
     closeUserAccount,
     toggleTwoFactorAuthRequiredForDomain,
     clearToggleTwoFactorAuthRequiredForDomainError,
-    clearValidateTwoFactorAuthCodeError,
+    clearValidateDomainTwoFactorCodeError,
 };
