@@ -1,7 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
 import ConnectionLayout from '@components/ConnectionLayout';
-import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import InteractiveStepSubPageHeader from '@components/InteractiveStepSubPageHeader';
 import useSubPage from '@hooks/useSubPage';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -34,7 +33,7 @@ function NetSuiteTokenInputPage({policy, route}: WithPolicyConnectionsProps) {
         Navigation.dismissModal();
     };
 
-    const {CurrentPage, nextPage, prevPage, pageIndex, moveTo, currentPageName, isRedirecting} = useSubPage<CustomSubPageTokenInputProps>({
+    const {CurrentPage, nextPage, prevPage, pageIndex, moveTo, currentPageName} = useSubPage<CustomSubPageTokenInputProps>({
         pages,
         onFinished: submit,
         buildRoute: (pageName) => ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(route.params.policyID, pageName),
@@ -49,10 +48,6 @@ function NetSuiteTokenInputPage({policy, route}: WithPolicyConnectionsProps) {
     };
 
     const shouldPageBeBlocked = !isEmptyObject(policy?.connections?.[CONST.POLICY.CONNECTIONS.NAME.NETSUITE]) && !hasAuthError;
-
-    if (isRedirecting) {
-        return <FullScreenLoadingIndicator />;
-    }
 
     return (
         <ConnectionLayout
