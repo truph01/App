@@ -783,6 +783,16 @@ function isSelectedFeedExpired(cardFeed: CombinedCardFeed | undefined): boolean 
 }
 
 /**
+ * For Amex Direct (FDX) feeds, accountList[0] is the parent card (primary account holder)
+ * which aggregates child accounts and should not be assignable.
+ * This helper filters out the parent card for Amex Direct feeds.
+ */
+function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCardFeedWithDomainID): string[] {
+    const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
+    return isAmexDirectFeed ? accountList.slice(1) : accountList;
+}
+
+/**
  * Returns list of unassigned cards that can be assigned.
  *
  * This function normalizes the difference between:
@@ -817,13 +827,7 @@ function getFilteredCardList(
 
     // For direct feeds (Plaid/OAuth): displayName === cardIdentifier
     if (accountList) {
-        // For Amex Direct (FDX) feeds, accountList[0] is the parent card (primary account holder)
-        // which aggregates child accounts and should not be assignable.
-        const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
-        const startIndex = isAmexDirectFeed ? 1 : 0;
-
-        return accountList
-            .slice(startIndex)
+        return filterAmexDirectParentCard(accountList, feedName)
             .filter((cardName) => !assignedCards.has(cardName) && !allWorkspaceAssignedCards.has(cardName))
             .map((cardName) => ({
                 cardName,
@@ -1203,6 +1207,7 @@ export {
     getFeedNameForDisplay,
     isCardClosed,
     isPlaidSupportedCountry,
+    filterAmexDirectParentCard,
     getFilteredCardList,
     hasOnlyOneCardToAssign,
     checkIfNewFeedConnected,

@@ -1,5 +1,5 @@
 import type {OnyxCollection, OnyxEntry, ResultMetadata} from 'react-native-onyx';
-import {getCompanyCardFeed, getCompanyFeeds, getSelectedFeed, normalizeCardName} from '@libs/CardUtils';
+import {filterAmexDirectParentCard, getCompanyCardFeed, getCompanyFeeds, getSelectedFeed, normalizeCardName} from '@libs/CardUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {CardFeeds, CardList} from '@src/types/onyx';
@@ -84,12 +84,7 @@ function buildCompanyCardEntries(
         coveredEncrypted.add(encryptedCardNumber);
     }
 
-    // For Amex Direct (FDX) feeds, accountList[0] is the parent card (primary account holder)
-    // which aggregates child accounts and should not be assignable.
-    const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
-    const unassignedAccountList = isAmexDirectFeed ? (accountList ?? []).slice(1) : (accountList ?? []);
-
-    for (const name of unassignedAccountList) {
+    for (const name of filterAmexDirectParentCard(accountList ?? [], feedName)) {
         if (coveredNames.has(normalizeCardName(name))) {
             continue;
         }
