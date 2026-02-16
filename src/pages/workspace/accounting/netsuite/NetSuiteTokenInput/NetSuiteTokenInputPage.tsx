@@ -5,7 +5,6 @@ import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import InteractiveStepSubPageHeader from '@components/InteractiveStepSubPageHeader';
 import useSubPage from '@hooks/useSubPage';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {isAuthenticationError} from '@libs/actions/connections';
 import Navigation from '@libs/Navigation/Navigation';
 import type {CustomSubPageTokenInputProps} from '@pages/workspace/accounting/netsuite/types';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
@@ -13,8 +12,8 @@ import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import NetSuiteTokenInputForm from './substeps/NetSuiteTokenInputForm';
-import NetSuiteTokenSetupContent from './substeps/NetSuiteTokenSetupContent';
+import NetSuiteTokenInputForm from './subPages/NetSuiteTokenInputForm';
+import NetSuiteTokenSetupContent from './subPages/NetSuiteTokenSetupContent';
 
 const pages = [
     {pageName: CONST.NETSUITE_CONFIG.TOKEN_INPUT.PAGE_NAME.INSTALL, component: NetSuiteTokenSetupContent},
@@ -28,8 +27,6 @@ function NetSuiteTokenInputPage({policy, route}: WithPolicyConnectionsProps) {
     const policyID = policy?.id;
     const styles = useThemeStyles();
 
-    const hasAuthError = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE);
-
     const submit = () => {
         Navigation.dismissModal();
     };
@@ -37,7 +34,6 @@ function NetSuiteTokenInputPage({policy, route}: WithPolicyConnectionsProps) {
     const {CurrentPage, nextPage, prevPage, pageIndex, moveTo, currentPageName, isRedirecting} = useSubPage<CustomSubPageTokenInputProps>({
         pages,
         onFinished: submit,
-        startFrom: hasAuthError ? CONST.NETSUITE_CONFIG.TOKEN_INPUT.CREDENTIALS_PAGE_INDEX : 0,
         buildRoute: (pageName) => ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(route.params.policyID, pageName),
     });
 
