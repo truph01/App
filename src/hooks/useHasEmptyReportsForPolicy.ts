@@ -6,14 +6,7 @@ import useOnyx from './useOnyx';
 
 function useHasEmptyReportsForPolicy(policyID: string | undefined): boolean {
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector, canBeMissing: true});
-    const hasEmptyReportSelector = useCallback(
-        (reports: Parameters<typeof hasEmptyReportsForPolicy>[0]) => {
-            const hasEmpty = hasEmptyReportsForPolicy(reports, policyID, accountID);
-
-            return hasEmpty;
-        },
-        [policyID, accountID],
-    );
+    const hasEmptyReportSelector = useCallback((reports: Parameters<typeof hasEmptyReportsForPolicy>[0]) => hasEmptyReportsForPolicy(reports, policyID, accountID), [policyID, accountID]);
     const [hasEmptyReport = false] = useOnyx(
         ONYXKEYS.COLLECTION.REPORT,
         {
