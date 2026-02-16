@@ -80,7 +80,6 @@ type RequestDataBase<TKey extends OnyxKey = any> = {
     shouldUseSecure?: boolean;
 
     /** Promise resolve handler */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolve?: (value: Response<TKey>) => void;
 
     /** Promise reject handler */
