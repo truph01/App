@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import type {ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import Icon from '@components/Icon';

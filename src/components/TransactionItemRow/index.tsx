@@ -794,7 +794,7 @@ function TransactionItemRow({
                             sentryLabel={checkboxSentryLabel}
                         />
                     )}
-                    {columns?.map(renderColumn).filter(Boolean)}
+                    {columns?.map(renderColumn)}
                     {shouldShowRadioButton && (
                         <View style={[styles.ml1, styles.justifyContentCenter]}>
                             <RadioButton
