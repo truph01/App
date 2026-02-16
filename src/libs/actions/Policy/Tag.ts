@@ -676,6 +676,7 @@ function renamePolicyTag(policyData: PolicyData, policyTag: {oldName: string; ne
                                     name: null,
                                 },
                                 errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.tags.genericFailureMessage'),
+                                previousTagName: newTagName,
                             },
                         },
                     },
