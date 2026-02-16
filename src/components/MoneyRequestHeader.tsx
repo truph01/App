@@ -159,6 +159,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
+    const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS, {canBeMissing: true});
 
     const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
     const isReportInRHP = route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT;
@@ -214,6 +215,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                     targetReport: activePolicyExpenseChat,
                     betas,
                     personalDetails,
+                    recentWaypoints,
                 });
             }
         },
@@ -230,6 +232,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
             isSelfTourViewed,
             betas,
             personalDetails,
+            recentWaypoints,
         ],
     );
 

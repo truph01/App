@@ -16,7 +16,7 @@ import IntlStore from '@src/languages/IntlStore';
 import OnyxUpdateManager from '@src/libs/actions/OnyxUpdateManager';
 import * as API from '@src/libs/API';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {OriginalMessageIOU, Report, ReportActions} from '@src/types/onyx';
+import type {OriginalMessageIOU, RecentWaypoint, Report, ReportActions} from '@src/types/onyx';
 import type ReportAction from '@src/types/onyx/ReportAction';
 import type {ReportActionsCollectionDataSet} from '@src/types/onyx/ReportAction';
 import type Transaction from '@src/types/onyx/Transaction';
@@ -890,6 +890,7 @@ describe('actions/Duplicate', () => {
 
     describe('duplicateExpenseTransaction', () => {
         let writeSpy: jest.SpyInstance;
+        let recentWaypoints: RecentWaypoint[] = [];
 
         const mockOptimisticChatReportID = '789';
         const mockOptimisticIOUReportID = '987';
@@ -916,6 +917,10 @@ describe('actions/Duplicate', () => {
                     }
                 }
                 return Promise.resolve();
+            });
+            Onyx.connect({
+                key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
+                callback: (val) => (recentWaypoints = val ?? []),
             });
             return Onyx.clear();
         });
@@ -952,6 +957,7 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints,
             });
 
             await waitForBatchedUpdates();
@@ -1011,6 +1017,7 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints,
             });
 
             await waitForBatchedUpdates();
@@ -1070,6 +1077,7 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints,
             });
 
             await waitForBatchedUpdates();
@@ -1146,6 +1154,7 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints,
             });
 
             await waitForBatchedUpdates();
@@ -1191,6 +1200,7 @@ describe('actions/Duplicate', () => {
                 targetReport: undefined,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints,
             });
 
             await waitForBatchedUpdates();
@@ -1247,6 +1257,7 @@ describe('actions/Duplicate', () => {
                 targetReport: policyExpenseChat,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints,
             });
 
             await waitForBatchedUpdates();
