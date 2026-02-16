@@ -247,6 +247,7 @@ function IOURequestStepConfirmation({
     const [selectedParticipantList, setSelectedParticipantList] = useState<Participant[]>([]);
 
     const [receiptFiles, setReceiptFiles] = useState<Record<string, Receipt>>({});
+    const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseIOUUtils(action);
     const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
     const isManualDistanceRequest = isManualDistanceRequestTransactionUtils(transaction);
     const isOdometerDistanceRequest = isOdometerDistanceRequestTransactionUtils(transaction);
@@ -272,7 +273,6 @@ function IOURequestStepConfirmation({
     const transactionTaxAmount = transaction?.taxAmount ?? 0;
     const isSharingTrackExpense = action === CONST.IOU.ACTION.SHARE;
     const isCategorizingTrackExpense = action === CONST.IOU.ACTION.CATEGORIZE;
-    const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseIOUUtils(action);
     const isTestTransaction = transaction?.participants?.some((participant) => isSelectedManagerMcTest(participant.login));
 
     const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && Object.values(receiptFiles).length && !isTestTransaction;
@@ -431,7 +431,7 @@ function IOURequestStepConfirmation({
             return;
         }
         if (isPerDiemRequest) {
-            if (isMovingTransactionFromTrackExpense) {
+            if (isMovingTransactionFromTrackExpense || isCreatingTrackExpense) {
                 Navigation.goBack();
                 return;
             }
@@ -466,6 +466,7 @@ function IOURequestStepConfirmation({
     }, [
         action,
         isPerDiemRequest,
+        isCreatingTrackExpense,
         transaction?.isFromGlobalCreate,
         transaction?.receipt?.isTestReceipt,
         transaction?.receipt?.isTestDriveReceipt,
@@ -614,7 +615,7 @@ function IOURequestStepConfirmation({
                         actionableWhisperReportActionID: item.actionableWhisperReportActionID,
                         linkedTrackedExpenseReportAction: item.linkedTrackedExpenseReportAction,
                         linkedTrackedExpenseReportID: item.linkedTrackedExpenseReportID,
-                        waypoints: Object.keys(item.comment?.waypoints ?? {}).length ? getValidWaypoints(item.comment?.waypoints, true) : undefined,
+                        waypoints: Object.keys(item.comment?.waypoints ?? {}).length ? getValidWaypoints(item.comment?.waypoints, true, isGPSDistanceRequest) : undefined,
                         customUnitRateID,
                         isTestDrive: item.receipt?.isTestDriveReceipt,
                         originalTransactionID: item.comment?.originalTransactionID,
@@ -674,6 +675,7 @@ function IOURequestStepConfirmation({
             isSelfTourViewed,
             betas,
             personalDetails,
+            isGPSDistanceRequest,
         ],
     );
 
@@ -812,7 +814,7 @@ function IOURequestStepConfirmation({
                         billable: item.billable,
                         reimbursable: item.reimbursable,
                         gpsPoint,
-                        validWaypoints: Object.keys(item?.comment?.waypoints ?? {}).length ? getValidWaypoints(item.comment?.waypoints, true) : undefined,
+                        validWaypoints: Object.keys(item?.comment?.waypoints ?? {}).length ? getValidWaypoints(item.comment?.waypoints, true, isGPSDistanceRequest) : undefined,
                         actionableWhisperReportActionID: item.actionableWhisperReportActionID,
                         linkedTrackedExpenseReportAction: item.linkedTrackedExpenseReportAction,
                         linkedTrackedExpenseReportID: item.linkedTrackedExpenseReportID,
@@ -900,7 +902,7 @@ function IOURequestStepConfirmation({
                     taxAmount: transactionTaxAmount,
                     customUnitRateID,
                     splitShares: transaction.splitShares,
-                    validWaypoints: getValidWaypoints(transaction.comment?.waypoints, true),
+                    validWaypoints: getValidWaypoints(transaction.comment?.waypoints, true, isGPSDistanceRequest),
                     billable: transaction.billable,
                     reimbursable: transaction.reimbursable,
                     attendees: transaction.comment?.attendees,
