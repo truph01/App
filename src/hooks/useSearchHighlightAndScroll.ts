@@ -245,15 +245,13 @@ function useSearchHighlightAndScroll({
         // only after the user has navigated to the "Reports > Expenses" page.
         // Otherwise, there is still a chance we might miss the timing because setTimeout runs too early,
         // causing the highlight not to appear.
-        let timer: NodeJS.Timeout;
-        const animation = requestAnimationFrame(() => {
-            timer = setTimeout(() => {
-                mergeTransactionIdsHighlightOnSearchRoute(queryJSON.type, Object.fromEntries(highlightedTransactionIDs.map((id) => [id, false])));
-            }, CONST.ANIMATED_HIGHLIGHT_START_DURATION);
-        });
+
+        const timer = setTimeout(() => {
+            mergeTransactionIdsHighlightOnSearchRoute(queryJSON.type, Object.fromEntries(highlightedTransactionIDs.map((id) => [id, false])));
+        }, CONST.ANIMATED_HIGHLIGHT_START_DURATION);
+
         return () => {
             clearTimeout(timer);
-            cancelAnimationFrame(animation);
         };
     }, [transactionIDsToHighlight, queryJSON.type, newSearchResultKeys]);
 
@@ -271,11 +269,17 @@ function useSearchHighlightAndScroll({
             return;
         }
 
-        const timer = setTimeout(() => {
-            setNewSearchResultKeys(null);
-        }, CONST.ANIMATED_HIGHLIGHT_START_DURATION);
+        let timer: NodeJS.Timeout;
+        const animation = requestAnimationFrame(() => {
+            timer = setTimeout(() => {
+                setNewSearchResultKeys(null);
+            }, CONST.ANIMATED_HIGHLIGHT_START_DURATION);
+        });
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            cancelAnimationFrame(animation);
+        };
     }, [newSearchResultKeys]);
 
     /**
