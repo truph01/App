@@ -711,8 +711,6 @@ describe('MoneyRequest', () => {
 
         const selfDMReport = createSelfDM(Number(SELF_DM_REPORT_ID), TEST_USER_ACCOUNT_ID);
 
-        let recentWaypoints: RecentWaypoint[] = [];
-
         const baseParams = {
             iouType: CONST.IOU.TYPE.CREATE,
             report: fakeReport,
@@ -739,7 +737,7 @@ describe('MoneyRequest', () => {
             quickAction: fakeQuickAction,
             selfDMReport,
             betas: [CONST.BETAS.ALL],
-            recentWaypoints,
+            recentWaypoints: [] as RecentWaypoint[],
         };
         const splitShares: SplitShares = {
             [firstSplitParticipantID]: {
@@ -751,10 +749,7 @@ describe('MoneyRequest', () => {
         };
 
         beforeEach(async () => {
-            Onyx.connect({
-                key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
-                callback: (val) => (recentWaypoints = val ?? []),
-            });
+            baseParams.recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${fakeReport.reportID}`, {
                 ...fakeReport,
                 participants: {
