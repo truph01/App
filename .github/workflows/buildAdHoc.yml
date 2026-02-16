@@ -137,6 +137,13 @@ jobs:
           git checkout ${{ inputs.MOBILE_EXPENSIFY_REF }}
           echo "Building from https://github.com/Expensify/Mobile-Expensify/pull/${{ inputs.MOBILE_EXPENSIFY_PR }}"
 
+      - name: Compute custom build identifier
+        id: computeIdentifier
+        run: |
+          APP_SHORT_SHA=$(git rev-parse --short HEAD)
+          MOBILE_EXPENSIFY_SHORT_SHA=$(cd Mobile-Expensify && git rev-parse --short HEAD)
+          echo "IDENTIFIER=${APP_SHORT_SHA}-${MOBILE_EXPENSIFY_SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
       - name: Configure MapBox SDK
         run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
 
@@ -216,7 +223,7 @@ jobs:
           keystore-path: '../tools/buildtools/upload-key.keystore'
           comment-bot: false
           rock-build-extra-params: '--extra-params "-PreactNativeArchitectures=arm64-v8a,x86_64 --profile"'
-          custom-identifier: ${{ inputs.APP_REF }}
+          custom-identifier: ${{ steps.computeIdentifier.outputs.IDENTIFIER }}
 
       - name: Upload Gradle profile report
         if: always()
@@ -256,6 +263,13 @@ jobs:
           git fetch origin ${{ inputs.MOBILE_EXPENSIFY_REF }}
           git checkout ${{ inputs.MOBILE_EXPENSIFY_REF }}
           echo "Building from https://github.com/Expensify/Mobile-Expensify/pull/${{ inputs.MOBILE_EXPENSIFY_PR }}"
+
+      - name: Compute custom build identifier
+        id: computeIdentifier
+        run: |
+          APP_SHORT_SHA=$(git rev-parse --short HEAD)
+          MOBILE_EXPENSIFY_SHORT_SHA=$(cd Mobile-Expensify && git rev-parse --short HEAD)
+          echo "IDENTIFIER=${APP_SHORT_SHA}-${MOBILE_EXPENSIFY_SHORT_SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Configure MapBox SDK
         run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
@@ -349,7 +363,7 @@ jobs:
               }
             ]
           comment-bot: false
-          custom-identifier: ${{ inputs.APP_REF }}
+          custom-identifier: ${{ steps.computeIdentifier.outputs.IDENTIFIER }}
 
       - name: Set artifact URL output
         id: set-artifact-url
