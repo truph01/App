@@ -5,7 +5,7 @@ import type {SharedValue} from 'react-native-reanimated';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';
 
 /** The pager items array is used within the pager to render and navigate between the images */
-export type AttachmentCarouselPagerItems = Pick<Attachment, 'attachmentID'> & {
+type AttachmentCarouselPagerItems = Pick<Attachment, 'attachmentID'> & {
     /** The source of the image is used to identify each attachment/page in the pager */
     source: AttachmentSource;
 
@@ -19,7 +19,7 @@ export type AttachmentCarouselPagerItems = Pick<Attachment, 'attachmentID'> & {
     isActive: boolean;
 };
 
-export type AttachmentCarouselPagerStateContextType = {
+type AttachmentCarouselPagerStateContextType = {
     /** List of attachments displayed in the pager */
     pagerItems: AttachmentCarouselPagerItems[];
 
@@ -39,7 +39,7 @@ export type AttachmentCarouselPagerStateContextType = {
     externalGestureHandler?: GestureType;
 };
 
-export type AttachmentCarouselPagerActionsContextType = {
+type AttachmentCarouselPagerActionsContextType = {
     /** Function to call after a tap event */
     onTap?: (shouldShowArrows?: boolean) => void;
 
@@ -52,3 +52,5 @@ export type AttachmentCarouselPagerActionsContextType = {
     /** Callback for attachment errors */
     onAttachmentError?: (source: AttachmentSource, state?: boolean) => void;
 };
+
+export type {AttachmentCarouselPagerItems, AttachmentCarouselPagerStateContextType, AttachmentCarouselPagerActionsContextType};

@@ -1,7 +1,7 @@
 import CONST from '@src/CONST';
 import type {Action, MultifactorAuthenticationState} from './types';
 
-export const DEFAULT_STATE: MultifactorAuthenticationState = {
+const DEFAULT_STATE: MultifactorAuthenticationState = {
     error: undefined,
     continuableError: undefined,
     validateCode: undefined,
@@ -29,7 +29,7 @@ export const DEFAULT_STATE: MultifactorAuthenticationState = {
  * @param action - The action to process with type-specific payload
  * @returns The new state after applying the action
  */
-export function stateReducer(state: MultifactorAuthenticationState, action: Action): MultifactorAuthenticationState {
+function stateReducer(state: MultifactorAuthenticationState, action: Action): MultifactorAuthenticationState {
     switch (action.type) {
         case 'SET_ERROR': {
             if (action.payload === undefined) {
@@ -86,3 +86,5 @@ export function stateReducer(state: MultifactorAuthenticationState, action: Acti
             return state;
     }
 }
+
+export {DEFAULT_STATE, stateReducer};

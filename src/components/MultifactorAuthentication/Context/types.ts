@@ -2,12 +2,12 @@ import type {MultifactorAuthenticationScenario, MultifactorAuthenticationScenari
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/Biometrics/ED25519/types';
 import type {AuthTypeInfo, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
 
-export type ErrorState = {
+type ErrorState = {
     reason: MultifactorAuthenticationReason;
     message?: string;
 };
 
-export type MultifactorAuthenticationState = {
+type MultifactorAuthenticationState = {
     /** Current error state - stops the flow and navigates to failure outcome */
     error: ErrorState | undefined;
 
@@ -48,13 +48,13 @@ export type MultifactorAuthenticationState = {
     authenticationMethod: AuthTypeInfo | undefined;
 };
 
-export type InitPayload = {
+type InitPayload = {
     scenario: MultifactorAuthenticationScenario;
     payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined;
     outcomePaths: OutcomePaths;
 };
 
-export type Action =
+type Action =
     | {type: 'SET_ERROR'; payload: ErrorState | undefined}
     | {type: 'CLEAR_CONTINUABLE_ERROR'}
     | {type: 'SET_VALIDATE_CODE'; payload: string | undefined}
@@ -73,9 +73,11 @@ export type Action =
     | {type: 'RESET'};
 
 /** Context value for state - the current MFA state */
-export type MultifactorAuthenticationStateContextType = MultifactorAuthenticationState;
+type MultifactorAuthenticationStateContextType = MultifactorAuthenticationState;
 
 /** Context value for actions - dispatch to update state */
-export type MultifactorAuthenticationActionsContextType = {
+type MultifactorAuthenticationActionsContextType = {
     dispatch: (action: Action) => void;
 };
+
+export type {ErrorState, MultifactorAuthenticationState, InitPayload, Action, MultifactorAuthenticationStateContextType, MultifactorAuthenticationActionsContextType};

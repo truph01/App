@@ -44,7 +44,7 @@ function BaseAttachmentViewPdf({
                 actions.onScaleChanged?.(newScale);
             }
         },
-        [state, actions, onScaleChangedProp],
+        [state?.pagerRef, actions, onScaleChangedProp],
     );
 
     /**

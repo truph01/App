@@ -1,6 +1,6 @@
 import {FlashList} from '@shopify/flash-list';
 import type {FlashListRef, ListRenderItemInfo} from '@shopify/flash-list';
-import React, {useCallback,  useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {ViewToken} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';

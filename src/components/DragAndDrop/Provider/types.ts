@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 
-export type DragAndDropProviderProps = {
+type DragAndDropProviderProps = {
     /** Children to render inside this component. */
     children: ReactNode;
 
@@ -11,9 +11,9 @@ export type DragAndDropProviderProps = {
     setIsDraggingOver?: (value: boolean) => void;
 };
 
-export type SetOnDropHandlerCallback = (event: DragEvent) => void;
+type SetOnDropHandlerCallback = (event: DragEvent) => void;
 
-export type DragAndDropStateContextType = {
+type DragAndDropStateContextType = {
     /** Whether something is dragging over a drop zone. */
     isDraggingOver: boolean;
 
@@ -21,10 +21,12 @@ export type DragAndDropStateContextType = {
     dropZoneID: string;
 };
 
-export type DragAndDropActionsContextType = {
+type DragAndDropActionsContextType = {
     /** Register the callback to run when an item is dropped in the drop zone. */
     setOnDropHandler: (callback: SetOnDropHandlerCallback) => void;
 };
 
 /** @deprecated Use DragAndDropStateContextType and DragAndDropActionsContextType with hooks instead. */
-export type DragAndDropContextParams = DragAndDropStateContextType & DragAndDropActionsContextType;
+type DragAndDropContextParams = DragAndDropStateContextType & DragAndDropActionsContextType;
+
+export type {DragAndDropProviderProps, SetOnDropHandlerCallback, DragAndDropStateContextType, DragAndDropActionsContextType, DragAndDropContextParams};
