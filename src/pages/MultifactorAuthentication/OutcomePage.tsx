@@ -4,12 +4,8 @@ import {useMultifactorAuthenticationState} from '@components/MultifactorAuthenti
 import type {ErrorState} from '@components/MultifactorAuthentication/Context/State';
 import CONST from '@src/CONST';
 
-// HTTP status codes starting with 5 indicate server errors (5xx)
 function isServerError(error: ErrorState): boolean {
-    const HTTP_SERVER_ERROR_PREFIX = '5';
-    return (
-        error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.UNKNOWN_RESPONSE || (error.httpStatus !== undefined && String(error.httpStatus).startsWith(HTTP_SERVER_ERROR_PREFIX))
-    );
+    return error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.UNKNOWN_RESPONSE || (error.httpStatus !== undefined && error.httpStatus >= 500 && error.httpStatus < 600);
 }
 
 function MultifactorAuthenticationOutcomePage() {
