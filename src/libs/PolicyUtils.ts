@@ -1617,8 +1617,11 @@ function getValidConnectedIntegration(policy: Policy | undefined, accountingInte
 
 /**
  * Returns a set of connected integration names for the given policies.
+ * @param policies - Collection of policies to get connected integrations.
+ * @param policyIDs - Policy IDs to filter by. When provided, only integrations from these policies are included.
+ * @param selectedExportedToValues - Selected accounting integrations to include when not in the filtered policies but selected before the workspace filter was applied.
  */
-function getConnectedIntegrationNamesForPolicies(policies: OnyxCollection<Policy> | undefined, policyIDs?: string[]): Set<string> {
+function getConnectedIntegrationNamesForPolicies(policies: OnyxCollection<Policy> | undefined, policyIDs?: string[], selectedExportedToValues?: string[]): Set<string> {
     if (!policies) {
         return new Set();
     }
@@ -1631,6 +1634,17 @@ function getConnectedIntegrationNamesForPolicies(policies: OnyxCollection<Policy
         const connectedIntegration = getValidConnectedIntegration(policy);
         if (connectedIntegration) {
             connectedIntegrationNames.add(connectedIntegration);
+        }
+    }
+
+    if (selectedExportedToValues?.length) {
+        for (const selectedExportedToValue of selectedExportedToValues) {
+            const connectionName = (Object.keys(CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY) as ConnectionName[]).find(
+                (key) => CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[key] === selectedExportedToValue,
+            );
+            if (connectionName) {
+                connectedIntegrationNames.add(connectionName);
+            }
         }
     }
 

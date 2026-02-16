@@ -888,7 +888,7 @@ function buildFilterFormValuesFromQuery(
             filtersForm[key as typeof filterKey] = filterValues;
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO) {
-            const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyID?.length ? policyID : undefined);
+            const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies);
             const validExportedToValues = new Set<string>(Object.values(CONST.REPORT.EXPORT_OPTION_LABELS));
             for (const connectionName of connectedIntegrationNames) {
                 validExportedToValues.add(getSearchValueForConnection(connectionName as PolicyConnectionName));

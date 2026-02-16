@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
@@ -36,14 +36,15 @@ function SearchFiltersExportedToPage() {
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {canBeMissing: true});
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
-    const policyIDs = useMemo(() => searchAdvancedFiltersForm?.policyID ?? [], [searchAdvancedFiltersForm?.policyID]);
+    const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const policy = policyIDs?.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDs.at(0)}`] : undefined;
 
     const predefinedConnectionNamesList = Object.values(CONST.POLICY.CONNECTIONS.NAME);
-    const connectedIntegrationNames = useMemo(() => getConnectedIntegrationNamesForPolicies(policies, policyIDs.length > 0 ? policyIDs : undefined), [policyIDs, policies]);
+    const selectedValues = searchAdvancedFiltersForm?.exportedTo ?? [];
+    const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyIDs.length > 0 ? policyIDs : undefined, selectedValues);
 
-    const items = useMemo((): SearchMultipleSelectionPickerItem[] => {
+    const items: SearchMultipleSelectionPickerItem[] = (() => {
         const predefinedConnectionNames = new Set<string>(predefinedConnectionNamesList);
         const defaultExportOptionIcon = (
             <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter, StyleUtils.getWidthAndHeightStyle(variables.w28, variables.h28)]}>
@@ -106,22 +107,9 @@ function SearchFiltersExportedToPage() {
         customItems.sort((a, b) => localeCompare(a.name, b.name));
 
         return [...integrationItems, ...customItems, ...standardItems];
-    }, [
-        integrationsExportTemplates,
-        csvExportLayouts,
-        policy,
-        expensifyIcons,
-        styles,
-        StyleUtils,
-        theme,
-        translate,
-        predefinedConnectionNamesList,
-        localeCompare,
-        connectedIntegrationNames,
-    ]);
+    })();
 
-    const initiallySelectedItems = useMemo((): SearchMultipleSelectionPickerItem[] | undefined => {
-        const selectedValues = searchAdvancedFiltersForm?.exportedTo ?? [];
+    const initiallySelectedItems: SearchMultipleSelectionPickerItem[] | undefined = (() => {
         if (selectedValues.length === 0) {
             return undefined;
         }
@@ -130,9 +118,9 @@ function SearchFiltersExportedToPage() {
             const value = typeof item.value === 'string' ? item.value : (item.value.at(0) ?? '');
             return normalizedSet.has(value.toLowerCase());
         });
-    }, [searchAdvancedFiltersForm?.exportedTo, items]);
+    })();
 
-    const onSaveSelection = useCallback((values: string[]) => updateAdvancedFilters({exportedTo: values}), []);
+    const onSaveSelection = (values: string[]) => updateAdvancedFilters({exportedTo: values});
 
     return (
         <ScreenWrapper
