@@ -6,6 +6,11 @@ import type {SecurityGroupKey, UserSecurityGroupData} from '@src/types/onyx/Doma
 import type {BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 
+type DomainSecurityGroupWithID = {
+    id: string;
+    details: DomainSecurityGroup;
+};
+
 const domainMemberSettingsSelector = (domainSettings: OnyxEntry<CardFeeds>) => domainSettings?.settings;
 
 const domainSamlSettingsStateSelector = (domain: OnyxEntry<Domain>) =>
@@ -150,6 +155,19 @@ const adminPendingActionSelector = (pendingAction: OnyxEntry<DomainPendingAction
 
 const defaultSecurityGroupIDSelector = (domain: OnyxEntry<Domain>) => domain?.domain_defaultSecurityGroupID;
 
+function groupsSelector(domain: OnyxEntry<Domain>): DomainSecurityGroupWithID[] {
+    if (!domain) {
+        return getEmptyArray<DomainSecurityGroupWithID>();
+    }
+
+    return Object.entries(domain).reduce<DomainSecurityGroupWithID[]>((acc, [key, value]) => {
+        if (key.startsWith(CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX)) {
+            acc.push({id: key.replace(CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, ''), details: value as DomainSecurityGroup});
+        }
+        return acc;
+    }, []);
+}
+
 export {
     domainMemberSettingsSelector,
     domainSettingsPrimaryContactSelector,
@@ -165,5 +183,8 @@ export {
     selectSecurityGroupForAccount,
     memberPendingActionSelector,
     isSecurityGroupEntry,
+    groupsSelector,
     vacationDelegateSelector,
 };
+
+export {type DomainSecurityGroupWithID};
