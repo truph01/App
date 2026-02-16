@@ -78,7 +78,6 @@ describe('MoneyRequest', () => {
         };
 
         const selfDMReport = createSelfDM(Number(SELF_DM_REPORT_ID), TEST_USER_ACCOUNT_ID);
-        let recentWaypoints: RecentWaypoint[] = [];
 
         const baseParams = {
             transactions: [fakeTransaction],
@@ -96,12 +95,12 @@ describe('MoneyRequest', () => {
             isSelfTourViewed: false,
             betas: [CONST.BETAS.ALL],
             personalDetails: {},
-            recentWaypoints,
+            recentWaypoints: [] as RecentWaypoint[],
         };
 
-        Onyx.connect({
-            key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
-            callback: (val) => (recentWaypoints = val ?? []),
+        beforeEach(async () => {
+            const freshRecentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
+            baseParams.recentWaypoints = freshRecentWaypoints;
         });
 
         afterEach(() => {
