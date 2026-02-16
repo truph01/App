@@ -27,12 +27,12 @@ Each rule file contains:
 
 ### [UI-1] Use the correct loading indicator based on navigation context
 
-- **Search patterns**: `FullscreenLoadingIndicator`, `ActivityIndicator`
+- **Search patterns**: `FullscreenLoadingIndicator`, `FullScreenLoadingIndicator`, `ActivityIndicator`
 
 - **Condition**: Flag ONLY when ANY of these patterns is found:
   - `FullscreenLoadingIndicator` and `HeaderWithBackButton` (or other navigation like close button) are **both under the same JSX tree** (not separated by conditionals)
-  - `FullscreenLoadingIndicator` without `shouldUseGoBackButton` prop when **no navigation component** is visible alongside it
-  - `ActivityIndicator` as the **sole/main screen content** (flex:1 container, early return) without any navigation component
+  - `FullscreenLoadingIndicator` without `shouldUseGoBackButton` prop when **no navigation component** (e.g., `HeaderWithBackButton`, close button) **is rendered in the same return statement or conditional branch**
+  - `ActivityIndicator` as the **sole/main screen content** (flex:1 container, early return) without any navigation component (e.g., `HeaderWithBackButton`, close button) **in the same return statement or conditional branch**
 
   **DO NOT flag if:**
 
