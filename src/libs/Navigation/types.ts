@@ -248,7 +248,9 @@ type SettingsNavigatorParamList = {
     [SCREENS.SETTINGS.RULES.ADD_MERCHANT]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_RENAME_MERCHANT]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_CATEGORY]: undefined;
-    [SCREENS.SETTINGS.RULES.ADD_TAG]: undefined;
+    [SCREENS.SETTINGS.RULES.ADD_TAG]: {
+        index: number;
+    };
     [SCREENS.SETTINGS.RULES.ADD_TAX]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_DESCRIPTION]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_REIMBURSABLE]: undefined;
@@ -269,6 +271,7 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS.RULES.EDIT_TAG]: {
         hash: string;
+        index: number;
     };
     [SCREENS.SETTINGS.RULES.EDIT_TAX]: {
         hash: string;
@@ -1449,6 +1452,7 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.RULES_MERCHANT_TAG]: {
         policyID: string;
         ruleID: string;
+        orderWeight: number;
     };
     [SCREENS.WORKSPACE.RULES_MERCHANT_TAX]: {
         policyID: string;
@@ -1535,6 +1539,12 @@ type SettingsNavigatorParamList = {
         accountID: number;
     };
     [SCREENS.DOMAIN.ADD_MEMBER]: {
+        domainAccountID: number;
+    };
+    [SCREENS.DOMAIN.MEMBERS_SETTINGS]: {
+        domainAccountID: number;
+    };
+    [SCREENS.DOMAIN.MEMBERS_SETTINGS_TWO_FACTOR_AUTH]: {
         domainAccountID: number;
     };
 } & ReimbursementAccountNavigatorParamList;
@@ -1896,7 +1906,8 @@ type MoneyRequestNavigatorParamList = {
         action: IOUAction;
         iouType: IOUType;
         transactionID: string;
-        readingType: OdometerImageType;
+        reportID: string;
+        imageType: OdometerImageType;
     };
     [SCREENS.MONEY_REQUEST.CREATE]: {
         iouType: IOUType;
@@ -2712,6 +2723,9 @@ type DomainSplitNavigatorParamList = {
         domainAccountID: number;
         accountID: number;
     };
+    [SCREENS.DOMAIN.GROUPS]: {
+        domainAccountID: number;
+    };
 };
 
 type OnboardingModalNavigatorParamList = {
@@ -2803,6 +2817,7 @@ type SharedScreensParamList = {
         shouldForceLogin: string;
         domain?: Routes;
         delegatorEmail?: string;
+        isSAML?: boolean;
     };
     [SCREENS.VALIDATE_LOGIN]: {
         accountID: string;
@@ -2887,6 +2902,7 @@ type AttachmentModalScreensParamList = {
         action?: IOUAction;
         iouType?: IOUType;
         mergeTransactionID?: string;
+        imageType?: OdometerImageType;
     };
     [SCREENS.MONEY_REQUEST.RECEIPT_PREVIEW]: AttachmentModalContainerModalProps & {
         reportID: string;
