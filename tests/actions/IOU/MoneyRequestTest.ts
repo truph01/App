@@ -837,7 +837,7 @@ describe('MoneyRequest', () => {
                 currentUserAccountIDParam: baseParams.currentUserAccountID,
                 currentUserEmailParam: baseParams.currentUserLogin,
                 quickAction: baseParams.quickAction,
-                recentWaypoints,
+                recentWaypoints: baseParams.recentWaypoints,
                 betas: [CONST.BETAS.ALL],
             });
 
@@ -900,7 +900,7 @@ describe('MoneyRequest', () => {
                     currentUserAccountIDParam: baseParams.currentUserAccountID,
                     currentUserEmailParam: baseParams.currentUserLogin,
                     quickAction: baseParams.quickAction,
-                    recentWaypoints,
+                    recentWaypoints: baseParams.recentWaypoints,
                 }),
             );
         });
