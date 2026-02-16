@@ -982,7 +982,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Corriger',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corriger la connexion de la carte d'entreprise ${feedName}` : 'Corriger la connexion de la carte entreprise'),
-                subtitle: 'Espace de travail > Cartes d’entreprise',
+                defaultSubtitle: 'Espace de travail > Cartes d’entreprise',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Cartes d'entreprise`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Corriger la connexion ${integrationName}`,
@@ -3137,6 +3138,11 @@ ${
             'Ajoutez un compte bancaire pour rembourser des dépenses, émettre des cartes Expensify, encaisser des paiements de factures et payer des factures, le tout à partir d’un seul endroit.',
         plaidBodyCopy: 'Offrez à vos employés un moyen plus simple de payer – et d’être remboursés – pour les dépenses de l’entreprise.',
         checkHelpLine: 'Votre numéro de routage et votre numéro de compte se trouvent sur un chèque lié à ce compte.',
+        bankAccountPurposeTitle: 'Que voulez-vous faire avec votre compte bancaire?',
+        getReimbursed: 'Être remboursé',
+        getReimbursedDescription: "Par l'employeur ou d'autres",
+        makePayments: 'Effectuer des paiements',
+        makePaymentsDescription: 'Payer les dépenses ou émettre des cartes Expensify',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Pour connecter un compte bancaire, veuillez <a href="${contactMethodRoute}">ajouter une adresse e-mail comme identifiant principal</a> puis réessayer. Vous pouvez ajouter votre numéro de téléphone comme identifiant secondaire.`,
         hasBeenThrottledError: 'Une erreur s’est produite lors de l’ajout de votre compte bancaire. Veuillez patienter quelques minutes, puis réessayer.',
@@ -8479,6 +8485,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
         },
         common: {settings: 'Paramètres'},
+        groups: {title: 'Groupes', memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`})},
     },
 };
 export default translations;

@@ -978,7 +978,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Beheben',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName}-Firmenkartenverbindung reparieren` : 'Firmenkarte reparieren Verbindung der Firmenkarte reparieren'),
-                subtitle: 'Workspace > Unternehmenskarten',
+                defaultSubtitle: 'Workspace > Unternehmenskarten',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Unternehmenskarten`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `${integrationName}-Verbindung reparieren`,
@@ -3128,6 +3129,11 @@ ${
             'Füge ein Bankkonto hinzu, um Ausgaben zu erstatten, Expensify Cards auszustellen, Rechnungszahlungen einzuziehen und Rechnungen zentral von einem Ort aus zu bezahlen.',
         plaidBodyCopy: 'Geben Sie Ihren Mitarbeitenden eine einfachere Möglichkeit, Firmenausgaben zu bezahlen – und erstattet zu bekommen.',
         checkHelpLine: 'Ihre Bankleitzahl und Kontonummer finden Sie auf einem Scheck für dieses Konto.',
+        bankAccountPurposeTitle: 'Was möchten Sie mit Ihrem Bankkonto machen?',
+        getReimbursed: 'Erstattung erhalten',
+        getReimbursedDescription: 'Vom Arbeitgeber oder anderen',
+        makePayments: 'Zahlungen tätigen',
+        makePaymentsDescription: 'Ausgaben bezahlen oder Expensify-Karten ausstellen',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Um ein Bankkonto zu verknüpfen, bitte <a href="${contactMethodRoute}">füge eine E-Mail-Adresse als deine primäre Anmeldung hinzu</a> und versuche es erneut. Du kannst deine Telefonnummer als sekundäre Anmeldung hinzufügen.`,
         hasBeenThrottledError: 'Beim Hinzufügen Ihres Bankkontos ist ein Fehler aufgetreten. Bitte warten Sie ein paar Minuten und versuchen Sie es erneut.',
@@ -8456,6 +8462,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             forceTwoFactorAuthError: 'Die Erzwingung der Zwei-Faktor-Authentifizierung konnte nicht geändert werden. Bitte versuche es später erneut.',
         },
         common: {settings: 'Einstellungen'},
+        groups: {title: 'Gruppen', memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`})},
     },
 };
 export default translations;
