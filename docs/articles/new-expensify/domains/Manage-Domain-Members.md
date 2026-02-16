@@ -1,23 +1,29 @@
 ---
-title: Domain Members
+title: Manage Domain Members
 description: Learn how to manage domain members in New Expensify.
 internalScope: Audience is Domain Admins. Covers inviting/adding domain members, closing accounts, and promoting members to Domain Admin. Does not cover domain verification, SAML setup, Domain Groups configuration, or account access troubleshooting.
 keywords: [New Expensify, Workspaces, Domains, domain members, verify domain, domain admin, domain control, remove domain member, deactivate domain user, invite domain user, promote to domain admin, workspace admins]
 ---
 
-Managing domain members helps your organization control who can use Expensify with your company email domain, and which domain-level settings apply to them.
+# Manage Domain Members
 
-*Settings > Workspaces > Domains > Domain Members*
+Managing domain members helps your organization control who can use Expensify with your company email domain, and which domain-level settings apply to them.
 
 There are two types of members within Domain Settings:
 - **Domain Member**: Subject to domain rules. Members must have an email address under the domain as their primary or secondary contact method, such as `@yourcompany.com`.
 - **Domain Admin**: Has full control over domain settings, including adding/removing members, managing rules, and configuring security settings. Admins do not need an email address associated with the domain.
 
+---
+
+## Who can manage Domain Members
+
+Only Domain Admins can invite, remove, deactivate, or promote Domain Members.
+
 Your domain must be verified before you can invite and manage members. Learn how to [claim and verify a domain](https://help.expensify.com/articles/new-expensify/domains/Claim-and-Verify-a-Domain).
 
 ---
 
-# How to add a Domain Member
+## How to add a Domain Member
 
 You can add Domain Members in two ways: automatically or manually.
 
@@ -67,9 +73,9 @@ You can give any member permission to manage domain settings by promoting them t
 
 # FAQ
 
-## What happens if a user removes their domain email?
+## What happens if a member removes their domain email?
 
-If a user removes their domain email from their contact methods, they’ll no longer be listed as a Domain Member.
+If a member removes their domain email from their contact methods, they’ll no longer be listed as a Domain Member.
 
 ## Can Domain Admins be outside the company domain?
 
