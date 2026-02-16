@@ -8164,6 +8164,10 @@ const CONST = {
             DOWNLOAD_RECEIPT: 'ReceiptModal-DownloadReceipt',
             DELETE_RECEIPT: 'ReceiptModal-DeleteReceipt',
         },
+        AVATAR_WITH_DISPLAY_NAME: {
+            SHOW_ACTOR_DETAILS: 'AvatarWithDisplayName-ShowActorDetails',
+            GO_TO_DETAILS_PAGE: 'AvatarWithDisplayName-GoToDetailsPage',
+        },
         HEADER_VIEW: {
             BACK_BUTTON: 'HeaderView-BackButton',
             DETAILS_BUTTON: 'HeaderView-DetailsButton',

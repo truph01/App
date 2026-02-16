@@ -265,6 +265,7 @@ function AvatarWithDisplayName({
                     <View accessibilityLabel={title}>
                         {shouldEnableAvatarNavigation ? (
                             <PressableWithoutFeedback
+                                sentryLabel={CONST.SENTRY_LABEL.AVATAR_WITH_DISPLAY_NAME.SHOW_ACTOR_DETAILS}
                                 onPress={showActorDetails}
                                 accessibilityLabel={title}
                                 role={getButtonRole(true)}
@@ -324,6 +325,7 @@ function AvatarWithDisplayName({
 
     return (
         <PressableWithoutFeedback
+            sentryLabel={CONST.SENTRY_LABEL.AVATAR_WITH_DISPLAY_NAME.GO_TO_DETAILS_PAGE}
             onPress={goToDetailsPage}
             style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}
             accessibilityLabel={title}
