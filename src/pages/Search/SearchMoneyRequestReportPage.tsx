@@ -72,12 +72,15 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
 
     const isFocused = useIsFocused();
 
+    // Dismiss modal when the money request report is removed (e.g. deleted or merged).
     useEffect(() => {
+        // Skip first run so we don't dismiss on mount when report may still be loading.
         if (firstRenderRef.current) {
             firstRenderRef.current = false;
             return;
         }
 
+        // Report is gone now but we had a money request report before → it was removed.
         const isRemovalExpectedForReportType = !report && isMoneyRequestReport(prevReport);
 
         if (isRemovalExpectedForReportType) {
