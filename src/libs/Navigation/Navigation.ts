@@ -185,10 +185,14 @@ const closeRHPFlow = (ref = navigationRef) => originalCloseRHPFlow(ref);
 /**
  * Close the side panel on narrow layout when navigating to a different screen.
  */
-function closeSidePanelOnNarrowScreen() {
+function closeSidePanelOnNarrowScreen(route: Route) {
     const isExtraLargeScreenWidth = Dimensions.get('window').width > variables.sidePanelResponsiveWidthBreakpoint;
+    const isAttachmentPreviewRoute = route && /^r\/\d+\/attachment\/add/.test(route);
 
-    if (!sidePanelNVP?.openNarrowScreen || isExtraLargeScreenWidth) {
+    // If we have a side panel open on devices smaller than 1300px and the user wants to go to the REPORT_ADD_ATTACHMENT route,
+    // this means that the user clicked `Add Attachments` in the side panel, and in this case,
+    // there is no need to close the side panel, as we need to have access to the chat.
+    if (!sidePanelNVP?.openNarrowScreen || isExtraLargeScreenWidth || isAttachmentPreviewRoute) {
         return;
     }
     SidePanelActions.closeSidePanel(true);
@@ -308,7 +312,7 @@ function navigate(route: Route, options?: LinkToOptions) {
 
     const targetRoute = route.startsWith(CONST.SAML_REDIRECT_URL) ? ROUTES.HOME : route;
     linkTo(navigationRef.current, targetRoute, options);
-    closeSidePanelOnNarrowScreen();
+    closeSidePanelOnNarrowScreen(route);
 }
 /**
  * When routes are compared to determine whether the fallback route passed to the goUp function is in the state,
