@@ -6,6 +6,7 @@ import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
 import CONST from '@src/CONST';
+import IntlStore from '@src/languages/IntlStore';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
     PersonalDetails,
@@ -24,7 +25,7 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {convertToDisplayString} from './CurrencyUtils';
 import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from './LocalePhoneNumber';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
-import {translateLocal} from './Localize';
+import {translate as translateWithLocale, translateLocal} from './Localize';
 // eslint-disable-next-line import/no-cycle
 import {getForReportAction, getMovedReportID} from './ModifiedExpenseMessage';
 import Parser from './Parser';
@@ -854,7 +855,9 @@ function getReportName(
         const {originalID} = getOriginalMessage(parentReportAction) ?? {};
         const originalReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalID}`];
         const originalReportName = originalReport ? getReportName(originalReport, reportAttributesDerivedValue) : '';
-        return getCreatedReportForUnapprovedTransactionsMessage(originalID, originalReportName, translateLocal);
+        const currentLocale = IntlStore.getCurrentLocale();
+        const translateInCurrentLocale: LocalizedTranslate = (path, ...parameters) => translateWithLocale(currentLocale, path, ...parameters);
+        return getCreatedReportForUnapprovedTransactionsMessage(originalID, originalReportName, translateInCurrentLocale);
     }
 
     if (isInvoiceRoom(report)) {
