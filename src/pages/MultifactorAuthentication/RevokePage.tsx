@@ -45,7 +45,7 @@ function MultifactorAuthenticationRevokePage() {
         const result = await revokeMultifactorAuthenticationCredentials();
 
         hideConfirmModal();
-        if (result.httpCode !== 200) {
+        if (result.httpStatusCode !== 200) {
             setErrorMessage(translate('multifactorAuthentication.revoke.error'));
         }
     };
