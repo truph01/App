@@ -15,6 +15,7 @@ const DEFAULT_STATE: MultifactorAuthenticationState = {
     isAuthorizationComplete: false,
     isFlowComplete: false,
     authenticationMethod: undefined,
+    scenarioResponse: undefined,
 };
 
 /**
@@ -66,6 +67,8 @@ function stateReducer(state: MultifactorAuthenticationState, action: Action): Mu
             return {...state, isFlowComplete: action.payload};
         case 'SET_AUTHENTICATION_METHOD':
             return {...state, authenticationMethod: action.payload};
+        case 'SET_SCENARIO_RESPONSE':
+            return {...state, scenarioResponse: action.payload};
         case 'INIT':
             return {
                 ...DEFAULT_STATE,
