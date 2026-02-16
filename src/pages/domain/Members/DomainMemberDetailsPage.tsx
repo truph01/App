@@ -11,7 +11,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearTwoFactorAuthExemptEmailsErrors, closeUserAccount, setTwoFactorAuthExemptEmailForDomain} from '@libs/actions/Domain';
+import {clearTwoFactorAuthExemptEmailsErrors, clearValidateDomainTwoFactorCodeError, closeUserAccount, setTwoFactorAuthExemptEmailForDomain} from '@libs/actions/Domain';
 import {getLatestError} from '@libs/ErrorUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
@@ -124,6 +124,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                         }
 
                         if (!value && account?.requiresTwoFactorAuth) {
+                            clearValidateDomainTwoFactorCodeError();
                             Navigation.navigate(ROUTES.DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
                         } else {
                             setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, domainSettings?.twoFactorAuthExemptEmails ?? [], personalDetails.login, value);
@@ -131,11 +132,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     }}
                     title={translate('domain.common.forceTwoFactorAuth')}
                     pendingAction={domainPendingActions?.member?.[accountID]?.twoFactorAuthExemptEmails}
-                    errors={
-                        domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin) || !account?.requiresTwoFactorAuth
-                            ? getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)
-                            : undefined
-                    }
+                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
                     onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
                 />
 
@@ -144,7 +141,10 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                         style={styles.mb5}
                         title={translate('domain.common.resetTwoFactorAuth')}
                         icon={icons.Flag}
-                        onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID))}
+                        onPress={() => {
+                            clearValidateDomainTwoFactorCodeError();
+                            Navigation.navigate(ROUTES.DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
+                        }}
                     />
                 )}
             </BaseDomainMemberDetailsComponent>

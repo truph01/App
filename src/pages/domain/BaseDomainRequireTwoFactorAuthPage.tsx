@@ -8,23 +8,29 @@ import ScrollView from '@components/ScrollView';
 import TwoFactorAuthForm from '@components/TwoFactorAuthForm';
 import type {BaseTwoFactorAuthFormRef} from '@components/TwoFactorAuthForm/types';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getLatestErrorMessage} from '@libs/ErrorUtils';
-import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
+import {clearValidateDomainTwoFactorCodeError} from '@userActions/Domain';
+import ONYXKEYS from '@src/ONYXKEYS';
+import type {PendingAction} from '@src/types/onyx/OnyxCommon';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import DomainNotFoundPageWrapper from './DomainNotFoundPageWrapper';
 
 type BaseDomainRequireTwoFactorAuthPageProps = {
     domainAccountID: number;
     onSubmit: (code: string) => void;
     onBackButtonPress: () => void;
-    onInputChange?: () => void;
-    errors?: Errors;
     pendingAction?: PendingAction;
 };
 
-function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackButtonPress, onInputChange, errors, pendingAction}: BaseDomainRequireTwoFactorAuthPageProps) {
+function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackButtonPress, pendingAction}: BaseDomainRequireTwoFactorAuthPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+
+    const [validateDomainTwoFactorCodeErrors] = useOnyx(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, {
+        canBeMissing: true,
+    });
 
     const baseTwoFactorAuthRef = useRef<BaseTwoFactorAuthFormRef>(null);
 
@@ -52,8 +58,13 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                             shouldAllowRecoveryCode
                             onSubmit={onSubmit}
                             shouldAutoFocus={false}
-                            onInputChange={onInputChange}
-                            errorMessage={getLatestErrorMessage({errors})}
+                            onInputChange={() => {
+                                if (isEmptyObject(validateDomainTwoFactorCodeErrors?.errors)) {
+                                    return;
+                                }
+                                clearValidateDomainTwoFactorCodeError();
+                            }}
+                            errorMessage={getLatestErrorMessage(validateDomainTwoFactorCodeErrors)}
                         />
                     </View>
                 </ScrollView>

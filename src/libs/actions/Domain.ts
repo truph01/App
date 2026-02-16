@@ -1166,6 +1166,11 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
                 },
             },
         },
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
+            value: null,
+        },
     ];
     const successData: OnyxUpdate[] = [
         {
@@ -1189,6 +1194,11 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
                     },
                 },
             },
+        },
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
+            value: null,
         },
     ];
     const failureData: OnyxUpdate[] = [
@@ -1218,11 +1228,22 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             value: {
                 memberErrors: {
                     [targetEmail]: {
-                        twoFactorAuthExemptEmailsError: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
+                        twoFactorAuthExemptEmailsError: twoFactorAuthCode ? null : getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
                     },
                 },
             },
         },
+        ...(twoFactorAuthCode
+            ? [
+                  {
+                      onyxMethod: Onyx.METHOD.MERGE,
+                      key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
+                      value: {
+                          errors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
+                      },
+                  },
+              ]
+            : []),
     ];
 
     const params: SetTwoFactorAuthExemptEmailForDomainParams = {
@@ -1327,6 +1348,10 @@ function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID
     API.write(WRITE_COMMANDS.RESET_DOMAIN_MEMBER_TWO_FACTOR_AUTH, params, {optimisticData, failureData, successData});
 }
 
+function clearValidateDomainTwoFactorCodeError() {
+    Onyx.set(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, null);
+}
+
 export {
     getDomainValidationCode,
     validateDomain,
@@ -1358,4 +1383,5 @@ export {
     setTwoFactorAuthExemptEmailForDomain,
     clearTwoFactorAuthExemptEmailsErrors,
     resetDomainMemberTwoFactorAuth,
+    clearValidateDomainTwoFactorCodeError,
 };
