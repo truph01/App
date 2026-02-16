@@ -33,9 +33,19 @@ type BaseVacationDelegateSelectionComponentProps = {
 
     /** Message to display when the user can't set a vacation delegate */
     cannotSetDelegateMessage: string;
+
+    /** Additional logins to exclude from the list */
+    additionalExcludeLogins?: Record<string, boolean>;
 };
 
-function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, headerTitle, onBackButtonPress, cannotSetDelegateMessage}: BaseVacationDelegateSelectionComponentProps) {
+function BaseVacationDelegateSelectionComponent({
+    vacationDelegate,
+    onSelectRow,
+    headerTitle,
+    onBackButtonPress,
+    cannotSetDelegateMessage,
+    additionalExcludeLogins,
+}: BaseVacationDelegateSelectionComponentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
@@ -49,6 +59,7 @@ function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, 
     const excludeLogins = {
         ...CONST.EXPENSIFY_EMAILS_OBJECT,
         ...(currentVacationDelegate && {[currentVacationDelegate]: true}),
+        ...additionalExcludeLogins,
     };
 
     const {searchTerm, debouncedSearchTerm, setSearchTerm, availableOptions, areOptionsInitialized, onListEndReached} = useSearchSelector({
@@ -57,6 +68,7 @@ function BaseVacationDelegateSelectionComponent({vacationDelegate, onSelectRow, 
         searchContext: CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_GENERAL,
         excludeLogins,
         includeRecentReports: true,
+        includeCurrentUser: true,
         getValidOptionsConfig: {
             excludeLogins,
         },

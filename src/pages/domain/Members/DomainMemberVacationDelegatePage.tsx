@@ -24,8 +24,8 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
 
     const vacationDelegate = useVacationDelegate(domainAccountID, accountID);
 
+    const memberLogin = getLoginByAccountID(accountID);
     const onSelectRow = (option: Participant) => {
-        const memberLogin = getLoginByAccountID(accountID);
         const delegateLogin = option?.login;
 
         if (!memberLogin || !delegateLogin) {
@@ -54,6 +54,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
                     onSelectRow={onSelectRow}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID))}
                     cannotSetDelegateMessage={translate('domain.members.cannotSetVacationDelegateForMember', getLoginByAccountID(accountID) ?? '')}
+                    additionalExcludeLogins={memberLogin ? {[memberLogin]: true} : undefined}
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>

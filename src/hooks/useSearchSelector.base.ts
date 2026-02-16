@@ -256,6 +256,7 @@ function useSearchSelectorBase({
                         maxElements: maxResults,
                         maxRecentReportElements: maxRecentReportsToShow,
                         includeUserToInvite,
+                        includeCurrentUser,
                         excludeLogins,
                         excludeFromSuggestionsOnly,
                         personalDetails,

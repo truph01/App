@@ -17,7 +17,7 @@ function VacationDelegatePage() {
     const {translate} = useLocalize();
     const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
     const [newVacationDelegate, setNewVacationDelegate] = useState('');
-    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
+    const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
 
     const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE, {canBeMissing: true});
 
@@ -29,7 +29,7 @@ function VacationDelegatePage() {
                 return;
             }
 
-            setVacationDelegate(currentUserLogin ?? '', option?.login ?? '', false, vacationDelegate?.delegate).then((response) => {
+            setVacationDelegate(currentUserLogin, option?.login ?? '', false, vacationDelegate?.delegate).then((response) => {
                 if (!response?.jsonCode) {
                     Navigation.goBack(ROUTES.SETTINGS_STATUS);
                     return;
@@ -59,6 +59,7 @@ function VacationDelegatePage() {
                     headerTitle={translate('common.vacationDelegate')}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
                     cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
+                    additionalExcludeLogins={{[currentUserLogin]: true}}
                 />
             </ScreenWrapper>
             <ConfirmModal
@@ -67,7 +68,7 @@ function VacationDelegatePage() {
                 prompt={translate('statusPage.vacationDelegateWarning', {nameOrEmail: getPersonalDetailByEmail(newVacationDelegate)?.displayName ?? newVacationDelegate})}
                 onConfirm={() => {
                     setIsWarningModalVisible(false);
-                    setVacationDelegate(currentUserLogin ?? '', newVacationDelegate, true, vacationDelegate?.delegate).then(() => Navigation.goBack(ROUTES.SETTINGS_STATUS));
+                    setVacationDelegate(currentUserLogin, newVacationDelegate, true, vacationDelegate?.delegate).then(() => Navigation.goBack(ROUTES.SETTINGS_STATUS));
                 }}
                 onCancel={() => {
                     setIsWarningModalVisible(false);
