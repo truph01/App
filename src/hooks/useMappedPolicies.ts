@@ -1,4 +1,3 @@
-import {useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
@@ -13,7 +12,7 @@ import useOnyx from './useOnyx';
  */
 function useMappedPolicies<T>(mapper: (policy: OnyxEntry<Policy>) => T) {
     const [policies, metadata] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
-    const transformedPolicies = useMemo(() => mapOnyxCollectionItems(policies, mapper), [policies, mapper]);
+    const transformedPolicies = mapOnyxCollectionItems(policies, mapper);
 
     return [transformedPolicies, metadata] as const;
 }
