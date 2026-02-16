@@ -248,6 +248,41 @@ describe('MoneyRequest', () => {
                 }),
             );
         });
+
+        it('should pass billable and reimbursable flags to trackExpense', () => {
+            createTransaction({
+                ...baseParams,
+                iouType: CONST.IOU.TYPE.TRACK,
+                billable: true,
+                reimbursable: false,
+            });
+
+            expect(IOU.trackExpense).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    transactionParams: expect.objectContaining({
+                        billable: true,
+                        reimbursable: false,
+                    }),
+                }),
+            );
+        });
+
+        it('should pass gpsPoint to trackExpense when provided', () => {
+            const gpsPoint = {lat: TEST_LATITUDE, long: TEST_LONGITUDE};
+            createTransaction({
+                ...baseParams,
+                iouType: CONST.IOU.TYPE.TRACK,
+                gpsPoint,
+            });
+
+            expect(IOU.trackExpense).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    transactionParams: expect.objectContaining({
+                        gpsPoint,
+                    }),
+                }),
+            );
+        });
     });
 
     describe('handleMoneyRequestStepScanParticipants', () => {
