@@ -977,7 +977,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Correggi',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Correggi la connessione della carta aziendale ${feedName}` : 'Correggi connessione carta aziendale'),
-                subtitle: 'Spazio di lavoro > Carte aziendali',
+                defaultSubtitle: 'Spazio di lavoro > Carte aziendali',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Carte aziendali`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Correggi connessione ${integrationName}`,
@@ -3116,6 +3117,11 @@ ${
         toGetStarted: 'Aggiungi un conto bancario per rimborsare le spese, emettere carte Expensify, riscuotere i pagamenti delle fatture e pagare le bollette, tutto da un unico posto.',
         plaidBodyCopy: 'Offri ai tuoi dipendenti un modo più semplice per pagare — e farsi rimborsare — le spese aziendali.',
         checkHelpLine: 'Il numero di instradamento e il numero di conto si trovano su un assegno relativo al conto.',
+        bankAccountPurposeTitle: 'Cosa vuoi fare con il tuo conto bancario?',
+        getReimbursed: 'Ottenere rimborsi',
+        getReimbursedDescription: 'Dal datore di lavoro o altri',
+        makePayments: 'Effettuare pagamenti',
+        makePaymentsDescription: 'Pagare spese o emettere carte Expensify',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Per collegare un conto bancario, <a href="${contactMethodRoute}">aggiungi un’email come accesso principale</a> e riprova. Puoi aggiungere il tuo numero di telefono come accesso secondario.`,
         hasBeenThrottledError: 'Si è verificato un errore durante l’aggiunta del tuo conto bancario. Attendi qualche minuto e riprova.',
@@ -8440,6 +8446,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             forceTwoFactorAuthError: 'Impossibile modificare l’impostazione “Forza l’autenticazione a due fattori”. Riprova più tardi.',
         },
         common: {settings: 'Impostazioni'},
+        groups: {title: 'Gruppi', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`})},
     },
 };
 export default translations;

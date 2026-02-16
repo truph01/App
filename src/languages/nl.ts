@@ -977,7 +977,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Repareren',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Verbinding bedrijfskaart ${feedName} herstellen` : 'Verbinding van bedrijfskaart repareren'),
-                subtitle: 'Werkruimte > Bedrijfspassen',
+                defaultSubtitle: 'Werkruimte > Bedrijfspassen',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Bedrijfspassen`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Verbinding met ${integrationName} repareren`,
@@ -3117,6 +3118,11 @@ ${
         toGetStarted: 'Voeg een bankrekening toe om onkosten terug te betalen, Expensify Cards uit te geven, factuurbetalingen te innen en rekeningen te betalen – allemaal vanuit één plek.',
         plaidBodyCopy: 'Geef je medewerkers een eenvoudigere manier om bedrijfsuitgaven te betalen – en terugbetaald te worden.',
         checkHelpLine: 'Je bankcode en rekeningnummer staan op een cheque van de rekening.',
+        bankAccountPurposeTitle: 'Wat wil je doen met je bankrekening?',
+        getReimbursed: 'Vergoed worden',
+        getReimbursedDescription: 'Door werkgever of anderen',
+        makePayments: 'Betalingen doen',
+        makePaymentsDescription: 'Uitgaven betalen of Expensify-kaarten uitgeven',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Om een bankrekening te koppelen, <a href="${contactMethodRoute}">voeg eerst een e-mailadres toe als je primaire login</a> en probeer het daarna opnieuw. Je kunt je telefoonnummer toevoegen als secundaire login.`,
         hasBeenThrottledError: 'Er is een fout opgetreden bij het toevoegen van je bankrekening. Wacht een paar minuten en probeer het opnieuw.',
@@ -8424,6 +8430,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             forceTwoFactorAuthError: 'Verplichte twee-factor-authenticatie kon niet worden gewijzigd. Probeer het later opnieuw.',
         },
         common: {settings: 'Instellingen'},
+        groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
     },
 };
 export default translations;
