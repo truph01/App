@@ -1708,7 +1708,7 @@ function createGroupChat(
     }
 
     // Preserve guided setup data when creating group chats
-    const guidedSetup = getGuidedSetupDataForOpenReport(deprecatedIntroSelected);
+    const guidedSetup = getGuidedSetupDataForOpenReport(introSelected);
     if (guidedSetup) {
         optimisticData.push(...guidedSetup.optimisticData);
         successData.push(...guidedSetup.successData);
@@ -6972,4 +6972,5 @@ export {
     optimisticReportLastData,
     setOptimisticTransactionThread,
     prepareOnyxDataForCleanUpOptimisticParticipants,
+    getGuidedSetupDataForOpenReport,
 };
