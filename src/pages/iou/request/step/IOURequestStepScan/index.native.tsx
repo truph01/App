@@ -86,8 +86,10 @@ function IOURequestStepScan({
     const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS, {canBeMissing: true});
     const isPlatformMuted = mutedPlatforms[platform];
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
+    const [isAttachmentPickerActive, setIsAttachmentPickerActive] = useState(false);
     const [didCapturePhoto, setDidCapturePhoto] = useState(false);
     const policy = usePolicy(report?.policyID);
+
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
 
     const askForPermissions = useCallback(() => {
@@ -413,6 +415,7 @@ function IOURequestStepScan({
                                         photo
                                         cameraTabIndex={1}
                                         onLayout={(e) => (viewfinderLayout.current = e.nativeEvent.layout)}
+                                        forceInactive={isAttachmentPickerActive}
                                     />
                                     <Animated.View style={[styles.cameraFocusIndicator, cameraFocusIndicatorAnimatedStyle]} />
                                     {canUseMultiScan ? (
@@ -460,7 +463,10 @@ function IOURequestStepScan({
                 )}
                 <View style={[styles.flexRow, styles.justifyContentAround, styles.alignItemsCenter, styles.pv3]}>
                     <AttachmentPicker
-                        onOpenPicker={() => setIsLoaderVisible(true)}
+                        onOpenPicker={() => {
+                            setIsAttachmentPickerActive(true);
+                            setIsLoaderVisible(true);
+                        }}
                         fileLimit={shouldAcceptMultipleFiles ? CONST.API_ATTACHMENT_VALIDATIONS.MAX_FILE_LIMIT : 1}
                         shouldValidateImage={false}
                     >
@@ -476,6 +482,7 @@ function IOURequestStepScan({
                                         onCanceled: () => setIsLoaderVisible(false),
                                         // makes sure the loader is not visible anymore e.g. when there is an error while uploading a file
                                         onClosed: () => {
+                                            setIsAttachmentPickerActive(false);
                                             setIsLoaderVisible(false);
                                         },
                                     });
