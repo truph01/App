@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import type {ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import Icon from '@components/Icon';
 import {DotIndicator} from '@components/Icon/Expensicons';
 import RenderHTML from '@components/RenderHTML';
+import Text from '@components/Text';
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -59,6 +60,7 @@ function TransactionItemRowRBR({transaction, violations, report, containerStyles
         policyTags,
         companyCardPageURL,
     );
+    const shouldRenderAsRichText = /<\/?[a-z][^>]*>/i.test(RBRMessages);
 
     return (
         RBRMessages.length > 0 && (
@@ -73,7 +75,17 @@ function TransactionItemRowRBR({transaction, violations, report, containerStyles
                     width={variables.iconSizeExtraSmall}
                 />
                 <View style={[styles.pre, styles.flexShrink1, {color: theme.danger}]}>
-                    <RenderHTML html={`<rbr shouldShowEllipsis="1" issmall >${RBRMessages}</rbr>`} />
+                    {shouldRenderAsRichText ? (
+                        <RenderHTML html={`<rbr shouldShowEllipsis="1" issmall >${RBRMessages}</rbr>`} />
+                    ) : (
+                        <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={[styles.textLabelError, styles.textMicro]}
+                        >
+                            {RBRMessages}
+                        </Text>
+                    )}
                 </View>
             </View>
         )
