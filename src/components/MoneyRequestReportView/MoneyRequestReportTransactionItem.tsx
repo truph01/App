@@ -119,6 +119,7 @@ function MoneyRequestReportTransactionItem({
                     handleOnPress(transaction.transactionID);
                 }}
                 accessibilityLabel={translate('iou.viewDetails')}
+                sentryLabel="MoneyRequestReportTransactionItem-ViewDetails"
                 role={getButtonRole(true)}
                 isNested
                 id={transaction.transactionID}
