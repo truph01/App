@@ -99,8 +99,7 @@ describe('MoneyRequest', () => {
         };
 
         beforeEach(async () => {
-            const freshRecentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
-            baseParams.recentWaypoints = freshRecentWaypoints;
+            baseParams.recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
         });
 
         afterEach(() => {
