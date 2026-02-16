@@ -8290,7 +8290,6 @@ const CONST = {
             FILTER_POPUP_APPLY_DATE: 'Search-FilterPopupApplyDate',
             FILTER_POPUP_RESET_USER: 'Search-FilterPopupResetUser',
             FILTER_POPUP_APPLY_USER: 'Search-FilterPopupApplyUser',
-            TRANSACTION_LIST_ITEM: 'Search-TransactionListItem',
             TRANSACTION_LIST_ITEM_CHECKBOX: 'Search-TransactionListItemCheckbox',
             EXPANDED_TRANSACTION_ROW: 'Search-ExpandedTransactionRow',
             EXPANDED_TRANSACTION_ROW_CHECKBOX: 'Search-ExpandedTransactionRowCheckbox',
