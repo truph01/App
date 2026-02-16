@@ -270,6 +270,7 @@ function useReceiptScan({
         shouldAcceptMultipleFiles,
         startLocationPermissionFlow,
         setStartLocationPermissionFlow,
+        shouldStartLocationPermissionFlow,
         receiptFiles,
         setReceiptFiles,
         shouldShowMultiScanEducationalPopup,

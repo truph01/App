@@ -8,6 +8,7 @@ import {updateLastAccessedWorkspace} from '@userActions/Policy/Policy';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 type NavigatorsParamList = AuthScreensParamList & SettingsNavigatorParamList & ReimbursementAccountNavigatorParamList & WorkspaceSplitNavigatorParamList;
@@ -87,8 +88,14 @@ export default function <TProps extends WithPolicyProps>(WrappedComponent: Compo
         const [hasLoadedApp] = useOnyx(ONYXKEYS.HAS_LOADED_APP, {canBeMissing: true});
         const [policy, policyResults] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {canBeMissing: true});
         const [policyDraft, policyDraftResults] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${policyID}`, {canBeMissing: true});
+        // After a full page refresh, Onyx may rehydrate before the policy is fetched. Keep showing loading
+        // when we have a policyID in the route but policy is still empty so we don't show "Not here" (e.g. in
+        // ReimbursementAccountPage / bank account RHP or other withPolicy screens) before the policy loads.
         /* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */
-        const isLoadingPolicy = !hasLoadedApp || isLoadingOnyxValue(policyResults, policyDraftResults);
+        const isLoadingPolicy =
+            !hasLoadedApp ||
+            isLoadingOnyxValue(policyResults, policyDraftResults) ||
+            (!!policyID && (policy === undefined || policy === null || isEmptyObject(policy)));
 
         if (policyID && policyID.length > 0) {
             updateLastAccessedWorkspace(policyID);
