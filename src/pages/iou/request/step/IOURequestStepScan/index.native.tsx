@@ -9,7 +9,6 @@ import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSequence, wit
 import type {Camera, PhotoFile, Point} from 'react-native-vision-camera';
 import {useCameraDevice} from 'react-native-vision-camera';
 import {scheduleOnRN} from 'react-native-worklets';
-import TestReceipt from '@assets/images/fake-receipt.png';
 import ActivityIndicator from '@components/ActivityIndicator';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
@@ -27,13 +26,11 @@ import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import setTestReceipt from '@libs/actions/setTestReceipt';
 import {showCameraPermissionsAlert} from '@libs/fileDownload/FileUtils';
 import getPhotoSource from '@libs/fileDownload/getPhotoSource';
 import getPlatform from '@libs/getPlatform';
 import type Platform from '@libs/getPlatform/types';
 import getReceiptsUploadFolderPath from '@libs/getReceiptsUploadFolderPath';
-import HapticFeedback from '@libs/HapticFeedback';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
@@ -41,7 +38,7 @@ import StepScreenWrapper from '@pages/iou/request/step/StepScreenWrapper';
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import withWritableReportOrNotFound from '@pages/iou/request/step/withWritableReportOrNotFound';
 import {replaceReceipt, setMoneyRequestReceipt, updateLastLocationPermissionPrompt} from '@userActions/IOU';
-import {buildOptimisticTransactionAndCreateDraft, removeDraftTransactions} from '@userActions/TransactionEdit';
+import {buildOptimisticTransactionAndCreateDraft} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
@@ -92,20 +89,6 @@ function IOURequestStepScan({
     const [didCapturePhoto, setDidCapturePhoto] = useState(false);
     const policy = usePolicy(report?.policyID);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
-
-    const blinkOpacity = useSharedValue(0);
-    const blinkStyle = useAnimatedStyle(() => ({
-        opacity: blinkOpacity.get(),
-    }));
-
-    const showBlink = useCallback(() => {
-        blinkOpacity.set(
-            withTiming(0.4, {duration: 10}, () => {
-                blinkOpacity.set(withTiming(0, {duration: 50}));
-            }),
-        );
-        HapticFeedback.press();
-    }, [blinkOpacity]);
 
     const askForPermissions = useCallback(() => {
         // There's no way we can check for the BLOCKED status without requesting the permission first
@@ -228,6 +211,9 @@ function IOURequestStepScan({
         submitMultiScanReceipts,
         toggleMultiScan,
         dismissMultiScanEducationalPopup,
+        blinkStyle,
+        showBlink,
+        setTestReceiptAndNavigate,
     } = useReceiptScan({
         report,
         reportID,
@@ -240,27 +226,10 @@ function IOURequestStepScan({
         backToReport,
         isMultiScanEnabled,
         isStartingScan,
-        setIsMultiScanEnabled,
         updateScanAndNavigate,
         getSource,
+        setIsMultiScanEnabled,
     });
-
-    /**
-     * Sets a test receipt from CONST.TEST_RECEIPT_URL and navigates to the confirmation step
-     */
-    const setTestReceiptAndNavigate = useCallback(() => {
-        setTestReceipt(TestReceipt, 'png', (source, file, filename) => {
-            if (!file?.uri) {
-                return;
-            }
-
-            // Set file type as 'image/png' since the test receipt is a PNG file
-            // prepareRequestPayload requires the file type to properly construct the FormData for API upload
-            setMoneyRequestReceipt(initialTransactionID, source, filename, !isEditing, 'image/png', true);
-            removeDraftTransactions(true);
-            navigateToConfirmationStep([{file, source: file.uri, transactionID: initialTransactionID}], false, true);
-        });
-    }, [initialTransactionID, isEditing, navigateToConfirmationStep]);
 
     const viewfinderLayout = useRef<LayoutRectangle>(null);
 

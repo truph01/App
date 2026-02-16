@@ -3,9 +3,8 @@ import React, {useCallback, useContext, useEffect, useReducer, useRef, useState}
 import type {LayoutRectangle} from 'react-native';
 import {PanResponder, StyleSheet, View} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
-import Animated, {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import type Webcam from 'react-webcam';
-import TestReceipt from '@assets/images/fake-receipt.png';
 import ActivityIndicator from '@components/ActivityIndicator';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
@@ -27,7 +26,6 @@ import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import setTestReceipt from '@libs/actions/setTestReceipt';
 import {clearUserLocation, setUserLocation} from '@libs/actions/UserLocation';
 import {isMobile, isMobileWebKit} from '@libs/Browser';
 import {base64ToFile, isLocalFile as isLocalFileFileUtils} from '@libs/fileDownload/FileUtils';
@@ -114,6 +112,9 @@ function IOURequestStepScan({
         submitMultiScanReceipts,
         toggleMultiScan,
         dismissMultiScanEducationalPopup,
+        blinkStyle,
+        showBlink,
+        setTestReceiptAndNavigate,
     } = useReceiptScan({
         report,
         reportID,
@@ -126,26 +127,13 @@ function IOURequestStepScan({
         backToReport,
         isMultiScanEnabled,
         isStartingScan,
-        setIsMultiScanEnabled,
         updateScanAndNavigate,
         getSource,
+        setIsMultiScanEnabled,
     });
 
     const [videoConstraints, setVideoConstraints] = useState<MediaTrackConstraints>();
     const isTabActive = useIsFocused();
-
-    const blinkOpacity = useSharedValue(0);
-    const blinkStyle = useAnimatedStyle(() => ({
-        opacity: blinkOpacity.get(),
-    }));
-
-    const showBlink = useCallback(() => {
-        blinkOpacity.set(
-            withTiming(0.4, {duration: 10}, () => {
-                blinkOpacity.set(withTiming(0, {duration: 50}));
-            }),
-        );
-    }, [blinkOpacity]);
 
     /**
      * On phones that have ultra-wide lens, react-webcam uses ultra-wide by default.
@@ -297,17 +285,6 @@ function IOURequestStepScan({
 
         validateFiles(files, Array.from(e.dataTransfer?.items ?? []));
     };
-
-    /**
-     * Sets a test receipt from CONST.TEST_RECEIPT_URL and navigates to the confirmation step
-     */
-    const setTestReceiptAndNavigate = useCallback(() => {
-        setTestReceipt(TestReceipt, 'png', (source, file, filename) => {
-            setMoneyRequestReceipt(initialTransactionID, source, filename, !isEditing, CONST.TEST_RECEIPT.FILE_TYPE, true);
-            removeDraftTransactions(true);
-            navigateToConfirmationStep([{file, source, transactionID: initialTransactionID}], false, true);
-        });
-    }, [initialTransactionID, isEditing, navigateToConfirmationStep]);
 
     const setupCameraPermissionsAndCapabilities = (stream: MediaStream) => {
         setCameraPermissionState('granted');
