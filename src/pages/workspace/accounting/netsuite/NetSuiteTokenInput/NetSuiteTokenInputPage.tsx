@@ -5,6 +5,7 @@ import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import InteractiveStepSubPageHeader from '@components/InteractiveStepSubPageHeader';
 import useSubPage from '@hooks/useSubPage';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {isAuthenticationError} from '@libs/actions/connections';
 import Navigation from '@libs/Navigation/Navigation';
 import type {CustomSubPageTokenInputProps} from '@pages/workspace/accounting/netsuite/types';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
@@ -26,6 +27,8 @@ const pages = [
 function NetSuiteTokenInputPage({policy, route}: WithPolicyConnectionsProps) {
     const policyID = policy?.id;
     const styles = useThemeStyles();
+
+    const hasAuthError = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE);
 
     const submit = () => {
         Navigation.dismissModal();
