@@ -363,7 +363,6 @@ function handleMoneyRequestStepScanParticipants({
                 participant,
                 transactionReportID: initialTransaction?.reportID,
             });
-            const recentWaypoints = getRecentWaypoints();
             if (locationPermissionGranted) {
                 getCurrentPosition(
                     (successData) => {
@@ -372,6 +371,7 @@ function handleMoneyRequestStepScanParticipants({
                             lat: successData.coords.latitude,
                             long: successData.coords.longitude,
                         };
+                        const recentWaypoints = getRecentWaypoints();
                         createTransaction({
                             transactions,
                             iouType,
@@ -401,6 +401,7 @@ function handleMoneyRequestStepScanParticipants({
                     (errorData) => {
                         Log.info('[IOURequestStepScan] getCurrentPosition failed', false, errorData);
                         // When there is an error, the money can still be requested, it just won't include the GPS coordinates
+                        const recentWaypoints = getRecentWaypoints();
                         createTransaction({
                             transactions,
                             iouType,
@@ -427,6 +428,7 @@ function handleMoneyRequestStepScanParticipants({
                 );
                 return;
             }
+            const recentWaypoints = getRecentWaypoints();
             createTransaction({
                 transactions,
                 iouType,
