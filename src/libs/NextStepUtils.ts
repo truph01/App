@@ -58,7 +58,8 @@ function buildNextStepMessage(nextStep: ReportNextStep, translate: LocaleContext
         eta = translate(`nextStep.eta.${nextStep.eta.etaKey}`);
         etaType = CONST.NEXT_STEP.ETA_TYPE.KEY;
     } else if (nextStep.eta?.dateTime) {
-        eta = DateUtils.formatToLongDateWithWeekday(nextStep.eta.dateTime);
+        const formatString = nextStep.messageKey === CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_AUTOMATIC_SUBMIT ? CONST.DATE.ORDINAL_DAY_OF_MONTH : CONST.DATE.LONG_DATE_FORMAT_WITH_WEEKDAY;
+        eta = format(new Date(nextStep.eta.dateTime), formatString);
         etaType = CONST.NEXT_STEP.ETA_TYPE.DATE_TIME;
     }
 
