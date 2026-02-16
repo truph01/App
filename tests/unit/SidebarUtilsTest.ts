@@ -16,6 +16,7 @@ import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {OriginalMessageIOU, PersonalDetails, Policy, Report, ReportAction, ReportActions, Transaction, TransactionViolation, TransactionViolations} from '@src/types/onyx';
+import type {ReportAttributes} from '@src/types/onyx/DerivedValues';
 import type {ReportCollectionDataSet} from '@src/types/onyx/Report';
 import type {TransactionViolationsCollectionDataSet} from '@src/types/onyx/TransactionViolation';
 import {actionR14932 as mockIOUAction} from '../../__mocks__/reportData/actions';
@@ -26,7 +27,7 @@ import {createRandomReport} from '../utils/collections/reports';
 import {createSidebarReportsCollection, createSidebarTestData} from '../utils/collections/sidebarReports';
 import createRandomTransaction from '../utils/collections/transaction';
 import * as LHNTestUtils from '../utils/LHNTestUtils';
-import {localeCompare} from '../utils/TestHelper';
+import {localeCompare, translateLocal} from '../utils/TestHelper';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
@@ -34,6 +35,7 @@ import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct'
 jest.mock('@libs/PolicyUtils', () => ({
     ...jest.requireActual<typeof PolicyUtils>('@libs/PolicyUtils'),
     getConnectedIntegration: jest.fn(() => true),
+    isPolicyAdmin: jest.fn(() => true),
 }));
 
 describe('SidebarUtils', () => {
@@ -47,16 +49,11 @@ describe('SidebarUtils', () => {
         await waitForBatchedUpdatesWithAct();
     });
 
-    beforeEach(() => {
-        // Reset all mocks before each test
-        jest.clearAllMocks();
-    });
-
-    afterAll(async () => {
+    afterEach(async () => {
         await act(async () => {
             await Onyx.clear();
         });
-        await waitForBatchedUpdatesWithAct();
+        jest.clearAllMocks();
     });
 
     describe('getReasonAndReportActionThatHasRedBrickRoad', () => {
@@ -348,13 +345,17 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
+                translate: translateLocal,
                 localeCompare,
                 lastAction: undefined,
                 lastActionReport: undefined,
                 isReportArchived: undefined,
+                currentUserAccountID: 0,
+                reportAttributesDerived: undefined,
             });
             const optionDataUnpinned = SidebarUtils.getOptionData({
                 report: MOCK_REPORT_UNPINNED,
@@ -362,13 +363,17 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
+                translate: translateLocal,
                 localeCompare,
                 lastAction: undefined,
                 lastActionReport: undefined,
                 isReportArchived: undefined,
+                currentUserAccountID: 0,
+                reportAttributesDerived: undefined,
             });
 
             expect(optionDataPinned?.isPinned).toBe(true);
@@ -966,7 +971,7 @@ describe('SidebarUtils', () => {
                         }),
                     )
                     .then(() => {
-                        const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, localeCompare);
+                        const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
                         expect(result.messageHtml).toContain('This chat is with');
                         expect(result.messageHtml).toContain('<user-details accountid="1">');
                         expect(result.messageHtml).toContain('<user-details accountid="2">');
@@ -992,7 +997,7 @@ describe('SidebarUtils', () => {
                 });
             });
 
-            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, localeCompare);
+            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
             expect(result.messageText).toBe('This chat is with Email One.');
             expect(result.messageHtml).toContain('<user-details accountid="1">Email One</user-details>');
         });
@@ -1015,7 +1020,7 @@ describe('SidebarUtils', () => {
                 });
             });
 
-            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, localeCompare);
+            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
             expect(result.messageText).toMatch(/^This chat is with .+ and .+\.$/);
             expect(result.messageText).toContain(' and ');
             expect(result.messageText).not.toContain('<user-details');
@@ -1040,7 +1045,7 @@ describe('SidebarUtils', () => {
                 });
             });
 
-            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, localeCompare);
+            const result = SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare);
             expect(result.messageText).toMatch(/^This chat is with .+, .+, and .+\.$/);
             expect(result.messageText).toContain(', and ');
             expect(result.messageText).not.toContain('<user-details');
@@ -1075,7 +1080,7 @@ describe('SidebarUtils', () => {
                     .then(() => {
                         // Simulate how components call getWelcomeMessage() by using the hook useReportIsArchived() to see if the report is archived
                         const {result: isReportArchived} = renderHook(() => useReportIsArchived(MOCK_REPORT?.reportID));
-                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, localeCompare, isReportArchived.current);
+                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare, isReportArchived.current);
                     })
 
                     // Then the welcome message should indicate the report is archived
@@ -1105,12 +1110,175 @@ describe('SidebarUtils', () => {
                     .then(() => {
                         // Simulate how components call getWelcomeMessage() by using the hook useReportIsArchived() to see if the report is archived
                         const {result: isReportArchived} = renderHook(() => useReportIsArchived(MOCK_REPORT?.reportID));
-                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, participantPersonalDetailList, localeCompare, isReportArchived.current);
+                        return SidebarUtils.getWelcomeMessage(MOCK_REPORT, undefined, undefined, participantPersonalDetailList, translateLocal, localeCompare, isReportArchived.current);
                     })
 
                     // Then the welcome message should explain the purpose of the room
                     .then((result) => expect(result.messageText).toBe('This chat is with everyone in Unavailable workspace. Use it for the most important announcements.'))
             );
+        });
+
+        it('should return correct welcome message for invoice room with business receiver', () => {
+            const invoiceReceiverPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Client Corporation',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                name: 'Vendor Workspace',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const invoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS,
+                    policyID: invoiceReceiverPolicy.id,
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(invoiceRoom, senderPolicy, invoiceReceiverPolicy, [], translateLocal, localeCompare);
+
+            expect(result.messageText).toContain('Client Corporation');
+            expect(result.messageText).toContain('Vendor Workspace');
+            expect(result.messageHtml).toContain('Client Corporation');
+            expect(result.messageHtml).toContain('Vendor Workspace');
+        });
+
+        it('should return correct welcome message for invoice room with individual receiver', () => {
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Service Provider',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const payerAccountID = 54321;
+            const invoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL,
+                    accountID: payerAccountID,
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(invoiceRoom, senderPolicy, undefined, [], translateLocal, localeCompare);
+
+            // When invoiceReceiverPolicy is undefined (individual payer), it should handle gracefully
+            expect(result.messageText).toBeTruthy();
+            expect(result.messageText).toContain('Service Provider');
+        });
+
+        it('should not return invoice room message for non-invoice rooms even with invoiceReceiverPolicy', () => {
+            const invoiceReceiverPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Some Policy',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                name: 'Regular Workspace',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const regularRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.POLICY_ANNOUNCE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.POLICY_ANNOUNCE,
+                policyID: policy.id,
+                policyName: policy.name,
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(regularRoom, policy, invoiceReceiverPolicy, [], translateLocal, localeCompare);
+
+            // Should not contain invoice-specific messaging
+            expect(result.messageText).not.toContain('Some Policy');
+            expect(result.messageText).toContain('Regular Workspace');
+        });
+
+        it('should handle archived invoice room with invoiceReceiverPolicy', () => {
+            const invoiceReceiverPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Archived Client',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                name: 'Archived Sender',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const archivedInvoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                reportName: 'Invoice Room',
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS,
+                    policyID: invoiceReceiverPolicy.id,
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(
+                archivedInvoiceRoom,
+                senderPolicy,
+                invoiceReceiverPolicy,
+                [],
+                translateLocal,
+                localeCompare,
+                true, // isReportArchived
+                'https://example.com/report',
+            );
+
+            // Should show archived message
+            expect(result.messageText).toContain('You missed the party');
+            expect(result.messageText).toContain(senderPolicy.name);
+        });
+
+        it('should handle invoice room when invoiceReceiverPolicy is null', () => {
+            const senderPolicy: Policy = {
+                ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                name: 'Sender Workspace',
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const invoiceRoom: Report = {
+                ...createRandomReport(1, CONST.REPORT.CHAT_TYPE.INVOICE),
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.INVOICE,
+                policyID: senderPolicy.id,
+                policyName: senderPolicy.name,
+                invoiceReceiver: {
+                    type: CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS,
+                    policyID: '999',
+                },
+            };
+
+            const result = SidebarUtils.getWelcomeMessage(
+                invoiceRoom,
+                senderPolicy,
+                undefined, // invoiceReceiverPolicy is undefined
+                [],
+                translateLocal,
+                localeCompare,
+            );
+
+            // Should still return a message, even if invoiceReceiverPolicy is missing
+            expect(result.messageText).toBeTruthy();
+            expect(result.messageText).toContain('Sender Workspace');
         });
     });
 
@@ -1162,13 +1330,17 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
+                translate: translateLocal,
                 localeCompare,
                 lastAction,
                 lastActionReport: undefined,
                 isReportArchived: undefined,
+                currentUserAccountID: 0,
+                reportAttributesDerived: undefined,
             });
 
             // Then the alternate text should be equal to the message of the last action prepended with the last actor display name.
@@ -1222,13 +1394,17 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
+                translate: translateLocal,
                 localeCompare,
                 lastAction,
                 lastActionReport: undefined,
                 isReportArchived: undefined,
+                currentUserAccountID: 0,
+                reportAttributesDerived: undefined,
             });
 
             // Then the alternate text should be equal to the message of the last action prepended with the last actor display name.
@@ -1285,13 +1461,17 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs: {},
                 personalDetails: {},
                 policy: undefined,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction: undefined,
                 oneTransactionThreadReport: undefined,
                 card: undefined,
+                translate: translateLocal,
                 localeCompare,
                 lastAction,
                 lastActionReport: undefined,
                 isReportArchived: undefined,
+                currentUserAccountID: 0,
+                reportAttributesDerived: undefined,
             });
 
             // Then the alternate text should show @Hidden.
@@ -1332,14 +1512,17 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: 0,
                 });
 
                 expect(optionData?.alternateText).toBe(`test message`);
@@ -1371,14 +1554,18 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: LHNTestUtils.fakePersonalDetails,
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     isReportArchived: true,
                     lastActionReport: undefined,
+                    currentUserAccountID: 0,
+                    reportAttributesDerived: undefined,
                 });
 
                 expect(optionData?.alternateText).toBe(`test message`);
@@ -1407,14 +1594,17 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: 0,
                 });
 
                 expect(optionData?.alternateText).toBe(`test message`);
@@ -1527,19 +1717,33 @@ describe('SidebarUtils', () => {
                     await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
                 });
 
+                const mockReportAttributesDerived: Record<string, ReportAttributes> = {
+                    [iouReport.reportID]: {
+                        reportName: iouReport.reportName ?? '',
+                        isEmpty: false,
+                        brickRoadStatus: undefined,
+                        requiresAttention: false,
+                        reportErrors: {},
+                    },
+                };
+
                 const optionData = SidebarUtils.getOptionData({
                     report: policyExpenseChat,
                     reportAttributes: undefined,
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: 0,
+                    reportAttributesDerived: mockReportAttributesDerived,
                 });
 
                 expect(optionData?.alternateText).toBe(formatReportLastMessageText(iouReport.reportName));
@@ -1573,14 +1777,17 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs,
                     personalDetails: {},
                     policy,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     lastMessageTextFromReport: 'test message',
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: 0,
                 });
 
                 expect(optionData?.alternateText).toBe(`${policy.name} ${CONST.DOT_SEPARATOR} test message`);
@@ -1644,13 +1851,16 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastAction,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: session.accountID,
                 });
 
                 // Then the alternate text should be equal to the message of the last action prepended with the last actor display name.
@@ -1703,19 +1913,79 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastAction,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: session.accountID,
                 });
 
                 expect(result?.alternateText).toBe(`You: moved this report to the Three's Workspace workspace`);
             });
 
+            it('shows "You:" prefix in a 1:1 chat when report actions are not loaded yet (cold start scenario)', async () => {
+                const session = {
+                    authToken: 'sensitive-auth-token',
+                    encryptedAuthToken: 'sensitive-encrypted-token',
+                    email: 'user@example.com',
+                    accountID: 2,
+                };
+
+                const report: Report = {
+                    ...createRandomReport(9999, undefined),
+                    type: CONST.REPORT.TYPE.CHAT,
+                    lastMessageText: 'someMessage',
+                    lastMessageHtml: 'someMessage',
+                    lastActorAccountID: session.accountID,
+                    lastActionType: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                    participants: {
+                        [session.accountID]: {notificationPreference: 'always'},
+                        3: {notificationPreference: 'always'},
+                    },
+                };
+
+                await act(async () => {
+                    await Onyx.set(ONYXKEYS.SESSION, session);
+                    await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`, report);
+
+                    // Note: We intentionally do NOT set REPORT_ACTIONS to simulate cold start
+                    // where report actions haven't been loaded yet
+                });
+
+                const result = SidebarUtils.getOptionData({
+                    report,
+                    reportAttributes: undefined,
+                    reportNameValuePairs: {},
+                    personalDetails: {
+                        [session.accountID]: {accountID: session.accountID},
+                    },
+                    policy: undefined,
+                    invoiceReceiverPolicy: undefined,
+                    parentReportAction: undefined,
+                    oneTransactionThreadReport: undefined,
+                    card: undefined,
+                    translate: translateLocal,
+                    localeCompare,
+                    lastAction: undefined,
+                    lastActionReport: undefined,
+                    isReportArchived: undefined,
+                    lastMessageTextFromReport: report.lastMessageText,
+                    currentUserAccountID: session.accountID,
+                });
+
+                expect(result?.alternateText).toBe('You: someMessage');
+            });
+
             it('returns the last action message as an alternate text if the expense report is the one expense report', async () => {
+                const session = {
+                    accountID: 123,
+                };
+
                 const IOUTransactionID = `${ONYXKEYS.COLLECTION.TRANSACTION}TRANSACTION_IOU` as const;
 
                 iouReportR14932.reportID = '5';
@@ -1757,7 +2027,7 @@ describe('SidebarUtils', () => {
                     shouldShow: true,
                     pendingAction: null,
                     actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
-                    actorAccountID: undefined,
+                    actorAccountID: session.accountID,
                 };
 
                 await act(async () => {
@@ -1769,18 +2039,21 @@ describe('SidebarUtils', () => {
                 });
 
                 const result = SidebarUtils.getOptionData({
-                    report: {...iouReportR14932, lastActorAccountID: undefined},
+                    report: {...iouReportR14932, lastActorAccountID: session.accountID},
                     reportAttributes: undefined,
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastAction,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: session.accountID,
                 });
 
                 expect(result?.alternateText).toBe(`You: ${getReportActionMessageText(lastAction)}`);
@@ -1891,13 +2164,16 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: {},
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastAction,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: 0,
                 });
 
                 expect(result?.alternateText).toContain(`${getReportActionMessageText(lastAction)}`);
@@ -1943,6 +2219,7 @@ describe('SidebarUtils', () => {
                         currency: 'USD',
                         message: '',
                         to: 'email1@test.com',
+                        workflow: CONST.POLICY.APPROVAL_MODE.BASIC,
                     },
                     previousMessage: undefined,
                     automatic: false,
@@ -1974,13 +2251,16 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: LHNTestUtils.fakePersonalDetails,
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
+                    translate: translateLocal,
                     localeCompare,
                     lastAction,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: 0,
                 });
 
                 expect(result?.alternateText).toBe(`One: submitted`);
@@ -2070,17 +2350,20 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: personalDetailList,
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: lastReportPreviewAction,
+                    translate: translateLocal,
                     localeCompare,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: managerID,
                 });
 
                 const reportPreviewMessage = getReportPreviewMessage(iouReport, iouAction, true, true, null, true, lastReportPreviewAction);
-                expect(result?.alternateText).toBe(`${getLastActorDisplayName({accountID: managerID})}: ${reportPreviewMessage}`);
+                expect(result?.alternateText).toBe(`${getLastActorDisplayName({accountID: managerID}, managerID)}: ${reportPreviewMessage}`);
             });
 
             it("shouldn't add current user prefix if the current user isn't the report's manager for report preview action in a DM chat", async () => {
@@ -2167,13 +2450,16 @@ describe('SidebarUtils', () => {
                     reportNameValuePairs: {},
                     personalDetails: personalDetailList,
                     policy: undefined,
+                    invoiceReceiverPolicy: undefined,
                     parentReportAction: undefined,
                     oneTransactionThreadReport: undefined,
                     card: undefined,
                     lastAction: lastReportPreviewAction,
+                    translate: translateLocal,
                     localeCompare,
                     lastActionReport: undefined,
                     isReportArchived: undefined,
+                    currentUserAccountID: managerID,
                 });
 
                 const reportPreviewMessage = getReportPreviewMessage(iouReport, iouAction, true, true, null, true, lastReportPreviewAction);
@@ -2185,7 +2471,7 @@ describe('SidebarUtils', () => {
     describe('sortReportsToDisplayInLHN', () => {
         describe('categorizeReportsForLHN', () => {
             it('should categorize reports into correct groups', () => {
-                const {reports, reportNameValuePairs, reportAttributes} = createSidebarTestData();
+                const {reports, reportNameValuePairs} = createSidebarTestData();
 
                 // Given reportsDrafts contains a draft comment for report '2'
                 const reportsDrafts = {
@@ -2193,7 +2479,7 @@ describe('SidebarUtils', () => {
                 };
 
                 // When the reports are categorized
-                const result = SidebarUtils.categorizeReportsForLHN(reports, reportsDrafts, reportNameValuePairs, reportAttributes);
+                const result = SidebarUtils.categorizeReportsForLHN(reports, reportsDrafts, reportNameValuePairs);
 
                 // Then the reports are categorized into the correct groups
                 expect(result.pinnedAndGBRReports).toHaveLength(1);
@@ -2215,21 +2501,12 @@ describe('SidebarUtils', () => {
                         reportName: 'Attention Report',
                         isPinned: false,
                         hasErrorsOtherThanFailedReceipt: false,
+                        requiresAttention: true,
                     },
                 ]);
 
-                const reportAttributes = {
-                    '0': {
-                        requiresAttention: true,
-                        reportName: 'Test Report',
-                        isEmpty: false,
-                        brickRoadStatus: undefined,
-                        reportErrors: {} as Record<string, string | null>,
-                    },
-                };
-
                 // When the reports are categorized
-                const result = SidebarUtils.categorizeReportsForLHN(reports, undefined, undefined, reportAttributes);
+                const result = SidebarUtils.categorizeReportsForLHN(reports, undefined, undefined);
 
                 // Then the reports are categorized into the correct groups
                 expect(result.pinnedAndGBRReports).toHaveLength(1);
