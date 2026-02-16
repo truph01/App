@@ -277,13 +277,10 @@ function MoneyRequestReportTransactionList({
     const {sortBy, sortOrder} = sortConfig;
 
     const sortedTransactions: TransactionWithOptionalHighlight[] = useMemo(() => {
-        return [...transactions]
-            .sort((a, b) => compareValues(getTransactionValue(a, sortBy, report), getTransactionValue(b, sortBy, report), sortOrder, sortBy, localeCompare, true))
-            .map((transaction) => ({
-                ...transaction,
-                shouldBeHighlighted: newTransactions?.includes(transaction),
-            }));
-    }, [newTransactions, sortBy, sortOrder, transactions, localeCompare, report]);
+        return [...transactions].sort((a, b) => compareValues(getTransactionValue(a, sortBy, report), getTransactionValue(b, sortBy, report), sortOrder, sortBy, localeCompare, true));
+    }, [sortBy, sortOrder, transactions, localeCompare, report]);
+
+    const highlightedTransactionIDs = useMemo(() => new Set(newTransactions.map(({transactionID}) => transactionID)), [newTransactions]);
 
     // Always use default columns for money request report view (don't use user-customized search columns)
     const columnsToShow = useMemo(() => {
@@ -331,13 +328,6 @@ function MoneyRequestReportTransactionList({
         };
     }, [visualOrderTransactionIDsDeepCompare]);
 
-    const sortedTransactionsMap = useMemo(() => {
-        const map = new Map<string, OnyxTypes.Transaction>();
-        for (const transaction of sortedTransactions) {
-            map.set(transaction.transactionID, transaction);
-        }
-        return map;
-    }, [sortedTransactions]);
 
     const groupSelectionState = useMemo(() => {
         const state = new Map<string, {isSelected: boolean; isIndeterminate: boolean; isDisabled: boolean; pendingAction?: PendingAction}>();
@@ -552,11 +542,11 @@ function MoneyRequestReportTransactionList({
                                       pendingAction={selectionState.pendingAction}
                                   />
                                   {group.transactions.map((transaction) => {
-                                      const originalTransaction = sortedTransactionsMap.get(transaction.transactionID) ?? transaction;
                                       return (
                                           <MoneyRequestReportTransactionItem
                                               key={transaction.transactionID}
-                                              transaction={originalTransaction}
+                                              transaction={transaction}
+                                              shouldBeHighlighted={highlightedTransactionIDs.has(transaction.transactionID)}
                                               violations={filteredViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`]}
                                               columns={columnsToShow}
                                               report={report}
@@ -580,6 +570,7 @@ function MoneyRequestReportTransactionList({
                           <MoneyRequestReportTransactionItem
                               key={transaction.transactionID}
                               transaction={transaction}
+                              shouldBeHighlighted={highlightedTransactionIDs.has(transaction.transactionID)}
                               violations={filteredViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`]}
                               columns={columnsToShow}
                               report={report}
