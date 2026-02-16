@@ -901,7 +901,7 @@ describe('actions/Duplicate', () => {
         const policyExpenseChat = createRandomReport(1, CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT);
         const fakePolicyCategories = createRandomPolicyCategories(3);
 
-        beforeEach(() => {
+        beforeEach(async () => {
             jest.clearAllMocks();
             global.fetch = getGlobalFetchMock();
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
@@ -918,10 +918,7 @@ describe('actions/Duplicate', () => {
                 }
                 return Promise.resolve();
             });
-            Onyx.connect({
-                key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
-                callback: (val) => (recentWaypoints = val ?? []),
-            });
+            recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
             return Onyx.clear();
         });
 
