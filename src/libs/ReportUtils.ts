@@ -8757,7 +8757,15 @@ function getReportSummariesForEmptyCheck(reports: OnyxCollection<Report> | Array
     }
 
     const reportsArray = Array.isArray(reports) ? reports : Object.values(reports);
-    return reportsArray.map((report) => toReportEmptyStateSummary(report as Report | ReportEmptyStateSummary | undefined)).filter((summary): summary is ReportEmptyStateSummary => !!summary);
+    const result: ReportEmptyStateSummary[] = [];
+    for (const report of reportsArray) {
+        const summary = toReportEmptyStateSummary(report as Report | ReportEmptyStateSummary | undefined);
+
+        if (summary) {
+            result.push(summary);
+        }
+    }
+    return result;
 }
 
 const reportSummariesOnyxSelector = (reports: Parameters<typeof getReportSummariesForEmptyCheck>[0]) => getReportSummariesForEmptyCheck(reports);
