@@ -7641,7 +7641,7 @@ ${amount} para ${merchant} - ${date}`,
         viewAttachment: 'Ver archivo adjunto',
         selectAllFeatures: 'Seleccionar todas las características',
         selectAllItems: 'Seleccionar todos los elementos',
-        selectAllTransactions: 'Seleccionar todos los gastos',
+        selectAllTransactions: 'Seleccionar todas las transacciones',
     },
     parentReportAction: {
         deletedReport: 'Informe eliminado',
