@@ -220,6 +220,7 @@ function IOURequestStepDistanceManual({
                 selfDMReport,
                 policyForMovingExpenses,
                 betas,
+                recentWaypoints,
             });
         },
         [

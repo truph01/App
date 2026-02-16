@@ -324,6 +324,7 @@ function IOURequestStepDistanceMap({
             selfDMReport,
             policyForMovingExpenses,
             betas,
+            recentWaypoints,
         });
     }, [
         iouType,
