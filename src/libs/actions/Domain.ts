@@ -1117,7 +1117,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
         ...(twoFactorAuthCode
             ? [
                   {
-                      onyxMethod: Onyx.METHOD.MERGE as const,
+                      onyxMethod: Onyx.METHOD.MERGE,
                       key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
                       value: {
                           errors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
