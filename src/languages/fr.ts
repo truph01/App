@@ -686,6 +686,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rejeter l’authentification',
             test: 'Test',
             biometricsAuthentication: 'Authentification biométrique',
+            authType: {
+                unknown: 'Inconnu',
+                none: 'Aucun',
+                credentials: 'Identifiants',
+                biometrics: 'Biométrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Veuillez activer la vérification par reconnaissance faciale/empreinte digitale ou définir un code d’accès à l’appareil dans vos',
@@ -720,6 +729,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Appareil non pris en charge',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Cette action n'est pas prise en charge sur votre appareil. Veuillez télécharger l'application Expensify depuis l'<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> ou le <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> et réessayer.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Échec de la vérification',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`

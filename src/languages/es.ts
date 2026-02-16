@@ -514,7 +514,17 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rechazar autenticación',
             test: 'Prueba',
             biometricsAuthentication: 'Autenticación biométrica',
+            authType: {
+                unknown: 'Desconocido',
+                none: 'Ninguno',
+                credentials: 'Credenciales',
+                biometrics: 'Biometría',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
+        verificationFailed: 'Verificación fallida',
         pleaseEnableInSystemSettings: {
             start: 'Por favor, activa la verificación de rostro/huella digital o establece un código de acceso en tus ',
             link: 'ajustes del sistema',

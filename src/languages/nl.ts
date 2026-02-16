@@ -683,6 +683,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Authenticatie weigeren',
             test: 'Test',
             biometricsAuthentication: 'Biometrische verificatie',
+            authType: {
+                unknown: 'Onbekend',
+                none: 'Geen',
+                credentials: 'Inloggegevens',
+                biometrics: 'Biometrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Schakel gezichts-/vingerafdrukverificatie in of stel een toesteltoegangscode in op uw',
@@ -716,6 +725,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Niet-ondersteund apparaat',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Deze actie wordt niet ondersteund op jouw apparaat. Download de Expensify-app uit de <a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> of de <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> en probeer het opnieuw.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Verificatie mislukt',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`

@@ -683,6 +683,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: '認証を拒否',
             test: 'テスト',
             biometricsAuthentication: '生体認証',
+            authType: {
+                unknown: '不明',
+                none: 'なし',
+                credentials: '資格情報',
+                biometrics: '生体認証',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: '顔認証/指紋認証を有効にするか、デバイスのパスコードを設定してください',
@@ -715,6 +724,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: '未対応のデバイス',
             pleaseDownloadMobileApp: `<centered-text><muted-text> この操作はお使いのデバイスではサポートされていません。<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> または <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Playストア</a> からExpensifyアプリをダウンロードして、もう一度お試しください。</muted-text></centered-text>`,
         },
+        verificationFailed: '認証に失敗しました',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`

@@ -683,6 +683,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Authentifizierung ablehnen',
             test: 'Test',
             biometricsAuthentication: 'Biometrische Authentifizierung',
+            authType: {
+                unknown: 'Unbekannt',
+                none: 'Keine',
+                credentials: 'Anmeldedaten',
+                biometrics: 'Biometrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Bitte aktiviere die Gesichts-/Fingerabdrucküberprüfung oder richte einen Gerätecode auf deinem Gerät ein',
@@ -716,6 +725,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Nicht unterstütztes Gerät',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Diese Aktion wird auf deinem Gerät nicht unterstützt. Bitte lade die Expensify-App aus dem <a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> oder dem <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> herunter und versuche es erneut.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Überprüfung fehlgeschlagen',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`

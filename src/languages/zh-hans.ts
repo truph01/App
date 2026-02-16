@@ -678,6 +678,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: '拒绝认证',
             test: '测试',
             biometricsAuthentication: '生物识别认证',
+            authType: {
+                unknown: '未知',
+                none: '无',
+                credentials: '凭据',
+                biometrics: '生物识别',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: '请在您的设备中启用面部/指纹验证或设置设备密码',
@@ -710,6 +719,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: '不支持的设备',
             pleaseDownloadMobileApp: `<centered-text><muted-text> 您的设备不支持此操作。请从<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a>或<a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play 商店</a>下载 Expensify 应用，然后重试。</muted-text></centered-text>`,
         },
+        verificationFailed: '验证失败',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
