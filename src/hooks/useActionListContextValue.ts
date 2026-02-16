@@ -1,4 +1,4 @@
-import {useMemo, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import type {FlatList} from 'react-native';
 import type {ActionListContextType, ScrollPosition} from '@pages/inbox/ReportScreenContext';
 
@@ -7,7 +7,7 @@ function useActionListContextValue(): ActionListContextType {
     const [scrollPosition, setScrollPosition] = useState<ScrollPosition>({});
     const scrollOffsetRef = useRef(0);
 
-    return useMemo(() => ({flatListRef, scrollPosition, setScrollPosition, scrollOffsetRef}), [scrollPosition]);
+    return {flatListRef, scrollPosition, setScrollPosition, scrollOffsetRef};
 }
 
 export default useActionListContextValue;
