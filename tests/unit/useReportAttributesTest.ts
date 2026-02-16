@@ -44,8 +44,8 @@ describe('useReportAttributes', () => {
         });
     });
 
-    beforeEach(() => {
-        Onyx.clear();
+    beforeEach(async () => {
+        await Onyx.clear();
     });
 
     it('should return undefined when the derived value is not set', async () => {
