@@ -2,7 +2,6 @@ import React, {useCallback, useMemo, useState} from 'react';
 import type {ValueOf} from 'type-fest';
 import ConfirmModal from '@components/ConfirmModal';
 import ConnectionLayout from '@components/ConnectionLayout';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -20,6 +19,7 @@ import type {TranslationPaths} from '@src/languages/types';
 import ROUTES from '@src/ROUTES';
 import INPUT_IDS from '@src/types/form/NetSuiteCustomFieldForm';
 import type {NetSuiteCustomList, NetSuiteCustomSegment} from '@src/types/onyx/Policy';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type CustomField = NetSuiteCustomList | NetSuiteCustomSegment;
 type ImportCustomFieldsKeys = ValueOf<typeof CONST.NETSUITE_CONFIG.IMPORT_CUSTOM_FIELDS>;
@@ -49,6 +49,7 @@ function NetSuiteImportCustomFieldView({
 
     const config = policy?.connections?.netsuite?.options?.config;
     const allRecords = useMemo(() => config?.syncOptions?.[importCustomField] ?? [], [config?.syncOptions, importCustomField]);
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
 
     const customField: CustomField | undefined = allRecords[valueIndex];
     const fieldList =
@@ -136,7 +137,7 @@ function NetSuiteImportCustomFieldView({
                         );
                     })}
                     <MenuItem
-                        icon={Expensicons.Trashcan}
+                        icon={icons.Trashcan}
                         title={translate('common.remove')}
                         disabled={!!config?.pendingFields?.[importCustomField]}
                         onPress={() => setIsRemoveModalOpen(true)}

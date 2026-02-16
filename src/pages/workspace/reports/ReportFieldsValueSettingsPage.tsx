@@ -2,7 +2,6 @@ import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import ConfirmModal from '@components/ConfirmModal';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -26,6 +25,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type ReportFieldsValueSettingsPageProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.REPORT_FIELDS_VALUE_SETTINGS>;
 
@@ -60,6 +60,7 @@ function ReportFieldsValueSettingsPage({
 
     const hasAccountingConnections = hasAccountingConnectionsUtil(policy);
     const oldValueName = usePrevious(currentValueName);
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
 
     if (!currentValueName && !oldValueName) {
         return <NotFoundPage />;
@@ -141,7 +142,7 @@ function ReportFieldsValueSettingsPage({
                     />
                     {!hasAccountingConnections && (
                         <MenuItem
-                            icon={Expensicons.Trashcan}
+                            icon={icons.Trashcan}
                             title={translate('common.delete')}
                             onPress={() => setIsDeleteTagModalOpen(true)}
                         />

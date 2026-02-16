@@ -3,7 +3,6 @@ import {View} from 'react-native';
 import type {OnyxCollection} from 'react-native-onyx';
 import ConfirmModal from '@components/ConfirmModal';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -30,6 +29,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Report, Transaction} from '@src/types/onyx';
 import type {Rate, TaxRateAttributes} from '@src/types/onyx/Policy';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type PolicyDistanceRateDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DISTANCE_RATE_DETAILS>;
 
@@ -88,6 +88,7 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
     });
 
     const transactionViolations = useTransactionViolation(eligibleTransactionIDs);
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
 
     const currency = rate?.currency ?? CONST.CURRENCY.USD;
     const taxClaimablePercentage = rate?.attributes?.taxClaimablePercentage;
@@ -237,7 +238,7 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                         </OfflineWithFeedback>
                     )}
                     <MenuItem
-                        icon={Expensicons.Trashcan}
+                        icon={icons.Trashcan}
                         title={translate('common.delete')}
                         onPress={() => {
                             if (canDisableOrDeleteRate) {

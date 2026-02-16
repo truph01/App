@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import ConfirmModal from '@components/ConfirmModal';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -23,6 +22,7 @@ import {deleteReportFields} from '@userActions/Policy/ReportField';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type ReportFieldsSettingsPageProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.REPORT_FIELDS_SETTINGS>;
 
@@ -35,6 +35,7 @@ function ReportFieldsSettingsPage({
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
 
     const hasAccountingConnections = hasAccountingConnectionsPolicyUtils(policy);
     const reportFieldKey = getReportFieldKey(reportFieldID);
@@ -121,7 +122,7 @@ function ReportFieldsSettingsPage({
                     {!hasAccountingConnections && (
                         <View style={styles.flexGrow1}>
                             <MenuItem
-                                icon={Expensicons.Trashcan}
+                                icon={icons.Trashcan}
                                 title={translate('common.delete')}
                                 onPress={() => setIsDeleteModalVisible(true)}
                             />

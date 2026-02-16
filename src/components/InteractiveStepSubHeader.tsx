@@ -7,8 +7,8 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import colors from '@styles/theme/colors';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import Icon from './Icon';
-import * as Expensicons from './Icon/Expensicons';
 import PressableWithFeedback from './Pressable/PressableWithFeedback';
 import Text from './Text';
 
@@ -65,6 +65,7 @@ function InteractiveStepSubHeader({stepNames, startStepIndex = 0, onStepSelected
         }),
         [],
     );
+    const icons = useMemoizedLazyExpensifyIcons(['Checkmark'] as const);
 
     const amountOfUnions = stepNames.length - 1;
 
@@ -112,7 +113,7 @@ function InteractiveStepSubHeader({stepNames, startStepIndex = 0, onStepSelected
                         >
                             {isCompletedStep ? (
                                 <Icon
-                                    src={Expensicons.Checkmark}
+                                    src={icons.Checkmark}
                                     width={variables.iconSizeNormal}
                                     height={variables.iconSizeNormal}
                                     fill={colors.white}

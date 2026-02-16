@@ -9,10 +9,10 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import Button from './Button';
 import Header from './Header';
 import Icon from './Icon';
-import {Close} from './Icon/Expensicons';
 import ImageSVG from './ImageSVG';
 import {PressableWithoutFeedback} from './Pressable';
 import Text from './Text';
@@ -138,6 +138,7 @@ function ConfirmContent({
     const {translate} = useLocalize();
     const theme = useTheme();
     const {isOffline} = useNetwork();
+    const icons = useMemoizedLazyExpensifyIcons(['Close'] as const);
 
     const isCentered = shouldCenterContent;
 
@@ -163,10 +164,11 @@ function ConfirmContent({
                                 onPress={onCancel}
                                 role={CONST.ROLE.BUTTON}
                                 accessibilityLabel={translate('common.close')}
+                                sentryLabel={CONST.SENTRY_LABEL.CONFIRM_CONTENT.DISMISS_BUTTON}
                             >
                                 <Icon
                                     fill={theme.icon}
-                                    src={Close}
+                                    src={icons.Close}
                                 />
                             </PressableWithoutFeedback>
                         </Tooltip>

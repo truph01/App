@@ -7,7 +7,6 @@ import ActivityIndicator from '@components/ActivityIndicator';
 import Checkbox from '@components/Checkbox';
 import FormHelpMessage from '@components/FormHelpMessage';
 import Icon from '@components/Icon';
-import * as Expensicons from '@components/Icon/Expensicons';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import type {AnimatedMarkdownTextInputRef} from '@components/RNMarkdownTextInput';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
@@ -28,6 +27,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import isInputAutoFilled from '@libs/isInputAutoFilled';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 function BaseTextInput({
     label = '',
@@ -199,6 +199,7 @@ function BaseTextInput({
 
     // The ref is needed when the component is uncontrolled and we don't have a value prop
     const hasValueRef = useRef(initialValue.length > 0);
+    const icons = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled'] as const);
     const inputValue = value ?? '';
     const hasValue = inputValue.length > 0 || hasValueRef.current;
 
@@ -454,7 +455,7 @@ function BaseTextInput({
                                     accessibilityLabel={translate('common.visible')}
                                 >
                                     <Icon
-                                        src={passwordHidden ? Expensicons.Eye : Expensicons.EyeDisabled}
+                                        src={passwordHidden ? icons.Eye : icons.EyeDisabled}
                                         fill={theme.icon}
                                     />
                                 </Checkbox>

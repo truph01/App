@@ -6,7 +6,6 @@ import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Button from '@components/Button';
 import Icon from '@components/Icon';
-import {Info} from '@components/Icon/Expensicons';
 import Popover from '@components/Popover';
 import {PressableWithFeedback} from '@components/Pressable';
 import Text from '@components/Text';
@@ -29,6 +28,7 @@ import {navigateToConciergeChat} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type WorkspaceCardsListLabelProps = {
     /** Label type */
@@ -60,6 +60,7 @@ function WorkspaceCardsListLabel({type, value, style}: WorkspaceCardsListLabelPr
     const settlementCurrency = useCurrencyForExpensifyCard({policyID});
     const [cardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${defaultFundID}`, {canBeMissing: true});
     const [cardManualBilling] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_MANUAL_BILLING}${defaultFundID}`, {canBeMissing: true});
+    const icons = useMemoizedLazyExpensifyIcons(['Info'] as const);
     const paymentBankAccountID = cardSettings?.paymentBankAccountID;
 
     const isLessThanMediumScreen = isMediumScreenWidth || shouldUseNarrowLayout;
@@ -114,9 +115,10 @@ function WorkspaceCardsListLabel({type, value, style}: WorkspaceCardsListLabelPr
                         accessibilityLabel={translate(`workspace.expensifyCard.${type}`)}
                         accessibilityRole={CONST.ROLE.BUTTON}
                         onPress={() => setVisible(true)}
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_CARDS_LIST.INFO_BUTTON}
                     >
                         <Icon
-                            src={Info}
+                            src={icons.Info}
                             width={variables.iconSizeExtraSmall}
                             height={variables.iconSizeExtraSmall}
                             fill={theme.icon}

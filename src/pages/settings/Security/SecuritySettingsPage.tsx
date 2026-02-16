@@ -6,8 +6,6 @@ import type {GestureResponderEvent, StyleProp, ViewStyle} from 'react-native';
 import ConfirmModal from '@components/ConfirmModal';
 import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-// eslint-disable-next-line no-restricted-imports
-import * as Expensicons from '@components/Icon/Expensicons';
 import {LockedAccountContext} from '@components/LockedAccountModalProvider';
 import MenuItem from '@components/MenuItem';
 import type {MenuItemProps} from '@components/MenuItem';
@@ -57,7 +55,18 @@ type BaseMenuItemType = {
 };
 
 function SecuritySettingsPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['Pencil', 'ArrowCollapse', 'FallbackAvatar', 'ThreeDots', 'UserLock', 'UserPlus', 'Shield', 'Fingerprint']);
+    const icons = useMemoizedLazyExpensifyIcons([
+        'ArrowCollapse',
+        'ClosedSign',
+        'FallbackAvatar',
+        'Fingerprint',
+        'Pencil',
+        'Shield',
+        'ThreeDots',
+        'Trashcan',
+        'UserLock',
+        'UserPlus',
+    ] as const);
     const illustrations = useMemoizedLazyIllustrations(['LockClosed']);
     const securitySettingsIllustration = useSecuritySettingsSectionIllustration();
     const styles = useThemeStyles();
@@ -199,7 +208,7 @@ function SecuritySettingsPage() {
 
         baseMenuItems.push({
             translationKey: 'closeAccountPage.closeAccount',
-            icon: Expensicons.ClosedSign,
+            icon: icons.ClosedSign,
             action: () => {
                 if (isDelegateAccessRestricted) {
                     showDelegateNoAccessModal();
@@ -224,6 +233,7 @@ function SecuritySettingsPage() {
         }));
     }, [
         icons.ArrowCollapse,
+        icons.ClosedSign,
         icons.UserLock,
         icons.Shield,
         icons.Fingerprint,
@@ -337,7 +347,7 @@ function SecuritySettingsPage() {
         },
         {
             text: translate('delegate.removeCopilot'),
-            icon: Expensicons.Trashcan,
+            icon: icons.Trashcan,
             onPress: () => {
                 if (isActingAsDelegate) {
                     modalClose(() => showDelegateNoAccessModal());

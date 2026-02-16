@@ -10,7 +10,6 @@ import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
-import * as Expensicons from '@components/Icon/Expensicons';
 import Modal from '@components/Modal';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -59,7 +58,7 @@ function AvatarCropModal({imageUri = '', imageName = '', imageType = '', onClose
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Zoom']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Rotate', 'Zoom'] as const);
 
     const originalImageWidth = useSharedValue<number>(CONST.AVATAR_CROP_MODAL.INITIAL_SIZE);
     const originalImageHeight = useSharedValue<number>(CONST.AVATAR_CROP_MODAL.INITIAL_SIZE);
@@ -409,6 +408,7 @@ function AvatarCropModal({imageUri = '', imageName = '', imageType = '', onClose
                                         onPressIn={(e) => scheduleOnUI(sliderOnPress, e.nativeEvent.locationX)}
                                         accessibilityLabel="slider"
                                         role={CONST.ROLE.SLIDER}
+                                        sentryLabel={CONST.SENTRY_LABEL.AVATAR_CROP_MODAL.ZOOM_SLIDER}
                                     >
                                         <Slider
                                             sliderValue={translateSlider}
@@ -421,7 +421,7 @@ function AvatarCropModal({imageUri = '', imageName = '', imageType = '', onClose
                                     >
                                         <View>
                                             <Button
-                                                icon={Expensicons.Rotate}
+                                                icon={expensifyIcons.Rotate}
                                                 iconFill={theme.icon}
                                                 onPress={rotateImage}
                                             />

@@ -3,7 +3,6 @@ import React from 'react';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import type {FormOnyxValues} from '@components/Form/types';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import * as Expensicons from '@components/Icon/Expensicons';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import {useSession} from '@components/OnyxListItemProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
@@ -32,6 +31,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Policy} from '@src/types/onyx';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import EditReportFieldDate from './EditReportFieldDate';
 import EditReportFieldDropdown from './EditReportFieldDropdown';
 import EditReportFieldText from './EditReportFieldText';
@@ -65,6 +65,7 @@ function EditReportFieldPage({route}: EditReportFieldPageProps) {
 
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
     const isReportFieldTitle = isReportFieldOfTypeTitle(reportField);
     const reportFieldsEnabled = ((isPaidGroupPolicyExpenseReport(report) || isInvoiceReport(report)) && !!policy?.areReportFieldsEnabled) || isReportFieldTitle;
     const hasOtherViolations =
@@ -152,7 +153,7 @@ function EditReportFieldPage({route}: EditReportFieldPageProps) {
 
     if (isReportFieldDeletable) {
         menuItems.push({
-            icon: Expensicons.Trashcan,
+            icon: icons.Trashcan,
             text: translate('common.delete'),
             onSelected: () => {
                 handleReportFieldDelete();

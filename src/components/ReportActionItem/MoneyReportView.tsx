@@ -5,7 +5,6 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Icon from '@components/Icon';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import SpacerView from '@components/SpacerView';
@@ -49,6 +48,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Policy, Report} from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type MoneyReportViewProps = {
     /** The report currently being looked at */
@@ -139,6 +139,7 @@ function MoneyReportView({report, policy, isCombinedReport = false, shouldShowTo
             ),
         [shouldHideThreadDividerLine, report?.reportID, styles.reportHorizontalRule],
     );
+    const icons = useMemoizedLazyExpensifyIcons(['Checkmark'] as const);
 
     return (
         <>
@@ -206,7 +207,7 @@ function MoneyReportView({report, policy, isCombinedReport = false, shouldShowTo
                                     {isSettled && !isPartiallyPaid && (
                                         <View style={[styles.defaultCheckmarkWrapper, styles.mh2]}>
                                             <Icon
-                                                src={Expensicons.Checkmark}
+                                                src={icons.Checkmark}
                                                 fill={theme.success}
                                             />
                                         </View>

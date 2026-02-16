@@ -7,8 +7,6 @@ import AttachmentPicker from '@components/AttachmentPicker';
 import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
 import {useFullScreenLoaderActions} from '@components/FullScreenLoaderContext';
 import Icon from '@components/Icon';
-// eslint-disable-next-line no-restricted-imports
-import * as Expensicons from '@components/Icon/Expensicons';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import PopoverMenu from '@components/PopoverMenu';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
@@ -139,19 +137,19 @@ function AttachmentPickerWithMenuItems({
     shouldDisableAttachmentItem,
 }: AttachmentPickerWithMenuItemsProps) {
     const icons = useMemoizedLazyExpensifyIcons([
+        'Cash',
+        'Coins',
         'Collapse',
         'Document',
         'Expand',
-        'Location',
-        'Paperclip',
-        'Task',
-        'Coins',
-        'Receipt',
-        'Cash',
         'InvoiceGeneric',
-        'Transfer',
-        'Receipt',
+        'Location',
         'MoneyCircle',
+        'Paperclip',
+        'Plus',
+        'Receipt',
+        'Task',
+        'Transfer',
     ] as const);
     const isFocused = useIsFocused();
     const theme = useTheme();
@@ -464,7 +462,7 @@ function AttachmentPickerWithMenuItems({
                                         >
                                             <Icon
                                                 fill={theme.icon}
-                                                src={Expensicons.Plus}
+                                                src={icons.Plus}
                                             />
                                         </PressableWithFeedback>
                                     </Tooltip>

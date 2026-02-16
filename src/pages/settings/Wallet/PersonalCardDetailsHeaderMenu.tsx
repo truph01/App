@@ -1,8 +1,6 @@
 import {format, parseISO} from 'date-fns';
 import React from 'react';
 import ActivityIndicator from '@components/ActivityIndicator';
-// eslint-disable-next-line no-restricted-imports
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -18,6 +16,7 @@ import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Card, PersonalDetails} from '@src/types/onyx';
 import type IconAsset from '@src/types/utils/IconAsset';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type PersonalCardDetailsHeaderMenuProps = {
     card: Card;
@@ -54,12 +53,13 @@ function PersonalCardDetailsHeaderMenu({
 }: PersonalCardDetailsHeaderMenuProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const icons = useMemoizedLazyExpensifyIcons(['Hourglass', 'Trashcan'] as const);
 
     return (
         <>
             {!cardholder?.validated && (
                 <MenuItem
-                    icon={Expensicons.Hourglass}
+                    icon={icons.Hourglass}
                     iconStyles={styles.mln2}
                     description={translate('workspace.expensifyCard.cardPending', {name: displayName})}
                     numberOfLinesDescription={0}
@@ -163,7 +163,7 @@ function PersonalCardDetailsHeaderMenu({
             )}
             {shouldShowBreakConnection && (
                 <MenuItem
-                    icon={Expensicons.Trashcan}
+                    icon={icons.Trashcan}
                     disabled={isOffline || card?.isLoadingLastUpdated}
                     title="Break connection (Testing)"
                     onPress={onBreakConnection}

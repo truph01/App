@@ -4,7 +4,6 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import FormHelpMessage from '@components/FormHelpMessage';
-import {GalleryPlus} from '@components/Icon/Expensicons';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import ReceiptImage from '@components/ReceiptImage';
 import Text from '@components/Text';
@@ -42,6 +41,7 @@ import SCREENS from '@src/SCREENS';
 import type Transaction from '@src/types/onyx/Transaction';
 import type {FileObject} from '@src/types/utils/Attachment';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import DiscardChangesConfirmation from './DiscardChangesConfirmation';
 import StepScreenWrapper from './StepScreenWrapper';
 import withFullTransactionOrNotFound from './withFullTransactionOrNotFound';
@@ -334,6 +334,7 @@ function IOURequestStepDistanceOdometer({
 
     const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS, {canBeMissing: true});
     const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const icons = useMemoizedLazyExpensifyIcons(['GalleryPlus'] as const);
     // Navigate to next page following Manual tab pattern
     const navigateToNextPage = () => {
         const start = parseFloat(startReading);
@@ -500,7 +501,7 @@ function IOURequestStepDistanceOdometer({
                                 shouldUseThumbnailImage
                                 thumbnailContainerStyles={styles.bgTransparent}
                                 isAuthTokenRequired
-                                fallbackIcon={GalleryPlus}
+                                fallbackIcon={icons.GalleryPlus}
                                 fallbackIconSize={20}
                                 fallbackIconColor={theme.icon}
                                 iconSize="x-small"
@@ -546,7 +547,7 @@ function IOURequestStepDistanceOdometer({
                                 shouldUseThumbnailImage
                                 thumbnailContainerStyles={styles.bgTransparent}
                                 isAuthTokenRequired
-                                fallbackIcon={GalleryPlus}
+                                fallbackIcon={icons.GalleryPlus}
                                 fallbackIconSize={20}
                                 fallbackIconColor={theme.icon}
                                 iconSize="x-small"

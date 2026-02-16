@@ -3,7 +3,6 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import * as Expensicons from '@components/Icon/Expensicons';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
@@ -30,6 +29,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {ReportAttributesDerivedValue} from '@src/types/onyx';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import DebugReportActions from './DebugReportActions';
 
 type DebugReportPageProps = PlatformStackScreenProps<DebugParamList, typeof SCREENS.DEBUG.REPORT>;
@@ -152,6 +152,8 @@ function DebugReportPage({
         ];
     }, [report, transactionViolations, reportID, isReportArchived, chatReport, reportActions, transactions, reportAttributes?.reportErrors, betas, priorityMode, draftComment, translate]);
 
+    const icons = useMemoizedLazyExpensifyIcons(['Eye'] as const);
+
     const DebugDetailsTab = useCallback(
         () => (
             <DebugDetails
@@ -189,7 +191,7 @@ function DebugReportPage({
                         onPress={() => {
                             Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
                         }}
-                        icon={Expensicons.Eye}
+                        icon={icons.Eye}
                     />
                     {!!transactionID && (
                         <Button
@@ -221,6 +223,7 @@ function DebugReportPage({
             theme.cardBG,
             transactionID,
             translate,
+            icons.Eye,
         ],
     );
 

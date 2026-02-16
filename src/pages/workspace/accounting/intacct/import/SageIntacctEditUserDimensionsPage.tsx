@@ -5,7 +5,6 @@ import ConnectionLayout from '@components/ConnectionLayout';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import TextInput from '@components/TextInput';
@@ -29,6 +28,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/SageIntacctDimensionsForm';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import DimensionTypeSelector from './DimensionTypeSelector';
 
 type SageIntacctEditUserDimensionsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_EDIT_USER_DIMENSION>;
@@ -64,6 +64,7 @@ function SageIntacctEditUserDimensionsPage({route}: SageIntacctEditUserDimension
         },
         [editedUserDimensionName, translate, userDimensions],
     );
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
 
     return (
         <ConnectionLayout
@@ -127,7 +128,7 @@ function SageIntacctEditUserDimensionsPage({route}: SageIntacctEditUserDimension
                     <View style={[styles.mhn5]}>
                         <MenuItem
                             title={translate('common.remove')}
-                            icon={Expensicons.Trashcan}
+                            icon={icons.Trashcan}
                             onPress={() => setIsDeleteModalOpen(true)}
                         />
                     </View>

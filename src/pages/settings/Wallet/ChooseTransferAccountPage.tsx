@@ -4,7 +4,6 @@ import FullscreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
 import getBankIcon from '@components/Icon/BankIcons';
-import * as Expensicons from '@components/Icon/Expensicons';
 import MenuItem from '@components/MenuItem';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
@@ -23,6 +22,7 @@ import ROUTES from '@src/ROUTES';
 import type {AccountData, BankAccount} from '@src/types/onyx';
 import type {BankName} from '@src/types/onyx/Bank';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type BankAccountListItem = ListItem & {
     value?: number;
@@ -57,6 +57,7 @@ function ChooseTransferAccountPage() {
     };
 
     const [bankAccountsList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
+    const icons = useMemoizedLazyExpensifyIcons(['Plus'] as const);
     const selectedAccountID = walletTransfer?.selectedAccountID;
     const bankAccountOptions = useMemo(() => {
         const options = Object.values(bankAccountsList ?? {}).map((bankAccount, index): BankAccountListItem => {
@@ -124,7 +125,7 @@ function ChooseTransferAccountPage() {
                                 ? translate('paymentMethodList.addNewBankAccount')
                                 : translate('paymentMethodList.addNewDebitCard')
                         }
-                        icon={Expensicons.Plus}
+                        icon={icons.Plus}
                     />
                 }
             />

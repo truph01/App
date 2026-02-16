@@ -3,7 +3,6 @@ import type {StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import Badge from '@components/Badge';
 import Button from '@components/Button';
-import {Star} from '@components/Icon/Expensicons';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -13,6 +12,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getFreeTrialText} from '@libs/SubscriptionUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type FreeTrialProps = {
     badgeStyles?: StyleProp<ViewStyle>;
@@ -33,6 +33,7 @@ function FreeTrial({badgeStyles, pressable = false, addSpacing = false, success 
     const [freeTrialText, setFreeTrialText] = useState<string | undefined>(undefined);
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
+    const icons = useMemoizedLazyExpensifyIcons(['Star'] as const);
 
     useEffect(() => {
         if (!privateSubscription && !isOffline) {
@@ -47,7 +48,7 @@ function FreeTrial({badgeStyles, pressable = false, addSpacing = false, success 
 
     const freeTrial = pressable ? (
         <Button
-            icon={Star}
+            icon={icons.Star}
             success={success}
             text={freeTrialText}
             iconWrapperStyles={[styles.mw100]}
