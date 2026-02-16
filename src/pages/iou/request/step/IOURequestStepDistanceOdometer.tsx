@@ -422,7 +422,7 @@ function IOURequestStepDistanceOdometer({
             odometerEnd: end,
             odometerDistance: calculatedDistance,
             betas,
-            recentWaypoints
+            recentWaypoints,
         });
     };
 
