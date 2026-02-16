@@ -12,7 +12,7 @@ describe('MultifactorAuthentication helpers', () => {
     describe('processRegistration', () => {
         beforeEach(() => {
             (registerAuthenticationKey as jest.Mock).mockResolvedValue({
-                httpCode: 200,
+                httpStatusCode: 200,
                 reason: 'Registration successful',
             });
         });
@@ -54,7 +54,7 @@ describe('MultifactorAuthentication helpers', () => {
         // Then it should return success because 2xx status codes indicate the credential was successfully registered on the backend
         it('should return success when HTTP response starts with 2xx', async () => {
             (registerAuthenticationKey as jest.Mock).mockResolvedValue({
-                httpCode: 201,
+                httpStatusCode: 201,
                 reason: 'Created',
             });
 
@@ -72,7 +72,7 @@ describe('MultifactorAuthentication helpers', () => {
         // Then it should return failure because non-2xx status codes indicate the credential registration was rejected by the backend
         it('should return failure when HTTP response does not start with 2xx', async () => {
             (registerAuthenticationKey as jest.Mock).mockResolvedValue({
-                httpCode: 400,
+                httpStatusCode: 400,
                 reason: 'Bad request',
             });
 

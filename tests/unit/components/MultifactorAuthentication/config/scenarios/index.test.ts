@@ -76,7 +76,7 @@ describe('MultifactorAuthentication Scenarios Config', () => {
 
         // Invoke the callback with successful authentication and valid response data
         const callbackResult = await biometricsTestConfig.callback?.(true, {
-            httpCode: 200,
+            httpStatusCode: 200,
             message: CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.AUTHORIZATION_SUCCESSFUL,
             body: {},
         });

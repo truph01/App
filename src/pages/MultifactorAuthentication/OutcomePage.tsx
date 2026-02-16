@@ -5,7 +5,9 @@ import type {ErrorState} from '@components/MultifactorAuthentication/Context/Sta
 import CONST from '@src/CONST';
 
 function isServerError(error: ErrorState): boolean {
-    return error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.UNKNOWN_RESPONSE || (error.httpStatus !== undefined && error.httpStatus >= 500 && error.httpStatus < 600);
+    return (
+        error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.UNKNOWN_RESPONSE || (error.httpStatusCode !== undefined && error.httpStatusCode >= 500 && error.httpStatusCode < 600)
+    );
 }
 
 function MultifactorAuthenticationOutcomePage() {

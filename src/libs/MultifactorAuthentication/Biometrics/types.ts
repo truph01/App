@@ -98,7 +98,7 @@ type MultifactorAuthenticationCallbackResponse = ValueOf<typeof VALUES.CALLBACK_
  */
 type MultifactorAuthenticationCallbackInput = {
     /** The HTTP status code of the API response, if applicable */
-    httpCode: number | undefined;
+    httpStatusCode: number | undefined;
 
     /** The HTTP status message or a pre-defined reason if the error occurred on the front-end */
     message?: string;

@@ -6,7 +6,7 @@ import type {MultifactorAuthenticationScenario, MultifactorAuthenticationScenari
 import useNetwork from '@hooks/useNetwork';
 import {requestValidateCodeAction} from '@libs/actions/User';
 import getPlatform from '@libs/getPlatform';
-import type {ChallengeType, MultifactorAuthenticationCallbackInput, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
+import type {ChallengeType, MultifactorAuthenticationCallbackInput, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
 import {processRegistration, processScenarioAction} from '@userActions/MultifactorAuthentication/processing';
@@ -85,7 +85,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
      */
     const handleCallback = useCallback(
         async (isSuccessful: boolean) => {
-            const {error, scenario, scenarioResponse } = state;
+            const {error, scenario, scenarioResponse} = state;
 
             if (!scenario) {
                 return;
@@ -93,7 +93,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
 
             const scenarioConfig = scenario;
             const callbackInput: MultifactorAuthenticationCallbackInput = {
-                httpCode: scenarioResponse?.httpCode,
+                httpStatusCode: scenarioResponse?.httpStatusCode,
                 message: scenarioResponse?.reason ?? error?.reason,
                 body: scenarioResponse?.body,
             };
@@ -106,10 +106,9 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                 return;
             }
 
-            if(isSuccessful) {
+            if (isSuccessful) {
                 Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME_SUCCESS, {forceReplace: true});
-            }
-            else {
+            } else {
                 Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_OUTCOME_FAILURE, {forceReplace: true});
             }
 
@@ -247,7 +246,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                         type: 'SET_ERROR',
                         payload: {
                             reason: registrationResponse.reason,
-                            httpStatus: registrationResponse.httpStatus,
+                            httpStatusCode: registrationResponse.httpStatusCode,
                             message: registrationResponse.message,
                         },
                     });
@@ -329,7 +328,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                             type: 'SET_ERROR',
                             payload: {
                                 reason: scenarioAPIResponse.reason,
-                                httpStatus: scenarioAPIResponse.httpStatus,
+                                httpStatusCode: scenarioAPIResponse.httpStatusCode,
                                 message: scenarioAPIResponse.message,
                             },
                         });
@@ -337,7 +336,15 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                     }
 
                     // Store the scenario response for callback invocation at outcome navigation
-                    dispatch({type: 'SET_SCENARIO_RESPONSE', payload: scenarioAPIResponse});
+                    dispatch({
+                        type: 'SET_SCENARIO_RESPONSE',
+                        payload: {
+                            httpStatusCode: scenarioAPIResponse.httpStatusCode,
+                            reason: scenarioAPIResponse.reason,
+                            message: scenarioAPIResponse.message,
+                            body: scenarioAPIResponse.body,
+                        },
+                    });
                     dispatch({type: 'SET_AUTHENTICATION_METHOD', payload: result.authenticationMethod});
                     dispatch({type: 'SET_AUTHORIZATION_COMPLETE', payload: true});
                 },

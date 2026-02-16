@@ -7,6 +7,7 @@ import {
     UnsupportedDeviceFailureScreen,
 } from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import type {MultifactorAuthenticationDefaultUIConfig, MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
+import type {MultifactorAuthenticationCallbackResponse} from '@libs/MultifactorAuthentication/Biometrics/types';
 import CONST from '@src/CONST';
 
 const DEFAULT_CONFIG = {
@@ -28,6 +29,8 @@ const DEFAULT_CONFIG = {
     },
 } as const satisfies MultifactorAuthenticationDefaultUIConfig;
 
+const defaultCallback = (): Promise<MultifactorAuthenticationCallbackResponse> => Promise.resolve(CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SHOW_OUTCOME_SCREEN);
+
 function customConfig<const T extends MultifactorAuthenticationScenarioCustomConfig<never>>(config: T) {
     const MODALS = {
         ...DEFAULT_CONFIG.MODALS,
@@ -42,6 +45,7 @@ function customConfig<const T extends MultifactorAuthenticationScenarioCustomCon
         ...DEFAULT_CONFIG,
         ...config,
         MODALS,
+        callback: config.callback ?? defaultCallback,
         failureHeaderTitle: config.failureHeaderTitle ?? DEFAULT_CONFIG.failureHeaderTitle,
         successScreen: config.successScreen ?? DEFAULT_CONFIG.successScreen,
         defaultClientFailureScreen: config.defaultClientFailureScreen ?? DEFAULT_CONFIG.defaultClientFailureScreen,

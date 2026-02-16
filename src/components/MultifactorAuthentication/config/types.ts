@@ -64,7 +64,7 @@ type MultifactorAuthenticationOutcomeScreens = {
  * Response from a multifactor authentication scenario action.
  */
 type MultifactorAuthenticationScenarioResponse = {
-    httpCode: number | undefined;
+    httpStatusCode: number | undefined;
     reason: MultifactorAuthenticationReason;
     message: string | undefined;
 
