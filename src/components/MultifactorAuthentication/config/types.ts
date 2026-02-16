@@ -45,23 +45,17 @@ type MultifactorAuthenticationModal = {
     cancelConfirmation: MultifactorAuthenticationCancelConfirm;
 };
 
-/**
- * Override configuration for modals with partial properties.
- * This allows customization of specific modal aspects without redefining the entire structure.
- * e.g. "Authentication attempt" in the cancel confirmation modal can be changed to "Transaction approval".
- */
-type MultifactorAuthenticationModalOptional = {
-    cancelConfirmation?: Partial<MultifactorAuthenticationCancelConfirm>;
-};
-
 type FailureScreenOverrides = Partial<Record<MultifactorAuthenticationReason, React.ReactElement>>;
 
-type MultifactorAuthenticationUI = {
-    MODALS: MultifactorAuthenticationModal;
+/**
+ * Outcome screens and related configuration displayed after MFA flow completes.
+ * Screen fields are required in resolved configs, all fields optional in custom configs (merged with defaults).
+ */
+type MultifactorAuthenticationOutcomeScreens = {
+    successScreen: React.ReactElement;
+    defaultClientFailureScreen: React.ReactElement;
+    defaultServerFailureScreen: React.ReactElement;
     failureHeaderTitle?: TranslationPaths;
-    successScreen?: React.ReactElement;
-    defaultClientFailureScreen?: React.ReactElement;
-    defaultServerFailureScreen?: React.ReactElement;
     failureScreens?: FailureScreenOverrides;
 };
 
@@ -87,9 +81,9 @@ type MultifactorAuthenticationScenarioPureMethod<T extends Record<string, unknow
 ) => Promise<MultifactorAuthenticationScenarioResponse>;
 
 /**
- * Complete scenario configuration including action, UI, and metadata.
+ * Shared scenario fields (non-UI) common to both resolved and custom configs.
  */
-type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> = EmptyObject> = {
+type MultifactorAuthenticationScenarioBase<T extends Record<string, unknown> = EmptyObject> = {
     action: MultifactorAuthenticationScenarioPureMethod<T>;
     allowedAuthenticationMethods: Array<ValueOf<typeof CONST.MULTIFACTOR_AUTHENTICATION.TYPE>>;
     screen: MultifactorAuthenticationScreen;
@@ -100,28 +94,31 @@ type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> =
      * so the absence of payload will be tolerated at the run-time.
      */
     pure?: true;
-} & MultifactorAuthenticationUI &
-    Required<Pick<MultifactorAuthenticationUI, 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen'>>;
+};
+
+/**
+ * Complete scenario configuration including action, UI, and metadata.
+ */
+type MultifactorAuthenticationScenarioConfig<T extends Record<string, unknown> = EmptyObject> = MultifactorAuthenticationScenarioBase<T> &
+    MultifactorAuthenticationOutcomeScreens & {
+        MODALS: MultifactorAuthenticationModal;
+    };
 
 /**
  * Scenario configuration for custom scenarios with optional overrides.
+ * Outcome screens and modals are optional — they are merged with defaults at runtime.
  */
-type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = Omit<
-    MultifactorAuthenticationScenarioConfig<T>,
-    'MODALS' | 'failureScreens' | 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen'
-> & {
-    MODALS?: MultifactorAuthenticationModalOptional;
-    successScreen?: React.ReactElement;
-    defaultClientFailureScreen?: React.ReactElement;
-    defaultServerFailureScreen?: React.ReactElement;
-    failureScreens?: FailureScreenOverrides;
-};
+type MultifactorAuthenticationScenarioCustomConfig<T extends Record<string, unknown> = EmptyObject> = MultifactorAuthenticationScenarioBase<T> &
+    Partial<MultifactorAuthenticationOutcomeScreens> & {
+        MODALS?: Partial<MultifactorAuthenticationModal>;
+    };
 
 /**
  * Default UI configuration shared across scenarios.
  */
-type MultifactorAuthenticationDefaultUIConfig = Pick<MultifactorAuthenticationScenarioConfig<never>, 'MODALS'> &
-    Required<Pick<MultifactorAuthenticationUI, 'failureHeaderTitle' | 'successScreen' | 'defaultClientFailureScreen' | 'defaultServerFailureScreen' | 'failureScreens'>>;
+type MultifactorAuthenticationDefaultUIConfig = Required<MultifactorAuthenticationOutcomeScreens> & {
+    MODALS: MultifactorAuthenticationModal;
+};
 
 /**
  * Record mapping all scenarios to their configurations.
@@ -187,7 +184,7 @@ export type {
     MultifactorAuthenticationScenarioParams,
     MultifactorAuthenticationPromptType,
     MultifactorAuthenticationScenarioConfig,
-    MultifactorAuthenticationUI,
+    MultifactorAuthenticationOutcomeScreens,
     MultifactorAuthenticationScenarioConfigRecord,
     MultifactorAuthenticationProcessScenarioParameters,
     MultifactorAuthenticationDefaultUIConfig,
