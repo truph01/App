@@ -437,14 +437,21 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
      * Sets an error state which triggers navigation to the failure outcome.
      */
     const cancel = useCallback(() => {
-        // Set error to trigger failure navigation
+        // When the app is reopened (e.g. page refresh on web), the MFA context resets to its default state
+        // and scenario becomes undefined. Without a scenario, the state machine in process() won't run,
+        // so dispatching SET_ERROR would have no effect. In this case we dismiss the modal directly.
+        if (!state.scenario) {
+            Navigation.dismissModal();
+            return;
+        }
+
         dispatch({
             type: 'SET_ERROR',
             payload: {
                 reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED,
             },
         });
-    }, [dispatch]);
+    }, [dispatch, state.scenario]);
 
     const contextValue: MultifactorAuthenticationContextValue = useMemo(
         () => ({
