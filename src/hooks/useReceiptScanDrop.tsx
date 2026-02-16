@@ -33,7 +33,7 @@ function useReceiptScanDrop() {
     const [personalPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${personalPolicyID}`, {canBeMissing: true});
     const [draftTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {canBeMissing: true});
 
-    const newReportID = useMemo(() => generateReportID(), []);
+    const newReportID = generateReportID();
     const [newReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${newReportID}`, {canBeMissing: true});
     const [newParentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${newReport?.parentReportID}`, {canBeMissing: true});
 
@@ -108,7 +108,7 @@ function useReceiptScanDrop() {
             return;
         }
         for (const file of files) {
-            // eslint-disable-next-line no-param-reassign
+            // eslint-disable-next-line no-param-reassign -- Attach blob URI to file object for downstream receipt processing
             file.uri = URL.createObjectURL(file);
         }
 
