@@ -686,6 +686,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rejeter l’authentification',
             test: 'Test',
             biometricsAuthentication: 'Authentification biométrique',
+            authType: {
+                unknown: 'Inconnu',
+                none: 'Aucun',
+                credentials: 'Identifiants',
+                biometrics: 'Biométrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Veuillez activer la vérification par reconnaissance faciale/empreinte digitale ou définir un code d’accès à l’appareil dans vos',

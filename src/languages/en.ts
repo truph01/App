@@ -703,6 +703,15 @@ const translations = {
             rejectAuthentication: 'Reject authentication',
             test: 'Test',
             biometricsAuthentication: 'Biometric authentication',
+            authType: {
+                unknown: 'Unknown',
+                none: 'None',
+                credentials: 'Credentials',
+                biometrics: 'Biometrics',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Please enable face/fingerprint verification or set a device passcode in your ',

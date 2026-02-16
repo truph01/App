@@ -683,6 +683,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Odrzuć uwierzytelnianie',
             test: 'Test',
             biometricsAuthentication: 'Uwierzytelnianie biometryczne',
+            authType: {
+                unknown: 'Nieznany',
+                none: 'Brak',
+                credentials: 'Dane logowania',
+                biometrics: 'Biometria',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Włącz weryfikację twarzą/odciskiem palca lub ustaw kod blokady urządzenia w swoim',

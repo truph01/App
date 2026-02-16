@@ -683,6 +683,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Authenticatie weigeren',
             test: 'Test',
             biometricsAuthentication: 'Biometrische verificatie',
+            authType: {
+                unknown: 'Onbekend',
+                none: 'Geen',
+                credentials: 'Inloggegevens',
+                biometrics: 'Biometrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Schakel gezichts-/vingerafdrukverificatie in of stel een toesteltoegangscode in op uw',

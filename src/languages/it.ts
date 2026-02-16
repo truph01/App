@@ -683,6 +683,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rifiuta autenticazione',
             test: 'Test',
             biometricsAuthentication: 'Autenticazione biometrica',
+            authType: {
+                unknown: 'Sconosciuto',
+                none: 'Nessuno',
+                credentials: 'Credenziali',
+                biometrics: 'Biometria',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Abilita la verifica tramite volto/impronta digitale oppure imposta un codice di sblocco del dispositivo nel tuo',
