@@ -358,6 +358,7 @@ function IOURequestStepDistanceMap({
         policyForMovingExpenses,
         selfDMReport,
         betas,
+        recentWaypoints,
     ]);
 
     const getError = () => {
