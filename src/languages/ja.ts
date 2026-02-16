@@ -3108,6 +3108,11 @@ ${
         toGetStarted: '銀行口座を追加して、経費の精算、Expensifyカードの発行、請求書の回収、支払いをすべて一か所で行いましょう。',
         plaidBodyCopy: '従業員に、会社の経費を支払うのも立て替え精算を受けるのも、より簡単な方法を提供しましょう。',
         checkHelpLine: '口座のルーティング番号と口座番号は、その口座の小切手に記載されています。',
+        bankAccountPurposeTitle: '銀行口座で何をしたいですか？',
+        getReimbursed: '払い戻しを受ける',
+        getReimbursedDescription: '雇用主または他の人から',
+        makePayments: '支払いを行う',
+        makePaymentsDescription: '経費を支払うかExpensifyカードを発行する',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `銀行口座を連携するには、まず<a href="${contactMethodRoute}">メールアドレスをプライマリログインとして追加</a>してから、もう一度お試しください。電話番号はセカンダリログインとして追加できます。`,
         hasBeenThrottledError: '銀行口座の追加中にエラーが発生しました。数分待ってから、もう一度お試しください。',
@@ -5344,8 +5349,8 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             editTags: 'タグを編集',
             findTag: 'タグを検索',
             subtitle: 'タグを使うと、コストをより詳しく分類できます。',
-            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
-                `<muted-text>タグを使うと、コストをより詳しく分類できます。あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
+            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
+                `<muted-text>あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
             emptyTags: {
                 title: 'タグがまだ作成されていません',
                 subtitle: 'タグを追加して、プロジェクト、所在地、部署などを追跡しましょう。',
@@ -7952,13 +7957,22 @@ ${reportName}
         paymentCard: {
             addPaymentCard: '支払カードを追加',
             enterPaymentCardDetails: '支払いカードの詳細を入力してください',
-            security: 'Expensify は PCI-DSS に準拠し、銀行レベルの暗号化を使用し、冗長化されたインフラストラクチャでお客様のデータを保護しています。',
-            learnMoreAboutSecurity: 'セキュリティの詳細をご覧ください。',
+            security: 'Expensify は PCI-DSS に準拠し、銀行レベルの暗号化を使用し、お客様のデータを保護するために冗長化されたインフラストラクチャを活用しています。',
+            learnMoreAboutSecurity: '当社のセキュリティについて詳しく見る',
+        },
+        expensifyCode: {
+            title: 'Expensifyコード',
+            discountCode: '割引コード',
+            enterCode: 'サブスクリプションに適用するExpensifyコードを入力してください。',
+            apply: '適用',
+            error: {
+                invalid: 'このコードは無効です',
+            },
         },
         subscriptionSettings: {
             title: 'サブスクリプション設定',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `サブスクリプションタイプ: ${subscriptionType}、サブスクリプション規模: ${subscriptionSize}、自動更新: ${autoRenew}、年間席数の自動増加: ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `サブスクリプションタイプ: ${subscriptionType}、サブスクリプション規模: ${subscriptionSize}${expensifyCode ? `、Expensifyコード: ${expensifyCode}` : ''}、自動更新: ${autoRenew}、年間席数の自動増加: ${autoIncrease}`,
             none: 'なし',
             on: 'オン',
             off: 'オフ',
