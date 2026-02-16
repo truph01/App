@@ -250,9 +250,7 @@ type SettingsNavigatorParamList = {
     [SCREENS.SETTINGS.RULES.ADD_MERCHANT]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_RENAME_MERCHANT]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_CATEGORY]: undefined;
-    [SCREENS.SETTINGS.RULES.ADD_TAG]: {
-        index: number;
-    };
+    [SCREENS.SETTINGS.RULES.ADD_TAG]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_TAX]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_DESCRIPTION]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_REIMBURSABLE]: undefined;
@@ -273,7 +271,6 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS.RULES.EDIT_TAG]: {
         hash: string;
-        index: number;
     };
     [SCREENS.SETTINGS.RULES.EDIT_TAX]: {
         hash: string;
@@ -622,6 +619,7 @@ type SettingsNavigatorParamList = {
     [SCREENS.SETTINGS.SUBSCRIPTION.SIZE]: {
         canChangeSize: 0 | 1;
     };
+    [SCREENS.SETTINGS.SUBSCRIPTION.EXPENSIFY_CODE]: undefined;
     [SCREENS.SETTINGS.SUBSCRIPTION.SETTINGS_DETAILS]: undefined;
     [SCREENS.SETTINGS.SUBSCRIPTION.ADD_PAYMENT_CARD]: undefined;
     [SCREENS.SETTINGS.SUBSCRIPTION.CHANGE_BILLING_CURRENCY]: undefined;
@@ -1454,7 +1452,6 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.RULES_MERCHANT_TAG]: {
         policyID: string;
         ruleID: string;
-        orderWeight: number;
     };
     [SCREENS.WORKSPACE.RULES_MERCHANT_TAX]: {
         policyID: string;
