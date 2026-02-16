@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {act, renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import CONST from '@src/CONST';
@@ -240,8 +242,8 @@ describe('useReceiptScan', () => {
         });
 
         it('should return canUseMultiScan false when isStartingScan is false', async () => {
-            const notStartingParams = {...params, isStartingScan: false};
-            const {result} = renderHook(() => useReceiptScan(notStartingParams));
+            const paramsWithStartingScanDisabled = {...params, isStartingScan: false};
+            const {result} = renderHook(() => useReceiptScan(paramsWithStartingScanDisabled));
             await waitForBatchedUpdatesWithAct();
 
             expect(result.current.canUseMultiScan).toBe(false);
@@ -330,7 +332,7 @@ describe('useReceiptScan', () => {
             await waitForBatchedUpdatesWithAct();
 
             expect(result.current.receiptFiles).toHaveLength(1);
-            expect(result.current.receiptFiles[0]).toEqual(receiptFile);
+            expect(result.current.receiptFiles.at(0)).toEqual(receiptFile);
         });
 
         it('should clear receiptFiles when isMultiScanEnabled changes from true to false', async () => {
@@ -444,7 +446,7 @@ describe('useReceiptScan', () => {
             });
 
             expect(mockSetMoneyRequestReceipt).toHaveBeenCalledWith(INITIAL_TRANSACTION_ID, 'file://receipt.jpg', 'receipt.jpg', false, 'image/jpeg');
-            expect(updateScanAndNavigate).toHaveBeenCalledWith(files[0], 'file://receipt.jpg');
+            expect(updateScanAndNavigate).toHaveBeenCalledWith(files.at(0), 'file://receipt.jpg');
             expect(mockHandleMoneyRequestStepScanParticipants).not.toHaveBeenCalled();
         });
 
@@ -523,9 +525,11 @@ describe('useReceiptScan', () => {
                 result.current.submitMultiScanReceipts();
             });
 
-            const callArgs = mockHandleMoneyRequestStepScanParticipants.mock.calls[0][0];
-            expect(callArgs.files).toHaveLength(1);
-            expect(callArgs.files[0].transactionID).toBe('111');
+            type HandleMoneyRequestStepScanPayload = {files: Array<{transactionID: string}>};
+            const calls = mockHandleMoneyRequestStepScanParticipants.mock.calls as Array<[HandleMoneyRequestStepScanPayload]>;
+            const scanParams = calls.at(0)?.at(0);
+            expect(scanParams?.files).toHaveLength(1);
+            expect(scanParams?.files.at(0)?.transactionID).toBe('111');
         });
     });
 });
