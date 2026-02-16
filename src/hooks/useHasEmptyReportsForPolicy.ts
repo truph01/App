@@ -14,10 +14,14 @@ function useHasEmptyReportsForPolicy(policyID: string | undefined): boolean {
         },
         [policyID, accountID],
     );
-    const [hasEmptyReport = false] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
-        canBeMissing: true,
-        selector: hasEmptyReportSelector,
-    });
+    const [hasEmptyReport = false] = useOnyx(
+        ONYXKEYS.COLLECTION.REPORT,
+        {
+            canBeMissing: true,
+            selector: hasEmptyReportSelector,
+        },
+        [policyID, accountID],
+    );
 
     return hasEmptyReport;
 }
