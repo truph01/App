@@ -223,6 +223,7 @@ export default {
     receiptPlaceholderIconWidth: 80,
     receiptPlaceholderIconHeight: 80,
     reportPreviewMaxWidth: 335,
+    previewEReceiptHeight: 186,
     reportActionImagesSingleImageHeight: 160,
     reportActionImagesDoubleImageHeight: 138,
     reportActionImagesMultipleImageHeight: 110,
