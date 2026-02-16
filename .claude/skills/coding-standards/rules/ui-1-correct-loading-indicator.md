@@ -84,7 +84,7 @@ Flag ONLY when ANY of these patterns is found:
 **DO NOT flag if:**
 
 **For `FullscreenLoadingIndicator`:**
-- Rendered by `FullScreenLoaderContext` provider
+- Visibility is controlled by `FullScreenLoaderContext`
 - Navigation visible in different conditional branches (separate return statement) AND has `shouldUseGoBackButton={true}`
 
 **For `ActivityIndicator`:**
