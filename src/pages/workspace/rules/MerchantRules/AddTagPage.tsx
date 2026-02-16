@@ -46,7 +46,7 @@ function AddTagPage({route}: AddTagPageProps) {
 
     const onSave = (value?: string) => {
         const newTags = [...formTags];
-        newTags[orderWeight] = value ?? '';
+        newTags.splice(orderWeight, newTags.length - orderWeight, value ?? '');
         updateDraftMerchantRule({tag: trimTag(newTags.join(':'))});
     };
 
