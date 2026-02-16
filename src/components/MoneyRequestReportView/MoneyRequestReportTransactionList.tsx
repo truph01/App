@@ -283,6 +283,8 @@ function MoneyRequestReportTransactionList({
     const highlightedTransactionIDs = useMemo(() => new Set(newTransactions.map(({transactionID}) => transactionID)), [newTransactions]);
 
     // Always use default columns for money request report view (don't use user-customized search columns)
+    const isExpenseReportViewFromIOUReport = isIOUReport(report);
+    const shouldShowBillableColumn = isBillableEnabledOnPolicy(policy);
     const columnsToShow = useMemo(() => {
         return getColumnsToShow(
             currentUserDetails?.accountID,
@@ -291,11 +293,11 @@ function MoneyRequestReportTransactionList({
             true,
             undefined,
             undefined,
-            isIOUReport(report),
-            isBillableEnabledOnPolicy(policy),
+            isExpenseReportViewFromIOUReport,
+            shouldShowBillableColumn,
             hasNonReimbursableTransactions(transactions),
         );
-    }, [transactions, currentUserDetails?.accountID, report, policy]);
+    }, [transactions, currentUserDetails?.accountID, isExpenseReportViewFromIOUReport, shouldShowBillableColumn]);
 
     const currentGroupBy = getReportLayoutGroupBy(reportLayoutGroupBy);
 
