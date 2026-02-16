@@ -1,6 +1,5 @@
 import reportsSelector from '@selectors/Attributes';
 import {filterCardsHiddenFromSearch} from '@selectors/Card';
-import {emailSelector} from '@selectors/Session';
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'react-native-gesture-handler/lib/typescript/typeUtils';
@@ -21,7 +20,6 @@ import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import type {WorkspaceListItem} from '@hooks/useWorkspaceList';
-import useWorkspaceList from '@hooks/useWorkspaceList';
 import {saveSearch} from '@libs/actions/Search';
 import {createCardFeedKey, getCardFeedKey, getCardFeedNamesWithType, getWorkspaceCardFeedKey} from '@libs/CardFeedUtils';
 import {getCardDescription} from '@libs/CardUtils';
@@ -368,16 +366,16 @@ function getFilterDisplayTitle(
         const equalTo = filters[equalToKey];
 
         if (equalTo) {
-            return translate('search.filters.amount.equalTo', {amount: convertToDisplayStringWithoutCurrency(Number(equalTo))});
+            return translate('search.filters.amount.equalTo', convertToDisplayStringWithoutCurrency(Number(equalTo)));
         }
         if (lessThan && greaterThan) {
             return translate('search.filters.amount.between', convertToDisplayStringWithoutCurrency(Number(greaterThan)), convertToDisplayStringWithoutCurrency(Number(lessThan)));
         }
         if (lessThan) {
-            return translate('search.filters.amount.lessThan', {amount: convertToDisplayStringWithoutCurrency(Number(lessThan))});
+            return translate('search.filters.amount.lessThan', convertToDisplayStringWithoutCurrency(Number(lessThan)));
         }
         if (greaterThan) {
-            return translate('search.filters.amount.greaterThan', {amount: convertToDisplayStringWithoutCurrency(Number(greaterThan))});
+            return translate('search.filters.amount.greaterThan', convertToDisplayStringWithoutCurrency(Number(greaterThan)));
         }
         // Will never happen
         return;
@@ -407,21 +405,21 @@ function getFilterDisplayTitle(
                     ? translate(`search.filters.date.presets.${fieldValue as SearchDatePreset}`)
                     : translate('search.filters.date.on', fieldValue as string);
 
-                values.push(translate('search.filters.reportField', {name: fieldName, value: dateString.toLowerCase()}));
+                values.push(translate('search.filters.reportField', fieldName, dateString.toLowerCase()));
             }
 
             if (fieldKey.startsWith(CONST.SEARCH.REPORT_FIELD.AFTER_PREFIX)) {
                 const dateString = translate('search.filters.date.after', fieldValue as string).toLowerCase();
-                values.push(translate('search.filters.reportField', {name: fieldName, value: dateString.toLowerCase()}));
+                values.push(translate('search.filters.reportField', fieldName, dateString.toLowerCase()));
             }
 
             if (fieldKey.startsWith(CONST.SEARCH.REPORT_FIELD.BEFORE_PREFIX)) {
                 const dateString = translate('search.filters.date.before', fieldValue as string).toLowerCase();
-                values.push(translate('search.filters.reportField', {name: fieldName, value: dateString.toLowerCase()}));
+                values.push(translate('search.filters.reportField', fieldName, dateString.toLowerCase()));
             }
 
             if (fieldKey.startsWith(CONST.SEARCH.REPORT_FIELD.DEFAULT_PREFIX)) {
-                const valueString = translate('search.filters.reportField', {name: fieldName, value: fieldValue as string});
+                const valueString = translate('search.filters.reportField', fieldName, fieldValue as string);
                 values.push(valueString);
             }
         }
@@ -557,8 +555,8 @@ function getFilterExpenseDisplayTitle(filters: Partial<SearchAdvancedFiltersForm
 function getFilterInDisplayTitle(
     filters: Partial<SearchAdvancedFiltersForm>,
     _: LocaleContextProps['translate'],
-    reports: OnyxCollection<Report> | undefined,
-    reportAttributes: ReportAttributesDerivedValue['reports'] | undefined,
+    reports: OnyxCollection<Report>,
+    reportAttributes: ReportAttributesDerivedValue['reports'],
 ) {
     return filters.in
         ?.map((id) => getReportName(reports?.[`${ONYXKEYS.COLLECTION.REPORT}${id}`], reportAttributes))
@@ -577,21 +575,13 @@ function AdvancedSearchFilters() {
     const [searchCards] = useOnyx(ONYXKEYS.DERIVED.NON_PERSONAL_AND_WORKSPACE_CARD_LIST, {canBeMissing: true, selector: filterCardsHiddenFromSearch});
     const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
     const personalDetails = usePersonalDetails();
+    const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true});
 
     const [policies = getEmptyObject<NonNullable<OnyxCollection<Policy>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
-    const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: false, selector: emailSelector});
+
     const taxRates = getAllTaxRates(policies);
 
-    const {sections: workspaces} = useWorkspaceList({
-        policies,
-        currentUserLogin,
-        shouldShowPendingDeletePolicy: false,
-        selectedPolicyIDs: undefined,
-        searchTerm: '',
-        localeCompare,
-    });
-
-    const {currentType, typeFiltersKeys} = useAdvancedSearchFilters();
+    const {currentType, typeFiltersKeys, workspaces} = useAdvancedSearchFilters();
 
     const queryString = useMemo(() => {
         const currentQueryJSON = getCurrentSearchQueryJSON();
@@ -645,7 +635,7 @@ function AdvancedSearchFilters() {
             ) {
                 filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters[key] ?? [], personalDetails, formatPhoneNumber);
             } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.IN) {
-                filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, translate, reports, reportAttributes);
+                filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, translate, reports, reportAttributes?.reports ?? {});
             } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID) {
                 const workspacesData = workspaces.flatMap((value) => value.data);
                 filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, workspacesData);

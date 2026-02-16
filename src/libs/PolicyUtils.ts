@@ -1952,6 +1952,19 @@ function getDefaultTimeTrackingRate(policy: Partial<OnyxEntry<Policy>>): number 
     return policy?.units?.time?.rate !== undefined ? convertToBackendAmount(policy.units.time.rate) : undefined;
 }
 
+function isPolicyTaxEnabled(policy: OnyxEntry<Policy>): boolean {
+    const isSyncTaxEnabled =
+        !!policy?.connections?.quickbooksOnline?.config?.syncTax ||
+        !!policy?.connections?.xero?.config?.importTaxRates ||
+        !!policy?.connections?.netsuite?.options?.config?.syncOptions?.syncTax;
+
+    return (policy?.tax?.trackingEnabled ?? false) || isSyncTaxEnabled;
+}
+
+function sortPoliciesByName(policies: Policy[], localeCompare: (a: string, b: string) => number): Policy[] {
+    return policies.sort((a, b) => localeCompare(a.name || '', b.name || ''));
+}
+
 export {
     canEditTaxRate,
     escapeTagName,
@@ -2125,6 +2138,8 @@ export {
     isTimeTrackingEnabled,
     getDefaultTimeTrackingRate,
     getActivePoliciesWithExpenseChatAndTimeEnabled,
+    isPolicyTaxEnabled,
+    sortPoliciesByName,
 };
 
 export type {MemberEmailsToAccountIDs};
