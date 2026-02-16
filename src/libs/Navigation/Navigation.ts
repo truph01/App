@@ -187,7 +187,8 @@ const closeRHPFlow = (ref = navigationRef) => originalCloseRHPFlow(ref);
  */
 function closeSidePanelOnNarrowScreen(route: Route) {
     const isExtraLargeScreenWidth = Dimensions.get('window').width > variables.sidePanelResponsiveWidthBreakpoint;
-    const isAttachmentPreviewRoute = route && /^r\/\d+\/attachment\/add/.test(route);
+    const attachmentRoutePrefix = ROUTES.REPORT_ADD_ATTACHMENT.route.split(':').at(0) ?? ''; // "r/"
+    const isAttachmentPreviewRoute = typeof route === 'string' && route.includes('/attachment/add') && route.startsWith(attachmentRoutePrefix);
 
     // If we have a side panel open on devices smaller than 1300px and the user wants to go to the REPORT_ADD_ATTACHMENT route,
     // this means that the user clicked `Add Attachments` in the side panel, and in this case,
