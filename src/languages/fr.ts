@@ -720,6 +720,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Appareil non pris en charge',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Cette action n'est pas prise en charge sur votre appareil. Veuillez télécharger l'application Expensify depuis l'<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> ou le <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> et réessayer.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Échec de la vérification',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
