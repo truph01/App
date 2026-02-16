@@ -1692,7 +1692,7 @@ function createGroupChat(
     const parameters: OpenReportParams = {
         reportID,
         emailList: participantLoginList.join(','),
-        accountIDList: participantAccountIDs.join(','),
+        accountIDList: '',
         chatType: CONST.REPORT.CHAT_TYPE.GROUP,
         groupChatAdminLogins: currentUserLogin,
         optimisticAccountIDList: Object.keys(newReportObject.participants ?? {}).join(','),
