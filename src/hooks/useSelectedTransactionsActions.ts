@@ -4,6 +4,7 @@ import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
 import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchContext} from '@components/Search/SearchContext';
+import {initBulkEditDraftTransaction} from '@libs/actions/IOU';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
 import {initSplitExpense} from '@libs/actions/IOU/Split';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
@@ -207,6 +208,7 @@ function useSelectedTransactionsActions({
                 icon: expensifyIcons.Pencil,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.EDIT,
                 onSelected: () => {
+                    initBulkEditDraftTransaction(selectedTransactionIDs);
                     Navigation.navigate(ROUTES.SEARCH_EDIT_MULTIPLE_TRANSACTIONS_RHP);
                 },
             });

@@ -38,6 +38,7 @@ import useSearchShouldCalculateTotals from '@hooks/useSearchShouldCalculateTotal
 import useSelfDMReport from '@hooks/useSelfDMReport';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {initBulkEditDraftTransaction} from '@libs/actions/IOU';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter, searchInServer} from '@libs/actions/Report';
 import {
@@ -742,7 +743,14 @@ function SearchPage({route}: SearchPageProps) {
                 text: translate('search.bulkActions.editMultiple'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.EDIT,
                 shouldCloseModalOnSelect: true,
-                onSelected: () => Navigation.navigate(ROUTES.SEARCH_EDIT_MULTIPLE_TRANSACTIONS_RHP),
+                onSelected: () => {
+                    const selectedTransactionIDs = Object.keys(selectedTransactions).filter((transactionID) => {
+                        const selectedTransaction = selectedTransactions[transactionID];
+                        return !!selectedTransaction?.transaction?.transactionID || !!allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+                    });
+                    initBulkEditDraftTransaction(selectedTransactionIDs);
+                    Navigation.navigate(ROUTES.SEARCH_EDIT_MULTIPLE_TRANSACTIONS_RHP);
+                },
             });
         }
 

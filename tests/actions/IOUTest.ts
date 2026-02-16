@@ -11274,13 +11274,15 @@ describe('actions/IOU', () => {
             await Onyx.set(draftKey, {amount: 1000});
             await waitForBatchedUpdates();
 
-            initBulkEditDraftTransaction();
+            const testTransactionIDs = ['transaction1', 'transaction2', 'transaction3'];
+            initBulkEditDraftTransaction(testTransactionIDs);
             await waitForBatchedUpdates();
 
             const draftTransaction = await getOnyxValue(draftKey);
             expect(draftTransaction).toMatchObject({
                 transactionID: CONST.IOU.OPTIMISTIC_BULK_EDIT_TRANSACTION_ID,
                 amount: 1000,
+                selectedTransactionIDs: testTransactionIDs,
             });
         });
 

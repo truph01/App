@@ -14025,9 +14025,10 @@ function updateMultipleMoneyRequests(
  * then apply those edits to each real transaction later. The placeholder ID is
  * just the storage key and never equals any actual transactionID.
  */
-function initBulkEditDraftTransaction() {
+function initBulkEditDraftTransaction(selectedTransactionIDs: string[]) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_BULK_EDIT_TRANSACTION_ID}`, {
         transactionID: CONST.IOU.OPTIMISTIC_BULK_EDIT_TRANSACTION_ID,
+        selectedTransactionIDs,
     });
 }
 

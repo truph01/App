@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -10,7 +10,7 @@ import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearBulkEditDraftTransaction, initBulkEditDraftTransaction, updateMultipleMoneyRequests} from '@libs/actions/IOU';
+import {clearBulkEditDraftTransaction, updateMultipleMoneyRequests} from '@libs/actions/IOU';
 import {convertToDisplayStringWithoutCurrency} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
@@ -30,7 +30,7 @@ import getCommonDependentTag from './SearchEditMultipleUtils';
 function SearchEditMultiplePage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const {selectedTransactionIDs: selectedTransactionIDsFromContext, selectedTransactions, clearSelectedTransactions} = useSearchContext();
+    const {clearSelectedTransactions} = useSearchContext();
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const [draftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_BULK_EDIT_TRANSACTION_ID}`, {canBeMissing: true});
@@ -38,16 +38,7 @@ function SearchEditMultiplePage() {
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
     const [allReportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {canBeMissing: true});
 
-    const selectedTransactionIDs = useMemo(() => {
-        if (selectedTransactionIDsFromContext.length) {
-            return selectedTransactionIDsFromContext;
-        }
-
-        return Object.keys(selectedTransactions ?? {}).filter((transactionID) => {
-            const selectedTransaction = selectedTransactions?.[transactionID];
-            return !!selectedTransaction?.transaction?.transactionID || !!allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
-        });
-    }, [allTransactions, selectedTransactionIDsFromContext, selectedTransactions]);
+    const selectedTransactionIDs = draftTransaction?.selectedTransactionIDs ?? [];
 
     const hasCustomUnitTransaction = selectedTransactionIDs.some((transactionID) => {
         const transaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
@@ -100,13 +91,6 @@ function SearchEditMultiplePage() {
     const isTaxTrackingEnabled = !!policy?.tax?.trackingEnabled;
     const areCategoriesEnabled = !!policy?.areCategoriesEnabled && hasEnabledOptions(policyCategories ?? {});
     const areTagsEnabled = !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
-
-    useEffect(() => {
-        if (draftTransaction?.transactionID) {
-            return;
-        }
-        initBulkEditDraftTransaction();
-    }, [draftTransaction?.transactionID]);
 
     useEffect(() => {
         return () => {
