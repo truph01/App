@@ -119,7 +119,6 @@ function SearchFiltersChatsSelector({initialReportIDs, onFiltersUpdate, isScreen
         const reportsFiltered = cleanSearchTerm === '' ? visibleReportsWhenSearchTermEmpty : visibleReportsWhenSearchTermNonEmpty;
 
         sections.push({
-            title: undefined,
             data: reportsFiltered,
             sectionIndex: 1,
         });

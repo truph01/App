@@ -229,7 +229,6 @@ function SearchFiltersParticipantsSelector({initialAccountIDs, onFiltersUpdate, 
             chatOptions.currentUserOption.text = formattedName;
 
             newSections.push({
-                title: '',
                 data: [chatOptions.currentUserOption],
                 sectionIndex: 0,
             });
@@ -245,13 +244,11 @@ function SearchFiltersParticipantsSelector({initialAccountIDs, onFiltersUpdate, 
         );
 
         newSections.push({
-            title: '',
             data: filteredRecentReports,
             sectionIndex: 1,
         });
 
         newSections.push({
-            title: '',
             data: chatOptions.personalDetails,
             sectionIndex: 2,
         });

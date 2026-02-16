@@ -186,7 +186,6 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
             )
         ) {
             newSections.push({
-                title: undefined,
                 data: [chatOptions.userToInvite].map((participant) => {
                     const isPolicyExpenseChat = participant?.isPolicyExpenseChat ?? false;
                     return isPolicyExpenseChat
@@ -276,7 +275,6 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
             showLoadingPlaceholder={showLoadingPlaceholder}
             isLoadingNewOptions={!!isSearchingForReports}
             showListEmptyContent={shouldShowListEmptyContent}
-            disableMaintainingScrollPosition
         />
     );
 }
