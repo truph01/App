@@ -243,6 +243,8 @@ const lastReportActions: ReportActions = {};
 const allSortedReportActions: Record<string, ReportAction[]> = {};
 let allReportActions: OnyxCollection<ReportActions>;
 const lastVisibleReportActions: ReportActions = {};
+const lastVisibleIOUMoneyActions: ReportActions = {};
+const cachedOneTransactionThreadReportIDs: Record<string, string | undefined> = {};
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
     waitForCollectionCallback: true,
@@ -266,9 +268,10 @@ Onyx.connect({
             const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
             const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
 
-            // If the report is a one-transaction report and has , we need to return the combined reportActions so that the LHN can display modifications
-            // to the transaction thread or the report itself
+            // If the report is a one-transaction report, we need to return the combined reportActions so that the LHN can display modifications
+            // to the transaction thread or the report itself. Cache the result to avoid O(n) recomputation in renderItem.
             const transactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, actions[reportActions[0]]);
+            cachedOneTransactionThreadReportIDs[reportID] = transactionThreadReportID;
             if (transactionThreadReportID) {
                 const transactionThreadReportActionsArray = Object.values(actions[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`] ?? {});
                 sortedReportActions = getCombinedReportActions(sortedReportActions, transactionThreadReportID, transactionThreadReportActionsArray, reportID);
@@ -300,6 +303,19 @@ Onyx.connect({
                 continue;
             }
             lastVisibleReportActions[reportID] = reportActionForDisplay;
+
+            // Pre-compute the first visible IOU money request action (newest, since sorted descending)
+            const iouMoneyAction = sortedReportActions.find(
+                (reportAction) =>
+                    shouldReportActionBeVisible(reportAction, reportAction.reportActionID, isWriteActionAllowed) &&
+                    reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
+                    isMoneyRequestAction(reportAction),
+            );
+            if (iouMoneyAction) {
+                lastVisibleIOUMoneyActions[reportID] = iouMoneyAction;
+            } else {
+                delete lastVisibleIOUMoneyActions[reportID];
+            }
         }
     },
 });
@@ -550,6 +566,10 @@ function isSearchStringMatchUserDetails(personalDetail: PersonalDetails, searchV
 /**
  * Get IOU report ID of report last action if the action is report action preview
  */
+function getCachedOneTransactionThreadReportID(reportID: string | undefined): string | undefined {
+    return reportID ? cachedOneTransactionThreadReportIDs[reportID] : undefined;
+}
+
 function getIOUReportIDOfLastAction(report: OnyxEntry<Report>): string | undefined {
     if (!report?.reportID) {
         return;
@@ -655,14 +675,7 @@ function getLastMessageTextForReport({
         lastMessageTextFromReport = formatReportLastMessageText(Parser.htmlToText(properSchemaForMoneyRequestMessage));
     } else if (isReportPreviewAction(lastReportAction)) {
         const iouReport = getReportOrDraftReport(getIOUReportIDFromReportActionPreview(lastReportAction));
-        const lastIOUMoneyReportAction = iouReport?.reportID
-            ? allSortedReportActions[iouReport.reportID]?.find(
-                  (reportAction, key): reportAction is ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.IOU> =>
-                      shouldReportActionBeVisible(reportAction, key, canUserPerformWriteAction(report, isReportArchived)) &&
-                      reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
-                      isMoneyRequestAction(reportAction),
-              )
-            : undefined;
+        const lastIOUMoneyReportAction = iouReport?.reportID ? lastVisibleIOUMoneyActions[iouReport.reportID] : undefined;
         // For workspace chats, use the report title
         if (reportUtilsIsPolicyExpenseChat(report) && !isEmptyObject(iouReport)) {
             const reportName = computeReportName(iouReport, undefined, undefined, undefined, undefined, undefined, undefined, currentUserAccountID);
@@ -3190,6 +3203,7 @@ export {
     getHeaderMessage,
     getHeaderMessageForNonUserList,
     getIOUConfirmationOptionsFromPayeePersonalDetail,
+    getCachedOneTransactionThreadReportID,
     getIOUReportIDOfLastAction,
     getIsUserSubmittedExpenseOrScannedReceipt,
     getLastActorDisplayName,
