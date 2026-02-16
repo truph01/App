@@ -76,7 +76,7 @@ function getImportCustomFieldsSettings(importField: ValueOf<typeof CONST.NETSUIT
     return data.map((_, index) => `${importField}_${index}`);
 }
 
-function getTokenInputStartPageName(policy: OnyxEntry<Policy>) {
+function getInitialSubPageForNetsuiteTokenInput(policy: OnyxEntry<Policy>) {
     const hasAuthError = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE);
     return hasAuthError ? CONST.NETSUITE_CONFIG.TOKEN_INPUT.PAGE_NAME.CREDENTIALS : CONST.NETSUITE_CONFIG.TOKEN_INPUT.PAGE_NAME.INSTALL;
 }
@@ -97,5 +97,5 @@ export {
     shouldHideTaxPostingAccountSelect,
     shouldHideExportForeignCurrencyAmount,
     getImportCustomFieldsSettings,
-    getTokenInputStartPageName,
+    getInitialSubPageForNetsuiteTokenInput,
 };

@@ -13,7 +13,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {ConnectToNetSuiteFlowProps} from './types';
-import {getTokenInputStartPageName} from '@pages/workspace/accounting/netsuite/utils';
+import {getInitialSubPageForNetsuiteTokenInput} from '@pages/workspace/accounting/netsuite/utils';
 
 function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
     const {translate} = useLocalize();
@@ -38,7 +38,7 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
             icon: Expensicons.LinkCopy,
             text: translate('workspace.common.createNewConnection'),
             onSelected: () => {
-                Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getTokenInputStartPageName(policy)));
+                Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getInitialSubPageForNetsuiteTokenInput(policy)));
                 setIsReuseConnectionsPopoverOpen(false);
             },
         },
@@ -54,7 +54,7 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
 
     useEffect(() => {
         if (shouldGoToCredentialsPage || !hasPoliciesConnectedToNetSuite) {
-            Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getTokenInputStartPageName(policy)));
+            Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getInitialSubPageForNetsuiteTokenInput(policy)));
             return;
         }
         setIsReuseConnectionsPopoverOpen(true);
