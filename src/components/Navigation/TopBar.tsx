@@ -13,6 +13,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import SignInButton from '@pages/inbox/sidebar/SignInButton';
 import {isAnonymousUser as isAnonymousUserUtil} from '@userActions/Session';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Session} from '@src/types/onyx';
 
@@ -63,6 +64,7 @@ function TopBar({breadcrumbLabel, shouldDisplaySearch = true, shouldDisplayHelpB
                     <PressableWithoutFeedback
                         accessibilityLabel={translate('common.cancel')}
                         style={styles.textBlue}
+                        sentryLabel={CONST.SENTRY_LABEL.TOP_BAR.CANCEL_BUTTON}
                         onPress={() => {
                             cancelSearch();
                         }}
