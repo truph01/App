@@ -61,27 +61,6 @@ function VacationDelegatePage() {
                     cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
                     additionalExcludeLogins={{[currentUserLogin]: true}}
                 />
-                {hasActiveDelegations ? (
-                    <View style={[styles.mb2, styles.mt6]}>
-                        <Text style={[styles.mh5, styles.mb4]}>{translate('statusPage.cannotSetVacationDelegate')}</Text>
-                        {renderDelegatorList()}
-                    </View>
-                ) : (
-                    <View style={[styles.flex1, styles.w100, styles.pRelative]}>
-                        <SelectionList
-                            sections={areOptionsInitialized ? sections : []}
-                            ListItem={UserListItem}
-                            onSelectRow={onSelectRow}
-                            textInputOptions={textInputOptions}
-                            showLoadingPlaceholder={!areOptionsInitialized}
-                            isLoadingNewOptions={!!isSearchingForReports}
-                            onEndReached={onListEndReached}
-                            disableMaintainingScrollPosition
-                            shouldSingleExecuteRowSelect
-                            shouldShowTextInput
-                        />
-                    </View>
-                )}
             </ScreenWrapper>
             <ConfirmModal
                 isVisible={isWarningModalVisible}

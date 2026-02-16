@@ -181,7 +181,6 @@ function BaseVacationDelegateSelectionComponent({
                         showLoadingPlaceholder={!areOptionsInitialized}
                         isLoadingNewOptions={!!isSearchingForReports}
                         onEndReached={onListEndReached}
-                        disableMaintainingScrollPosition
                         shouldSingleExecuteRowSelect
                         shouldShowTextInput
                     />
