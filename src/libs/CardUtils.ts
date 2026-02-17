@@ -783,13 +783,34 @@ function isSelectedFeedExpired(cardFeed: CombinedCardFeed | undefined): boolean 
 }
 
 /**
- * For Amex Direct (FDX) feeds, accountList[0] is the parent card (primary account holder)
- * which aggregates child accounts and should not be assignable.
- * This helper filters out the parent card for Amex Direct feeds.
+ * For Amex Direct (FDX) feeds, parent cards aggregate child accounts and should not be assignable.
+ * Parent cards follow the format "CardType - Digits" (2 segments separated by " - "),
+ * while child cards include a cardholder name: "CardType - NAME - Digits" (3 segments).
+ * A parent card is removed only when at least one child card with the same card type exists.
  */
 function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCardFeedWithDomainID): string[] {
     const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
-    return isAmexDirectFeed ? accountList.slice(1) : accountList;
+    if (!isAmexDirectFeed) {
+        return accountList;
+    }
+
+    // Collect card type prefixes that have at least one child card (3+ segments)
+    const cardTypesWithChildren = new Set<string>();
+    for (const name of accountList) {
+        const segments = name.split(' - ');
+        if (segments.length >= 3) {
+            cardTypesWithChildren.add(segments[0]);
+        }
+    }
+
+    // Remove parent cards (2 segments) whose card type has children
+    return accountList.filter((name) => {
+        const segments = name.split(' - ');
+        if (segments.length === 2 && cardTypesWithChildren.has(segments[0])) {
+            return false;
+        }
+        return true;
+    });
 }
 
 /**
