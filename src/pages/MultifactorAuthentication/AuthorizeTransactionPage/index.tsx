@@ -10,6 +10,8 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {MultifactorAuthenticationParamList} from '@libs/Navigation/types';
 import Navigation from '@navigation/Navigation';
 import type SCREENS from '@src/SCREENS';
+import CONST from '@src/CONST';
+import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -19,8 +21,9 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    // TODO: Use context here when merged
-    // const {executeScenario, cancel} = useMultifactorAuthenticationContext();
+    // TODO: Listen for the Onyx key here and if the transaction details are missing, then render the 'already review' component instead
+
+    const {executeScenario} = useMultifactorAuthentication();
 
     const transactionID = route.params.transactionID;
     const [isConfirmModalVisible, setConfirmModalVisibility] = useState(false);
@@ -34,19 +37,17 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     };
 
     const approveTransaction = () => {
-        // TODO: Use context here when merged
-        // executeScenario(CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION, {
-        //     transactionID,
-        // });
+        executeScenario(CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION, {
+            transactionID,
+        });
     };
 
-    // Remove this eslint disable when below TODO is done
-    // eslint-disable-next-line rulesdir/prefer-early-return
     const denyTransaction = () => {
         if (isConfirmModalVisible) {
             hideConfirmModal();
         }
-        // TODO: Set state here that the outcome page should be displayed
+        // TODO: Use DenyTransaction - API for denying, same for ValidateCodePage
+        // TODO: Set state (add a new useState at the top) here that the outcome page should be displayed instead of closing the flow
         Navigation.closeRHPFlow();
     };
 
@@ -66,10 +67,13 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                         onAuthorize={approveTransaction}
                         onDeny={showConfirmModal}
                     />
-                    {/* TODO: Use custom AuthorizeTransactionCancelModal */}
+                    {/*
+                        TODO: Use custom AuthorizeTransactionCancelModal (not yet implemented)
+                        The config for MFA modals should be exactly the same as `failureScreens` structure.
+                        Right now only the props for modals are stored in the config but it should be key - component pattern instead.
+                        See: FailureScreen directory and how it is used in the scenarios config.
+                    */}
                     <MultifactorAuthenticationTriggerCancelConfirmModal
-                        // TODO: Uncomment when context is merged
-                        // scenario={CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION}
                         isVisible={isConfirmModalVisible}
                         onConfirm={denyTransaction}
                         onCancel={hideConfirmModal}

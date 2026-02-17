@@ -655,6 +655,9 @@ const ONYXKEYS = {
     /** Stores the user's report layout group-by preference */
     NVP_REPORT_LAYOUT_GROUP_BY: 'nvp_expensify_groupByOption',
 
+    /** Partial transaction data used for MFA authorize transaction preview */
+    TRANSACTIONS_PENDING_3DS_REVIEW: 'transactionsPending3DSReview',
+
     /** Whether the user has denied the contact import permission prompt */
     HAS_DENIED_CONTACT_IMPORT_PROMPT: 'hasDeniedContactImportPrompt',
 
@@ -704,9 +707,6 @@ const ONYXKEYS = {
         REPORT_VIOLATIONS: 'reportViolations_',
         SECURITY_GROUP: 'securityGroup_',
         TRANSACTION: 'transactions_',
-        // TODO: AUTHORIZE_TRANSACTION should be reavluated/removed when we finally decide from where comes the data use in AuthorizeTransactionPage
-        /** Partial transaction data used for MFA authorize transaction preview */
-        AUTHORIZE_TRANSACTION: 'authorizeTransaction_',
         TRANSACTION_VIOLATIONS: 'transactionViolations_',
         TRANSACTION_DRAFT: 'transactionsDraft_',
         SKIP_CONFIRMATION: 'skipConfirmation_',
@@ -1186,8 +1186,6 @@ type OnyxCollectionValuesMapping = {
     [ONYXKEYS.COLLECTION.REPORT_VIOLATIONS]: OnyxTypes.ReportViolations;
     [ONYXKEYS.COLLECTION.SECURITY_GROUP]: OnyxTypes.SecurityGroup;
     [ONYXKEYS.COLLECTION.TRANSACTION]: OnyxTypes.Transaction;
-    // TODO: AUTHORIZE_TRANSACTION should be reavluated/removed when we finally decide from where comes the data use in AuthorizeTransactionPage
-    [ONYXKEYS.COLLECTION.AUTHORIZE_TRANSACTION]: OnyxTypes.AuthorizeTransaction;
     [ONYXKEYS.COLLECTION.TRANSACTION_DRAFT]: OnyxTypes.Transaction;
     [ONYXKEYS.COLLECTION.SKIP_CONFIRMATION]: boolean;
     [ONYXKEYS.COLLECTION.TRANSACTION_BACKUP]: OnyxTypes.Transaction;
@@ -1277,6 +1275,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_PRIORITY_MODE]: ValueOf<typeof CONST.PRIORITY_MODE>;
     [ONYXKEYS.NVP_BLOCKED_FROM_CONCIERGE]: OnyxTypes.BlockedFromConcierge;
     [ONYXKEYS.QUEUE_FLUSHED_DATA]: AnyOnyxUpdate[];
+    [ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW]: OnyxTypes.TransactionsPending3DSReview;
 
     // The value of this nvp is a string representation of the date when the block expires, or an empty string if the user is not blocked
     [ONYXKEYS.NVP_BLOCKED_FROM_CHAT]: string;

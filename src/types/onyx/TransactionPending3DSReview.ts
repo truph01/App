@@ -1,9 +1,8 @@
-// TODO: AUTHORIZE_TRANSACTION should be reavluated/removed when we finally decide from where comes the data use in AuthorizeTransactionPage
 /**
  * Minimal transaction data needed to render the MFA authorize transaction preview.
- * This is stored under the `authorizeTransaction_` Onyx collection.
+ * This is stored under the `transactionsPending3DSReview` Onyx key.
  */
-type AuthorizeTransaction = {
+type TransactionPending3DSReview = {
     /** Transaction amount in cents */
     amount: number;
 
@@ -26,4 +25,4 @@ type AuthorizeTransaction = {
     transactionID?: string;
 };
 
-export default AuthorizeTransaction;
+export default TransactionPending3DSReview;

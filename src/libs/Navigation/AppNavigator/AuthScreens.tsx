@@ -165,6 +165,14 @@ function AuthScreens() {
     const {shouldRenderSecondaryOverlayForWideRHP, shouldRenderSecondaryOverlayForRHPOnWideRHP, shouldRenderSecondaryOverlayForRHPOnSuperWideRHP, shouldRenderTertiaryOverlay} =
         useWideRHPState();
 
+    // TODO MFA:
+    // 1. Listen for the TRANSACTIONS_PENDING_3DS_REVIEW Onyx Key changes
+    // 2. Sort by `expires` field, the oldest one is the first one
+    // 3. We check:
+    //  - If the Authorize Transaction scenario supports native if on mobile and passkeys on web
+    // 4. Make an API call (GetTransactionsPending3DSReview) to verify the transaction - it will return the same object as the one stored in Onyx
+    // 5. If the transaction is okay - if not on any MFA screen then navigate to the TransactionReviewPage.
+
     // Check if the user is currently on a 2FA setup screen
     // We can't rely on useRoute in this component because we're not a child of a Navigator, so we must sift through nav state by hand
     const isIn2FASetupFlow = useNavigationState((state) => {
