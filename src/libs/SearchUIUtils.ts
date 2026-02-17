@@ -4179,7 +4179,7 @@ function getColumnsToShow(
         }
 
         if (groupBy === CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID) {
-            const requiredColumns = new Set<SearchColumnType>([CONST.SEARCH.TABLE_COLUMNS.AVATAR, CONST.SEARCH.TABLE_COLUMNS.STATUS, CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWAL_ID]);
+            const requiredColumns = new Set<SearchColumnType>([CONST.SEARCH.TABLE_COLUMNS.AVATAR, CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWAL_ID]);
             const result: SearchColumnType[] = [];
 
             for (const col of requiredColumns) {
@@ -4191,6 +4191,9 @@ function getColumnsToShow(
             for (const col of columnsToShow ?? []) {
                 result.push(col);
             }
+
+            const withdrawnIndex = result.indexOf(CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWN);
+            result.splice(withdrawnIndex >= 0 ? withdrawnIndex + 1 : 1, 0, CONST.SEARCH.TABLE_COLUMNS.STATUS);
 
             return result;
         }
