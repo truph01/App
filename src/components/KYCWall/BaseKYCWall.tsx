@@ -162,7 +162,6 @@ function KYCWall({
                         return;
                     }
 
-                    
                     const {policyID, workspaceChatReportID, reportPreviewReportActionID, adminsChatReportID} =
                         createWorkspaceFromIOUPayment(iouReport, reportPreviewAction, currentUserEmail, employeeEmail) ?? {};
                     if (policyID && iouReport?.policyID) {
