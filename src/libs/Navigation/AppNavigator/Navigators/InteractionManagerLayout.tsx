@@ -12,11 +12,9 @@ function InteractionManagerLayout({
 }: ScreenLayoutArgs<ParamListBase, string, StackNavigationOptions | PlatformStackNavigationOptions, PlatformStackNavigationProp<ParamListBase>>) {
     useLayoutEffect(() => {
         const transitionStartListener = navigation.addListener('transitionStart', () => {
-            console.log('xdd transitionStart', route?.name);
             TransitionTracker.startTransition('navigation');
         });
         const transitionEndListener = navigation.addListener('transitionEnd', () => {
-            console.log('xdd transitionEnd', route?.name);
             TransitionTracker.endTransition('navigation');
         });
 
