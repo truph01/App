@@ -18,20 +18,18 @@ type DebugReportActionPreviewProps = {
 };
 
 function DebugReportActionPreview({reportAction, reportID}: DebugReportActionPreviewProps) {
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
     const [userWalletTierName] = useOnyx(ONYXKEYS.USER_WALLET, {selector: tierNameSelector, canBeMissing: false});
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector, canBeMissing: true});
     const personalDetails = usePersonalDetails();
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID, {canBeMissing: true});
-    const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {canBeMissing: true});
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {canBeMissing: false});
     const isTryNewDotNVPDismissed = !!tryNewDot?.classicRedirect?.dismissed;
 
     return (
         <ScrollView>
             <ReportActionItem
-                allReports={allReports}
                 policies={policies}
                 action={reportAction ?? ({} as ReportAction)}
                 report={report ?? ({} as Report)}
