@@ -255,7 +255,7 @@ In all cases, the rule applies to: **new components**, **new features added to e
 **DO NOT flag if:**
 - Props are domain identifiers used for data fetching (e.g., `reportID`, `policyID`, `transactionID`)
 - Props are event handlers for abstract actions (e.g., `onPress`, `onChange`, `onSelectRow`)
-- Props are structural/presentational (e.g., `style`, `testID`)
+- Props are structural/presentational (e.g., `style`, `testID`) — this includes booleans that select between layout or styling strategies on a focused component (e.g., `shouldUseAspectRatio` toggling between fixed-height and aspect-ratio styles)
 - The component already uses composition and child components for features
 - The optional prop is used for logic beyond just conditional rendering (e.g., computing derived values, passed to callbacks, used in multiple places within the component)
 - The component is a thin wrapper around a platform primitive (e.g., wrapping `TextInput`, `ScrollView`, `Pressable`) — these naturally pass through configuration props
