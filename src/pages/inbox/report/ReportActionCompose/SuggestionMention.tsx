@@ -205,19 +205,20 @@ function SuggestionMention({
             const mentionCode = getMentionCode(mentionObject, suggestionValues.prefixType);
             const originalMention = getOriginalMentionText(value, suggestionValues.atSignIndex, StringUtils.countWhiteSpaces(suggestionValues.mentionPrefix));
 
-            let trailingDots = '';
+            // We split trailing dot from the mention token so selecting `@a.` can become `@adam.`
+            // (preserve sentence punctuation) instead of consuming the `.` into the replacement.
+            let trailingDot = '';
             let mentionToReplace = originalMention;
             if (suggestionValues.prefixType === '@' && suggestionValues.mentionPrefix.endsWith('.')) {
-                const match = originalMention.match(/\.{1,}$/);
-                trailingDots = match?.[0] ?? '';
-                mentionToReplace = originalMention.slice(0, originalMention.length - trailingDots.length);
+                trailingDot = originalMention.match(CONST.REGEX.TRAILING_DOTS)?.[0] ?? '';
+                mentionToReplace = originalMention.slice(0, originalMention.length - trailingDot.length);
             }
 
             const commentAfterMention = value.slice(
                 suggestionValues.atSignIndex + Math.max(mentionToReplace.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length),
             );
 
-            updateComment(`${commentBeforeAtSign}${mentionCode}${trailingDots}${trimLeadingSpace(commentAfterMention)}`, true);
+            updateComment(`${commentBeforeAtSign}${mentionCode}${trailingDot}${trimLeadingSpace(commentAfterMention)}`, true);
             const selectionPosition = suggestionValues.atSignIndex + mentionCode.length + CONST.SPACE_LENGTH;
             setSelection({
                 start: selectionPosition,
