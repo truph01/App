@@ -1135,7 +1135,6 @@ function PureReportActionItem({
             const iouReportID = moneyRequestOriginalMessage?.IOUReportID?.toString();
             children = (
                 <MoneyRequestAction
-                    allReports={allReports}
                     // If originalMessage.iouReportID is set, this is a 1:1 IOU expense in a DM chat whose reportID is report.chatReportID
                     chatReportID={chatReportID}
                     requestReportID={iouReportID}
@@ -1158,7 +1157,6 @@ function PureReportActionItem({
                     children = (
                         <View style={[styles.mt1, styles.w100]}>
                             <TransactionPreview
-                                allReports={allReports}
                                 iouReportID={getIOUReportIDFromReportActionPreview(action)}
                                 chatReportID={reportID}
                                 reportID={reportID}

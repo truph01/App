@@ -19,11 +19,11 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Transaction} from '@src/types/onyx';
+import useOnyx from '@hooks/useOnyx';
 import MoneyRequestReportPreviewContent from './MoneyRequestReportPreviewContent';
 import type {MoneyRequestReportPreviewProps} from './types';
 
 function MoneyRequestReportPreview({
-    allReports,
     policies,
     iouReportID,
     policyID,
@@ -44,7 +44,7 @@ function MoneyRequestReportPreview({
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const personalDetailsList = usePersonalDetails();
-    const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`];
+    const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, {canBeMissing: true});
     const invoiceReceiverPolicy =
         policies?.[`${ONYXKEYS.COLLECTION.POLICY}${chatReport?.invoiceReceiver && 'policyID' in chatReport.invoiceReceiver ? chatReport.invoiceReceiver.policyID : undefined}`];
     const invoiceReceiverPersonalDetail = chatReport?.invoiceReceiver && 'accountID' in chatReport.invoiceReceiver ? personalDetailsList?.[chatReport.invoiceReceiver.accountID] : null;
@@ -121,7 +121,6 @@ function MoneyRequestReportPreview({
 
     const renderItem: ListRenderItem<Transaction> = ({item}) => (
         <TransactionPreview
-            allReports={allReports}
             chatReportID={chatReportID}
             action={getIOUActionForReportID(item.reportID, item.transactionID)}
             contextAction={action}
