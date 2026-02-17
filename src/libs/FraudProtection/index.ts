@@ -10,8 +10,6 @@ let lastSentIdentity: string | undefined;
 let cachedAccount: OnyxEntry<Account>;
 let cachedSession: OnyxEntry<Session>;
 
-Log.info(`[Fraud Protection] Initial sessionID generated: ${sessionID}`);
-
 function trySendToFraudProtection() {
     const isAuthenticated = !!(cachedSession?.authToken ?? null);
     const identity = isAuthenticated ? (cachedSession?.accountID?.toString() ?? '') : '';
