@@ -2138,6 +2138,23 @@ describe('CardUtils', () => {
             const description = getCardDescription(card, translateLocal);
             expect(description).toBe(CONST.EXPENSIFY_CARD.BANK);
         });
+
+        it('should return the correct card description for personal card', () => {
+            const personalCard: Card = {
+                accountID: 1,
+                bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
+                cardID: 1,
+                cardName: 'Personal Visa •••• 1234',
+                domainName: '',
+                fraud: 'none',
+                lastFourPAN: '1234',
+                lastScrape: '',
+                lastUpdated: '',
+                state: 3,
+            };
+            const description = getCardDescription(personalCard, translateLocal);
+            expect(description).toBe('Personal Visa •••• 1234');
+        });
     });
 
     describe('PersonalCard (isPersonalCard)', () => {
