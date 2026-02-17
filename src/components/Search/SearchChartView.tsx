@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import type {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {View} from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -153,34 +153,24 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll, t
     const titleIcon = icons[titleIconName];
     const ChartComponent = CHART_VIEW_TO_COMPONENT[view];
 
-    const handleItemPress = useCallback(
-        (filterQuery: string) => {
-            const currentQueryString = buildSearchQueryString(queryJSON);
-            const newQueryJSON = buildSearchQueryJSON(`${currentQueryString} ${filterQuery}`);
+    const handleItemPress = (filterQuery: string) => {
+        const currentQueryString = buildSearchQueryString(queryJSON);
+        const newQueryJSON = buildSearchQueryJSON(`${currentQueryString} ${filterQuery}`);
 
-            if (!newQueryJSON) {
-                Log.alert('[SearchChartView] Failed to build search query JSON from filter query');
-                return;
-            }
-            newQueryJSON.groupBy = undefined;
-            newQueryJSON.view = CONST.SEARCH.VIEW.TABLE;
+        if (!newQueryJSON) {
+            Log.alert('[SearchChartView] Failed to build search query JSON from filter query');
+            return;
+        }
+        newQueryJSON.groupBy = undefined;
+        newQueryJSON.view = CONST.SEARCH.VIEW.TABLE;
 
-            const newQueryString = buildSearchQueryString(newQueryJSON);
-            Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: newQueryString}));
-        },
-        [queryJSON],
-    );
+        const newQueryString = buildSearchQueryString(newQueryJSON);
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: newQueryString}));
+    };
 
-    const {yAxisUnit, yAxisUnitPosition} = useMemo((): {yAxisUnit: string; yAxisUnitPosition: 'left' | 'right'} => {
-        const firstItem = data.at(0);
-        const currency = firstItem?.currency ?? 'USD';
-        const {symbol, position} = getCurrencyDisplayInfoForCharts(currency);
-
-        return {
-            yAxisUnit: symbol,
-            yAxisUnitPosition: position,
-        };
-    }, [data]);
+    const firstItem = data.at(0);
+    const currency = firstItem?.currency ?? 'USD';
+    const {symbol: yAxisUnit, position: yAxisUnitPosition} = getCurrencyDisplayInfoForCharts(currency);
 
     return (
         <Animated.ScrollView

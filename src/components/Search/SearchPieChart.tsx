@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import {PieChart} from '@components/Charts';
 import type {ChartDataPoint} from '@components/Charts/types';
 import {convertToFrontendAmountAsInteger} from '@libs/CurrencyUtils';
@@ -18,32 +18,27 @@ function SearchPieChart({
     yAxisUnitPosition,
 }: SearchChartProps) {
     // Transform grouped transaction data to PieChart format
-    const chartData: ChartDataPoint[] = useMemo(() => {
-        return data.map((item) => {
-            const currency = item.currency ?? 'USD';
-            const valueInDisplayUnits = convertToFrontendAmountAsInteger(item.total ?? 0, currency);
+    const chartData: ChartDataPoint[] = data.map((item) => {
+        const currency = item.currency ?? 'USD';
+        const valueInDisplayUnits = convertToFrontendAmountAsInteger(item.total ?? 0, currency);
 
-            return {
-                label: getLabel(item),
-                total: valueInDisplayUnits,
-            };
-        });
-    }, [data, getLabel]);
+        return {
+            label: getLabel(item),
+            total: valueInDisplayUnits,
+        };
+    });
 
-    const handleSlicePress = useCallback(
-        (dataPoint: ChartDataPoint, index: number) => {
-            if (!onItemPress) {
-                return;
-            }
-            const item = data.at(index);
-            if (!item) {
-                return;
-            }
-            const filterQuery = getFilterQuery(item);
-            onItemPress(filterQuery);
-        },
-        [data, getFilterQuery, onItemPress],
-    );
+    const handleSlicePress = (dataPoint: ChartDataPoint, index: number) => {
+        if (!onItemPress) {
+            return;
+        }
+        const item = data.at(index);
+        if (!item) {
+            return;
+        }
+        const filterQuery = getFilterQuery(item);
+        onItemPress(filterQuery);
+    };
 
     return (
         <PieChart
