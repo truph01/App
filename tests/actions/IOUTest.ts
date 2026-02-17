@@ -83,6 +83,7 @@ import * as API from '@src/libs/API';
 import DateUtils from '@src/libs/DateUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import * as SearchQueryUtils from '@src/libs/SearchQueryUtils';
 import type {PersonalDetailsList, Policy, PolicyTagLists, RecentlyUsedTags, RecentWaypoint, Report, ReportNameValuePairs, SearchResults} from '@src/types/onyx';
 import type {Accountant, Attendee, SplitExpense} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
@@ -9323,6 +9324,93 @@ describe('actions/IOU', () => {
             for (const value of Object.values(params as Record<string, unknown>)) {
                 expect(Array.isArray(value) ? value.every(isValid) : isValid(value)).toBe(true);
             }
+        });
+
+        it('adds grouped from snapshot optimistic data for grouped search queries', async () => {
+            const currentSearchQueryJSON = {
+                type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                status: [CONST.SEARCH.STATUS.EXPENSE.DRAFTS, CONST.SEARCH.STATUS.EXPENSE.OUTSTANDING] as SearchStatus,
+                sortBy: CONST.SEARCH.TABLE_COLUMNS.DATE,
+                sortOrder: CONST.SEARCH.SORT_ORDER.DESC,
+                groupBy: CONST.SEARCH.GROUP_BY.FROM,
+                filters: {
+                    operator: CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO,
+                    left: CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE,
+                    right: 'yes',
+                },
+                inputQuery: 'sortBy:date sortOrder:desc type:expense groupBy:from status:drafts,outstanding',
+                flatFilters: [],
+                hash: 71801560,
+                recentSearchHash: 1043581824,
+                similarSearchHash: 1832274510,
+                view: CONST.SEARCH.VIEW.TABLE,
+            } as SearchQueryJSON;
+
+            const getCurrentSearchQueryJSONSpy = jest.spyOn(SearchQueryUtils, 'getCurrentSearchQueryJSON').mockReturnValue(currentSearchQueryJSON);
+
+            requestMoney({
+                action: CONST.IOU.ACTION.CREATE,
+                report: {reportID: ''},
+                participantParams: {
+                    payeeEmail: RORY_EMAIL,
+                    payeeAccountID: RORY_ACCOUNT_ID,
+                    participant: {login: CARLOS_EMAIL, accountID: CARLOS_ACCOUNT_ID},
+                },
+                transactionParams: {
+                    amount: 10000,
+                    attendees: [],
+                    currency: CONST.CURRENCY.USD,
+                    created: '',
+                    merchant: 'KFC',
+                    comment: '',
+                    linkedTrackedExpenseReportAction: {
+                        reportActionID: '',
+                        actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+                        created: '2024-10-30',
+                    },
+                    actionableWhisperReportActionID: '1',
+                    linkedTrackedExpenseReportID: '1',
+                },
+                shouldGenerateTransactionThreadReport: true,
+                isASAPSubmitBetaEnabled: false,
+                currentUserAccountIDParam: RORY_ACCOUNT_ID,
+                currentUserEmailParam: RORY_EMAIL,
+                transactionViolations: {},
+                policyRecentlyUsedCurrencies: [],
+                isSelfTourViewed: false,
+                quickAction: undefined,
+                personalDetails: {},
+            });
+
+            await waitForBatchedUpdates();
+
+            expect(writeSpy).toHaveBeenCalledTimes(1);
+            const [, , requestData] = writeSpy.mock.calls.at(0) as [ApiCommand, Record<string, unknown>, {optimisticData?: Array<{key: string}>}];
+            const optimisticData = requestData.optimisticData ?? [];
+            const mainSnapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${currentSearchQueryJSON.hash}`;
+            expect(optimisticData.some((update) => update.key === mainSnapshotKey)).toBeTruthy();
+
+            const newFlatFilters = currentSearchQueryJSON.flatFilters.filter((filter) => filter.key !== CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM);
+            newFlatFilters.push({
+                key: CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM,
+                filters: [{operator: CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO, value: String(RORY_ACCOUNT_ID)}],
+            });
+            const groupedTransactionsQueryJSON = SearchQueryUtils.buildSearchQueryJSON(
+                SearchQueryUtils.buildSearchQueryString({
+                    ...currentSearchQueryJSON,
+                    groupBy: undefined,
+                    flatFilters: newFlatFilters,
+                }),
+            );
+
+            expect(groupedTransactionsQueryJSON?.hash).toBeDefined();
+            if (!groupedTransactionsQueryJSON) {
+                throw new Error('Expected grouped transactions query JSON to be defined');
+            }
+            const groupedSnapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${groupedTransactionsQueryJSON.hash}`;
+            expect(optimisticData.some((update) => update.key === groupedSnapshotKey)).toBeTruthy();
+
+            getCurrentSearchQueryJSONSpy.mockRestore();
         });
 
         test.each([
