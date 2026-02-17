@@ -102,7 +102,6 @@ function MoneyRequestReportView({report, policy, reportMetadata, shouldDisplayRe
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
 
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
     const reportID = report?.reportID;
     const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP, {canBeMissing: true});
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`, {canBeMissing: true});
@@ -250,7 +249,6 @@ function MoneyRequestReportView({report, policy, reportMetadata, shouldDisplayRe
                         <Animated.View style={styles.wideRHPMoneyRequestReceiptViewContainer}>
                             <ScrollView contentContainerStyle={styles.wideRHPMoneyRequestReceiptViewScrollViewContainer}>
                                 <MoneyRequestReceiptView
-                                    allReports={allReports}
                                     report={transactionThreadReport}
                                     fillSpace
                                     isDisplayedInWideRHP
