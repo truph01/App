@@ -113,7 +113,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
                     pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
                     errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
-                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, domainPendingActions?.member?.[memberLogin]?.vacationDelegate)}
+                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, vacationDelegate?.previousDelegate)}
                 />
             </BaseDomainMemberDetailsComponent>
             <DecisionModal
