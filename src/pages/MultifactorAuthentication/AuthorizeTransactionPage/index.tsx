@@ -14,8 +14,8 @@ import CONST from '@src/CONST';
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
-import Text from '@components/Text'; // WIP
 import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
+import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -27,6 +27,8 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
+    const [transactionDenied, setTransactionDenied] = useState(false);
+
     const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
     const transaction = transactionQueue?.[transactionID];
 
@@ -36,7 +38,8 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
 
     const showConfirmModal = () => {
         if (!transaction) {
-            // if the transaction has disappeared from state, just close the RHP immediately
+            // This is the event handler for the user pressing "back" in the Header
+            // if the transaction has disappeared from state at this point, just close the RHP immediately
             Navigation.closeRHPFlow();
         }
         setConfirmModalVisibility(true);
@@ -57,10 +60,28 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
             hideConfirmModal();
         }
 
-        denyTransaction({transactionID}).then(() => Navigation.closeRHPFlow());
+        denyTransaction({transactionID}).then(() => setTransactionDenied(true));
         // TODO: Set state (add a new useState at the top) here that the outcome page should be displayed instead of closing the flow
-        // CHUCK NOTE: what does ^this mean?
+        // CHUCK NOTE: I have done what I interpreted this to mean
     };
+
+    if (transactionDenied) {
+        return (
+            <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
+                {/* WIP this'll be replaced with the proper outcome screen after we merge the error screens PR */}
+                <DefaultClientFailureScreen />
+            </ScreenWrapper>
+        );
+    }
+
+    if (!transaction) {
+        return (
+            <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
+                {/* WIP this'll be replaced with the proper outcome screen after we merge the error screens PR */}
+                <DefaultClientFailureScreen />
+            </ScreenWrapper>
+        );
+    }
 
     return (
         <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
@@ -70,32 +91,25 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                 shouldShowBackButton
             />
             <FullPageOfflineBlockingView>
-                {transaction ? (
-                    <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
-                        <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
-                        <MultifactorAuthenticationAuthorizeTransactionActions
-                            isLoading={transaction.isLoading}
-                            onAuthorize={approveTransaction}
-                            onDeny={showConfirmModal}
-                        />
-                        {/*
+                <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
+                    <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
+                    <MultifactorAuthenticationAuthorizeTransactionActions
+                        isLoading={transaction.isLoading}
+                        onAuthorize={approveTransaction}
+                        onDeny={showConfirmModal}
+                    />
+                    {/*
                         TODO: Use custom AuthorizeTransactionCancelModal (not yet implemented)
                         The config for MFA modals should be exactly the same as `failureScreens` structure.
                         Right now only the props for modals are stored in the config but it should be key - component pattern instead.
                         See: FailureScreen directory and how it is used in the scenarios config.
                     */}
-                        <MultifactorAuthenticationTriggerCancelConfirmModal
-                            isVisible={isConfirmModalVisible}
-                            onConfirm={onDenyTransaction}
-                            onCancel={hideConfirmModal}
-                        />
-                    </View>
-                ) : (
-                    <View>
-                        {/* CHUCK WIP */}
-                        <Text>Oops humpty dumpty nothing here!</Text>
-                    </View>
-                )}
+                    <MultifactorAuthenticationTriggerCancelConfirmModal
+                        isVisible={isConfirmModalVisible}
+                        onConfirm={onDenyTransaction}
+                        onCancel={hideConfirmModal}
+                    />
+                </View>
             </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
