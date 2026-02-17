@@ -98,6 +98,7 @@ function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false}:
                 accessibilityLabel={translate('common.receipt')}
                 accessibilityRole={CONST.ROLE.BUTTON}
                 onPress={() => Navigation.navigate(ROUTES.MONEY_REQUEST_RECEIPT_VIEW.getRoute(item.transactionID, Navigation.getActiveRoute()))}
+                sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.RECEIPT_PREVIEW_ITEM}
             >
                 <Image
                     source={typeof item.source === 'string' ? {uri: item.source} : item.source}
@@ -140,6 +141,7 @@ function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false}:
                         icon={icons.ArrowRight}
                         iconFill={theme.white}
                         onPress={submit}
+                        sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.RECEIPT_PREVIEW_SUBMIT_BUTTON}
                     />
                 </SubmitButtonShadow>
             </View>

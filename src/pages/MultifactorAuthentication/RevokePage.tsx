@@ -45,7 +45,7 @@ function MultifactorAuthenticationRevokePage() {
         const result = await revokeMultifactorAuthenticationCredentials();
 
         hideConfirmModal();
-        if (result.httpCode !== 200) {
+        if (result.httpStatusCode !== 200) {
             setErrorMessage(translate('multifactorAuthentication.revoke.error'));
         }
     };
@@ -72,6 +72,7 @@ function MultifactorAuthenticationRevokePage() {
                 <View style={[styles.flexRow, styles.m5, styles.mt0]}>
                     {hasDevices ? (
                         <Button
+                            large
                             danger
                             style={styles.flex1}
                             onPress={showConfirmModal}
@@ -79,6 +80,7 @@ function MultifactorAuthenticationRevokePage() {
                         />
                     ) : (
                         <Button
+                            large
                             success
                             style={styles.flex1}
                             onPress={onGoBackPress}
