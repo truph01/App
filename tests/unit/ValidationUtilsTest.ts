@@ -558,23 +558,23 @@ describe('ValidationUtils', () => {
             expect(isValidUSPhone('+12018675309')).toBe(true);
         });
 
-        test('Should return true for a Puerto Rico phone number (+1-787)', () => {
+        test('Should return true for a Puerto Rico phone number', () => {
             expect(isValidUSPhone('+17873464732')).toBe(true);
         });
 
-        test('Should return true for a US Virgin Islands phone number (+1-340)', () => {
+        test('Should return true for a US Virgin Islands phone number', () => {
             expect(isValidUSPhone('+13405551234')).toBe(true);
         });
 
-        test('Should return true for a Guam phone number (+1-671)', () => {
+        test('Should return true for a Guam phone number', () => {
             expect(isValidUSPhone('+16715551234')).toBe(true);
         });
 
-        test('Should return true for a Northern Mariana Islands phone number (+1-670)', () => {
+        test('Should return true for a Northern Mariana Islands phone number', () => {
             expect(isValidUSPhone('+16705551234')).toBe(true);
         });
 
-        test('Should return false for a Canadian phone number (+1-416)', () => {
+        test('Should return false for a Canadian phone number', () => {
             expect(isValidUSPhone('+14165551234')).toBe(false);
         });
 

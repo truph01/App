@@ -324,7 +324,7 @@ function isValidUSPhone(phoneNumber = '', isCountryCodeOptional?: boolean): bool
 
     // US territories share the +1 country calling code but have their own ISO region codes.
     // We accept these as valid US phone numbers for wallet/bank account verification.
-    const validUSRegionCodes = [CONST.COUNTRY.US, CONST.COUNTRY.PR, CONST.COUNTRY.GU, CONST.COUNTRY.VI, 'AS', 'MP'];
+    const validUSRegionCodes = [CONST.COUNTRY.US, CONST.COUNTRY.PR, CONST.COUNTRY.GU, CONST.COUNTRY.VI, CONST.COUNTRY.AS, CONST.COUNTRY.MP];
     return parsedPhoneNumber.possible && validUSRegionCodes.includes(parsedPhoneNumber.regionCode ?? '');
 }
 
