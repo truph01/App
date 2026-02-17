@@ -170,7 +170,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll, t
 
     const firstItem = data.at(0);
     const currency = firstItem?.currency ?? 'USD';
-    const {symbol: yAxisUnit, position: yAxisUnitPosition} = getCurrencyDisplayInfoForCharts(currency);
+    const {symbol: unit, position: unitPosition} = getCurrencyDisplayInfoForCharts(currency);
 
     return (
         <Animated.ScrollView
@@ -188,8 +188,8 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll, t
                     getFilterQuery={getFilterQuery}
                     onItemPress={handleItemPress}
                     isLoading={isLoading}
-                    yAxisUnit={yAxisUnit}
-                    yAxisUnitPosition={yAxisUnitPosition}
+                    unit={unit}
+                    unitPosition={unitPosition}
                 />
             </View>
         </Animated.ScrollView>

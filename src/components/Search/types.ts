@@ -1,5 +1,5 @@
 import type {ValueOf} from 'type-fest';
-import type {YAxisUnitPosition} from '@components/Charts';
+import type {UnitPosition} from '@components/Charts';
 import type {PaymentMethod} from '@components/KYCWall/types';
 import type {
     ReportActionListItemType,
@@ -358,11 +358,11 @@ type SearchChartProps = {
     /** Whether data is loading */
     isLoading?: boolean;
 
-    /** Currency symbol for Y-axis labels */
-    yAxisUnit?: string;
+    /** Currency symbol (e.g., '$', '€', 'PLN') */
+    unit?: string;
 
     /** Position of currency symbol relative to value */
-    yAxisUnitPosition?: YAxisUnitPosition;
+    unitPosition?: UnitPosition;
 };
 
 export type {

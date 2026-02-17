@@ -28,7 +28,7 @@ type CartesianChartProps = {
     yAxisUnit?: string;
 
     /** Position of the unit symbol relative to the value. Defaults to 'left'. */
-    yAxisUnitPosition?: YAxisUnitPosition;
+    yAxisUnitPosition?: UnitPosition;
 };
 
 type PieChartProps = {
@@ -62,6 +62,6 @@ type PieSlice = {
     originalIndex: number;
 };
 
-type YAxisUnitPosition = 'left' | 'right';
+type UnitPosition = 'left' | 'right';
 
-export type {ChartDataPoint, CartesianChartProps, PieChartProps, PieSlice, YAxisUnitPosition};
+export type {ChartDataPoint, CartesianChartProps, PieChartProps, PieSlice, UnitPosition};

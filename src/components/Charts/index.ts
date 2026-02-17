@@ -5,5 +5,5 @@ import LineChart from './LineChart';
 import PieChart from './PieChart';
 
 export {BarChart, ChartHeader, ChartTooltip, LineChart, PieChart};
-export type {ChartDataPoint, CartesianChartProps, YAxisUnitPosition} from './types';
+export type {ChartDataPoint, CartesianChartProps, UnitPosition} from './types';
 export type {LineChartProps} from './LineChart/LineChartContent';

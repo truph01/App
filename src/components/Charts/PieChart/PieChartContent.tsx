@@ -8,7 +8,7 @@ import {Pie, PolarChart} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
-import {TOOLTIP_BAR_GAP, useTooltipData} from '@components/Charts/hooks';
+import {TOOLTIP_BAR_GAP, useChartLabelFormats, useTooltipData} from '@components/Charts/hooks';
 import type {ChartDataPoint, PieChartProps, PieSlice} from '@components/Charts/types';
 import {getChartColor} from '@components/Charts/utils';
 import Text from '@components/Text';
@@ -133,8 +133,8 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     // Map sorted slice index back to original data index for the tooltip hook
     const activeOriginalDataIndex = activeSliceIndex >= 0 ? (processedSlices.at(activeSliceIndex)?.originalIndex ?? -1) : -1;
 
-    const formatAmount = (value: number) => (valueUnit ? `${valueUnit}${value.toLocaleString()}` : value.toLocaleString());
-    const tooltipData = useTooltipData(activeOriginalDataIndex, data, formatAmount);
+    const {formatValue} = useChartLabelFormats({data, unit: valueUnit});
+    const tooltipData = useTooltipData(activeOriginalDataIndex, data, formatValue);
 
     // Calculate pie geometry
     const pieGeometry = {radius: Math.min(canvasSize.width, canvasSize.height) / 2, centerX: canvasSize.width / 2, centerY: canvasSize.height / 2} as const;

@@ -12,10 +12,10 @@ function SearchPieChart({
     getFilterQuery,
     onItemPress,
     isLoading,
-    yAxisUnit,
-    // Accepted for API compatibility with SearchChartView; pie chart does not use axis position
+    unit,
+    // Accepted for API compatibility with SearchChartView; pie chart does not use unit position
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    yAxisUnitPosition,
+    unitPosition,
 }: SearchChartProps) {
     // Transform grouped transaction data to PieChart format
     const chartData: ChartDataPoint[] = data.map((item) => {
@@ -47,7 +47,7 @@ function SearchPieChart({
             titleIcon={titleIcon}
             isLoading={isLoading}
             onSlicePress={handleSlicePress}
-            valueUnit={yAxisUnit}
+            valueUnit={unit}
         />
     );
 }
