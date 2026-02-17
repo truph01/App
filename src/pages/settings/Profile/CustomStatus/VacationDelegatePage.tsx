@@ -59,7 +59,7 @@ function VacationDelegatePage() {
                     headerTitle={translate('common.vacationDelegate')}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
                     cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
-                    additionalExcludeLogins={{[currentUserLogin]: true}}
+                    includeCurrentUser={false}
                 />
             </ScreenWrapper>
             <ConfirmModal

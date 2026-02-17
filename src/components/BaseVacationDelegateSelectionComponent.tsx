@@ -36,6 +36,9 @@ type BaseVacationDelegateSelectionComponentProps = {
 
     /** Additional logins to exclude from the list */
     additionalExcludeLogins?: Record<string, boolean>;
+
+    /** Whether to include the current user in the list */
+    includeCurrentUser?: boolean;
 };
 
 function BaseVacationDelegateSelectionComponent({
@@ -45,6 +48,7 @@ function BaseVacationDelegateSelectionComponent({
     onBackButtonPress,
     cannotSetDelegateMessage,
     additionalExcludeLogins,
+    includeCurrentUser = true,
 }: BaseVacationDelegateSelectionComponentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -68,7 +72,7 @@ function BaseVacationDelegateSelectionComponent({
         searchContext: CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_GENERAL,
         excludeLogins,
         includeRecentReports: true,
-        includeCurrentUser: true,
+        includeCurrentUser,
         getValidOptionsConfig: {
             excludeLogins,
         },
