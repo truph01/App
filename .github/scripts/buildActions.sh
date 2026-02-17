@@ -9,7 +9,6 @@ ACTIONS_DIR="$(dirname "$(dirname "$0")")/actions/javascript"
 
 # List of paths to all JS files that implement our GH Actions
 declare -r GITHUB_ACTIONS=(
-    "$ACTIONS_DIR/failureNotifier/failureNotifier.ts"
     "$ACTIONS_DIR/authorChecklist/authorChecklist.ts"
     "$ACTIONS_DIR/awaitStagingDeploys/awaitStagingDeploys.ts"
     "$ACTIONS_DIR/bumpVersion/bumpVersion.ts"
@@ -17,6 +16,7 @@ declare -r GITHUB_ACTIONS=(
     "$ACTIONS_DIR/checkDeployBlockers/checkDeployBlockers.ts"
     "$ACTIONS_DIR/checkSVGCompression/checkSVGCompression.ts"
     "$ACTIONS_DIR/createOrUpdateStagingDeploy/createOrUpdateStagingDeploy.ts"
+    "$ACTIONS_DIR/failureNotifier/failureNotifier.ts"
     "$ACTIONS_DIR/formatCodeCovComment/formatCodeCovComment.ts"
     "$ACTIONS_DIR/getAndroidRolloutPercentage/getAndroidRolloutPercentage.ts"
     "$ACTIONS_DIR/getArtifactInfo/getArtifactInfo.ts"

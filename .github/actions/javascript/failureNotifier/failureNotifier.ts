@@ -1,23 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import type {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods';
+import dedent from 'dedent';
 
-type WorkflowRun = {
-    id: number;
-    workflow_id: number;
-    head_commit: {id: string} | null;
-    head_branch: string;
-    actor: {login: string} | null;
-    status: string | null;
-};
+type WorkflowRun = RestEndpointMethodTypes['actions']['listWorkflowRuns']['response']['data']['workflow_runs'][number];
 
-type PullRequest = {
-    html_url: string;
-    user: {login: string} | null;
-    merged_at: string | null;
-    base: {ref: string};
-    number: number;
-};
+type PullRequest = RestEndpointMethodTypes['repos']['listPullRequestsAssociatedWithCommit']['response']['data'][number];
 
 /**
  * Given the list of PRs associated with a commit on the target branch,
@@ -79,7 +68,7 @@ async function run() {
         commit_sha: headCommit,
     });
 
-    const targetBranch = workflowRun.head_branch;
+    const targetBranch = workflowRun.head_branch ?? 'main';
     const pr = getMergedPR(prData.data, targetBranch);
     const prLink = pr?.html_url ?? 'N/A';
     const prAuthor = pr?.user?.login ?? 'unknown';
@@ -113,21 +102,27 @@ async function run() {
         }
 
         const issueTitle = `Investigate workflow job failing on main: ${job.name}`;
-        const issueBody =
-            `🚨 **Failure Summary** 🚨:\n\n` +
-            `- **📋 Job Name**: [${job.name}](${job.html_url})\n` +
-            `- **🔧 Failure in Workflow**: Process new code merged to main\n` +
-            `- **🔗 Triggered by PR**: [PR Link](${prLink})\n` +
-            `- **👤 PR Author**: @${prAuthor}\n` +
-            `- **🤝 Merged by**: @${prMerger}\n` +
-            `- **🐛 Error Message**: \n ${errorMessage}\n\n` +
-            `⚠️ **Action Required** ⚠️:\n\n` +
-            `🛠️ A recent merge appears to have caused a failure in the job named [${job.name}](${job.html_url}).\n` +
-            `This issue has been automatically created and labeled with \`${failureLabel}\` for investigation. \n\n` +
-            `👀 **Please look into the following**:\n` +
-            `1. **Why the PR caused the job to fail?**\n` +
-            `2. **Address any underlying issues.**\n\n` +
-            `🐛 We appreciate your help in squashing this bug!`;
+        const issueBody = dedent`
+            🚨 **Failure Summary** 🚨:
+
+            - **📋 Job Name**: [${job.name}](${job.html_url})
+            - **🔧 Failure in Workflow**: Process new code merged to main
+            - **🔗 Triggered by PR**: [PR Link](${prLink})
+            - **👤 PR Author**: @${prAuthor}
+            - **🤝 Merged by**: @${prMerger}
+            - **🐛 Error Message**:
+             ${errorMessage}
+
+            ⚠️ **Action Required** ⚠️:
+
+            🛠️ A recent merge appears to have caused a failure in the job named [${job.name}](${job.html_url}).
+            This issue has been automatically created and labeled with \`${failureLabel}\` for investigation.
+
+            👀 **Please look into the following**:
+            1. **Why the PR caused the job to fail?**
+            2. **Address any underlying issues.**
+
+            🐛 We appreciate your help in squashing this bug!`;
 
         await octokit.rest.issues.create({
             owner,

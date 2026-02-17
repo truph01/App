@@ -4524,6 +4524,73 @@ function removeHook(state, name, method) {
 
 /***/ }),
 
+/***/ 5281:
+/***/ ((module) => {
+
+"use strict";
+
+
+function dedent(strings) {
+
+  var raw = void 0;
+  if (typeof strings === "string") {
+    // dedent can be used as a plain function
+    raw = [strings];
+  } else {
+    raw = strings.raw;
+  }
+
+  // first, perform interpolation
+  var result = "";
+  for (var i = 0; i < raw.length; i++) {
+    result += raw[i].
+    // join lines when there is a suppressed newline
+    replace(/\\\n[ \t]*/g, "").
+
+    // handle escaped backticks
+    replace(/\\`/g, "`");
+
+    if (i < (arguments.length <= 1 ? 0 : arguments.length - 1)) {
+      result += arguments.length <= i + 1 ? undefined : arguments[i + 1];
+    }
+  }
+
+  // now strip indentation
+  var lines = result.split("\n");
+  var mindent = null;
+  lines.forEach(function (l) {
+    var m = l.match(/^(\s+)\S+/);
+    if (m) {
+      var indent = m[1].length;
+      if (!mindent) {
+        // this is the first indented line
+        mindent = indent;
+      } else {
+        mindent = Math.min(mindent, indent);
+      }
+    }
+  });
+
+  if (mindent !== null) {
+    result = lines.map(function (l) {
+      return l[0] === " " ? l.slice(mindent) : l;
+    }).join("\n");
+  }
+
+  // dedent eats leading and trailing whitespace too
+  result = result.trim();
+
+  // handle escaped newlines at the end to ensure they don't get stripped too
+  return result.replace(/\\n/g, "\n");
+}
+
+if (true) {
+  module.exports = dedent;
+}
+
+
+/***/ }),
+
 /***/ 8932:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -9544,11 +9611,15 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getMergedPR = getMergedPR;
 /* eslint-disable @typescript-eslint/naming-convention */
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const dedent_1 = __importDefault(__nccwpck_require__(5281));
 /**
  * Given the list of PRs associated with a commit on the target branch,
  * find the PR that was actually merged into that branch.
@@ -9600,7 +9671,7 @@ async function run() {
         repo,
         commit_sha: headCommit,
     });
-    const targetBranch = workflowRun.head_branch;
+    const targetBranch = workflowRun.head_branch ?? 'main';
     const pr = getMergedPR(prData.data, targetBranch);
     const prLink = pr?.html_url ?? 'N/A';
     const prAuthor = pr?.user?.login ?? 'unknown';
@@ -9627,20 +9698,27 @@ async function run() {
             errorMessage += `${checkResult.annotation_level}: ${checkResult.message}\n`;
         }
         const issueTitle = `Investigate workflow job failing on main: ${job.name}`;
-        const issueBody = `🚨 **Failure Summary** 🚨:\n\n` +
-            `- **📋 Job Name**: [${job.name}](${job.html_url})\n` +
-            `- **🔧 Failure in Workflow**: Process new code merged to main\n` +
-            `- **🔗 Triggered by PR**: [PR Link](${prLink})\n` +
-            `- **👤 PR Author**: @${prAuthor}\n` +
-            `- **🤝 Merged by**: @${prMerger}\n` +
-            `- **🐛 Error Message**: \n ${errorMessage}\n\n` +
-            `⚠️ **Action Required** ⚠️:\n\n` +
-            `🛠️ A recent merge appears to have caused a failure in the job named [${job.name}](${job.html_url}).\n` +
-            `This issue has been automatically created and labeled with \`${failureLabel}\` for investigation. \n\n` +
-            `👀 **Please look into the following**:\n` +
-            `1. **Why the PR caused the job to fail?**\n` +
-            `2. **Address any underlying issues.**\n\n` +
-            `🐛 We appreciate your help in squashing this bug!`;
+        const issueBody = (0, dedent_1.default) `
+            🚨 **Failure Summary** 🚨:
+
+            - **📋 Job Name**: [${job.name}](${job.html_url})
+            - **🔧 Failure in Workflow**: Process new code merged to main
+            - **🔗 Triggered by PR**: [PR Link](${prLink})
+            - **👤 PR Author**: @${prAuthor}
+            - **🤝 Merged by**: @${prMerger}
+            - **🐛 Error Message**:
+             ${errorMessage}
+
+            ⚠️ **Action Required** ⚠️:
+
+            🛠️ A recent merge appears to have caused a failure in the job named [${job.name}](${job.html_url}).
+            This issue has been automatically created and labeled with \`${failureLabel}\` for investigation.
+
+            👀 **Please look into the following**:
+            1. **Why the PR caused the job to fail?**
+            2. **Address any underlying issues.**
+
+            🐛 We appreciate your help in squashing this bug!`;
         await octokit.rest.issues.create({
             owner,
             repo,
