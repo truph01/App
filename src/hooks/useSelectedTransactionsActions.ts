@@ -1,11 +1,11 @@
-import {useContext, useState} from 'react';
+import {useState} from 'react';
 import {DeviceEventEmitter} from 'react-native';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
-import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchContext} from '@components/Search/SearchContext';
-import {initSplitExpense} from '@libs/actions/IOU';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
+import {initSplitExpense} from '@libs/actions/IOU/Split';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {exportReportToCSV} from '@libs/actions/Report';
 import {getExportTemplates, handlePreventSearchAPI} from '@libs/actions/Search';
@@ -71,7 +71,8 @@ function useSelectedTransactionsActions({
     isOnSearch?: boolean;
 }) {
     const {isOffline} = useNetworkWithOfflineStatus();
-    const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const {selectedTransactionIDs, clearSelectedTransactions, currentSearchHash, selectedTransactions: selectedTransactionsMeta} = useSearchContext();
     const allTransactions = useAllTransactions();
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
