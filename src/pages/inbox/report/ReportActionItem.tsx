@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, {useCallback} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {useBlockedFromConcierge} from '@components/OnyxListItemProvider';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -112,11 +112,14 @@ function ReportActionItem({
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
     const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
 
-    const getLinkedTransactionRouteError = useCallback((transaction: OnyxEntry<Transaction>) => {
-        return linkedTransactionRouteErrorProp ?? transaction?.errorFields?.route;
-    }, [linkedTransactionRouteErrorProp])
+    const getLinkedTransactionRouteError = useCallback(
+        (transaction: OnyxEntry<Transaction>) => {
+            return linkedTransactionRouteErrorProp ?? transaction?.errorFields?.route;
+        },
+        [linkedTransactionRouteErrorProp],
+    );
 
-    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: getLinkedTransactionRouteError });
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {canBeMissing: true, selector: getLinkedTransactionRouteError});
 
     // The app would crash due to subscribing to the entire report collection if parentReportID is an empty string. So we should have a fallback ID here.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

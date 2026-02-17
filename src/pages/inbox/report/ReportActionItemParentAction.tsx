@@ -20,22 +20,21 @@ import {
 } from '@libs/ReportUtils';
 import {navigateToConciergeChatAndDeleteReport} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type * as OnyxTypes from '@src/types/onyx';
+import type {PersonalDetailsList, Policy, Report, ReportAction, ReportActionReactions, ReportActions, ReportActionsDrafts, ReportNameValuePairs, Transaction} from '@src/types/onyx';
 import AnimatedEmptyStateBackground from './AnimatedEmptyStateBackground';
 import RepliesDivider from './RepliesDivider';
 import ReportActionItem from './ReportActionItem';
 import ThreadDivider from './ThreadDivider';
-import { Transaction } from '@src/types/onyx';
 
 type ReportActionItemParentActionProps = {
     /** All the data of the report collection */
-    allReports: OnyxCollection<OnyxTypes.Report>;
+    allReports: OnyxCollection<Report>;
 
     /** All the data of the policy collection */
-    policies: OnyxCollection<OnyxTypes.Policy>;
+    policies: OnyxCollection<Policy>;
 
     /** All the data of the action item */
-    action: OnyxTypes.ReportAction;
+    action: ReportAction;
 
     /** Flag to show, hide the thread divider line */
     shouldHideThreadDividerLine?: boolean;
@@ -48,13 +47,13 @@ type ReportActionItemParentActionProps = {
     reportID: string;
 
     /** The current report is displayed */
-    report: OnyxEntry<OnyxTypes.Report>;
+    report: OnyxEntry<Report>;
 
     /** The transaction thread report associated with the current report, if any */
-    transactionThreadReport: OnyxEntry<OnyxTypes.Report>;
+    transactionThreadReport: OnyxEntry<Report>;
 
     /** Report actions belonging to the report's parent */
-    parentReportAction: OnyxEntry<OnyxTypes.ReportAction>;
+    parentReportAction: OnyxEntry<ReportAction>;
 
     /** Whether we should display "Replies" divider */
     shouldDisplayReplyDivider: boolean;
@@ -72,13 +71,13 @@ type ReportActionItemParentActionProps = {
     isUserValidated: boolean | undefined;
 
     /** Personal details list */
-    personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
+    personalDetails: OnyxEntry<PersonalDetailsList>;
 
     /** All draft messages collection */
-    allDraftMessages?: OnyxCollection<OnyxTypes.ReportActionsDrafts>;
+    allDraftMessages?: OnyxCollection<ReportActionsDrafts>;
 
     /** All emoji reactions collection */
-    allEmojiReactions?: OnyxCollection<OnyxTypes.ReportActionReactions>;
+    allEmojiReactions?: OnyxCollection<ReportActionReactions>;
 
     /** User billing fund ID */
     userBillingFundID: number | undefined;
@@ -119,16 +118,16 @@ function ReportActionItemParentAction({
 
     const getLinkedTransactionRouteError = useCallback((transaction: OnyxEntry<Transaction>) => {
         return transaction?.errorFields?.route;
-    }, [])
+    }, []);
 
-    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: getLinkedTransactionRouteError});
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {canBeMissing: true, selector: getLinkedTransactionRouteError});
 
     const ancestorReportNameValuePairsSelector = useCallback(
-        (allReportNameValuePairs: OnyxCollection<OnyxTypes.ReportNameValuePairs>) => {
+        (allReportNameValuePairs: OnyxCollection<ReportNameValuePairs>) => {
             if (!allReportNameValuePairs) {
                 return {};
             }
-            const ancestorReportNameValuePairs: OnyxCollection<OnyxTypes.ReportNameValuePairs> = {};
+            const ancestorReportNameValuePairs: OnyxCollection<ReportNameValuePairs> = {};
             for (const ancestor of ancestors) {
                 ancestorReportNameValuePairs[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${ancestor.report.reportID}`] =
                     allReportNameValuePairs[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${ancestor.report.reportID}`];
@@ -148,7 +147,7 @@ function ReportActionItemParentAction({
     );
 
     const ancestorReportActionsSelector = useCallback(
-        (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
+        (allReportActions: OnyxCollection<ReportActions>) => {
             const reportIDs = ancestors.map((ancestor) => ancestor.report.reportID);
             return getReportActionsForReportIDs(allReportActions, reportIDs);
         },
