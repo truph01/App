@@ -56,7 +56,8 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         if (isConfirmModalVisible || !transactionID) {
             hideConfirmModal();
         }
-        // TODO: Use DenyTransaction - API for denying, same for ValidateCodePage
+
+        denyTransaction({transactionID}).then(() => Navigation.closeRHPFlow());
         // TODO: Set state (add a new useState at the top) here that the outcome page should be displayed instead of closing the flow
         // CHUCK NOTE: what does ^this mean?
     };

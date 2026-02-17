@@ -134,6 +134,11 @@ const API_RESPONSE_MAP = {
             TRANSACTION_NOT_FOUND: REASON.BACKEND.TRANSACTION_NOT_FOUND,
         },
     },
+
+    // CHUCK WIP
+    DENY_TRANSACTION: {
+        ...MULTIFACTOR_AUTHENTICATION_COMMAND_BASE_RESPONSE_MAP,
+    },
 } as const;
 /* eslint-enable @typescript-eslint/naming-convention */
 

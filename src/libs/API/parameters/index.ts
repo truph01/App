@@ -484,3 +484,4 @@ export type {default as GetTransactionsMatchingCodingRuleParams} from './GetTran
 export type {default as SetPolicyTimeTrackingDefaultRateParams} from './SetPolicyTimeTrackingDefaultRateParams';
 export type {default as ToggleTwoFactorAuthRequiredForDomainParams} from './ToggleTwoFactorAuthRequiredForDomainParams';
 export type {default as AuthorizeTransactionParams} from './AuthorizeTransactionParams';
+export type {default as DenyTransactionParams} from './DenyTransactionParams';

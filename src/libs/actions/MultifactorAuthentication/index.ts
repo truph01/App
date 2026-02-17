@@ -12,6 +12,7 @@ import {parseHttpRequest} from '@libs/MultifactorAuthentication/Biometrics/helpe
 import type {MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {DenyTransactionParams} from '@libs/API/parameters';
 
 /**
  * To keep the code clean and readable, these functions return parsed data in order to:
@@ -205,6 +206,46 @@ async function authorizeTransaction({transactionID, signedChallenge, authenticat
     }
 }
 
+async function denyTransaction({transactionID}: DenyTransactionParams) {
+    try {
+        const response = await makeRequestWithSideEffects(
+            SIDE_EFFECT_REQUEST_COMMANDS.DENY_TRANSACTION,
+            {transactionID},
+            {
+                optimisticData: [
+                    {
+                        key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        value: {
+                            [transactionID]: {
+                                isLoading: true,
+                            },
+                        },
+                    },
+                ],
+                finallyData: [
+                    {
+                        key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        value: {
+                            [transactionID]: {
+                                isLoading: false,
+                            },
+                        },
+                    },
+                ],
+            },
+        );
+
+        const {jsonCode, message} = response ?? {};
+
+        return parseHttpRequest(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.DENY_TRANSACTION, message);
+    } catch (error) {
+        Log.hmmm('[MultifactorAuthentication] Failed to authorize transaction', {error});
+        return parseHttpRequest(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.DENY_TRANSACTION, undefined);
+    }
+}
+
 function markHasAcceptedSoftPrompt() {
     Onyx.merge(ONYXKEYS.DEVICE_BIOMETRICS, {
         hasAcceptedSoftPrompt: true,
@@ -226,5 +267,6 @@ export {
     markHasAcceptedSoftPrompt,
     clearLocalMFAPublicKeyList,
     refreshTransactionsPending3DSReview,
+    denyTransaction,
     authorizeTransaction,
 };
