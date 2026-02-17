@@ -196,6 +196,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles, route}: BaseOnboarding
     const renderOption = useCallback(
         (item: OnboardingListItem) => (
             <PressableWithoutFeedback
+                sentryLabel="OnboardingAccounting-integrationOption"
                 key={item.keyForList ?? ''}
                 onPress={() => handleIntegrationSelect(item.keyForList)}
                 accessibilityLabel={item.text}

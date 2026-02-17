@@ -71,6 +71,7 @@ function RadioButtonWithLabel({
                     hasError={hasError}
                 />
                 <PressableWithFeedback
+                    sentryLabel="RadioButtonWithLabel"
                     tabIndex={-1}
                     accessible={false}
                     onPress={onPress}
