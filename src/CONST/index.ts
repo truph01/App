@@ -7982,10 +7982,6 @@ const CONST = {
         ADD_EXPENSE_APPROVALS: 'addExpenseApprovals',
     },
 
-    MODAL_EVENTS: {
-        CLOSED: 'modalClosed',
-    },
-
     LIST_BEHAVIOR: {
         REGULAR: 'regular',
         INVERTED: 'inverted',
