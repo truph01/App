@@ -23,6 +23,7 @@ import type {
     PrivatePersonalDetails,
     WorkspaceCardsList,
 } from '@src/types/onyx';
+import ROUTES from '@src/ROUTES';
 import type {UnassignedCard} from '@src/types/onyx/Card';
 import type {
     BankName,
@@ -40,7 +41,6 @@ import type IconAsset from '@src/types/utils/IconAsset';
 import {filterObject} from './ObjectUtils';
 import {arePersonalDetailsMissing, getDisplayNameOrDefault} from './PersonalDetailsUtils';
 import StringUtils from './StringUtils';
-import ROUTES from '@src/ROUTES';
 
 const COMPANY_CARD_FEED_ICON_NAMES = [
     'VisaCompanyCardDetailLarge',
