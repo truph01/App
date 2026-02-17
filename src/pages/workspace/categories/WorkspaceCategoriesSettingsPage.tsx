@@ -81,12 +81,8 @@ function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSet
             setWorkspaceDefaultSpendCategory(policyID, currentGroupID, selectedCategory.keyForList);
         }
 
-        console.log('test: dismissing keyboard');
         KeyboardUtils.dismiss({
-            afterTransition: () => {
-                console.log('test: after interactions');
-                return setIsSelectorModalVisible(false);
-            },
+            afterTransition: () => setIsSelectorModalVisible(false),
         });
     };
 
