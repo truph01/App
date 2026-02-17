@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -1603,17 +1602,17 @@ const translations: TranslationDeepObject<typeof en> = {
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_ADD_TRANSACTIONS]: ({actor, actorType}: NextStepParams) => {
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `We wachten op <strong>jou</strong> om onkosten toe te voegen.`;
+                        return `In afwachting tot <strong>jij</strong> uitgaven toevoegt.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot <strong>${actor}</strong> onkosten toevoegt.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
-                        return `Wachten tot een beheerder uitgaven toevoegt.`;
+                        return `Wachten tot een beheerder onkosten toevoegt.`;
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_SUBMIT]: ({actor, actorType}: NextStepParams) => {
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `Aan het wachten tot <strong>jij</strong> onkosten indient.`;
+                        return `Wachten tot <strong>jij</strong> onkosten indient.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot <strong>${actor}</strong> onkosten indient.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
@@ -1624,7 +1623,7 @@ const translations: TranslationDeepObject<typeof en> = {
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_SUBMITTER_ACCOUNT]: ({actor, actorType}: NextStepParams) => {
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `Wachten tot <strong>jij</strong> een bankrekening toevoegt.`;
+                        return `We wachten op <strong>jou</strong> om een bankrekening toe te voegen.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot <strong>${actor}</strong> een bankrekening toevoegt.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
@@ -1634,21 +1633,21 @@ const translations: TranslationDeepObject<typeof en> = {
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_AUTOMATIC_SUBMIT]: ({actor, actorType, eta, etaType}: NextStepParams) => {
                 let formattedETA = '';
                 if (eta) {
-                    formattedETA = etaType === CONST.NEXT_STEP.ETA_TYPE.DATE_TIME ? ` op ${eta}` : ` ${eta}`;
+                    formattedETA = etaType === CONST.NEXT_STEP.ETA_TYPE.DATE_TIME ? `op de ${eta} van elke maand` : ` ${eta}`;
                 }
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `Wachten tot <strong>je</strong> declaraties automatisch worden ingediend${formattedETA}.`;
+                        return `Wachten tot <strong>jouw</strong> declaraties automatisch worden ingediend${formattedETA}.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot de uitgaven van <strong>${actor}</strong> automatisch worden ingediend${formattedETA}.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
-                        return `Wachten tot de onkosten van een beheerder automatisch worden ingediend${formattedETA}.`;
+                        return `Wachten tot de onkostendeclaraties van een beheerder automatisch worden ingediend${formattedETA}.`;
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_FIX_ISSUES]: ({actor, actorType}: NextStepParams) => {
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `Wacht tot <strong>jij</strong> de problemen oplost.`;
+                        return `We wachten op <strong>jou</strong> om de problemen op te lossen.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot <strong>${actor}</strong> de problemen oplost.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
@@ -1658,17 +1657,17 @@ const translations: TranslationDeepObject<typeof en> = {
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_APPROVE]: ({actor, actorType}: NextStepParams) => {
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `Wacht tot <strong>jij</strong> de declaraties goedkeurt.`;
+                        return `Wachten tot <strong>jij</strong> de declaraties goedkeurt.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
-                        return `Wachten tot <strong>${actor}</strong> de onkosten goedkeurt.`;
+                        return `Wacht tot <strong>${actor}</strong> de onkosten goedkeurt.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
-                        return `Wachten op goedkeuring van de onkosten door een beheerder.`;
+                        return `Wachten tot een beheerder de onkosten goedkeurt.`;
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_EXPORT]: ({actor, actorType}: NextStepParams) => {
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
-                        return `We wachten op <strong>jou</strong> om dit rapport te exporteren.`;
+                        return `Wachten tot <strong>jij</strong> dit rapport exporteert.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot <strong>${actor}</strong> dit rapport exporteert.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
@@ -1692,18 +1691,18 @@ const translations: TranslationDeepObject<typeof en> = {
                     case CONST.NEXT_STEP.ACTOR_TYPE.OTHER_USER:
                         return `Wachten tot <strong>${actor}</strong> klaar is met het instellen van een zakelijke bankrekening.`;
                     case CONST.NEXT_STEP.ACTOR_TYPE.UNSPECIFIED_ADMIN:
-                        return `Wachten tot een beheerder het instellen van een zakelijke bankrekening afrondt.`;
+                        return `Wachten tot een beheerder klaar is met het instellen van een zakelijke bankrekening.`;
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_PAYMENT]: ({eta, etaType}: NextStepParams) => {
                 let formattedETA = '';
                 if (eta) {
-                    formattedETA = etaType === CONST.NEXT_STEP.ETA_TYPE.DATE_TIME ? ` voor ${eta}` : ` ${eta}`;
+                    formattedETA = etaType === CONST.NEXT_STEP.ETA_TYPE.DATE_TIME ? `vóór ${eta}` : ` ${eta}`;
                 }
                 return `Wachten tot de betaling is voltooid${formattedETA}.`;
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.SUBMITTING_TO_SELF]: (_: NextStepParams) =>
-                `Oeps! Het lijkt erop dat je deze rapportage naar <strong>jezelf</strong> indient. Het goedkeuren van je eigen rapporten is <strong>verboden</strong> binnen je workspace. Dien dit rapport in bij iemand anders of neem contact op met je beheerder om de persoon te wijzigen naar wie je indient.`,
+                `Oeps! Het lijkt erop dat je deze verklaring naar <strong>jezelf</strong> indient. Het goedkeuren van je eigen rapporten is <strong>verboden</strong> door je werkruimte. Dien dit rapport in bij iemand anders of neem contact op met je beheerder om de persoon te wijzigen bij wie je indient.`,
         },
         eta: {
             [CONST.NEXT_STEP.ETA_KEY.SHORTLY]: 'binnenkort',
@@ -8018,7 +8017,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         subscriptionSettings: {
             title: 'Abonnementsinstellingen',
             summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Abonnementstype: ${subscriptionType}, Abonnementsomvang: ${subscriptionSize}, Automatisch verlengen: ${autoRenew}, Automatisch jaarlijkse seats verhogen: ${autoIncrease}`,
+                `Abonnementstype: ${subscriptionType}, Abonnementsgrootte: ${subscriptionSize}, Automatisch verlengen: ${autoRenew}, Jaarlijkse seats automatisch verhogen: ${autoIncrease}`,
             none: 'geen',
             on: 'aan',
             off: 'uit',
