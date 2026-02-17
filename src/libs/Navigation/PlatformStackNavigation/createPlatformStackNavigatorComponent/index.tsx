@@ -1,4 +1,4 @@
-import type {ParamListBase, ScreenLayoutArgs, StackActionHelpers} from '@react-navigation/native';
+import type {ParamListBase, StackActionHelpers} from '@react-navigation/native';
 import {StackRouter, useNavigationBuilder} from '@react-navigation/native';
 import type {StackNavigationEventMap, StackNavigationOptions, StackNavigationProp} from '@react-navigation/stack';
 import {StackView} from '@react-navigation/stack';
@@ -13,7 +13,7 @@ import type {
     PlatformStackNavigatorProps,
     PlatformStackRouterOptions,
 } from '@libs/Navigation/PlatformStackNavigation/types';
-import InteractionManagerLayout from '@libs/Navigation/AppNavigator/Navigators/InteractionManagerLayout';
+import ScreenLayout from '@libs/Navigation/PlatformStackNavigation/ScreenLayout';
 
 function createPlatformStackNavigatorComponent<RouterOptions extends PlatformStackRouterOptions = PlatformStackRouterOptions>(
     displayName: string,
@@ -66,7 +66,7 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
                 persistentScreens,
                 // eslint-disable-next-line react/no-unstable-nested-components
                 screenLayout: ({navigation: navigationFromScreenLayout, ...layoutProps}) => (
-                    <InteractionManagerLayout
+                    <ScreenLayout
                         // eslint-disable-next-line react/jsx-props-no-spreading
                         {...layoutProps}
                         navigation={navigationFromScreenLayout as unknown as StackNavigationProp<ParamListBase>}

@@ -1,10 +1,10 @@
 import type {ParamListBase, ScreenLayoutArgs} from '@react-navigation/native';
 import type {StackNavigationOptions} from '@react-navigation/stack';
 import {useLayoutEffect} from 'react';
-import type {PlatformStackNavigationOptions, PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
+import type {PlatformStackNavigationOptions, PlatformStackNavigationProp} from './types';
 
-function InteractionManagerLayout({
+function ScreenLayout({
     children,
     navigation,
     options,
@@ -27,4 +27,4 @@ function InteractionManagerLayout({
     return children;
 }
 
-export default InteractionManagerLayout;
+export default ScreenLayout;
