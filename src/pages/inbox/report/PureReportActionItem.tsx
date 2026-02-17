@@ -259,6 +259,7 @@ import TripSummary from './TripSummary';
 import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
 import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
 import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
+import CreatedReportForUnapprovedTransactionsAction from '@components/ReportActionItem/CreatedReportForUnapprovedTransactionsAction';
 
 type PureReportActionItemProps = {
     /** All the data of the policy collection */
@@ -1692,15 +1693,9 @@ function PureReportActionItem({
                 </ReportActionItemBasicMessage>
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CREATED) && isHarvestCreatedExpenseReport) {
-            children = <CreateHarvestReportAction reportNameValuePairsOriginalID={reportNameValuePairsOriginalId} />;
+            children = <CreateHarvestReportAction reportNameValuePairsOriginalID={reportNameValuePairsOriginalID} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CREATED_REPORT_FOR_UNAPPROVED_TRANSACTIONS)) {
-            const {originalID} = getOriginalMessage(action) ?? {};
-            const reportName = getReportName(allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalID}`]);
-            children = (
-                <ReportActionItemBasicMessage>
-                    <RenderHTML html={`<comment><muted-text>${getCreatedReportForUnapprovedTransactionsMessage(originalID, reportName, translate)}</muted-text></comment>`} />
-                </ReportActionItemBasicMessage>
-            );
+            children = <CreatedReportForUnapprovedTransactionsAction action={action} />;
         } else if (isActionableMentionWhisper(action)) {
             children = (
                 <ReportActionItemBasicMessage>
