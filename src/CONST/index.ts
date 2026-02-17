@@ -8639,13 +8639,11 @@ const CONST = {
                 BULK_ACTIONS_DROPDOWN: 'WorkspaceDistanceRates-BulkActionsDropdown',
             },
             WORKFLOWS: {
-                DELAY_SUBMISSION: 'WorkspaceWorkflows-DelaySubmission',
                 AUTO_REPORTING_FREQUENCY: 'WorkspaceWorkflows-AutoReportingFrequency',
                 ADD_APPROVAL: 'WorkspaceWorkflows-AddApproval',
                 BANK_ACCOUNT: 'WorkspaceWorkflows-BankAccount',
                 ADD_BANK_ACCOUNT: 'WorkspaceWorkflows-AddBankAccount',
                 AUTHORIZED_PAYER: 'WorkspaceWorkflows-AuthorizedPayer',
-                PAYER: 'WorkspaceWorkflows-Payer',
             },
             ACCOUNTING: {
                 SETUP_BUTTON: 'WorkspaceAccounting-SetupButton',
@@ -8653,7 +8651,6 @@ const CONST = {
                 THREE_DOT_MENU: 'WorkspaceAccounting-ThreeDotMenu',
             },
             RULES: {
-                EXPENSE_REPORTS_MENU_ITEM: 'WorkspaceRules-ExpenseReportsMenuItem',
                 INDIVIDUAL_EXPENSES_MENU_ITEM: 'WorkspaceRules-IndividualExpensesMenuItem',
             },
             EXPENSIFY_CARD: {
