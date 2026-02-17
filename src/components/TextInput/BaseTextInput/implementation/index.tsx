@@ -85,9 +85,10 @@ function BaseTextInput({
     ref,
     sentryLabel,
 
-    // Destructure role so it doesn't leak into inputProps and override the
-    // native semantics of the actual <input> element on web.
-    role: _role,
+    // Destructure role to prevent role="presentation" from leaking into
+    // inputProps and stripping the native semantics of the <input> element.
+    // Non-presentation roles (e.g. CONST.ROLE.SEARCHBOX) are preserved.
+    role,
     ...inputProps
 }: BaseTextInputProps) {
     const InputComponent = InputComponentMap.get(type) ?? RNTextInput;
@@ -444,6 +445,7 @@ function BaseTextInput({
                                 }}
                                 // eslint-disable-next-line
                                 {...inputProps}
+                                role={role === CONST.ROLE.PRESENTATION ? undefined : role}
                                 autoCorrect={inputProps.secureTextEntry ? false : autoCorrect}
                                 placeholder={newPlaceholder}
                                 placeholderTextColor={placeholderTextColor ?? theme.placeholderText}
