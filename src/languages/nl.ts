@@ -576,6 +576,14 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Week',
         year: 'Jaar',
         quarter: 'Kwartaal',
+        expensifyLogo: 'Expensify-logo',
+    },
+    socials: {
+        podcast: 'Volg ons op Podcast',
+        twitter: 'Volg ons op Twitter',
+        instagram: 'Volg ons op Instagram',
+        facebook: 'Volg ons op Facebook',
+        linkedin: 'Volg ons op LinkedIn',
     },
     supportalNoAccess: {
         title: 'Niet zo snel',
@@ -683,6 +691,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Authenticatie weigeren',
             test: 'Test',
             biometricsAuthentication: 'Biometrische verificatie',
+            authType: {
+                unknown: 'Onbekend',
+                none: 'Geen',
+                credentials: 'Inloggegevens',
+                biometrics: 'Biometrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Schakel gezichts-/vingerafdrukverificatie in of stel een toesteltoegangscode in op uw',
@@ -702,7 +719,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Schakel snelle, veilige verificatie in met je gezicht of vingerafdruk. Geen wachtwoorden of codes nodig.',
         },
         revoke: {
-            remove: 'Verwijderen',
             title: 'Gezicht/vingerafdruk & passkeys',
             explanation:
                 'Gezichts-/vingerafdruk- of passkeys-verificatie is ingeschakeld op een of meer apparaten. Toegang intrekken betekent dat er een magische code nodig is voor de volgende verificatie op elk apparaat.',
@@ -711,11 +727,13 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: 'Je hebt geen apparaten geregistreerd voor gezichts-/vingerafdruk- of passkey-verificatie. Als je er een registreert, kun je die toegang hier intrekken.',
             dismiss: 'Begrepen',
             error: 'Aanvraag mislukt. Probeer het later opnieuw.',
+            revoke: 'Intrekken',
         },
         unsupportedDevice: {
             unsupportedDevice: 'Niet-ondersteund apparaat',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Deze actie wordt niet ondersteund op jouw apparaat. Download de Expensify-app uit de <a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> of de <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> en probeer het opnieuw.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Verificatie mislukt',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
@@ -1757,7 +1775,7 @@ const translations: TranslationDeepObject<typeof en> = {
         featureRequiresValidate: 'Voor deze functie moet je je account verifiëren.',
         validateAccount: 'Valideer je account',
         helpText: ({email}: {email: string}) =>
-            `Voeg meer manieren toe om in te loggen en bonnetjes naar Expensify te sturen.<br/><br/>Voeg een e-mailadres toe om bonnetjes door te sturen naar <a href="mailto:${email}">${email}</a> of voeg een telefoonnummer toe om bonnetjes te sms’en naar 47777 (alleen voor Amerikaanse nummers).`,
+            `Voeg meer manieren toe om in te loggen en bonnetjes naar Expensify te sturen.<br/><br/>Voeg een e-mailadres toe om bonnetjes door te sturen naar <a href="mailto:${email}">${email}</a> of voeg een telefoonnummer toe om bonnetjes te sms'en naar 47777 (alleen voor Amerikaanse nummers).`,
         pleaseVerify: 'Verifieer deze contactmethode.',
         getInTouch: 'We gebruiken deze methode om contact met je op te nemen.',
         enterMagicCode: (contactMethod: string) => `Voer de magische code in die naar ${contactMethod} is verzonden. Deze zou binnen een minuut of twee moeten aankomen.`,
@@ -2169,6 +2187,11 @@ const translations: TranslationDeepObject<typeof en> = {
             `${admin} verliest de toegang tot deze zakelijke bankrekening. We verwerken nog steeds alle betalingen die al in behandeling zijn.`,
         reachOutForHelp: 'Het wordt gebruikt met de Expensify Card. <concierge-link>Neem contact op met Concierge</concierge-link> als je het moet stoppen met delen.',
         unshareErrorModalTitle: 'Kan betaalrekening niet meer ontkoppelen',
+        travelCVV: {
+            title: 'Reis-CVV',
+            subtitle: 'Gebruik dit bij het boeken van reizen',
+            description: 'Gebruik deze kaart voor je Expensify Travel-boekingen. Hij wordt weergegeven als “Travel Card” bij het afrekenen.',
+        },
         chaseAccountNumberDifferent: 'Waarom is mijn rekeningnummer anders?',
     },
     cardPage: {
@@ -2240,6 +2263,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} voor ${merchant} - ${date}`,
         },
+        freezeCard: 'Kaart blokkeren',
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',
@@ -2251,6 +2275,7 @@ ${amount} voor ${merchant} - ${date}`,
         addApprovalsTitle: 'Goedkeuringen',
         accessibilityLabel: ({members, approvers}: {members: string; approvers: string}) => `de uitgaven van ${members}, en de goedkeurder is ${approvers}`,
         addApprovalButton: 'Goedkeuringsworkflow toevoegen',
+        findWorkflow: 'Workflow zoeken',
         addApprovalTip: 'Deze standaardworkflow is van toepassing op alle leden, tenzij er een specifiekere workflow bestaat.',
         approver: 'Fiatteur',
         addApprovalsDescription: 'Extra goedkeuring vereisen voordat je een betaling autoriseert.',
@@ -7423,6 +7448,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `Van ${reportName}${workspaceName ? `in ${workspaceName}` : ''}`,
     },
     qrCodes: {
+        qrCode: 'QR-code',
         copy: 'URL kopiëren',
         copied: 'Gekopieerd!',
     },
@@ -8015,10 +8041,19 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             security: 'Expensify is PCI-DSS-conform, gebruikt encryptie op bankniveau en maakt gebruik van redundante infrastructuur om je gegevens te beschermen.',
             learnMoreAboutSecurity: 'Meer informatie over onze beveiliging.',
         },
+        expensifyCode: {
+            title: 'Expensify-code',
+            discountCode: 'Kortingscode',
+            enterCode: 'Voer een Expensify-code in om toe te passen op je abonnement.',
+            apply: 'Toepassen',
+            error: {
+                invalid: 'Deze code is ongeldig',
+            },
+        },
         subscriptionSettings: {
             title: 'Abonnementsinstellingen',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Abonnementstype: ${subscriptionType}, Abonnementsgrootte: ${subscriptionSize}, Automatisch verlengen: ${autoRenew}, Jaarlijkse seats automatisch verhogen: ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Abonnementstype: ${subscriptionType}, Abonnementsomvang: ${subscriptionSize}${expensifyCode ? `, Expensify-code: ${expensifyCode}` : ''}, Automatisch verlengen: ${autoRenew}, Automatisch jaarlijkse seats verhogen: ${autoIncrease}`,
             none: 'geen',
             on: 'aan',
             off: 'uit',

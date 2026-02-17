@@ -175,6 +175,7 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
+
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -575,6 +576,14 @@ const translations: TranslationDeepObject<typeof en> = {
         week: '週',
         year: '年',
         quarter: '四半期',
+        expensifyLogo: 'Expensifyロゴ',
+    },
+    socials: {
+        podcast: 'ポッドキャストでフォロー',
+        twitter: 'Twitterでフォロー',
+        instagram: 'Instagramでフォロー',
+        facebook: 'Facebookでフォロー',
+        linkedin: 'LinkedInでフォロー',
     },
     supportalNoAccess: {
         title: 'ちょっと待ってください',
@@ -682,6 +691,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: '認証を拒否',
             test: 'テスト',
             biometricsAuthentication: '生体認証',
+            authType: {
+                unknown: '不明',
+                none: 'なし',
+                credentials: '資格情報',
+                biometrics: '生体認証',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: '顔認証/指紋認証を有効にするか、デバイスのパスコードを設定してください',
@@ -701,7 +719,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: '顔や指紋を使って、素早く安全に認証できます。パスワードやコードは不要です。',
         },
         revoke: {
-            remove: '削除',
             title: '顔認証／指紋認証とパスキー',
             explanation: '1 つ以上のデバイスで顔／指紋またはパスキーによる認証が有効になっています。アクセスを取り消すと、次回どのデバイスで認証する場合もマジックコードが必要になります。',
             confirmationPrompt: '本当に実行しますか？次回以降、どのデバイスでも認証にはマジックコードが必要になります。',
@@ -709,11 +726,13 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: '顔認証／指紋認証またはパスキー認証用に登録されているデバイスがありません。デバイスを登録すると、そのアクセスをここで取り消せるようになります。',
             dismiss: '了解しました',
             error: 'リクエストに失敗しました。後でもう一度お試しください。',
+            revoke: '取り消す',
         },
         unsupportedDevice: {
             unsupportedDevice: '未対応のデバイス',
             pleaseDownloadMobileApp: `<centered-text><muted-text> この操作はお使いのデバイスではサポートされていません。<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> または <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Playストア</a> からExpensifyアプリをダウンロードして、もう一度お試しください。</muted-text></centered-text>`,
         },
+        verificationFailed: '認証に失敗しました',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
@@ -2158,6 +2177,11 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} はこのビジネス銀行口座へのアクセス権を失います。処理中の支払いは引き続き完了します。`,
         reachOutForHelp: 'そのレポートは Expensify Card と一緒に使用されています。共有を解除する必要がある場合は、<concierge-link>Concierge に連絡してください</concierge-link>。',
         unshareErrorModalTitle: '銀行口座の共有を解除できません',
+        travelCVV: {
+            title: 'トラベルCVV',
+            subtitle: '出張を予約するときにこれを使用してください',
+            description: 'このカードをExpensify Travelでの予約に使用してください。チェックアウト時には「Travel Card」と表示されます。',
+        },
         chaseAccountNumberDifferent: '口座番号が異なるのはなぜですか？',
     },
     cardPage: {
@@ -2225,6 +2249,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${date} の ${merchant} への ${amount}`,
         },
+        freezeCard: 'カードを一時停止',
     },
     workflowsPage: {
         workflowTitle: '支出',
@@ -2236,6 +2261,7 @@ ${date} の ${merchant} への ${amount}`,
         addApprovalsTitle: '承認',
         accessibilityLabel: ({members, approvers}: {members: string; approvers: string}) => `${members} の経費で、承認者は ${approvers} です`,
         addApprovalButton: '承認ワークフローを追加',
+        findWorkflow: 'ワークフローを検索',
         addApprovalTip: 'より詳細なワークフローが存在する場合を除き、このデフォルトのワークフローがすべてのメンバーに適用されます。',
         approver: '承認者',
         addApprovalsDescription: '支払いを承認する前に、追加の承認を必須にする。',
@@ -7366,6 +7392,7 @@ ${reportName}
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `${reportName}${workspaceName ? `${workspaceName} の中` : ''} から`,
     },
     qrCodes: {
+        qrCode: 'QRコード',
         copy: 'URLをコピー',
         copied: 'コピーしました！',
     },
@@ -7951,13 +7978,22 @@ ${reportName}
         paymentCard: {
             addPaymentCard: '支払カードを追加',
             enterPaymentCardDetails: '支払いカードの詳細を入力してください',
-            security: 'Expensify は PCI-DSS に準拠し、銀行レベルの暗号化を使用し、冗長化されたインフラストラクチャでお客様のデータを保護しています。',
-            learnMoreAboutSecurity: 'セキュリティの詳細をご覧ください。',
+            security: 'Expensify は PCI-DSS に準拠し、銀行レベルの暗号化を使用し、お客様のデータを保護するために冗長化されたインフラストラクチャを活用しています。',
+            learnMoreAboutSecurity: '当社のセキュリティについて詳しく見る',
+        },
+        expensifyCode: {
+            title: 'Expensifyコード',
+            discountCode: '割引コード',
+            enterCode: 'サブスクリプションに適用するExpensifyコードを入力してください。',
+            apply: '適用',
+            error: {
+                invalid: 'このコードは無効です',
+            },
         },
         subscriptionSettings: {
             title: 'サブスクリプション設定',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `サブスクリプションの種類: ${subscriptionType}、サブスクリプションの規模: ${subscriptionSize}、自動更新: ${autoRenew}、年間席数の自動増加: ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `サブスクリプションタイプ: ${subscriptionType}、サブスクリプション規模: ${subscriptionSize}${expensifyCode ? `、Expensifyコード: ${expensifyCode}` : ''}、自動更新: ${autoRenew}、年間席数の自動増加: ${autoIncrease}`,
             none: 'なし',
             on: 'オン',
             off: 'オフ',

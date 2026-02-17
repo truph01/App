@@ -596,6 +596,14 @@ const translations = {
         week: 'Week',
         year: 'Year',
         quarter: 'Quarter',
+        expensifyLogo: 'Expensify logo',
+    },
+    socials: {
+        podcast: 'Follow us on Podcast',
+        twitter: 'Follow us on Twitter',
+        instagram: 'Follow us on Instagram',
+        facebook: 'Follow us on Facebook',
+        linkedin: 'Follow us on LinkedIn',
     },
     supportalNoAccess: {
         title: 'Not so fast',
@@ -703,6 +711,15 @@ const translations = {
             rejectAuthentication: 'Reject authentication',
             test: 'Test',
             biometricsAuthentication: 'Biometric authentication',
+            authType: {
+                unknown: 'Unknown',
+                none: 'None',
+                credentials: 'Credentials',
+                biometrics: 'Biometrics',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Please enable face/fingerprint verification or set a device passcode in your ',
@@ -710,6 +727,7 @@ const translations = {
             end: '.',
         },
         oops: 'Oops, something went wrong',
+        verificationFailed: 'Verification failed',
         looksLikeYouRanOutOfTime: 'Looks like you ran out of time! Please try again at the merchant.',
         youRanOutOfTime: 'You ran out of time',
         letsVerifyItsYou: 'Let’s verify it’s you',
@@ -722,7 +740,7 @@ const translations = {
             biometrics: 'Enable quick, secure verification using your face or fingerprint. No passwords or codes required.',
         },
         revoke: {
-            remove: 'Remove',
+            revoke: 'Revoke',
             title: 'Face/fingerprint & passkeys',
             explanation: 'Face/fingerprint or passkey verification are enabled on one or more devices. Revoking access will require a magic code for the next verification on any device.',
             confirmationPrompt: "Are you sure? You'll need a magic code for the next verification on any device.",
@@ -2201,6 +2219,11 @@ const translations = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} will lose access to this business bank account. We’ll still complete any payments in process.`,
         reachOutForHelp: 'It’s being used with the Expensify Card. <concierge-link>Reach out to Concierge</concierge-link> if you need to unshare it.',
         unshareErrorModalTitle: `Can't unshare bank account`,
+        travelCVV: {
+            title: 'Travel CVV',
+            subtitle: 'Use this when booking travel',
+            description: "Use this card for your Expensify Travel bookings. It'll show as “Travel Card” at checkout.",
+        },
         chaseAccountNumberDifferent: 'Why is my account number different?',
     },
     cardPage: {
@@ -2258,6 +2281,7 @@ const translations = {
             alertMessage: ({cardLastFour, amount, merchant, date}: {cardLastFour: string; amount: string; merchant: string; date: string}) =>
                 `identified suspicious activity on card ending in ${cardLastFour}. Do you recognize this charge?\n\n${amount} for ${merchant} - ${date}`,
         },
+        freezeCard: 'Freeze card',
     },
     workflowsPage: {
         workflowTitle: 'Spend',
@@ -2269,6 +2293,7 @@ const translations = {
         addApprovalsTitle: 'Approvals',
         accessibilityLabel: ({members, approvers}: {members: string; approvers: string}) => `expenses from ${members}, and the approver is ${approvers}`,
         addApprovalButton: 'Add approval workflow',
+        findWorkflow: 'Find workflow',
         addApprovalTip: 'This default workflow applies to all members, unless a more specific workflow exists.',
         approver: 'Approver',
         addApprovalsDescription: 'Require additional approval before authorizing a payment.',
@@ -7392,6 +7417,7 @@ const translations = {
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `From ${reportName}${workspaceName ? ` in ${workspaceName}` : ''}`,
     },
     qrCodes: {
+        qrCode: 'QR code',
         copy: 'Copy URL',
         copied: 'Copied!',
     },
@@ -7985,10 +8011,19 @@ const translations = {
             security: 'Expensify is PCI-DSS compliant, uses bank-level encryption, and utilizes redundant infrastructure to protect your data.',
             learnMoreAboutSecurity: 'Learn more about our security.',
         },
+        expensifyCode: {
+            title: 'Expensify code',
+            discountCode: 'Discount code',
+            enterCode: 'Enter an Expensify code to apply to your subscription.',
+            apply: 'Apply',
+            error: {
+                invalid: 'This code is invalid',
+            },
+        },
         subscriptionSettings: {
             title: 'Subscription settings',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Subscription type: ${subscriptionType}, Subscription size: ${subscriptionSize}, Auto renew: ${autoRenew}, Auto increase annual seats: ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Subscription type: ${subscriptionType}, Subscription size: ${subscriptionSize}${expensifyCode ? `, Expensify code: ${expensifyCode}` : ''}, Auto renew: ${autoRenew}, Auto increase annual seats: ${autoIncrease}`,
             none: 'none',
             on: 'on',
             off: 'off',
