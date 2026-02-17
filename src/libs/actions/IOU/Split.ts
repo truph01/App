@@ -2434,7 +2434,9 @@ function updateSplitExpenseAmountField(draftTransaction: OnyxEntry<OnyxTypes.Tra
             // Update distance for distance transactions based on new amount and rate
             if (isDistanceRequest && originalTransaction && splitExpense.customUnit) {
                 const mileageRate = DistanceRequestUtils.getRate({transaction: originalTransaction, policy: policy ?? undefined});
-                const {unit, rate} = mileageRate;
+                const {rate = 0} =
+                    DistanceRequestUtils.getRateByCustomUnitRateID({policy, customUnitRateID: splitExpense.customUnit?.customUnitRateID ?? String(CONST.DEFAULT_NUMBER_ID)}) ?? {};
+                const {unit} = mileageRate;
 
                 if (rate && rate > 0) {
                     // Calculate distance from amount: distance = amount / rate
