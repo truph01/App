@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -719,7 +718,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Schakel snelle, veilige verificatie in met je gezicht of vingerafdruk. Geen wachtwoorden of codes nodig.',
         },
         revoke: {
-            remove: 'Verwijderen',
             title: 'Gezicht/vingerafdruk & passkeys',
             explanation:
                 'Gezichts-/vingerafdruk- of passkeys-verificatie is ingeschakeld op een of meer apparaten. Toegang intrekken betekent dat er een magische code nodig is voor de volgende verificatie op elk apparaat.',
@@ -728,6 +726,7 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: 'Je hebt geen apparaten geregistreerd voor gezichts-/vingerafdruk- of passkey-verificatie. Als je er een registreert, kun je die toegang hier intrekken.',
             dismiss: 'Begrepen',
             error: 'Aanvraag mislukt. Probeer het later opnieuw.',
+            revoke: 'Intrekken',
         },
         unsupportedDevice: {
             unsupportedDevice: 'Niet-ondersteund apparaat',

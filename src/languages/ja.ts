@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -719,7 +718,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: '顔や指紋を使って、素早く安全に認証できます。パスワードやコードは不要です。',
         },
         revoke: {
-            remove: '削除',
             title: '顔認証／指紋認証とパスキー',
             explanation: '1 つ以上のデバイスで顔／指紋またはパスキーによる認証が有効になっています。アクセスを取り消すと、次回どのデバイスで認証する場合もマジックコードが必要になります。',
             confirmationPrompt: '本当に実行しますか？次回以降、どのデバイスでも認証にはマジックコードが必要になります。',
@@ -727,6 +725,7 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: '顔認証／指紋認証またはパスキー認証用に登録されているデバイスがありません。デバイスを登録すると、そのアクセスをここで取り消せるようになります。',
             dismiss: '了解しました',
             error: 'リクエストに失敗しました。後でもう一度お試しください。',
+            revoke: '取り消す',
         },
         unsupportedDevice: {
             unsupportedDevice: '未対応のデバイス',

@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -718,7 +717,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Ative uma verificação rápida e segura usando seu rosto ou impressão digital. Nenhuma senha ou código é necessário.',
         },
         revoke: {
-            remove: 'Remover',
             title: 'Face/digital & passkeys',
             explanation:
                 'A verificação por rosto/digital ou por chave de acesso está ativada em um ou mais dispositivos. Revogar o acesso exigirá um código mágico para a próxima verificação em qualquer dispositivo.',
@@ -727,6 +725,7 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: 'Você não tem nenhum dispositivo registrado para verificação por rosto/digital ou passkey. Se você registrar algum, poderá revogar esse acesso aqui.',
             dismiss: 'Entendi',
             error: 'Falha na solicitação. Tente novamente mais tarde.',
+            revoke: 'Revogar',
         },
         unsupportedDevice: {
             unsupportedDevice: 'Dispositivo não compatível',

@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -714,7 +713,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: '使用面部或指纹即可进行快速、安全的验证，无需密码或验证码。',
         },
         revoke: {
-            remove: '移除',
             title: '面容/指纹和通行密钥',
             explanation: '在一台或多台设备上已启用面容/指纹或通行密钥验证。撤销访问后，下次在任何设备上进行验证时都需要输入魔法验证码。',
             confirmationPrompt: '确定吗？下一次在任何设备上进行验证时，你都需要输入魔法码。',
@@ -722,6 +720,7 @@ const translations: TranslationDeepObject<typeof en> = {
             noDevices: '您尚未注册用于面部 / 指纹或通行密钥验证的任何设备。如果您注册了设备，之后可以在此撤销该访问权限。',
             dismiss: '明白了',
             error: '请求失败。请稍后重试。',
+            revoke: '撤销',
         },
         unsupportedDevice: {
             unsupportedDevice: '不支持的设备',

@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -719,7 +718,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Włącz szybką i bezpieczną weryfikację za pomocą twarzy lub odcisku palca. Bez haseł i kodów.',
         },
         revoke: {
-            remove: 'Usuń',
             title: 'Twarz/odcisk palca i klucze dostępu',
             explanation:
                 'Weryfikacja twarzy/odciskiem palca lub kluczem dostępu jest włączona na jednym lub kilku urządzeniach. Cofnięcie dostępu spowoduje konieczność użycia magicznego kodu przy następnej weryfikacji na dowolnym urządzeniu.',
@@ -729,6 +727,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Nie masz zarejestrowanych żadnych urządzeń do weryfikacji twarzą/odciskiem palca ani kluczem dostępu. Jeśli jakieś zarejestrujesz, będziesz mógł/mogła cofnąć ten dostęp tutaj.',
             dismiss: 'Rozumiem',
             error: 'Żądanie nie powiodło się. Spróbuj ponownie później.',
+            revoke: 'Odwołaj',
         },
         unsupportedDevice: {
             unsupportedDevice: 'Nieobsługiwane urządzenie',

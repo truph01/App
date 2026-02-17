@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -719,7 +718,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Attiva una verifica rapida e sicura utilizzando il volto o l’impronta digitale. Nessuna password o codice richiesto.',
         },
         revoke: {
-            remove: 'Rimuovi',
             title: 'Volto/impronta digitale e passkey',
             explanation:
                 'La verifica con volto/impronta digitale o passkey è abilitata su uno o più dispositivi. La revoca dell’accesso richiederà un codice magico per la prossima verifica su qualsiasi dispositivo.',
@@ -729,6 +727,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Non hai alcun dispositivo registrato per il riconoscimento facciale/impronta digitale o la verifica con passkey. Se ne registri uno, potrai revocare tale accesso qui.',
             dismiss: 'Ho capito',
             error: 'Richiesta non riuscita. Riprova più tardi.',
+            revoke: 'Revoca',
         },
         unsupportedDevice: {
             unsupportedDevice: 'Dispositivo non supportato',
