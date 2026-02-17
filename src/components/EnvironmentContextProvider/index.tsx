@@ -1,38 +1,22 @@
 import {DomUtils, parseDocument} from 'htmlparser2';
 import type {ReactElement, ReactNode} from 'react';
-import React, {createContext, useCallback, useEffect, useMemo, useState} from 'react';
-import type {ValueOf} from 'type-fest';
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {getEnvironmentURL} from '@libs/Environment/Environment';
 import getEnvironment from '@libs/Environment/getEnvironment';
-import CONST from '@src/CONST';
+import {defaultEnvironmentActionsContextValue, defaultEnvironmentStateContextValue} from './default';
+import type {EnvironmentActionsContextType, EnvironmentStateContextType, EnvironmentValue} from './types';
 
 type EnvironmentProviderProps = {
     /** Actual content wrapped by this component */
     children: ReactNode;
 };
 
-type EnvironmentValue = ValueOf<typeof CONST.ENVIRONMENT>;
-
-type EnvironmentContextValue = {
-    /** The string value representing the current environment */
-    environment: EnvironmentValue;
-
-    /** The string value representing the URL of the current environment */
-    environmentURL: string;
-
-    /** Adjusts Expensify links in the given HTML content to point to the current environment URL */
-    adjustExpensifyLinksForEnv: (html: string) => string;
-};
-
-const EnvironmentContext = createContext<EnvironmentContextValue>({
-    environment: CONST.ENVIRONMENT.PRODUCTION,
-    environmentURL: CONST.NEW_EXPENSIFY_URL,
-    adjustExpensifyLinksForEnv: () => '',
-});
+const EnvironmentStateContext = createContext<EnvironmentStateContextType>(defaultEnvironmentStateContextValue);
+const EnvironmentActionsContext = createContext<EnvironmentActionsContextType>(defaultEnvironmentActionsContextValue);
 
 function EnvironmentProvider({children}: EnvironmentProviderProps): ReactElement {
-    const [environment, setEnvironment] = useState<EnvironmentValue>(CONST.ENVIRONMENT.PRODUCTION);
-    const [environmentURL, setEnvironmentURL] = useState(CONST.NEW_EXPENSIFY_URL);
+    const [environment, setEnvironment] = useState<EnvironmentValue>(defaultEnvironmentStateContextValue.environment);
+    const [environmentURL, setEnvironmentURL] = useState(defaultEnvironmentStateContextValue.environmentURL);
     const [environmentURLWithoutTrailingSlash] = useMemo(() => [environmentURL.replaceAll(/\/+$/g, '')], [environmentURL]);
 
     useEffect(() => {
@@ -76,17 +60,34 @@ function EnvironmentProvider({children}: EnvironmentProviderProps): ReactElement
         [environmentURLWithoutTrailingSlash],
     );
 
-    const contextValue = useMemo(
-        (): EnvironmentContextValue => ({
-            environment,
-            environmentURL,
-            adjustExpensifyLinksForEnv,
-        }),
-        [environment, environmentURL, adjustExpensifyLinksForEnv],
-    );
+    // Because of the React Compiler we don't need to memoize it manually
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
+    const stateValue = {
+        environment,
+        environmentURL,
+    };
 
-    return <EnvironmentContext.Provider value={contextValue}>{children}</EnvironmentContext.Provider>;
+    // Because of the React Compiler we don't need to memoize it manually
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
+    const actionsValue = {
+        adjustExpensifyLinksForEnv,
+    };
+
+    return (
+        <EnvironmentStateContext.Provider value={stateValue}>
+            <EnvironmentActionsContext.Provider value={actionsValue}>{children}</EnvironmentActionsContext.Provider>
+        </EnvironmentStateContext.Provider>
+    );
 }
 
-export {EnvironmentContext, EnvironmentProvider};
-export type {EnvironmentContextValue};
+function useEnvironmentState() {
+    return useContext(EnvironmentStateContext);
+}
+
+function useEnvironmentActions() {
+    return useContext(EnvironmentActionsContext);
+}
+
+export default EnvironmentProvider;
+export {EnvironmentStateContext, EnvironmentActionsContext, useEnvironmentState, useEnvironmentActions};
+export type {EnvironmentStateContextType, EnvironmentActionsContextType};
