@@ -1,4 +1,6 @@
-import React, {createContext, useCallback, useContext, useMemo, useState} from 'react';
+// This component is memoized by the React Compiler
+/* eslint-disable react/jsx-no-constructed-context-values */
+import React, {createContext, useContext, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {View} from 'react-native';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -31,22 +33,16 @@ function DelegateNoAccessModalProvider({children}: PropsWithChildren) {
         </View>
     );
 
-    const stateValue = useMemo<DelegateNoAccessStateContextType>(
-        () => ({
-            isActingAsDelegate,
-            isDelegateAccessRestricted,
-        }),
-        [isActingAsDelegate, isDelegateAccessRestricted],
-    );
+    const stateValue = {
+        isActingAsDelegate,
+        isDelegateAccessRestricted,
+    };
 
-    const showDelegateNoAccessModal = useCallback(() => setIsModalOpen(true), []);
+    const showDelegateNoAccessModal = () => setIsModalOpen(true);
 
-    const actionsValue = useMemo<DelegateNoAccessActionsContextType>(
-        () => ({
-            showDelegateNoAccessModal,
-        }),
-        [showDelegateNoAccessModal],
-    );
+    const actionsValue = {
+        showDelegateNoAccessModal,
+    };
 
     return (
         <DelegateNoAccessStateContext.Provider value={stateValue}>

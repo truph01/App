@@ -10,7 +10,6 @@ import StatusBar from '@libs/StatusBar';
 import type {StatusBarStyle} from '@styles/index';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {useCustomStatusBarAndBackgroundActions, useCustomStatusBarAndBackgroundState} from './CustomStatusBarAndBackgroundContext';
-import type {CustomStatusBarAndBackgroundActionsContextType, CustomStatusBarAndBackgroundStateContextType} from './types';
 import updateGlobalBackgroundColor from './updateGlobalBackgroundColor';
 import updateStatusBarAppearance from './updateStatusBarAppearance';
 
@@ -21,10 +20,8 @@ type CustomStatusBarAndBackgroundProps = {
 };
 
 function CustomStatusBarAndBackground({isNested = false}: CustomStatusBarAndBackgroundProps) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- hooks return typed state/actions; type resolution fails from re-exports
-    const {isRootStatusBarEnabled}: CustomStatusBarAndBackgroundStateContextType = useCustomStatusBarAndBackgroundState();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- hooks return typed state/actions; type resolution fails from re-exports
-    const {setRootStatusBarEnabled}: CustomStatusBarAndBackgroundActionsContextType = useCustomStatusBarAndBackgroundActions();
+    const {isRootStatusBarEnabled} = useCustomStatusBarAndBackgroundState();
+    const {setRootStatusBarEnabled} = useCustomStatusBarAndBackgroundActions();
     const theme = useTheme();
     const [statusBarStyle, setStatusBarStyle] = useState<StatusBarStyle>();
     const [closingReactNativeApp = false] = useOnyx(ONYXKEYS.HYBRID_APP, {selector: isClosingReactNativeAppSelector, canBeMissing: true});

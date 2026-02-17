@@ -34,4 +34,3 @@ export {
     useCustomStatusBarAndBackgroundActions,
     useCustomStatusBarAndBackgroundState,
 };
-export type {CustomStatusBarAndBackgroundActionsContextType, CustomStatusBarAndBackgroundStateContextType} from './types';
