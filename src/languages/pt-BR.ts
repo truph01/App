@@ -576,6 +576,14 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Semana',
         year: 'Ano',
         quarter: 'Trimestre',
+        expensifyLogo: 'Logo da Expensify',
+    },
+    socials: {
+        podcast: 'Siga-nos no Podcast',
+        twitter: 'Siga-nos no Twitter',
+        instagram: 'Siga-nos no Instagram',
+        facebook: 'Siga-nos no Facebook',
+        linkedin: 'Siga-nos no LinkedIn',
     },
     supportalNoAccess: {
         title: 'Calma aí',
@@ -683,6 +691,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rejeitar autenticação',
             test: 'Teste',
             biometricsAuthentication: 'Autenticação biométrica',
+            authType: {
+                unknown: 'Desconhecido',
+                none: 'Nenhum',
+                credentials: 'Credenciais',
+                biometrics: 'Biometria',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Ative a verificação por rosto/digital ou defina um código de acesso do dispositivo no seu',
@@ -716,6 +733,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Dispositivo não compatível',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Esta ação não é compatível com seu dispositivo. Baixe o app do Expensify na <a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> ou na <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> e tente novamente.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Falha na verificação',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
@@ -755,6 +773,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: 'Nome, e-mail ou número de telefone',
         findMember: 'Encontrar membro',
         searchForSomeone: 'Buscar alguém',
+        userSelected: (username: string) => `${username} selecionado`,
     },
     customApprovalWorkflow: {
         title: 'Fluxo de aprovação personalizado',
@@ -976,7 +995,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Corrigir',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corrigir conexão do cartão corporativo ${feedName}` : 'Corrigir conexão do cartão corporativo'),
-                subtitle: 'Área de trabalho > Cartões corporativos',
+                defaultSubtitle: 'Área de trabalho > Cartões corporativos',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Cartões corporativos`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Corrigir conexão com ${integrationName}`,
@@ -1511,7 +1531,7 @@ const translations: TranslationDeepObject<typeof en> = {
             ratePreview: (rate: string) => `${rate} / hora`,
             amountTooLargeError: 'O valor total é muito alto. Diminua as horas ou reduza a tarifa.',
         },
-        correctDistanceRateError: 'Corrija o erro na taxa de distância e tente novamente.',
+        correctRateError: 'Corrija o erro de taxa e tente novamente.',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Explicar</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'marcou a despesa como "reembolsável"' : 'marcou a despesa como “não reembolsável”'),
@@ -2414,7 +2434,6 @@ ${amount} para ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Regras de despesas',
-        subtitle: 'Essas regras serão aplicadas às suas despesas. Se você enviar para um espaço de trabalho, as regras desse espaço de trabalho poderão substituí-las.',
         findRule: 'Encontrar regra',
         emptyRules: {
             title: 'Você não criou nenhuma regra',
@@ -2460,6 +2479,7 @@ ${amount} para ${merchant} - ${date}`,
             deleteSinglePrompt: 'Tem certeza de que deseja excluir esta regra?',
             deleteMultiplePrompt: 'Tem certeza de que deseja excluir essas regras?',
         },
+        subtitle: 'Essas regras serão aplicadas às suas despesas.',
     },
     preferencesPage: {
         appSection: {
@@ -3022,10 +3042,7 @@ ${
     detailsPage: {
         localTime: 'Hora local',
     },
-    newChatPage: {
-        startGroup: 'Iniciar grupo',
-        addToGroup: 'Adicionar ao grupo',
-    },
+    newChatPage: {startGroup: 'Iniciar grupo', addToGroup: 'Adicionar ao grupo', addUserToGroup: (username: string) => `Adicionar ${username} ao grupo`},
     yearPickerPage: {
         year: 'Ano',
         selectYear: 'Selecione um ano',
@@ -3111,6 +3128,11 @@ ${
         toGetStarted: 'Adicione uma conta bancária para reembolsar despesas, emitir cartões Expensify, receber pagamentos de faturas e pagar contas, tudo em um só lugar.',
         plaidBodyCopy: 'Dê aos seus funcionários uma forma mais fácil de pagar — e ser reembolsados — pelas despesas da empresa.',
         checkHelpLine: 'Seu número de roteamento e número da conta podem ser encontrados em um cheque dessa conta.',
+        bankAccountPurposeTitle: 'O que você quer fazer com sua conta bancária?',
+        getReimbursed: 'Ser reembolsado',
+        getReimbursedDescription: 'Pelo empregador ou outros',
+        makePayments: 'Fazer pagamentos',
+        makePaymentsDescription: 'Pagar despesas ou emitir cartões Expensify',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Para conectar uma conta bancária, <a href="${contactMethodRoute}">adicione um e-mail como seu login principal</a> e tente novamente. Você pode adicionar seu número de telefone como login secundário.`,
         hasBeenThrottledError: 'Ocorreu um erro ao adicionar sua conta bancária. Aguarde alguns minutos e tente novamente.',
@@ -6455,6 +6477,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             symbols: 'Símbolos',
             flags: 'Bandeiras',
         },
+        emojiNotSelected: 'Emoji não selecionado',
     },
     newRoomPage: {
         newRoom: 'Nova sala',
@@ -7404,6 +7427,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `De ${reportName}${workspaceName ? `em ${workspaceName}` : ''}`,
     },
     qrCodes: {
+        qrCode: 'Código QR',
         copy: 'Copiar URL',
         copied: 'Copiado!',
     },
@@ -7996,10 +8020,19 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             security: 'O Expensify é compatível com PCI-DSS, usa criptografia em nível bancário e utiliza infraestrutura redundante para proteger seus dados.',
             learnMoreAboutSecurity: 'Saiba mais sobre nossa segurança.',
         },
+        expensifyCode: {
+            title: 'Código Expensify',
+            discountCode: 'Código de desconto',
+            enterCode: 'Insira um código Expensify para aplicar à sua assinatura.',
+            apply: 'Aplicar',
+            error: {
+                invalid: 'Este código é inválido',
+            },
+        },
         subscriptionSettings: {
             title: 'Configurações de assinatura',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Tipo de assinatura: ${subscriptionType}, Tamanho da assinatura: ${subscriptionSize}, Renovação automática: ${autoRenew}, Aumento automático de assentos anuais: ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Tipo de assinatura: ${subscriptionType}, Tamanho da assinatura: ${subscriptionSize}${expensifyCode ? `, Código Expensify: ${expensifyCode}` : ''}, Renovação automática: ${autoRenew}, Aumento automático de assentos anuais: ${autoIncrease}`,
             none: 'nenhum',
             on: 'ativado',
             off: 'desligado',
@@ -8410,6 +8443,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             forceTwoFactorAuthError: 'Não foi possível alterar a exigência de autenticação em duas etapas. Tente novamente mais tarde.',
         },
         common: {settings: 'Configurações'},
+        groups: {title: 'Grupos', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`})},
     },
 };
 export default translations;

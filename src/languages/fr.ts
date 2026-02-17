@@ -578,6 +578,14 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Semaine',
         year: 'Année',
         quarter: 'Trimestre',
+        expensifyLogo: 'Logo Expensify',
+    },
+    socials: {
+        podcast: 'Suivez-nous sur Podcast',
+        twitter: 'Suivez-nous sur Twitter',
+        instagram: 'Suivez-nous sur Instagram',
+        facebook: 'Suivez-nous sur Facebook',
+        linkedin: 'Suivez-nous sur LinkedIn',
     },
     supportalNoAccess: {
         title: 'Pas si vite',
@@ -687,6 +695,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rejeter l’authentification',
             test: 'Test',
             biometricsAuthentication: 'Authentification biométrique',
+            authType: {
+                unknown: 'Inconnu',
+                none: 'Aucun',
+                credentials: 'Identifiants',
+                biometrics: 'Biométrie',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Veuillez activer la vérification par reconnaissance faciale/empreinte digitale ou définir un code d’accès à l’appareil dans vos',
@@ -721,6 +738,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Appareil non pris en charge',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Cette action n'est pas prise en charge sur votre appareil. Veuillez télécharger l'application Expensify depuis l'<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> ou le <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> et réessayer.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Échec de la vérification',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
@@ -759,6 +777,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nameEmailOrPhoneNumber: 'Nom, e-mail ou numéro de téléphone',
         findMember: 'Trouver un membre',
         searchForSomeone: 'Rechercher une personne',
+        userSelected: (username: string) => `${username} sélectionné`,
     },
     customApprovalWorkflow: {
         title: 'Workflow d’approbation personnalisé',
@@ -982,7 +1001,8 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Corriger',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corriger la connexion de la carte d'entreprise ${feedName}` : 'Corriger la connexion de la carte entreprise'),
-                subtitle: 'Espace de travail > Cartes d’entreprise',
+                defaultSubtitle: 'Espace de travail > Cartes d’entreprise',
+                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Cartes d'entreprise`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Corriger la connexion ${integrationName}`,
@@ -1524,7 +1544,7 @@ const translations: TranslationDeepObject<typeof en> = {
             ratePreview: (rate: string) => `${rate} / heure`,
             amountTooLargeError: 'Le montant total est trop élevé. Réduisez le nombre d’heures ou diminuez le taux.',
         },
-        correctDistanceRateError: 'Corrigez l’erreur de taux de distance, puis réessayez.',
+        correctRateError: 'Corrigez l’erreur de taux et réessayez.',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Expliquer</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'a marqué la dépense comme « remboursable »' : 'a marqué la dépense comme « non remboursable »'),
@@ -1767,7 +1787,7 @@ const translations: TranslationDeepObject<typeof en> = {
         featureRequiresValidate: 'Cette fonctionnalité exige que vous validiez votre compte.',
         validateAccount: 'Validez votre compte',
         helpText: ({email}: {email: string}) =>
-            `Ajoutez d’autres moyens de vous connecter et d’envoyer des reçus à Expensify.<br/><br/>Ajoutez une adresse e-mail pour transférer des reçus à <a href="mailto:${email}">${email}</a> ou ajoutez un numéro de téléphone pour envoyer des reçus par SMS au 47777 (numéros américains uniquement).`,
+            `Ajoutez d'autres moyens de vous connecter et d'envoyer des reçus à Expensify.<br/><br/>Ajoutez une adresse e-mail pour transférer des reçus à <a href="mailto:${email}">${email}</a> ou ajoutez un numéro de téléphone pour envoyer des reçus par SMS au 47777 (numéros américains uniquement).`,
         pleaseVerify: 'Veuillez vérifier cette méthode de contact.',
         getInTouch: 'Nous utiliserons cette méthode pour vous contacter.',
         enterMagicCode: (contactMethod: string) => `Veuillez saisir le code magique envoyé à ${contactMethod}. Il devrait arriver d'ici une à deux minutes.`,
@@ -2432,7 +2452,6 @@ ${amount} pour ${merchant} - ${date}`,
     },
     expenseRulesPage: {
         title: 'Règles de dépenses',
-        subtitle: 'Ces règles s’appliqueront à vos dépenses. Si vous soumettez dans un espace de travail, alors les règles de cet espace de travail peuvent les remplacer.',
         findRule: 'Rechercher une règle',
         emptyRules: {
             title: 'Vous n’avez créé aucune règle',
@@ -2478,6 +2497,7 @@ ${amount} pour ${merchant} - ${date}`,
             deleteSinglePrompt: 'Voulez-vous vraiment supprimer cette règle ?',
             deleteMultiplePrompt: 'Voulez-vous vraiment supprimer ces règles ?',
         },
+        subtitle: 'Ces règles s’appliqueront à vos dépenses.',
     },
     preferencesPage: {
         appSection: {
@@ -3048,6 +3068,7 @@ ${
     newChatPage: {
         startGroup: 'Commencer le groupe',
         addToGroup: 'Ajouter au groupe',
+        addUserToGroup: (username: string) => `Ajouter ${username} au groupe`,
     },
     yearPickerPage: {
         year: 'Année',
@@ -3136,6 +3157,11 @@ ${
             'Ajoutez un compte bancaire pour rembourser des dépenses, émettre des cartes Expensify, encaisser des paiements de factures et payer des factures, le tout à partir d’un seul endroit.',
         plaidBodyCopy: 'Offrez à vos employés un moyen plus simple de payer – et d’être remboursés – pour les dépenses de l’entreprise.',
         checkHelpLine: 'Votre numéro de routage et votre numéro de compte se trouvent sur un chèque lié à ce compte.',
+        bankAccountPurposeTitle: 'Que voulez-vous faire avec votre compte bancaire?',
+        getReimbursed: 'Être remboursé',
+        getReimbursedDescription: "Par l'employeur ou d'autres",
+        makePayments: 'Effectuer des paiements',
+        makePaymentsDescription: 'Payer les dépenses ou émettre des cartes Expensify',
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Pour connecter un compte bancaire, veuillez <a href="${contactMethodRoute}">ajouter une adresse e-mail comme identifiant principal</a> puis réessayer. Vous pouvez ajouter votre numéro de téléphone comme identifiant secondaire.`,
         hasBeenThrottledError: 'Une erreur s’est produite lors de l’ajout de votre compte bancaire. Veuillez patienter quelques minutes, puis réessayer.',
@@ -6510,6 +6536,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             symbols: 'Symboles',
             flags: 'Drapeaux',
         },
+        emojiNotSelected: 'Emoji non sélectionné',
     },
     newRoomPage: {
         newRoom: 'Nouvelle salle',
@@ -7468,6 +7495,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `De ${reportName}${workspaceName ? `dans ${workspaceName}` : ''}`,
     },
     qrCodes: {
+        qrCode: 'Code QR',
         copy: 'Copier l’URL',
         copied: 'Copié !',
     },
@@ -8062,10 +8090,19 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             security: 'Expensify est conforme à la norme PCI-DSS, utilise un chiffrement de niveau bancaire et une infrastructure redondante pour protéger vos données.',
             learnMoreAboutSecurity: 'En savoir plus sur notre sécurité.',
         },
+        expensifyCode: {
+            title: 'Code Expensify',
+            discountCode: 'Code de réduction',
+            enterCode: 'Saisissez un code Expensify à appliquer à votre abonnement.',
+            apply: 'Appliquer',
+            error: {
+                invalid: "Ce code n'est pas valide",
+            },
+        },
         subscriptionSettings: {
             title: 'Paramètres d’abonnement',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}${expensifyCode ? `, Code Expensify : ${expensifyCode}` : ''}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
             none: 'aucun',
             on: 'activé',
             off: 'désactivé',
@@ -8477,6 +8514,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
         },
         common: {settings: 'Paramètres'},
+        groups: {title: 'Groupes', memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`})},
     },
 };
 export default translations;
