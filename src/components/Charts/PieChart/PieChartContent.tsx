@@ -1,16 +1,15 @@
-import type {Color} from '@shopify/react-native-skia';
-import React, {useCallback, useState} from 'react';
-import type {ColorValue, LayoutChangeEvent} from 'react-native';
+import React, {useState} from 'react';
+import type {LayoutChangeEvent} from 'react-native';
 import {View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import Animated, {useAnimatedStyle, useSharedValue} from 'react-native-reanimated';
+import Animated, {useSharedValue} from 'react-native-reanimated';
 import {scheduleOnRN} from 'react-native-worklets';
 import {Pie, PolarChart} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
-import {TOOLTIP_BAR_GAP} from '@components/Charts/hooks';
-import type {ChartDataPoint, PieChartProps, ProcessedSlice} from '@components/Charts/types';
+import {TOOLTIP_BAR_GAP, useTooltipData} from '@components/Charts/hooks';
+import type {ChartDataPoint, PieChartProps, PieSlice} from '@components/Charts/types';
 import {getChartColor} from '@components/Charts/utils';
 import Text from '@components/Text';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -21,50 +20,42 @@ const PIE_CHART_START_ANGLE = -90;
 /**
  * Process raw data into slices.
  */
-function processDataIntoSlices(data: ChartDataPoint[], startAngle: number): ProcessedSlice[] {
+function processDataIntoSlices(data: ChartDataPoint[], startAngle: number): PieSlice[] {
     if (data.length === 0) {
         return [];
     }
 
-    const total = data.reduce((sum, point) => sum + point.total, 0);
+    // Use absolute values so refunds/negative amounts are represented by slice size
+    const absoluteData = data.map((point, index) => ({
+        ...point,
+        absTotal: Math.abs(point.total),
+        originalIndex: index,
+    }));
+
+    const total = absoluteData.reduce((sum, point) => sum + point.absTotal, 0);
     if (total === 0) {
         return [];
     }
 
-    // Calculate percentages and sort by value descending
-    const withPercentages = data.map((point, index) => ({
-        ...point,
-        percentage: (point.total / total) * 100,
-        originalIndex: index,
-    }));
-
-    withPercentages.sort((a, b) => b.total - a.total);
+    // Sort by absolute value descending
+    absoluteData.sort((a, b) => b.absTotal - a.absTotal);
 
     // Build final slices array
-    const finalSlices: ProcessedSlice[] = [];
     let currentAngle = startAngle;
-
-    // Add valid slices
-    for (let index = 0; index < withPercentages.length; index++) {
-        const slice = withPercentages.at(index);
-        if (!slice) {
-            continue;
-        }
-        const sweepAngle = (slice.total / total) * 360;
-        const color = getChartColor(index);
-        finalSlices.push({
+    return absoluteData.map((slice, index) => {
+        const sweepAngle = (slice.absTotal / total) * 360;
+        const pieSlice: PieSlice = {
             label: slice.label,
-            value: slice.total,
-            color,
-            percentage: slice.percentage,
+            value: slice.absTotal,
+            color: getChartColor(index),
+            percentage: (slice.absTotal / total) * 100,
             startAngle: currentAngle,
             endAngle: currentAngle + sweepAngle,
             originalIndex: slice.originalIndex,
-        });
+        };
         currentAngle += sweepAngle;
-    }
-
-    return finalSlices;
+        return pieSlice;
+    });
 }
 
 /**
@@ -100,7 +91,7 @@ function isAngleInSlice(angle: number, startAngle: number, endAngle: number): bo
 /**
  * Find which slice index contains the given cursor position
  */
-function findSliceAtPosition(cursorX: number, cursorY: number, centerX: number, centerY: number, radius: number, innerRadius: number, slices: ProcessedSlice[]): number {
+function findSliceAtPosition(cursorX: number, cursorY: number, centerX: number, centerY: number, radius: number, innerRadius: number, slices: PieSlice[]): number {
     'worklet';
 
     // Convert cursor to polar coordinates relative to center
@@ -117,14 +108,7 @@ function findSliceAtPosition(cursorX: number, cursorY: number, centerX: number, 
     const cursorAngle = Math.atan2(dy, dx) * (180 / Math.PI);
 
     // Find which slice contains this angle
-    for (let i = 0; i < slices.length; i++) {
-        const slice = slices.at(i);
-        if (slice && isAngleInSlice(cursorAngle, slice.startAngle, slice.endAngle)) {
-            return i;
-        }
-    }
-
-    return -1;
+    return slices.findIndex((slice) => isAngleInSlice(cursorAngle, slice.startAngle, slice.endAngle));
 }
 
 function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSlicePress}: PieChartProps) {
@@ -136,6 +120,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     const isHovering = useSharedValue(false);
     const cursorX = useSharedValue(0);
     const cursorY = useSharedValue(0);
+    const tooltipPosition = useSharedValue({x: 0, y: 0});
 
     const handleLayout = (event: LayoutChangeEvent) => {
         const {width, height} = event.nativeEvent.layout;
@@ -143,17 +128,16 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     };
 
     // Process data into slices with aggregation.
-    const processedSlices: ProcessedSlice[] = processDataIntoSlices(data, PIE_CHART_START_ANGLE);
+    const processedSlices: PieSlice[] = processDataIntoSlices(data, PIE_CHART_START_ANGLE);
+
+    // Map sorted slice index back to original data index for the tooltip hook
+    const activeOriginalDataIndex = activeSliceIndex >= 0 ? (processedSlices.at(activeSliceIndex)?.originalIndex ?? -1) : -1;
+
+    const formatAmount = (value: number) => (valueUnit ? `${valueUnit}${value.toLocaleString()}` : value.toLocaleString());
+    const tooltipData = useTooltipData(activeOriginalDataIndex, data, formatAmount);
 
     // Calculate pie geometry
     const pieGeometry = {radius: Math.min(canvasSize.width, canvasSize.height) / 2, centerX: canvasSize.width / 2, centerY: canvasSize.height / 2} as const;
-
-    // Transform data for Victory Native PolarChart
-    const chartData = processedSlices.map((slice: {label: string; value: number; color: Color}) => ({
-        label: slice.label,
-        value: slice.value,
-        color: slice.color,
-    }));
 
     // Handle hover state updates
     const updateActiveSlice = (x: number, y: number) => {
@@ -186,6 +170,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
                 isHovering.set(true);
                 cursorX.set(e.x);
                 cursorY.set(e.y);
+                tooltipPosition.set({x: e.x, y: e.y - TOOLTIP_BAR_GAP});
                 scheduleOnRN(updateActiveSlice, e.x, e.y);
             })
             .onUpdate((e) => {
@@ -193,6 +178,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
 
                 cursorX.set(e.x);
                 cursorY.set(e.y);
+                tooltipPosition.set({x: e.x, y: e.y - TOOLTIP_BAR_GAP});
                 scheduleOnRN(updateActiveSlice, e.x, e.y);
             })
             .onEnd(() => {
@@ -218,50 +204,17 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     // Combined gestures - Race allows both hover and tap to work independently
     const combinedGesture = Gesture.Race(hoverGesture(), tapGesture());
 
-    // Tooltip data
-    const tooltipData = () => {
-        if (activeSliceIndex < 0 || activeSliceIndex >= processedSlices.length) {
-            return null;
-        }
-        const slice = processedSlices.at(activeSliceIndex);
-        if (!slice) {
-            return null;
-        }
-        const formattedValue = valueUnit ? `${valueUnit}${slice.value.toLocaleString()}` : slice.value.toLocaleString();
-        const formattedPercentage = `${slice.percentage.toFixed(1)}%`;
-        return {
-            label: slice.label,
-            amount: formattedValue,
-            percentage: formattedPercentage,
-        };
+    const renderLegendItem = (slice: PieSlice) => {
+        return (
+            <View
+                key={`legend-${slice.label}`}
+                style={[styles.flexRow, styles.alignItemsCenter, styles.mr4, styles.mb2]}
+            >
+                <View style={[styles.pieChartLegendDot, {backgroundColor: slice.color}]} />
+                <Text style={[styles.textNormal, styles.ml2]}>{slice.label}</Text>
+            </View>
+        );
     };
-
-    // Tooltip position (at cursor)
-    const tooltipStyle = useAnimatedStyle(() => {
-        return {
-            position: 'absolute',
-            left: cursorX.get(),
-            top: cursorY.get() - TOOLTIP_BAR_GAP,
-            transform: [{translateX: '-50%'}, {translateY: '-100%'}],
-            opacity: isHovering.get() ? 1 : 0,
-            pointerEvents: 'none',
-        };
-    });
-
-    const renderLegendItem = useCallback(
-        (slice: {label: string; value: number; color: Color}) => {
-            return (
-                <View
-                    key={`legend-${slice.label}`}
-                    style={[styles.flexRow, styles.alignItemsCenter, styles.mr4, styles.mb2]}
-                >
-                    <View style={[styles.pieChartLegendDot, {backgroundColor: slice.color as ColorValue | undefined}]} />
-                    <Text style={[styles.textNormal, styles.ml2]}>{slice.label}</Text>
-                </View>
-            );
-        },
-        [styles],
-    );
 
     if (isLoading) {
         return (
@@ -282,38 +235,35 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
                 titleIcon={titleIcon}
             />
 
-            <View
-                style={styles.pieChartChartContainer}
-                onLayout={handleLayout}
-            >
-                {canvasSize.width > 0 && canvasSize.height > 0 && chartData.length > 0 && (
-                    <PolarChart
-                        data={chartData}
-                        labelKey="label"
-                        valueKey="value"
-                        colorKey="color"
-                    >
-                        <Pie.Chart startAngle={PIE_CHART_START_ANGLE} />
-                    </PolarChart>
-                )}
+            <GestureDetector gesture={combinedGesture}>
+                <Animated.View
+                    style={styles.pieChartChartContainer}
+                    onLayout={handleLayout}
+                >
+                    {canvasSize.width > 0 && canvasSize.height > 0 && processedSlices.length > 0 && (
+                        <PolarChart
+                            data={processedSlices}
+                            labelKey="label"
+                            valueKey="value"
+                            colorKey="color"
+                        >
+                            <Pie.Chart startAngle={PIE_CHART_START_ANGLE} />
+                        </PolarChart>
+                    )}
 
-                {/* Hover and tap detection overlay */}
-                <GestureDetector gesture={combinedGesture}>
-                    <Animated.View style={styles.pieChartHoverOverlay} />
-                </GestureDetector>
-
-                {/* Tooltip */}
-                {activeSliceIndex >= 0 && !!tooltipData && (
-                    <Animated.View style={tooltipStyle}>
+                    {/* Tooltip */}
+                    {activeSliceIndex >= 0 && !!tooltipData && (
                         <ChartTooltip
-                            label={tooltipData()?.label ?? ''}
-                            amount={tooltipData()?.amount ?? ''}
-                            percentage={tooltipData()?.percentage ?? ''}
+                            label={tooltipData.label}
+                            amount={tooltipData.amount}
+                            percentage={tooltipData.percentage}
+                            chartWidth={canvasSize.width}
+                            initialTooltipPosition={tooltipPosition}
                         />
-                    </Animated.View>
-                )}
-            </View>
-            <View style={styles.pieChartLegendContainer}>{chartData.map((slice) => renderLegendItem(slice))}</View>
+                    )}
+                </Animated.View>
+            </GestureDetector>
+            <View style={styles.pieChartLegendContainer}>{processedSlices.map((slice) => renderLegendItem(slice))}</View>
         </View>
     );
 }

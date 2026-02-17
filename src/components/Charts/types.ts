@@ -1,4 +1,3 @@
-import type {Color} from '@shopify/react-native-skia';
 import type IconAsset from '@src/types/utils/IconAsset';
 
 type ChartDataPoint = {
@@ -52,10 +51,11 @@ type PieChartProps = {
     valueUnit?: string;
 };
 
-type ProcessedSlice = {
+type PieSlice = {
     label: string;
+    /** Absolute value used for slice sizing */
     value: number;
-    color: Color;
+    color: string;
     percentage: number;
     startAngle: number;
     endAngle: number;
@@ -64,4 +64,4 @@ type ProcessedSlice = {
 
 type YAxisUnitPosition = 'left' | 'right';
 
-export type {ChartDataPoint, CartesianChartProps, PieChartProps, ProcessedSlice, YAxisUnitPosition};
+export type {ChartDataPoint, CartesianChartProps, PieChartProps, PieSlice, YAxisUnitPosition};
