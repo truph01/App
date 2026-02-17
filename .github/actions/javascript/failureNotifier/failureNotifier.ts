@@ -2,6 +2,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import type {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods';
+import dedent from '@libs/StringUtils/dedent';
 
 type WorkflowRun = RestEndpointMethodTypes['actions']['listWorkflowRuns']['response']['data']['workflow_runs'][number];
 
@@ -101,21 +102,27 @@ async function run() {
         }
 
         const issueTitle = `Investigate workflow job failing on main: ${job.name}`;
-        const issueBody =
-            `🚨 **Failure Summary** 🚨:\n\n` +
-            `- **📋 Job Name**: [${job.name}](${job.html_url})\n` +
-            `- **🔧 Failure in Workflow**: Process new code merged to main\n` +
-            `- **🔗 Triggered by PR**: [PR Link](${prLink})\n` +
-            `- **👤 PR Author**: @${prAuthor}\n` +
-            `- **🤝 Merged by**: @${prMerger}\n` +
-            `- **🐛 Error Message**: \n ${errorMessage}\n\n` +
-            `⚠️ **Action Required** ⚠️:\n\n` +
-            `🛠️ A recent merge appears to have caused a failure in the job named [${job.name}](${job.html_url}).\n` +
-            `This issue has been automatically created and labeled with \`${failureLabel}\` for investigation. \n\n` +
-            `👀 **Please look into the following**:\n` +
-            `1. **Why the PR caused the job to fail?**\n` +
-            `2. **Address any underlying issues.**\n\n` +
-            `🐛 We appreciate your help in squashing this bug!`;
+        const issueBody = dedent(`
+            🚨 **Failure Summary** 🚨:
+
+            - **📋 Job Name**: [${job.name}](${job.html_url})
+            - **🔧 Failure in Workflow**: Process new code merged to main
+            - **🔗 Triggered by PR**: [PR Link](${prLink})
+            - **👤 PR Author**: @${prAuthor}
+            - **🤝 Merged by**: @${prMerger}
+            - **🐛 Error Message**: \n ${errorMessage}
+
+            ⚠️ **Action Required** ⚠️:
+
+            🛠️ A recent merge appears to have caused a failure in the job named [${job.name}](${job.html_url}).
+            🔍 This issue has been automatically created and labeled with \`${failureLabel}\` for investigation.
+
+            **👀 Please look into the following:**
+            1. **Why the PR caused the job to fail?**
+            2. **Address any underlying issues.**
+
+            **🐛 We appreciate your help in squashing this bug!**
+        `);
 
         await octokit.rest.issues.create({
             owner,
