@@ -33,7 +33,7 @@ function TestToolMenu() {
     const {translate} = useLocalize();
     const {clearLHNCache} = useSidebarOrderedReports();
     const [hasBiometricsRegistered = false] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true, selector: hasBiometricsRegisteredSelector});
-    const [isAccountLoading = false] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true, selector: isAccountLoadingSelector})
+    const [isAccountLoading = false] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true, selector: isAccountLoadingSelector});
 
     const {singleExecution} = useSingleExecution();
     const waitForNavigate = useWaitForNavigation();
