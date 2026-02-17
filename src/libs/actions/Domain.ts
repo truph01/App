@@ -1249,6 +1249,7 @@ function deleteDomainVacationDelegate(domainAccountID: number, domainMemberAccou
                 [`${CONST.DOMAIN.PRIVATE_VACATION_DELEGATE_PREFIX}${domainMemberAccountID}`]: {
                     creator: null,
                     delegate: null,
+                    previousDelegate: vacationDelegate?.delegate,
                 },
             } as PrefixedRecord<typeof CONST.DOMAIN.PRIVATE_VACATION_DELEGATE_PREFIX, NullishDeep<BaseVacationDelegate>>,
         },
