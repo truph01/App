@@ -681,20 +681,21 @@ const translations: TranslationDeepObject<typeof en> = {
     multifactorAuthentication: {
         reviewTransaction: {
             reviewTransaction: 'Transactie beoordelen',
-            pleaseReview: 'Beoordeel deze transactie alstublieft',
-            requiresYourReview: 'Een transactie met de Expensify kaart vereist hieronder uw beoordeling.',
+            pleaseReview: 'Controleer deze transactie alsjeblieft',
+            requiresYourReview: 'Een Expensify Card-transactie hieronder vereist je beoordeling.',
             transactionDetails: 'Transactiedetails',
             deny: 'Weigeren',
             approve: 'Goedkeuren',
             denyTransaction: 'Transactie weigeren',
             transactionDenied: 'Transactie geweigerd',
             transactionApproved: 'Transactie goedgekeurd!',
-            areYouSureToDeny: 'Weet u zeker dat u wilt weigeren? De transactie wordt geweigerd als u dit scherm sluit.',
+            areYouSureToDeny: 'Weet je het zeker? De transactie wordt geweigerd als je dit scherm sluit.',
             youCanTryAgainAtMerchantOrReachOut:
-                'U kunt het opnieuw proberen bij de handelaar. Als u deze transactie niet heeft geprobeerd, neem dan contact op met Concierge om mogelijke fraude te melden.',
-            youNeedToTryAgainAtMerchant: 'Deze transactie is niet geverifieerd, dus we hebben het geweigerd. U moet het opnieuw bij de handelaar proberen.',
-            goBackToTheMerchant: 'Ga terug naar de website van de handelaar om de transactie voort te zetten.',
-            authorizationFailed: 'Uw goedkeuring is mislukt, dus we hebben deze transactie geweigerd. U kunt het opnieuw bij de handelaar proberen.',
+                'Je kunt het opnieuw proberen bij de verkoper. Als je deze transactie niet hebt geprobeerd uit te voeren, neem dan contact op met Concierge om mogelijke fraude te melden.',
+            youNeedToTryAgainAtMerchant: 'Deze transactie is niet geverifieerd, dus we hebben deze geweigerd. Je moet het opnieuw proberen bij de handelaar.',
+            goBackToTheMerchant: 'Ga terug naar de website van de verkoper om de transactie voort te zetten.',
+            authorizationFailed: 'Je goedkeuring is mislukt, dus we hebben deze transactie geweigerd. Je kunt het opnieuw proberen bij de merchant.',
+            attemptedTransaction: 'Poging tot transactie',
         },
         biometricsTest: {
             biometricsTest: 'Biometrische test',
@@ -5415,7 +5416,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             findTag: 'Tag zoeken',
             subtitle: 'Labels bieden meer gedetailleerde manieren om kosten te classificeren.',
             dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Je gebruikt <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">afhankelijke labels</a>. Je kunt <a href="${importSpreadsheetLink}">een spreadsheet opnieuw importeren</a> om je labels bij te werken.</muted-text>`,
+                `<muted-text>Je gebruikt <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">afhankelijke labels</a>. Je kunt een <a href="${importSpreadsheetLink}">spreadsheet opnieuw importeren</a> om je labels bij te werken.</muted-text>`,
             emptyTags: {
                 title: 'Je hebt nog geen labels gemaakt',
                 subtitle: 'Voeg een tag toe om projecten, locaties, afdelingen en meer bij te houden.',

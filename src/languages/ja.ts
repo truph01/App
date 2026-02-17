@@ -680,20 +680,21 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     multifactorAuthentication: {
         reviewTransaction: {
-            reviewTransaction: '取引のレビュー',
-            pleaseReview: 'この取引をレビューしてください',
-            requiresYourReview: 'Expensifyカードの取引が以下のレビューを必要としています。',
+            reviewTransaction: '取引を確認',
+            pleaseReview: 'この取引を確認してください',
+            requiresYourReview: '以下のExpensifyカード取引の内容を確認してください。',
             transactionDetails: '取引の詳細',
             deny: '拒否',
             approve: '承認',
             denyTransaction: '取引を拒否',
             transactionDenied: '取引が拒否されました',
             transactionApproved: '取引が承認されました！',
-            areYouSureToDeny: 'よろしいですか？ この画面を閉じると取引は拒否されます。',
-            youCanTryAgainAtMerchantOrReachOut: '商店で再試行することができます。この取引を試みなかった場合は、Conciergeに連絡して潜在的な詐欺を報告してください。',
-            youNeedToTryAgainAtMerchant: 'この取引は検証されませんでしたので、拒否しました。商店で再試行する必要があります。',
-            goBackToTheMerchant: '取引を続行するために、商店のサイトに戻ってください。',
-            authorizationFailed: '承認が失敗したため、この取引は拒否されました。商店で再試行してください。',
+            areYouSureToDeny: '本当によろしいですか？この画面を閉じると、取引は拒否されます。',
+            youCanTryAgainAtMerchantOrReachOut: '加盟店で再度お試しください。もしこの取引に心当たりがない場合は、不正利用の可能性としてConciergeまでご連絡ください。',
+            youNeedToTryAgainAtMerchant: 'この取引は認証されなかったため、却下されました。加盟店でもう一度お試しください。',
+            goBackToTheMerchant: '取引を続行するには、加盟店のサイトに戻ってください。',
+            authorizationFailed: '承認が失敗したため、この取引は拒否されました。加盟店でもう一度お試しください。',
+            attemptedTransaction: '試行された取引',
         },
         biometricsTest: {
             biometricsTest: '生体認証テスト',
@@ -5379,7 +5380,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             findTag: 'タグを検索',
             subtitle: 'タグを使うと、コストをより詳しく分類できます。',
             dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
+                `<muted-text><a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">従属タグ</a>を使用中です。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
             emptyTags: {
                 title: 'タグがまだ作成されていません',
                 subtitle: 'タグを追加して、プロジェクト、所在地、部署などを追跡しましょう。',

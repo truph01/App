@@ -512,7 +512,7 @@ const translations: TranslationDeepObject<typeof en> = {
             pleaseReview: 'Por favor revisa esta transacción',
             requiresYourReview: 'Una transacción con la tarjeta Expensify requiere tu revisión a continuación.',
             transactionDetails: 'Detalles de la transacción',
-            attemptedTransaction: 'Transacción intentada',
+            attemptedTransaction: 'Intento de transacción',
             deny: 'Rechazar',
             approve: 'Aprobar',
             denyTransaction: 'Rechazar transacción',

@@ -680,9 +680,9 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     multifactorAuthentication: {
         reviewTransaction: {
-            reviewTransaction: 'Transaktion überprüfen',
+            reviewTransaction: 'Transaktion prüfen',
             pleaseReview: 'Bitte überprüfe diese Transaktion',
-            requiresYourReview: 'Eine Transaktion mit der Expensify-Karte erfordert deine Überprüfung unten.',
+            requiresYourReview: 'Eine Expensify Card-Transaktion erfordert unten Ihre Überprüfung.',
             transactionDetails: 'Transaktionsdetails',
             deny: 'Ablehnen',
             approve: 'Genehmigen',
@@ -691,10 +691,11 @@ const translations: TranslationDeepObject<typeof en> = {
             transactionApproved: 'Transaktion genehmigt!',
             areYouSureToDeny: 'Bist du sicher? Die Transaktion wird abgelehnt, wenn du diesen Bildschirm schließt.',
             youCanTryAgainAtMerchantOrReachOut:
-                'Du kannst es beim Händler erneut versuchen. Wenn du diese Transaktion nicht versucht hast, wende dich an Concierge, um einen möglichen Betrug zu melden.',
-            youNeedToTryAgainAtMerchant: 'Diese Transaktion wurde nicht verifiziert, daher haben wir sie abgelehnt. Du musst es beim Händler erneut versuchen.',
-            goBackToTheMerchant: 'Geh zurück zur Händlerseite, um die Transaktion fortzusetzen.',
-            authorizationFailed: 'Deine Genehmigung ist fehlgeschlagen, daher haben wir diese Transaktion abgelehnt. Du kannst es beim Händler erneut versuchen.',
+                'Du kannst es beim Händler noch einmal versuchen. Wenn du diese Transaktion nicht veranlasst hast, wende dich an Concierge, um einen möglichen Betrug zu melden.',
+            youNeedToTryAgainAtMerchant: 'Diese Transaktion wurde nicht verifiziert, daher haben wir sie abgelehnt. Bitte versuchen Sie es erneut beim Händler.',
+            goBackToTheMerchant: 'Gehe zurück zur Händlerseite, um die Transaktion fortzusetzen.',
+            authorizationFailed: 'Deine Autorisierung ist fehlgeschlagen, daher haben wir diese Transaktion abgelehnt. Du kannst es beim Händler erneut versuchen.',
+            attemptedTransaction: 'Versuchter Umsatz',
         },
         biometricsTest: {
             biometricsTest: 'Biometrie-Test',
@@ -5439,7 +5440,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             findTag: 'Tag finden',
             subtitle: 'Tags bieten detailliertere Möglichkeiten, Kosten zu klassifizieren.',
             dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Sie verwenden <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">abhängige Tags</a>. Sie können <a href="${importSpreadsheetLink}">eine Tabelle erneut importieren</a>, um Ihre Tags zu aktualisieren.</muted-text>`,
+                `<muted-text>Sie verwenden <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">abhängige Tags</a>. Sie können eine <a href="${importSpreadsheetLink}">Tabelle erneut importieren</a>, um Ihre Tags zu aktualisieren.</muted-text>`,
             emptyTags: {
                 title: 'Sie haben noch keine Tags erstellt',
                 subtitle: 'Füge ein Tag hinzu, um Projekte, Standorte, Abteilungen und mehr zu verfolgen.',

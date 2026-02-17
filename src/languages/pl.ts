@@ -681,19 +681,21 @@ const translations: TranslationDeepObject<typeof en> = {
     multifactorAuthentication: {
         reviewTransaction: {
             reviewTransaction: 'Przejrzyj transakcję',
-            pleaseReview: 'Proszę przejrzeć tę transakcję',
-            requiresYourReview: 'Transakcja kartą Expensify wymaga poniżej Twojej recenzji.',
+            pleaseReview: 'Sprawdź tę transakcję',
+            requiresYourReview: 'Transakcja kartą Expensify wymaga Twojej weryfikacji poniżej.',
             transactionDetails: 'Szczegóły transakcji',
-            deny: 'Odmów',
+            deny: 'Odrzuć',
             approve: 'Zatwierdź',
-            denyTransaction: 'Odmów transakcję',
+            denyTransaction: 'Odrzuć transakcję',
             transactionDenied: 'Transakcja odrzucona',
             transactionApproved: 'Transakcja zatwierdzona!',
-            areYouSureToDeny: 'Czy jesteś pewien? Transakcja zostanie odrzucona, jeśli zamkniesz ten ekran.',
-            youCanTryAgainAtMerchantOrReachOut: 'Możesz spróbować ponownie u sprzedawcy. Jeśli nie próbowałeś tej transakcji, skontaktuj się z Concierge, aby zgłosić potencjalne oszustwo.',
-            youNeedToTryAgainAtMerchant: 'Ta transakcja nie została zweryfikowana, więc została odrzucona. Musisz spróbować ponownie u sprzedawcy.',
-            goBackToTheMerchant: 'Wróć na stronę sprzedawcy, aby kontynuować transakcję.',
-            authorizationFailed: 'Twoja autoryzacja nie powiodła się, więc odrzuciliśmy tę transakcję. Możesz spróbować ponownie u sprzedawcy.',
+            areYouSureToDeny: 'Na pewno? Transakcja zostanie odrzucona, jeśli zamkniesz ten ekran.',
+            youCanTryAgainAtMerchantOrReachOut:
+                'Możesz spróbować ponownie u sprzedawcy. Jeśli nie próbowałeś(-aś) wykonać tej transakcji, skontaktuj się z Concierge, aby zgłosić potencjalne oszustwo.',
+            youNeedToTryAgainAtMerchant: 'Ta transakcja nie została zweryfikowana, więc ją odrzuciliśmy. Spróbuj ponownie u sprzedawcy.',
+            goBackToTheMerchant: 'Wróć do strony sprzedawcy, aby kontynuować transakcję.',
+            authorizationFailed: 'Twoje zatwierdzenie nie powiodło się, więc odrzuciliśmy tę transakcję. Możesz spróbować ponownie u sprzedawcy.',
+            attemptedTransaction: 'Próbowana transakcja',
         },
         biometricsTest: {
             biometricsTest: 'Test biometrii',
@@ -5404,7 +5406,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             findTag: 'Znajdź tag',
             subtitle: 'Tagi umożliwiają bardziej szczegółowe klasyfikowanie kosztów.',
             dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Używasz <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">zależnych tagów</a>. Możesz <a href="${importSpreadsheetLink}">ponownie zaimportować arkusz kalkulacyjny</a>, aby zaktualizować swoje tagi.</muted-text>`,
+                `<muted-text>Używasz <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tagów zależnych</a>. Możesz <a href="${importSpreadsheetLink}">ponownie zaimportować arkusz</a>, aby zaktualizować swoje tagi.</muted-text>`,
             emptyTags: {
                 title: 'Nie utworzono jeszcze żadnych tagów',
                 subtitle: 'Dodaj tag, aby śledzić projekty, lokalizacje, działy i inne.',

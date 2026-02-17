@@ -680,8 +680,8 @@ const translations: TranslationDeepObject<typeof en> = {
     multifactorAuthentication: {
         reviewTransaction: {
             reviewTransaction: 'Revisar transação',
-            pleaseReview: 'Por favor, revise esta transação',
-            requiresYourReview: 'Uma transação com o Cartão Expensify requer sua revisão abaixo.',
+            pleaseReview: 'Revise esta transação',
+            requiresYourReview: 'Uma transação com o Cartão Expensify precisa da sua revisão abaixo.',
             transactionDetails: 'Detalhes da transação',
             deny: 'Negar',
             approve: 'Aprovar',
@@ -690,10 +690,11 @@ const translations: TranslationDeepObject<typeof en> = {
             transactionApproved: 'Transação aprovada!',
             areYouSureToDeny: 'Tem certeza? A transação será negada se você fechar esta tela.',
             youCanTryAgainAtMerchantOrReachOut:
-                'Você pode tentar novamente no comerciante. Se você não tentou esta transação, entre em contato com o Concierge para relatar uma possível fraude.',
-            youNeedToTryAgainAtMerchant: 'Esta transação não foi verificada, então a negamos. Você precisará tentar novamente no comerciante.',
+                'Você pode tentar novamente no estabelecimento. Se você não fez esta transação, entre em contato com o Concierge para reportar uma possível fraude.',
+            youNeedToTryAgainAtMerchant: 'Essa transação não foi verificada, então nós a recusamos. Você precisará tentar novamente no estabelecimento.',
             goBackToTheMerchant: 'Volte ao site do comerciante para continuar a transação.',
-            authorizationFailed: 'Sua aprovação falhou, então negamos esta transação. Você pode tentar novamente no comerciante.',
+            authorizationFailed: 'Sua aprovação falhou, então negamos esta transação. Você pode tentar novamente no estabelecimento.',
+            attemptedTransaction: 'Transação tentada',
         },
         biometricsTest: {
             biometricsTest: 'Teste de biometria',
