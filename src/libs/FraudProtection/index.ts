@@ -1,31 +1,42 @@
 import {Str} from 'expensify-common';
 import Onyx from 'react-native-onyx';
+import type {OnyxEntry} from 'react-native-onyx';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {Account} from '@src/types/onyx';
+import Log from '@libs/Log';
 import {init, sendEvent, setAttribute, setAuthenticationData} from './GroupIBSdkBridge';
 
-let sessionID: string;
-let identity: string | undefined;
-// We use `connectWithoutView` here since this connection only sends the new session data to the Fraud Protection backend, and doesn't need to trigger component re-renders.
+let sessionID = Str.guid();
+Log.info(`[Fraud Protection] Initial sessionID generated: ${sessionID}`);
+let cachedAccount: OnyxEntry<Account>;
+
+// Cache account data as it arrives before the session is fully authenticated.
+Onyx.connectWithoutView({
+    key: ONYXKEYS.ACCOUNT,
+    callback: (account) => {
+        cachedAccount = account;
+    },
+});
+
+// When the session changes, send identity, sessionID and account attributes to the Fraud Protection server.
 Onyx.connectWithoutView({
     key: ONYXKEYS.SESSION,
     callback: (session) => {
         const isAuthenticated = !!(session?.authToken ?? null);
-        const newIdentity = isAuthenticated ? (session?.accountID?.toString() ?? '') : '';
-        if (newIdentity !== identity) {
-            identity = newIdentity;
-            sessionID = typeof identity === 'string' && identity.length > 0 ? Str.guid() : '';
-            setAuthenticationData(identity, sessionID);
-        }
-    },
-});
+        const identity = isAuthenticated ? (session?.accountID?.toString() ?? '') : '';
 
-// We use `connectWithoutView` here since this connection only sends the new email and mfa data to the Fraud Protection backend, and doesn't need to trigger component re-renders.
-Onyx.connectWithoutView({
-    key: ONYXKEYS.ACCOUNT,
-    callback: (account) => {
-        setAttribute('email', account?.primaryLogin ?? '', false, true);
-        setAttribute('mfa', account?.requiresTwoFactorAuth ? '2fa_enabled' : '2fa_disabled', false, true);
-        setAttribute('is_validated', account?.validated ? 'true' : 'false', false, true);
+        Log.info(`[Fraud Protection] SESSION changed — isAuthenticated: ${isAuthenticated}, identity: ${identity}, sessionID: ${sessionID}, email: ${cachedAccount?.primaryLogin ?? ''}`);
+
+        setAuthenticationData(identity, sessionID);
+        setAttribute('email', cachedAccount?.primaryLogin ?? '', false, true);
+        setAttribute('mfa', cachedAccount?.requiresTwoFactorAuth ? '2fa_enabled' : '2fa_disabled', false, true);
+        setAttribute('is_validated', cachedAccount?.validated ? 'true' : 'false', false, true);
+
+        // Generate a new sessionID for the next session after logout.
+        if (!isAuthenticated) {
+            sessionID = Str.guid();
+            Log.info(`[Fraud Protection] Logged out — new sessionID generated for next session: ${sessionID}`);
+        }
     },
 });
 
