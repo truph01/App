@@ -167,7 +167,6 @@ function MoneyRequestAction({
 
     return (
         <TransactionPreview
-            allReports={allReports}
             iouReportID={requestReportID}
             chatReportID={chatReportID}
             reportID={reportID}
