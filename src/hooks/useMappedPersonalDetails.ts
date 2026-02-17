@@ -1,7 +1,15 @@
 import type {OnyxEntry} from 'react-native-onyx';
-import ONYXKEYS from '@src/ONYXKEYS';
-import type {PersonalDetails} from '@src/types/onyx';
+import ONYXKEYS from './src/ONYXKEYS';
+import type {OnyxInputOrEntry, PersonalDetails} from './src/types/onyx';
 import useOnyx from './useOnyx';
+
+const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
+    personalDetail && {
+        accountID: personalDetail.accountID,
+        login: personalDetail.login,
+        avatar: personalDetail.avatar,
+        pronouns: personalDetail.pronouns,
+    };
 
 /**
  * Subscribes to all personal details and transforms each one via the provided mapper.
@@ -10,7 +18,9 @@ import useOnyx from './useOnyx';
  * shallowEqual on raw personal detail references, then maps the collection inline.
  */
 function useMappedPersonalDetails<T>(mapper: (personalDetail: OnyxEntry<PersonalDetails>) => T) {
-    const [personalDetails, metadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: false});
+    const [personalDetails, metadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+        canBeMissing: false,
+    });
     const transformed = Object.entries(personalDetails ?? {}).reduce<Record<string, T>>((acc, [key, entry]) => {
         acc[key] = mapper(entry ?? undefined);
         return acc;
@@ -19,4 +29,5 @@ function useMappedPersonalDetails<T>(mapper: (personalDetail: OnyxEntry<Personal
     return [transformed, metadata] as const;
 }
 
+export {personalDetailMapper};
 export default useMappedPersonalDetails;
