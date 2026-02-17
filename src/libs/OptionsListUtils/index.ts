@@ -263,7 +263,7 @@ Onyx.connect({
             const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
 
             // If the report is a one-transaction report, we need to return the combined reportActions so that the LHN can display modifications
-            // to the transaction thread or the report itself. Cache the result to avoid O(n) recomputation in renderItem.
+            // to the transaction thread or the report itself. Cache the result to avoid recomputation in renderItem.
             const transactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, actions[reportActions[0]]);
             cachedOneTransactionThreadReportIDs[reportID] = transactionThreadReportID;
             if (transactionThreadReportID) {
@@ -561,7 +561,7 @@ function isSearchStringMatchUserDetails(personalDetail: PersonalDetails, searchV
 /**
  * Get IOU report ID of report last action if the action is report action preview
  */
-function getCachedOneTransactionThreadReportID(reportID: string | undefined): string | undefined {
+function getCachedOneTransactionThreadReportID(reportID?: string): string | undefined {
     return reportID ? cachedOneTransactionThreadReportIDs[reportID] : undefined;
 }
 

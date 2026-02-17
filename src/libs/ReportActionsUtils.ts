@@ -1421,8 +1421,8 @@ function findLastReportActions(
     reportActions: OnyxEntry<ReportActions>,
     canUserPerformWriteAction?: boolean,
 ): {
-    lastVisibleAction: ReportAction | undefined;
-    lastActionForDisplay: ReportAction | undefined;
+    lastVisibleAction?: ReportAction;
+    lastActionForDisplay?: ReportAction;
 } {
     if (!reportActions) {
         return {lastVisibleAction: undefined, lastActionForDisplay: undefined};
