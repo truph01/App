@@ -1,13 +1,12 @@
 import '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
-import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 jest.useRealTimers();
 
+// Auto-initialize Onyx for tests.
+// Tests that already call Onyx.init() in their own beforeAll will safely re-configure Onyx —
+// the second init() just re-runs initStoreValues and re-resolves the already-resolved deferred task.
 beforeAll(() => {
-    if (OnyxUtils.getDeferredInitTask().isResolved) {
-        return;
-    }
     Onyx.init({keys: ONYXKEYS});
 });
