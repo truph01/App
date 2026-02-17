@@ -82,6 +82,7 @@ function ReportActionItem({
     isUserValidated,
     personalDetails,
     userBillingFundID,
+    linkedTransactionRouteError: linkedTransactionRouteErrorProp,
     isTryNewDotNVPDismissed,
     ...props
 }: ReportActionItemProps) {
@@ -110,7 +111,7 @@ function ReportActionItem({
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
     const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
-    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => transaction?.errorFields?.route ?? undefined});
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => {return linkedTransactionRouteErrorProp ?? transaction?.errorFields?.route} });
 
     // The app would crash due to subscribing to the entire report collection if parentReportID is an empty string. So we should have a fallback ID here.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
