@@ -1,5 +1,5 @@
 import type {FeedKeysWithAssignedCards} from '@selectors/Card';
-import {fromUnixTime, isBefore} from 'date-fns';
+import {format, fromUnixTime, isBefore} from 'date-fns';
 import groupBy from 'lodash/groupBy';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {TupleToUnion, ValueOf} from 'type-fest';
@@ -841,15 +841,7 @@ function getDefaultCardName(cardholder?: string) {
     return `${cardholder}'s card`;
 }
 
-/**
- * Gets the date option for a card assignment.
- * When not editing, always returns CUSTOM option.
- * When editing, returns the existing date option or CUSTOM as fallback.
- *
- * @param isEditing - Whether the card assignment is being edited
- * @param existingDateOption - The existing date option from previous assignment
- * @returns Date option constant
- */
+/** Returns the date option for a card assignment — CUSTOM when not editing, or the existing option when editing. */
 function getCardAssignmentDateOption(isEditing: boolean | undefined, existingDateOption?: string): ValueOf<typeof CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS> {
     if (!isEditing) {
         return CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM;
@@ -858,6 +850,14 @@ function getCardAssignmentDateOption(isEditing: boolean | undefined, existingDat
         return CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.FROM_BEGINNING;
     }
     return CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM;
+}
+
+/** Returns the start date for a card assignment — today when not editing, or the existing date when editing. */
+function getCardAssignmentStartDate(isEditing: boolean | undefined, existingStartDate?: string): string {
+    if (isEditing && existingStartDate) {
+        return existingStartDate;
+    }
+    return format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
 }
 
 function checkIfNewFeedConnected(prevFeedsData: CompanyFeeds, currentFeedsData: CompanyFeeds, plaidBank?: string) {
@@ -1221,6 +1221,7 @@ export {
     checkIfNewFeedConnected,
     getDefaultCardName,
     getCardAssignmentDateOption,
+    getCardAssignmentStartDate,
     getDomainOrWorkspaceAccountID,
     mergeCardListWithWorkspaceFeeds,
     isCard,
