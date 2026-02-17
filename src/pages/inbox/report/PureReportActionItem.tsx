@@ -256,9 +256,6 @@ import ReportActionItemThread from './ReportActionItemThread';
 import TripSummary from './TripSummary';
 
 type PureReportActionItemProps = {
-    /** All the data of the report collection */
-    allReports: OnyxCollection<OnyxTypes.Report>;
-
     /** All the data of the policy collection */
     policies: OnyxCollection<OnyxTypes.Policy>;
 
