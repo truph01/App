@@ -5,7 +5,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import CardFeedIcon from '@components/CardFeedIcon';
-import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import FeedSelector from '@components/FeedSelector';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 // eslint-disable-next-line no-restricted-imports
@@ -77,7 +77,8 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
 
     const shouldShowSelector = Object.keys(allExpensifyCardFeeds ?? {}).length > 1;
 
-    const {isActingAsDelegate, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isActingAsDelegate} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const {isAccountLocked, showLockedAccountModal} = useContext(LockedAccountContext);
     const isUkEuCurrencySupported = useExpensifyCardUkEuSupported(policyID);
 
@@ -177,6 +178,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                             currency={settlementCurrency}
                             isVirtual={!!item.nameValuePairs?.isVirtual}
                             isHovered={hovered}
+                            limitType={item.nameValuePairs?.limitType}
                         />
                     )}
                 </PressableWithFeedback>
@@ -209,9 +211,11 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
     );
 
     const handleBackButtonPress = () => {
-        Navigation.popToSidebar();
+        Navigation.goBack();
         return true;
     };
+
+    const policyCollection = policy?.id ? {[`${ONYXKEYS.COLLECTION.POLICY}${policy.id}`]: policy} : undefined;
 
     useAndroidBackButtonHandler(handleBackButtonPress);
 
@@ -239,7 +243,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                         onFeedSelect={() => Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD_SELECT_FEED.getRoute(policyID))}
                         CardFeedIcon={cardFeedIcon}
                         feedName={translate('workspace.common.expensifyCard')}
-                        supportingText={getDescriptionForPolicyDomainCard(cardSettings?.domainName ?? '')}
+                        supportingText={getDescriptionForPolicyDomainCard(cardSettings?.domainName ?? '', policyCollection)}
                     />
                     {isBankAccountVerified && getHeaderButtons()}
                 </View>
