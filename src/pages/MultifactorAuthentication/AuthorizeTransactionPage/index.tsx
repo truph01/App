@@ -46,10 +46,11 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         if (isConfirmModalVisible) {
             hideConfirmModal();
         }
-        // TODO: Use context here when merged
+        // TODO: Set state here that the outcome page should be displayed
         Navigation.closeRHPFlow();
-        // cancel();
     };
+
+    // TODO: Instead of navigate to outcome page, if the state above is true then render failure component here
 
     return (
         <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
@@ -65,6 +66,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                         onAuthorize={approveTransaction}
                         onDeny={showConfirmModal}
                     />
+                    {/* TODO: Use custom AuthorizeTransactionCancelModal */}
                     <MultifactorAuthenticationTriggerCancelConfirmModal
                         // TODO: Uncomment when context is merged
                         // scenario={CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION}
