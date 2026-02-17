@@ -1,8 +1,8 @@
 import type {ParamListBase, ScreenLayoutArgs} from '@react-navigation/native';
-import {StackNavigationOptions} from '@react-navigation/stack';
+import type {StackNavigationOptions} from '@react-navigation/stack';
 import {useLayoutEffect} from 'react';
-import {PlatformStackNavigationOptions, PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
-import {endTransition, startTransition} from '@libs/Navigation/TransitionTracker';
+import type {PlatformStackNavigationOptions, PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
 
 function InteractionManagerLayout({
     children,
@@ -12,12 +12,12 @@ function InteractionManagerLayout({
 }: ScreenLayoutArgs<ParamListBase, string, StackNavigationOptions | PlatformStackNavigationOptions, PlatformStackNavigationProp<ParamListBase>>) {
     useLayoutEffect(() => {
         const transitionStartListener = navigation.addListener('transitionStart', () => {
-            console.log('transitionStart', route?.name);
-            // startTransition();
+            console.log('xdd transitionStart', route?.name);
+            TransitionTracker.startTransition('navigation');
         });
         const transitionEndListener = navigation.addListener('transitionEnd', () => {
-            console.log('transitionEnd', route?.name);
-            // endTransition();
+            console.log('xdd transitionEnd', route?.name);
+            TransitionTracker.endTransition('navigation');
         });
 
         return () => {

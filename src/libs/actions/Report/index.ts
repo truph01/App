@@ -1630,7 +1630,7 @@ function navigateToAndOpenReport(
 
     if (shouldDismissModal) {
         Navigation.dismissModal({
-            callback: () => {
+            afterTransition: () => {
                 if (!report?.reportID) {
                     return;
                 }

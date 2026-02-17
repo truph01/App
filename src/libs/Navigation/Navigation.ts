@@ -39,7 +39,7 @@ import setNavigationActionToMicrotaskQueue from './helpers/setNavigationActionTo
 import {linkingConfig} from './linkingConfig';
 import {SPLIT_TO_SIDEBAR} from './linkingConfig/RELATIONS';
 import navigationRef from './navigationRef';
-import {runAfterTransition} from './TransitionTracker';
+import TransitionTracker from './TransitionTracker';
 import type {
     NavigationPartialRoute,
     NavigationRef,
@@ -316,7 +316,7 @@ function navigate(route: Route, options?: LinkToOptions) {
     closeSidePanelOnNarrowScreen();
 
     if (options?.afterTransition) {
-        runAfterTransition(options.afterTransition);
+        TransitionTracker.runAfterTransitions(options.afterTransition);
     }
 }
 /**
@@ -464,7 +464,7 @@ function goBack(backToRoute?: Route, options?: GoBackOptions) {
     if (backToRoute) {
         goUp(backToRoute, options);
         if (options?.afterTransition) {
-            runAfterTransition(options.afterTransition);
+            TransitionTracker.runAfterTransitions(options.afterTransition);
         }
         return;
     }
@@ -476,7 +476,7 @@ function goBack(backToRoute?: Route, options?: GoBackOptions) {
 
     navigationRef.current?.goBack();
     if (options?.afterTransition) {
-        runAfterTransition(options.afterTransition);
+        TransitionTracker.runAfterTransitions(options.afterTransition);
     }
 }
 
@@ -710,26 +710,18 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
  *
  * @param options - Configuration object
  * @param options.ref - Navigation ref to use (defaults to navigationRef)
- * @param options.callback - Optional callback to execute when the modal unmounts (fires on MODAL_EVENTS.CLOSED).
  * @param options.afterTransition - Optional callback to execute after the navigation transition animation completes.
  *
  * For detailed information about dismissing modals,
  * see the NAVIGATION.md documentation.
  */
-const dismissModal = ({ref = navigationRef, callback, afterTransition}: {ref?: NavigationRef; callback?: () => void; afterTransition?: () => void} = {}) => {
+const dismissModal = ({ref = navigationRef, afterTransition}: {ref?: NavigationRef; callback?: () => void; afterTransition?: () => void} = {}) => {
     clearSelectedText();
     isNavigationReady().then(() => {
-        if (callback) {
-            const subscription = DeviceEventEmitter.addListener(CONST.MODAL_EVENTS.CLOSED, () => {
-                subscription.remove();
-                callback();
-            });
-        }
-
         ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
 
         if (afterTransition) {
-            runAfterTransition(afterTransition);
+            TransitionTracker.runAfterTransitions(afterTransition);
         }
     });
 };
@@ -970,7 +962,6 @@ export default {
     getTopmostSuperWideRHPReportID,
     getTopmostSearchReportRouteParams,
     navigateBackToLastSuperWideRHPScreen,
-    runAfterTransition,
 };
 
 export {navigationRef, getDeepestFocusedScreenName, isTwoFactorSetupScreen, shouldShowRequire2FAPage};
