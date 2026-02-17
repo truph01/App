@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native';
-import {Platform} from 'react-native';
+import {NativeModules, Platform} from 'react-native';
 import {isDevelopment} from '@libs/Environment/Environment';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import {browserProfilingIntegration, navigationIntegration, tracingIntegration} from '@libs/telemetry/integrations';
@@ -13,9 +13,9 @@ export default function (): void {
     // With Sentry enabled in dev mode, profiling on iOS and Android does not work
     // If you want to enable Sentry in dev, set ENABLE_SENTRY_ON_DEV=true in .env
     // or comment out the condition below
-    if (isDevelopment() && !CONFIG.ENABLE_SENTRY_ON_DEV) {
-        return;
-    }
+    // if (isDevelopment() && !CONFIG.ENABLE_SENTRY_ON_DEV) {
+    //     return;
+    // }
 
     const integrations = [navigationIntegration, tracingIntegration, browserProfilingIntegration].filter((integration) => !!integration);
 
@@ -35,8 +35,17 @@ export default function (): void {
         enableLogs: true,
     });
 
+    const appStartTimeModule = NativeModules.AppStartTime as {APP_START_TIME: number} | undefined;
+    const nativeAppStartTimeMs = Platform.OS !== 'web' ? appStartTimeModule?.APP_START_TIME : undefined;
+console.log(`[Telemetry] Native app start time: ${nativeAppStartTimeMs}`);
+console.log(`[Telemetry] Date.now(): ${Date.now()}`);
+    if (nativeAppStartTimeMs) {
+        console.log(`[Telemetry] Time spent in native before JS: ${Date.now() - nativeAppStartTimeMs}ms`);
+    }
+
     startSpan(CONST.TELEMETRY.SPAN_APP_STARTUP, {
         name: CONST.TELEMETRY.SPAN_APP_STARTUP,
         op: CONST.TELEMETRY.SPAN_APP_STARTUP,
+        startTime: nativeAppStartTimeMs ?? undefined,
     });
 }
