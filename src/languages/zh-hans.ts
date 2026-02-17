@@ -1847,8 +1847,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: '清除缓存并重启',
-            viewConsole: '查看调试控制台',
-            debugConsole: '调试控制台',
             description: '<muted-text>使用下方工具来帮助排查 Expensify 使用中的问题。如果遇到任何问题，请<concierge-link>提交错误报告</concierge-link>。</muted-text>',
             confirmResetDescription: '所有未发送的草稿消息都会丢失，但你的其他数据是安全的。',
             resetAndRefresh: '重置并刷新',
@@ -1879,23 +1877,12 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: '延迟失效',
             leftHandNavCache: '左侧导航缓存',
             clearleftHandNavCache: '清除',
-            recordTroubleshootData: '记录故障排查数据',
             softKillTheApp: '软关闭应用程序',
             kill: '终止',
             sentryDebug: 'Sentry 调试',
             sentryDebugDescription: '将 Sentry 请求记录到控制台',
             sentryHighlightedSpanOps: '高亮的跨度名称',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.click，navigation，ui.load',
-        },
-        debugConsole: {
-            saveLog: '保存日志',
-            shareLog: '分享日志',
-            enterCommand: '输入命令',
-            execute: '执行',
-            noLogsAvailable: '无可用日志',
-            logSizeTooLarge: (size: number) => `日志大小超过 ${size} MB 限制。请使用“保存日志”来下载日志文件。`,
-            logs: '日志',
-            viewConsole: '查看控制台',
         },
         security: '安全',
         signOut: '退出登录',
@@ -2170,6 +2157,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} 将失去对此企业银行账户的访问权限。我们仍会完成任何正在处理中的付款。`,
         reachOutForHelp: '它正在与 Expensify Card 一起使用。若需要取消共享，请<concierge-link>联系 Concierge</concierge-link>。',
         unshareErrorModalTitle: '无法取消共享银行账户',
+        travelCVV: {title: '旅行 CVV', subtitle: '预订差旅时使用此选项', description: '使用此卡预订 Expensify Travel 行程。结账时它会显示为“Travel Card”。'},
         chaseAccountNumberDifferent: '为什么我的账户号码不同？',
     },
     cardPage: {
@@ -2237,6 +2225,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount}，商户：${merchant} - 日期：${date}`,
         },
+        freezeCard: '冻结卡片',
     },
     workflowsPage: {
         workflowTitle: '支出',
@@ -5311,8 +5300,8 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             editTags: '编辑标签',
             findTag: '查找标签',
             subtitle: '标签可用于以更细致的方式分类成本。',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>您正在使用<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">依赖标签</a>。您可以<a href="${importSpreadsheetLink}">重新导入电子表格</a>来更新标签。</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>标签可用于以更细致的方式分类成本。您正在使用<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">依赖标签</a>。您可以<a href="${importSpreadsheetLink}">重新导入电子表格</a>来更新您的标签。</muted-text>`,
             emptyTags: {
                 title: '你还没有创建任何标签',
                 subtitle: '添加标签，以跟踪项目、地点、部门等。',
