@@ -35,7 +35,8 @@ jest.mock('@libs/getImageRecyclingKey', () =>
 const MOCK_STATIC_SOURCE = 42;
 
 function getFirstCallProps(): Record<string, unknown> {
-    return mockImageComponent.mock.calls.at(0)?.at(0) as Record<string, unknown>;
+    const firstCall = mockImageComponent.mock.calls.at(0) as unknown[] | undefined;
+    return firstCall?.at(0) as Record<string, unknown>;
 }
 
 describe('ImageSVG cache policy', () => {
