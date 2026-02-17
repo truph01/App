@@ -21,41 +21,32 @@ const PIE_CHART_START_ANGLE = -90;
  * Process raw data into slices.
  */
 function processDataIntoSlices(data: ChartDataPoint[], startAngle: number): PieSlice[] {
-    if (data.length === 0) {
-        return [];
-    }
-
-    // Use absolute values so refunds/negative amounts are represented by slice size
-    const absoluteData = data.map((point, index) => ({
-        ...point,
-        absTotal: Math.abs(point.total),
-        originalIndex: index,
-    }));
-
-    const total = absoluteData.reduce((sum, point) => sum + point.absTotal, 0);
+    const total = data.reduce((sum, point) => sum + Math.abs(point.total), 0);
     if (total === 0) {
         return [];
     }
 
-    // Sort by absolute value descending
-    absoluteData.sort((a, b) => b.absTotal - a.absTotal);
-
-    // Build final slices array
-    let currentAngle = startAngle;
-    return absoluteData.map((slice, index) => {
-        const sweepAngle = (slice.absTotal / total) * 360;
-        const pieSlice: PieSlice = {
-            label: slice.label,
-            value: slice.absTotal,
-            color: getChartColor(index),
-            percentage: (slice.absTotal / total) * 100,
-            startAngle: currentAngle,
-            endAngle: currentAngle + sweepAngle,
-            originalIndex: slice.originalIndex,
-        };
-        currentAngle += sweepAngle;
-        return pieSlice;
-    });
+    return data
+        .map((point, index) => ({label: point.label, absTotal: Math.abs(point.total), originalIndex: index}))
+        .sort((a, b) => b.absTotal - a.absTotal)
+        .reduce<{slices: PieSlice[]; angle: number}>(
+            (acc, slice, index) => {
+                const fraction = slice.absTotal / total;
+                const sweepAngle = fraction * 360;
+                acc.slices.push({
+                    label: slice.label,
+                    value: slice.absTotal,
+                    color: getChartColor(index),
+                    percentage: fraction * 100,
+                    startAngle: acc.angle,
+                    endAngle: acc.angle + sweepAngle,
+                    originalIndex: slice.originalIndex,
+                });
+                acc.angle += sweepAngle;
+                return acc;
+            },
+            {slices: [], angle: startAngle},
+        ).slices;
 }
 
 /**
