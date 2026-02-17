@@ -471,11 +471,6 @@ type PureReportActionItemProps = {
 const emptyHTML = <RenderHTML html="" />;
 const isEmptyHTML = <T extends React.JSX.Element>({props: {html}}: T): boolean => typeof html === 'string' && html.length === 0;
 
-/**
- * This is a pure version of ReportActionItem, used in ReportActionList and Search result chat list items.
- * Since the search result has a separate Onyx key under the 'snapshot_' prefix, we should not connect this component with Onyx.
- * Instead, pass all Onyx read/write operations as props.
- */
 function PureReportActionItem({
     policies,
     personalPolicyID,
