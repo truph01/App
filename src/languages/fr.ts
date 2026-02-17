@@ -713,7 +713,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Activez une vérification rapide et sécurisée à l’aide de votre visage ou de votre empreinte digitale. Aucun mot de passe ni code requis.',
         },
         revoke: {
-            remove: 'Supprimer',
             title: 'Reconnaissance faciale/empreinte digitale et passkeys',
             explanation:
                 'La vérification par reconnaissance faciale/empreinte digitale ou par passkey est activée sur un ou plusieurs appareils. Révoquer l’accès exigera un code magique pour la prochaine vérification sur n’importe quel appareil.',

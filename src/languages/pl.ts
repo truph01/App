@@ -710,7 +710,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Włącz szybką i bezpieczną weryfikację za pomocą twarzy lub odcisku palca. Bez haseł i kodów.',
         },
         revoke: {
-            remove: 'Usuń',
             title: 'Twarz/odcisk palca i klucze dostępu',
             explanation:
                 'Weryfikacja twarzy/odciskiem palca lub kluczem dostępu jest włączona na jednym lub kilku urządzeniach. Cofnięcie dostępu spowoduje konieczność użycia magicznego kodu przy następnej weryfikacji na dowolnym urządzeniu.',

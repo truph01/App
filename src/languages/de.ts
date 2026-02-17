@@ -710,7 +710,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Aktiviere eine schnelle, sichere Verifizierung mit deinem Gesicht oder Fingerabdruck. Keine Passwörter oder Codes erforderlich.',
         },
         revoke: {
-            remove: 'Entfernen',
             title: 'Gesicht/Fingerabdruck & Passkeys',
             explanation:
                 'Gesichts-/Fingerabdruck- oder Passkey-Verifizierung ist auf einem oder mehreren Geräten aktiviert. Das Widerrufen des Zugriffs erfordert für die nächste Verifizierung auf jedem Gerät einen magischen Code.',

@@ -709,7 +709,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Ative uma verificação rápida e segura usando seu rosto ou impressão digital. Nenhuma senha ou código é necessário.',
         },
         revoke: {
-            remove: 'Remover',
             title: 'Face/digital & passkeys',
             explanation:
                 'A verificação por rosto/digital ou por chave de acesso está ativada em um ou mais dispositivos. Revogar o acesso exigirá um código mágico para a próxima verificação em qualquer dispositivo.',

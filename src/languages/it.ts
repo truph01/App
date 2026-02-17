@@ -710,7 +710,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: 'Attiva una verifica rapida e sicura utilizzando il volto o l’impronta digitale. Nessuna password o codice richiesto.',
         },
         revoke: {
-            remove: 'Rimuovi',
             title: 'Volto/impronta digitale e passkey',
             explanation:
                 'La verifica con volto/impronta digitale o passkey è abilitata su uno o più dispositivi. La revoca dell’accesso richiederà un codice magico per la prossima verifica su qualsiasi dispositivo.',

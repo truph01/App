@@ -710,7 +710,6 @@ const translations: TranslationDeepObject<typeof en> = {
             biometrics: '顔や指紋を使って、素早く安全に認証できます。パスワードやコードは不要です。',
         },
         revoke: {
-            remove: '削除',
             title: '顔認証／指紋認証とパスキー',
             explanation: '1 つ以上のデバイスで顔／指紋またはパスキーによる認証が有効になっています。アクセスを取り消すと、次回どのデバイスで認証する場合もマジックコードが必要になります。',
             confirmationPrompt: '本当に実行しますか？次回以降、どのデバイスでも認証にはマジックコードが必要になります。',
