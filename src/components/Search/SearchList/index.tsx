@@ -352,8 +352,6 @@ function SearchList({
         canBeMissing: true,
     });
 
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
-
     const hasItemsBeingRemoved = prevDataLength && prevDataLength > data.length;
     const personalDetails = usePersonalDetails();
 
@@ -480,7 +478,6 @@ function SearchList({
                         columns={columns}
                         policies={policies}
                         isDisabled={isDisabled}
-                        allReports={allReports}
                         groupBy={groupBy}
                         searchType={type}
                         onDEWModalOpen={onDEWModalOpen}
@@ -516,7 +513,6 @@ function SearchList({
             hash,
             columns,
             policies,
-            allReports,
             userWalletTierName,
             isUserValidated,
             personalDetails,
