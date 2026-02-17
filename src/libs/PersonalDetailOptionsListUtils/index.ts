@@ -4,8 +4,7 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {FallbackAvatar} from '@components/Icon/Expensicons';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import {appendCountryCode, getPhoneNumberWithoutSpecialChars} from '@libs/LoginUtils';
-import {MaxHeap} from '@libs/MaxHeap';
-import {MinHeap} from '@libs/MinHeap';
+import {optionsOrderBy, personalDetailsComparator, processSearchString} from '@libs/OptionsListUtils';
 import {addSMSDomainIfPhoneNumber, parsePhoneNumber} from '@libs/PhoneNumber';
 import {getDisplayNameForParticipant} from '@libs/ReportUtils';
 import {generateAccountID} from '@libs/UserUtils';
@@ -123,63 +122,11 @@ function getUserToInviteOption({searchValue, countryCode, formatPhoneNumber, log
 }
 
 /**
- * Sort personal details by displayName or login in alphabetical order
- */
-const personalDetailsComparator = (personalDetail: OptionData) => {
-    const name = personalDetail.text ?? personalDetail.alternateText ?? personalDetail.login ?? '';
-    return name.toLowerCase();
-};
-
-/**
  * Sort reports by archived status and last visible action
  */
 const recentReportComparator = (option: OptionData) => {
     return `${option.private_isArchived ? 0 : 1}_${option.lastVisibleActionCreated ?? ''}`;
 };
-
-/**
- * Sort options by a given comparator and return first sorted options.
- * Function uses a min heap to efficiently get the first sorted options.
- */
-function optionsOrderBy<T = OptionData>(options: T[], comparator: (option: T) => number | string, limit?: number, filter?: (option: T) => boolean | undefined, reversed = false): T[] {
-    const heap = reversed ? new MaxHeap<T>(comparator) : new MinHeap<T>(comparator);
-
-    // If a limit is 0 or negative, return an empty array
-    if (limit !== undefined && limit <= 0) {
-        return [];
-    }
-
-    for (const option of options) {
-        if (filter && !filter(option)) {
-            continue;
-        }
-        if (limit !== undefined && heap.size() >= limit) {
-            const peekedValue = heap.peek();
-            if (!peekedValue) {
-                throw new Error('Heap is empty, cannot peek value');
-            }
-            if (reversed ? comparator(option) < comparator(peekedValue) : comparator(option) > comparator(peekedValue)) {
-                heap.pop();
-                heap.push(option);
-            }
-        } else {
-            heap.push(option);
-        }
-    }
-    return [...heap].reverse();
-}
-
-/**
- * Process a search string into normalized search terms
- * @param searchString - The raw search string to process
- * @returns Array of normalized search terms
- */
-function processSearchString(searchString: string | undefined): string[] {
-    return deburr(searchString ?? '')
-        .toLowerCase()
-        .split(' ')
-        .filter((term) => term.length > 0);
-}
 
 function canCreateOptimisticPersonalDetailOption({
     recentOptions,
