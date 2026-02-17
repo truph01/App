@@ -17,7 +17,7 @@ const EnvironmentActionsContext = createContext<EnvironmentActionsContextType>(d
 function EnvironmentProvider({children}: EnvironmentProviderProps): ReactElement {
     const [environment, setEnvironment] = useState<EnvironmentValue>(defaultEnvironmentStateContextValue.environment);
     const [environmentURL, setEnvironmentURL] = useState(defaultEnvironmentStateContextValue.environmentURL);
-    const [environmentURLWithoutTrailingSlash] = useMemo(() => [environmentURL.replaceAll(/\/+$/g, '')], [environmentURL]);
+    const environmentURLWithoutTrailingSlash = useMemo(() => environmentURL.replaceAll(/\/+$/g, ''), [environmentURL]);
 
     useEffect(() => {
         getEnvironment().then(setEnvironment);
@@ -60,18 +60,20 @@ function EnvironmentProvider({children}: EnvironmentProviderProps): ReactElement
         [environmentURLWithoutTrailingSlash],
     );
 
-    // Because of the React Compiler we don't need to memoize it manually
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    const stateValue = {
-        environment,
-        environmentURL,
-    };
+    const stateValue = useMemo(
+        () => ({
+            environment,
+            environmentURL,
+        }),
+        [environment, environmentURL],
+    );
 
-    // Because of the React Compiler we don't need to memoize it manually
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    const actionsValue = {
-        adjustExpensifyLinksForEnv,
-    };
+    const actionsValue = useMemo(
+        () => ({
+            adjustExpensifyLinksForEnv,
+        }),
+        [adjustExpensifyLinksForEnv],
+    );
 
     return (
         <EnvironmentStateContext.Provider value={stateValue}>

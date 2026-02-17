@@ -36,7 +36,7 @@ import SidePanelContextProvider from './components/SidePanel/SidePanelContextPro
 import SVGDefinitionsProvider from './components/SVGDefinitionsProvider';
 import ThemeIllustrationsProvider from './components/ThemeIllustrationsProvider';
 import ThemeProvider from './components/ThemeProvider';
-import ThemeStylesProvider from './components/ThemeStylesProvider';
+import ThemeStylesProvider from './components/ThemeStylesContextProvider';
 import {FullScreenContextProvider} from './components/VideoPlayerContexts/FullScreenContext';
 import {PlaybackContextProvider} from './components/VideoPlayerContexts/PlaybackContext';
 import {VideoPopoverMenuContextProvider} from './components/VideoPlayerContexts/VideoPopoverMenuContext';
