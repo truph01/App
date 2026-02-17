@@ -2,8 +2,8 @@
  * @jest-environment node
  */
 /* eslint-disable @typescript-eslint/naming-convention -- matching GitHub API response field names */
-import getMergedPR from '@github/libs/failureNotifierUtils';
-import type {PullRequest} from '@github/libs/failureNotifierUtils';
+import {getMergedPR} from '@github/actions/javascript/failureNotifier/failureNotifier';
+import type {PullRequest} from '@github/actions/javascript/failureNotifier/failureNotifier';
 
 describe('getMergedPR', () => {
     const mergedPR: PullRequest = {

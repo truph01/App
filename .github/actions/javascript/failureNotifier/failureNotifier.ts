@@ -1,18 +1,36 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import getMergedPR from '@github/libs/failureNotifierUtils';
 
 type WorkflowRun = {
     id: number;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     workflow_id: number;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     head_commit: {id: string} | null;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     head_branch: string;
     actor: {login: string} | null;
     status: string | null;
 };
+
+type PullRequest = {
+    html_url: string;
+    user: {login: string} | null;
+    merged_at: string | null;
+    base: {ref: string};
+    number: number;
+};
+
+/**
+ * Given the list of PRs associated with a commit on the target branch,
+ * find the PR that was actually merged into that branch.
+ *
+ * The GitHub API `listPullRequestsAssociatedWithCommit` returns ALL PRs
+ * that contain the commit — including open PRs that have merged the target
+ * branch into their feature branch. We must filter to only merged PRs
+ * targeting the correct base branch to avoid blaming the wrong PR.
+ */
+function getMergedPR(associatedPRs: PullRequest[], targetBranch = 'main'): PullRequest | undefined {
+    return associatedPRs.find((pr) => pr.merged_at !== null && pr.base.ref === targetBranch) ?? associatedPRs.at(0);
+}
 
 async function run() {
     const token = core.getInput('GITHUB_TOKEN', {required: true});
@@ -21,20 +39,16 @@ async function run() {
     const {owner, repo} = github.context.repo;
     const workflowRun = github.context.payload.workflow_run as WorkflowRun;
 
-    // Fetch current workflow run jobs
     const jobsData = await octokit.rest.actions.listJobsForWorkflowRun({
         owner,
         repo,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         run_id: workflowRun.id,
     });
     const jobs = jobsData.data;
 
-    // Fetch previous workflow run for comparison
     const allRuns = await octokit.rest.actions.listWorkflowRuns({
         owner,
         repo,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         workflow_id: workflowRun.workflow_id,
     });
     const filteredRuns = allRuns.data.workflow_runs.filter((r) => r.actor?.login !== 'OSBotify' && r.status !== 'cancelled');
@@ -46,16 +60,13 @@ async function run() {
         return;
     }
 
-    // Fetch previous run jobs
     const previousRunJobsData = await octokit.rest.actions.listJobsForWorkflowRun({
         owner,
         repo,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         run_id: previousRun.id,
     });
     const previousRunJobs = previousRunJobsData.data;
 
-    // Find the PR that caused this failure
     const headCommit = workflowRun.head_commit?.id;
     if (!headCommit) {
         console.log('No head commit found, skipping PR lookup.');
@@ -65,7 +76,6 @@ async function run() {
     const prData = await octokit.rest.repos.listPullRequestsAssociatedWithCommit({
         owner,
         repo,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         commit_sha: headCommit,
     });
 
@@ -94,7 +104,6 @@ async function run() {
         const checkResults = await octokit.rest.checks.listAnnotations({
             owner,
             repo,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             check_run_id: job.id,
         });
 
@@ -133,7 +142,13 @@ async function run() {
     }
 }
 
-run().catch((error: Error) => {
-    console.error('Failed to process workflow failure:', error);
-    core.setFailed(error.message);
-});
+if (require.main === module) {
+    run().catch((error: Error) => {
+        console.error('Failed to process workflow failure:', error);
+        core.setFailed(error.message);
+    });
+}
+
+export default run;
+export {getMergedPR};
+export type {PullRequest};
