@@ -256,6 +256,7 @@ import ReportActionItemMessageWithExplain from './ReportActionItemMessageWithExp
 import ReportActionItemSingle from './ReportActionItemSingle';
 import ReportActionItemThread from './ReportActionItemThread';
 import TripSummary from './TripSummary';
+import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
 
 type PureReportActionItemProps = {
     /** All the data of the policy collection */
@@ -1441,28 +1442,12 @@ function PureReportActionItem({
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.DELETED_TRANSACTION) {
             children = <ReportActionItemBasicMessage message={getDeletedTransactionMessage(translate, action)} />;
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION) {
-            const movedTransactionOriginalMessage = getOriginalMessage(action as OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION>) ?? {};
-            const {toReportID, fromReportID} = movedTransactionOriginalMessage as OriginalMessageMovedTransaction;
-            const toReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${toReportID}`];
-            const fromReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`];
-            const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-            // When the transaction is moved from personal space (unreported), fromReportID will be "0" which doesn't exist in allReports
-            const hasFromReport = fromReportID === CONST.REPORT.UNREPORTED_REPORT_ID ? true : !!fromReport;
-            const htmlContent = isPendingDelete
-                ? `<del><comment><muted-text>${Parser.htmlToText(getMovedTransactionMessage(translate, action))}</muted-text></comment></del>`
-                : `<comment><muted-text>${getMovedTransactionMessage(translate, action)}</muted-text></comment>`;
-            // When expenses are merged multiple times, the previous fromReportID may reference a deleted report,
-            // making it impossible to retrieve the report name for display
-            // Ref: https://github.com/Expensify/App/issues/70338
-            if (!toReport && !hasFromReport) {
-                children = emptyHTML;
-            } else {
-                children = (
-                    <ReportActionItemBasicMessage message="">
-                        <RenderHTML html={htmlContent} />
-                    </ReportActionItemBasicMessage>
-                );
-            }
+            children = (
+                <MovedTransactionAction
+                    action={action as OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION>}
+                    emptyHTML={emptyHTML}
+                />
+            );
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.MOVED) {
             children = (
                 <ReportActionItemBasicMessage message="">
