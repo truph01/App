@@ -27,6 +27,12 @@ jest.mock('@components/Image', () => {
     };
 });
 
+jest.mock('@components/Lightbox/numberOfConcurrentLightboxes', () => ({
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- __esModule is required by Jest to properly mock ES modules with default exports
+    __esModule: true,
+    default: 3,
+}));
+
 jest.mock('@components/MultiGestureCanvas', () => {
     const MockReact = require('react') as typeof React;
     const {View} = require('react-native') as {View: typeof RNView};
@@ -129,6 +135,18 @@ describe('Lightbox', () => {
             expect(images.length).toBeGreaterThan(0);
             for (const image of images) {
                 expect(image.props.accessibilityHint).toBe(CONST.IMAGE_LOADING_PRIORITY.HIGH);
+            }
+        });
+
+        it('should assign NORMAL priority to non-active pages within the lightbox visible range', async () => {
+            const contextValue = createContextValue(5, 30);
+
+            await renderLightboxInCarousel('attachment-4', TEST_URI, contextValue);
+
+            const images = screen.getAllByTestId('image');
+            expect(images.length).toBeGreaterThan(0);
+            for (const image of images) {
+                expect(image.props.accessibilityHint).toBe(CONST.IMAGE_LOADING_PRIORITY.NORMAL);
             }
         });
 
