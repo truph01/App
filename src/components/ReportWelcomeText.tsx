@@ -1,9 +1,9 @@
-import {createPersonalDetailsSelector} from '@selectors/PersonalDetails';
 import React from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
+import useMappedPersonalDetails from '@hooks/useMappedPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -39,7 +39,7 @@ type ReportWelcomeTextProps = {
     policy: OnyxEntry<Policy>;
 };
 
-const personalDetailSelector = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
+const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
     personalDetail && {
         accountID: personalDetail.accountID,
         login: personalDetail.login,
@@ -47,13 +47,11 @@ const personalDetailSelector = (personalDetail: OnyxInputOrEntry<PersonalDetails
         pronouns: personalDetail.pronouns,
     };
 
-const personalDetailsSelector = (personalDetail: OnyxEntry<PersonalDetailsList>) => createPersonalDetailsSelector(personalDetail, personalDetailSelector);
-
 function ReportWelcomeText({report, policy}: ReportWelcomeTextProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
     const {environmentURL} = useEnvironment();
-    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: personalDetailsSelector, canBeMissing: false});
+    const [personalDetails] = useMappedPersonalDetails(personalDetailMapper);
     const {isRestrictedToPreferredPolicy} = usePreferredPolicy();
     const isPolicyExpenseChat = isPolicyExpenseChatReportUtils(report);
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

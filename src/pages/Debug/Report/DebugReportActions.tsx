@@ -1,4 +1,3 @@
-import {createPersonalDetailsSelector} from '@selectors/PersonalDetails';
 import React, {useCallback, useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
@@ -7,6 +6,7 @@ import SelectionList from '@components/SelectionList';
 import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
+import useMappedPersonalDetails from '@hooks/useMappedPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -24,15 +24,13 @@ import type {OnyxInputOrEntry, PersonalDetails, PersonalDetailsList, ReportActio
 type DebugReportActionsProps = {
     reportID: string;
 };
-const personalDetailSelector = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
+const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
     personalDetail && {
         accountID: personalDetail.accountID,
         login: personalDetail.login,
         avatar: personalDetail.avatar,
         pronouns: personalDetail.pronouns,
     };
-
-const personalDetailsSelector = (personalDetail: OnyxEntry<PersonalDetailsList>) => createPersonalDetailsSelector(personalDetail, personalDetailSelector);
 
 function DebugReportActions({reportID}: DebugReportActionsProps) {
     const {translate, datetimeToCalendarTime, localeCompare} = useLocalize();
@@ -44,7 +42,7 @@ function DebugReportActions({reportID}: DebugReportActionsProps) {
     const [invoiceReceiverPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${invoiceReceiverPolicyID}`, {canBeMissing: true});
     const isReportArchived = useReportIsArchived(reportID);
     const ifUserCanPerformWriteAction = canUserPerformWriteAction(report, isReportArchived);
-    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: personalDetailsSelector, canBeMissing: false});
+    const [personalDetails] = useMappedPersonalDetails(personalDetailMapper);
 
     const getSortedAllReportActionsSelector = useCallback(
         (allReportActions: OnyxEntry<ReportActions>): ReportAction[] => {
