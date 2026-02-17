@@ -48,8 +48,6 @@ ps aux | grep "webpack" | grep -v grep
 3. **If the page appears unchanged** (same elements, same URL), wait 1 second and snapshot again.
 4. **Repeat up to 3 times** with 1-second waits if needed.
 
-This approach is significantly faster than adding 3-4 second waits after every action. Most actions in the app complete in under 500ms, so immediate snapshots will usually capture the result.
-
 ## Dev Environment Sign-In
 
 When signing in to dev environment:
