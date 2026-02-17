@@ -1850,8 +1850,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'キャッシュをクリアして再起動',
-            viewConsole: 'デバッグコンソールを表示',
-            debugConsole: 'デバッグコンソール',
             description:
                 '<muted-text>以下のツールを使用して、Expensify のご利用状況のトラブルシューティングに役立ててください。問題が発生した場合は、<concierge-link>バグを報告</concierge-link>してください。</muted-text>',
             confirmResetDescription: '送信されていない下書きメッセージはすべて失われますが、その他のデータは安全です。',
@@ -1883,23 +1881,12 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: '遅延して無効化',
             leftHandNavCache: '左側ナビキャッシュ',
             clearleftHandNavCache: 'クリア',
-            recordTroubleshootData: 'トラブルシュートデータを記録',
             softKillTheApp: 'アプリをソフトキルする',
             kill: '終了',
             sentryDebug: 'Sentry デバッグ',
             sentryDebugDescription: 'Sentry リクエストをコンソールに記録',
             sentryHighlightedSpanOps: '強調表示されたスパン名',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.click、ナビゲーション、ui.load',
-        },
-        debugConsole: {
-            saveLog: 'ログを保存',
-            shareLog: 'ログを共有',
-            enterCommand: 'コマンドを入力',
-            execute: '実行',
-            noLogsAvailable: 'ログはありません',
-            logSizeTooLarge: (size: number) => `ログサイズが上限の ${size} MB を超えています。"ログを保存" を使用してログファイルをダウンロードしてください。`,
-            logs: 'ログ',
-            viewConsole: 'コンソールを表示',
         },
         security: 'セキュリティ',
         signOut: 'サインアウト',
@@ -2176,6 +2163,11 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} はこのビジネス銀行口座へのアクセス権を失います。処理中の支払いは引き続き完了します。`,
         reachOutForHelp: 'そのレポートは Expensify Card と一緒に使用されています。共有を解除する必要がある場合は、<concierge-link>Concierge に連絡してください</concierge-link>。',
         unshareErrorModalTitle: '銀行口座の共有を解除できません',
+        travelCVV: {
+            title: 'トラベルCVV',
+            subtitle: '出張を予約するときにこれを使用してください',
+            description: 'このカードをExpensify Travelでの予約に使用してください。チェックアウト時には「Travel Card」と表示されます。',
+        },
         chaseAccountNumberDifferent: '口座番号が異なるのはなぜですか？',
     },
     cardPage: {
@@ -2243,6 +2235,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${date} の ${merchant} への ${amount}`,
         },
+        freezeCard: 'カードを一時停止',
     },
     workflowsPage: {
         workflowTitle: '支出',
