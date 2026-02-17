@@ -576,6 +576,14 @@ const translations: TranslationDeepObject<typeof en> = {
         week: '週',
         year: '年',
         quarter: '四半期',
+        expensifyLogo: 'Expensifyロゴ',
+    },
+    socials: {
+        podcast: 'ポッドキャストでフォロー',
+        twitter: 'Twitterでフォロー',
+        instagram: 'Instagramでフォロー',
+        facebook: 'Facebookでフォロー',
+        linkedin: 'LinkedInでフォロー',
     },
     supportalNoAccess: {
         title: 'ちょっと待ってください',
@@ -7377,6 +7385,7 @@ ${reportName}
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `${reportName}${workspaceName ? `${workspaceName} の中` : ''} から`,
     },
     qrCodes: {
+        qrCode: 'QRコード',
         copy: 'URLをコピー',
         copied: 'コピーしました！',
     },
