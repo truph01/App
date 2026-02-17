@@ -14,12 +14,8 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {revokeMultifactorAuthenticationCredentials} from '@libs/actions/MultifactorAuthentication';
 import Navigation from '@libs/Navigation/Navigation';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {hasBiometricsRegisteredSelector} from '@src/selectors/Account';
-import type {Account} from '@src/types/onyx';
+import {hasBiometricsRegisteredSelector, isAccountLoadingSelector} from '@src/selectors/Account';
 
-function getIsLoading(data: OnyxEntry<Account>) {
-    return !!data?.isLoading;
-}
 function MultifactorAuthenticationRevokePage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -27,7 +23,7 @@ function MultifactorAuthenticationRevokePage() {
     const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
     const [hasDevices] = useOnyx(ONYXKEYS.ACCOUNT, {selector: hasBiometricsRegisteredSelector, canBeMissing: true});
-    const [isLoading] = useOnyx(ONYXKEYS.ACCOUNT, {selector: getIsLoading, canBeMissing: true});
+    const [isLoading] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isAccountLoadingSelector, canBeMissing: true});
 
     const onGoBackPress = () => {
         Navigation.goBack();
