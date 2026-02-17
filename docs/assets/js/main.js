@@ -82,13 +82,15 @@ let allowedDomains = [];
 fetch('/assets/js/allowedExternalUrls.json')
     .then((response) => response.json())
     .then((urls) => {
-        allowedDomains = urls.map((url) => {
-            try {
-                return new URL(url).hostname;
-            } catch {
-                return null;
-            }
-        }).filter(Boolean);
+        allowedDomains = urls
+            .map((url) => {
+                try {
+                    return new URL(url).hostname;
+                } catch {
+                    return null;
+                }
+            })
+            .filter(Boolean);
     })
     .catch(() => {});
 
