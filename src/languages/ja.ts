@@ -3897,7 +3897,6 @@ ${
             workspaceType: 'ワークスペースの種類',
             workspaceAvatar: 'ワークスペースのアバター',
             clientID: 'クライアントID',
-            clientIDInputLabel: 'クライアントID',
             clientIDInputHint: 'クライアントの一意の識別子を入力してください',
             mustBeOnlineToViewMembers: 'このワークスペースのメンバーを表示するには、オンライン接続が必要です。',
             moreFeatures: 'その他の機能',
