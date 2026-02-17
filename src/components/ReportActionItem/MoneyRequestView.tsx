@@ -116,6 +116,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {TransactionPendingFieldsKey} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import MoneyRequestReceiptView from './MoneyRequestReceiptView';
+import useSplitExpense from '@hooks/useSplitExpense';
 
 type MoneyRequestViewProps = {
     /** The report currently being looked at */
@@ -168,6 +169,7 @@ function MoneyRequestView({
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
     const {isOffline} = useNetwork();
+    const splitExpenses = useSplitExpense();
     const {environmentURL} = useEnvironment();
     const {translate, toLocaleDigit} = useLocalize();
     const {getCurrencySymbol} = useCurrencyListActions();
@@ -602,7 +604,7 @@ function MoneyRequestView({
                         }
 
                         if (isExpenseSplit && isSplitAvailable) {
-                            initSplitExpense(allTransactions, allReports, transaction);
+                            splitExpenses.initSplit();
                             return;
                         }
 
@@ -655,7 +657,7 @@ function MoneyRequestView({
                         }
 
                         if (isExpenseSplit && isSplitAvailable) {
-                            initSplitExpense(allTransactions, allReports, transaction);
+                            splitExpenses.initSplit();
                             return;
                         }
 
@@ -809,7 +811,6 @@ function MoneyRequestView({
             <>
                 {(wideRHPRouteKeys.length === 0 || isSmallScreenWidth || isFromReviewDuplicates || isFromMergeTransaction) && (
                     <MoneyRequestReceiptView
-                        allReports={allReports}
                         report={transactionThreadReport ?? parentReport}
                         readonly={readonly}
                         updatedTransaction={updatedTransaction}
@@ -847,7 +848,7 @@ function MoneyRequestView({
                             }
 
                             if (isExpenseSplit && isSplitAvailable) {
-                                initSplitExpense(allTransactions, allReports, transaction);
+                                splitExpenses.initSplit();
                                 return;
                             }
 
