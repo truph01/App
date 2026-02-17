@@ -1,11 +1,13 @@
 import React from 'react';
 import {View} from 'react-native';
+import type {ViewStyle} from 'react-native';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {useWideRHPState} from '@components/WideRHPContextProvider';
 import DropZoneUI from './DropZoneUI';
 import DropZoneWrapper from './DropZoneWrapper';
 
@@ -30,12 +32,20 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
     const theme = useTheme();
     const icons = useMemoizedLazyExpensifyIcons(['MessageInABottle', 'SmartScan', 'ReplaceReceipt']);
 
-    const shouldStackVertically = shouldUseNarrowLayout || isMediumScreenWidth;
+    const {isWideRHPFocused, isSuperWideRHPFocused} = useWideRHPState();
+    const shouldStackVertically = (shouldUseNarrowLayout || isMediumScreenWidth) && !isWideRHPFocused && !isSuperWideRHPFocused;
     const scanReceiptsText = shouldAcceptSingleReceipt ? 'dropzone.addReceipt' : 'dropzone.scanReceipts';
+    const shouldStackRevertHorizontally = isWideRHPFocused || isSuperWideRHPFocused;
+    let flexStyle: ViewStyle = styles.flexRow;
+    if (shouldStackVertically) {
+        flexStyle = styles.flexColumn;
+    } else if (shouldStackRevertHorizontally) {
+        flexStyle = styles.flexRowReverse;
+    }
 
     return (
         <DragAndDropConsumer onDrop={() => {}}>
-            <View style={[shouldStackVertically ? styles.flexColumn : styles.flexRow, styles.w100, styles.h100]}>
+            <View style={[flexStyle, styles.w100, styles.h100]}>
                 <DropZoneWrapper onDrop={onAttachmentDrop}>
                     {({isDraggingOver}) => (
                         <DropZoneUI
