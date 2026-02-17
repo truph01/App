@@ -45,7 +45,19 @@ function usePromptContent(promptType: MultifactorAuthenticationPromptType): Prom
 
     // We need to know if server has this device's credentials specifically
     useEffect(() => {
-        areLocalCredentialsKnownToServer().then((localCredentialsKnown) => setServerHasCredentials(localCredentialsKnown));
+        let ignore = false;
+        async function checkCredentials() {
+            const localCredentialsKnown = await areLocalCredentialsKnownToServer();
+            if (ignore) {
+                return;
+            }
+            setServerHasCredentials(localCredentialsKnown);
+        }
+        checkCredentials();
+        return () => {
+            // Guard against race condition in case where multifactorAuthenticationPublicKeyIDs gets updated in onyx while a KeyStore.get call is in-flight
+            ignore = true;
+        };
     }, [areLocalCredentialsKnownToServer]);
 
     // This one's a real doozy. There's an edge case with the MFA flows where the user's keys were revoked
