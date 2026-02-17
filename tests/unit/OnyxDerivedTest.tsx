@@ -426,6 +426,9 @@ describe('OnyxDerived', () => {
     describe('nonPersonalAndWorkspaceCardList', () => {
         beforeAll(async () => {
             onyxDerivedTestSetup();
+            // Initialize dependency keys so Onyx.clear() in beforeEach triggers derived value recomputation
+            await Onyx.set(ONYXKEYS.CARD_LIST, {});
+            await waitForBatchedUpdates();
         });
 
         it('returns empty object when dependencies are not set', async () => {
