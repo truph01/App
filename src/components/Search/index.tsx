@@ -546,7 +546,7 @@ function Search({
         setShouldShowFiltersBarLoading(shouldShowLoadingState && lastSearchType !== type);
     }, [lastSearchType, setShouldShowFiltersBarLoading, shouldShowLoadingState, type]);
 
-    const shouldRetrySearchWithTotalsRef = useRef(false);
+    const shouldRetrySearchWithTotalsOrGroupedRef = useRef(false);
 
     useEffect(() => {
         const focusedRoute = findFocusedRoute(navigationRef.getRootState());
@@ -558,8 +558,8 @@ function Search({
         }
 
         if (searchResults?.search?.isLoading) {
-            if (shouldCalculateTotals && searchResults?.search?.count === undefined) {
-                shouldRetrySearchWithTotalsRef.current = true;
+            if (validGroupBy || (shouldCalculateTotals && searchResults?.search?.count === undefined)) {
+                shouldRetrySearchWithTotalsOrGroupedRef.current = true;
             }
             return;
         }
@@ -571,19 +571,19 @@ function Search({
     }, [handleSearch, isOffline, offset, queryJSON, searchKey, shouldCalculateTotals]);
 
     useEffect(() => {
-        if (!shouldRetrySearchWithTotalsRef.current || searchResults?.search?.isLoading || !shouldCalculateTotals) {
+        if (!shouldRetrySearchWithTotalsOrGroupedRef.current || searchResults?.search?.isLoading || (!shouldCalculateTotals && !validGroupBy)) {
             return;
         }
 
         // If count is already present, the latest response already contains totals and we can skip the re-query.
-        if (searchResults?.search?.count !== undefined) {
-            shouldRetrySearchWithTotalsRef.current = false;
+        if (!validGroupBy && searchResults?.search?.count !== undefined) {
+            shouldRetrySearchWithTotalsOrGroupedRef.current = false;
             return;
         }
 
-        shouldRetrySearchWithTotalsRef.current = false;
+        shouldRetrySearchWithTotalsOrGroupedRef.current = false;
         handleSearch({queryJSON, searchKey, offset, shouldCalculateTotals: true, prevReportsLength: filteredDataLength, isLoading: false});
-    }, [filteredDataLength, handleSearch, offset, queryJSON, searchKey, searchResults?.search?.count, searchResults?.search?.isLoading, shouldCalculateTotals]);
+    }, [filteredDataLength, handleSearch, offset, queryJSON, searchKey, searchResults?.search?.count, searchResults?.search?.isLoading, shouldCalculateTotals, validGroupBy]);
 
     // When new data load, selectedTransactions is updated in next effect. We use this flag to whether selection is updated
     const isRefreshingSelection = useRef(false);
