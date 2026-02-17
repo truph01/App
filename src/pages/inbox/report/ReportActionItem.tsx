@@ -46,9 +46,6 @@ type ReportActionItemProps = Omit<
     /** All the data of the policy collection */
     policies: OnyxCollection<Policy>;
 
-    /** Array of report actions for the report */
-    reportActions: ReportAction[];
-
     /** Whether to show the draft message or not */
     shouldShowDraftMessage?: boolean;
 
@@ -88,7 +85,6 @@ function ReportActionItem({
     isUserValidated,
     personalDetails,
     reportActionID,
-    reportActions,
     userBillingFundID,
     isTryNewDotNVPDismissed,
     ...props
@@ -117,8 +113,7 @@ function ReportActionItem({
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
-    const reportAction = reportActions[parseInt(reportActionID)];
-    const transactionID = isMoneyRequestAction(reportAction) && getOriginalMessage(reportAction)?.IOUTransactionID;
+    const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
     const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => transaction?.errorFields?.route ?? undefined});
 
     // The app would crash due to subscribing to the entire report collection if parentReportID is an empty string. So we should have a fallback ID here.
@@ -136,7 +131,6 @@ function ReportActionItem({
         <PureReportActionItem
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
-            reportActions={reportActions}
             allReports={allReports}
             introSelected={introSelected}
             allTransactionDrafts={allTransactionDrafts}
