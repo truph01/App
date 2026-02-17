@@ -589,7 +589,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                 <PressableWithFeedback
                     onPress={showWorkspaces}
                     role={CONST.ROLE.TAB}
-                    accessibilityLabel={translate('common.workspacesTabTitle')}
+                    accessibilityLabel={`${translate('common.workspacesTabTitle')}${workspacesTabIndicatorStatus ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
                     accessibilityState={workspacesAccessibilityState}
                     wrapperStyle={styles.flex1}
                     style={styles.navigationTabBarItem}
