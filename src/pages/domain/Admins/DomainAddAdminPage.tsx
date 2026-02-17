@@ -1,7 +1,6 @@
 import {adminAccountIDsSelector, domainEmailSelector} from '@selectors/Domain';
 import {Str} from 'expensify-common';
 import React, {useEffect, useRef, useState} from 'react';
-import type {SectionListData} from 'react-native';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -27,7 +26,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-type Sections = SectionListData<OptionData, Section<OptionData>>;
+type Sections = Section<OptionData>;
 
 type DomainAddAdminProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.ADD_ADMIN>;
 
@@ -87,6 +86,7 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
             sections.push({
                 title: undefined,
                 data: [currentlySelectedUser],
+                sectionIndex: 0,
             });
         }
 
@@ -94,6 +94,7 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
             sections.push({
                 title: translate('common.contacts'),
                 data: filteredOptions,
+                sectionIndex: 1,
             });
         }
 
@@ -101,6 +102,7 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
             sections.push({
                 title: undefined,
                 data: [availableOptions.userToInvite],
+                sectionIndex: 2,
             });
         }
     }
@@ -129,6 +131,13 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
         return getHeaderMessage(filteredOptions.length > 0 || !!currentlySelectedUser, !!availableOptions.userToInvite, searchValue, countryCode, false);
     };
 
+    const textInputOptions = {
+        label: translate('selectionList.nameEmailOrPhoneNumber'),
+        value: searchTerm,
+        onChangeText: setSearchTerm,
+        headerMessage: headerMessage(),
+    };
+
     return (
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
@@ -142,7 +151,7 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
                     title={translate('domain.admins.addAdmin')}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_ADMINS.getRoute(domainAccountID))}
                 />
-                <SelectionList
+                <SelectionListWithSections
                     sections={sections}
                     headerMessage={headerMessage()}
                     ListItem={SingleSelectWithAvatarListItem}
@@ -157,8 +166,10 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
                     shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                     footerContent={footerContent}
                     isLoadingNewOptions={!!isSearchingForReports}
-                    addBottomSafeAreaPadding
                     onEndReached={onListEndReached}
+                    addBottomSafeAreaPadding
+                    shouldShowTextInput
+                    disableMaintainingScrollPosition
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
