@@ -1,5 +1,6 @@
 import React from 'react';
-import {FailureScreenBase, OutOfTimeFailureScreen, SuccessScreenBase} from '@components/MultifactorAuthentication/components/OutcomeScreen';
+import DefaultSuccessScreen from '@components/MultifactorAuthentication/components/OutcomeScreen/SuccessScreen/defaultScreens';
+import {DefaultClientFailureScreen, DefaultServerFailureScreen, OutOfTimeFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen/FailureScreen/defaultScreens';
 import type {MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import variables from '@styles/variables';
 import {authorizeTransaction} from '@userActions/MultifactorAuthentication';
@@ -16,7 +17,7 @@ export default {
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION,
     failureHeaderTitle: 'multifactorAuthentication.reviewTransaction.reviewTransaction',
     successScreen: (
-        <SuccessScreenBase
+        <DefaultSuccessScreen
             headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"
             illustration="ApprovedTransactionHand"
             iconWidth={variables.transactionHandWidth}
@@ -26,7 +27,7 @@ export default {
         />
     ),
     defaultClientFailureScreen: (
-        <FailureScreenBase
+        <DefaultClientFailureScreen
             headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"
             illustration="DeniedTransactionHand"
             iconWidth={variables.transactionHandWidth}
@@ -36,7 +37,7 @@ export default {
         />
     ),
     defaultServerFailureScreen: (
-        <FailureScreenBase
+        <DefaultServerFailureScreen
             headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"
             illustration="DeniedTransactionHand"
             iconWidth={variables.transactionHandWidth}
