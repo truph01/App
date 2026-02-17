@@ -183,9 +183,7 @@ function WorkspaceInviteMessageComponent({
         }
 
         Navigation.dismissModal({
-            afterTransition: () => {
-                return Navigation.navigate(ROUTES.WORKSPACE_MEMBERS.getRoute(policyID));
-            },
+            afterTransition: () => Navigation.navigate(ROUTES.WORKSPACE_MEMBERS.getRoute(policyID)),
         });
     };
 
