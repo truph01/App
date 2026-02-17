@@ -213,7 +213,10 @@ function askHelpsiteAI(query) {
 
             const template = cloneTemplate('ai-response-template');
             const content = template.querySelector('.ai-content');
-            content.innerHTML = answer;
+            content.innerHTML = DOMPurify.sanitize(answer, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'b', 'em', 'i', 'ul', 'ol', 'li', 'a', 'code', 'pre'],
+                ALLOWED_ATTR: ['href', 'target', 'rel'],
+            });
 
             const showMoreButton = template.querySelector('.ai-show-more');
             aiContainer.innerHTML = '';
