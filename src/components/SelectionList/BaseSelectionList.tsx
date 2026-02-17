@@ -67,6 +67,7 @@ function BaseSelectionList<TItem extends ListItem>({
     isLoadingNewOptions,
     isRowMultilineSupported = false,
     addBottomSafeAreaPadding,
+    isScrollEnabled: isScrollEnabledOverride,
     showListEmptyContent = true,
     showLoadingPlaceholder,
     showScrollIndicator = true,
@@ -94,6 +95,7 @@ function BaseSelectionList<TItem extends ListItem>({
     const styles = useThemeStyles();
     const isFocused = useIsFocused();
     const scrollEnabled = useScrollEnabled();
+    const isScrollEnabled = isScrollEnabledOverride ?? scrollEnabled;
     const {singleExecution} = useSingleExecution();
     const activeElementRole = useActiveElementRole();
     const {isKeyboardShown} = useKeyboardState();
@@ -518,7 +520,7 @@ function BaseSelectionList<TItem extends ListItem>({
                         keyExtractor={(item) => item.keyForList}
                         extraData={extraData}
                         ListFooterComponent={listFooterContent}
-                        scrollEnabled={scrollEnabled}
+                        scrollEnabled={isScrollEnabled}
                         indicatorStyle="white"
                         keyboardShouldPersistTaps="always"
                         showsVerticalScrollIndicator={showScrollIndicator}

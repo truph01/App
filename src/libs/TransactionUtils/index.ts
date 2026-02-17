@@ -2676,9 +2676,7 @@ function willFieldBeAutomaticallyFilled(transaction: OnyxEntry<Transaction>, fie
         return false;
     }
 
-    const isSmartScanActive = isScanRequest(transaction);
-
-    if (!isSmartScanActive) {
+    if (!isScanRequest(transaction)) {
         return false;
     }
 
@@ -2796,7 +2794,6 @@ export {
     isCreatedMissing,
     areRequiredFieldsEmpty,
     hasMissingSmartscanFields,
-    willFieldBeAutomaticallyFilled,
     hasPendingRTERViolation,
     hasValidModifiedAmount,
     allHavePendingRTERViolation,
@@ -2858,6 +2855,7 @@ export {
     isFromCreditCardImport,
     getExchangeRate,
     shouldReuseInitialTransaction,
+    willFieldBeAutomaticallyFilled,
     getOriginalAmountForDisplay,
     getOriginalCurrencyForDisplay,
     getConvertedAmount,

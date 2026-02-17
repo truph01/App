@@ -1483,6 +1483,7 @@ const translations: TranslationDeepObject<typeof en> = {
             one: `出張: 1日間`,
             other: (count: number) => `出張期間：${count} 日間`,
         }),
+        automaticallyEnterExpenseDetails: 'コンシェルジュが自動的に経費の詳細を入力するか、手動で追加することができます。',
         dates: '日付',
         rates: '料金',
         submitsTo: ({name}: SubmitsToParams) => `${name} に提出`,

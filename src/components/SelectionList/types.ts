@@ -67,6 +67,9 @@ type BaseSelectionListProps<TItem extends ListItem> = {
     /** Whether to add bottom safe area padding */
     addBottomSafeAreaPadding?: boolean;
 
+    /** Whether list scrolling is enabled. Defaults to platform behavior when omitted */
+    isScrollEnabled?: boolean;
+
     /** Styles for the list */
     style?: SelectionListStyle;
 
@@ -184,6 +187,9 @@ type SelectionListStyle = {
 
     /** Styles for the content container of the list (scrolls with content) */
     contentContainerStyle?: StyleProp<ViewStyle>;
+
+    /** Styles for the list footer content container */
+    listFooterContentStyle?: StyleProp<ViewStyle>;
 
     /** Styles for the list container */
     containerStyle?: StyleProp<ViewStyle>;

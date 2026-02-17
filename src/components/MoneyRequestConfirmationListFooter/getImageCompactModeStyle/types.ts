@@ -1,5 +1,5 @@
 import type {ViewStyle} from 'react-native';
 
-type GetImageCompactModeStyle = (maxWidth: number, availableWidth: number, aspectRatio?: number | null, imageHeight?: number | null) => ViewStyle;
+type GetImageCompactModeStyle = (maxWidth: number) => ViewStyle;
 
 export default GetImageCompactModeStyle;
