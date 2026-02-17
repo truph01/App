@@ -712,6 +712,13 @@ const translations = {
             youNeedToTryAgainAtMerchant: "This transaction was not verified, so we denied it. You'll need to try again at the merchant.",
             goBackToTheMerchant: 'Go back to the merchant site to continue the transaction.',
             authorizationFailed: 'Your approval failed, so we denied this transaction. You can try again at the merchant.',
+            transactionFailed: 'Transaction failed',
+            transactionCouldNotBeCompleted: 'Your transaction could not be completed. Please try again at the merchant.',
+            transactionCouldNotBeCompletedReachOut: {
+                start: "Your transaction could not be completed. If you didn't attempt this transaction, ",
+                link: 'reach out to Concierge',
+                end: ' to report potential fraud.',
+            },
         },
         unsupportedDevice: {
             unsupportedDevice: 'Unsupported device',

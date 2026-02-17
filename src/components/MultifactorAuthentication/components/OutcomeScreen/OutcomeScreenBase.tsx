@@ -49,7 +49,7 @@ function OutcomeScreenBase({headerTitle, illustration, iconWidth, iconHeight, ti
                     titleStyles={styles.mb2}
                     subtitle={subtitle}
                     CustomSubtitle={customSubtitle}
-                    subtitleStyle={styles.textSupporting}
+                    subtitleStyle={[styles.textSupporting, styles.ph5]}
                     containerStyle={[styles.ph5, padding]}
                     testID={OutcomeScreenBase.displayName}
                 />

@@ -1,6 +1,14 @@
 import React from 'react';
+import DeniedTransactionDescription from '@components/MultifactorAuthentication/components/DeniedTransactionDescription';
+import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
+import {
+    DefaultClientFailureScreen,
+    DefaultServerFailureScreen,
+    NoEligibleMethodsFailureScreen,
+    OutOfTimeFailureScreen,
+    UnsupportedDeviceFailureScreen,
+} from '@components/MultifactorAuthentication/components/OutcomeScreen/FailureScreen/defaultScreens';
 import DefaultSuccessScreen from '@components/MultifactorAuthentication/components/OutcomeScreen/SuccessScreen/defaultScreens';
-import {DefaultClientFailureScreen, DefaultServerFailureScreen, OutOfTimeFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen/FailureScreen/defaultScreens';
 import type {MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import variables from '@styles/variables';
 import {authorizeTransaction} from '@userActions/MultifactorAuthentication';
@@ -10,6 +18,38 @@ import SCREENS from '@src/SCREENS';
 type Payload = {
     transactionID: string;
 };
+
+const DefaultTransactionReviewClientFailureScreen = createScreenWithDefaults(
+    DefaultClientFailureScreen,
+    {
+        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
+        illustration: 'DeniedTransactionHand',
+        iconWidth: variables.transactionHandWidth,
+        iconHeight: variables.transactionHandHeight,
+        title: 'multifactorAuthentication.reviewTransaction.transactionFailed',
+        subtitle: 'multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompleted',
+    },
+    'DefaultTransactionReviewClientFailureScreen',
+);
+
+const DeniedTransactionClientFailureScreen = createScreenWithDefaults(
+    DefaultTransactionReviewClientFailureScreen,
+    {
+        customSubtitle: <DeniedTransactionDescription />,
+    },
+    'DeniedTransactionFailureScreen',
+);
+
+const DeniedTransactionServerFailureScreen = createScreenWithDefaults(
+    DefaultServerFailureScreen,
+    {
+        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
+        customSubtitle: <DeniedTransactionDescription />,
+    },
+    'DeniedTransactionFailureScreen',
+);
+
+export {DeniedTransactionServerFailureScreen, DeniedTransactionClientFailureScreen, DefaultTransactionReviewClientFailureScreen};
 
 export default {
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
@@ -26,28 +66,18 @@ export default {
             subtitle="multifactorAuthentication.reviewTransaction.goBackToTheMerchant"
         />
     ),
-    defaultClientFailureScreen: (
-        <DefaultClientFailureScreen
-            headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"
-            illustration="DeniedTransactionHand"
-            iconWidth={variables.transactionHandWidth}
-            iconHeight={variables.transactionHandHeight}
-            title="multifactorAuthentication.reviewTransaction.transactionDenied"
-            subtitle="multifactorAuthentication.reviewTransaction.youCanTryAgainAtMerchantOrReachOut"
-        />
-    ),
+    defaultClientFailureScreen: <DefaultTransactionReviewClientFailureScreen />,
     defaultServerFailureScreen: (
         <DefaultServerFailureScreen
-            headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"
-            illustration="DeniedTransactionHand"
-            iconWidth={variables.transactionHandWidth}
-            iconHeight={variables.transactionHandHeight}
-            title="multifactorAuthentication.reviewTransaction.transactionDenied"
-            subtitle="multifactorAuthentication.reviewTransaction.youCanTryAgainAtMerchantOrReachOut"
+            headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed"
+            subtitle="multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompleted"
         />
     ),
     failureScreens: {
-        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_EXPIRED]: <OutOfTimeFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction" />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_EXPIRED]: <OutOfTimeFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED]: <DeniedTransactionClientFailureScreen />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS]: <NoEligibleMethodsFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: <UnsupportedDeviceFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
     },
     MODALS: {
         cancelConfirmation: {
