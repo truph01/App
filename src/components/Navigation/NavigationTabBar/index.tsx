@@ -521,7 +521,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                 <PressableWithFeedback
                     onPress={navigateToChats}
                     role={CONST.ROLE.TAB}
-                    accessibilityLabel={translate('common.inbox')}
+                    accessibilityLabel={chatTabBrickRoad ? `${translate('common.inbox')}. ${translate('common.yourReviewIsRequired')}` : translate('common.inbox')}
                     accessibilityState={inboxAccessibilityState}
                     wrapperStyle={styles.flex1}
                     style={styles.navigationTabBarItem}
