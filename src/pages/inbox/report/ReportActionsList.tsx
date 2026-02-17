@@ -692,7 +692,6 @@ function ReportActionsList({
                     allReports={allReports}
                     policies={policies}
                     reportAction={reportAction}
-                    reportActions={sortedReportActions}
                     parentReportAction={parentReportAction}
                     parentReportActionForTransactionThread={parentReportActionForTransactionThread}
                     index={index}
@@ -729,7 +728,6 @@ function ReportActionsList({
             emojiReactions,
             allReports,
             policies,
-            sortedReportActions,
             parentReportAction,
             parentReportActionForTransactionThread,
             report,
