@@ -110,6 +110,8 @@ Examples:
 
 This ensures office-related purchases follow company coding standards.
 
+![Image of an expense with Workspace Merchant Rule applied]({{site.url}}/assets/images/ExpensiHelp-MerchantRules-2.png){:width="100%"}
+
 ---
 
 # FAQ
