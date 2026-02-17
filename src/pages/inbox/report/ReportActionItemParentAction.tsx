@@ -22,7 +22,6 @@ import {navigateToConciergeChatAndDeleteReport} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import {ReportAction} from '@src/types/onyx';
-import type {Errors} from '@src/types/onyx/OnyxCommon';
 import AnimatedEmptyStateBackground from './AnimatedEmptyStateBackground';
 import RepliesDivider from './RepliesDivider';
 import ReportActionItem from './ReportActionItem';
@@ -35,6 +34,9 @@ type ReportActionItemParentActionProps = {
     /** All the data of the policy collection */
     policies: OnyxCollection<OnyxTypes.Policy>;
 
+    /** All the data of the action item */
+    action: OnyxTypes.ReportAction;
+
     /** Flag to show, hide the thread divider line */
     shouldHideThreadDividerLine?: boolean;
 
@@ -44,9 +46,6 @@ type ReportActionItemParentActionProps = {
     /** The id of the report */
     // eslint-disable-next-line react/no-unused-prop-types
     reportID: string;
-
-    /** Array of report actions for the report */
-    reportActions: ReportAction[];
 
     /** The current report is displayed */
     report: OnyxEntry<OnyxTypes.Report>;
@@ -98,11 +97,11 @@ function ReportActionItemParentAction({
     allReports,
     policies,
     report,
+    action,
     reportActionID,
     transactionThreadReport,
     parentReportAction,
     index = 0,
-    reportActions,
     shouldHideThreadDividerLine = false,
     shouldDisplayReplyDivider,
     isFirstVisibleReportAction = false,
@@ -120,8 +119,7 @@ function ReportActionItemParentAction({
     const ancestors = useAncestors(report, shouldExcludeAncestorReportAction);
     const {isOffline} = useNetwork();
     const {isInNarrowPaneModal} = useResponsiveLayout();
-    const reportAction = reportActions[parseInt(reportActionID)];
-    const transactionID = isMoneyRequestAction(reportAction) && getOriginalMessage(reportAction)?.IOUTransactionID;
+    const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
     const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => transaction?.errorFields?.route ?? undefined});
 
     const ancestorReportNameValuePairsSelector = useCallback(
@@ -212,7 +210,6 @@ function ReportActionItemParentAction({
                                 reportActionID={reportActionID}
                                 allReports={allReports}
                                 policies={policies}
-                                reportActions={reportActions}
                                 onPress={
                                     canCurrentUserOpenReport(ancestorReport, isAncestorReportArchived)
                                         ? () => navigateToLinkedReportAction(ancestor, isInNarrowPaneModal, canUserPerformWriteAction, isOffline)

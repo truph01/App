@@ -209,6 +209,7 @@ function ReportActionsListItemRenderer({
                 parentReportAction={parentReportAction}
                 reportID={report.reportID}
                 report={report}
+                action={action}
                 reportActionID={reportAction.reportActionID}
                 transactionThreadReport={transactionThreadReport}
                 index={index}
