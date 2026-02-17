@@ -97,6 +97,46 @@ function BaseWidgetItem({icon, iconBackgroundColor, title, subtitle, ctaText, on
 />
 ```
 
+#### Incorrect (configuration — config-array driven rendering)
+
+- Statically-known items encoded as data instead of declared as JSX
+- The generic component must handle every possible config shape
+- Business logic leaks into data declarations (filters, conditionals)
+- Adding behavior means expanding the config schema, not adding a component
+
+```tsx
+// A) Basic: statically-known actions encoded as a config array
+<Actions actions={[
+    {icon: 'Plus', isMenu: true, menuItems: [...]},
+    {icon: 'TextFormat', onPress: onFormat},
+    {icon: 'Emoji', onPress: onEmoji},
+]} />
+```
+
+```tsx
+// B) With embedded conditionals (worse): business logic mixed into data declarations
+const todoItems = [
+    {
+        key: 'submit',
+        count: submitCount,
+        icon: Send,
+        translationKey: '...',
+        handler: handleSubmit,
+    },
+    {
+        key: 'approve',
+        count: approveCount,
+        icon: ThumbsUp,
+        translationKey: '...',
+        handler: handleApprove,
+    },
+].filter((item) => item.count > 0);
+
+{todoItems.map(({key, icon, ...rest}) => (
+    <BaseWidgetItem key={key} icon={icon} {...rest} />
+))}
+```
+
 ### Correct
 
 #### Correct (composition — boolean features)
@@ -220,6 +260,37 @@ export default WidgetItem;
 // Adding a new section doesn't change the Provider or other blocks
 ```
 
+#### Correct (composition — declarative JSX over config arrays)
+
+- Each item is explicit JSX — visible in the component tree
+- Conditional rendering is standard JSX (`{count > 0 && ...}`), not data-level filtering
+- No generic component needs to interpret a config schema
+- Adding/removing items means adding/removing JSX, not expanding a data structure
+
+```tsx
+// Each item declared as JSX — self-contained, type-safe, independently modifiable
+<ForYouSection.Container>
+    {submitCount > 0 && (
+        <WidgetItem.Container onPress={handleSubmit}>
+            <WidgetItem.Icon src={Send} backgroundColor={theme.widgetIconBG} />
+            <WidgetItem.Content>
+                <WidgetItem.Title>{translate('homePage.forYouSection.submit', {count: submitCount})}</WidgetItem.Title>
+            </WidgetItem.Content>
+            <WidgetItem.Action onPress={handleSubmit}>{beginText}</WidgetItem.Action>
+        </WidgetItem.Container>
+    )}
+    {approveCount > 0 && (
+        <WidgetItem.Container onPress={handleApprove}>
+            <WidgetItem.Icon src={ThumbsUp} backgroundColor={theme.widgetIconBG} />
+            <WidgetItem.Content>
+                <WidgetItem.Title>{translate('homePage.forYouSection.approve', {count: approveCount})}</WidgetItem.Title>
+            </WidgetItem.Content>
+            <WidgetItem.Action onPress={handleApprove}>{beginText}</WidgetItem.Action>
+        </WidgetItem.Container>
+    )}
+</ForYouSection.Container>
+```
+
 ---
 
 ### Review Metadata
@@ -250,6 +321,12 @@ Flag when ANY of these are true:
 - These props could be broken into independent composable blocks: Provider manages state, sub-components render independently
 - The component becomes a "configuration object consumer" rather than a composition of building blocks
 
+**Case 4 — Config-array driven rendering:**
+- Statically-known items (finite, fixed at development time) are encoded as a data array of config objects
+- The array is `.map()`'d through a generic component to produce JSX
+- Each item has distinct behavior or props that could be expressed as individual JSX elements or dedicated components
+- Business logic is mixed into the array (conditional entries via `&&`, `.filter()`)
+
 In all cases, the rule applies to: **new components**, **new features added to existing components**, and **refactorings that create new components still following configuration patterns**
 
 **DO NOT flag if:**
@@ -259,8 +336,13 @@ In all cases, the rule applies to: **new components**, **new features added to e
 - The component already uses composition and child components for features
 - The optional prop is used for logic beyond just conditional rendering (e.g., computing derived values, passed to callbacks, used in multiple places within the component)
 - The component is a thin wrapper around a platform primitive (e.g., wrapping `TextInput`, `ScrollView`, `Pressable`) — these naturally pass through configuration props
+- Items come from **runtime data** (API responses, user-generated content, Onyx collections) — dynamic data must be mapped
+- The array is used with **list components** (e.g., `FlatList`, `SectionList`, or custom wrappers) — these require data arrays by design
+- Items are truly **homogeneous** (same shape, same behavior, only values differ) and the count is **unbounded** (e.g., list of chat messages, search results)
+- The array is a **framework requirement** (e.g., React Navigation screen config, form validation rules)
 
 **Search Patterns** (hints for reviewers):
 - **Case 1**: `should\w+`, `can\w+`, `enable`, `disable` (boolean flag prefixes in prop types)
 - **Case 2**: `{!!`, `&&\s*<`, `?\s*<`, `: null`, combined with optional prop markers (`?:` in type definitions)
 - **Case 3**: Components with 8+ props in their type definition, especially mixing state/handler/content props
+- **Case 4**: `\.map\(` combined with array literal `= \[` in the same component; `actions={[`, `items={[`, `options={[` (config arrays passed as props); `.filter(` on array literals (conditional items)
