@@ -659,21 +659,18 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         const hasAtLeastOneNonAuditorRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.AUDITOR);
         const hasAtLeastOneNonMemberRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.USER);
         const hasAtLeastOneNonAdminRole = selectedEmployeesRoles.some((role) => role !== CONST.POLICY.ROLE.ADMIN);
-        const shouldShowChangeRoleAction = policy?.achAccount?.reimburser ? !selectedEmployees.includes(policy?.achAccount?.reimburser) : true;
+        const isReimbursementEnabled = policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES;
+        const hasAtLeastOnePayer = isReimbursementEnabled && policy?.achAccount?.reimburser ? selectedEmployees.includes(policy?.achAccount?.reimburser) : false;
+
+        if (hasAtLeastOneNonMemberRole && !hasAtLeastOnePayer) {
+            options.push(memberOption);
+        }
 
         if (hasAtLeastOneNonAdminRole) {
             options.push(adminOption);
         }
 
-        if (!shouldShowChangeRoleAction) {
-            return options;
-        }
-
-        if (hasAtLeastOneNonMemberRole) {
-            options.push(memberOption);
-        }
-
-        if (hasAtLeastOneNonAuditorRole && isControlPolicy(policy)) {
+        if (hasAtLeastOneNonAuditorRole && isControlPolicy(policy) && !hasAtLeastOnePayer) {
             options.push(auditorOption);
         }
 
