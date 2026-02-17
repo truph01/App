@@ -177,7 +177,6 @@ function ReportActionsList({
     const [isVisible, setIsVisible] = useState(Visibility.isVisible);
     const isFocused = useIsFocused();
 
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
     const isReportArchived = useReportIsArchived(report?.reportID);
@@ -693,7 +692,6 @@ function ReportActionsList({
 
             return (
                 <ReportActionsListItemRenderer
-                    allReports={allReports}
                     policies={policies}
                     reportAction={reportAction}
                     parentReportAction={parentReportAction}
@@ -732,7 +730,6 @@ function ReportActionsList({
         [
             draftMessage,
             emojiReactions,
-            allReports,
             policies,
             parentReportAction,
             parentReportActionForTransactionThread,
