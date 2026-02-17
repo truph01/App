@@ -9,8 +9,8 @@ title: Optimize data selection and handling
 
 `useOnyx` supports an optional `selector` to narrow data before it reaches the component. Selectors control both **what** data the component receives and **how** Onyx detects changes:
 
-- **With a selector**: Onyx runs `deepEqual` on the selector output to decide whether to re-render.
-- **Without a selector**: Onyx uses `shallowEqual` on raw references, which is much cheaper.
+- **With a selector**: Onyx runs `deepEqual` on the selector output to decide whether to re-render. This guards against unnecessary re-renders when unrelated data changes, but the comparison cost scales with the size of the output.
+- **Without a selector**: Onyx uses `shallowEqual` on raw references, which is much cheaper. However, the component will re-render whenever **any** part of the subscribed data changes, since there is no narrowing to filter out irrelevant updates.
 
 This means selectors are a double-edged sword. A well-written selector that returns a primitive or a small object is highly effective — it skips re-renders when unrelated data changes, and `deepEqual` on a small value is trivial. But a poorly-written selector that returns a large object, a full collection, or a non-plain type like `Set`/`Map` makes things worse — it forces an expensive `deepEqual` on every Onyx update with no re-render savings.
 
