@@ -164,9 +164,9 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
 
     const reportID = report?.reportID;
     const doesReportIDLookValid = isValidReportIDFromPath(reportID);
-    const hasLoadedReportActions = reportMetadata?.hasOnceLoadedReportActions ?? reportMetadata?.isLoadingInitialReportActions === false;
+    const hasLoadedReportActions = reportMetadata?.hasOnceLoadedReportActions === true || reportMetadata?.isLoadingInitialReportActions === false;
     const isReportPendingDeletion = isMoneyRequestReportPendingDeletion(report);
-    const hasLoadedThreadReportActions = !!reportMetadata && (reportMetadata.hasOnceLoadedReportActions ?? reportMetadata.isLoadingInitialReportActions === false);
+    const hasLoadedThreadReportActions = !!reportMetadata && (reportMetadata.hasOnceLoadedReportActions === true || reportMetadata.isLoadingInitialReportActions === false);
     const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
     const {wasParentActionDeleted} = getParentReportActionDeletionStatus({
         parentReportID: report?.parentReportID,

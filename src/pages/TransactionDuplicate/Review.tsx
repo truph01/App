@@ -125,7 +125,7 @@ function TransactionDuplicateReview() {
         getDuplicateTransactionDetails(transactionID);
     }, [transactionID]);
 
-    const hasLoadedThreadReportActions = !!reportMetadata && ((reportMetadata?.hasOnceLoadedReportActions ?? reportMetadata?.isLoadingInitialReportActions === false) || isOffline);
+    const hasLoadedThreadReportActions = !!reportMetadata && (reportMetadata?.hasOnceLoadedReportActions === true || reportMetadata?.isLoadingInitialReportActions === false || isOffline);
     const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
     const {hasLoadedParentReportActions, wasParentActionDeleted} = getParentReportActionDeletionStatus({
         parentReportID: report?.parentReportID,

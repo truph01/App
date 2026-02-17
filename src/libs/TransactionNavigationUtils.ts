@@ -17,7 +17,7 @@ function hasLoadedReportActions(reportMetadata: OnyxInputOrEntry<ReportMetadata>
     if (!reportMetadata) {
         return false;
     }
-    return (reportMetadata?.hasOnceLoadedReportActions ?? reportMetadata?.isLoadingInitialReportActions === false) || isOffline;
+    return reportMetadata?.hasOnceLoadedReportActions === true || reportMetadata?.isLoadingInitialReportActions === false || isOffline;
 }
 
 function decodeDeleteNavigateBackUrl(url: string): string {
