@@ -248,7 +248,6 @@ function getOnboardingAdaptedState(state: PartialState<NavigationState>): Partia
 
 function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamList>>): GetAdaptedStateReturnType {
     const fullScreenRoute = state.routes.find((route) => isFullScreenName(route.name));
-    const onboardingNavigator = state.routes.find((route) => route.name === NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR);
     const isWorkspaceSplitNavigator = fullScreenRoute?.name === NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR;
 
     if (isWorkspaceSplitNavigator) {
@@ -273,6 +272,8 @@ function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamL
                 return getRoutesWithIndex(routes);
             }
         }
+
+        const onboardingNavigator = state.routes.find((route) => route.name === NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR);
 
         // The onboarding flow consists of several screens. If we open any of the screens, the previous screens from that flow should be in the state.
         if (onboardingNavigator?.state) {
