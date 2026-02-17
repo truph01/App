@@ -20,9 +20,8 @@ jest.mock('expo-image', () => ({
     },
 }));
 
-jest.mock('@libs/getImageRecyclingKey', () => ({
-    __esModule: true,
-    default: jest.fn((source: unknown) => {
+jest.mock('@libs/getImageRecyclingKey', () =>
+    jest.fn((source: unknown) => {
         if (typeof source === 'number') {
             return String(source);
         }
@@ -31,9 +30,13 @@ jest.mock('@libs/getImageRecyclingKey', () => ({
         }
         return undefined;
     }),
-}));
+);
 
 const MOCK_STATIC_SOURCE = 42;
+
+function getFirstCallProps(): Record<string, unknown> {
+    return mockImageComponent.mock.calls.at(0)?.at(0) as Record<string, unknown>;
+}
 
 describe('ImageSVG cache policy', () => {
     beforeEach(() => {
@@ -45,14 +48,14 @@ describe('ImageSVG cache policy', () => {
             render(<ImageSVGiOS src={MOCK_STATIC_SOURCE} />);
 
             expect(mockImageComponent).toHaveBeenCalled();
-            const props = mockImageComponent.mock.calls[0][0] as Record<string, unknown>;
+            const props = getFirstCallProps();
             expect(props.cachePolicy).toBe('memory-disk');
         });
 
         it('should set recyclingKey for static image sources', () => {
             render(<ImageSVGiOS src={MOCK_STATIC_SOURCE} />);
 
-            const props = mockImageComponent.mock.calls[0][0] as Record<string, unknown>;
+            const props = getFirstCallProps();
             expect(props.recyclingKey).toBe(String(MOCK_STATIC_SOURCE));
         });
 
@@ -77,14 +80,14 @@ describe('ImageSVG cache policy', () => {
             render(<ImageSVGAndroid src={MOCK_STATIC_SOURCE} />);
 
             expect(mockImageComponent).toHaveBeenCalled();
-            const props = mockImageComponent.mock.calls[0][0] as Record<string, unknown>;
+            const props = getFirstCallProps();
             expect(props.cachePolicy).toBe('memory');
         });
 
         it('should set recyclingKey for static image sources', () => {
             render(<ImageSVGAndroid src={MOCK_STATIC_SOURCE} />);
 
-            const props = mockImageComponent.mock.calls[0][0] as Record<string, unknown>;
+            const props = getFirstCallProps();
             expect(props.recyclingKey).toBe(String(MOCK_STATIC_SOURCE));
         });
 
