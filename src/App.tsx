@@ -37,7 +37,7 @@ import SVGDefinitionsProvider from './components/SVGDefinitionsProvider';
 import ThemeIllustrationsProvider from './components/ThemeIllustrationsProvider';
 import ThemeProvider from './components/ThemeProvider';
 import ThemeStylesProvider from './components/ThemeStylesContextProvider';
-import {FullScreenContextProvider} from './components/VideoPlayerContexts/FullScreenContext';
+import FullScreenContextProvider from './components/VideoPlayerContexts/FullScreenContextProvider';
 import {PlaybackContextProvider} from './components/VideoPlayerContexts/PlaybackContext';
 import {VideoPopoverMenuContextProvider} from './components/VideoPlayerContexts/VideoPopoverMenuContext';
 import {VolumeContextProvider} from './components/VideoPlayerContexts/VolumeContext';
