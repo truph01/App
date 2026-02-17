@@ -172,6 +172,7 @@ function ContactMethodDetailsPage({route}: ContactMethodDetailsPageProps) {
         }
         setShouldNavigateOnFocus(false);
         Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.getRoute(backTo));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isFocused]);
 
     useEffect(() => {
