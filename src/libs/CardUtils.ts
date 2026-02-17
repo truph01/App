@@ -40,6 +40,7 @@ import type IconAsset from '@src/types/utils/IconAsset';
 import {filterObject} from './ObjectUtils';
 import {arePersonalDetailsMissing, getDisplayNameOrDefault} from './PersonalDetailsUtils';
 import StringUtils from './StringUtils';
+import ROUTES from '@src/ROUTES';
 
 const COMPANY_CARD_FEED_ICON_NAMES = [
     'VisaCompanyCardDetailLarge',
@@ -1169,6 +1170,25 @@ function hasDisplayableAssignedCards(cardList: CardList | undefined): boolean {
     );
 }
 
+/**
+ * Return url for fixing broken personal card connection
+ *
+ * @param cards list of the broken cards
+ * @param environmentURL environment url
+ * @returns url
+ */
+function getBrokenConnectionUrlToFixPersonalCard(cards: Record<string, Card>, environmentURL: string) {
+    if (!cards) {
+        return undefined;
+    }
+    if (Object.keys(cards).length === 1) {
+        const card = Object.values(cards).at(0);
+        return `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(card?.cardID.toString())}`;
+    }
+
+    return `${environmentURL}/${ROUTES.SETTINGS_WALLET}`;
+}
+
 export {
     getAssignedCardSortKey,
     getDefaultExpensifyCardLimitType,
@@ -1176,6 +1196,7 @@ export {
     getDomainCards,
     formatCardExpiration,
     getMonthFromExpirationDateString,
+    getBrokenConnectionUrlToFixPersonalCard,
     getYearFromExpirationDateString,
     maskCard,
     maskCardNumber,

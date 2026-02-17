@@ -39,6 +39,8 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import useCardFeedErrors from '@hooks/useCardFeedErrors';
+import {getBrokenConnectionUrlToFixPersonalCard} from '@libs/CardUtils';
 import type {TransactionPreviewContentProps} from './types';
 
 function TransactionPreviewContent({
@@ -124,7 +126,8 @@ function TransactionPreviewContent({
     const isIOUActionType = isMoneyRequestAction(action);
     const canEdit = isIOUActionType && canEditMoneyRequest(action, isChatReportArchived, report, policy, transaction);
     const companyCardPageURL = `${environmentURL}/${ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(report?.policyID)}`;
-    const connectionLink = transaction?.cardID ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(transaction.cardID.toString())}` : undefined;
+    const {personalCardsWithBrokenConnection} = useCardFeedErrors();
+    const connectionLink = getBrokenConnectionUrlToFixPersonalCard(personalCardsWithBrokenConnection, environmentURL);
     const cardID = firstViolation?.data?.cardID;
     const card = cardID ? cardList?.[cardID] : undefined;
     const isMarkAsCash = parentReport && currentUserLogin ? isMarkAsCashActionForTransaction(currentUserLogin, parentReport, violations, policy) : false;
