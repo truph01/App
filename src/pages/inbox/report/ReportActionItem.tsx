@@ -33,7 +33,6 @@ import {clearError} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Policy, Report, ReportAction, ReportActionReactions, Transaction} from '@src/types/onyx';
-import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
 
@@ -46,6 +45,9 @@ type ReportActionItemProps = Omit<
 
     /** All the data of the policy collection */
     policies: OnyxCollection<Policy>;
+
+    /** Array of report actions for the report */
+    reportActions: ReportAction[];
 
     /** Whether to show the draft message or not */
     shouldShowDraftMessage?: boolean;

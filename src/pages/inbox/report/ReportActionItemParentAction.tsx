@@ -21,6 +21,7 @@ import {
 import {navigateToConciergeChatAndDeleteReport} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
+import {ReportAction} from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import AnimatedEmptyStateBackground from './AnimatedEmptyStateBackground';
 import RepliesDivider from './RepliesDivider';
@@ -43,6 +44,9 @@ type ReportActionItemParentActionProps = {
     /** The id of the report */
     // eslint-disable-next-line react/no-unused-prop-types
     reportID: string;
+
+    /** Array of report actions for the report */
+    reportActions: ReportAction[];
 
     /** The current report is displayed */
     report: OnyxEntry<OnyxTypes.Report>;
@@ -98,6 +102,7 @@ function ReportActionItemParentAction({
     transactionThreadReport,
     parentReportAction,
     index = 0,
+    reportActions,
     shouldHideThreadDividerLine = false,
     shouldDisplayReplyDivider,
     isFirstVisibleReportAction = false,
@@ -207,6 +212,7 @@ function ReportActionItemParentAction({
                                 reportActionID={reportActionID}
                                 allReports={allReports}
                                 policies={policies}
+                                reportActions={reportActions}
                                 onPress={
                                     canCurrentUserOpenReport(ancestorReport, isAncestorReportArchived)
                                         ? () => navigateToLinkedReportAction(ancestor, isInNarrowPaneModal, canUserPerformWriteAction, isOffline)
