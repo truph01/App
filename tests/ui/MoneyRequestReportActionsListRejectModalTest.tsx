@@ -39,13 +39,15 @@ jest.mock('@libs/Navigation/Navigation', () => ({
 }));
 
 jest.mock('@components/MoneyRequestReportView/MoneyRequestReportTransactionList', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const {View} = require('react-native');
     return () => <View testID="MockMoneyRequestReportTransactionList" />;
 });
 
 jest.mock('@components/HoldOrRejectEducationalModal', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const {View} = require('react-native');
-    return (props: {onClose: () => void; onConfirm: () => void}) => (
+    return (props: {onConfirm: () => void}) => (
         <View testID="HoldOrRejectEducationalModal">
             <View
                 testID="HoldOrRejectEducationalModal-confirm"
@@ -56,17 +58,19 @@ jest.mock('@components/HoldOrRejectEducationalModal', () => {
 });
 
 jest.mock('@components/ButtonWithDropdownMenu', () => {
-    const {View, TouchableOpacity, Text} = require('react-native');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const {View, Pressable, Text} = require('react-native');
     return ({options}: {options: Array<{text: string; value: string; onSelected?: () => void}>}) => (
         <View testID="ButtonWithDropdownMenu">
             {options.map((option: {text: string; value: string; onSelected?: () => void}) => (
-                <TouchableOpacity
+                <Pressable
                     key={option.value}
                     testID={`dropdown-option-${option.value}`}
                     onPress={() => option.onSelected?.()}
+                    accessibilityRole="button"
                 >
                     <Text>{option.text}</Text>
-                </TouchableOpacity>
+                </Pressable>
             ))}
         </View>
     );
@@ -81,13 +85,13 @@ jest.mock('@hooks/useSelectedTransactionsActions', () => {
         options: [
             {
                 text: 'Delete',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
                 value: C.REPORT.SECONDARY_ACTIONS.DELETE,
                 onSelected: jest.fn(),
             },
             {
                 text: 'Reject',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
                 value: C.REPORT.SECONDARY_ACTIONS.REJECT,
                 onSelected: mockOriginalRejectOnSelected,
             },
@@ -232,9 +236,7 @@ describe('MoneyRequestReportActionsList - Reject Educational Modal', () => {
         expect(screen.queryByTestId('HoldOrRejectEducationalModal')).toBeNull();
 
         // Press the reject option
-        await act(async () => {
-            fireEvent.press(screen.getByTestId(`dropdown-option-${CONST.REPORT.SECONDARY_ACTIONS.REJECT}`));
-        });
+        fireEvent.press(screen.getByTestId(`dropdown-option-${CONST.REPORT.SECONDARY_ACTIONS.REJECT}`));
         await waitForBatchedUpdatesWithAct();
 
         // Modal should now be visible
@@ -257,9 +259,7 @@ describe('MoneyRequestReportActionsList - Reject Educational Modal', () => {
         await waitForBatchedUpdatesWithAct();
 
         // Press the reject option
-        await act(async () => {
-            fireEvent.press(screen.getByTestId(`dropdown-option-${CONST.REPORT.SECONDARY_ACTIONS.REJECT}`));
-        });
+        fireEvent.press(screen.getByTestId(`dropdown-option-${CONST.REPORT.SECONDARY_ACTIONS.REJECT}`));
         await waitForBatchedUpdatesWithAct();
 
         // Modal should NOT be shown; original handler should be called directly
