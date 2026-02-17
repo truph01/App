@@ -113,7 +113,8 @@ function findSliceAtPosition(cursorX: number, cursorY: number, centerX: number, 
 
 function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSlicePress}: PieChartProps) {
     const styles = useThemeStyles();
-    const [canvasSize, setCanvasSize] = useState({width: 0, height: 0});
+    const [canvasWidth, setCanvasWidth] = useState(0);
+    const [canvasHeight, setCanvasHeight] = useState(0);
     const [activeSliceIndex, setActiveSliceIndex] = useState(-1);
 
     // Shared values for hover state
@@ -123,8 +124,8 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     const tooltipPosition = useSharedValue({x: 0, y: 0});
 
     const handleLayout = (event: LayoutChangeEvent) => {
-        const {width, height} = event.nativeEvent.layout;
-        setCanvasSize({width, height});
+        setCanvasWidth(event.nativeEvent.layout.width);
+        setCanvasHeight(event.nativeEvent.layout.height);
     };
 
     // Process data into slices with aggregation.
@@ -137,7 +138,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     const tooltipData = useTooltipData(activeOriginalDataIndex, data, formatValue);
 
     // Calculate pie geometry
-    const pieGeometry = {radius: Math.min(canvasSize.width, canvasSize.height) / 2, centerX: canvasSize.width / 2, centerY: canvasSize.height / 2} as const;
+    const pieGeometry = {radius: Math.min(canvasWidth, canvasHeight) / 2, centerX: canvasWidth / 2, centerY: canvasHeight / 2};
 
     // Handle hover state updates
     const updateActiveSlice = (x: number, y: number) => {
@@ -240,7 +241,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
                     style={styles.pieChartChartContainer}
                     onLayout={handleLayout}
                 >
-                    {canvasSize.width > 0 && canvasSize.height > 0 && processedSlices.length > 0 && (
+                    {processedSlices.length > 0 && (
                         <PolarChart
                             data={processedSlices}
                             labelKey="label"
@@ -257,7 +258,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
                             label={tooltipData.label}
                             amount={tooltipData.amount}
                             percentage={tooltipData.percentage}
-                            chartWidth={canvasSize.width}
+                            chartWidth={canvasWidth}
                             initialTooltipPosition={tooltipPosition}
                         />
                     )}
