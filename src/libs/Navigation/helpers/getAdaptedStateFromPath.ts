@@ -1,15 +1,16 @@
-import type {NavigationState, PartialState, getStateFromPath as RNGetStateFromPath, Route} from '@react-navigation/native';
-import {findFocusedRoute} from '@react-navigation/native';
-import pick from 'lodash/pick';
 import getInitialSplitNavigatorState from '@libs/Navigation/AppNavigator/createSplitNavigator/getInitialSplitNavigatorState';
-import {RHP_TO_DOMAIN, RHP_TO_SEARCH, RHP_TO_SETTINGS, RHP_TO_SIDEBAR, RHP_TO_WORKSPACE, RHP_TO_WORKSPACES_LIST} from '@libs/Navigation/linkingConfig/RELATIONS';
+import {RHP_TO_DOMAIN, RHP_TO_HOME, RHP_TO_SEARCH, RHP_TO_SETTINGS, RHP_TO_SIDEBAR, RHP_TO_WORKSPACE, RHP_TO_WORKSPACES_LIST} from '@libs/Navigation/linkingConfig/RELATIONS';
 import type {NavigationPartialRoute, RootNavigatorParamList} from '@libs/Navigation/types';
 import {getReportOrDraftReport} from '@libs/ReportUtils';
+import {getSearchParamFromPath} from '@libs/Url';
+import type {NavigationState, PartialState, getStateFromPath as RNGetStateFromPath, Route} from '@react-navigation/native';
+import {findFocusedRoute} from '@react-navigation/native';
 import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
 import type {Route as RoutePath} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
+import pick from 'lodash/pick';
 import getLastSuffixFromPath from './getLastSuffixFromPath';
 import getMatchingNewRoute from './getMatchingNewRoute';
 import getParamsFromRoute from './getParamsFromRoute';
@@ -114,9 +115,18 @@ function getMatchingFullScreenRoute(route: NavigationPartialRoute) {
     const routeNameForLookup = getSearchScreenNameForRoute(route);
     if (RHP_TO_SEARCH[routeNameForLookup]) {
         const paramsFromRoute = getParamsFromRoute(RHP_TO_SEARCH[routeNameForLookup]);
+        const copiedParams = paramsFromRoute.length > 0 ? pick(route.params, paramsFromRoute) : {};
+        let queryParam: Record<string, string> = {};
+        if (route.path) {
+            const query = getSearchParamFromPath(route.path, 'q');
+            if (query) {
+                queryParam = {q: query};
+            }
+        }
+
         const searchRoute = {
             name: RHP_TO_SEARCH[routeNameForLookup],
-            params: paramsFromRoute.length > 0 ? pick(route.params, paramsFromRoute) : undefined,
+            params: Object.keys({...copiedParams, ...queryParam}).length > 0 ? {...copiedParams, ...queryParam} : undefined,
         };
         return {
             name: NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR,
@@ -128,6 +138,13 @@ function getMatchingFullScreenRoute(route: NavigationPartialRoute) {
         return getInitialSplitNavigatorState({
             name: RHP_TO_SIDEBAR[route.name],
         });
+    }
+
+    if (RHP_TO_HOME[route.name]) {
+        return {
+            name: SCREENS.HOME,
+            path: normalizePath(ROUTES.HOME),
+        };
     }
 
     if (RHP_TO_WORKSPACES_LIST[route.name]) {
@@ -265,6 +282,12 @@ function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamL
             };
 
             return getRoutesWithIndex([{name: SCREENS.HOME}, adaptedOnboardingNavigator]);
+        }
+
+        const isRightModalNavigator = state.routes.find((route) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR);
+
+        if (isRightModalNavigator) {
+            return getRoutesWithIndex([{name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR}, ...state.routes]);
         }
 
         const defaultFullScreenRoute = getDefaultFullScreenRoute(focusedRoute);
