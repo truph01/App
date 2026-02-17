@@ -32,6 +32,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import {
     getFirstVisibleReportActionID,
+    getIOUReportIDFromReportActionPreview,
     getOriginalMessage,
     isConsecutiveActionMadeByPreviousActor,
     isConsecutiveChronosAutomaticTimerAction,
@@ -684,7 +685,6 @@ function ReportActionsList({
             const reportDraftMessages = draftMessage?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`];
             const matchingDraftMessage = reportDraftMessages?.[reportAction.reportActionID];
             const matchingDraftMessageString = matchingDraftMessage?.message;
-
             const actionEmojiReactions = emojiReactions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${reportAction.reportActionID}`];
 
             return (

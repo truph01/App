@@ -4,7 +4,6 @@ import {getOriginalMessage, isSentMoneyReportAction, isTransactionThread} from '
 import {isChatThread} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {PersonalDetailsList, Policy, Report, ReportAction, ReportActionReactions, ReportActionsDrafts, Transaction} from '@src/types/onyx';
-import type {Errors} from '@src/types/onyx/OnyxCommon';
 import ReportActionItem from './ReportActionItem';
 import ReportActionItemParentAction from './ReportActionItemParentAction';
 
@@ -17,9 +16,6 @@ type ReportActionsListItemRendererProps = {
 
     /** All the data of the action item */
     reportAction: ReportAction;
-
-    /** Array of report actions for the report */
-    reportActions: ReportAction[];
 
     /** The report's parentReportAction */
     parentReportAction: OnyxEntry<ReportAction>;
@@ -103,7 +99,6 @@ function ReportActionsListItemRenderer({
     allReports,
     policies,
     reportAction,
-    reportActions = [],
     parentReportAction,
     index,
     report,
@@ -215,7 +210,6 @@ function ReportActionsListItemRenderer({
                 reportID={report.reportID}
                 report={report}
                 reportActionID={reportAction.reportActionID}
-                reportActions={reportActions}
                 transactionThreadReport={transactionThreadReport}
                 index={index}
                 isFirstVisibleReportAction={isFirstVisibleReportAction}
@@ -243,7 +237,6 @@ function ReportActionsListItemRenderer({
             transactionThreadReport={transactionThreadReport}
             parentReportActionForTransactionThread={parentReportActionForTransactionThread}
             action={action}
-            reportActions={reportActions}
             linkedReportActionID={linkedReportActionID}
             displayAsGroup={displayAsGroup}
             shouldDisplayNewMarker={shouldDisplayNewMarker}
