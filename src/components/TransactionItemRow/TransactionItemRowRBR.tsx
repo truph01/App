@@ -19,6 +19,8 @@ import ROUTES from '@src/ROUTES';
 import type {Report, TransactionViolation} from '@src/types/onyx';
 import type Transaction from '@src/types/onyx/Transaction';
 
+const HTML_TAG_PATTERN = /<\/?[a-z][^>]*>/i;
+
 type TransactionItemRowRBRProps = {
     /** Transaction item */
     transaction: Transaction;
@@ -60,7 +62,7 @@ function TransactionItemRowRBR({transaction, violations, report, containerStyles
         policyTags,
         companyCardPageURL,
     );
-    const shouldRenderAsRichText = /<\/?[a-z][^>]*>/i.test(RBRMessages);
+    const hasHTMLTags = HTML_TAG_PATTERN.test(RBRMessages);
 
     return (
         RBRMessages.length > 0 && (
@@ -75,7 +77,7 @@ function TransactionItemRowRBR({transaction, violations, report, containerStyles
                     width={variables.iconSizeExtraSmall}
                 />
                 <View style={[styles.pre, styles.flexShrink1, {color: theme.danger}]}>
-                    {shouldRenderAsRichText ? (
+                    {hasHTMLTags ? (
                         <RenderHTML html={`<rbr shouldShowEllipsis="1" issmall >${RBRMessages}</rbr>`} />
                     ) : (
                         <Text
