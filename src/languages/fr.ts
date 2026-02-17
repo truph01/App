@@ -5443,8 +5443,8 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             editTags: 'Modifier les tags',
             findTag: 'Trouver un tag',
             subtitle: 'Les tags ajoutent des moyens plus détaillés de classer les coûts.',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Vous utilisez des <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tags dépendants</a>. Vous pouvez <a href="${importSpreadsheetLink}">réimporter une feuille de calcul</a> pour mettre à jour vos tags.</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>Les tags ajoutent des moyens plus détaillés de classer les coûts. Vous utilisez des <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tags dépendants</a>. Vous pouvez <a href="${importSpreadsheetLink}">réimporter une feuille de calcul</a> pour mettre à jour vos tags.</muted-text>`,
             emptyTags: {
                 title: 'Vous n’avez créé aucun tag',
                 subtitle: 'Ajoutez un tag pour suivre les projets, les lieux, les services et plus encore.',
