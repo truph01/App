@@ -799,14 +799,14 @@ function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCar
     for (const name of accountList) {
         const segments = name.split(' - ');
         if (segments.length >= 3) {
-            cardTypesWithChildren.add(segments[0]);
+            cardTypesWithChildren.add(segments.at(0) ?? '');
         }
     }
 
     // Remove parent cards (2 segments) whose card type has children
     return accountList.filter((name) => {
         const segments = name.split(' - ');
-        if (segments.length === 2 && cardTypesWithChildren.has(segments[0])) {
+        if (segments.length === 2 && cardTypesWithChildren.has(segments.at(0) ?? '')) {
             return false;
         }
         return true;
