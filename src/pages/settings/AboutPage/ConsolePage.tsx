@@ -58,9 +58,7 @@ function ConsolePage() {
     const showLogSizeTooLargeModal = useCallback(() => {
         return showConfirmModal({
             title: translate('initialSettingsPage.debugConsole.shareLog'),
-            prompt: translate('initialSettingsPage.debugConsole.logSizeTooLarge', {
-                size: CONST.API_ATTACHMENT_VALIDATIONS.MAX_SIZE / 1024 / 1024,
-            }),
+            prompt: translate('initialSettingsPage.debugConsole.logSizeTooLarge', CONST.API_ATTACHMENT_VALIDATIONS.MAX_SIZE / 1024 / 1024),
             confirmText: translate('common.ok'),
             shouldShowCancelButton: false,
         });

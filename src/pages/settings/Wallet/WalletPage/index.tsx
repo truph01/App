@@ -36,7 +36,7 @@ import {hasDisplayableAssignedCards, maskCardNumber} from '@libs/CardUtils';
 import {convertToDisplayString} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {formatPaymentMethods, getPaymentMethodDescription} from '@libs/PaymentUtils';
-import {getDescriptionForPolicyDomainCard, hasEligibleActiveAdminFromWorkspaces} from '@libs/PolicyUtils';
+import {getDescriptionForPolicyDomainCard, hasActiveAdminWorkspaces, hasEligibleActiveAdminFromWorkspaces} from '@libs/PolicyUtils';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import PaymentMethodList from '@pages/settings/Wallet/PaymentMethodList';
 import {deletePaymentBankAccount, openPersonalBankAccountSetupView, setPersonalBankAccountContinueKYCOnSuccess} from '@userActions/BankAccounts';
@@ -95,6 +95,7 @@ function WalletPage() {
     const [shouldShowShareButton, setShouldShowShareButton] = useState(false);
     const [shouldShowUnshareButton, setShouldShowUnshareButton] = useState(false);
     const kycWallRef = useContext(KYCWallContext);
+    const isCurrentUserPolicyAdmin = hasActiveAdminWorkspaces(currentUserLogin, allPolicies);
 
     const hasWallet = !isEmpty(userWallet);
     const hasActivatedWallet = ([CONST.WALLET.TIER_NAME.GOLD, CONST.WALLET.TIER_NAME.PLATINUM] as string[]).includes(userWallet?.tierName ?? '');
@@ -159,27 +160,30 @@ function WalletPage() {
 
     const onBankAccountRowPressed = ({accountData}: PaymentMethodPressHandlerParams) => {
         const accountPolicyID = accountData?.additionalData?.policyID;
+        const bankAccountID = accountData?.bankAccountID;
 
-        if (accountPolicyID) {
-            if (isAccountLocked) {
-                showLockedAccountModal();
-                return;
-            }
-            navigateToBankAccountRoute(accountPolicyID, ROUTES.SETTINGS_WALLET);
+        if (accountPolicyID && isAccountLocked) {
+            showLockedAccountModal();
+            return;
         }
+        if (accountPolicyID) {
+            navigateToBankAccountRoute({policyID: accountPolicyID, backTo: ROUTES.SETTINGS_WALLET});
+            return;
+        }
+        navigateToBankAccountRoute({bankAccountID, backTo: ROUTES.SETTINGS_WALLET});
     };
 
     const assignedCardPressed = ({event, cardData, icon, cardID}: CardPressHandlerParams) => {
         paymentMethodButtonRef.current = event?.currentTarget as HTMLDivElement;
         setSelectedCard(cardData);
-        const isCSVImportCard = cardData?.bank === CONST.COMPANY_CARDS.BANK_NAME.UPLOAD;
+        const isCSVImportCard = cardData?.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD;
         const cardTitle = isCSVImportCard ? (cardData?.nameValuePairs?.cardTitle ?? cardData?.cardName) : maskCardNumber(cardData?.cardName, cardData?.bank);
         setPaymentMethod({
             isSelectedPaymentMethodDefault: false,
             selectedPaymentMethod: {},
             formattedSelectedPaymentMethod: {
                 title: cardTitle ?? '',
-                description: cardData ? getDescriptionForPolicyDomainCard(cardData.domainName) : '',
+                description: cardData ? getDescriptionForPolicyDomainCard(cardData.domainName, allPolicies) : '',
                 icon,
             },
             selectedPaymentMethodType: '',
@@ -190,6 +194,10 @@ function WalletPage() {
     const addBankAccountPressed = () => {
         if (isAccountLocked) {
             showLockedAccountModal();
+            return;
+        }
+        if (isCurrentUserPolicyAdmin) {
+            Navigation.navigate(ROUTES.SETTINGS_BANK_ACCOUNT_PURPOSE);
             return;
         }
         openPersonalBankAccountSetupView({});
@@ -324,7 +332,6 @@ function WalletPage() {
             shouldUseHeadlineHeader
             shouldShowBackButton={shouldUseNarrowLayout}
             shouldDisplaySearchRouter
-            onBackButtonPress={Navigation.popToSidebar}
         />
     );
 
@@ -460,7 +467,7 @@ function WalletPage() {
     );
 
     const cardThreeDotsMenuItems = useMemo(() => {
-        const shouldShowCSVImportItems = selectedCard?.bank === CONST.COMPANY_CARDS.BANK_NAME.UPLOAD && isBetaEnabled(CONST.BETAS.CSV_CARD_IMPORT);
+        const shouldShowCSVImportItems = selectedCard?.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD && isBetaEnabled(CONST.BETAS.CSV_CARD_IMPORT);
         return [
             ...(shouldUseNarrowLayout ? [bottomMountItem] : []),
             {
