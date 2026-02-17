@@ -21,8 +21,7 @@
 - Reason:
   
     ```
-    This patch fixes a fatal Android crash (java.lang.IllegalStateException: Already closed) that occurs when users
-    navigate away from a PDF while it's still rendering.
+    This patch fixes a fatal Android crash (java.lang.IllegalStateException: Already closed) that occurs when users navigate away from a PDF while it's still rendering.
 
     The crash is caused by a race condition between the background rendering thread and the main thread during component unmount. The fix sets AlreadyClosedBehavior.IGNORE via pdfiumandroid's global config, so that attempts to close already-closed resources are silently ignored instead of throwing.
     ```
