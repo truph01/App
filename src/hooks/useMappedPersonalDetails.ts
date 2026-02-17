@@ -1,6 +1,6 @@
 import type {OnyxEntry} from 'react-native-onyx';
-import ONYXKEYS from './src/ONYXKEYS';
-import type {OnyxInputOrEntry, PersonalDetails} from './src/types/onyx';
+import ONYXKEYS from '../ONYXKEYS';
+import type {OnyxInputOrEntry, PersonalDetails} from '../types/onyx';
 import useOnyx from './useOnyx';
 
 const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
