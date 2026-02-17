@@ -2257,6 +2257,10 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount} dla ${merchant} - ${date}`,
         },
         freezeCard: 'Zamroź kartę',
+        unfreeze: 'Odmroź',
+        unfreezeCard: 'Odmroź kartę',
+        freezeDescription: 'Zamrożonej karty nie można używać do zakupów i transakcji. Możesz ją odmrozić w dowolnym momencie.',
+        unfreezeDescription: 'Odmrożenie tej karty ponownie umożliwi zakupy i transakcje. Kontynuuj tylko wtedy, gdy masz pewność, że korzystanie z karty jest bezpieczne.',
     },
     workflowsPage: {
         workflowTitle: 'Wydatki',

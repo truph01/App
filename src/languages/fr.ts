@@ -2274,6 +2274,11 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount} pour ${merchant} - ${date}`,
         },
         freezeCard: 'Geler la carte',
+        unfreeze: 'Dégeler',
+        unfreezeCard: 'Dégeler la carte',
+        freezeDescription: 'Une carte gelée ne peut pas être utilisée pour des achats ni des transactions. Vous pouvez la dégeler à tout moment.',
+        unfreezeDescription:
+            'Dégeler cette carte permettra à nouveau les achats et les transactions. Continuez uniquement si vous êtes sûr(e) que la carte peut être utilisée en toute sécurité.',
     },
     workflowsPage: {
         workflowTitle: 'Dépense',

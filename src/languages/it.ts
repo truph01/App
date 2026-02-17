@@ -2262,6 +2262,10 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount} per ${merchant} - ${date}`,
         },
         freezeCard: 'Blocca carta',
+        unfreeze: 'Sblocca',
+        unfreezeCard: 'Sblocca carta',
+        freezeDescription: 'Una carta bloccata non può essere usata per acquisti e transazioni. Puoi sbloccarla in qualsiasi momento.',
+        unfreezeDescription: 'Sbloccando questa carta torneranno ad essere consentiti acquisti e transazioni. Procedi solo se sei sicuro che la carta sia sicura da usare.',
     },
     workflowsPage: {
         workflowTitle: 'Spesa',
