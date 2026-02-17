@@ -612,7 +612,6 @@ function MoneyRequestReportActionsList({
                     allReports={allReports}
                     policies={policies}
                     reportAction={reportAction}
-                    reportActions={reportActions}
                     parentReportAction={parentReportAction}
                     parentReportActionForTransactionThread={EmptyParentReportActionForTransactionThread}
                     index={index}
@@ -640,7 +639,6 @@ function MoneyRequestReportActionsList({
         },
         [
             visibleReportActions,
-            reportActions,
             reportActionsObject,
             parentReportAction,
             report,
