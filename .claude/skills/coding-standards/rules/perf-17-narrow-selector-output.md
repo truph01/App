@@ -37,6 +37,14 @@ const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {
     selector: (data) => data?.reports,
 });
 
+// BAD: Selector filters/maps a collection into an array — deepEqual on every item
+const [archivedReportIdsArray] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {
+    selector: (data): string[] =>
+        Object.entries(data ?? {})
+            .filter(([, value]) => value?.isArchived)
+            .map(([key]) => key),
+});
+
 // BAD: Selector returns a Set — deepEqual is extremely slow on Sets
 const [archivedReportIds] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {
     selector: (data): Set<string> => {
@@ -74,14 +82,13 @@ const mappedPolicies = Object.fromEntries(
 const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES);
 const reports = reportAttributes?.reports;
 
-// GOOD: Selector returns a plain array, Set computed inline
-const [archivedReportIdsArray] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {
-    selector: (data): string[] =>
-        Object.entries(data ?? {})
-            .filter(([, value]) => value?.isArchived)
-            .map(([key]) => key),
-});
-const archivedReportIds = new Set(archivedReportIdsArray);
+// GOOD: No selector — filter and compute Set inline
+const [reportNameValuePairs] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS);
+const archivedReportIds = new Set(
+    Object.entries(reportNameValuePairs ?? {})
+        .filter(([, value]) => value?.isArchived)
+        .map(([key]) => key),
+);
 
 // GOOD: Selector computes the final boolean directly
 const [hasEmptyReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
