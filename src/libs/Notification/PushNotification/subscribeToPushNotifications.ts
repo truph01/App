@@ -35,9 +35,6 @@ Onyx.connectWithoutView({
 
             PushNotification.onReceived(PushNotification.TYPE.TRANSACTION, applyOnyxData);
             PushNotification.onSelected(PushNotification.TYPE.TRANSACTION, navigateToReport);
-
-            PushNotification.onReceived(PushNotification.TYPE.AUTHORIZE_TRANSACTION, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.AUTHORIZE_TRANSACTION, navigateToTransactionApproval);
         } else {
             PushNotification.deregister();
             PushNotification.clearNotifications();
@@ -112,37 +109,6 @@ function applyOnyxData<TKey extends OnyxKey>({reportID, onyxData, lastUpdateID, 
     return getLastUpdateIDAppliedToClient()
         .then((lastUpdateIDAppliedToClient) => applyOnyxUpdatesReliably(updates, {shouldRunSync: true, clientLastUpdateID: lastUpdateIDAppliedToClient}))
         .then(() => NativeModules.PushNotificationBridge?.finishBackgroundProcessing());
-}
-
-function navigateToTransactionApproval(data: AnyPushNotificationData): Promise<void> {
-    if (!('transactionID' in data)) {
-        Log.alert('[PushNotification] Transaction approval - failed', {error: 'transactionID is missing'});
-        return Promise.resolve();
-    }
-
-    const {transactionID} = data;
-
-    Log.info('[PushNotification] Navigating to transaction approval screen', false, {transactionID});
-
-    Navigation.waitForProtectedRoutes().then(() => {
-        try {
-            Log.info('[PushNotification] onSelected() - Navigation is ready. Navigating...', false, {transactionID});
-
-            const route = ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION.getRoute(transactionID);
-
-            Navigation.navigate(route);
-            updateLastVisitedPath(route);
-        } catch (error) {
-            let errorMessage = String(error);
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            }
-
-            Log.alert('[PushNotification] onSelected() - failed', {transactionID, error: errorMessage});
-        }
-    });
-
-    return Promise.resolve();
 }
 
 function navigateToReport({reportID}: AnyPushNotificationData): Promise<void> {
