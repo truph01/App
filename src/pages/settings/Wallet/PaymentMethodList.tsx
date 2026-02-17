@@ -26,6 +26,7 @@ import {
     getCardFeedIcon,
     getCardFeedWithDomainID,
     getPlaidInstitutionIconUrl,
+    isCardConnectionBroken,
     isExpensifyCard,
     isExpensifyCardPendingAction,
     isPersonalCard,
@@ -241,7 +242,7 @@ function PaymentMethodList({
                     }
                 }
 
-                if (card.errors && isUserPersonalCard) {
+                if (isUserPersonalCard && (card.errors || isCardConnectionBroken(card))) {
                     brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
                 }
 

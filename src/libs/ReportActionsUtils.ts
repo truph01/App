@@ -30,7 +30,7 @@ import type ReportAction from '@src/types/onyx/ReportAction';
 import type {Message, OldDotReportAction, OriginalMessage, ReportActions} from '@src/types/onyx/ReportAction';
 import type ReportActionName from '@src/types/onyx/ReportActionName';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import {getBankName, isCardPendingActivate, isPersonalCardBrokenConnection} from './CardUtils';
+import {getBankName, isCardPendingActivate} from './CardUtils';
 import {getDecodedCategoryName} from './CategoryUtils';
 import {convertAmountToDisplayString, convertToBackendAmount, convertToDisplayString, convertToShortDisplayString} from './CurrencyUtils';
 import DateUtils from './DateUtils';
@@ -416,10 +416,7 @@ function getOriginalMessage<T extends ReportActionName>(reportAction: OnyxInputO
     return reportAction.originalMessage;
 }
 
-function getCardConnectionBrokenMessage(reportAction: OnyxEntry<ReportAction>, card: Card | undefined, translate: LocaleContextProps['translate'], connectionLink: string) {
-    if (!isCardBrokenConnectionAction(reportAction) || !isPersonalCardBrokenConnection(card)) {
-        return '';
-    }
+function getCardConnectionBrokenMessage(card: Card | undefined, translate: LocaleContextProps['translate'], connectionLink: string) {
     const cardName = card?.cardName;
     const personalCardName = cardName ?? getBankName(card?.bank as CompanyCardFeed);
     return translate('personalCard.conciergeBrokenConnection', {cardName: personalCardName, connectionLink});

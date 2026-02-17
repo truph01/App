@@ -257,6 +257,7 @@ import ReportActionItemMessageWithExplain from './ReportActionItemMessageWithExp
 import ReportActionItemSingle from './ReportActionItemSingle';
 import ReportActionItemThread from './ReportActionItemThread';
 import TripSummary from './TripSummary';
+import {isPersonalCardBrokenConnection} from '@libs/CardUtils';
 
 type PureReportActionItemProps = {
     /** All the data of the report collection */
@@ -1659,11 +1660,16 @@ function PureReportActionItem({
             const cardID = getOriginalMessage(action)?.cardID;
             const card = cardID ? cardList?.[cardID] : undefined;
             const connectionLink = cardID ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : '';
-            children = (
-                <ReportActionItemBasicMessage message="">
-                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(action, card, translate, connectionLink)}</comment>`} />
-                </ReportActionItemBasicMessage>
-            );
+            const isPersonalCardBroken = isPersonalCardBrokenConnection(card);
+            if (isPersonalCardBroken) {
+                children = (
+                    <ReportActionItemBasicMessage message="">
+                        <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
+                    </ReportActionItemBasicMessage>
+                );
+            } else {
+                children = emptyHTML;
+            }
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {
             children = <ExportIntegration action={action} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED)) {
