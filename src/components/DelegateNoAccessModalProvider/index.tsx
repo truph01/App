@@ -7,8 +7,8 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import AccountUtils from '@libs/AccountUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ConfirmModal from '../ConfirmModal';
-import RenderHTML from '../RenderHTML';
+import ConfirmModal from '@components/ConfirmModal';
+import RenderHTML from '@components/RenderHTML';
 import {defaultDelegateNoAccessActionsContextValue, defaultDelegateNoAccessStateContextValue} from './default';
 import type {DelegateNoAccessActionsContextType, DelegateNoAccessStateContextType} from './types';
 

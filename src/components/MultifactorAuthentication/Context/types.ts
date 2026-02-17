@@ -1,13 +1,15 @@
 import type {
     MultifactorAuthenticationScenario,
     MultifactorAuthenticationScenarioAdditionalParams,
+    MultifactorAuthenticationScenarioConfig,
     MultifactorAuthenticationScenarioResponse,
 } from '@components/MultifactorAuthentication/config/types';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/Biometrics/ED25519/types';
-import type {AuthTypeInfo, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
+import type {AuthTypeInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 
 type ErrorState = {
     reason: MultifactorAuthenticationReason;
+    httpStatusCode?: number;
     message?: string;
 };
 
@@ -30,14 +32,11 @@ type MultifactorAuthenticationState = {
     /** Whether user approved the soft prompt for biometric setup */
     softPromptApproved: boolean;
 
-    /** Current scenario being executed */
-    scenario: MultifactorAuthenticationScenario | undefined;
+    /** Current scenario configuration being executed */
+    scenario: MultifactorAuthenticationScenarioConfig | undefined;
 
     /** Additional parameters for the current scenario */
     payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined;
-
-    /** Outcome paths for navigation after authentication completes */
-    outcomePaths: OutcomePaths | undefined;
 
     /** Whether registration step has been completed */
     isRegistrationComplete: boolean;
@@ -58,7 +57,6 @@ type MultifactorAuthenticationState = {
 type InitPayload = {
     scenario: MultifactorAuthenticationScenario;
     payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined;
-    outcomePaths: OutcomePaths;
 };
 
 type Action =
@@ -68,9 +66,8 @@ type Action =
     | {type: 'SET_REGISTRATION_CHALLENGE'; payload: RegistrationChallenge | undefined}
     | {type: 'SET_AUTHORIZATION_CHALLENGE'; payload: AuthenticationChallenge | undefined}
     | {type: 'SET_SOFT_PROMPT_APPROVED'; payload: boolean}
-    | {type: 'SET_SCENARIO'; payload: MultifactorAuthenticationScenario | undefined}
+    | {type: 'SET_SCENARIO'; payload: MultifactorAuthenticationScenarioConfig | undefined}
     | {type: 'SET_PAYLOAD'; payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined}
-    | {type: 'SET_OUTCOME_PATHS'; payload: OutcomePaths | undefined}
     | {type: 'SET_REGISTRATION_COMPLETE'; payload: boolean}
     | {type: 'SET_AUTHORIZATION_COMPLETE'; payload: boolean}
     | {type: 'SET_FLOW_COMPLETE'; payload: boolean}
