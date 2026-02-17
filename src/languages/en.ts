@@ -2276,6 +2276,7 @@ const translations = {
             alertMessage: ({cardLastFour, amount, merchant, date}: {cardLastFour: string; amount: string; merchant: string; date: string}) =>
                 `identified suspicious activity on card ending in ${cardLastFour}. Do you recognize this charge?\n\n${amount} for ${merchant} - ${date}`,
         },
+        freezeCard: 'Freeze card',
     },
     workflowsPage: {
         workflowTitle: 'Spend',

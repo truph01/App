@@ -2268,6 +2268,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} pour ${merchant} - ${date}`,
         },
+        freezeCard: 'Geler la carte',
     },
     workflowsPage: {
         workflowTitle: 'Dépense',

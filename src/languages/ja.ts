@@ -2243,6 +2243,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${date} の ${merchant} への ${amount}`,
         },
+        freezeCard: 'カードを一時停止',
     },
     workflowsPage: {
         workflowTitle: '支出',

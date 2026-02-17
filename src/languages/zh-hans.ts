@@ -2220,6 +2220,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount}，商户：${merchant} - 日期：${date}`,
         },
+        freezeCard: '冻结卡片',
     },
     workflowsPage: {
         workflowTitle: '支出',
