@@ -422,6 +422,8 @@ function IOURequestStepDistanceOdometer({
             odometerEnd: end,
             odometerDistance: calculatedDistance,
             betas,
+            unit,
+            personalOutputCurrency: personalPolicy?.outputCurrency,
         });
     };
 
