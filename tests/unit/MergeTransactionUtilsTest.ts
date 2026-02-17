@@ -1,5 +1,5 @@
 import Onyx from 'react-native-onyx';
-import {convertToBackendAmount} from '@libs/CurrencyUtils';
+import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import {
     areTransactionsEligibleForMerge,
     buildMergedTransactionData,
@@ -600,7 +600,7 @@ describe('MergeTransactionUtils', () => {
                 waypoints: {waypoint0: {name: 'Selected waypoint'}},
                 customUnit: {name: CONST.CUSTOM_UNITS.NAME_DISTANCE, customUnitID: 'distance1', quantity: 100},
                 taxValue: '9%',
-                taxAmount: convertToBackendAmount(calculateTaxAmount('9%', 2000, 'USD')),
+                taxAmount: convertToBackendAmount(calculateTaxAmount('9%', 2000, getCurrencyDecimals(CONST.CURRENCY.USD))),
                 taxCode: 'id_TAX_RATE_1',
                 taxName: 'Tax Rate 1 (9%)',
             };
@@ -631,7 +631,7 @@ describe('MergeTransactionUtils', () => {
                 reportID: '1',
                 reportName: 'Test Report',
                 taxValue: '9%',
-                taxAmount: convertToBackendAmount(calculateTaxAmount('9%', 2000, 'USD')),
+                taxAmount: convertToBackendAmount(calculateTaxAmount('9%', 2000, getCurrencyDecimals(CONST.CURRENCY.USD))),
                 taxCode: 'id_TAX_RATE_1',
                 taxName: 'Tax Rate 1 (9%)',
             });

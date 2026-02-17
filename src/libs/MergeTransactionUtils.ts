@@ -8,7 +8,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {MergeTransaction, Policy, Report, SearchResults, Transaction} from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
 import SafeString from '@src/utils/SafeString';
-import {convertToBackendAmount, convertToDisplayString} from './CurrencyUtils';
+import {convertToBackendAmount, convertToDisplayString, getCurrencyDecimals} from './CurrencyUtils';
 import Parser from './Parser';
 import {getCommaSeparatedTagNameWithSanitizedColons} from './PolicyUtils';
 import {getIOUActionForReportID} from './ReportActionsUtils';
@@ -603,7 +603,7 @@ function getMergeFieldUpdatedValues<K extends MergeFieldKey>({
     if (field === 'amount') {
         updatedValues.currency = getCurrency(transaction);
         if (mergeTransaction?.taxValue && transaction?.amount) {
-            updatedValues.taxAmount = convertToBackendAmount(calculateTaxAmount(mergeTransaction?.taxValue, transaction.amount, getCurrency(transaction)));
+            updatedValues.taxAmount = convertToBackendAmount(calculateTaxAmount(mergeTransaction?.taxValue, transaction.amount, getCurrencyDecimals(getCurrency(transaction))));
         }
     }
 
@@ -629,7 +629,7 @@ function getMergeFieldUpdatedValues<K extends MergeFieldKey>({
         updatedValues.taxName = getTaxName(policy, transaction) ?? transaction?.taxValue ?? '';
         updatedValues.taxPolicyID = policy?.id;
         if (mergeTransaction?.amount) {
-            updatedValues.taxAmount = convertToBackendAmount(calculateTaxAmount(transaction?.taxValue, mergeTransaction.amount, mergeTransaction.currency));
+            updatedValues.taxAmount = convertToBackendAmount(calculateTaxAmount(transaction?.taxValue, mergeTransaction.amount, getCurrencyDecimals(getCurrency(transaction))));
         }
     }
 
