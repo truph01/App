@@ -4,16 +4,17 @@ import {getTransactionDetails} from '@libs/ReportUtils';
 import {getOriginalTransactionWithSplitInfo, getChildTransactions, buildOptimisticTransaction} from '@libs/TransactionUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {Transaction} from '@src/types/onyx';
-import {SplitExpense, type Attendee} from '@src/types/onyx/IOU';
+import type {Report, Transaction} from '@src/types/onyx';
+import type {SplitExpense, Attendee} from '@src/types/onyx/IOU';
 import CONST from '@src/CONST';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import Navigation from '@libs/Navigation/Navigation';
 import {calculateAmount} from '@libs/IOUUtils';
 import {rand64} from '@libs/NumberUtils';
-import useOnyx from './useOnyx';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import {createDraftTransaction} from '@libs/actions/TransactionEdit';
+import {useCallback} from 'react';
+import useOnyx from './useOnyx';
 
 /**
  * Create a draft transaction to set up split expense details for the split expense flow
@@ -22,10 +23,8 @@ function useSplitExpense(transactions: OnyxCollection<Transaction>, transaction:
     const reportID = transaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
     const originalTransactionID = transaction?.comment?.originalTransactionID;
 
-    const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
-    const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`);
-    const [splitExpenses = getEmptyArray<SplitExpense>()] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}`, {
-        selector: (reports) => {
+    const splitExpensesSelector = useCallback(
+        (reports: OnyxCollection<Report>) => {
             const relatedTransactions = getChildTransactions(transactions, reports, originalTransactionID);
             const splitExpenses = relatedTransactions.map((currentTransaction) => {
                 const currentTransactionReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${currentTransaction?.reportID}`];
@@ -33,6 +32,14 @@ function useSplitExpense(transactions: OnyxCollection<Transaction>, transaction:
             });
             return splitExpenses;
         },
+        [transactions, originalTransactionID],
+    );
+
+    const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {canBeMissing: true});
+    const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`, {canBeMissing: true});
+    const [splitExpenses = getEmptyArray<SplitExpense>()] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}`, {
+        canBeMissing: true,
+        selector: splitExpensesSelector,
     });
 
     function initSplit() {
@@ -47,7 +54,7 @@ function useSplitExpense(transactions: OnyxCollection<Transaction>, transaction:
             const draftTransaction = buildOptimisticTransaction({
                 originalTransactionID,
                 transactionParams: {
-                    splitExpenses: splitExpenses,
+                    splitExpenses,
                     splitExpensesTotal: splitExpenses.reduce((total, item) => total + item.amount, 0),
                     amount: transactionDetails?.amount ?? 0,
                     currency: transactionDetails?.currency ?? CONST.CURRENCY.USD,

@@ -15,7 +15,7 @@ type CreatedReportForUnapprovedTransactionsActionProps = {
 function CreatedReportForUnapprovedTransactionsAction({action}: CreatedReportForUnapprovedTransactionsActionProps) {
     const {originalID} = getOriginalMessage(action) ?? {};
     const {translate} = useLocalize();
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalID}`);
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalID}`, {canBeMissing: true});
     const reportName = getReportName(report);
     const htmlContent = `<comment><muted-text>${getCreatedReportForUnapprovedTransactionsMessage(originalID, reportName, translate)}</muted-text></comment>`;
 

@@ -11,7 +11,7 @@ import useOnyx from '@hooks/useOnyx';
 
 type MovedTransactionActionProps = {
     action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION>;
-    emptyHTML: JSX.Element;
+    emptyHTML: React.JSX.Element;
 };
 
 function MovedTransactionAction({action, emptyHTML}: MovedTransactionActionProps) {
@@ -20,8 +20,8 @@ function MovedTransactionAction({action, emptyHTML}: MovedTransactionActionProps
     const toReportID = movedTransactionOriginalMessage?.toReportID;
     const fromReportID = movedTransactionOriginalMessage?.fromReportID;
 
-    const [toReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${toReportID}`);
-    const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`);
+    const [toReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${toReportID}`, {canBeMissing: true});
+    const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`, {canBeMissing: true});
 
     const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
     // When the transaction is moved from personal space (unreported), fromReportID will be "0" which doesn't exist in allReports

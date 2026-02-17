@@ -12,7 +12,7 @@ type CreateHarvestReportActionProps = {
 
 function CreateHarvestReportAction({reportNameValuePairsOriginalID}: CreateHarvestReportActionProps) {
     const {translate} = useLocalize();
-    const [harvestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportNameValuePairsOriginalID}`);
+    const [harvestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportNameValuePairsOriginalID}`, {canBeMissing: true});
     const harvestReportName = getReportName(harvestReport);
     const htmlContent = `<comment><muted-text>${getHarvestCreatedExpenseReportMessage(harvestReport?.reportID, harvestReportName, translate)}</muted-text></comment>`;
 

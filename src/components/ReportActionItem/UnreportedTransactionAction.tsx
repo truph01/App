@@ -18,7 +18,7 @@ function UnreportedTransactionAction({action}: UnreportedTransactionActionProps)
     const fromReportID = unreportedTransactionOriginalMessage?.fromReportID;
 
     const {translate} = useLocalize();
-    const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`);
+    const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`, {canBeMissing: true});
 
     const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
     const hasUnreportedTransaction = getUnreportedTransactionMessage(translate, action);
