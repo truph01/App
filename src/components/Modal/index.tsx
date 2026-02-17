@@ -20,10 +20,6 @@ function Modal({fullscreen = true, onModalHide = () => {}, type, onModalShow = (
         StatusBar.setBackgroundColor(color);
     };
 
-    const hideModal = () => {
-        onModalHide();
-    };
-
     const handlePopStateRef = useRef(() => {
         rest.onClose?.();
     });
@@ -46,6 +42,16 @@ function Modal({fullscreen = true, onModalHide = () => {}, type, onModalShow = (
     const handlePopState = useCallback(() => {
         handlePopStateRef.current();
     }, []);
+
+    const hideModal = () => {
+        window.removeEventListener('popstate', handlePopState);
+        if ((window.history.state as WindowState)?.shouldGoBack && shouldHandleNavigationBack) {
+            window.addEventListener('popstate', onModalHide, {once: true});
+            window.history.back();
+        } else {
+            onModalHide();
+        }
+    };
 
     const showModal = () => {
         if (shouldHandleNavigationBack) {
@@ -82,9 +88,6 @@ function Modal({fullscreen = true, onModalHide = () => {}, type, onModalShow = (
     const onModalWillHide = () => {
         setStatusBarColor(previousStatusBarColor);
         rest.onModalWillHide?.();
-        if ((window.history.state as WindowState)?.shouldGoBack && shouldHandleNavigationBack) {
-            window.history.back();
-        }
     };
 
     return (

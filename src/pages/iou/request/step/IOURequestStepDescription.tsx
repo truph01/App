@@ -22,9 +22,9 @@ import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {shouldUseTransactionDraft} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import Parser from '@libs/Parser';
-import {getPersonalPolicy} from '@libs/PolicyUtils';
 import variables from '@styles/variables';
-import {setDraftSplitTransaction, setMoneyRequestDescription, updateMoneyRequestDescription} from '@userActions/IOU';
+import {setMoneyRequestDescription, updateMoneyRequestDescription} from '@userActions/IOU';
+import {setDraftSplitTransaction} from '@userActions/IOU/Split';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -51,8 +51,12 @@ function IOURequestStepDescription({
     const policy = usePolicy(report?.policyID);
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`, {canBeMissing: true});
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
+    const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
+    const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`, {canBeMissing: true});
 
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${report?.policyID}`, {canBeMissing: true});
+
+    const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -152,17 +156,19 @@ function IOURequestStepDescription({
         setMoneyRequestDescription(transaction?.transactionID, newComment, isTransactionDraft);
 
         if (action === CONST.IOU.ACTION.EDIT) {
-            updateMoneyRequestDescription(
-                transaction?.transactionID,
-                reportID,
-                newComment,
+            updateMoneyRequestDescription({
+                transactionID: transaction?.transactionID,
+                transactionThreadReport: report,
+                parentReport,
+                comment: newComment,
                 policy,
-                policyTags,
+                policyTagList: policyTags,
                 policyCategories,
                 currentUserAccountIDParam,
                 currentUserEmailParam,
                 isASAPSubmitBetaEnabled,
-            );
+                parentReportNextStep,
+            });
         }
 
         setIsSaved(true);
@@ -172,7 +178,7 @@ function IOURequestStepDescription({
     // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = useShowNotFoundPageInIOUStep(action, iouType, reportActionID, report, transaction);
 
-    const isReportInGroupPolicy = !!report?.policyID && report.policyID !== CONST.POLICY.ID_FAKE && getPersonalPolicy()?.id !== report.policyID;
+    const isReportInGroupPolicy = !!report?.policyID && report.policyID !== CONST.POLICY.ID_FAKE && personalPolicyID !== report.policyID;
     const getDescriptionHint = () => {
         return transaction?.category && policyCategories ? (policyCategories[transaction?.category]?.commentHint ?? '') : '';
     };

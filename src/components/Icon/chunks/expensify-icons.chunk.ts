@@ -20,6 +20,7 @@ import NotificationsAvatar from '@assets/images/avatars/notifications-avatar.svg
 import ActiveRoomAvatar from '@assets/images/avatars/room.svg';
 import BackArrow from '@assets/images/back-left.svg';
 import Bank from '@assets/images/bank.svg';
+import Basket from '@assets/images/basket.svg';
 import Bed from '@assets/images/bed.svg';
 import Bell from '@assets/images/bell.svg';
 import Bill from '@assets/images/bill.svg';
@@ -80,6 +81,7 @@ import EReceiptIcon from '@assets/images/eReceiptIcon.svg';
 import Exclamation from '@assets/images/exclamation.svg';
 import Exit from '@assets/images/exit.svg';
 import Expand from '@assets/images/expand.svg';
+import ExpenseCopy from '@assets/images/expense-copy.svg';
 import ExpensifyAppIcon from '@assets/images/expensify-app-icon.svg';
 import ExpensifyCard from '@assets/images/expensify-card-icon.svg';
 import ExpensifyFooterLogoVertical from '@assets/images/expensify-footer-logo-vertical.svg';
@@ -156,9 +158,12 @@ import MoneySearch from '@assets/images/money-search.svg';
 import MoneyWaving from '@assets/images/money-waving.svg';
 import Monitor from '@assets/images/monitor.svg';
 import MultiTag from '@assets/images/multi-tag.svg';
+import Fingerprint from '@assets/images/multifactorAuthentication/fingerprint.svg';
 import Mute from '@assets/images/mute.svg';
 import NewWindow from '@assets/images/new-window.svg';
 import NewWorkspace from '@assets/images/new-workspace.svg';
+import OdometerEnd from '@assets/images/odometer-end.svg';
+import OdometerStart from '@assets/images/odometer-start.svg';
 import OfflineCloud from '@assets/images/offline-cloud.svg';
 import Offline from '@assets/images/offline.svg';
 import Paperclip from '@assets/images/paperclip.svg';
@@ -183,6 +188,7 @@ import ReceiptScan from '@assets/images/receipt-scan.svg';
 import ReceiptSlash from '@assets/images/receipt-slash.svg';
 import Receipt from '@assets/images/receipt.svg';
 import RemoveMembers from '@assets/images/remove-members.svg';
+import ReportCopy from '@assets/images/report-copy.svg';
 import Rotate from '@assets/images/rotate-image.svg';
 import RotateLeft from '@assets/images/rotate-left.svg';
 import Scan from '@assets/images/scan.svg';
@@ -215,6 +221,7 @@ import ThumbsUp from '@assets/images/thumbs-up.svg';
 import Train from '@assets/images/train.svg';
 import Transfer from '@assets/images/transfer.svg';
 import Trashcan from '@assets/images/trashcan.svg';
+import TreasureChestGreenWithSparkle from '@assets/images/treasure-chest-green-with-sparkle.svg';
 import TreasureChest from '@assets/images/treasure-chest.svg';
 import Unlock from '@assets/images/unlock.svg';
 import UploadAlt from '@assets/images/upload-alt.svg';
@@ -224,6 +231,7 @@ import UserEye from '@assets/images/user-eye.svg';
 import UserLock from '@assets/images/user-lock.svg';
 import UserMinus from '@assets/images/user-minus.svg';
 import UserPlus from '@assets/images/user-plus.svg';
+import UserShield from '@assets/images/user-shield.svg';
 import User from '@assets/images/user.svg';
 import Users from '@assets/images/users.svg';
 import VideoSlash from '@assets/images/video-slash.svg';
@@ -253,6 +261,7 @@ const Expensicons = {
     AttachmentNotFound,
     BackArrow,
     Bank,
+    Basket,
     CircularArrowBackwards,
     Bill,
     BillComSquare,
@@ -299,6 +308,7 @@ const Expensicons = {
     EReceiptIcon,
     Emoji,
     EmptyStateRoutePending,
+    ExpenseCopy,
     Exclamation,
     Exit,
     ExpensifyAppIcon,
@@ -316,6 +326,7 @@ const Expensicons = {
     FlagLevelOne,
     FlagLevelTwo,
     FlagLevelThree,
+    Fingerprint,
     Fullscreen,
     Folder,
     Tag,
@@ -366,6 +377,8 @@ const Expensicons = {
     NotificationsAvatar,
     Offline,
     OfflineCloud,
+    OdometerStart,
+    OdometerEnd,
     Paperclip,
     Pause,
     Pencil,
@@ -387,6 +400,7 @@ const Expensicons = {
     ReceiptScan,
     ReceiptSlash,
     RemoveMembers,
+    ReportCopy,
     ReplaceReceipt,
     ReceiptMultiple,
     Rotate,
@@ -471,6 +485,8 @@ const Expensicons = {
     XeroExport,
     ArrowCircleClockwise,
     LuggageWithLines,
+    TreasureChestGreenWithSparkle,
+    UserShield,
 };
 
 // Create the ExpensifyIcons object from the imported Expensicons

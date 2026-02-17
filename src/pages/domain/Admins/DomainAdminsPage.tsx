@@ -2,17 +2,19 @@ import {adminAccountIDsSelector, adminPendingActionSelector, technicalContactSet
 import React from 'react';
 import Badge from '@components/Badge';
 import Button from '@components/Button';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {hasDomainAdminsSettingsErrors} from '@libs/DomainUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {DomainSplitNavigatorParamList} from '@navigation/types';
 import BaseDomainMembersPage from '@pages/domain/BaseDomainMembersPage';
 import {clearAdminError} from '@userActions/Domain';
-import {getCurrentUserAccountID} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -23,9 +25,10 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
     const {domainAccountID} = route.params;
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const theme = useTheme();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(['UserShield']);
-    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'Plus']);
+    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'Plus', 'DotIndicator']);
 
     const [adminAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         canBeMissing: true,
@@ -47,7 +50,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
         selector: technicalContactSettingsSelector,
     });
 
-    const currentUserAccountID = getCurrentUserAccountID();
+    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const isAdmin = adminAccountIDs?.includes(currentUserAccountID);
 
     const getCustomRightElement = (accountID: number) => {
@@ -64,6 +67,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
         pendingAction: domainPendingAction?.[accountID]?.pendingAction,
     });
 
+    const hasSettingsErrors = hasDomainAdminsSettingsErrors(domainErrors);
     const headerContent = isAdmin ? (
         <>
             <Button
@@ -76,8 +80,10 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
             />
             <Button
                 onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADMINS_SETTINGS.getRoute(domainAccountID))}
-                text={translate('domain.admins.settings')}
-                icon={icons.Gear}
+                text={translate('domain.common.settings')}
+                icon={hasSettingsErrors ? icons.DotIndicator : icons.Gear}
+                iconFill={hasSettingsErrors ? theme.danger : undefined}
+                iconHoverFill={hasSettingsErrors ? theme.dangerHover : undefined}
                 innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}
                 style={shouldUseNarrowLayout ? [styles.flexGrow1, styles.mb3] : undefined}
             />

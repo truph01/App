@@ -68,7 +68,7 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
     const hasViolations = hasViolationsReportUtils(undefined, transactionViolations, accountID ?? CONST.DEFAULT_NUMBER_ID, email ?? '');
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const [hasDismissedEmptyReportsConfirmation] = useOnyx(ONYXKEYS.NVP_EMPTY_REPORTS_CONFIRMATION_DISMISSED, {canBeMissing: true});
-
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
     const [policies, fetchStatus] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -122,6 +122,7 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
                 isASAPSubmitBetaEnabled,
                 hasViolations,
                 policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`],
+                betas,
                 false,
                 shouldDismissEmptyReportsConfirmation,
             );
@@ -130,16 +131,17 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
             if (isMovingExpenses && (!!selectedTransactionsKeys.length || !!selectedTransactionIDs.length)) {
                 const reportNextStep = allReportNextSteps?.[`${ONYXKEYS.COLLECTION.NEXT_STEP}${optimisticReport.reportID}`];
                 setNavigationActionToMicrotaskQueue(() => {
-                    changeTransactionsReport(
-                        selectedTransactionsKeys.length ? selectedTransactionsKeys : selectedTransactionIDs,
+                    changeTransactionsReport({
+                        transactionIDs: selectedTransactionsKeys.length ? selectedTransactionsKeys : selectedTransactionIDs,
                         isASAPSubmitBetaEnabled,
-                        currentUserPersonalDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID,
-                        currentUserPersonalDetails?.email ?? '',
-                        optimisticReport,
-                        policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`],
+                        accountID: currentUserPersonalDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID,
+                        email: currentUserPersonalDetails?.email ?? '',
+                        newReport: optimisticReport,
+                        policy: policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`],
                         reportNextStep,
-                        undefined,
-                    );
+                        policyCategories: undefined,
+                        allTransactions,
+                    });
 
                     // eslint-disable-next-line rulesdir/no-default-id-values
                     setNameValuePair(ONYXKEYS.NVP_ACTIVE_POLICY_ID, policyID, activePolicyID ?? '');
@@ -159,18 +161,20 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
             navigateToNewReport(optimisticReport.reportID);
         },
         [
-            activePolicyID,
             currentUserPersonalDetails,
             isASAPSubmitBetaEnabled,
             hasViolations,
+            policies,
             selectedTransactions,
             isMovingExpenses,
             selectedTransactionIDs,
             navigateToNewReport,
             allReportNextSteps,
-            policies,
-            clearSelectedTransactions,
             backTo,
+            allTransactions,
+            activePolicyID,
+            clearSelectedTransactions,
+            betas,
         ],
     );
 
@@ -257,15 +261,19 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
             return [];
         }
 
-        return Object.values(policies)
-            .filter(
-                (policy) =>
-                    shouldShowPolicy(policy, false, currentUserPersonalDetails?.login) &&
-                    !policy?.isJoinRequestPending &&
-                    policy?.isPolicyExpenseChatEnabled &&
-                    (!hasPerDiemTransactions || canSubmitPerDiemExpenseFromWorkspace(policy)),
-            )
-            .map((policy, index) => ({
+        const result = [];
+        let index = 0;
+        for (const policy of Object.values(policies)) {
+            if (
+                policy?.isJoinRequestPending ||
+                !policy?.isPolicyExpenseChatEnabled ||
+                !shouldShowPolicy(policy, false, currentUserPersonalDetails?.login) ||
+                (hasPerDiemTransactions && !canSubmitPerDiemExpenseFromWorkspace(policy))
+            ) {
+                continue;
+            }
+
+            result.push({
                 text: policy?.name ?? '',
                 policyID: policy?.id,
                 icons: [
@@ -280,8 +288,11 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
                 keyForList: `${policy?.id}-${index}`,
                 isPolicyAdmin: isPolicyAdmin(policy),
                 shouldSyncFocus: true,
-            }))
-            .sort((a, b) => localeCompare(a.text, b.text));
+            });
+            index++;
+        }
+
+        return result.sort((a, b) => localeCompare(a.text, b.text));
     }, [policies, currentUserPersonalDetails?.login, localeCompare, hasPerDiemTransactions, icons.FallbackWorkspaceAvatar]);
 
     const filteredAndSortedUserWorkspaces = useMemo<WorkspaceListItem[]>(
