@@ -840,6 +840,22 @@ function getDefaultCardName(cardholder?: string) {
     return `${cardholder}'s card`;
 }
 
+/**
+ * Gets the date option for a card assignment.
+ * When not editing, always returns CUSTOM option.
+ * When editing, returns the existing date option or CUSTOM as fallback.
+ *
+ * @param isEditing - Whether the card assignment is being edited
+ * @param existingDateOption - The existing date option from previous assignment
+ * @returns Date option constant
+ */
+function getCardAssignmentDateOption(
+    isEditing: boolean | undefined,
+    existingDateOption?: ValueOf<typeof CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS>,
+): ValueOf<typeof CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS> {
+    return isEditing ? (existingDateOption ?? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM) : CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM;
+}
+
 function checkIfNewFeedConnected(prevFeedsData: CompanyFeeds, currentFeedsData: CompanyFeeds, plaidBank?: string) {
     const prevFeeds = Object.keys(prevFeedsData);
     const currentFeeds = Object.keys(currentFeedsData);
@@ -1196,6 +1212,7 @@ export {
     hasOnlyOneCardToAssign,
     checkIfNewFeedConnected,
     getDefaultCardName,
+    getCardAssignmentDateOption,
     getDomainOrWorkspaceAccountID,
     mergeCardListWithWorkspaceFeeds,
     isCard,
