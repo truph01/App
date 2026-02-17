@@ -1,16 +1,19 @@
 import React, {createContext, useContext, useMemo, useReducer} from 'react';
 import type {ReactNode} from 'react';
+import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
 import type {
     MultifactorAuthenticationScenario,
     MultifactorAuthenticationScenarioAdditionalParams,
+    MultifactorAuthenticationScenarioConfig,
     MultifactorAuthenticationScenarioResponse,
 } from '@components/MultifactorAuthentication/config/types';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/Biometrics/ED25519/types';
-import type {AuthTypeInfo, MultifactorAuthenticationReason, OutcomePaths} from '@libs/MultifactorAuthentication/Biometrics/types';
+import type {AuthTypeInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/Biometrics/types';
 import CONST from '@src/CONST';
 
 type ErrorState = {
     reason: MultifactorAuthenticationReason;
+    httpStatusCode?: number;
     message?: string;
 };
 
@@ -33,14 +36,11 @@ type MultifactorAuthenticationState = {
     /** Whether user approved the soft prompt for biometric setup */
     softPromptApproved: boolean;
 
-    /** Current scenario being executed */
-    scenario: MultifactorAuthenticationScenario | undefined;
+    /** Current scenario configuration being executed */
+    scenario: MultifactorAuthenticationScenarioConfig | undefined;
 
     /** Additional parameters for the current scenario */
     payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined;
-
-    /** Outcome paths for navigation after authentication completes */
-    outcomePaths: OutcomePaths | undefined;
 
     /** Whether registration step has been completed */
     isRegistrationComplete: boolean;
@@ -72,7 +72,6 @@ const DEFAULT_STATE: MultifactorAuthenticationState = {
     softPromptApproved: false,
     scenario: undefined,
     payload: undefined,
-    outcomePaths: undefined,
     isRegistrationComplete: false,
     isAuthorizationComplete: false,
     isFlowComplete: false,
@@ -83,7 +82,6 @@ const DEFAULT_STATE: MultifactorAuthenticationState = {
 type InitPayload = {
     scenario: MultifactorAuthenticationScenario;
     payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined;
-    outcomePaths: OutcomePaths;
 };
 
 type Action =
@@ -93,9 +91,8 @@ type Action =
     | {type: 'SET_REGISTRATION_CHALLENGE'; payload: RegistrationChallenge | undefined}
     | {type: 'SET_AUTHORIZATION_CHALLENGE'; payload: AuthenticationChallenge | undefined}
     | {type: 'SET_SOFT_PROMPT_APPROVED'; payload: boolean}
-    | {type: 'SET_SCENARIO'; payload: MultifactorAuthenticationScenario | undefined}
+    | {type: 'SET_SCENARIO'; payload: MultifactorAuthenticationScenarioConfig | undefined}
     | {type: 'SET_PAYLOAD'; payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined}
-    | {type: 'SET_OUTCOME_PATHS'; payload: OutcomePaths | undefined}
     | {type: 'SET_REGISTRATION_COMPLETE'; payload: boolean}
     | {type: 'SET_AUTHORIZATION_COMPLETE'; payload: boolean}
     | {type: 'SET_FLOW_COMPLETE'; payload: boolean}
@@ -144,8 +141,6 @@ function stateReducer(state: MultifactorAuthenticationState, action: Action): Mu
             return {...state, scenario: action.payload};
         case 'SET_PAYLOAD':
             return {...state, payload: action.payload};
-        case 'SET_OUTCOME_PATHS':
-            return {...state, outcomePaths: action.payload};
         case 'SET_REGISTRATION_COMPLETE':
             return {...state, isRegistrationComplete: action.payload};
         case 'SET_AUTHORIZATION_COMPLETE':
@@ -159,9 +154,8 @@ function stateReducer(state: MultifactorAuthenticationState, action: Action): Mu
         case 'INIT':
             return {
                 ...DEFAULT_STATE,
-                scenario: action.payload.scenario,
+                scenario: MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG[action.payload.scenario],
                 payload: action.payload.payload,
-                outcomePaths: action.payload.outcomePaths,
             };
         case 'RESET':
             return DEFAULT_STATE;
@@ -170,7 +164,6 @@ function stateReducer(state: MultifactorAuthenticationState, action: Action): Mu
                 ...DEFAULT_STATE,
                 scenario: state.scenario,
                 payload: state.payload,
-                outcomePaths: state.outcomePaths,
             };
         default:
             return state;

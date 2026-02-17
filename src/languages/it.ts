@@ -576,6 +576,14 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Settimana',
         year: 'Anno',
         quarter: 'Trimestre',
+        expensifyLogo: 'Logo Expensify',
+    },
+    socials: {
+        podcast: 'Seguici su Podcast',
+        twitter: 'Seguici su Twitter',
+        instagram: 'Seguici su Instagram',
+        facebook: 'Seguici su Facebook',
+        linkedin: 'Seguici su LinkedIn',
     },
     supportalNoAccess: {
         title: 'Non così in fretta',
@@ -683,6 +691,15 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectAuthentication: 'Rifiuta autenticazione',
             test: 'Test',
             biometricsAuthentication: 'Autenticazione biometrica',
+            authType: {
+                unknown: 'Sconosciuto',
+                none: 'Nessuno',
+                credentials: 'Credenziali',
+                biometrics: 'Biometria',
+                faceId: 'Face ID',
+                touchId: 'Touch ID',
+                opticId: 'Optic ID',
+            },
         },
         pleaseEnableInSystemSettings: {
             start: 'Abilita la verifica tramite volto/impronta digitale oppure imposta un codice di sblocco del dispositivo nel tuo',
@@ -717,6 +734,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unsupportedDevice: 'Dispositivo non supportato',
             pleaseDownloadMobileApp: `<centered-text><muted-text> Questa azione non è supportata sul tuo dispositivo. Scarica l'app Expensify dall'<a href="${CONST.APP_DOWNLOAD_LINKS.IOS}">App Store</a> o da <a href="${CONST.APP_DOWNLOAD_LINKS.ANDROID}">Google Play Store</a> e riprova.</muted-text></centered-text>`,
         },
+        verificationFailed: 'Verifica non riuscita',
     },
     validateCodeModal: {
         successfulSignInTitle: dedent(`
@@ -7438,6 +7456,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
         parentNavigationSummary: ({reportName, workspaceName}: ParentNavigationSummaryParams) => `Da ${reportName}${workspaceName ? `in ${workspaceName}` : ''}`,
     },
     qrCodes: {
+        qrCode: 'Codice QR',
         copy: 'Copia URL',
         copied: 'Copiato!',
     },
