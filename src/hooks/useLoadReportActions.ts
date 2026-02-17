@@ -5,6 +5,7 @@ import {getNewerActions, getOlderActions} from '@userActions/Report';
 import CONST from '@src/CONST';
 import type {Report, ReportAction, Response} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import type ONYXKEYS from '@src/ONYXKEYS';
 import useNetwork from './useNetwork';
 
 type UseLoadReportActionsArguments = {
@@ -98,7 +99,7 @@ function useLoadReportActions({reportID, reportActions, allReportActionIDs, tran
             }
 
             isLoadingOlderChats.current = true;
-            const getOlderActionsPromises: Array<Promise<Response | void>> = [];
+            const getOlderActionsPromises: Array<Promise<Response<typeof ONYXKEYS.COLLECTION.REPORT_METADATA> | void>> = [];
 
             if (isTransactionThreadReport) {
                 getOlderActionsPromises.push(getOlderActions(reportID, currentReportOldest?.reportActionID));
@@ -140,7 +141,7 @@ function useLoadReportActions({reportID, reportActions, allReportActionIDs, tran
             }
 
             isLoadingNewerChats.current = true;
-            const getNewerActionsPromises: Array<Promise<Response | void>> = [];
+            const getNewerActionsPromises: Array<Promise<Response<typeof ONYXKEYS.COLLECTION.REPORT_METADATA> | void>> = [];
 
             if (!isEmptyObject(transactionThreadReport)) {
                 getNewerActionsPromises.push(getNewerActions(reportID, currentReportNewest?.reportActionID));
