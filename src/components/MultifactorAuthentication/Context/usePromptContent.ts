@@ -38,15 +38,15 @@ function serverHasRegisteredCredentials(data: OnyxEntry<Account>) {
  */
 function usePromptContent(promptType: MultifactorAuthenticationPromptType): PromptContent {
     const {state} = useMultifactorAuthenticationState();
-    const biometrics = useNativeBiometrics();
+    const {areLocalCredentialsKnownToServer} = useNativeBiometrics();
     const [serverHasCredentials, setServerHasCredentials] = useState(false);
     const [deviceBiometricsState] = useOnyx(ONYXKEYS.DEVICE_BIOMETRICS, {canBeMissing: true});
     const hasEverAcceptedSoftPrompt = deviceBiometricsState?.hasAcceptedSoftPrompt ?? false;
 
     // We need to know if server has this device's credentials specifically
     useEffect(() => {
-        biometrics.areLocalCredentialsKnownToServer().then((localCredentialsKnown) => setServerHasCredentials(localCredentialsKnown));
-    }, [biometrics]);
+        areLocalCredentialsKnownToServer().then((localCredentialsKnown) => setServerHasCredentials(localCredentialsKnown));
+    }, [areLocalCredentialsKnownToServer]);
 
     // This one's a real doozy. There's an edge case with the MFA flows where the user's keys were revoked
     // server-side, but the client missed the Onyx update to clear them locally. When the client launches the MFA
