@@ -1,6 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import {hasSeenTourSelector, tryNewDotOnyxSelector} from '@selectors/Onboarding';
-import {createPoliciesSelector} from '@selectors/Policy';
+import {groupPaidPoliciesWithExpenseChatEnabledSelector} from '@selectors/Policy';
 import {Str} from 'expensify-common';
 import type {ImageContentFit} from 'expo-image';
 import type {ForwardedRef} from 'react';
@@ -22,6 +22,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
+import useMappedPolicies from '@hooks/useMappedPolicies';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import usePrevious from '@hooks/usePrevious';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -41,14 +42,7 @@ import navigateAfterInteraction from '@libs/Navigation/navigateAfterInteraction'
 import Navigation from '@libs/Navigation/Navigation';
 import {openTravelDotLink, shouldOpenTravelDotLinkWeb} from '@libs/openTravelDotLink';
 import Permissions from '@libs/Permissions';
-import {
-    areAllGroupPoliciesExpenseChatDisabled,
-    canSendInvoice as canSendInvoicePolicyUtils,
-    getDefaultChatEnabledPolicy,
-    getGroupPaidPoliciesWithExpenseChatEnabled,
-    isPaidGroupPolicy,
-    shouldShowPolicy,
-} from '@libs/PolicyUtils';
+import {areAllGroupPoliciesExpenseChatDisabled, canSendInvoice as canSendInvoicePolicyUtils, getDefaultChatEnabledPolicy, isPaidGroupPolicy, shouldShowPolicy} from '@libs/PolicyUtils';
 import {getQuickActionIcon, getQuickActionTitle, isQuickActionAllowed} from '@libs/QuickActionUtils';
 import {
     generateReportID,
@@ -96,7 +90,7 @@ type FloatingActionButtonAndPopoverRef = {
     hideCreateMenu: () => void;
 };
 
-const policySelector = (policy: OnyxEntry<OnyxTypes.Policy>): PolicySelector =>
+const policyMapper = (policy: OnyxEntry<OnyxTypes.Policy>): PolicySelector =>
     (policy && {
         type: policy.type,
         role: policy.role,
@@ -107,8 +101,6 @@ const policySelector = (policy: OnyxEntry<OnyxTypes.Policy>): PolicySelector =>
         name: policy.name,
         areInvoicesEnabled: policy.areInvoicesEnabled,
     }) as PolicySelector;
-
-const policiesSelector = (policies: OnyxCollection<OnyxTypes.Policy>) => createPoliciesSelector(policies, policySelector);
 
 const sessionSelector = (session: OnyxEntry<OnyxTypes.Session>) => ({email: session?.email, accountID: session?.accountID});
 
@@ -137,6 +129,7 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
         'Cash',
         'Transfer',
         'MoneyCircle',
+        'Clock',
     ] as const);
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -163,8 +156,9 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
         const policyChatsForActivePolicy = getWorkspaceChats(activePolicyID, [session?.accountID ?? CONST.DEFAULT_NUMBER_ID], allReports);
         return policyChatsForActivePolicy.length > 0 ? policyChatsForActivePolicy.at(0) : ({} as OnyxTypes.Report);
     }, [activePolicy, activePolicyID, session?.accountID, allReports]);
-    const [quickActionPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${quickActionReport?.policyID}`, {canBeMissing: true});
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: policiesSelector, canBeMissing: true});
+    const quickActionPolicyID = quickAction?.action === CONST.QUICK_ACTIONS.TRACK_PER_DIEM && quickAction?.perDiemPolicyID ? quickAction?.perDiemPolicyID : quickActionReport?.policyID;
+    const [quickActionPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${quickActionPolicyID}`, {canBeMissing: true});
+    const [allPolicies] = useMappedPolicies(policyMapper);
     const [lastDistanceExpenseType] = useOnyx(ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE, {canBeMissing: true});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
@@ -200,8 +194,20 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
     const isUserPaidPolicyMember = useIsPaidPolicyAdmin();
     const reportID = useMemo(() => generateReportID(), []);
 
+    const groupPaidPoliciesWithChatEnabled = useCallback(
+        (policies: OnyxCollection<OnyxTypes.Policy>) => groupPaidPoliciesWithExpenseChatEnabledSelector(policies, session?.email),
+        [session?.email],
+    );
+
     const isReportInSearch = isOnSearchMoneyRequestReportPage();
-    const groupPoliciesWithChatEnabled = getGroupPaidPoliciesWithExpenseChatEnabled(allPolicies as OnyxCollection<OnyxTypes.Policy>);
+    const [groupPoliciesWithChatEnabled = CONST.EMPTY_ARRAY] = useOnyx(
+        ONYXKEYS.COLLECTION.POLICY,
+        {
+            selector: groupPaidPoliciesWithChatEnabled,
+            canBeMissing: true,
+        },
+        [session?.email],
+    );
 
     /**
      * There are scenarios where users who have not yet had their group workspace-chats in NewDot (isPolicyExpenseChatEnabled). In those scenarios, things can get confusing if they try to submit/track expenses. To address this, we block them from Creating, Tracking, Submitting expenses from NewDot if they are:
@@ -464,7 +470,7 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
         };
 
         if (quickAction?.action && quickActionReport) {
-            if (!isQuickActionAllowed(quickAction, quickActionReport, quickActionPolicy, isReportArchived, isRestrictedToPreferredPolicy)) {
+            if (!isQuickActionAllowed(quickAction, quickActionReport, quickActionPolicy, isReportArchived, allBetas, isRestrictedToPreferredPolicy)) {
                 return [];
             }
             const onSelected = () => {
@@ -556,6 +562,7 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
         showDelegateNoAccessModal,
         reportID,
         allTransactionDrafts,
+        allBetas,
     ]);
 
     const isTravelEnabled = useMemo(() => {
