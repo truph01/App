@@ -108,7 +108,7 @@ function ScreenWrapper({
     const navigationFallback = useNavigation<PlatformStackNavigationProp<RootNavigatorParamList>>();
     const navigation = navigationProp ?? navigationFallback;
     const isFocused = useIsFocused();
-    const screenWrapperRef = useRef<View>(null);
+    const screenWrapperRef = useRef<View | HTMLElement>(null);
     const mergedScreenWrapperRef = mergeRefs(screenWrapperRef, ref);
 
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout for a case where we want to show the offline indicator only on small screens
@@ -236,12 +236,12 @@ function ScreenWrapper({
             return;
         }
 
-        const element = screenWrapperRef.current as unknown as HTMLElement | null;
-        if (!element) {
+        const element = screenWrapperRef.current;
+        if (!element || !('contains' in element) || !('querySelectorAll' in element)) {
             return;
         }
 
-        const activeElement = document.activeElement as HTMLElement | null;
+        const activeElement = document.activeElement;
         if (activeElement && element.contains(activeElement)) {
             return;
         }
@@ -258,7 +258,7 @@ function ScreenWrapper({
             }
 
             focusTarget.focus();
-            const focusedElement = document.activeElement as HTMLElement | null;
+            const focusedElement = document.activeElement;
             if (focusedElement === focusTarget || (focusedElement && focusTarget.contains(focusedElement))) {
                 return;
             }
