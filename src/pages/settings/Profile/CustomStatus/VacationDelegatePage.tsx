@@ -5,7 +5,6 @@ import MenuItem from '@components/MenuItem';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ScreenWrapper from '@components/ScreenWrapper';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
-import SelectionList from '@components/SelectionList/SelectionListWithSections';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import Text from '@components/Text';
 import useConfirmModal from '@hooks/useConfirmModal';
