@@ -850,10 +850,7 @@ function getDefaultCardName(cardholder?: string) {
  * @returns Formatted start date string in yyyy-MM-dd format
  */
 function getCardAssignmentStartDate(isEditing: boolean | undefined, existingStartDate?: string): string {
-    if (!isEditing) {
-        return format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
-    }
-    return existingStartDate ?? format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
+    return isEditing ? (existingStartDate ?? format(new Date(), CONST.DATE.FNS_FORMAT_STRING)) : format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
 }
 
 function checkIfNewFeedConnected(prevFeedsData: CompanyFeeds, currentFeedsData: CompanyFeeds, plaidBank?: string) {
