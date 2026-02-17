@@ -160,7 +160,6 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
     const styles = useThemeStyles();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
     const {translate} = useLocalize();
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
     const reportIDFromRoute = getNonEmptyStringOnyxID(route.params?.reportID);
     const reportActionIDFromRoute = route?.params?.reportActionID;
     const isFocused = useIsFocused();
@@ -1055,7 +1054,6 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
                                         <Animated.View style={styles.wideRHPMoneyRequestReceiptViewContainer}>
                                             <ScrollView contentContainerStyle={styles.wideRHPMoneyRequestReceiptViewScrollViewContainer}>
                                                 <MoneyRequestReceiptView
-                                                    allReports={allReports}
                                                     report={transactionThreadReport ?? report}
                                                     fillSpace
                                                     isDisplayedInWideRHP
