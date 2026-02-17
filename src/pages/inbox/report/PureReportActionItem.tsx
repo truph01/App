@@ -4,7 +4,7 @@ import mapValues from 'lodash/mapValues';
 import React, {memo, use, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {GestureResponderEvent, TextInput} from 'react-native';
 import {InteractionManager, Keyboard, View} from 'react-native';
-import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import {useOnyx, type OnyxCollection, type OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {Emoji} from '@assets/emojis/types';
 import * as ActionSheetAwareScrollView from '@components/ActionSheetAwareScrollView';
@@ -174,6 +174,7 @@ import {
     isMarkAsClosedAction,
     isMessageDeleted,
     isMoneyRequestAction,
+    isMovedTransactionAction,
     isPendingRemove,
     isReimbursementDeQueuedOrCanceledAction,
     isReimbursementQueuedAction,
@@ -239,6 +240,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {JoinWorkspaceResolution, OriginalMessageMovedTransaction, OriginalMessageUnreportedTransaction} from '@src/types/onyx/OriginalMessage';
 import {isEmptyObject, isEmptyValueObject} from '@src/types/utils/EmptyObject';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {RestrictedReadOnlyContextMenuActions} from './ContextMenu/ContextMenuActions';
 import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMenu';
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
@@ -477,7 +479,6 @@ const isEmptyHTML = <T extends React.JSX.Element>({props: {html}}: T): boolean =
  * Instead, pass all Onyx read/write operations as props.
  */
 function PureReportActionItem({
-    allReports,
     policies,
     personalPolicyID,
     introSelected,
@@ -544,7 +545,6 @@ function PureReportActionItem({
     const personalDetail = useCurrentUserPersonalDetails();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const reportID = report?.reportID ?? action?.reportID;
-    const childReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${action.childReportID}`];
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -571,6 +571,9 @@ function PureReportActionItem({
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Eye'] as const);
+
+    const [childReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action.childReportID)}`);
+    const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.chatReportID)}`);
 
     const highlightedBackgroundColorIfNeeded = useMemo(
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -608,7 +611,6 @@ function PureReportActionItem({
     const dismissError = useCallback(() => {
         const transactionID = isMoneyRequestAction(action) ? getOriginalMessage(action)?.IOUTransactionID : undefined;
         if (isSendingMoney && transactionID && reportID) {
-            const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
             cleanUpMoneyRequest(transactionID, action, reportID, report, chatReport, undefined, true);
             return;
         }
@@ -616,7 +618,7 @@ function PureReportActionItem({
             clearError(transactionID);
         }
         clearAllRelatedReportActionErrors(reportID, action);
-    }, [action, isSendingMoney, clearAllRelatedReportActionErrors, reportID, allReports, report, clearError]);
+    }, [action, isSendingMoney, clearAllRelatedReportActionErrors, reportID, report, clearError]);
 
     const showDismissReceiptErrorModal = useCallback(async () => {
         const result = await showConfirmModal({
