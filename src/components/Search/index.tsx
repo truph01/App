@@ -576,6 +576,7 @@ function Search({
         }
 
         // If count is already present, the latest response already contains totals and we can skip the re-query.
+        // If we show grouped values we want to retry search either way, the data may be outdated e.g. after deleting an expense.
         if (!validGroupBy && searchResults?.search?.count !== undefined) {
             shouldRetrySearchWithTotalsOrGroupedRef.current = false;
             return;
