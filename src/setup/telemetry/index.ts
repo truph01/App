@@ -37,11 +37,7 @@ export default function (): void {
 
     const appStartTimeModule = NativeModules.AppStartTime as {APP_START_TIME: number} | undefined;
     const nativeAppStartTimeMs = Platform.OS !== 'web' ? appStartTimeModule?.APP_START_TIME : undefined;
-console.log(`[Telemetry] Native app start time: ${nativeAppStartTimeMs}`);
-console.log(`[Telemetry] Date.now(): ${Date.now()}`);
-    if (nativeAppStartTimeMs) {
-        console.log(`[Telemetry] Time spent in native before JS: ${Date.now() - nativeAppStartTimeMs}ms`);
-    }
+    
 
     startSpan(CONST.TELEMETRY.SPAN_APP_STARTUP, {
         name: CONST.TELEMETRY.SPAN_APP_STARTUP,
