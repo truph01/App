@@ -3,7 +3,6 @@ import BaseVacationDelegateSelectionComponent from '@components/BaseVacationDele
 import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
 import Navigation from '@libs/Navigation/Navigation';
-import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
@@ -12,6 +11,9 @@ import {getCurrentUserEmail} from '@userActions/IOU';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Participant} from '@src/types/onyx/IOU';
+import useOnyx from '@hooks/useOnyx';
+import ONYXKEYS from '@src/ONYXKEYS';
+import {personalDetailsSelector} from '@selectors/PersonalDetails';
 import useVacationDelegate from './hooks/useVacationDelegate';
 
 type DomainMemberVacationDelegatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.VACATION_DELEGATE>;
@@ -24,7 +26,12 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
 
     const vacationDelegate = useVacationDelegate(domainAccountID, accountID);
 
-    const memberLogin = getLoginByAccountID(accountID);
+    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+        canBeMissing: true,
+        selector: personalDetailsSelector(accountID),
+    });
+    const memberLogin = personalDetails?.login;
+
     const onSelectRow = (option: Participant) => {
         const delegateLogin = option?.login;
 
@@ -53,7 +60,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
                     headerTitle={translate('common.vacationDelegate')}
                     onSelectRow={onSelectRow}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID))}
-                    cannotSetDelegateMessage={translate('domain.members.cannotSetVacationDelegateForMember', getLoginByAccountID(accountID) ?? '')}
+                    cannotSetDelegateMessage={translate('domain.members.cannotSetVacationDelegateForMember', memberLogin ?? '')}
                     additionalExcludeLogins={memberLogin ? {[memberLogin]: true} : undefined}
                 />
             </ScreenWrapper>
