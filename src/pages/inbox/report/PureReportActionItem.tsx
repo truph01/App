@@ -257,6 +257,8 @@ import ReportActionItemSingle from './ReportActionItemSingle';
 import ReportActionItemThread from './ReportActionItemThread';
 import TripSummary from './TripSummary';
 import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
+import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
+import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
 
 type PureReportActionItemProps = {
     /** All the data of the policy collection */
@@ -1461,20 +1463,7 @@ function PureReportActionItem({
                 </ReportActionItemBasicMessage>
             );
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION) {
-            const unreportedTransactionOriginalMessage = getOriginalMessage(action as OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION>) ?? {};
-            const {fromReportID} = unreportedTransactionOriginalMessage as OriginalMessageUnreportedTransaction;
-            const fromReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`];
-            const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-            const unreportedTransactionMessage = getUnreportedTransactionMessage(translate, action);
-            const htmlContent = isPendingDelete
-                ? `<del><comment><muted-text>${Parser.htmlToText(unreportedTransactionMessage)}</muted-text></comment></del>`
-                : `<comment><muted-text>${unreportedTransactionMessage}</muted-text></comment>`;
-
-            children = (
-                <ReportActionItemBasicMessage message="">
-                    <RenderHTML html={htmlContent} />
-                </ReportActionItemBasicMessage>
-            );
+            children = <UnreportedTransactionAction action={action as OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION>} />;
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.MERGED_WITH_CASH_TRANSACTION) {
             children = <ReportActionItemBasicMessage message={translate('systemMessage.mergedWithCashTransaction')} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.DISMISSED_VIOLATION)) {
@@ -1703,13 +1692,7 @@ function PureReportActionItem({
                 </ReportActionItemBasicMessage>
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CREATED) && isHarvestCreatedExpenseReport) {
-            const harvestReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportNameValuePairsOriginalID}`];
-            const harvestReportName = getReportName(harvestReport);
-            children = (
-                <ReportActionItemBasicMessage>
-                    <RenderHTML html={`<comment><muted-text>${getHarvestCreatedExpenseReportMessage(harvestReport?.reportID, harvestReportName, translate)}</muted-text></comment>`} />
-                </ReportActionItemBasicMessage>
-            );
+            children = <CreateHarvestReportAction reportNameValuePairsOriginalID={reportNameValuePairsOriginalId} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CREATED_REPORT_FOR_UNAPPROVED_TRANSACTIONS)) {
             const {originalID} = getOriginalMessage(action) ?? {};
             const reportName = getReportName(allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalID}`]);
