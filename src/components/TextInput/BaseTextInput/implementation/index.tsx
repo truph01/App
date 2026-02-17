@@ -84,6 +84,10 @@ function BaseTextInput({
     shouldUseDefaultLineHeightForPrefix = true,
     ref,
     sentryLabel,
+
+    // Destructure role so it doesn't leak into inputProps and override the
+    // native semantics of the actual <input> element on web.
+    role: _role,
     ...inputProps
 }: BaseTextInputProps) {
     const InputComponent = InputComponentMap.get(type) ?? RNTextInput;

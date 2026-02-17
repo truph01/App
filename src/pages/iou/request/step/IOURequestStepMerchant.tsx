@@ -167,6 +167,7 @@ function IOURequestStepMerchant({
                         onValueChange={updateMerchantRef}
                         label={translate('common.merchant')}
                         accessibilityLabel={translate('common.merchant')}
+                        role={CONST.ROLE.PRESENTATION}
                         ref={inputCallbackRef}
                     />
                 </View>
