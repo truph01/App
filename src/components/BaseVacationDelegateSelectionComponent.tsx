@@ -72,9 +72,9 @@ function BaseVacationDelegateSelectionComponent({
         searchContext: CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_GENERAL,
         excludeLogins,
         includeRecentReports: true,
-        includeCurrentUser,
         getValidOptionsConfig: {
             excludeLogins,
+            includeCurrentUser,
         },
     });
 
