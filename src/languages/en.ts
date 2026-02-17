@@ -5359,8 +5359,8 @@ const translations = {
             findTag: 'Find tag',
             subtitle: 'Tags add more detailed ways to classify costs.',
             // TODO: Add a actual link to the help article https://github.com/Expensify/App/issues/63612
-            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
-                `<muted-text>Tags add more detailed ways to classify costs. You are using <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">dependent tags</a>. You can <a href="${importSpreadsheetLink}">reimport a spreadsheet</a> to update your tags.</muted-text>`,
+            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
+                `<muted-text>You are using <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">dependent tags</a>. You can <a href="${importSpreadsheetLink}">reimport a spreadsheet</a> to update your tags.</muted-text>`,
             emptyTags: {
                 title: "You haven't created any tags",
                 //  We need to remove the subtitle and use the below one when we remove the canUseMultiLevelTags beta
@@ -7985,10 +7985,19 @@ const translations = {
             security: 'Expensify is PCI-DSS compliant, uses bank-level encryption, and utilizes redundant infrastructure to protect your data.',
             learnMoreAboutSecurity: 'Learn more about our security.',
         },
+        expensifyCode: {
+            title: 'Expensify code',
+            discountCode: 'Discount code',
+            enterCode: 'Enter an Expensify code to apply to your subscription.',
+            apply: 'Apply',
+            error: {
+                invalid: 'This code is invalid',
+            },
+        },
         subscriptionSettings: {
             title: 'Subscription settings',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Subscription type: ${subscriptionType}, Subscription size: ${subscriptionSize}, Auto renew: ${autoRenew}, Auto increase annual seats: ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Subscription type: ${subscriptionType}, Subscription size: ${subscriptionSize}${expensifyCode ? `, Expensify code: ${expensifyCode}` : ''}, Auto renew: ${autoRenew}, Auto increase annual seats: ${autoIncrease}`,
             none: 'none',
             on: 'on',
             off: 'off',

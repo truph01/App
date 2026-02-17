@@ -5425,8 +5425,8 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             editTags: 'Modifier les tags',
             findTag: 'Trouver un tag',
             subtitle: 'Les tags ajoutent des moyens plus détaillés de classer les coûts.',
-            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
-                `<muted-text>Les tags ajoutent des moyens plus détaillés de classer les coûts. Vous utilisez des <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tags dépendants</a>. Vous pouvez <a href="${importSpreadsheetLink}">réimporter une feuille de calcul</a> pour mettre à jour vos tags.</muted-text>`,
+            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
+                `<muted-text>Vous utilisez des <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">tags dépendants</a>. Vous pouvez <a href="${importSpreadsheetLink}">réimporter une feuille de calcul</a> pour mettre à jour vos tags.</muted-text>`,
             emptyTags: {
                 title: 'Vous n’avez créé aucun tag',
                 subtitle: 'Ajoutez un tag pour suivre les projets, les lieux, les services et plus encore.',
@@ -8070,10 +8070,19 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             security: 'Expensify est conforme à la norme PCI-DSS, utilise un chiffrement de niveau bancaire et une infrastructure redondante pour protéger vos données.',
             learnMoreAboutSecurity: 'En savoir plus sur notre sécurité.',
         },
+        expensifyCode: {
+            title: 'Code Expensify',
+            discountCode: 'Code de réduction',
+            enterCode: 'Saisissez un code Expensify à appliquer à votre abonnement.',
+            apply: 'Appliquer',
+            error: {
+                invalid: "Ce code n'est pas valide",
+            },
+        },
         subscriptionSettings: {
             title: 'Paramètres d’abonnement',
-            summary: ({subscriptionType, subscriptionSize, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
-                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
+            summary: ({subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease}: SubscriptionSettingsSummaryParams) =>
+                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}${expensifyCode ? `, Code Expensify : ${expensifyCode}` : ''}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
             none: 'aucun',
             on: 'activé',
             off: 'désactivé',
