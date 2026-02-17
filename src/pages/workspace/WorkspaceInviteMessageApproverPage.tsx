@@ -57,67 +57,54 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
 
     const policyMemberEmailsToAccountIDs = useMemo(() => getMemberAccountIDsForWorkspace(employeeList), [employeeList]);
 
-    const orderedApprovers = useMemo(() => {
-        const approvers: SelectionListApprover[] = [];
-
-        if (employeeList) {
-            const availableApprovers = Object.values(employeeList)
-                .map((employee): SelectionListApprover | null => {
-                    const email = employee.email;
-
-                    if (!email || employee.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
-                        return null;
-                    }
-
-                    if (preventSelfApproval && invitedEmails.includes(email)) {
-                        return null;
-                    }
-
-                    const accountID = Number(policyMemberEmailsToAccountIDs[email] ?? '');
-
-                    if (!accountID) {
-                        return null;
-                    }
-
-                    const {avatar, displayName = email, login} = personalDetails?.[accountID] ?? {};
-
-                    return {
-                        text: displayName,
-                        alternateText: email,
-                        keyForList: email,
-                        isSelected: selectedApprover === email,
-                        login: email,
-                        icons: [{source: avatar ?? icons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
-                        rightElement: (
-                            <MemberRightIcon
-                                role={employee.role}
-                                owner={policyOwner}
-                                login={login}
-                            />
-                        ),
-                    };
-                })
-                .filter((approver): approver is SelectionListApprover => !!approver);
-
-            approvers.push(...availableApprovers);
+    const allApprovers = useMemo(() => {
+        if (!employeeList) {
+            return [];
         }
 
-        const filteredApprovers = tokenizedSearch(approvers, getSearchValueForPhoneOrEmail(debouncedSearchTerm, countryCode), (approver) => [approver.text ?? '', approver.login ?? '']);
+        return Object.values(employeeList)
+            .map((employee): SelectionListApprover | null => {
+                const email = employee.email;
 
+                if (!email || employee.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+                    return null;
+                }
+
+                if (preventSelfApproval && invitedEmails.includes(email)) {
+                    return null;
+                }
+
+                const accountID = Number(policyMemberEmailsToAccountIDs[email] ?? '');
+
+                if (!accountID) {
+                    return null;
+                }
+
+                const {avatar, displayName = email, login} = personalDetails?.[accountID] ?? {};
+
+                return {
+                    text: displayName,
+                    alternateText: email,
+                    keyForList: email,
+                    isSelected: selectedApprover === email,
+                    login: email,
+                    icons: [{source: avatar ?? icons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
+                    rightElement: (
+                        <MemberRightIcon
+                            role={employee.role}
+                            owner={policyOwner}
+                            login={login}
+                        />
+                    ),
+                };
+            })
+            .filter((approver): approver is SelectionListApprover => !!approver);
+    }, [employeeList, policyOwner, preventSelfApproval, policyMemberEmailsToAccountIDs, invitedEmails, personalDetails, selectedApprover, icons.FallbackAvatar]);
+
+    const orderedApprovers = useMemo(() => {
+        const filteredApprovers = tokenizedSearch(allApprovers, getSearchValueForPhoneOrEmail(debouncedSearchTerm, countryCode), (approver) => [approver.text ?? '', approver.login ?? '']);
         return sortAlphabetically(filteredApprovers, 'text', localeCompare);
-    }, [
-        employeeList,
-        policyOwner,
-        preventSelfApproval,
-        policyMemberEmailsToAccountIDs,
-        invitedEmails,
-        debouncedSearchTerm,
-        countryCode,
-        localeCompare,
-        personalDetails,
-        selectedApprover,
-        icons.FallbackAvatar,
-    ]);
+    }, [allApprovers, debouncedSearchTerm, countryCode, localeCompare]);
 
     const goBack = useCallback(() => {
         Navigation.goBack();
@@ -177,7 +164,7 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
                     ListItem={InviteMemberListItem}
                     onSelectRow={handleOnSelectRow}
                     textInputOptions={textInputOptions}
-                    shouldShowTextInput={orderedApprovers.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
+                    shouldShowTextInput={allApprovers.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
                     shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                     showLoadingPlaceholder={isLoadingReportData}
                     initiallyFocusedItemKey={selectedApprover}
