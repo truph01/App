@@ -6,29 +6,29 @@ import {getMergedPR} from '@github/actions/javascript/failureNotifier/failureNot
 import type {PullRequest} from '@github/actions/javascript/failureNotifier/failureNotifier';
 
 describe('getMergedPR', () => {
-    const mergedPR: PullRequest = {
+    const mergedPR = {
         html_url: 'https://github.com/Expensify/App/pull/82016',
         user: {login: 'test-user'},
         merged_at: '2026-02-10T17:00:00Z',
         base: {ref: 'main'},
         number: 82016,
-    };
+    } as PullRequest;
 
-    const openPRWithMainMerged: PullRequest = {
+    const openPRWithMainMerged = {
         html_url: 'https://github.com/Expensify/App/pull/80254',
         user: {login: 'test-user'},
         merged_at: null,
         base: {ref: 'main'},
         number: 80254,
-    };
+    } as PullRequest;
 
-    const openPRDifferentBase: PullRequest = {
+    const openPRDifferentBase = {
         html_url: 'https://github.com/Expensify/App/pull/99999',
         user: {login: 'other-user'},
         merged_at: null,
         base: {ref: 'staging'},
         number: 99999,
-    };
+    } as PullRequest;
 
     it('should return the merged PR, not an open PR that contains the same commit', () => {
         // When an open PR has merged main, both PRs are associated with the head commit.
@@ -51,12 +51,12 @@ describe('getMergedPR', () => {
     });
 
     it('should filter by target branch', () => {
-        const mergedToStaging: PullRequest = {
+        const mergedToStaging = {
             ...mergedPR,
             number: 11111,
             base: {ref: 'staging'},
             merged_at: '2026-02-10T18:00:00Z',
-        };
+        } as PullRequest;
 
         const associatedPRs = [mergedToStaging, mergedPR];
 
