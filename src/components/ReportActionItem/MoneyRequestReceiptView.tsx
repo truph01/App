@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import type {ValueOf} from 'type-fest';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ReceiptAudit, {ReceiptAuditMessages} from '@components/ReceiptAudit';
 import ReceiptEmptyState from '@components/ReceiptEmptyState';
@@ -30,6 +31,7 @@ import {
     isPaidGroupPolicy,
     isTrackExpenseReportNew,
 } from '@libs/ReportUtils';
+import trackExpenseCreationError from '@libs/telemetry/trackExpenseCreationError';
 import {
     didReceiptScanSucceed as didReceiptScanSucceedTransactionUtils,
     hasReceipt as hasReceiptTransactionUtils,
@@ -223,6 +225,41 @@ function MoneyRequestReceiptView({
     const dismissReceiptError = () => {
         if (!report?.reportID) {
             return;
+        }
+
+        // Track expense creation errors to Sentry when the user dismisses them
+        if (!isEmptyObject(errors)) {
+            let errorType: ValueOf<typeof CONST.TELEMETRY.EXPENSE_ERROR_TYPE>;
+            let errorSource: ValueOf<typeof CONST.TELEMETRY.EXPENSE_ERROR_SOURCE>;
+
+            if (!isEmptyObject(reportCreationError)) {
+                errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.REPORT_CREATION_FAILED;
+                errorSource = CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_CREATION;
+            } else if (parentReportAction?.errors && !isEmptyObject(parentReportAction.errors)) {
+                errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.TRANSACTION_MISSING;
+                errorSource = CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.REPORT_ACTION;
+            } else {
+                errorType = CONST.TELEMETRY.EXPENSE_ERROR_TYPE.TRANSACTION_MISSING;
+                errorSource = CONST.TELEMETRY.EXPENSE_ERROR_SOURCE.TRANSACTION;
+            }
+
+            const errorValue = Object.values(errors).at(0);
+            const errorMessage = typeof errorValue === 'string' ? errorValue : JSON.stringify(errorValue);
+            const isRequestPending = transaction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
+            const isTransactionMissing = !transaction?.transactionID && !!linkedTransactionID;
+
+            trackExpenseCreationError(null, {
+                errorType,
+                errorSource,
+                reportID: report.reportID,
+                transactionID: linkedTransactionID,
+                hasReceipt,
+                pendingAction: transaction?.pendingAction,
+                iouType,
+                errorMessage,
+                isRequestPending,
+                isTransactionMissing,
+            });
         }
         if (transaction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
             if (chatReport?.reportID && getCreationReportErrors(chatReport)) {
