@@ -6142,7 +6142,8 @@ const dynamicStyles = (theme: ThemeColors) =>
             const SEARCHBAR_HEIGHT = isSearchable ? 50 : 0;
             const SEARCHBAR_MARGIN = isSearchable ? 14 : 0;
             const PADDING = 44 - (shouldUseNarrowLayout ? 32 : 0);
-            const ESTIMATED_LIST_HEIGHT = itemCount * variables.optionRowHeightCompact + SEARCHBAR_HEIGHT + SEARCHBAR_MARGIN + BUTTON_HEIGHT + PADDING;
+            const LIST_BOTTOM_PADDING = 12;
+            const ESTIMATED_LIST_HEIGHT = itemCount * variables.optionRowHeightCompact + SEARCHBAR_HEIGHT + SEARCHBAR_MARGIN + BUTTON_HEIGHT + PADDING + LIST_BOTTOM_PADDING;
 
             // Native platforms don't support maxHeight in the way thats expected, so lets manually set the height to either
             // the listHeight, the max height of the popover, or 90% of the window height, such that we never overflow the screen
