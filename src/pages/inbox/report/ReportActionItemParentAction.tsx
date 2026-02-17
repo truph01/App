@@ -88,9 +88,6 @@ type ReportActionItemParentActionProps = {
 
     /** Whether the report is archived */
     isReportArchived: boolean;
-
-    /** The report action ID */
-    reportActionID: string;
 };
 
 function ReportActionItemParentAction({
@@ -98,7 +95,6 @@ function ReportActionItemParentAction({
     policies,
     report,
     action,
-    reportActionID,
     transactionThreadReport,
     parentReportAction,
     index = 0,
@@ -207,7 +203,6 @@ function ReportActionItemParentAction({
                                 />
                             )}
                             <ReportActionItem
-                                reportActionID={reportActionID}
                                 allReports={allReports}
                                 policies={policies}
                                 onPress={

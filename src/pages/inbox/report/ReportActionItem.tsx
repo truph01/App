@@ -67,9 +67,6 @@ type ReportActionItemProps = Omit<
     /** User billing fund ID */
     userBillingFundID: number | undefined;
 
-    /** The report action id */
-    reportActionID: string;
-
     /** Did the user dismiss trying out NewDot? If true, it means they prefer using OldDot */
     isTryNewDotNVPDismissed?: boolean;
 };
@@ -84,7 +81,6 @@ function ReportActionItem({
     userWalletTierName,
     isUserValidated,
     personalDetails,
-    reportActionID,
     userBillingFundID,
     isTryNewDotNVPDismissed,
     ...props

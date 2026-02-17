@@ -32,13 +32,10 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import {
     getFirstVisibleReportActionID,
-    getIOUReportIDFromReportActionPreview,
-    getOriginalMessage,
     isConsecutiveActionMadeByPreviousActor,
     isConsecutiveChronosAutomaticTimerAction,
     isCurrentActionUnread,
     isDeletedParentAction,
-    isMoneyRequestAction,
     isReportPreviewAction,
     isReversedTransaction,
     isSentMoneyReportAction,

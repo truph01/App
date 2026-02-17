@@ -210,7 +210,6 @@ function ReportActionsListItemRenderer({
                 reportID={report.reportID}
                 report={report}
                 action={action}
-                reportActionID={reportAction.reportActionID}
                 transactionThreadReport={transactionThreadReport}
                 index={index}
                 isFirstVisibleReportAction={isFirstVisibleReportAction}
@@ -229,7 +228,6 @@ function ReportActionsListItemRenderer({
 
     return (
         <ReportActionItem
-            reportActionID={reportAction.reportActionID}
             allReports={allReports}
             policies={policies}
             shouldHideThreadDividerLine={shouldHideThreadDividerLine}
