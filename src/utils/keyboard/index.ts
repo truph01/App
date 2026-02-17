@@ -1,4 +1,6 @@
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {Keyboard} from 'react-native';
+import type {DismissKeyboardOptions} from './types';
 
 type SimplifiedKeyboardEvent = {
     height?: number;
@@ -20,7 +22,7 @@ const subscribeKeyboardVisibilityChange = (cb: (isVisible: boolean) => void) => 
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const dismiss = (shouldSkipSafari?: boolean): Promise<void> => {
+const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
     return new Promise((resolve) => {
         if (!isVisible) {
             resolve();
@@ -30,10 +32,16 @@ const dismiss = (shouldSkipSafari?: boolean): Promise<void> => {
 
         const subscription = Keyboard.addListener('keyboardDidHide', () => {
             resolve();
+            TransitionTracker.endTransition('keyboard');
             subscription.remove();
         });
 
+        TransitionTracker.startTransition('keyboard');
         Keyboard.dismiss();
+
+        if (options?.afterTransition) {
+            TransitionTracker.runAfterTransitions(options.afterTransition);
+        }
     });
 };
 

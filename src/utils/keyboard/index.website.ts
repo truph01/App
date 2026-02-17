@@ -1,6 +1,8 @@
 import {Keyboard} from 'react-native';
 import {isMobile, isMobileSafari} from '@libs/Browser';
 import CONST from '@src/CONST';
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
+import type {DismissKeyboardOptions} from './types';
 
 let isVisible = false;
 const initialViewportHeight = window?.visualViewport?.height;
@@ -34,9 +36,9 @@ const handleResize = () => {
 
 window.visualViewport?.addEventListener('resize', handleResize);
 
-const dismiss = (shouldSkipSafari = false): Promise<void> => {
+const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
     return new Promise((resolve) => {
-        if (shouldSkipSafari && isMobileSafari()) {
+        if (options?.shouldSkipSafari && isMobileSafari()) {
             resolve();
             return;
         }
@@ -58,11 +60,16 @@ const dismiss = (shouldSkipSafari = false): Promise<void> => {
             }
 
             window.visualViewport?.removeEventListener('resize', handleDismissResize);
+            TransitionTracker.endTransition('keyboard');
             return resolve();
         };
 
         window.visualViewport?.addEventListener('resize', handleDismissResize);
         Keyboard.dismiss();
+        TransitionTracker.startTransition('keyboard');
+        if (options?.afterTransition) {
+            TransitionTracker.runAfterTransitions(options.afterTransition);
+        }
     });
 };
 
