@@ -45,6 +45,7 @@ import ApprovedTransactionHand from '@assets/images/multifactorAuthentication/ap
 import DeniedTransactionHand from '@assets/images/multifactorAuthentication/denied-transaction-hand.svg';
 import EncryptionMan from '@assets/images/multifactorAuthentication/encryption-man.svg';
 import HumptyDumpty from '@assets/images/multifactorAuthentication/humpty-dumpty.svg';
+import MagnifyingGlassSpyMouthClosed from '@assets/images/multifactorAuthentication/magnifying-glass-spy-mouth-closed.svg';
 import OpenPadlock from '@assets/images/multifactorAuthentication/open-padlock.svg';
 import RunOutOfTime from '@assets/images/multifactorAuthentication/running-out-of-time.svg';
 import PendingTravel from '@assets/images/pending-travel.svg';
@@ -350,6 +351,7 @@ const Illustrations = {
     UserShield,
 
     // Multifactor Authentication Illustrations
+    MagnifyingGlassSpyMouthClosed,
     OpenPadlock,
     ApprovedTransactionHand,
     DeniedTransactionHand,
