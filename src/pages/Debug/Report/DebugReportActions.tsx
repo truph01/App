@@ -6,7 +6,7 @@ import SelectionList from '@components/SelectionList';
 import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
-import useMappedPersonalDetails from '@hooks/useMappedPersonalDetails';
+import useMappedPersonalDetails, {personalDetailMapper} from '@hooks/useMappedPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -19,18 +19,11 @@ import SidebarUtils from '@libs/SidebarUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {OnyxInputOrEntry, PersonalDetails, PersonalDetailsList, ReportAction, ReportActions} from '@src/types/onyx';
+import type {OnyxInputOrEntry, PersonalDetailsList, ReportAction, ReportActions} from '@src/types/onyx';
 
 type DebugReportActionsProps = {
     reportID: string;
 };
-const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
-    personalDetail && {
-        accountID: personalDetail.accountID,
-        login: personalDetail.login,
-        avatar: personalDetail.avatar,
-        pronouns: personalDetail.pronouns,
-    };
 
 function DebugReportActions({reportID}: DebugReportActionsProps) {
     const {translate, datetimeToCalendarTime, localeCompare} = useLocalize();

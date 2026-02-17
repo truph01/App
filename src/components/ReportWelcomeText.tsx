@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
-import useMappedPersonalDetails from '@hooks/useMappedPersonalDetails';
+import useMappedPersonalDetails, {personalDetailMapper} from '@hooks/useMappedPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -27,7 +27,7 @@ import CONST from '@src/CONST';
 import type {IOUType} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {OnyxInputOrEntry, PersonalDetails, PersonalDetailsList, Policy, Report} from '@src/types/onyx';
+import type {OnyxInputOrEntry, PersonalDetailsList, Policy, Report} from '@src/types/onyx';
 import RenderHTML from './RenderHTML';
 import Text from './Text';
 
@@ -38,14 +38,6 @@ type ReportWelcomeTextProps = {
     /** The policy for the current route */
     policy: OnyxEntry<Policy>;
 };
-
-const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>): OnyxInputOrEntry<PersonalDetails> =>
-    personalDetail && {
-        accountID: personalDetail.accountID,
-        login: personalDetail.login,
-        avatar: personalDetail.avatar,
-        pronouns: personalDetail.pronouns,
-    };
 
 function ReportWelcomeText({report, policy}: ReportWelcomeTextProps) {
     const {translate, localeCompare} = useLocalize();
