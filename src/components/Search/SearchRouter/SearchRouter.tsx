@@ -5,7 +5,6 @@ import {InteractionManager, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
-import {useOptionsList} from '@components/OptionListContextProvider';
 import OptionsListSkeletonView from '@components/OptionsListSkeletonView';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
 import type {GetAdditionalSectionsCallback} from '@components/Search/SearchAutocompleteList';
@@ -66,10 +65,8 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
     const [, recentSearchesMetadata] = useOnyx(ONYXKEYS.RECENT_SEARCHES, {canBeMissing: true});
-    const {areOptionsInitialized} = useOptionsList();
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {initWithStoredValues: false, canBeMissing: true});
     const isRecentSearchesDataLoaded = !isLoadingOnyxValue(recentSearchesMetadata);
-    const shouldShowList = isRecentSearchesDataLoaded && areOptionsInitialized;
     const personalDetails = usePersonalDetails();
     const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
@@ -485,29 +482,28 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                     shouldDelayFocus
                 />
             </View>
-            {shouldShowList && (
-                <SearchAutocompleteList
-                    autocompleteQueryValue={autocompleteQueryValue || textInputValue}
-                    handleSearch={searchInServer}
-                    searchQueryItem={searchQueryItem}
-                    getAdditionalSections={getAdditionalSections}
-                    onListItemPress={onListItemPress}
-                    onHighlightFirstItem={updateAndScrollToFocusedIndex}
-                    ref={listRef}
-                    personalDetails={personalDetails}
-                    reports={reports}
-                    allFeeds={allFeeds}
-                    allCards={nonPersonalAndWorkspaceCards}
-                    textInputRef={textInputRef}
-                />
-            )}
-            {!shouldShowList && (
-                <OptionsListSkeletonView
-                    fixedNumItems={4}
-                    shouldStyleAsTable
-                    speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
-                />
-            )}
+            <SearchAutocompleteList
+                autocompleteQueryValue={autocompleteQueryValue || textInputValue}
+                handleSearch={searchInServer}
+                searchQueryItem={searchQueryItem}
+                getAdditionalSections={getAdditionalSections}
+                onListItemPress={onListItemPress}
+                onHighlightFirstItem={updateAndScrollToFocusedIndex}
+                ref={listRef}
+                personalDetails={personalDetails}
+                reports={reports}
+                allFeeds={allFeeds}
+                allCards={nonPersonalAndWorkspaceCards}
+                textInputRef={textInputRef}
+                isInitialDataLoading={!isRecentSearchesDataLoaded}
+                skeletonView={
+                    <OptionsListSkeletonView
+                        fixedNumItems={4}
+                        shouldStyleAsTable
+                        speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
+                    />
+                }
+            />
         </View>
     );
 }

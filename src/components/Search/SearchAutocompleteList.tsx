@@ -104,6 +104,12 @@ type SearchAutocompleteListProps = {
 
     /** Reference to the outer element */
     ref?: ForwardedRef<SelectionListWithSectionsHandle>;
+
+    /** Whether initial data needed for the list is still loading */
+    isInitialDataLoading?: boolean;
+
+    /** Optional skeleton view to render while loadings */
+    skeletonView?: React.ReactNode;
 };
 
 const defaultListOptions = {
@@ -165,6 +171,8 @@ function SearchAutocompleteList({
     allFeeds,
     allCards = CONST.EMPTY_OBJECT,
     ref,
+    isInitialDataLoading,
+    skeletonView,
 }: SearchAutocompleteListProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
@@ -900,6 +908,12 @@ function SearchAutocompleteList({
             onHighlightFirstItem?.();
         }
     }, [autocompleteQueryValue, onHighlightFirstItem, normalizedReferenceText]);
+
+    const isLoading = !!isInitialDataLoading || !areOptionsInitialized;
+
+    if (isLoading && skeletonView) {
+        return skeletonView;
+    }
 
     return (
         <SelectionListWithSections<AutocompleteListItem>
