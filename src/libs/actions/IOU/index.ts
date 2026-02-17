@@ -6153,8 +6153,7 @@ function convertBulkTrackedExpensesToIOU({
         return;
     }
 
-    const chatReportID = chatReport?.reportID;
-    if (!chatReportID) {
+    if (!chatReport?.reportID) {
         Log.warn('[convertBulkTrackedExpensesToIOU] No chat report found for IOU', {iouReportID});
         return;
     }
