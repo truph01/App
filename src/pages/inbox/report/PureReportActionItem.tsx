@@ -61,7 +61,6 @@ import {getLatestErrorMessageField, isReceiptError} from '@libs/ErrorUtils';
 import focusComposerWithDelay from '@libs/focusComposerWithDelay';
 import {isReportMessageAttachment} from '@libs/isReportMessageAttachment';
 import Navigation from '@libs/Navigation/Navigation';
-import Parser from '@libs/Parser';
 import Permissions from '@libs/Permissions';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import {getCleanedTagName, hasDynamicExternalWorkflow, isPolicyAdmin, isPolicyMember, isPolicyOwner} from '@libs/PolicyUtils';
@@ -78,14 +77,12 @@ import {
     getChangedApproverActionMessage,
     getCompanyAddressUpdateMessage,
     getCompanyCardConnectionBrokenMessage,
-    getCreatedReportForUnapprovedTransactionsMessage,
     getDefaultApproverUpdateMessage,
     getDeletedApprovalRuleMessage,
     getDeletedBudgetMessage,
     getDemotedFromWorkspaceMessage,
     getDismissedViolationMessageText,
     getForwardsToUpdateMessage,
-    getHarvestCreatedExpenseReportMessage,
     getIntegrationSyncFailedMessage,
     getInvoiceCompanyNameUpdateMessage,
     getInvoiceCompanyWebsiteUpdateMessage,
@@ -174,7 +171,6 @@ import {
     isMarkAsClosedAction,
     isMessageDeleted,
     isMoneyRequestAction,
-    isMovedTransactionAction,
     isPendingRemove,
     isReimbursementDeQueuedOrCanceledAction,
     isReimbursementQueuedAction,
@@ -191,7 +187,6 @@ import {
     isWhisperActionTargetedToOthers,
     useTableReportViewActionRenderConditionals,
 } from '@libs/ReportActionsUtils';
-import {getReportName} from '@libs/ReportNameUtils';
 import type {MissingPaymentMethod} from '@libs/ReportUtils';
 import {
     canWriteInReport,
@@ -200,9 +195,7 @@ import {
     getDeletedTransactionMessage,
     getDisplayNamesWithTooltips,
     getMovedActionMessage,
-    getMovedTransactionMessage,
     getPolicyChangeMessage,
-    getUnreportedTransactionMessage,
     getWhisperDisplayNames,
     getWorkspaceNameUpdatedMessage,
     isArchivedNonExpenseReport,
@@ -238,9 +231,13 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
-import type {JoinWorkspaceResolution, OriginalMessageMovedTransaction, OriginalMessageUnreportedTransaction} from '@src/types/onyx/OriginalMessage';
+import type {JoinWorkspaceResolution} from '@src/types/onyx/OriginalMessage';
 import {isEmptyObject, isEmptyValueObject} from '@src/types/utils/EmptyObject';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
+import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
+import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
+import CreatedReportForUnapprovedTransactionsAction from '@components/ReportActionItem/CreatedReportForUnapprovedTransactionsAction';
 import {RestrictedReadOnlyContextMenuActions} from './ContextMenu/ContextMenuActions';
 import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMenu';
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
@@ -256,10 +253,6 @@ import ReportActionItemMessageWithExplain from './ReportActionItemMessageWithExp
 import ReportActionItemSingle from './ReportActionItemSingle';
 import ReportActionItemThread from './ReportActionItemThread';
 import TripSummary from './TripSummary';
-import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
-import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
-import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
-import CreatedReportForUnapprovedTransactionsAction from '@components/ReportActionItem/CreatedReportForUnapprovedTransactionsAction';
 
 type PureReportActionItemProps = {
     /** All the data of the policy collection */
@@ -1930,7 +1923,7 @@ function PureReportActionItem({
                 shouldHideThreadDividerLine={shouldHideThreadDividerLine}
             />
         );
-    }, [contextValue, allReports, parentReportAction, parentReport, draftMessage, shouldHideThreadDividerLine, parentReportActionForTransactionThread]);
+    }, [contextValue, parentReportAction, parentReport, draftMessage, shouldHideThreadDividerLine, parentReportActionForTransactionThread]);
 
     if (action.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED && !isHarvestCreatedExpenseReport) {
         return createdActionContent;
