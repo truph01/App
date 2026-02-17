@@ -155,7 +155,6 @@ function SearchFiltersCardPage() {
                             showLoadingPlaceholder={
                                 isLoadingOnyxValue(userCardListMetadata, workspaceCardFeedsMetadata, searchAdvancedFiltersFormMetadata, policiesMetadata) || !didScreenTransitionEnd
                             }
-                            disableMaintainingScrollPosition
                             shouldStopPropagation
                             canSelectMultiple
                         />
