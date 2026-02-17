@@ -7,15 +7,17 @@ import useThemeStyles from '@hooks/useThemeStyles';
 type MultifactorAuthenticationAuthorizeTransactionActionsProps = {
     onAuthorize: () => void;
     onDeny: () => void;
+    isLoading: boolean | undefined;
 };
 
-function MultifactorAuthenticationAuthorizeTransactionActions({onAuthorize, onDeny}: MultifactorAuthenticationAuthorizeTransactionActionsProps) {
+function MultifactorAuthenticationAuthorizeTransactionActions({onAuthorize, onDeny, isLoading}: MultifactorAuthenticationAuthorizeTransactionActionsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     return (
         <FixedFooter style={[styles.flexRow, styles.gap2]}>
             <Button
+                isLoading={isLoading}
                 danger
                 large
                 style={styles.flex1}
@@ -23,6 +25,7 @@ function MultifactorAuthenticationAuthorizeTransactionActions({onAuthorize, onDe
                 text={translate('multifactorAuthentication.reviewTransaction.deny')}
             />
             <Button
+                isLoading={isLoading}
                 success
                 large
                 style={styles.flex1}

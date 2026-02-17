@@ -187,6 +187,11 @@ async function revokeMultifactorAuthenticationCredentials() {
     }
 }
 
+async function refreshTransactionsPending3DSReview() {
+    // TODO call GetTransactionsPending3DSReview
+    return true;
+}
+
 async function authorizeTransaction({transactionID, signedChallenge, authenticationMethod}: MultifactorAuthenticationScenarioParameters['AUTHORIZE-TRANSACTION']) {
     try {
         const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.AUTHORIZE_TRANSACTION, {transactionID, signedChallenge, authenticationMethod}, {});
@@ -220,5 +225,6 @@ export {
     revokeMultifactorAuthenticationCredentials,
     markHasAcceptedSoftPrompt,
     clearLocalMFAPublicKeyList,
+    refreshTransactionsPending3DSReview,
     authorizeTransaction,
 };

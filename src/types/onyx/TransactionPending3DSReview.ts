@@ -12,8 +12,12 @@ type TransactionPending3DSReview = {
     /** Merchant name */
     merchant: string;
 
+    // CHUCK QUESTION: is the comment below true? Seems like it's YYYY-MM-DD in Auth
     /** Created date (YYYY-MM-DD or full timestamp, depending on source) */
     created: string;
+
+    /** Expiration date - should be exactly 8 minutes after created date */
+    expires: string;
 
     /** Last 4 digits of the card PAN */
     lastFourPAN: number;
@@ -23,6 +27,9 @@ type TransactionPending3DSReview = {
 
     /** Optional transactionID if the backend provides it */
     transactionID?: string;
+
+    /** Added by client to mark that an approval/denial request is in-flight for this transaction */
+    isLoading?: boolean;
 };
 
 export default TransactionPending3DSReview;

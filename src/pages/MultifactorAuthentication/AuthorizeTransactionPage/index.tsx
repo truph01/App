@@ -12,23 +12,33 @@ import Navigation from '@navigation/Navigation';
 import type SCREENS from '@src/SCREENS';
 import CONST from '@src/CONST';
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
+import useOnyx from '@hooks/useOnyx';
+import ONYXKEYS from '@src/ONYXKEYS';
+import Text from '@components/Text'; // WIP
+import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
 type MultifactorAuthenticationAuthorizeTransactionPageProps = PlatformStackScreenProps<MultifactorAuthenticationParamList, typeof SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION>;
 
 function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: MultifactorAuthenticationAuthorizeTransactionPageProps) {
+    const transactionID = route.params.transactionID;
+
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    // TODO: Listen for the Onyx key here and if the transaction details are missing, then render the 'already review' component instead
+    const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
+    const transaction = transactionQueue?.[transactionID];
 
     const {executeScenario} = useMultifactorAuthentication();
 
-    const transactionID = route.params.transactionID;
     const [isConfirmModalVisible, setConfirmModalVisibility] = useState(false);
 
     const showConfirmModal = () => {
+        if (!transaction) {
+            // if the transaction has disappeared from state, just close the RHP immediately
+            Navigation.closeRHPFlow();
+        }
         setConfirmModalVisibility(true);
     };
 
@@ -42,16 +52,14 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         });
     };
 
-    const denyTransaction = () => {
-        if (isConfirmModalVisible) {
+    const onDenyTransaction = () => {
+        if (isConfirmModalVisible || !transactionID) {
             hideConfirmModal();
         }
         // TODO: Use DenyTransaction - API for denying, same for ValidateCodePage
         // TODO: Set state (add a new useState at the top) here that the outcome page should be displayed instead of closing the flow
-        Navigation.closeRHPFlow();
+        // CHUCK NOTE: what does ^this mean?
     };
-
-    // TODO: Instead of navigate to outcome page, if the state above is true then render failure component here
 
     return (
         <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
@@ -61,24 +69,32 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                 shouldShowBackButton
             />
             <FullPageOfflineBlockingView>
-                <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
-                    <MultifactorAuthenticationAuthorizeTransactionContent transactionID={transactionID} />
-                    <MultifactorAuthenticationAuthorizeTransactionActions
-                        onAuthorize={approveTransaction}
-                        onDeny={showConfirmModal}
-                    />
-                    {/*
+                {transaction ? (
+                    <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
+                        <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
+                        <MultifactorAuthenticationAuthorizeTransactionActions
+                            isLoading={transaction.isLoading}
+                            onAuthorize={approveTransaction}
+                            onDeny={showConfirmModal}
+                        />
+                        {/*
                         TODO: Use custom AuthorizeTransactionCancelModal (not yet implemented)
                         The config for MFA modals should be exactly the same as `failureScreens` structure.
                         Right now only the props for modals are stored in the config but it should be key - component pattern instead.
                         See: FailureScreen directory and how it is used in the scenarios config.
                     */}
-                    <MultifactorAuthenticationTriggerCancelConfirmModal
-                        isVisible={isConfirmModalVisible}
-                        onConfirm={denyTransaction}
-                        onCancel={hideConfirmModal}
-                    />
-                </View>
+                        <MultifactorAuthenticationTriggerCancelConfirmModal
+                            isVisible={isConfirmModalVisible}
+                            onConfirm={onDenyTransaction}
+                            onCancel={hideConfirmModal}
+                        />
+                    </View>
+                ) : (
+                    <View>
+                        {/* CHUCK WIP */}
+                        <Text>Oops humpty dumpty nothing here!</Text>
+                    </View>
+                )}
             </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );

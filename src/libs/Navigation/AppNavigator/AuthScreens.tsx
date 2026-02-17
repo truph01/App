@@ -66,6 +66,9 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type ReactComponentModule from '@src/types/utils/ReactComponentModule';
+import type {OnyxEntry} from 'react-native-onyx';
+import type {TransactionsPending3DSReview} from '@src/types/onyx';
+import {refreshTransactionsPending3DSReview} from '@libs/actions/MultifactorAuthentication';
 import attachmentModalScreenOptions from './attachmentModalScreenOptions';
 import createRootStackNavigator from './createRootStackNavigator';
 import {screensWithEnteringAnimation, workspaceOrDomainSplitsWithoutEnteringAnimation} from './createRootStackNavigator/GetStateForActionHandlers';
@@ -144,6 +147,25 @@ const modalScreenListenersWithCancelSearch = {
     },
 };
 
+// CHUCK WIP move to selectors file
+function getMostUrgentTransactionPendingReview(transactions: OnyxEntry<TransactionsPending3DSReview>) {
+    return transactions
+        ? Object.values(transactions)
+              .sort((a, b) => {
+                  const aExpires = new Date(a.expires);
+                  const bExpires = new Date(b.expires);
+                  if (aExpires < bExpires) {
+                      return -1;
+                  }
+                  if (aExpires > bExpires) {
+                      return 1;
+                  }
+                  return 0;
+              })
+              .at(0)
+        : null;
+}
+
 function AuthScreens() {
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
@@ -165,13 +187,30 @@ function AuthScreens() {
     const {shouldRenderSecondaryOverlayForWideRHP, shouldRenderSecondaryOverlayForRHPOnWideRHP, shouldRenderSecondaryOverlayForRHPOnSuperWideRHP, shouldRenderTertiaryOverlay} =
         useWideRHPState();
 
+    const [transactionPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true, selector: getMostUrgentTransactionPendingReview});
+
     // TODO MFA:
-    // 1. Listen for the TRANSACTIONS_PENDING_3DS_REVIEW Onyx Key changes
-    // 2. Sort by `expires` field, the oldest one is the first one
-    // 3. We check:
-    //  - If the Authorize Transaction scenario supports native if on mobile and passkeys on web
-    // 4. Make an API call (GetTransactionsPending3DSReview) to verify the transaction - it will return the same object as the one stored in Onyx
-    // 5. If the transaction is okay - if not on any MFA screen then navigate to the TransactionReviewPage.
+    // 1. [x] Listen for the TRANSACTIONS_PENDING_3DS_REVIEW Onyx Key changes
+    // 2. [x] Sort by `expires` field, the oldest one is the first one
+    // 3. [ ] If the Authorize Transaction scenario supports native if on mobile and passkeys on web
+    // 4. [-] Make an API call (GetTransactionsPending3DSReview) to verify the transaction - it will return the same object as the one stored in Onyx (mocked)
+    // 5. [x] If the transaction is okay - if not on any MFA screen then navigate to the TransactionReviewPage.
+    // CHUCK WIP move to hook
+    useEffect(() => {
+        if (!transactionPending3DSReview?.transactionID) {
+            return;
+        }
+        let cancel = false;
+        refreshTransactionsPending3DSReview().then((shouldNavigate) => {
+            if (!shouldNavigate || cancel || !transactionPending3DSReview.transactionID) {
+                return;
+            }
+            Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION.getRoute(transactionPending3DSReview.transactionID));
+        });
+        return () => {
+            cancel = true;
+        };
+    }, [transactionPending3DSReview?.transactionID]);
 
     // Check if the user is currently on a 2FA setup screen
     // We can't rely on useRoute in this component because we're not a child of a Navigator, so we must sift through nav state by hand
