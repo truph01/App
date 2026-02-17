@@ -120,6 +120,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const currencySymbol = getCurrencySymbol(transactionDetails.currency ?? '') ?? transactionDetails.currency ?? CONST.CURRENCY.USD;
 
     const isPerDiem = isPerDiemRequest(transaction);
+    const isDistance = isDistanceRequest(transaction);
     const isCard = isManagedCardTransaction(transaction);
     const originalTransactionID = draftTransaction?.comment?.originalTransactionID ?? CONST.IOU.OPTIMISTIC_TRANSACTION_ID;
     const iouActions = getIOUActionForTransactions([originalTransactionID], expenseReport?.reportID);
@@ -153,7 +154,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         if (splitTransaction && currentPolicy) {
             const isSplitDistance = isDistanceRequest(splitTransaction);
             if (isSplitDistance) {
-                const currentRateID = splitExpense?.customUnit?.customUnitRateID ?? '';
+                const currentRateID = splitExpense?.customUnit?.customUnitRateID ?? String(CONST.DEFAULT_NUMBER_ID);
                 const rates = DistanceRequestUtils.getMileageRates(currentPolicy, false, currentRateID);
                 const {rate} = DistanceRequestUtils.getRate({transaction: splitTransaction, policy: currentPolicy});
                 if (!rates[currentRateID] || !rate) {
@@ -234,7 +235,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             clearSplitTransactionDraftErrors(transactionID);
         }
 
-        if (invalidSplit && sumOfSplitExpenses !== transactionDetailsAmount) {
+        if (invalidSplit && sumOfSplitExpenses !== transactionDetailsAmount && !isDistance) {
             if (difference > 0) {
                 setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(Math.abs(difference), transactionDetails?.currency)}));
             } else {
@@ -243,12 +244,12 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             return;
         }
 
-        if (sumOfSplitExpenses > transactionDetailsAmount) {
+        if (sumOfSplitExpenses > transactionDetailsAmount && !isDistance) {
             const greaterThanDifference = sumOfSplitExpenses - transactionDetailsAmount;
             setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', {amount: convertToDisplayString(greaterThanDifference, transactionDetails?.currency)}));
             return;
         }
-        if (sumOfSplitExpenses < transactionDetailsAmount && (isPerDiem || isCard)) {
+        if (sumOfSplitExpenses < transactionDetailsAmount && (isPerDiem || isCard) && !isDistance) {
             const lessThanDifference = transactionDetailsAmount - sumOfSplitExpenses;
             setErrorMessage(translate('iou.totalAmountLessThanOriginal', {amount: convertToDisplayString(lessThanDifference, transactionDetails?.currency)}));
             return;

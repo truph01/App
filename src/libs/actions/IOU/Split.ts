@@ -2118,7 +2118,12 @@ function addSplitExpenseField(
     const currency = getCurrency(draftTransaction);
     const originalTransactionID = draftTransaction.comment?.originalTransactionID ?? transaction.transactionID;
 
-    const redistributedSplitExpenses = redistributeSplitExpenseAmounts(updatedSplitExpenses, total, currency);
+    let redistributedSplitExpenses = updatedSplitExpenses;
+
+    // Auto-redistribute amounts for all splits if this is not a distance request
+    if (!isDistanceRequest) {
+        redistributedSplitExpenses = redistributeSplitExpenseAmounts(updatedSplitExpenses, total, currency);
+    }
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${originalTransactionID}`, {
         comment: {
@@ -2295,7 +2300,15 @@ function removeSplitExpenseField(draftTransaction: OnyxEntry<OnyxTypes.Transacti
     const total = getAmount(draftTransaction, undefined, undefined, true, true);
     const currency = getCurrency(draftTransaction);
 
-    const redistributedSplitExpenses = redistributeSplitExpenseAmounts(splitExpenses, total, currency);
+    const originalTransaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`];
+    const isDistanceRequest = originalTransaction && isDistanceRequestTransactionUtils(originalTransaction);
+
+    let redistributedSplitExpenses = splitExpenses;
+
+    // Auto-redistribute amounts for all splits if this is not a distance request
+    if (!isDistanceRequest) {
+        redistributedSplitExpenses = redistributeSplitExpenseAmounts(splitExpenses, total, currency);
+    }
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${originalTransactionID}`, {
         comment: {
@@ -2448,7 +2461,12 @@ function updateSplitExpenseAmountField(draftTransaction: OnyxEntry<OnyxTypes.Tra
         return splitExpense;
     });
 
-    const redistributedSplitExpenses = redistributeSplitExpenseAmounts(splitWithUpdatedAmount, total, currency);
+    let redistributedSplitExpenses = splitWithUpdatedAmount;
+
+    // Auto-redistribute amounts for all splits if this is not a distance request
+    if (!isDistanceRequest) {
+        redistributedSplitExpenses = redistributeSplitExpenseAmounts(splitWithUpdatedAmount, total, currency);
+    }
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${originalTransactionID}`, {
         comment: {
