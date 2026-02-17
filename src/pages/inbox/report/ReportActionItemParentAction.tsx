@@ -25,6 +25,7 @@ import AnimatedEmptyStateBackground from './AnimatedEmptyStateBackground';
 import RepliesDivider from './RepliesDivider';
 import ReportActionItem from './ReportActionItem';
 import ThreadDivider from './ThreadDivider';
+import { Transaction } from '@src/types/onyx';
 
 type ReportActionItemParentActionProps = {
     /** All the data of the report collection */
@@ -115,7 +116,12 @@ function ReportActionItemParentAction({
     const {isOffline} = useNetwork();
     const {isInNarrowPaneModal} = useResponsiveLayout();
     const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
-    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: (transaction) => transaction?.errorFields?.route ?? undefined});
+
+    const getLinkedTransactionRouteError = useCallback((transaction: OnyxEntry<Transaction>) => {
+        return transaction?.errorFields?.route;
+    }, [])
+
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: getLinkedTransactionRouteError});
 
     const ancestorReportNameValuePairsSelector = useCallback(
         (allReportNameValuePairs: OnyxCollection<OnyxTypes.ReportNameValuePairs>) => {
