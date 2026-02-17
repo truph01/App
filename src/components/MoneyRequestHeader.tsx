@@ -460,7 +460,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                 if (hasCustomUnitOutOfPolicyViolation) {
                     showConfirmModal({
                         title: translate('common.duplicateExpense'),
-                        prompt: translate('iou.correctDistanceRateError'),
+                        prompt: translate('iou.correctRateError'),
                         confirmText: translate('common.buttonConfirm'),
                         shouldShowCancelButton: false,
                     });
