@@ -82,7 +82,7 @@ function InternationalDepositAccountContent({
     const topmostFullScreenRoute = useRootNavigationState((state) => state?.routes.findLast((route) => isFullScreenName(route.name)));
 
     const goBack = useCallback(() => {
-        if (backTo) {
+        if (backTo && !backTo.includes(ROUTES.SETTINGS_BANK_ACCOUNT_PURPOSE)) {
             Navigation.goBack(backTo);
             return;
         }
