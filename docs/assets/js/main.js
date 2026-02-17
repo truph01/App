@@ -78,6 +78,35 @@ function injectFooterCopyright() {
 const SEARCH_API_URL = 'https://www.expensify.com/api/SearchHelpsite';
 const ASK_AI_API_URL = 'https://www.expensify.com/api/AskHelpsiteAI';
 
+let allowedDomains = [];
+fetch('/assets/js/allowedExternalUrls.json')
+    .then((response) => response.json())
+    .then((urls) => {
+        allowedDomains = urls.map((url) => {
+            try {
+                return new URL(url).hostname;
+            } catch {
+                return null;
+            }
+        }).filter(Boolean);
+    })
+    .catch(() => {});
+
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A' && node.hasAttribute('href')) {
+        const href = node.getAttribute('href');
+        try {
+            const hostname = new URL(href).hostname;
+            const isExpensifyLink = hostname === 'expensify.com' || hostname.endsWith('.expensify.com');
+            if (!isExpensifyLink && !allowedDomains.includes(hostname)) {
+                node.remove();
+            }
+        } catch {
+            node.remove();
+        }
+    }
+});
+
 function getTitleFromURL(url) {
     return url.split('/').pop().replace(/-/g, ' ');
 }
