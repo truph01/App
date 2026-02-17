@@ -30,6 +30,12 @@ beforeEach(async () => {
     jest.clearAllMocks();
 });
 
+/** Returns the sessionID argument from the Nth call to setAuthenticationData. */
+function getSessionIDFromCall(callIndex: number): string {
+    const call = mockSetAuthenticationData.mock.calls.at(callIndex) as unknown[];
+    return call.at(1) as string;
+}
+
 describe('FraudProtection', () => {
     it('should not send auth data when only account data arrives without a session', async () => {
         await Onyx.merge(ONYXKEYS.ACCOUNT, {primaryLogin: 'user@expensify.com', requiresTwoFactorAuth: false, validated: true});
@@ -93,7 +99,7 @@ describe('FraudProtection', () => {
         await Onyx.merge(ONYXKEYS.SESSION, {authToken: 'token123', accountID: 12345});
         await waitForBatchedUpdates();
 
-        const firstSessionID = mockSetAuthenticationData.mock.calls[0][1] as string;
+        const firstSessionID = getSessionIDFromCall(0);
         jest.clearAllMocks();
 
         // Logout: clear the session (Onyx.merge strips undefined, so use set with null)
@@ -104,7 +110,7 @@ describe('FraudProtection', () => {
         expect(mockSetAuthenticationData).toHaveBeenCalledWith('', expect.any(String));
 
         // The new sessionID should differ from the one used during auth
-        const logoutSessionID = mockSetAuthenticationData.mock.calls[0][1] as string;
+        const logoutSessionID = getSessionIDFromCall(0);
         expect(logoutSessionID).not.toBe(firstSessionID);
     });
 
@@ -114,7 +120,7 @@ describe('FraudProtection', () => {
         await Onyx.merge(ONYXKEYS.SESSION, {authToken: 'token123', accountID: 12345});
         await waitForBatchedUpdates();
 
-        const firstSessionID = mockSetAuthenticationData.mock.calls[0][1] as string;
+        const firstSessionID = getSessionIDFromCall(0);
 
         // Logout
         await Onyx.set(ONYXKEYS.SESSION, null);
@@ -133,7 +139,7 @@ describe('FraudProtection', () => {
         expect(mockSetAttribute).toHaveBeenCalledWith('is_validated', 'false', false, true);
 
         // Should use a different sessionID than the first login
-        const secondSessionID = mockSetAuthenticationData.mock.calls[0][1] as string;
+        const secondSessionID = getSessionIDFromCall(0);
         expect(secondSessionID).not.toBe(firstSessionID);
     });
 
