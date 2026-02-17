@@ -6126,8 +6126,8 @@ function convertBulkTrackedExpensesToIOU({
     iouReport,
     chatReport,
     isASAPSubmitBetaEnabled,
-    currentUserAccountIDParam,
-    currentUserEmailParam,
+    currentUserAccountID,
+    currentUserEmail,
     transactionViolations,
     policyRecentlyUsedCurrencies,
     quickAction,
@@ -6138,8 +6138,8 @@ function convertBulkTrackedExpensesToIOU({
     iouReport: OnyxEntry<OnyxTypes.Report>;
     chatReport: OnyxEntry<OnyxTypes.Report>;
     isASAPSubmitBetaEnabled: boolean;
-    currentUserAccountIDParam: number;
-    currentUserEmailParam: string;
+    currentUserAccountID: number;
+    currentUserEmail: string;
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     policyRecentlyUsedCurrencies: string[];
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
@@ -6255,8 +6255,8 @@ function convertBulkTrackedExpensesToIOU({
             existingTransactionID: transactionID,
             existingTransaction: transaction,
             isASAPSubmitBetaEnabled,
-            currentUserAccountIDParam,
-            currentUserEmailParam,
+            currentUserAccountIDParam: currentUserAccountID,
+            currentUserEmailParam: currentUserEmail,
             transactionViolations,
             quickAction,
             policyRecentlyUsedCurrencies,
