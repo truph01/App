@@ -1648,6 +1648,7 @@ const staticStyles = (theme: ThemeColors) =>
             borderRadius: 999,
             alignItems: 'center',
             justifyContent: 'center',
+            boxShadow: theme.shadow,
         },
 
         floatingSecondaryActionButton: {
@@ -1662,6 +1663,7 @@ const staticStyles = (theme: ThemeColors) =>
         floatingActionButtonSmall: {
             width: variables.componentSizeNormal,
             height: variables.componentSizeNormal,
+            boxShadow: 'none',
         },
 
         floatingCameraButton: {
@@ -2961,6 +2963,10 @@ const staticStyles = (theme: ThemeColors) =>
             alignSelf: 'flex-start',
         },
 
+        transactionsCarouselGap: {
+            width: variables.spacing2,
+        },
+
         attachmentCarouselContainer: {
             height: '100%',
             width: '100%',
@@ -4251,12 +4257,17 @@ const staticStyles = (theme: ThemeColors) =>
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: variables.buttonBorderRadius,
+            scrollMarginInline: variables.tabSelectorScrollMarginInline,
         },
 
         tabSelector: {
             flexDirection: 'row',
             paddingHorizontal: 20,
             paddingBottom: 12,
+        },
+
+        scrollableTabSelector: {
+            flexGrow: 0,
         },
 
         dualColorOverscrollSpacer: {
@@ -5213,6 +5224,16 @@ const staticStyles = (theme: ThemeColors) =>
             height: 170,
         },
 
+        travelCCVIllustration: {
+            width: 240,
+            height: 100,
+        },
+
+        travelInvoicingIcon: {
+            backgroundColor: colors.productLight700,
+            borderRadius: variables.componentBorderRadiusNormal,
+        },
+
         successBankSharedCardIllustration: {
             width: 164,
             height: 164,
@@ -6106,8 +6127,7 @@ const dynamicStyles = (theme: ThemeColors) =>
 
         getForYouSectionContainerStyle: (shouldUseNarrowLayout: boolean): ViewStyle => ({
             flexDirection: 'column',
-            marginBottom: shouldUseNarrowLayout ? 8 : 12,
-            paddingVertical: 12,
+            marginBottom: shouldUseNarrowLayout ? 8 : 20,
         }),
 
         getSelectionListPopoverHeight: (itemCount: number, windowHeight: number, isSearchable: boolean) => {
