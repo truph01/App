@@ -42,7 +42,7 @@ function useSplitExpense(transactions: OnyxCollection<Transaction>, transaction:
         selector: splitExpensesSelector,
     });
 
-    function initSplit() {
+    function startSplitExpenseFlow() {
         if (!transaction) {
             return;
         }
@@ -116,7 +116,7 @@ function useSplitExpense(transactions: OnyxCollection<Transaction>, transaction:
         }
     }
 
-    return {initSplit};
+    return {startSplitExpenseFlow};
 }
 
 export default useSplitExpense;
