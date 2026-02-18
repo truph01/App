@@ -8328,7 +8328,6 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
         expenseLevelExport: 'Tutti i dati - livello spesa',
         exportInProgress: 'Esportazione in corso',
         conciergeWillSend: 'Concierge ti invierà il file a breve.',
-        conciergeWillNotifyOnExportFailure: 'Concierge ti invierà un messaggio se alcuni report non vengono esportati.',
     },
     domain: {
         notVerified: 'Non verificato',

@@ -8292,7 +8292,6 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
         expenseLevelExport: 'Wszystkie dane – poziom wydatku',
         exportInProgress: 'Trwa eksport',
         conciergeWillSend: 'Concierge wkrótce wyśle Ci plik.',
-        conciergeWillNotifyOnExportFailure: 'Concierge wyśle Ci wiadomość, jeśli niektóre raporty nie zostaną wyeksportowane.',
     },
     domain: {
         notVerified: 'Niezweryfikowane',

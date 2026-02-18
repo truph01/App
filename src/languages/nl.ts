@@ -8312,7 +8312,6 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
         expenseLevelExport: 'Alle gegevens - uitgaveniveau',
         exportInProgress: 'Export bezig',
         conciergeWillSend: 'Concierge stuurt je het bestand zo meteen.',
-        conciergeWillNotifyOnExportFailure: 'Concierge stuurt je een bericht als rapporten niet worden geëxporteerd.',
     },
     domain: {
         notVerified: 'Niet geverifieerd',

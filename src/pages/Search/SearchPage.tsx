@@ -872,6 +872,8 @@ function SearchPage({route}: SearchPageProps) {
                         onSelected: () => handleExportAction(() => exportMultipleReportsToIntegration(hash, selectedReportIDs, connectedIntegration)),
                         shouldCloseModalOnSelect: true,
                         shouldCallAfterModalHide: true,
+                        displayInDefaultIconColor: true,
+                        additionalIconStyles: styles.integrationIcon,
                     },
                     {
                         text: translate('workspace.common.markAsExported'),
@@ -879,6 +881,8 @@ function SearchPage({route}: SearchPageProps) {
                         onSelected: () => handleExportAction(() => markAsManuallyExportedMultipleReports(selectedReportIDs, connectedIntegration)),
                         shouldCloseModalOnSelect: true,
                         shouldCallAfterModalHide: true,
+                        displayInDefaultIconColor: true,
+                        additionalIconStyles: styles.integrationIcon,
                     },
                 );
             }
