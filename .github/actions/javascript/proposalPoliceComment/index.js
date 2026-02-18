@@ -11659,7 +11659,8 @@ async function run() {
             if (!isProposal || previousProposalCreatedAt >= newProposalCreatedAt) {
                 continue;
             }
-            const isAuthorBot = previousProposal.user?.login === CONST_1.default.COMMENT.NAME_MELVIN ||
+            const isAuthorBot = previousProposal.user?.login === CONST_1.default.COMMENT.NAME_MELVIN_A ||
+                previousProposal.user?.login === CONST_1.default.COMMENT.NAME_MELVIN_B ||
                 previousProposal.user?.login === CONST_1.default.COMMENT.NAME_CODEX ||
                 previousProposal.user?.login === CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS ||
                 previousProposal.user?.type === CONST_1.default.COMMENT.TYPE_BOT;
@@ -11871,7 +11872,8 @@ const CONST = {
     },
     COMMENT: {
         TYPE_BOT: 'Bot',
-        NAME_MELVIN: 'melvin-bot',
+        NAME_MELVIN_A: 'melvin-bot',
+        NAME_MELVIN_B: 'MelvinBot',
         NAME_CODEX: 'chatgpt-codex-connector',
         NAME_GITHUB_ACTIONS: 'github-actions',
     },
