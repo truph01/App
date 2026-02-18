@@ -894,9 +894,7 @@ describe('actions/Policy', () => {
                 ),
             );
 
-            const removedWorkspaceChatUpdates = (writeOptions?.optimisticData ?? []).filter(
-                (update) => (update.value as {reportID?: string | null} | undefined)?.reportID === null,
-            );
+            const removedWorkspaceChatUpdates = (writeOptions?.optimisticData ?? []).filter((update) => (update.value as {reportID?: string | null} | undefined)?.reportID === null);
             expect(removedWorkspaceChatUpdates).toHaveLength(nonOwnedWorkspaceChats.length);
 
             expect(writeOptions?.optimisticData).not.toEqual(
@@ -915,7 +913,7 @@ describe('actions/Policy', () => {
                     expect.objectContaining({
                         key: `${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${ownWorkspaceChat.reportID}`,
                         value: expect.objectContaining({
-                            private_isArchived: expect.any(String),
+                            private_isArchived: expect.any(String) as unknown as string,
                         }),
                     }),
                 ]),
