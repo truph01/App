@@ -19,7 +19,7 @@ const request: OnyxTypes.AnyRequest = {
 
 test('Request.addMiddleware() can register a middleware and it will run', () => {
     const testMiddleware = jest.fn<Middleware, Parameters<Middleware>>();
-    Request.addMiddleware(testMiddleware as unknown as Middleware);
+    Request.addMiddleware(testMiddleware as unknown as Middleware, 'TestMiddleware');
 
     Request.processWithMiddleware(request, true);
     return waitForBatchedUpdates().then(() => {
@@ -52,8 +52,8 @@ test('Request.addMiddleware() can register two middlewares. They can pass a resp
             throw new Error('Oops');
         });
 
-    Request.addMiddleware(testMiddleware);
-    Request.addMiddleware(errorThrowingMiddleware);
+    Request.addMiddleware(testMiddleware, 'TestMiddleware');
+    Request.addMiddleware(errorThrowingMiddleware, 'ErrorThrowingMiddleware');
 
     const catchHandler = jest.fn();
     Request.processWithMiddleware(request).catch(catchHandler);

@@ -23,31 +23,31 @@ import {READ_COMMANDS} from './types';
 // e.g. an error thrown in Logging or Reauthenticate logic will be caught by the next middleware or the SequentialQueue which retries failing requests.
 
 // Logging - Logs request details and errors.
-addMiddleware(Logging);
+addMiddleware(Logging, 'Logging');
 
 // RecheckConnection - Sets a timer for a request that will "recheck" if we are connected to the internet if time runs out. Also triggers the connection recheck when we encounter any error.
-addMiddleware(RecheckConnection);
+addMiddleware(RecheckConnection, 'RecheckConnection');
 
 // Reauthentication - Handles jsonCode 407 which indicates an expired authToken. We need to reauthenticate and get a new authToken with our stored credentials.
-addMiddleware(Reauthentication);
+addMiddleware(Reauthentication, 'Reauthentication');
 
 // Handles the case when the copilot has been deleted. The response contains jsonCode 408 and a message indicating account deletion
-addMiddleware(handleDeletedAccount);
+addMiddleware(handleDeletedAccount, 'HandleDeletedAccount');
 
 // Handle supportal permission denial centrally
-addMiddleware(SupportalPermission);
+addMiddleware(SupportalPermission, 'SupportalPermission');
 
 // If an optimistic ID is not used by the server, this will update the remaining serialized requests using that optimistic ID to use the correct ID instead.
-addMiddleware(HandleUnusedOptimisticID);
+addMiddleware(HandleUnusedOptimisticID, 'HandleUnusedOptimisticID');
 
-addMiddleware(Pagination);
+addMiddleware(Pagination, 'Pagination');
 
 // SaveResponseInOnyx - Merges either the successData or failureData (or finallyData, if included in place of the former two values) into Onyx depending on if the call was successful or not. This needs to be the LAST middleware we use, don't add any
 // middlewares after this, because the SequentialQueue depends on the result of this middleware to pause the queue (if needed) to bring the app to an up-to-date state.
-addMiddleware(SaveResponseInOnyx);
+addMiddleware(SaveResponseInOnyx, 'SaveResponseInOnyx');
 
 // FraudMonitoring - Tags the request with the appropriate Fraud Protection event.
-addMiddleware(FraudMonitoring);
+addMiddleware(FraudMonitoring, 'FraudMonitoring');
 
 let requestIndex = 0;
 
