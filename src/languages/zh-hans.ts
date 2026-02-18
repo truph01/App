@@ -2209,6 +2209,10 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount}，商户：${merchant} - 日期：${date}`,
         },
         freezeCard: '冻结卡片',
+        unfreeze: '解冻',
+        unfreezeCard: '解冻卡片',
+        freezeDescription: '冻结的卡片无法用于购买和交易。你可以随时解冻。',
+        unfreezeDescription: '解冻此卡后，将重新允许购买和交易。仅当你确定该卡可以安全使用时再继续。',
     },
     workflowsPage: {
         workflowTitle: '支出',
