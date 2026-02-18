@@ -27,7 +27,7 @@ import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
-import * as Card from '@libs/actions/Card';
+import {freezeCard, unfreezeCard} from '@libs/actions/Card';
 import {formatCardExpiration, getDomainCards, getTranslationKeyForLimitType, isCardFrozen, maskCard, maskPin} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
@@ -175,7 +175,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
         if (!currentCard) {
             return;
         }
-        Card.freezeCard(Number(currentCard?.fundID ?? CONST.DEFAULT_NUMBER_ID), currentCard, session?.accountID ?? CONST.DEFAULT_NUMBER_ID);
+        freezeCard(Number(currentCard?.fundID ?? CONST.DEFAULT_NUMBER_ID), currentCard, session?.accountID ?? CONST.DEFAULT_NUMBER_ID);
         handleDismissFreezeModal();
     }, [currentCard, handleDismissFreezeModal, session?.accountID]);
 
@@ -191,7 +191,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
         if (!currentCard) {
             return;
         }
-        Card.unfreezeCard(Number(currentCard?.fundID ?? CONST.DEFAULT_NUMBER_ID), currentCard);
+        unfreezeCard(Number(currentCard?.fundID ?? CONST.DEFAULT_NUMBER_ID), currentCard);
         handleDismissUnfreezeModal();
     }, [currentCard, handleDismissUnfreezeModal]);
 
