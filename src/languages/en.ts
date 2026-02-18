@@ -1500,7 +1500,6 @@ const translations = {
             one: `Trip: 1 full day`,
             other: (count: number) => `Trip: ${count} full days`,
         }),
-        automaticallyEnterExpenseDetails: 'Concierge will automatically enter the expense details for you, or you can add them manually.',
         dates: 'Dates',
         rates: 'Rates',
         submitsTo: ({name}: SubmitsToParams) => `Submits to ${name}`,

@@ -73,7 +73,6 @@ import type {DropdownOption} from './ButtonWithDropdownMenu/types';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from './DelegateNoAccessModalProvider';
 import FormHelpMessage from './FormHelpMessage';
 import MoneyRequestAmountInput from './MoneyRequestAmountInput';
-import getContentContainerStyle from './MoneyRequestConfirmationList/getContentContainerStyles';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
 import {PressableWithFeedback} from './Pressable';
 import {useProductTrainingContext} from './ProductTrainingContext';
@@ -1337,7 +1336,6 @@ function MoneyRequestConfirmationList({
                 style={selectionListStyle}
                 isScrollEnabled={!isCompactMode}
                 disableKeyboardShortcuts
-                contentContainerStyle={getContentContainerStyle(isCompactMode, styles.flex1).contentContainerStyle}
                 ListFooterComponentStyle={isCompactMode ? [styles.flex1] : undefined}
             />
         </MouseProvider>

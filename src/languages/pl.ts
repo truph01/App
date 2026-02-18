@@ -1487,7 +1487,6 @@ const translations: TranslationDeepObject<typeof en> = {
             one: `Podróż: 1 pełny dzień`,
             other: (count: number) => `Podróż: ${count} pełne dni`,
         }),
-        automaticallyEnterExpenseDetails: 'Concierge automatycznie wprowadzi szczegóły wydatku za Ciebie lub możesz dodać je ręcznie.',
         dates: 'Daty',
         rates: 'Stawki',
         submitsTo: ({name}: SubmitsToParams) => `Przesyła do ${name}`,

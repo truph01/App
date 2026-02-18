@@ -1464,7 +1464,6 @@ const translations: TranslationDeepObject<typeof en> = {
             one: `行程：1 个完整天`,
             other: (count: number) => `行程：${count} 整天`,
         }),
-        automaticallyEnterExpenseDetails: 'Concierge 将自动为您输入费用详情，或者您可以手动添加。',
         dates: '日期',
         rates: '费率',
         submitsTo: ({name}: SubmitsToParams) => `提交给 ${name}`,
