@@ -62,46 +62,34 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
     const isVsb = onboardingValues?.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.VSB;
     const isSmb = onboardingValues?.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.SMB;
 
-    const handleJoinWorkspace = useCallback(
-        (policy: JoinablePolicy) => {
-            if (policy.automaticJoiningEnabled) {
-                joinAccessiblePolicy(policy.policyID);
-            } else {
-                askToJoinPolicy(policy.policyID);
-            }
-            completeOnboarding({
-                engagementChoice: CONST.ONBOARDING_CHOICES.LOOKING_AROUND,
-                onboardingMessage: onboardingMessages[CONST.ONBOARDING_CHOICES.LOOKING_AROUND],
-                firstName: onboardingPersonalDetails?.firstName ?? '',
-                lastName: onboardingPersonalDetails?.lastName ?? '',
-                shouldSkipTestDriveModal: !!(policy.automaticJoiningEnabled ? policy.policyID : undefined),
-                companySize: onboardingCompanySize,
-                introSelected,
-            });
-            setOnboardingAdminsChatReportID();
-            setOnboardingPolicyID(policy.policyID);
-
-            navigateAfterOnboardingWithMicrotaskQueue(
-                isSmallScreenWidth,
-                isBetaEnabled(CONST.BETAS.DEFAULT_ROOMS),
-                conciergeReportID,
-                archivedReportsIdSet,
-                policy.automaticJoiningEnabled ? policy.policyID : undefined,
-                undefined,
-                false,
-            );
-        },
-        [
-            onboardingMessages,
-            onboardingPersonalDetails?.firstName,
-            onboardingPersonalDetails?.lastName,
-            isSmallScreenWidth,
-            isBetaEnabled,
-            onboardingCompanySize,
-            archivedReportsIdSet,
+    const handleJoinWorkspace = (policy: JoinablePolicy) => {
+        if (policy.automaticJoiningEnabled) {
+            joinAccessiblePolicy(policy.policyID);
+        } else {
+            askToJoinPolicy(policy.policyID);
+        }
+        completeOnboarding({
+            engagementChoice: CONST.ONBOARDING_CHOICES.LOOKING_AROUND,
+            onboardingMessage: onboardingMessages[CONST.ONBOARDING_CHOICES.LOOKING_AROUND],
+            firstName: onboardingPersonalDetails?.firstName ?? '',
+            lastName: onboardingPersonalDetails?.lastName ?? '',
+            shouldSkipTestDriveModal: !!(policy.automaticJoiningEnabled ? policy.policyID : undefined),
+            companySize: onboardingCompanySize,
             introSelected,
-        ],
-    );
+        });
+        setOnboardingAdminsChatReportID();
+        setOnboardingPolicyID(policy.policyID);
+
+        navigateAfterOnboardingWithMicrotaskQueue(
+            isSmallScreenWidth,
+            isBetaEnabled(CONST.BETAS.DEFAULT_ROOMS),
+            conciergeReportID,
+            archivedReportsIdSet,
+            policy.automaticJoiningEnabled ? policy.policyID : undefined,
+            undefined,
+            false,
+        );
+    };
 
     const policyIDItems = useMemo(() => {
         return Object.values(joinablePolicies ?? {}).map((policyInfo) => {

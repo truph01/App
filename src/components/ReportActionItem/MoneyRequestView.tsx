@@ -1,5 +1,5 @@
 import {Str} from 'expensify-common';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
@@ -193,8 +193,6 @@ function MoneyRequestView({
     const parentReportActionSelector = (reportActions: OnyxEntry<OnyxTypes.ReportActions>) =>
         transactionThreadReport?.parentReportActionID ? reportActions?.[transactionThreadReport.parentReportActionID] : undefined;
 
-    // The parentReportActionSelector is memoized by React Compiler
-    // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
     const [parentReportAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportID}`, {
         canEvict: false,
         canBeMissing: true,
@@ -254,16 +252,8 @@ function MoneyRequestView({
     const isInvoice = isInvoiceReport(moneyRequestReport);
     const isTrackExpense = !mergeTransactionID && isTrackExpenseReportNew(transactionThreadReport, moneyRequestReport, parentReportAction);
 
-    const iouType = useMemo(() => {
-        if (isTrackExpense) {
-            return CONST.IOU.TYPE.TRACK;
-        }
-        if (isInvoice) {
-            return CONST.IOU.TYPE.INVOICE;
-        }
-
-        return CONST.IOU.TYPE.SUBMIT;
-    }, [isTrackExpense, isInvoice]);
+    // eslint-disable-next-line no-nested-ternary
+    const iouType = isTrackExpense ? CONST.IOU.TYPE.TRACK : isInvoice ? CONST.IOU.TYPE.INVOICE : CONST.IOU.TYPE.SUBMIT;
 
     const allowNegativeAmount = shouldEnableNegative(parentReport, policy, iouType);
 

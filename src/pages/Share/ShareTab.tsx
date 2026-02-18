@@ -68,28 +68,25 @@ function ShareTab({ref}: ShareTabProps) {
     const offlineMessage: string = isOffline ? `${translate('common.youAppearToBeOffline')} ${translate('search.resultsAreLimited')}` : '';
     const showLoadingPlaceholder = useMemo(() => !areOptionsInitialized || !didScreenTransitionEnd, [areOptionsInitialized, didScreenTransitionEnd]);
 
-    const searchOptions = useMemo(() => {
-        if (!areOptionsInitialized) {
-            return defaultListOptions;
-        }
-        return getSearchOptions({
-            options,
-            draftComments,
-            nvpDismissedProductTraining,
-            betas: betas ?? [],
-            isUsedInChatFinder: false,
-            includeReadOnly: false,
-            searchQuery: textInputValue,
-            maxResults: 20,
-            includeUserToInvite: true,
-            countryCode,
-            loginList,
-            currentUserAccountID,
-            currentUserEmail,
-            policyCollection: allPolicies,
-            personalDetails,
-        });
-    }, [areOptionsInitialized, options, draftComments, nvpDismissedProductTraining, betas, textInputValue, countryCode, loginList, currentUserAccountID, currentUserEmail, personalDetails]);
+    const searchOptions = areOptionsInitialized
+        ? getSearchOptions({
+              options,
+              draftComments,
+              nvpDismissedProductTraining,
+              betas: betas ?? [],
+              isUsedInChatFinder: false,
+              includeReadOnly: false,
+              searchQuery: textInputValue,
+              maxResults: 20,
+              includeUserToInvite: true,
+              countryCode,
+              loginList,
+              currentUserAccountID,
+              currentUserEmail,
+              policyCollection: allPolicies,
+              personalDetails,
+          })
+        : defaultListOptions;
 
     const recentReportsOptions = useMemo(() => {
         if (textInputValue.trim() === '') {

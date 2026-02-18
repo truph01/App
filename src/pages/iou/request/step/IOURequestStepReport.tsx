@@ -65,13 +65,9 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     const session = useSession();
     const personalDetails = usePersonalDetails();
-    const ownerAccountID = useMemo(() => {
-        if (isUnreported) {
-            return iouActions?.find((iouAction) => getOriginalMessage(iouAction as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.IOU>)?.IOUTransactionID === transaction.transactionID)
-                ?.actorAccountID;
-        }
-        return selectedReport?.ownerAccountID;
-    }, [isUnreported, selectedReport?.ownerAccountID, iouActions, transaction?.transactionID]);
+    const ownerAccountID = isUnreported
+        ? iouActions?.find((iouAction) => getOriginalMessage(iouAction as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.IOU>)?.IOUTransactionID === transaction.transactionID)?.actorAccountID
+        : selectedReport?.ownerAccountID;
     const ownerPersonalDetails = useMemo(() => getPersonalDetailsForAccountID(ownerAccountID, personalDetails) as PersonalDetails, [personalDetails, ownerAccountID]);
 
     const transactionPolicyID = transaction?.participants?.at(0)?.isPolicyExpenseChat ? transaction?.participants.at(0)?.policyID : undefined;

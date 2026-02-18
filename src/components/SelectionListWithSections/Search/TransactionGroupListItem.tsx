@@ -458,54 +458,43 @@ function TransactionGroupListItem<TItem extends ListItem>({
             ? CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE
             : undefined);
 
-    const groupViolations = useMemo(() => {
-        if (!transactionsSnapshot?.data) {
-            return {};
-        }
-        const result: Record<string, TransactionViolations | undefined> = {};
-        for (const [key, value] of Object.entries(transactionsSnapshot.data)) {
+    const snapshotData = transactionsSnapshot?.data;
+    const groupViolations: Record<string, TransactionViolations | undefined> = {};
+    if (snapshotData) {
+        for (const [key, value] of Object.entries(snapshotData)) {
             if (key.startsWith(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS)) {
-                result[key] = value as TransactionViolations;
+                groupViolations[key] = value as TransactionViolations;
             }
         }
-        return result;
-    }, [transactionsSnapshot?.data]);
+    }
 
-    // Filter violations based on user visibility
-    const filteredViolations = useMemo(() => {
-        if (!groupViolations || !transactionsSnapshot?.data) {
-            return groupViolations;
-        }
-
-        const filtered: Record<string, TransactionViolation[]> = {};
-
-        const transactionKeys = Object.keys(transactionsSnapshot.data).filter((key) => key.startsWith(ONYXKEYS.COLLECTION.TRANSACTION));
-
-        for (const key of transactionKeys) {
-            const transaction = transactionsSnapshot.data[key as keyof typeof transactionsSnapshot.data] as Transaction;
-            if (!transaction || typeof transaction !== 'object' || !('transactionID' in transaction) || !('reportID' in transaction)) {
+    const filteredViolations: Record<string, TransactionViolation[]> = {};
+    if (snapshotData) {
+        for (const key of Object.keys(snapshotData)) {
+            if (!key.startsWith(ONYXKEYS.COLLECTION.TRANSACTION)) {
+                continue;
+            }
+            const snapshotTransaction = snapshotData[key as keyof typeof snapshotData] as Transaction;
+            if (!snapshotTransaction || typeof snapshotTransaction !== 'object' || !('transactionID' in snapshotTransaction) || !('reportID' in snapshotTransaction)) {
                 continue;
             }
 
-            const report = transactionsSnapshot.data[`${ONYXKEYS.COLLECTION.REPORT}${transaction.reportID}`];
-            const policy = transactionsSnapshot.data[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`];
+            const report = snapshotData[`${ONYXKEYS.COLLECTION.REPORT}${snapshotTransaction.reportID}`];
+            const policy = snapshotData[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`];
 
             if (report && policy) {
-                const transactionViolations = groupViolations[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`];
+                const transactionViolations = groupViolations[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${snapshotTransaction.transactionID}`];
                 if (transactionViolations) {
-                    const filteredTransactionViolations = mergeProhibitedViolations(
-                        transactionViolations.filter((violation) => shouldShowViolation(report, policy, violation.name, currentUserDetails?.email ?? '', true, transaction)),
+                    const merged = mergeProhibitedViolations(
+                        transactionViolations.filter((violation) => shouldShowViolation(report, policy, violation.name, currentUserDetails?.email ?? '', true, snapshotTransaction)),
                     );
-
-                    if (filteredTransactionViolations.length > 0) {
-                        filtered[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`] = filteredTransactionViolations;
+                    if (merged.length > 0) {
+                        filteredViolations[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${snapshotTransaction.transactionID}`] = merged;
                     }
                 }
             }
         }
-
-        return filtered;
-    }, [groupViolations, transactionsSnapshot, currentUserDetails?.email]);
+    }
 
     return (
         <OfflineWithFeedback pendingAction={pendingAction}>

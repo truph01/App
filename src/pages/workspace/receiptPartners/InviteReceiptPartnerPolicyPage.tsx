@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ConfirmationPage from '@components/ConfirmationPage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 // eslint-disable-next-line no-restricted-imports
@@ -45,12 +45,8 @@ function InviteReceiptPartnerPolicyPage({route}: InviteReceiptPartnerPolicyPageP
     const policy = usePolicy(policyID);
     const shouldShowTextInput = policy?.employeeList && Object.keys(policy.employeeList).length >= CONST.STANDARD_LIST_ITEM_LIMIT;
     const textInputLabel = shouldShowTextInput ? translate('common.search') : undefined;
-    const workspaceMembers = useMemo((): MemberForList[] => {
-        const members: MemberForList[] = [];
-        if (!policy?.employeeList) {
-            return members;
-        }
-        // Get the list of employees from the U4B organization
+    const workspaceMembers: MemberForList[] = [];
+    if (policy?.employeeList) {
         const uberEmployees = policy?.receiptPartners?.uber?.employees ?? {};
 
         for (const [email, policyEmployee] of Object.entries(policy.employeeList)) {
@@ -70,31 +66,30 @@ function InviteReceiptPartnerPolicyPage({route}: InviteReceiptPartnerPolicyPageP
 
             const personalDetail = getPersonalDetailByEmail(email);
             if (personalDetail) {
-                const memberForList = formatMemberForList({
-                    text: personalDetail?.displayName ?? email,
-                    alternateText: email,
-                    login: email,
-                    accountID: personalDetail?.accountID,
-                    icons: [
-                        {
-                            source: personalDetail?.avatar ?? icons.FallbackAvatar,
-                            name: formatPhoneNumber(email),
-                            type: CONST.ICON_TYPE_AVATAR,
-                            id: personalDetail?.accountID,
-                        },
-                    ],
-                    reportID: '',
-                    keyForList: email,
-                    isSelected: true,
-                });
-
-                members.push(memberForList);
+                workspaceMembers.push(
+                    formatMemberForList({
+                        text: personalDetail?.displayName ?? email,
+                        alternateText: email,
+                        login: email,
+                        accountID: personalDetail?.accountID,
+                        icons: [
+                            {
+                                source: personalDetail?.avatar ?? icons.FallbackAvatar,
+                                name: formatPhoneNumber(email),
+                                type: CONST.ICON_TYPE_AVATAR,
+                                id: personalDetail?.accountID,
+                            },
+                        ],
+                        reportID: '',
+                        keyForList: email,
+                        isSelected: true,
+                    }),
+                );
             }
         }
 
-        sortAlphabetically(members, 'text', localeCompare);
-        return members;
-    }, [policy?.employeeList, policy?.receiptPartners?.uber?.employees, isOffline, icons, localeCompare]);
+        sortAlphabetically(workspaceMembers, 'text', localeCompare);
+    }
 
     const allMembersWithState: MemberForList[] = [];
     if (workspaceMembers.length > 0) {

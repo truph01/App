@@ -178,17 +178,14 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
         ],
     );
 
-    const handleConfirmCreateReport = useCallback(
-        (shouldDismissEmptyReportsConfirmation: boolean) => {
-            if (!pendingPolicySelection?.policy.policyID) {
-                return;
-            }
+    const handleConfirmCreateReport = (shouldDismissEmptyReportsConfirmation: boolean) => {
+        if (!pendingPolicySelection?.policy.policyID) {
+            return;
+        }
 
-            createReport(pendingPolicySelection.policy.policyID, shouldDismissEmptyReportsConfirmation);
-            setPendingPolicySelection(null);
-        },
-        [createReport, pendingPolicySelection?.policy.policyID],
-    );
+        createReport(pendingPolicySelection.policy.policyID, shouldDismissEmptyReportsConfirmation);
+        setPendingPolicySelection(null);
+    };
 
     const handleCancelCreateReport = useCallback(() => {
         setPendingPolicySelection(null);

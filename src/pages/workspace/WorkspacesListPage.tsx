@@ -336,192 +336,163 @@ function WorkspacesListPage() {
     /**
      * Gets the menu item for each workspace
      */
-    const getWorkspaceMenuItem = useCallback(
-        ({item, index}: GetWorkspaceMenuItem) => {
-            const isAdmin = isPolicyAdmin(item as unknown as PolicyType, session?.email);
-            const isOwner = item.ownerAccountID === session?.accountID;
-            const isDefault = activePolicyID === item.policyID;
-            const shouldAnimateInHighlight = duplicateWorkspace?.policyID === item.policyID;
+    const getWorkspaceMenuItem = ({item, index}: GetWorkspaceMenuItem) => {
+        const isAdmin = isPolicyAdmin(item as unknown as PolicyType, session?.email);
+        const isOwner = item.ownerAccountID === session?.accountID;
+        const isDefault = activePolicyID === item.policyID;
+        const shouldAnimateInHighlight = duplicateWorkspace?.policyID === item.policyID;
 
-            const threeDotsMenuItems: PopoverMenuItem[] = [
-                {
-                    icon: expensifyIcons.Building,
-                    text: translate('workspace.common.goToWorkspace'),
-                    onSelected: item.action,
+        const threeDotsMenuItems: PopoverMenuItem[] = [
+            {
+                icon: expensifyIcons.Building,
+                text: translate('workspace.common.goToWorkspace'),
+                onSelected: item.action,
+            },
+        ];
+
+        if (!isOwner && (item.policyID !== preferredPolicyID || !isRestrictedToPreferredPolicy)) {
+            threeDotsMenuItems.push({
+                icon: expensifyIcons.Exit,
+                text: translate('common.leave'),
+                onSelected: callFunctionIfActionIsAllowed(() => {
+                    close(() => {
+                        const isReimburser = isUserReimburserForPolicy(policies, item.policyID, session?.email);
+
+                        setPolicyIDToLeave(item.policyID);
+
+                        if (isReimburser) {
+                            setIsCannotLeaveWorkspaceModalOpen(true);
+                            return;
+                        }
+
+                        setIsLeaveModalOpen(true);
+                    });
+                }),
+            });
+        }
+
+        if (isAdmin) {
+            threeDotsMenuItems.push({
+                icon: icons.Copy,
+                text: translate('workspace.common.duplicateWorkspace'),
+                onSelected: () => (item.policyID ? Navigation.navigate(ROUTES.WORKSPACE_DUPLICATE.getRoute(item.policyID)) : undefined),
+            });
+        }
+
+        if (!isDefault && !item?.isJoinRequestPending && !isRestrictedToPreferredPolicy) {
+            threeDotsMenuItems.push({
+                icon: icons.Star,
+                text: translate('workspace.common.setAsDefault'),
+                onSelected: () => {
+                    if (!item.policyID || !activePolicyID) {
+                        return;
+                    }
+                    setNameValuePair(ONYXKEYS.NVP_ACTIVE_POLICY_ID, item.policyID, activePolicyID);
                 },
-            ];
+            });
+        }
+        if (isOwner) {
+            threeDotsMenuItems.push({
+                icon: icons.Trashcan,
+                text: translate('workspace.common.delete'),
+                shouldShowLoadingSpinnerIcon: loadingSpinnerIconIndex === index,
+                onSelected: () => {
+                    if (loadingSpinnerIconIndex !== null) {
+                        return;
+                    }
 
-            if (!isOwner && (item.policyID !== preferredPolicyID || !isRestrictedToPreferredPolicy)) {
-                threeDotsMenuItems.push({
-                    icon: expensifyIcons.Exit,
-                    text: translate('common.leave'),
-                    onSelected: callFunctionIfActionIsAllowed(() => {
-                        close(() => {
-                            const isReimburser = isUserReimburserForPolicy(policies, item.policyID, session?.email);
+                    if (
+                        shouldBlockWorkspaceDeletionForInvoicifyUser(
+                            isSubscriptionTypeOfInvoicing(privateSubscription?.type),
+                            policies,
+                            item?.policyID,
+                            currentUserPersonalDetails?.accountID,
+                        )
+                    ) {
+                        Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_DOWNGRADE_BLOCKED.getRoute(Navigation.getActiveRoute()));
+                        return;
+                    }
 
-                            setPolicyIDToLeave(item.policyID);
+                    setPolicyIDToDelete(item.policyID);
+                    setPolicyNameToDelete(item.title);
 
-                            if (isReimburser) {
-                                setIsCannotLeaveWorkspaceModalOpen(true);
-                                return;
-                            }
+                    if (shouldCalculateBillNewDot) {
+                        setIsDeletingPaidWorkspace(true);
+                        calculateBillNewDot();
+                        setLoadingSpinnerIconIndex(index);
+                        return;
+                    }
 
-                            setIsLeaveModalOpen(true);
-                        });
-                    }),
-                });
-            }
+                    continueDeleteWorkspace();
+                },
+                shouldKeepModalOpen: shouldCalculateBillNewDot,
+                shouldCallAfterModalHide: !shouldCalculateBillNewDot,
+            });
+        }
 
-            if (isAdmin) {
-                threeDotsMenuItems.push({
-                    icon: icons.Copy,
-                    text: translate('workspace.common.duplicateWorkspace'),
-                    onSelected: () => (item.policyID ? Navigation.navigate(ROUTES.WORKSPACE_DUPLICATE.getRoute(item.policyID)) : undefined),
-                });
-            }
+        if (isAdmin && !isOwner && shouldRenderTransferOwnerButton(fundList)) {
+            threeDotsMenuItems.push({
+                icon: icons.Transfer,
+                text: translate('workspace.people.transferOwner'),
+                onSelected: () => startChangeOwnershipFlow(item.policyID),
+            });
+        }
 
-            if (!isDefault && !item?.isJoinRequestPending && !isRestrictedToPreferredPolicy) {
-                threeDotsMenuItems.push({
-                    icon: icons.Star,
-                    text: translate('workspace.common.setAsDefault'),
-                    onSelected: () => {
-                        if (!item.policyID || !activePolicyID) {
-                            return;
-                        }
-                        setNameValuePair(ONYXKEYS.NVP_ACTIVE_POLICY_ID, item.policyID, activePolicyID);
-                    },
-                });
-            }
-            if (isOwner) {
-                threeDotsMenuItems.push({
-                    icon: icons.Trashcan,
-                    text: translate('workspace.common.delete'),
-                    shouldShowLoadingSpinnerIcon: loadingSpinnerIconIndex === index,
-                    onSelected: () => {
-                        if (loadingSpinnerIconIndex !== null) {
-                            return;
-                        }
+        const ownerDisplayName = personalDetails?.[item.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID]?.displayName ?? '';
+        const workspaceType = item.type ? getUserFriendlyWorkspaceType(item.type, translate) : '';
+        const accessibilityLabel = [
+            `${translate('workspace.common.workspace')}: ${item.title}`,
+            isDefault ? translate('common.default') : '',
+            `${translate('workspace.common.workspaceOwner')}: ${ownerDisplayName}`,
+            `${translate('workspace.common.workspaceType')}: ${workspaceType}`,
+        ]
+            .filter(Boolean)
+            .join(', ');
 
-                        if (
-                            shouldBlockWorkspaceDeletionForInvoicifyUser(
-                                isSubscriptionTypeOfInvoicing(privateSubscription?.type),
-                                policies,
-                                item?.policyID,
-                                currentUserPersonalDetails?.accountID,
-                            )
-                        ) {
-                            Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_DOWNGRADE_BLOCKED.getRoute(Navigation.getActiveRoute()));
-                            return;
-                        }
-
-                        setPolicyIDToDelete(item.policyID);
-                        setPolicyNameToDelete(item.title);
-
-                        if (shouldCalculateBillNewDot) {
-                            setIsDeletingPaidWorkspace(true);
-                            calculateBillNewDot();
-                            setLoadingSpinnerIconIndex(index);
-                            return;
-                        }
-
-                        continueDeleteWorkspace();
-                    },
-                    shouldKeepModalOpen: shouldCalculateBillNewDot,
-                    shouldCallAfterModalHide: !shouldCalculateBillNewDot,
-                });
-            }
-
-            if (isAdmin && !isOwner && shouldRenderTransferOwnerButton(fundList)) {
-                threeDotsMenuItems.push({
-                    icon: icons.Transfer,
-                    text: translate('workspace.people.transferOwner'),
-                    onSelected: () => startChangeOwnershipFlow(item.policyID),
-                });
-            }
-
-            const ownerDisplayName = personalDetails?.[item.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID]?.displayName ?? '';
-            const workspaceType = item.type ? getUserFriendlyWorkspaceType(item.type, translate) : '';
-            const accessibilityLabel = [
-                `${translate('workspace.common.workspace')}: ${item.title}`,
-                isDefault ? translate('common.default') : '',
-                `${translate('workspace.common.workspaceOwner')}: ${ownerDisplayName}`,
-                `${translate('workspace.common.workspaceType')}: ${workspaceType}`,
-            ]
-                .filter(Boolean)
-                .join(', ');
-
-            return (
-                <OfflineWithFeedback
-                    key={`${item.title}_${index}`}
-                    pendingAction={item.pendingAction}
-                    errorRowStyles={[styles.ph5, styles.mt3]}
-                    onClose={item.dismissError}
-                    errors={item.errors}
-                    style={styles.mb2}
-                    shouldShowErrorMessages={item.policyID !== policyIDToDelete}
-                    shouldHideOnDelete={false}
+        return (
+            <OfflineWithFeedback
+                key={`${item.title}_${index}`}
+                pendingAction={item.pendingAction}
+                errorRowStyles={[styles.ph5, styles.mt3]}
+                onClose={item.dismissError}
+                errors={item.errors}
+                style={styles.mb2}
+                shouldShowErrorMessages={item.policyID !== policyIDToDelete}
+                shouldHideOnDelete={false}
+            >
+                <PressableWithoutFeedback
+                    role={CONST.ROLE.BUTTON}
+                    accessibilityLabel={accessibilityLabel}
+                    style={[styles.mh5]}
+                    disabled={item.disabled}
+                    onPress={item.action}
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_MENU_ITEM}
                 >
-                    <PressableWithoutFeedback
-                        role={CONST.ROLE.BUTTON}
-                        accessibilityLabel={accessibilityLabel}
-                        style={[styles.mh5]}
-                        disabled={item.disabled}
-                        onPress={item.action}
-                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_MENU_ITEM}
-                    >
-                        {({hovered}) => (
-                            <WorkspacesListRow
-                                title={item.title}
-                                policyID={item.policyID}
-                                menuItems={threeDotsMenuItems}
-                                workspaceIcon={item.icon}
-                                ownerAccountID={item.ownerAccountID}
-                                workspaceType={item.type}
-                                shouldAnimateInHighlight={shouldAnimateInHighlight}
-                                isJoinRequestPending={item?.isJoinRequestPending}
-                                rowStyles={hovered && styles.hoveredComponentBG}
-                                layoutWidth={isLessThanMediumScreen ? CONST.LAYOUT_WIDTH.NARROW : CONST.LAYOUT_WIDTH.WIDE}
-                                brickRoadIndicator={item.brickRoadIndicator}
-                                shouldDisableThreeDotsMenu={item.disabled}
-                                style={[item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ? styles.offlineFeedbackDeleted : {}]}
-                                isDefault={isDefault}
-                                isLoadingBill={isLoadingBill}
-                                resetLoadingSpinnerIconIndex={resetLoadingSpinnerIconIndex}
-                                isHovered={hovered}
-                            />
-                        )}
-                    </PressableWithoutFeedback>
-                </OfflineWithFeedback>
-            );
-        },
-        [
-            session?.email,
-            session?.accountID,
-            activePolicyID,
-            duplicateWorkspace?.policyID,
-            translate,
-            policies,
-            fundList,
-            styles,
-            loadingSpinnerIconIndex,
-            shouldCalculateBillNewDot,
-            setIsDeletingPaidWorkspace,
-            startChangeOwnershipFlow,
-            isLessThanMediumScreen,
-            isLoadingBill,
-            resetLoadingSpinnerIconIndex,
-            continueDeleteWorkspace,
-            isRestrictedToPreferredPolicy,
-            policyIDToDelete,
-            preferredPolicyID,
-            icons,
-            expensifyIcons.Building,
-            expensifyIcons.Exit,
-            privateSubscription?.type,
-            currentUserPersonalDetails?.accountID,
-            personalDetails,
-        ],
-    );
+                    {({hovered}) => (
+                        <WorkspacesListRow
+                            title={item.title}
+                            policyID={item.policyID}
+                            menuItems={threeDotsMenuItems}
+                            workspaceIcon={item.icon}
+                            ownerAccountID={item.ownerAccountID}
+                            workspaceType={item.type}
+                            shouldAnimateInHighlight={shouldAnimateInHighlight}
+                            isJoinRequestPending={item?.isJoinRequestPending}
+                            rowStyles={hovered && styles.hoveredComponentBG}
+                            layoutWidth={isLessThanMediumScreen ? CONST.LAYOUT_WIDTH.NARROW : CONST.LAYOUT_WIDTH.WIDE}
+                            brickRoadIndicator={item.brickRoadIndicator}
+                            shouldDisableThreeDotsMenu={item.disabled}
+                            style={[item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ? styles.offlineFeedbackDeleted : {}]}
+                            isDefault={isDefault}
+                            isLoadingBill={isLoadingBill}
+                            resetLoadingSpinnerIconIndex={resetLoadingSpinnerIconIndex}
+                            isHovered={hovered}
+                        />
+                    )}
+                </PressableWithoutFeedback>
+            </OfflineWithFeedback>
+        );
+    };
 
     const navigateToWorkspace = useCallback(
         (policyID: string) => {

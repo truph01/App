@@ -41,13 +41,13 @@ function SelectCountryStep({policyID}: CountryStepProps) {
 
     const [searchValue, debouncedSearchValue, setSearchValue] = useDebouncedState('');
 
-    const getCountry = useCallback(() => {
+    const getCountry = () => {
         if (addNewCard?.data?.selectedCountry) {
             return addNewCard.data.selectedCountry;
         }
 
         return getPlaidCountry(policy?.outputCurrency, currencyList, countryByIp);
-    }, [addNewCard?.data.selectedCountry, countryByIp, currencyList, policy?.outputCurrency]);
+    };
 
     const [currentCountry, setCurrentCountry] = useState<string | undefined>(getCountry);
     const [hasError, setHasError] = useState(false);
