@@ -1806,8 +1806,8 @@ function getOlderActions(reportID: string | undefined, reportActionID: string | 
     };
 
     return API.paginate(
-        CONST.API_REQUEST_TYPE.READ,
-        READ_COMMANDS.GET_OLDER_ACTIONS,
+        CONST.API_REQUEST_TYPE.MAKE_REQUEST_WITH_SIDE_EFFECTS,
+        SIDE_EFFECT_REQUEST_COMMANDS.GET_OLDER_ACTIONS,
         parameters,
         {optimisticData, successData, failureData},
         {
@@ -1864,8 +1864,8 @@ function getNewerActions(reportID: string | undefined, reportActionID: string | 
     };
 
     return API.paginate(
-        CONST.API_REQUEST_TYPE.READ,
-        READ_COMMANDS.GET_NEWER_ACTIONS,
+        CONST.API_REQUEST_TYPE.MAKE_REQUEST_WITH_SIDE_EFFECTS,
+        SIDE_EFFECT_REQUEST_COMMANDS.GET_NEWER_ACTIONS,
         parameters,
         {optimisticData, successData, failureData},
         {

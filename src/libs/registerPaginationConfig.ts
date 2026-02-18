@@ -2,7 +2,7 @@ import type {OnyxCollection} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportNameValuePairs} from '@src/types/onyx';
-import {READ_COMMANDS, WRITE_COMMANDS} from './API/types';
+import {SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from './API/types';
 import {registerPaginationConfig} from './Middleware/Pagination';
 import {getSortedReportActionsForDisplay} from './ReportActionsUtils';
 import {canUserPerformWriteAction as canUserPerformWriteActionReportUtils} from './ReportUtils';
@@ -37,8 +37,8 @@ Onyx.connectWithoutView({
 
 registerPaginationConfig({
     initialCommand: WRITE_COMMANDS.OPEN_REPORT,
-    previousCommand: READ_COMMANDS.GET_OLDER_ACTIONS,
-    nextCommand: READ_COMMANDS.GET_NEWER_ACTIONS,
+    previousCommand: SIDE_EFFECT_REQUEST_COMMANDS.GET_OLDER_ACTIONS,
+    nextCommand: SIDE_EFFECT_REQUEST_COMMANDS.GET_NEWER_ACTIONS,
     resourceCollectionKey: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
     pageCollectionKey: ONYXKEYS.COLLECTION.REPORT_ACTIONS_PAGES,
     sortItems: (reportActions, reportID) => {
