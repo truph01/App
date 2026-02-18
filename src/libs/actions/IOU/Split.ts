@@ -1290,6 +1290,13 @@ function updateSplitTransactions({
                     // Ensure we pass the currency to getUpdateMoneyRequestParams as well, so the amount message is created correctly
                 } else if (key === 'amount') {
                     transactionChanges.currency = originalTransactionDetails?.currency;
+                } else if (key === 'waypoints') {
+                    // For waypoints, we need to compare the stringified version of the arrays since they are arrays of objects
+                    const newWaypoints = JSON.stringify(transactionChanges.waypoints);
+                    const oldWaypoints = JSON.stringify(oldTransactionChanges?.waypoints);
+                    if (newWaypoints === oldWaypoints) {
+                        delete transactionChanges.waypoints;
+                    }
                 }
             }
 
@@ -1314,6 +1321,7 @@ function updateSplitTransactions({
                     currentUserEmailParam: currentUserPersonalDetails?.login ?? '',
                     isASAPSubmitBetaEnabled,
                     iouReportNextStep,
+                    isSplitTransaction: true,
                 });
                 if (currentSplit) {
                     currentSplit.modifiedExpenseReportActionID = params.reportActionID;
@@ -1801,7 +1809,7 @@ function setDraftSplitTransaction(
               isFromExpenseReport: false,
               shouldUpdateReceiptState: false,
               policy,
-              isDraftSplitTransaction: true,
+              isSplitTransaction: true,
           })
         : null;
 

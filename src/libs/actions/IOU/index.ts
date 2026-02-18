@@ -4497,6 +4497,7 @@ type GetUpdateMoneyRequestParamsType = {
     isASAPSubmitBetaEnabled: boolean;
     policyRecentlyUsedCurrencies?: string[];
     iouReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
+    isSplitTransaction?: boolean;
 };
 
 type UpdateMoneyRequestDataKeys =
@@ -4533,6 +4534,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
         isASAPSubmitBetaEnabled,
         policyRecentlyUsedCurrencies,
         iouReportNextStep,
+        isSplitTransaction,
     } = params;
     const optimisticData: Array<
         OnyxUpdate<
@@ -4577,6 +4579,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
               transaction,
               transactionChanges,
               isFromExpenseReport,
+              isSplitTransaction,
               policy,
           })
         : undefined;
