@@ -955,6 +955,7 @@ describe('createOrUpdateStagingDeployCash', () => {
                             {prNumber: 6, date: '2024-01-01T10:00:00Z'},
                             {prNumber: 7, date: '2024-01-01T17:00:00Z'},
                         ],
+                        // cspell:disable
                         submoduleUpdates: [
                             {version: '9.3.21-0', date: '2024-01-01T11:00:00Z', commit: 'aabbccddee'},
                             {version: '9.3.21-1', date: '2024-01-01T12:00:00Z', commit: 'bbccddeeaa'},
@@ -963,6 +964,7 @@ describe('createOrUpdateStagingDeployCash', () => {
                             {version: '9.3.21-4', date: '2024-01-01T16:00:00Z', commit: 'eeffaabbdd'},
                             {version: '9.3.21-5', date: '2024-01-01T18:00:00Z', commit: 'ffaabbccee'},
                         ],
+                        // cspell:enable
                     };
                 }
                 return {mergedPRs: [], submoduleUpdates: []};
@@ -979,6 +981,7 @@ describe('createOrUpdateStagingDeployCash', () => {
             const body = result?.body ?? '';
 
             // Mobile-Expensify PR #20 should ONLY appear under 9.3.21-2, and PR #21 ONLY under 9.3.21-4
+            // cspell:disable
             const expectedChronologicalSection = buildChronologicalSection([
                 {type: 'pr', prNumber: 6},
                 {type: 'submodule', version: '9.3.21-0', commit: 'aabbccddee'},
@@ -989,6 +992,7 @@ describe('createOrUpdateStagingDeployCash', () => {
                 {type: 'pr', prNumber: 7},
                 {type: 'submodule', version: '9.3.21-5', commit: 'ffaabbccee'},
             ]);
+            // cspell:enable
             expect(body).toContain(expectedChronologicalSection);
 
             // Verify no duplication: each Mobile-Expensify PR URL should appear exactly once in the chronological section
