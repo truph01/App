@@ -228,14 +228,13 @@ Optimistic updates allow users to see changes immediately while the API request 
 
 **CRITICAL:** Backend response data is automatically applied via Pusher updates or HTTPS responses. You do NOT manually set backend data in successData/failureData.
 
-1. **optimisticData** (Applied immediately)
-   - Replicates what the backend will respond with if it succeeds
-   - Shows the user instant feedback
-   - Often includes `pendingAction` to show the action is in progress
-   - Applied before the API call is made
+1. **optimisticData** (Applied immediately, before the API call)
+   - Mirrors what the backend would return on success
+   - Gives the user instant feedback without waiting for the server
+   - Often includes `pendingAction` to flag the change as optimistic (e.g. greying out a comment while offline)
+   - `pendingAction` is cleared once `successData` or `failureData` is applied
 
 2. **successData** (Applied when API succeeds)
-   - **NOT backend response data** - that's applied automatically
    - Used for UI state management like:
      - Setting `isLoading: false`
      - Clearing `pendingAction`
@@ -632,36 +631,7 @@ ONYXKEYS.COLLECTION.REPORT_ACTIONS = 'reportActions_';
 
 ### When to Use Optimistic Updates
 
-**Use Pattern A (Optimistic Without Feedback) when:**
-- The user should get instant feedback
-- The user does NOT need to know when the change is done on the server
-- The request will almost certainly succeed
-- Example: Pinning a chat
-
-**Use Pattern B (Optimistic With Feedback) when:**
-- The user needs feedback that data will be sent to the server later
-- The action should show as pending while offline (greyed out UI)
-- The user needs to know if the action succeeded or failed
-- Example: Sending a chat message, creating an expense
-
-**Use Pattern C (Blocking Form) when:**
-- A form makes a WRITE request
-- Server must validate parameters that can't be validated on client
-- Server response will be unknown (can't be done optimistically)
-- The request is moving money
-- Example: Inviting workspace members
-
-**Use Pattern D (Full Page Blocking) when:**
-- Blocking READ is being performed
-- User cannot see stale data (must be fresh from server)
-- App is offline and data cannot be fetched
-- ONLY use in extreme cases when all other options exhausted
-- Example: Fetching bank accounts from Plaid
-
-**Never use optimistic updates for:**
-- Actions that move money (unless using blocking UI)
-- Data that requires server validation that can't be done client-side
-- When you can't anticipate the server response
+See `@contributingGuides/philosophies/OFFLINE.md` for the full decision flowchart and guidance on which pattern (A/B/C/D) to use. That document covers the motivation, when-to-use criteria, and UX behavior for each pattern.
 
 ## Common Tasks Quick Reference
 
@@ -715,10 +685,10 @@ API.write('SomeCommand', params, {optimisticData, successData, failureData});
 - `/src/libs/actions/` - Action files that update Onyx
 - `/src/hooks/useOnyx.ts` - useOnyx hook implementation
 - `/src/types/onyx/` - TypeScript types for Onyx data
-- `/contributingGuides/philosophies/OFFLINE.md` - Offline UX patterns and when to use optimistic updates
+- `@contributingGuides/philosophies/OFFLINE.md` - Full offline UX patterns, decision flowchart, and when to use each pattern
 
 ## External Resources
 
 - [Onyx GitHub Repository](https://github.com/Expensify/react-native-onyx)
 - [Onyx README](https://github.com/Expensify/react-native-onyx/blob/main/README.md)
-- [Offline UX Patterns Guide](/contributingGuides/philosophies/OFFLINE.md)
+- [Offline UX Patterns Guide](@contributingGuides/philosophies/OFFLINE.md)
