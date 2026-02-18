@@ -1870,21 +1870,21 @@ function initSplitExpenseItemData(
 /**
  * Create a draft transaction to set up split expense details for the split expense flow
  */
-function initSplitExpense(transactions: OnyxCollection<OnyxTypes.Transaction>, reports: OnyxCollection<OnyxTypes.Report>, transaction: OnyxEntry<OnyxTypes.Transaction>) {
+function initSplitExpense(transaction: OnyxEntry<OnyxTypes.Transaction>) {
     if (!transaction) {
         return;
     }
 
     const reportID = transaction.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
     const originalTransactionID = transaction?.comment?.originalTransactionID;
-    const originalTransaction = transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`];
+    const originalTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`];
     const {isExpenseSplit} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
 
     if (isExpenseSplit) {
-        const relatedTransactions = getChildTransactions(transactions, reports, originalTransactionID);
+        const relatedTransactions = getChildTransactions(allTransactions, allReports, originalTransactionID);
         const transactionDetails = getTransactionDetails(originalTransaction);
         const splitExpenses = relatedTransactions.map((currentTransaction) => {
-            const currentTransactionReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${currentTransaction?.reportID}`];
+            const currentTransactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${currentTransaction?.reportID}`];
             return initSplitExpenseItemData(currentTransaction, currentTransactionReport, {isManuallyEdited: true});
         });
         const draftTransaction = buildOptimisticTransaction({
@@ -1913,7 +1913,7 @@ function initSplitExpense(transactions: OnyxCollection<OnyxTypes.Transaction>, r
 
     const transactionDetails = getTransactionDetails(transaction);
     const transactionDetailsAmount = transactionDetails?.amount ?? 0;
-    const transactionReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`];
+    const transactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`];
 
     const splitExpenses = [
         initSplitExpenseItemData(transaction, transactionReport, {

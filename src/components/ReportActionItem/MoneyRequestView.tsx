@@ -115,7 +115,7 @@ import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {TransactionPendingFieldsKey} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import useSplitExpense from '@hooks/useSplitExpense';
+import {initSplitExpense} from '@libs/actions/IOU/Split';
 import MoneyRequestReceiptView from './MoneyRequestReceiptView';
 
 type MoneyRequestViewProps = {
@@ -174,7 +174,6 @@ function MoneyRequestView({
     const {getCurrencySymbol} = useCurrencyListActions();
     const {getReportRHPActiveRoute} = useActiveRoute();
     const [lastVisitedPath] = useOnyx(ONYXKEYS.LAST_VISITED_PATH, {canBeMissing: true});
-    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: false});
 
     const {currentSearchResults} = useSearchContext();
 
@@ -235,7 +234,6 @@ function MoneyRequestView({
     const policyTagList = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${targetPolicyID}`];
     const [nonPersonalAndWorkspaceCards] = useOnyx(ONYXKEYS.DERIVED.NON_PERSONAL_AND_WORKSPACE_CARD_LIST, {canBeMissing: true});
 
-    const {startSplitExpenseFlow} = useSplitExpense(allTransactions, transaction);
     const [transactionBackup] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_BACKUP}${getNonEmptyStringOnyxID(linkedTransactionID)}`, {canBeMissing: true});
     const transactionViolations = useTransactionViolations(transaction?.transactionID);
     const [outstandingReportsByPolicyID] = useOnyx(ONYXKEYS.DERIVED.OUTSTANDING_REPORTS_BY_POLICY_ID, {canBeMissing: true});
@@ -605,7 +603,7 @@ function MoneyRequestView({
                         }
 
                         if (isExpenseSplit && isSplitAvailable) {
-                            startSplitExpenseFlow();
+                            initSplitExpense(transaction);
                             return;
                         }
 
@@ -658,7 +656,7 @@ function MoneyRequestView({
                         }
 
                         if (isExpenseSplit && isSplitAvailable) {
-                            startSplitExpenseFlow();
+                            initSplitExpense(transaction);
                             return;
                         }
 
@@ -849,7 +847,7 @@ function MoneyRequestView({
                             }
 
                             if (isExpenseSplit && isSplitAvailable) {
-                                startSplitExpenseFlow();
+                                initSplitExpense(transaction);
                                 return;
                             }
 
