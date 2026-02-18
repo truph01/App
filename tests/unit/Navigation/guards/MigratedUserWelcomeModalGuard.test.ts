@@ -282,8 +282,8 @@ describe('MigratedUserWelcomeModalGuard', () => {
             // Trigger redirect first
             MigratedUserWelcomeModalGuard.evaluate(mockState, mockAction, defaultContext);
 
-            // Modal is NOT the last route
-            const stateWithModalNotOnTop: NavigationState = {
+            // Modal is below other routes (not on top)
+            const stateWithModalBelowHome: NavigationState = {
                 key: 'root',
                 index: 1,
                 routeNames: [NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR, SCREENS.HOME],
@@ -295,7 +295,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
                 type: 'stack',
             };
 
-            const result = MigratedUserWelcomeModalGuard.evaluate(stateWithModalNotOnTop, tabSwitchAction, defaultContext);
+            const result = MigratedUserWelcomeModalGuard.evaluate(stateWithModalBelowHome, tabSwitchAction, defaultContext);
             expect(result.type).not.toBe('BLOCK');
         });
     });
