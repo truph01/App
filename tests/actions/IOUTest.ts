@@ -4605,6 +4605,61 @@ describe('actions/IOU', () => {
             const createdTransaction = Object.values(allTransactions ?? {}).at(0) as Transaction | undefined;
             expect(createdTransaction).toBeTruthy();
         });
+
+        it('skips creating optimistic personal details when participant exists in personalDetails', async () => {
+            // Given a participant (Carlos) who IS in the personalDetails map and no existing report
+            const recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
+
+            // When creating a distance request with personalDetails containing the participant
+            createDistanceRequest({
+                ...getDefaultDistanceRequestParams(undefined, {amount: 1000}, recentWaypoints),
+                personalDetails: mockPersonalDetails,
+            });
+            await waitForBatchedUpdates();
+
+            // Then the personal details list should NOT contain an optimistic entry for the participant
+            const personalDetailsList = await getOnyxValue(ONYXKEYS.PERSONAL_DETAILS_LIST);
+            const participantDetails = personalDetailsList?.[CARLOS_ACCOUNT_ID];
+            if (participantDetails) {
+                expect(participantDetails).not.toHaveProperty('isOptimisticPersonalDetail', true);
+            }
+        });
+
+        it('creates optimistic personal details when participant is not in personalDetails', async () => {
+            // Given a new participant who is NOT in the personalDetails map and no existing chat report
+            const UNKNOWN_ACCOUNT_ID = 99999;
+            const UNKNOWN_EMAIL = 'unknown@expensifail.com';
+            const recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
+
+            // Pause the fetch mock so we can observe optimistic data before success data clears it
+            mockFetch?.pause?.();
+
+            // When creating a distance request with personalDetails that does NOT include the participant
+            createDistanceRequest({
+                ...getDefaultDistanceRequestParams(undefined, {amount: 500}, recentWaypoints),
+                participants: [{accountID: UNKNOWN_ACCOUNT_ID, login: UNKNOWN_EMAIL}],
+                personalDetails: {},
+            });
+            await waitForBatchedUpdates();
+
+            // Then optimistic personal details should be created for the unknown participant
+            let personalDetailsList: OnyxEntry<PersonalDetailsList>;
+            await getOnyxData({
+                key: ONYXKEYS.PERSONAL_DETAILS_LIST,
+                callback: (value) => {
+                    personalDetailsList = value;
+                },
+            });
+            const unknownDetails = personalDetailsList?.[UNKNOWN_ACCOUNT_ID];
+            expect(unknownDetails).toBeDefined();
+            expect(unknownDetails?.isOptimisticPersonalDetail).toBe(true);
+            expect(unknownDetails?.login).toBe(UNKNOWN_EMAIL);
+
+            // Resume fetch to complete the test
+            mockFetch?.fail?.();
+            await mockFetch?.resume?.();
+            await waitForBatchedUpdates();
+        });
     });
 
     describe('split expense', () => {
