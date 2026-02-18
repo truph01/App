@@ -49,6 +49,7 @@ function FrozenCardIndicator({cardID, onUnfreezePress, isDisabled = false}: Froz
 
     const scarfOverlayStyle = useMemo<ViewStyle>(
         () => ({
+            top: 0,
             left: (variables.cardPreviewWidth - variables.cardScarfOverlayWidth) / 2,
             zIndex: variables.cardScarfOverlayZIndex,
             width: variables.cardScarfOverlayWidth,
