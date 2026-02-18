@@ -1660,8 +1660,7 @@ function PureReportActionItem({
             const cardID = getOriginalMessage(action)?.cardID;
             const card = cardID ? cardList?.[cardID] : undefined;
             const connectionLink = cardID ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : '';
-            const isPersonalCardBroken = isPersonalCard(card);
-            if (isPersonalCardBroken) {
+            if (isPersonalCard(card)) {
                 children = (
                     <ReportActionItemBasicMessage message="">
                         <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
