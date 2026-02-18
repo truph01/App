@@ -4,17 +4,21 @@ import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 
-type LoginContextType = {
+type LoginStateContextType = {
     login: string;
+};
+
+type LoginActionsContextType = {
     setLogin: (login: string) => void;
 };
 
-const defaultLoginContext: LoginContextType = {
+const LoginStateContext = React.createContext<LoginStateContextType>({
     login: '',
-    setLogin: () => {},
-};
+});
 
-const Context = React.createContext<LoginContextType>(defaultLoginContext);
+const LoginActionsContext = React.createContext<LoginActionsContextType>({
+    setLogin: () => {},
+});
 
 function LoginProvider({children}: ChildrenProps) {
     const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS, {canBeMissing: true});
@@ -24,19 +28,23 @@ function LoginProvider({children}: ChildrenProps) {
         setLoginState(newLogin);
     }, []);
 
-    const loginContext = useMemo<LoginContextType>(
-        () => ({
-            login,
-            setLogin,
-        }),
-        [login, setLogin],
+    const stateValue = useMemo<LoginStateContextType>(() => ({login}), [login]);
+    const actionsValue = useMemo<LoginActionsContextType>(() => ({setLogin}), [setLogin]);
+
+    return (
+        <LoginStateContext.Provider value={stateValue}>
+            <LoginActionsContext.Provider value={actionsValue}>{children}</LoginActionsContext.Provider>
+        </LoginStateContext.Provider>
     );
-
-    return <Context.Provider value={loginContext}>{children}</Context.Provider>;
 }
 
-function useLogin() {
-    return useContext(Context);
+function useLoginState() {
+    return useContext(LoginStateContext);
 }
 
-export {LoginProvider, useLogin, Context};
+function useLoginActions() {
+    return useContext(LoginActionsContext);
+}
+
+export {LoginProvider, LoginStateContext, LoginActionsContext, useLoginState, useLoginActions};
+export type {LoginStateContextType, LoginActionsContextType};
