@@ -271,8 +271,6 @@ function MoneyReportHeader({
         [integrationsExportTemplates, csvExportLayouts, policy, translate],
     );
     const {areStrictPolicyRulesEnabled} = useStrictPolicyRules();
-    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: false});
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
     const [allPolicyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES, {canBeMissing: false});
 
     const requestParentReportAction = useMemo(() => {
@@ -1383,7 +1381,7 @@ function MoneyReportHeader({
                     return;
                 }
 
-                initSplitExpense(allTransactions, allReports, currentTransaction);
+                initSplitExpense(currentTransaction);
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.MERGE]: {

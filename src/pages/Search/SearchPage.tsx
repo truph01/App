@@ -1021,7 +1021,7 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.ArrowSplit,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
-                    initSplitExpense(allTransactions, allReports, firstTransaction);
+                    initSplitExpense(firstTransaction);
                 },
             });
         }
@@ -1084,7 +1084,6 @@ function SearchPage({route}: SearchPageProps) {
         handleBasicExport,
         handleApproveWithDEWCheck,
         handleDeleteSelectedTransactions,
-        allReports,
         theme.icon,
         styles.colorMuted,
         styles.fontWeightNormal,

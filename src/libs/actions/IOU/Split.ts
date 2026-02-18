@@ -148,6 +148,9 @@ type SplitBillActionsParams = {
     betas: OnyxEntry<OnyxTypes.Beta[]>;
 };
 
+// We use connectWithoutView because `initSplitExpense` doesn't affect the UI rendering and
+// this avoids unnecessary re-rendering for components when any transaction changes. This data should ONLY
+// be used for `initSplitExpense`
 let allTransactions: OnyxCollection<OnyxTypes.Transaction>;
 Onyx.connectWithoutView({
     key: ONYXKEYS.COLLECTION.TRANSACTION,
@@ -155,6 +158,9 @@ Onyx.connectWithoutView({
     callback: (value) => (allTransactions = value),
 });
 
+// We use connectWithoutView because `initSplitExpense` doesn't affect the UI rendering and
+// this avoids unnecessary re-rendering for components when any report changes. This data should ONLY
+// be used for `initSplitExpense`
 let allReports: OnyxCollection<OnyxTypes.Report>;
 Onyx.connectWithoutView({
     key: ONYXKEYS.COLLECTION.REPORT,
