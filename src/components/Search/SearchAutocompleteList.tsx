@@ -16,7 +16,7 @@ import SearchQueryListItem, {isSearchQueryItem} from '@components/SelectionListW
 import {useCurrencyListState} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebounce from '@hooks/useDebounce';
-import useExportedToAutocompleteList from '@hooks/useExportedToAutocompleteList';
+import useExportedToFilterOptions from '@hooks/useExportedToFilterOptions';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -352,8 +352,7 @@ function SearchAutocompleteList({
     const [allRecentTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS, {canBeMissing: true});
     const tagAutocompleteList = getAutocompleteTags(allPoliciesTags);
     const recentTagsAutocompleteList = getAutocompleteRecentTags(allRecentTags);
-
-    const exportedToAutocompleteList = useExportedToAutocompleteList();
+    const {exportedToFilterOptions} = useExportedToFilterOptions();
 
     const [autocompleteParsedQuery, autocompleteQueryWithoutFilters] = (() => {
         const queryWithoutFilters = getQueryWithoutFilters(autocompleteQueryValue);
@@ -647,7 +646,7 @@ function SearchAutocompleteList({
                 return filteredIsValues.map((isValue) => ({filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.IS, text: isValue}));
             }
             case CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO: {
-                const filteredExportedTo = exportedToAutocompleteList
+                const filteredExportedTo = exportedToFilterOptions
                     .filter((value) => {
                         const lowerValue = value.toLowerCase();
                         return lowerValue.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(lowerValue);

@@ -31,10 +31,8 @@ import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import FILTER_KEYS, {ALLOWED_TYPE_FILTERS, AMOUNT_FILTER_KEYS, DATE_FILTER_KEYS} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import type * as OnyxTypes from '@src/types/onyx';
-import type {PolicyConnectionName} from '@src/types/onyx/Policy';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import arraysEqual from '@src/utils/arraysEqual';
-import {getSearchValueForConnection} from './AccountingUtils';
 import {getCardFeedsForDisplay} from './CardFeedUtils';
 import {getCardDescription} from './CardUtils';
 import {convertToBackendAmount, convertToFrontendAmountAsInteger} from './CurrencyUtils';
@@ -44,7 +42,7 @@ import {getPreservedNavigatorState} from './Navigation/AppNavigator/createSplitN
 import navigationRef from './Navigation/navigationRef';
 import type {SearchFullscreenNavigatorParamList} from './Navigation/types';
 import {getDisplayNameOrDefault, getPersonalDetailByEmail} from './PersonalDetailsUtils';
-import {getCleanedTagName, getConnectedIntegrationNamesForPolicies, getTagNamesFromTagsLists} from './PolicyUtils';
+import {getCleanedTagName, getTagNamesFromTagsLists} from './PolicyUtils';
 import {getReportName} from './ReportUtils';
 import {parse as parseSearchQuery} from './SearchParser/searchParser';
 import StringUtils from './StringUtils';
@@ -819,7 +817,7 @@ function buildFilterFormValuesFromQuery(
     cardList: OnyxTypes.CardList | undefined,
     reports: OnyxCollection<OnyxTypes.Report>,
     taxRates: Record<string, string[]>,
-    policies?: OnyxCollection<OnyxTypes.Policy>,
+    exportedToFilterOptions?: string[],
 ) {
     const filters = queryJSON.flatFilters;
     const filtersForm = {} as Partial<SearchAdvancedFiltersForm>;
@@ -888,12 +886,8 @@ function buildFilterFormValuesFromQuery(
             filtersForm[key as typeof filterKey] = filterValues;
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO) {
-            const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies);
-            const validExportedToValues = new Set<string>(Object.values(CONST.REPORT.EXPORT_OPTION_LABELS));
-            for (const connectionName of connectedIntegrationNames) {
-                validExportedToValues.add(getSearchValueForConnection(connectionName as PolicyConnectionName));
-            }
-            filtersForm[key as typeof filterKey] = filterValues.filter((value) => validExportedToValues.has(value));
+            const allowedValues = new Set<string>(exportedToFilterOptions ?? []);
+            filtersForm[key as typeof filterKey] = filterValues.filter((value) => allowedValues.has(value));
         }
 
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.PAYER) {

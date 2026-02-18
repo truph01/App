@@ -1,5 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
+import type {TupleToUnion} from 'type-fest';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -21,7 +22,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
-const EXPORT_OPTION_TO_QUERY_LABEL: Record<string, string> = {
+/** Maps standard export template IDs to the display label used in search query/filter */
+const STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL: Record<string, string> = {
     [CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT]: CONST.REPORT.EXPORT_OPTION_LABELS.REPORT_LEVEL_EXPORT,
     [CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT]: CONST.REPORT.EXPORT_OPTION_LABELS.EXPENSE_LEVEL_EXPORT,
 };
@@ -38,26 +40,26 @@ function SearchFiltersExportedToPage() {
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
     const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
-    const policy = policyIDs?.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDs.at(0)}`] : undefined;
 
-    const predefinedConnectionNamesList = Object.values(CONST.POLICY.CONNECTIONS.NAME);
-    const selectedValues = searchAdvancedFiltersForm?.exportedTo ?? [];
-    const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyIDs.length > 0 ? policyIDs : undefined, selectedValues);
+    const integrationConnectionNames = Object.values(CONST.POLICY.CONNECTIONS.NAME);
+    const selectedExportedToValues = searchAdvancedFiltersForm?.exportedTo ?? [];
+    const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyIDs.length > 0 ? policyIDs : undefined);
 
-    const items: SearchMultipleSelectionPickerItem[] = (() => {
-        const predefinedConnectionNames = new Set<string>(predefinedConnectionNamesList);
-        const defaultExportOptionIcon = (
-            <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter, StyleUtils.getWidthAndHeightStyle(variables.w28, variables.h28)]}>
-                <Icon
-                    src={expensifyIcons.Table}
-                    fill={theme.icon}
-                    width={variables.iconSizeNormal}
-                    height={variables.iconSizeNormal}
-                />
-            </View>
-        );
+    const tableIconForExportOption = (
+        <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter, StyleUtils.getWidthAndHeightStyle(variables.w28, variables.h28)]}>
+            <Icon
+                src={expensifyIcons.Table}
+                fill={theme.icon}
+                width={variables.iconSizeNormal}
+                height={variables.iconSizeNormal}
+            />
+        </View>
+    );
 
-        const integrationItems: SearchMultipleSelectionPickerItem[] = predefinedConnectionNamesList
+    const exportedToPickerOptions: SearchMultipleSelectionPickerItem[] = (() => {
+        const integrationConnectionNamesSet = new Set<string>(integrationConnectionNames);
+
+        const connectedIntegrationPickerItems: SearchMultipleSelectionPickerItem[] = integrationConnectionNames
             .filter((connectionName) => connectedIntegrationNames.has(connectionName))
             .map((connectionName) => {
                 const icon = getIntegrationIcon(connectionName, expensifyIcons);
@@ -71,7 +73,7 @@ function SearchFiltersExportedToPage() {
                         />
                     </View>
                 ) : (
-                    defaultExportOptionIcon
+                    tableIconForExportOption
                 );
                 return {
                     name: CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName],
@@ -79,45 +81,89 @@ function SearchFiltersExportedToPage() {
                     leftElement,
                 };
             });
-        const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, policy, true);
 
-        const customItems: SearchMultipleSelectionPickerItem[] = [];
-        const standardItems: SearchMultipleSelectionPickerItem[] = [];
+        const policiesToLoadTemplatesFrom =
+            policyIDs.length > 0 ? policyIDs.map((id) => policies?.[`${ONYXKEYS.COLLECTION.POLICY}${id}`]).filter(Boolean) : Object.values(policies ?? {});
+        const exportTemplatesFromPolicies = policiesToLoadTemplatesFrom.flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
+        const exportTemplatesFromAccount = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
+        const allExportTemplates = [...exportTemplatesFromAccount, ...exportTemplatesFromPolicies];
 
-        for (const template of exportTemplates) {
-            if (!template.templateName || predefinedConnectionNames.has(template.templateName)) {
+        const exportTemplatesByTemplateId = new Map<string, TupleToUnion<typeof allExportTemplates>>();
+        for (const template of allExportTemplates) {
+            if (template.templateName && !exportTemplatesByTemplateId.has(template.templateName)) {
+                exportTemplatesByTemplateId.set(template.templateName, template);
+            }
+        }
+        const deduplicatedExportTemplates = Array.from(exportTemplatesByTemplateId.values());
+
+        const customExportTemplatePickerItems: SearchMultipleSelectionPickerItem[] = [];
+        const standardExportTemplatePickerItems: SearchMultipleSelectionPickerItem[] = [];
+
+        for (const template of deduplicatedExportTemplates) {
+            if (!template.templateName || integrationConnectionNamesSet.has(template.templateName)) {
                 continue;
             }
 
-            const name = template.name ?? template.templateName ?? '';
-            const value = EXPORT_OPTION_TO_QUERY_LABEL[template.templateName] ?? template.templateName;
-            const item: SearchMultipleSelectionPickerItem = {
-                name,
-                value,
-                leftElement: defaultExportOptionIcon,
+            const displayName = template.name ?? template.templateName ?? '';
+            const isStandardExportTemplate = !!STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL[template.templateName];
+            const filterValue = isStandardExportTemplate
+                ? (STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL[template.templateName] ?? template.templateName)
+                : (template.name ?? template.templateName);
+            const pickerItem: SearchMultipleSelectionPickerItem = {
+                name: displayName,
+                value: filterValue,
+                leftElement: tableIconForExportOption,
             };
 
-            if (EXPORT_OPTION_TO_QUERY_LABEL[template.templateName]) {
-                standardItems.push(item);
+            if (STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL[template.templateName]) {
+                standardExportTemplatePickerItems.push(pickerItem);
             } else {
-                customItems.push(item);
+                customExportTemplatePickerItems.push(pickerItem);
             }
         }
 
-        customItems.sort((a, b) => localeCompare(a.name, b.name));
+        customExportTemplatePickerItems.sort((a, b) => localeCompare(a.name, b.name));
 
-        return [...integrationItems, ...customItems, ...standardItems];
+        return [...connectedIntegrationPickerItems, ...customExportTemplatePickerItems, ...standardExportTemplatePickerItems];
     })();
 
-    const initiallySelectedItems: SearchMultipleSelectionPickerItem[] | undefined = (() => {
-        if (selectedValues.length === 0) {
+    const initiallySelectedPickerItems: SearchMultipleSelectionPickerItem[] | undefined = (() => {
+        if (selectedExportedToValues.length === 0) {
             return undefined;
         }
-        const normalizedSet = new Set(selectedValues.map((selectedValue) => selectedValue.toLowerCase()));
-        return items.filter((item) => {
-            const value = typeof item.value === 'string' ? item.value : (item.value.at(0) ?? '');
-            return normalizedSet.has(value.toLowerCase());
+        const normalizedSelectedValueIds = new Set(selectedExportedToValues.map((value) => value.toLowerCase()));
+        const selectedOptionsPresentInCurrentList = exportedToPickerOptions.filter((option) => {
+            const optionValue = typeof option.value === 'string' ? option.value : (option.value.at(0) ?? '');
+            return normalizedSelectedValueIds.has(optionValue.toLowerCase());
         });
+        const selectedValueIdsFoundInCurrentOptions = new Set(
+            selectedOptionsPresentInCurrentList.map((option) => (typeof option.value === 'string' ? option.value : option.value.at(0) ?? '').toLowerCase()),
+        );
+        const unavailableSelectedValues = selectedExportedToValues.filter((value) => !selectedValueIdsFoundInCurrentOptions.has(value.toLowerCase()));
+        const unavailableSelectedOptions: SearchMultipleSelectionPickerItem[] = unavailableSelectedValues.map((value) => {
+            const connectionName = integrationConnectionNames.find(
+                (name) => CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[name] === value,
+            );
+            const integrationIcon = connectionName ? getIntegrationIcon(connectionName, expensifyIcons) : null;
+            const leftElement = integrationIcon ? (
+                <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter]}>
+                    <Icon
+                        src={integrationIcon}
+                        width={variables.iconSizeXLarge}
+                        height={variables.iconSizeXLarge}
+                        additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.ICON_TYPE_AVATAR)]}
+                    />
+                </View>
+            ) : (
+                tableIconForExportOption
+            );
+            return {
+                name: value,
+                value,
+                leftElement,
+            };
+        });
+        return [...selectedOptionsPresentInCurrentList, ...unavailableSelectedOptions];
     })();
 
     const onSaveSelection = (values: string[]) => updateAdvancedFilters({exportedTo: values});
@@ -137,8 +183,8 @@ function SearchFiltersExportedToPage() {
             />
             <View style={[styles.flex1]}>
                 <SearchMultipleSelectionPicker
-                    items={items}
-                    initiallySelectedItems={initiallySelectedItems}
+                    items={exportedToPickerOptions}
+                    initiallySelectedItems={initiallySelectedPickerItems}
                     onSaveSelection={onSaveSelection}
                     shouldShowTextInput
                 />

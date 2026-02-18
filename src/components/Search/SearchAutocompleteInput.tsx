@@ -10,7 +10,7 @@ import TextInput from '@components/TextInput';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import {useCurrencyListState} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import useExportedToAutocompleteList from '@hooks/useExportedToAutocompleteList';
+import useExportedToFilterOptions from '@hooks/useExportedToFilterOptions';
 import useFocusAfterNav from '@hooks/useFocusAfterNav';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -116,8 +116,8 @@ function SearchAutocompleteInput({
     const emailList = Object.keys(loginList ?? {});
     const emailListSharedValue = useSharedValue(emailList);
 
-    const exportedToAutocompleteList = useExportedToAutocompleteList();
-    const exportedToSharedValue = useSharedValue(exportedToAutocompleteList);
+    const {exportedToFilterOptions} = useExportedToFilterOptions();
+    const exportedToSharedValue = useSharedValue(exportedToFilterOptions);
 
     const offlineMessage: string = isOffline && shouldShowOfflineMessage ? `${translate('common.youAppearToBeOffline')} ${translate('search.resultsAreLimited')}` : '';
 
@@ -172,9 +172,9 @@ function SearchAutocompleteInput({
         scheduleOnLiveMarkdownRuntime(() => {
             'worklet';
 
-            exportedToSharedValue.set(exportedToAutocompleteList);
+            exportedToSharedValue.set(exportedToFilterOptions);
         });
-    }, [exportedToSharedValue, exportedToAutocompleteList]);
+    }, [exportedToSharedValue, exportedToFilterOptions]);
 
     const parser = (input: string) => {
         'worklet';
