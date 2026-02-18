@@ -10,10 +10,10 @@ import AnimatedSubmitButton from '@components/AnimatedSubmitButton';
 import Button from '@components/Button';
 import {getButtonRole} from '@components/Button/utils';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
-import ConfirmModal from '@components/ConfirmModal';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import Icon from '@components/Icon';
 import type {PaymentMethod} from '@components/KYCWall/types';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import MoneyReportHeaderStatusBarSkeleton from '@components/MoneyReportHeaderStatusBarSkeleton';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {PressableWithFeedback} from '@components/Pressable';
@@ -24,6 +24,7 @@ import ExportWithDropdownMenu from '@components/ReportActionItem/ExportWithDropd
 import AnimatedSettlementButton from '@components/SettlementButton/AnimatedSettlementButton';
 import {showContextMenuForReport} from '@components/ShowContextMenuContext';
 import Text from '@components/Text';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -172,10 +173,10 @@ function MoneyRequestReportPreviewContent({
 
     const {isPaidAnimationRunning, isApprovedAnimationRunning, isSubmittingAnimationRunning, stopAnimation, startAnimation, startApprovedAnimation, startSubmittingAnimation} =
         usePaymentAnimations();
+    const {showConfirmModal} = useConfirmModal();
     const [isHoldMenuVisible, setIsHoldMenuVisible] = useState(false);
     const [requestType, setRequestType] = useState<ActionHandledType>();
     const [paymentType, setPaymentType] = useState<PaymentMethodType>();
-    const [isDEWModalVisible, setIsDEWModalVisible] = useState(false);
     const isIouReportArchived = useReportIsArchived(iouReportID);
     const isChatReportArchived = useReportIsArchived(chatReport?.reportID);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
@@ -312,9 +313,23 @@ function MoneyRequestReportPreviewContent({
         ],
     );
 
+    const showDEWModal = useCallback(() => {
+        showConfirmModal({
+            title: translate('customApprovalWorkflow.title'),
+            prompt: translate('customApprovalWorkflow.description'),
+            confirmText: translate('customApprovalWorkflow.goToExpensifyClassic'),
+            shouldShowCancelButton: false,
+        }).then((result) => {
+            if (result.action !== ModalActions.CONFIRM) {
+                return;
+            }
+            openOldDotLink(CONST.OLDDOT_URLS.INBOX);
+        });
+    }, [showConfirmModal, translate]);
+
     const confirmApproval = () => {
         if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
-            setIsDEWModalVisible(true);
+            showDEWModal();
             return;
         }
         setRequestType(CONST.IOU.REPORT_ACTION_TYPE.APPROVE);
@@ -621,7 +636,7 @@ function MoneyRequestReportPreviewContent({
                 text={translate('common.submit')}
                 onPress={() => {
                     if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
-                        setIsDEWModalVisible(true);
+                        showDEWModal();
                         return;
                     }
                     startSubmittingAnimation();
@@ -947,18 +962,6 @@ function MoneyRequestReportPreviewContent({
                     />
                 )}
             </OfflineWithFeedback>
-            <ConfirmModal
-                title={translate('customApprovalWorkflow.title')}
-                isVisible={isDEWModalVisible}
-                onConfirm={() => {
-                    setIsDEWModalVisible(false);
-                    openOldDotLink(CONST.OLDDOT_URLS.INBOX);
-                }}
-                onCancel={() => setIsDEWModalVisible(false)}
-                prompt={translate('customApprovalWorkflow.description')}
-                confirmText={translate('customApprovalWorkflow.goToExpensifyClassic')}
-                shouldShowCancelButton={false}
-            />
         </View>
     );
 }
