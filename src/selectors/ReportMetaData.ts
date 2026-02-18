@@ -3,6 +3,8 @@ import type {ReportMetadata} from '@src/types/onyx';
 
 const isActionLoadingSelector = (reportMetadata: OnyxEntry<ReportMetadata>) => reportMetadata?.isActionLoading ?? false;
 
+const hasOnceLoadedReportActionsSelector = (reportMetadata: OnyxEntry<ReportMetadata>) => reportMetadata?.hasOnceLoadedReportActions;
+
 const isActionLoadingSetSelector = (all: OnyxCollection<ReportMetadata>): ReadonlySet<string> => {
     const ids = new Set<string>();
     if (!all) {
@@ -17,4 +19,4 @@ const isActionLoadingSetSelector = (all: OnyxCollection<ReportMetadata>): Readon
     return ids;
 };
 
-export {isActionLoadingSelector, isActionLoadingSetSelector};
+export {isActionLoadingSelector, isActionLoadingSetSelector, hasOnceLoadedReportActionsSelector};

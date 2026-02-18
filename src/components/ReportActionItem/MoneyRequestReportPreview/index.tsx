@@ -21,6 +21,7 @@ import {contextMenuRef} from '@pages/inbox/report/ContextMenu/ReportActionContex
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import {hasOnceLoadedReportActionsSelector} from '@src/selectors/ReportMetaData';
 import type {Transaction} from '@src/types/onyx';
 import MoneyRequestReportPreviewContent from './MoneyRequestReportPreviewContent';
 import type {MoneyRequestReportPreviewProps} from './types';
@@ -121,8 +122,11 @@ function MoneyRequestReportPreview({
             Navigation.navigate(ROUTES.EXPENSE_REPORT_RHP.getRoute({reportID: iouReportID, backTo: Navigation.getActiveRoute()}));
         }
     }, [iouReportID, isSmallScreenWidth]);
-    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${chatReportID}`, {canBeMissing: true});
-    const newTransactions = useNewTransactions(reportMetadata?.hasOnceLoadedReportActions, transactions);
+    const [hasOnceLoadedReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${chatReportID}`, {
+        selector: hasOnceLoadedReportActionsSelector,
+        canBeMissing: true,
+    });
+    const newTransactions = useNewTransactions(hasOnceLoadedReportActions, transactions);
     const isFocused = useIsFocused();
     // We only want to highlight the new expenses if the screen is focused.
     const newTransactionIDs = isFocused ? new Set(newTransactions.map((transaction) => transaction.transactionID)) : undefined;
