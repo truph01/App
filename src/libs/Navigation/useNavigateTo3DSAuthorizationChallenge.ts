@@ -2,37 +2,45 @@ import useOnyx from '@hooks/useOnyx';
 import {refreshTransactionsPending3DSReview} from '@libs/actions/MultifactorAuthentication';
 import ONYXKEYS from '@src/ONYXKEYS';
 import CONST from '@src/CONST';
-import type {TransactionsPending3DSReview} from '@src/types/onyx';
-import {useEffect} from 'react';
-import type {OnyxEntry} from 'react-native-onyx';
+import type {TransactionPending3DSReview} from '@src/types/onyx';
+import {useEffect, useMemo} from 'react';
 import ROUTES from '@src/ROUTES';
 import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
 // see note inside useEffect
 // import AuthorizeTransaction from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
 import Navigation from './Navigation';
 
-function getMostUrgentTransactionPendingReview(transactions: OnyxEntry<TransactionsPending3DSReview>) {
+function getMostUrgentTransactionPendingReview(transactions: TransactionPending3DSReview[]) {
     return transactions
-        ? Object.values(transactions)
-              .sort((a, b) => {
-                  const aExpires = new Date(a.expires);
-                  const bExpires = new Date(b.expires);
-                  if (aExpires < bExpires) {
-                      return -1;
-                  }
-                  if (aExpires > bExpires) {
-                      return 1;
-                  }
-                  return 0;
-              })
-              .at(0)
-        : undefined;
+        .sort((a, b) => {
+            const aExpires = new Date(a.expires);
+            const bExpires = new Date(b.expires);
+            if (aExpires < bExpires) {
+                return -1;
+            }
+            if (aExpires > bExpires) {
+                return 1;
+            }
+            return 0;
+        })
+        .at(0);
 }
 
 function useNavigateTo3DSAuthorizationChallenge() {
-    const [transactionPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true, selector: getMostUrgentTransactionPendingReview});
+    const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
+    const [blocklistedTransactionChallenges] = useOnyx(ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES, {canBeMissing: true});
 
     const {doesDeviceSupportBiometrics} = useNativeBiometrics();
+
+    const transactionPending3DSReview = useMemo(() => {
+        if (!transactionsPending3DSReview) {
+            return undefined;
+        }
+        const nonBlocklistedTransactions = Object.values(transactionsPending3DSReview).filter((challenge) =>
+            blocklistedTransactionChallenges && challenge.transactionID ? !blocklistedTransactionChallenges[challenge.transactionID] : true,
+        );
+        return getMostUrgentTransactionPendingReview(nonBlocklistedTransactions);
+    }, [transactionsPending3DSReview, blocklistedTransactionChallenges]);
 
     // TODO MFA:
     // 1. [x] Listen for the TRANSACTIONS_PENDING_3DS_REVIEW Onyx Key changes
@@ -40,6 +48,8 @@ function useNavigateTo3DSAuthorizationChallenge() {
     // 3. [x] If the Authorize Transaction scenario supports native if on mobile and passkeys on web
     // 4. [-] Make an API call (GetTransactionsPending3DSReview) to verify the transaction - it will return the same object as the one stored in Onyx (mocked)
     // 5. [x] If the transaction is okay - if not on any MFA screen then navigate to the TransactionReviewPage.
+    // 6. [x] blocklist transactions when we attempt to respond to them and ignore them in the queue
+    // 7. [ ] remove transactions from the blocklist when we observe them removed from the queue (probably in a different file)
     useEffect(() => {
         if (!transactionPending3DSReview?.transactionID) {
             return;
