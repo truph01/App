@@ -329,7 +329,7 @@ function AttachmentView({
             <>
                 <View style={styles.imageModalImageCenterContainer}>
                     <AttachmentViewImage
-                        // Forces remount when transitioning from blob URL (uploading) to server URL (uploaded).
+                        // Forces remount of high resolution images when transitioning from blob URL (uploading) to server URL (uploaded).
                         // Prevents stale Image cache that causes "Attachment not found" errors.
                         // See: https://github.com/Expensify/App/issues/76193
                         key={attachmentID ? `${attachmentID}-${isHighResolution && isUploaded ? 'preview' : 'full'}` : undefined}
