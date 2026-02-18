@@ -53,7 +53,7 @@ function IOURequestStepOdometerImage({
     const theme = useTheme();
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'boltSlash']);
     const lazyIllustrationsOnly = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
-    const [cameraPermissionStatus, setCameraPermissionStatus] = useState<typeof RESULTS.GRANTED | typeof RESULTS.DENIED | typeof RESULTS.BLOCKED | null>(null);
+    const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
     const [flash, setFlash] = useState(false);
     const [hasFlash, setHasFlash] = useState(false);
     const [didCapturePhoto, setDidCapturePhoto] = useState(false);
@@ -67,14 +67,25 @@ function IOURequestStepOdometerImage({
     const isPlatformMuted = platform === CONST.PLATFORM.IOS;
 
     const title = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
-    const message = imageType === 'start' ? translate('distance.odometer.startMessageWeb') : translate('distance.odometer.endMessageWeb');
 
     const navigateBack = useCallback(() => {
         Navigation.goBack();
     }, []);
 
     const askForPermissions = useCallback(() => {
-        showCameraPermissionsAlert(translate);
+        // There's no way we can check for the BLOCKED status without requesting the permission first
+        // https://github.com/zoontek/react-native-permissions/blob/a836e114ce3a180b2b23916292c79841a267d828/README.md?plain=1#L670
+        CameraPermission.requestCameraPermission?.()
+            .then((status: string) => {
+                setCameraPermissionStatus(status);
+
+                if (status === RESULTS.BLOCKED) {
+                    showCameraPermissionsAlert(translate);
+                }
+            })
+            .catch(() => {
+                setCameraPermissionStatus(RESULTS.UNAVAILABLE);
+            });
     }, [translate]);
 
     const blinkOpacity = useSharedValue(0);
@@ -122,7 +133,7 @@ function IOURequestStepOdometerImage({
             setDidCapturePhoto(false);
             const refreshCameraPermissionStatus = () => {
                 CameraPermission?.getCameraPermissionStatus?.()
-                    .then((status) => setCameraPermissionStatus(status as typeof RESULTS.GRANTED | typeof RESULTS.DENIED | typeof RESULTS.BLOCKED | null))
+                    .then(setCameraPermissionStatus)
                     .catch(() => setCameraPermissionStatus(null));
             };
 
@@ -259,11 +270,7 @@ function IOURequestStepOdometerImage({
                         />
 
                         <Text style={[styles.textFileUpload]}>{translate('receipt.takePhoto')}</Text>
-                        {cameraPermissionStatus === RESULTS.DENIED || cameraPermissionStatus === RESULTS.BLOCKED ? (
-                            <Text style={[styles.subTextFileUpload]}>{translate('receipt.deniedCameraAccess')}</Text>
-                        ) : (
-                            <Text style={[styles.subTextFileUpload]}>{message}</Text>
-                        )}
+                        <Text style={[styles.subTextFileUpload]}>TODO: ADD TRANSLATION - Camera access is required to take photos.</Text>
                         <Button
                             success
                             text={translate('common.continue')}
