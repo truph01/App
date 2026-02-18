@@ -65,7 +65,6 @@ const mockCardsList = {
         card1: 'card1',
         card2: 'card2',
     },
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     '21570652': {
         accountID: 18439984,
         bank: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
@@ -83,13 +82,11 @@ const mockCardsList = {
 const entry = (cardName: string, encryptedCardNumber?: string, isAssigned = false) => expect.objectContaining({cardName, encryptedCardNumber: encryptedCardNumber ?? cardName, isAssigned});
 
 jest.mock('@hooks/useCardFeeds', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: jest.fn(),
 }));
 
 jest.mock('@hooks/useCardsList', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: jest.fn(),
 }));
@@ -541,6 +538,114 @@ describe('useCompanyCards', () => {
             const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
 
             expect(result.current.companyCardEntries).toEqual([entry('Business Platinum Card\u00AE - JOHN SMITH - 1234', undefined, true)]);
+        });
+    });
+
+    describe('CDF stale card name resolution via lastFourPAN', () => {
+        it('should resolve stale assigned card name from cardList using lastFourPAN', async () => {
+            const cdfCardsList = {
+                cardList: {
+                    '111222XXXX31234': 'v1:2D0EF0C3C834A6C5721225BAB4996799',
+                    '888222XXXX74444': 'v1:148EECFC15D818ACBC0D707FD0C44CC3',
+                },
+                '8340': {
+                    cardID: 8340,
+                    accountID: 11,
+                    bank: 'gl1025',
+                    cardName: 'XXXXXXXXXXX1234',
+                    lastFourPAN: '1234',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+                '8341': {
+                    cardID: 8341,
+                    accountID: 8393,
+                    bank: 'gl1025',
+                    cardName: '888222XXXXX4444',
+                    encryptedCardNumber: 'v1:148EECFC15D818ACBC0D707FD0C44CC3',
+                    lastFourPAN: '4444',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cdfCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            const entries = result.current.companyCardEntries ?? [];
+
+            // Card 8340: stale name "XXXXXXXXXXX1234" resolved to "111222XXXX31234" via lastFourPAN
+            expect(entries).toEqual(
+                expect.arrayContaining([entry('111222XXXX31234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true), entry('888222XXXXX4444', 'v1:148EECFC15D818ACBC0D707FD0C44CC3', true)]),
+            );
+
+            // No duplicates — the stale name should NOT appear
+            expect(entries).toHaveLength(2);
+            expect(entries.map((e) => e.cardName)).not.toContain('XXXXXXXXXXX1234');
+        });
+
+        it('should not resolve via lastFourPAN when multiple cardList entries share the same last 4 digits', async () => {
+            const cdfCardsList = {
+                cardList: {
+                    '111222XXXX64444': 'v1:ENCRYPTED_A',
+                    '333222XXXX44444': 'v1:ENCRYPTED_B',
+                },
+                '9000': {
+                    cardID: 9000,
+                    accountID: 11,
+                    bank: 'gl1025',
+                    cardName: 'XXXXXXXXXXX4444',
+                    lastFourPAN: '4444',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cdfCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            const entries = result.current.companyCardEntries ?? [];
+
+            // Ambiguous match — falls back to original card name
+            expect(entries.map((e) => e.cardName)).toContain('XXXXXXXXXXX4444');
+            // The two cardList entries should also appear as unassigned
+            expect(entries).toHaveLength(3);
+        });
+
+        it('should not resolve via lastFourPAN when assigned card already has encryptedCardNumber', async () => {
+            const cdfCardsList = {
+                cardList: {
+                    '111222XXXX31234': 'v1:NEW_ENCRYPTED',
+                },
+                '7000': {
+                    cardID: 7000,
+                    accountID: 11,
+                    bank: 'gl1025',
+                    cardName: 'XXXXXXXXXXX1234',
+                    encryptedCardNumber: 'v1:OLD_ENCRYPTED',
+                    lastFourPAN: '1234',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cdfCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            const entries = result.current.companyCardEntries ?? [];
+
+            // Card already has encryptedCardNumber — uses its own name and encrypted value
+            expect(entries).toEqual(expect.arrayContaining([entry('XXXXXXXXXXX1234', 'v1:OLD_ENCRYPTED', true), entry('111222XXXX31234', 'v1:NEW_ENCRYPTED')]));
+            expect(entries).toHaveLength(2);
         });
     });
 
