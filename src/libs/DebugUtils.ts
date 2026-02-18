@@ -544,7 +544,6 @@ function validateReportDraftProperty(key: keyof Report | keyof ReportNameValuePa
                 icon: 'string',
                 actorAccountID: 'number',
                 eta: 'object',
-                iconFill: 'string',
             });
         case 'tripData':
             return validateObject<ObjectElement<Report, 'tripData'>>(value, {
@@ -994,6 +993,8 @@ function validateTransactionDraftProperty(key: keyof Transaction, value: string)
             return validateNumber(value);
         case 'iouRequestType':
             return validateConstantEnum(value, CONST.IOU.REQUEST_TYPE);
+        case 'selectedTransactionIDs':
+            return validateArray(value, 'string');
         case 'participants':
             return validateArray<ArrayElement<Transaction, 'participants'>>(value, {
                 accountID: 'number',
@@ -1088,6 +1089,7 @@ function validateTransactionDraftProperty(key: keyof Transaction, value: string)
                     reportName: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     routes: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     transactionID: CONST.RED_BRICK_ROAD_PENDING_ACTION,
+                    selectedTransactionIDs: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     tag: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     transactionType: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     isFromGlobalCreate: CONST.RED_BRICK_ROAD_PENDING_ACTION,

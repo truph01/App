@@ -15,7 +15,7 @@ import Text from '@components/Text';
 import ViolationMessages from '@components/ViolationMessages';
 import {useWideRHPState} from '@components/WideRHPContextProvider';
 import useActiveRoute from '@hooks/useActiveRoute';
-import useCurrencyList from '@hooks/useCurrencyList';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -23,6 +23,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
+import useReportAttributes from '@hooks/useReportAttributes';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePrevious from '@hooks/usePrevious';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -33,7 +34,8 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolations from '@hooks/useTransactionViolations';
 import type {ViolationField} from '@hooks/useViolations';
 import useViolations from '@hooks/useViolations';
-import {initSplitExpense, updateMoneyRequestBillable, updateMoneyRequestReimbursable} from '@libs/actions/IOU/index';
+import {updateMoneyRequestBillable, updateMoneyRequestReimbursable} from '@libs/actions/IOU/index';
+import {initSplitExpense} from '@libs/actions/IOU/Split';
 import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {getCompanyCardDescription} from '@libs/CardUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
@@ -54,13 +56,13 @@ import {
     isTaxTrackingEnabled,
 } from '@libs/PolicyUtils';
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
+import {getReportName} from '@libs/ReportNameUtils';
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
 import {
     canEditFieldOfMoneyRequest,
     canEditMoneyRequest,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
     // eslint-disable-next-line @typescript-eslint/no-deprecated
-    getReportName,
     getTransactionDetails,
     getTripIDFromTransactionParentReportID,
     isExpenseReport,
@@ -72,7 +74,7 @@ import {
     isTrackExpenseReportNew,
     shouldEnableNegative,
 } from '@libs/ReportUtils';
-import {hasEnabledTags} from '@libs/TagsOptionsListUtils';
+import {hasEnabledTags, shouldShowDependentTagList} from '@libs/TagsOptionsListUtils';
 import {
     getBillable,
     getCurrency,
@@ -82,7 +84,6 @@ import {
     getOriginalAmountForDisplay,
     getOriginalTransactionWithSplitInfo,
     getReimbursable,
-    getTagArrayFromName,
     getTagForDisplay,
     getTaxName,
     hasMissingSmartscanFields,
@@ -90,7 +91,9 @@ import {
     hasRoute as hasRouteTransactionUtils,
     isFromCreditCardImport as isCardTransactionTransactionUtils,
     isCategoryBeingAnalyzed,
+    isCustomUnitRateIDForP2P,
     isDistanceRequest as isDistanceRequestTransactionUtils,
+    isDistanceTypeRequest,
     isExpenseUnreported as isExpenseUnreportedTransactionUtils,
     isGPSDistanceRequest as isGPSDistanceRequestTransactionUtils,
     isManualDistanceRequest as isManualDistanceRequestTransactionUtils,
@@ -171,13 +174,15 @@ function MoneyRequestView({
     const {isOffline} = useNetwork();
     const {environmentURL} = useEnvironment();
     const {translate, toLocaleDigit} = useLocalize();
-    const {getCurrencySymbol} = useCurrencyList();
+    const {getCurrencySymbol} = useCurrencyListActions();
     const {getReportRHPActiveRoute} = useActiveRoute();
     const [lastVisitedPath] = useOnyx(ONYXKEYS.LAST_VISITED_PATH, {canBeMissing: true});
 
     const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: false});
 
     const {currentSearchResults} = useSearchContext();
+
+    const reportAttributes = useReportAttributes();
 
     // When this component is used when merging from the search page, we might not have the parent report stored in the main collection
     let [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`, {canBeMissing: true});
@@ -242,7 +247,7 @@ function MoneyRequestView({
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
-
+    const isP2PDistanceRequest = isCustomUnitRateIDForP2P(transaction);
     const moneyRequestReport = parentReport;
     const isApproved = isReportApproved({report: moneyRequestReport});
     const isInvoice = isInvoiceReport(moneyRequestReport);
@@ -282,7 +287,7 @@ function MoneyRequestView({
     const isManualDistanceRequest = isManualDistanceRequestTransactionUtils(transaction, !!mergeTransactionID);
     const isGPSDistanceRequest = isGPSDistanceRequestTransactionUtils(transaction);
     const isOdometerDistanceRequest = isOdometerDistanceRequestTransactionUtils(transaction);
-    const isMapDistanceRequest = isMapDistanceRequestTransactionUtils(transaction);
+    const isMapDistanceRequest = isMapDistanceRequestTransactionUtils(transaction) || isDistanceTypeRequest(transaction);
     const isTransactionScanning = isScanning(updatedTransaction ?? transaction);
     const hasRoute = hasRouteTransactionUtils(transactionBackup ?? transaction, isDistanceRequest);
 
@@ -344,16 +349,18 @@ function MoneyRequestView({
     const canEditDate =
         isEditable && canEditFieldOfMoneyRequest(parentReportAction, CONST.EDIT_REQUEST_FIELD.DATE, undefined, isChatReportArchived, undefined, transaction, moneyRequestReport, policy);
 
+    const canEditDistanceOrRate = isPolicyAccessible(policy, currentUserEmailParam) || isP2PDistanceRequest;
+
     const canEditDistance =
         !isGPSDistanceRequest &&
         isEditable &&
         canEditFieldOfMoneyRequest(parentReportAction, CONST.EDIT_REQUEST_FIELD.DISTANCE, undefined, isChatReportArchived, undefined, transaction, moneyRequestReport, policy) &&
-        isPolicyAccessible(policy, currentUserEmailParam);
+        canEditDistanceOrRate;
 
     const canEditDistanceRate =
         isEditable &&
         canEditFieldOfMoneyRequest(parentReportAction, CONST.EDIT_REQUEST_FIELD.DISTANCE_RATE, undefined, isChatReportArchived, undefined, transaction, moneyRequestReport, policy) &&
-        isPolicyAccessible(policy, currentUserEmailParam);
+        canEditDistanceOrRate;
 
     const canEditReport =
         isEditable &&
@@ -702,30 +709,7 @@ function MoneyRequestView({
         const tagForDisplay = getTagForDisplay(updatedTransaction ?? transaction, index);
         let shouldShow = false;
         if (hasDependentTags) {
-            if (index === 0) {
-                shouldShow = true;
-            } else {
-                const prevTagValue = getTagForDisplay(transaction, index - 1);
-                if (!prevTagValue) {
-                    shouldShow = false;
-                } else {
-                    const parentTag = getTagArrayFromName(transactionTag ?? '')
-                        .slice(0, index)
-                        .join(':');
-
-                    const availableTags = Object.values(tags).filter((policyTag) => {
-                        const filterRegex = policyTag.rules?.parentTagsFilter;
-                        if (!filterRegex) {
-                            return true;
-                        }
-
-                        const regex = new RegExp(filterRegex);
-                        return regex.test(parentTag ?? '');
-                    });
-
-                    shouldShow = availableTags.some((tag) => tag.enabled);
-                }
-            }
+            shouldShow = shouldShowDependentTagList(index, transactionTag, tags);
         } else {
             shouldShow = !!tagForDisplay || (canEdit && hasEnabledOptions(tags));
         }
@@ -785,7 +769,9 @@ function MoneyRequestView({
     });
 
     // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const reportNameToDisplay = isFromMergeTransaction ? (updatedTransaction?.reportName ?? translate('common.none')) : getReportName(parentReport) || parentReport?.reportName;
+    const reportNameToDisplay = isFromMergeTransaction
+        ? (updatedTransaction?.reportName ?? translate('common.none'))
+        : getReportName(parentReport, reportAttributes) || parentReport?.reportName;
     const shouldShowReport = !!parentReportID || (isFromMergeTransaction && !!reportNameToDisplay);
     const reportCopyValue = !canEditReport && reportNameToDisplay !== translate('common.none') ? reportNameToDisplay : undefined;
     const shouldShowCategoryAnalyzing = isCategoryBeingAnalyzed(updatedTransaction ?? transaction);

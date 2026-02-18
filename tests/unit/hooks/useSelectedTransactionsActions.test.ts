@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import {renderHook, waitFor} from '@testing-library/react-native';
+import {act, renderHook, waitFor} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {SelectedTransactions} from '@components/Search/types';
 import useSelectedTransactionsActions from '@hooks/useSelectedTransactionsActions';
-import {initSplitExpense} from '@libs/actions/IOU';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
+import {initSplitExpense} from '@libs/actions/IOU/Split';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {exportReportToCSV} from '@libs/actions/Report';
 import Navigation from '@libs/Navigation/Navigation';
@@ -29,7 +29,7 @@ jest.mock('@libs/actions/Search', () => ({
     getExportTemplates: jest.fn(() => []),
 }));
 
-jest.mock('@libs/actions/IOU', () => ({
+jest.mock('@libs/actions/IOU/Split', () => ({
     initSplitExpense: jest.fn(),
 }));
 
@@ -187,6 +187,48 @@ describe('useSelectedTransactionsActions', () => {
         const exportOption = result.current.options.find((option) => option.value === CONST.REPORT.SECONDARY_ACTIONS.EXPORT);
         expect(exportOption).toBeDefined();
         expect(exportOption?.text).toBe('common.export');
+    });
+
+    it('should show edit multiple option when multiple transactions are editable', async () => {
+        const transactionID1 = '123';
+        const transactionID2 = '456';
+        const report = createRandomReport(1, undefined);
+        const reportActions: ReportAction[] = [];
+        const transaction1 = createRandomTransaction(1);
+        transaction1.transactionID = transactionID1;
+        transaction1.amount = 1000;
+        const transaction2 = createRandomTransaction(2);
+        transaction2.transactionID = transactionID2;
+        transaction2.amount = 2000;
+
+        mockSelectedTransactionIDs.push(transactionID1, transactionID2);
+
+        await act(async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID1}`, transaction1);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID2}`, transaction2);
+        });
+
+        jest.spyOn(require('@libs/ReportUtils'), 'canEditMultipleTransactions').mockReturnValue(true);
+
+        const {result} = renderHook(() =>
+            useSelectedTransactionsActions({
+                report,
+                reportActions,
+                allTransactionsLength: 2,
+                beginExportWithTemplate: mockBeginExportWithTemplate,
+            }),
+        );
+
+        await waitFor(() => {
+            expect(result.current.options.length).toBeGreaterThan(0);
+        });
+
+        const editOption = result.current.options.find((option) => option.value === CONST.SEARCH.BULK_ACTION_TYPES.EDIT);
+        expect(editOption).toBeDefined();
+
+        editOption?.onSelected?.();
+
+        expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.SEARCH_EDIT_MULTIPLE_TRANSACTIONS_RHP);
     });
 
     it('should handle basic export when online', async () => {
