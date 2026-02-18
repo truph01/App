@@ -242,7 +242,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {JoinWorkspaceResolution, OriginalMessageMovedTransaction, OriginalMessageUnreportedTransaction} from '@src/types/onyx/OriginalMessage';
 import {isEmptyObject, isEmptyValueObject} from '@src/types/utils/EmptyObject';
-import {isPersonalCardBrokenConnection} from '@libs/CardUtils';
+import {isPersonalCard, isPersonalCardBrokenConnection} from '@libs/CardUtils';
 import {RestrictedReadOnlyContextMenuActions} from './ContextMenu/ContextMenuActions';
 import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMenu';
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
@@ -1660,7 +1660,7 @@ function PureReportActionItem({
             const cardID = getOriginalMessage(action)?.cardID;
             const card = cardID ? cardList?.[cardID] : undefined;
             const connectionLink = cardID ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : '';
-            const isPersonalCardBroken = isPersonalCardBrokenConnection(card);
+            const isPersonalCardBroken = isPersonalCard(card);
             if (isPersonalCardBroken) {
                 children = (
                     <ReportActionItemBasicMessage message="">

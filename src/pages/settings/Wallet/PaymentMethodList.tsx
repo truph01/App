@@ -242,7 +242,7 @@ function PaymentMethodList({
                     }
                 }
 
-                if (isUserPersonalCard && (card.errors || isCardConnectionBroken(card))) {
+                if (isUserPersonalCard && (!isEmptyObject(card.errors) || isCardConnectionBroken(card))) {
                     brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
                 }
 
