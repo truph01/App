@@ -78,28 +78,30 @@ function clearReportActionErrors(reportID: string, reportAction: ReportAction, o
 ignore: `undefined` means we want to check both parent and children report actions
 ignore: `parent` or `child` means we want to ignore checking parent or child report actions because they've been previously checked
  */
-function clearAllRelatedReportActionErrors(reportID: string | undefined, reportAction: ReportAction | null | undefined, ignore?: IgnoreDirection, keys?: string[]) {
+function clearAllRelatedReportActionErrors(reportID: string | undefined, reportAction: ReportAction | null | undefined, originalReportID: string | undefined, ignore?: IgnoreDirection, keys?: string[]) {
     const errorKeys = keys ?? Object.keys(reportAction?.errors ?? {});
     if (!reportAction || errorKeys.length === 0 || !reportID) {
         return;
     }
 
-    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
     clearReportActionErrors(reportID, reportAction, originalReportID, keys);
 
     const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
     if (report?.parentReportID && report?.parentReportActionID && ignore !== 'parent') {
         const parentReportAction = getReportAction(report.parentReportID, report.parentReportActionID);
         const parentErrorKeys = Object.keys(parentReportAction?.errors ?? {}).filter((err) => errorKeys.includes(err));
+        const parentReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`] ?? {};
+        const parentOriginalReportID = getOriginalReportID(report.parentReportID, parentReportAction, parentReportActions);
 
-        clearAllRelatedReportActionErrors(report.parentReportID, parentReportAction, 'child', parentErrorKeys);
+        clearAllRelatedReportActionErrors(report.parentReportID, parentReportAction, parentOriginalReportID, 'child', parentErrorKeys);
     }
 
     if (reportAction.childReportID && ignore !== 'child') {
         const childActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportAction.childReportID}`] ?? {};
         for (const action of Object.values(childActions)) {
             const childErrorKeys = Object.keys(action.errors ?? {}).filter((err) => errorKeys.includes(err));
-            clearAllRelatedReportActionErrors(reportAction.childReportID, action, 'parent', childErrorKeys);
+            const childOriginalReportID = getOriginalReportID(reportAction.childReportID, action, childActions);
+            clearAllRelatedReportActionErrors(reportAction.childReportID, action, childOriginalReportID, 'parent', childErrorKeys);
         }
     }
 }

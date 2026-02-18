@@ -27,6 +27,7 @@ import {
     canEditMoneyRequest,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
     getCreationReportErrors,
+    getOriginalReportID,
     isInvoiceReport,
     isPaidGroupPolicy,
     isTrackExpenseReportNew,
@@ -51,6 +52,7 @@ import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {TransactionPendingFieldsKey} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import useOriginalReportID from '@hooks/useOriginalReportID';
 import ReportActionItemImage from './ReportActionItemImage';
 
 type MoneyRequestReceiptViewProps = {
@@ -113,6 +115,7 @@ function MoneyRequestReceiptView({
 
     const [isLoading, setIsLoading] = useState(true);
     const parentReportAction = report?.parentReportActionID ? parentReportActions?.[report.parentReportActionID] : undefined;
+    const originalReportID = useOriginalReportID(report?.reportID, parentReportAction);
     const {iouReport, chatReport: chatIOUReport, isChatIOUReportArchived} = useGetIOUReportFromReportAction(parentReportAction);
     const isTrackExpense = !mergeTransactionID && isTrackExpenseReportNew(report, parentReport, parentReportAction);
     const moneyRequestReport = parentReport;
@@ -267,16 +270,17 @@ function MoneyRequestReceiptView({
                 return;
             }
             if (parentReportAction) {
-                cleanUpMoneyRequest(transaction?.transactionID ?? linkedTransactionID, parentReportAction, report.reportID, iouReport, chatIOUReport, isChatIOUReportArchived, true);
+                cleanUpMoneyRequest(transaction?.transactionID ?? linkedTransactionID, parentReportAction, report.reportID, iouReport, chatIOUReport, isChatIOUReportArchived, true, originalReportID);
                 return;
             }
         }
+
         if (!transaction?.transactionID) {
             if (!linkedTransactionID) {
                 return;
             }
             clearError(linkedTransactionID);
-            clearAllRelatedReportActionErrors(report.reportID, parentReportAction);
+            clearAllRelatedReportActionErrors(report.reportID, parentReportAction, originalReportID);
             return;
         }
         if (!isEmptyObject(transactionAndReportActionErrors)) {
@@ -284,7 +288,7 @@ function MoneyRequestReceiptView({
         }
         if (!isEmptyObject(errorsWithoutReportCreation)) {
             clearError(transaction.transactionID);
-            clearAllRelatedReportActionErrors(report.reportID, parentReportAction);
+            clearAllRelatedReportActionErrors(report.reportID, parentReportAction, originalReportID);
         }
         if (!isEmptyObject(reportCreationError)) {
             if (isInNarrowPaneModal) {
