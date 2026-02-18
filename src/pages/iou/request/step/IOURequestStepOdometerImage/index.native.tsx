@@ -62,20 +62,20 @@ function IOURequestStepOdometerImage({
     const {setIsLoaderVisible} = useFullScreenLoaderActions();
     const [isAttachmentPickerActive, setIsAttachmentPickerActive] = useState(false);
 
-    const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
-    const [flash, setFlash] = useState(false);
-    const [hasFlash, setHasFlash] = useState(false);
-    const [didCapturePhoto, setDidCapturePhoto] = useState(false);
-    const camera = useRef<Camera>(null);
-    const viewfinderLayout = useRef<LayoutRectangle>(null);
-    const isTransactionDraft = shouldUseTransactionDraft(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.REQUEST);
-
     const device = useCameraDevice('back', {
         physicalDevices: ['wide-angle-camera', 'ultra-wide-angle-camera'],
     });
     const platform = getPlatform(true);
     const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS, {canBeMissing: true});
     const isPlatformMuted = mutedPlatforms[platform];
+
+    const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
+    const hasFlash = !!device?.hasFlash;
+    const [flash, setFlash] = useState(false);
+    const [didCapturePhoto, setDidCapturePhoto] = useState(false);
+    const camera = useRef<Camera>(null);
+    const viewfinderLayout = useRef<LayoutRectangle>(null);
+    const isTransactionDraft = shouldUseTransactionDraft(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.REQUEST);
 
     const title = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
 
@@ -168,14 +168,6 @@ function IOURequestStepOdometerImage({
             };
         }, [isLoaderVisible, setIsLoaderVisible]),
     );
-
-    useEffect(() => {
-        if (!device) {
-            return;
-        }
-
-        setHasFlash(!!device.hasFlash);
-    }, [device]);
 
     const handleImageSelected = useCallback(
         (files: FileObject[]) => {
