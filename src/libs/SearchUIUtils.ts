@@ -2231,17 +2231,14 @@ function getReportSections({
     return [reportIDToTransactionsValues, reportIDToTransactionsValues.length];
 }
 
-function buildGroupDrillQuery(queryJSON: SearchQueryJSON, filterKey: SearchFilterKey, filterValue: string | number): SearchQueryJSON | undefined {
+function buildSpecificGroupQuery(queryJSON: SearchQueryJSON, filterKey: SearchFilterKey, filterValue: string | number): SearchQueryJSON | undefined {
     const newFlatFilters = queryJSON.flatFilters.filter((filter) => filter.key !== filterKey);
     newFlatFilters.push({key: filterKey, filters: [{operator: CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO, value: filterValue}]});
     const newQueryJSON: SearchQueryJSON = {...queryJSON, groupBy: undefined, flatFilters: newFlatFilters};
     return buildSearchQueryJSON(buildSearchQueryString(newQueryJSON));
 }
 
-function buildDateRangeGroupDrillQuery(
-    queryJSON: SearchQueryJSON,
-    dateRange: {start: string; end: string},
-): {transactionsQueryJSON: SearchQueryJSON | undefined; start: string; end: string} {
+function buildDateRangeGroupQuery(queryJSON: SearchQueryJSON, dateRange: {start: string; end: string}): {transactionsQueryJSON: SearchQueryJSON | undefined; start: string; end: string} {
     const dateFilters = queryJSON.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
     const {start, end} = adjustTimeRangeToDateFilters(dateRange, dateFilters);
     const newFlatFilters = queryJSON.flatFilters.filter((filter) => filter.key !== CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
@@ -2275,7 +2272,7 @@ function getMemberSections(
             const memberGroup = data[key] as SearchMemberGroup;
 
             const personalDetails = data.personalDetailsList?.[memberGroup.accountID] ?? emptyPersonalDetails;
-            const transactionsQueryJSON = queryJSON && memberGroup.accountID ? buildGroupDrillQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM, memberGroup.accountID) : undefined;
+            const transactionsQueryJSON = queryJSON && memberGroup.accountID ? buildSpecificGroupQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM, memberGroup.accountID) : undefined;
 
             memberSections[key] = {
                 groupedBy: CONST.SEARCH.GROUP_BY.FROM,
@@ -2312,7 +2309,7 @@ function getCardSections(
         if (isGroupEntry(key)) {
             const cardGroup = data[key] as SearchCardGroup;
             const personalDetails = data.personalDetailsList?.[cardGroup.accountID] ?? emptyPersonalDetails;
-            const transactionsQueryJSON = queryJSON && cardGroup.cardID ? buildGroupDrillQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID, cardGroup.cardID) : undefined;
+            const transactionsQueryJSON = queryJSON && cardGroup.cardID ? buildSpecificGroupQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID, cardGroup.cardID) : undefined;
 
             if (!cardGroup.cardID) {
                 continue;
@@ -2360,7 +2357,7 @@ function getWithdrawalIDSections(data: OnyxTypes.SearchResults['data'], queryJSO
         if (isGroupEntry(key)) {
             const withdrawalIDGroup = data[key] as SearchWithdrawalIDGroup;
             const transactionsQueryJSON =
-                queryJSON && withdrawalIDGroup.entryID ? buildGroupDrillQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID, withdrawalIDGroup.entryID) : undefined;
+                queryJSON && withdrawalIDGroup.entryID ? buildSpecificGroupQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID, withdrawalIDGroup.entryID) : undefined;
 
             if (!withdrawalIDGroup.accountNumber) {
                 continue;
@@ -2395,7 +2392,7 @@ function getCategorySections(data: OnyxTypes.SearchResults['data'], queryJSON: S
 
             const transactionsQueryJSON =
                 queryJSON && categoryGroup.category !== undefined
-                    ? buildGroupDrillQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY, !categoryGroup.category ? CONST.SEARCH.CATEGORY_EMPTY_VALUE : categoryGroup.category)
+                    ? buildSpecificGroupQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY, !categoryGroup.category ? CONST.SEARCH.CATEGORY_EMPTY_VALUE : categoryGroup.category)
                     : undefined;
 
             // Format the category name - decode HTML entities for display, keep empty/none values as-is
@@ -2431,7 +2428,7 @@ function getMerchantSections(data: OnyxTypes.SearchResults['data'], queryJSON: S
 
             const transactionsQueryJSON =
                 queryJSON && merchantGroup.merchant !== undefined
-                    ? buildGroupDrillQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT, merchantGroup.merchant === '' ? CONST.SEARCH.MERCHANT_EMPTY_VALUE : merchantGroup.merchant)
+                    ? buildSpecificGroupQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT, merchantGroup.merchant === '' ? CONST.SEARCH.MERCHANT_EMPTY_VALUE : merchantGroup.merchant)
                     : undefined;
 
             // Format the merchant name - use translated "No merchant" for empty values so it sorts alphabetically
@@ -2475,7 +2472,11 @@ function getTagSections(data: OnyxTypes.SearchResults['data'], queryJSON: Search
 
             const transactionsQueryJSON =
                 queryJSON && tagGroup.tag !== undefined
-                    ? buildGroupDrillQuery(queryJSON, CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG, tagGroup.tag === '' || tagGroup.tag === '(untagged)' ? CONST.SEARCH.TAG_EMPTY_VALUE : tagGroup.tag)
+                    ? buildSpecificGroupQuery(
+                          queryJSON,
+                          CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG,
+                          tagGroup.tag === '' || tagGroup.tag === '(untagged)' ? CONST.SEARCH.TAG_EMPTY_VALUE : tagGroup.tag,
+                      )
                     : undefined;
 
             // Format the tag name - use translated "No tag" for empty values so it sorts alphabetically
@@ -2512,7 +2513,7 @@ function getMonthSections(data: OnyxTypes.SearchResults['data'], queryJSON: Sear
                 continue;
             }
             const dateResult =
-                queryJSON && monthGroup.year && monthGroup.month ? buildDateRangeGroupDrillQuery(queryJSON, DateUtils.getMonthDateRange(monthGroup.year, monthGroup.month)) : undefined;
+                queryJSON && monthGroup.year && monthGroup.month ? buildDateRangeGroupQuery(queryJSON, DateUtils.getMonthDateRange(monthGroup.year, monthGroup.month)) : undefined;
             const transactionsQueryJSON = dateResult?.transactionsQueryJSON;
 
             const monthDate = new Date(monthGroup.year, monthGroup.month - 1, 1);
@@ -2546,7 +2547,7 @@ function getWeekSections(data: OnyxTypes.SearchResults['data'], queryJSON: Searc
                 continue;
             }
             const rawRange = DateUtils.getWeekDateRange(weekGroup.week);
-            const dateResult = queryJSON && weekGroup.week ? buildDateRangeGroupDrillQuery(queryJSON, rawRange) : undefined;
+            const dateResult = queryJSON && weekGroup.week ? buildDateRangeGroupQuery(queryJSON, rawRange) : undefined;
             const transactionsQueryJSON = dateResult?.transactionsQueryJSON;
             const formattedWeek = DateUtils.getFormattedDateRangeForSearch(dateResult?.start ?? rawRange.start, dateResult?.end ?? rawRange.end);
 
@@ -2577,7 +2578,7 @@ function getYearSections(data: OnyxTypes.SearchResults['data'], queryJSON: Searc
                 continue;
             }
             const transactionsQueryJSON =
-                queryJSON && yearGroup.year !== undefined ? buildDateRangeGroupDrillQuery(queryJSON, DateUtils.getYearDateRange(yearGroup.year))?.transactionsQueryJSON : undefined;
+                queryJSON && yearGroup.year !== undefined ? buildDateRangeGroupQuery(queryJSON, DateUtils.getYearDateRange(yearGroup.year))?.transactionsQueryJSON : undefined;
             const formattedYear = String(yearGroup.year);
 
             yearSections[key] = {
@@ -2605,7 +2606,7 @@ function getQuarterSections(data: OnyxTypes.SearchResults['data'], queryJSON: Se
             }
             const transactionsQueryJSON =
                 queryJSON && quarterGroup.year !== undefined && quarterGroup.quarter !== undefined
-                    ? buildDateRangeGroupDrillQuery(queryJSON, DateUtils.getQuarterDateRange(quarterGroup.year, quarterGroup.quarter))?.transactionsQueryJSON
+                    ? buildDateRangeGroupQuery(queryJSON, DateUtils.getQuarterDateRange(quarterGroup.year, quarterGroup.quarter))?.transactionsQueryJSON
                     : undefined;
             const formattedQuarter = DateUtils.getFormattedQuarterForSearch(quarterGroup.year, quarterGroup.quarter);
 
@@ -2811,9 +2812,9 @@ function getSortedSections(
     }
 
     if (groupBy) {
-        const sortFn = groupBySortFunction[groupBy];
-        if (sortFn) {
-            return sortFn(data as TransactionGroupListItemType[], localeCompare, sortBy, sortOrder);
+        const sortFunction = groupBySortFunction[groupBy];
+        if (sortFunction) {
+            return sortFunction(data as TransactionGroupListItemType[], localeCompare, sortBy, sortOrder);
         }
     }
 
