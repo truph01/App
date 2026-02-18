@@ -2,7 +2,7 @@
 // These functions use makeRequestWithSideEffects because challenge data must be returned immediately
 // for security and timing requirements (see detailed explanation below)
 import Onyx from 'react-native-onyx';
-import type {OnyxUpdate} from 'react-native-onyx';
+import type {OnyxEntry, OnyxUpdate} from 'react-native-onyx';
 import type {MultifactorAuthenticationScenarioParameters} from '@components/MultifactorAuthentication/config/types';
 import {makeRequestWithSideEffects} from '@libs/API';
 import {SIDE_EFFECT_REQUEST_COMMANDS} from '@libs/API/types';
@@ -13,6 +13,7 @@ import type {MultifactorAuthenticationReason} from '@libs/MultifactorAuthenticat
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {DenyTransactionParams} from '@libs/API/parameters';
+import type {Blocklisted3DSTransactionChallenges} from '@src/types/onyx';
 
 /**
  * To keep the code clean and readable, these functions return parsed data in order to:
@@ -278,6 +279,38 @@ function clearLocalMFAPublicKeyList() {
         multifactorAuthenticationPublicKeyIDs: CONST.MULTIFACTOR_AUTHENTICATION.PUBLIC_KEYS_PREVIOUSLY_BUT_NOT_CURRENTLY_REGISTERED,
     });
 }
+
+function cleanUpLocalChallengeBlocklist(entriesToDelete: string[]) {
+    const value: Record<string, null> = {};
+    for (const entry of entriesToDelete) {
+        value[entry] = null;
+    }
+    Onyx.merge(ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES, value);
+}
+
+let blocklisted3DSTransactionChallenges: OnyxEntry<Blocklisted3DSTransactionChallenges> = {};
+
+Onyx.connectWithoutView({
+    key: ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES,
+    callback: (blocklist) => {
+        blocklisted3DSTransactionChallenges = blocklist;
+    },
+});
+
+// clean up blocklisted challenges when they are removed from the queue
+Onyx.connectWithoutView({
+    key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
+    callback: (queue) => {
+        if (!blocklisted3DSTransactionChallenges || !queue) {
+            return;
+        }
+        const queuedTransactionIDs = Object.keys(queue);
+        const blocklistEntriesToCleanup = Object.keys(blocklisted3DSTransactionChallenges).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
+        if (blocklistEntriesToCleanup.length > 0) {
+            cleanUpLocalChallengeBlocklist(blocklistEntriesToCleanup);
+        }
+    },
+});
 
 export {
     registerAuthenticationKey,

@@ -27,8 +27,8 @@ function getMostUrgentTransactionPendingReview(transactions: TransactionPending3
 }
 
 function useNavigateTo3DSAuthorizationChallenge() {
-    const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
     const [blocklistedTransactionChallenges] = useOnyx(ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES, {canBeMissing: true});
+    const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
 
     const {doesDeviceSupportBiometrics} = useNativeBiometrics();
 
@@ -49,7 +49,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
     // 4. [-] Make an API call (GetTransactionsPending3DSReview) to verify the transaction - it will return the same object as the one stored in Onyx (mocked)
     // 5. [x] If the transaction is okay - if not on any MFA screen then navigate to the TransactionReviewPage.
     // 6. [x] blocklist transactions when we attempt to respond to them and ignore them in the queue
-    // 7. [ ] remove transactions from the blocklist when we observe them removed from the queue (probably in a different file)
+    // 7. [x] remove transactions from the blocklist when we observe them removed from the queue (probably in a different file)
     useEffect(() => {
         if (!transactionPending3DSReview?.transactionID) {
             return;
