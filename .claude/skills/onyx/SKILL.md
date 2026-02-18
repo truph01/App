@@ -1,3 +1,9 @@
+---
+name: onyx
+description: Onyx state management patterns — useOnyx hook, action files, optimistic updates, collections, and offline-first architecture. Use when working with Onyx connections, writing action files, debugging state, or implementing API calls with optimistic data.
+alwaysApply: false
+---
+
 # Onyx State Management Skill
 
 Use this skill when working with Onyx for state management, data persistence, or optimistic updates.
