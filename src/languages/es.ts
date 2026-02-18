@@ -2053,6 +2053,10 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount} para ${merchant} - ${date}`,
         },
         freezeCard: 'Congelar tarjeta',
+        unfreeze: 'Descongelar',
+        unfreezeCard: 'Descongelar tarjeta',
+        freezeDescription: 'Una tarjeta congelada no se puede usar para compras ni transacciones. Puedes descongelarla en cualquier momento.',
+        unfreezeDescription: 'Al descongelar esta tarjeta se volverán a permitir compras y transacciones. Continúa solo si estás seguro de que la tarjeta es segura para usar.',
     },
     workflowsPage: {
         workflowTitle: 'Gasto',

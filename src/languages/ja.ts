@@ -2237,6 +2237,10 @@ const translations: TranslationDeepObject<typeof en> = {
 ${date} の ${merchant} への ${amount}`,
         },
         freezeCard: 'カードを一時停止',
+        unfreeze: '再開',
+        unfreezeCard: 'カードの一時停止を解除',
+        freezeDescription: '一時停止したカードは購入や取引に使用できません。いつでも再開できます。',
+        unfreezeDescription: 'このカードの一時停止を解除すると、購入と取引が再び可能になります。カードが安全に使用できると確信できる場合にのみ続行してください。',
     },
     workflowsPage: {
         workflowTitle: '支出',
