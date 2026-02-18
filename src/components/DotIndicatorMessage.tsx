@@ -66,24 +66,6 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
 
     const isErrorMessage = type === 'error';
     const receiptError = uniqueMessages.find(isReceiptError);
-    const receiptFailureMessageShort = translate('iou.error.receiptFailureMessageShort');
-    const errorIconLabel = isErrorMessage
-        ? [
-              CONST.ACCESSIBILITY_LABELS.ERROR,
-              ...uniqueMessages
-                  .map((message) => {
-                      if (isReceiptError(message)) {
-                          return receiptFailureMessageShort;
-                      }
-                      if (isTranslationKeyError(message)) {
-                          return translate(message.translationKey);
-                      }
-                      return message;
-                  })
-                  .filter(Boolean),
-          ].join(' ')
-        : undefined;
-
     const handleLinkPress = (href: string) => {
         if (!receiptError) {
             return;
@@ -140,7 +122,7 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
                 style={styles.offlineFeedbackErrorDot}
                 accessible={isErrorMessage}
                 role={isErrorMessage ? CONST.ROLE.IMG : undefined}
-                accessibilityLabel={errorIconLabel}
+                accessibilityLabel={isErrorMessage ? (CONST.ACCESSIBILITY_LABELS.ERROR as string) : undefined}
             >
                 <Icon
                     src={expensifyIcons.DotIndicator}

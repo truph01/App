@@ -53,7 +53,7 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
         return `<muted-text-label>${replacedText}</muted-text-label>`;
     }, [isError, message, shouldRenderMessageAsHTML]);
 
-    const errorIconLabel = isError && shouldShowRedDotIndicator ? [CONST.ACCESSIBILITY_LABELS.ERROR, typeof message === 'string' ? message : ''].filter(Boolean).join(' ') : undefined;
+    const errorIconLabel = isError && shouldShowRedDotIndicator ? CONST.ACCESSIBILITY_LABELS.ERROR : undefined;
 
     if (isEmpty(message) && isEmpty(children)) {
         return null;
