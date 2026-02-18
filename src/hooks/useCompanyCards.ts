@@ -56,12 +56,17 @@ type UseCompanyCardsResult = Partial<{
  * Only the lastFourPAN path enriches the card; the other two confirm the card is already linked.
  */
 function resolveCardListEntry(card: Card, cardListEntries: Array<[string, string]>): Card {
+    if (!card.lastFourPAN) {
+        return card;
+    }
+
     const {cardName, encryptedCardNumber, lastFourPAN} = card;
 
     const isLinkedByEncrypted = encryptedCardNumber && cardListEntries.some(([, enc]) => enc === encryptedCardNumber);
-    const isLinkedByName = cardName && cardListEntries.some(([name]) => normalizeCardName(name) === normalizeCardName(cardName));
+    const normalizedCardName = cardName ? normalizeCardName(cardName) : undefined;
+    const isLinkedByName = normalizedCardName && cardListEntries.some(([name]) => normalizeCardName(name) === normalizedCardName);
 
-    if (isLinkedByEncrypted || isLinkedByName || !lastFourPAN) {
+    if (isLinkedByEncrypted || isLinkedByName) {
         return card;
     }
 
