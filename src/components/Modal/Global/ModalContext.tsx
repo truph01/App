@@ -1,5 +1,5 @@
 import noop from 'lodash/noop';
-import React, {useCallback, useContext, useMemo, useRef, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import Log from '@libs/Log';
 import CONST from '@src/CONST';
 
@@ -40,7 +40,7 @@ function ModalProvider({children}: {children: React.ReactNode}) {
     const modalIDRef = useRef(1);
     const [modalStack, setModalStack] = useState<{modals: ModalInfo[]}>({modals: []});
 
-    const showModal = useCallback<ModalContextType['showModal']>(({component, props, id, isCloseable = true}) => {
+    const showModal: ModalContextType['showModal'] = ({component, props, id, isCloseable = true}) => {
         // This is a promise that will resolve when the modal is closed
         let closeModalPromise: Promise<ModalStateChangePayload> | null = null;
 
@@ -73,9 +73,9 @@ function ModalProvider({children}: {children: React.ReactNode}) {
         }
 
         return closeModalPromise;
-    }, []);
+    };
 
-    const closeModal = useCallback<ModalContextType['closeModal']>((data = {action: 'CLOSE'}) => {
+    const closeModal: ModalContextType['closeModal'] = (data = {action: 'CLOSE'}) => {
         setModalStack((prevState) => {
             const lastModal = prevState.modals.at(-1);
             lastModal?.promiseWithResolvers.resolve(data);
@@ -84,14 +84,13 @@ function ModalProvider({children}: {children: React.ReactNode}) {
                 modals: prevState.modals.slice(0, -1),
             };
         });
-    }, []);
+    };
 
-    const contextValue = useMemo(() => ({showModal, closeModal}), [closeModal, showModal]);
     const modalToRender = modalStack.modals.length > 0 ? modalStack.modals.at(modalStack.modals.length - 1) : null;
     const ModalComponent = modalToRender?.component;
 
     return (
-        <ModalContext.Provider value={contextValue}>
+        <ModalContext.Provider value={{showModal, closeModal}}>
             {children}
             {!!ModalComponent && (
                 <ModalComponent
