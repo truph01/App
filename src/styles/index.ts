@@ -5203,18 +5203,6 @@ const staticStyles = (theme: ThemeColors) =>
             ...flex.justifyContentCenter,
         },
 
-        emptyStateCompanyCardsIllustrationContainer: {
-            width: '100%',
-            aspectRatio: 680 / 220,
-            ...flex.alignItemsCenter,
-            ...flex.justifyContentCenter,
-        },
-
-        emptyStateCompanyCardsIllustration: {
-            width: '100%',
-            height: '100%',
-        },
-
         emptyStateSamlIllustration: {
             width: 218,
             height: 190,
@@ -6205,6 +6193,13 @@ const dynamicStyles = (theme: ThemeColors) =>
                 overflow: 'hidden',
             };
         },
+
+        getEmptyStateCompanyCardsIllustrationContainer: (shouldUseNarrowLayout: boolean) => (shouldUseNarrowLayout ? {height: 220} : {aspectRatio: 680 / 220}),
+
+        getEmptyStateCompanyCardsIllustration: (shouldUseNarrowLayout: boolean) => ({
+            width: shouldUseNarrowLayout ? 680 : undefined,
+            height: shouldUseNarrowLayout ? 220 : undefined,
+        }),
     }) satisfies DynamicStyles;
 
 // Styles that cannot be wrapped in StyleSheet.create because they eg. must be passed to 3rd party libraries as JS objects
