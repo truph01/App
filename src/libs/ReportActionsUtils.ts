@@ -4306,6 +4306,7 @@ export {
     isAddCommentAction,
     isApprovedOrSubmittedReportAction,
     isIOURequestReportAction,
+    isNewerReportAction,
     isChronosOOOListAction,
     isClosedAction,
     isConsecutiveActionMadeByPreviousActor,

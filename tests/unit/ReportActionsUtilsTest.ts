@@ -27,6 +27,7 @@ import {
     getSendMoneyFlowAction,
     getUpdateACHAccountMessage,
     isIOUActionMatchingTransactionList,
+    isNewerReportAction,
 } from '../../src/libs/ReportActionsUtils';
 import {buildOptimisticCreatedReportForUnapprovedAction} from '../../src/libs/ReportUtils';
 import ONYXKEYS from '../../src/ONYXKEYS';
@@ -3431,6 +3432,60 @@ describe('ReportActionsUtils', () => {
 
             const result = getAutoReimbursementMessage(translateLocal, action);
             expect(result).toBe('changed the auto-pay approved reports threshold to "$1,000.00" (previously "$500.00")');
+        });
+    });
+
+    describe('isNewerReportAction', () => {
+        const makeAction = (overrides: Partial<ReportAction>): ReportAction =>
+            ({
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                reportActionID: '1',
+                created: '2024-01-01 00:00:00.000',
+                ...overrides,
+            }) as ReportAction;
+
+        it('should return true when a has a later timestamp than b', () => {
+            const a = makeAction({created: '2024-01-02 00:00:00.000', reportActionID: '1'});
+            const b = makeAction({created: '2024-01-01 00:00:00.000', reportActionID: '2'});
+            expect(isNewerReportAction(a, b)).toBeTruthy();
+        });
+
+        it('should return false when a has an earlier timestamp than b', () => {
+            const a = makeAction({created: '2024-01-01 00:00:00.000', reportActionID: '1'});
+            const b = makeAction({created: '2024-01-02 00:00:00.000', reportActionID: '2'});
+            expect(isNewerReportAction(a, b)).toBeFalsy();
+        });
+
+        it('should treat CREATED action as always oldest', () => {
+            const created = makeAction({actionName: CONST.REPORT.ACTIONS.TYPE.CREATED, created: '2024-12-31 00:00:00.000', reportActionID: '1'});
+            const comment = makeAction({created: '2024-01-01 00:00:00.000', reportActionID: '2'});
+
+            expect(isNewerReportAction(created, comment)).toBeFalsy();
+            expect(isNewerReportAction(comment, created)).toBeTruthy();
+        });
+
+        it('should treat undefined created as oldest', () => {
+            const withUndefined = makeAction({created: undefined, reportActionID: '1'});
+            const withDate = makeAction({created: '2024-01-01 00:00:00.000', reportActionID: '2'});
+
+            expect(isNewerReportAction(withUndefined, withDate)).toBeFalsy();
+            expect(isNewerReportAction(withDate, withUndefined)).toBeTruthy();
+        });
+
+        it('should prefer REPORT_PREVIEW over other actions when timestamps match', () => {
+            const preview = makeAction({actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW, created: '2024-01-01 00:00:00.000', reportActionID: '1'});
+            const comment = makeAction({actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, created: '2024-01-01 00:00:00.000', reportActionID: '2'});
+
+            expect(isNewerReportAction(preview, comment)).toBeTruthy();
+            expect(isNewerReportAction(comment, preview)).toBeFalsy();
+        });
+
+        it('should fall back to reportActionID comparison when timestamps and action types match', () => {
+            const higher = makeAction({created: '2024-01-01 00:00:00.000', reportActionID: '200'});
+            const lower = makeAction({created: '2024-01-01 00:00:00.000', reportActionID: '100'});
+
+            expect(isNewerReportAction(higher, lower)).toBeTruthy();
+            expect(isNewerReportAction(lower, higher)).toBeFalsy();
         });
     });
 });

@@ -238,7 +238,6 @@ const allSortedReportActions: Record<string, ReportAction[]> = {};
 let allReportActions: OnyxCollection<ReportActions>;
 const lastVisibleReportActions: ReportActions = {};
 const lastVisibleIOUMoneyActions: ReportActions = {};
-const cachedOneTransactionThreadReportIDs: Record<string, string | undefined> = {};
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
     waitForCollectionCallback: true,
@@ -263,9 +262,8 @@ Onyx.connect({
             const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
 
             // If the report is a one-transaction report, we need to return the combined reportActions so that the LHN can display modifications
-            // to the transaction thread or the report itself. Cache the result to avoid recomputation in renderItem.
+            // to the transaction thread or the report itself.
             const transactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, actions[reportActions[0]]);
-            cachedOneTransactionThreadReportIDs[reportID] = transactionThreadReportID;
             if (transactionThreadReportID) {
                 const transactionThreadReportActionsArray = Object.values(actions[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`] ?? {});
                 sortedReportActions = getCombinedReportActions(sortedReportActions, transactionThreadReportID, transactionThreadReportActionsArray, reportID);
@@ -282,29 +280,42 @@ Onyx.connect({
             const isReportArchived = !!reportNameValuePairs?.private_isArchived;
             const isWriteActionAllowed = canUserPerformWriteAction(report, isReportArchived);
 
-            // The report is only visible if it is the last action not deleted that
-            // does not match a closed or created state.
-            const reportActionsForDisplay = sortedReportActions.filter(
-                (reportAction, actionKey) =>
-                    (!(isWhisperAction(reportAction) && !isReportPreviewAction(reportAction) && !isMoneyRequestAction(reportAction)) || isActionableMentionWhisper(reportAction)) &&
-                    shouldReportActionBeVisible(reportAction, actionKey, isWriteActionAllowed) &&
-                    reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED &&
-                    reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-            );
-            const reportActionForDisplay = reportActionsForDisplay.at(0);
+            // Single pass: find the first visible action for display and the first visible IOU money request action.
+            // sortedReportActions is sorted descending (newest first), so the first match is the newest.
+            let reportActionForDisplay: ReportAction | undefined;
+            let iouMoneyAction: ReportAction | undefined;
+            for (let i = 0; i < sortedReportActions.length; i++) {
+                const reportAction = sortedReportActions.at(i);
+                if (!reportAction) {
+                    continue;
+                }
+                const isPending = reportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+
+                if (!reportActionForDisplay) {
+                    const isDisplayable =
+                        (!(isWhisperAction(reportAction) && !isReportPreviewAction(reportAction) && !isMoneyRequestAction(reportAction)) || isActionableMentionWhisper(reportAction)) &&
+                        reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED;
+                    if (isDisplayable && shouldReportActionBeVisible(reportAction, i, isWriteActionAllowed) && !isPending) {
+                        reportActionForDisplay = reportAction;
+                    }
+                }
+
+                if (!iouMoneyAction && shouldReportActionBeVisible(reportAction, reportAction.reportActionID, isWriteActionAllowed) && !isPending && isMoneyRequestAction(reportAction)) {
+                    iouMoneyAction = reportAction;
+                }
+
+                if (reportActionForDisplay && iouMoneyAction) {
+                    break;
+                }
+            }
+
             if (!reportActionForDisplay) {
                 delete lastVisibleReportActions[reportID];
+                delete lastVisibleIOUMoneyActions[reportID];
                 continue;
             }
             lastVisibleReportActions[reportID] = reportActionForDisplay;
 
-            // Pre-compute the first visible IOU money request action (newest, since sorted descending)
-            const iouMoneyAction = sortedReportActions.find(
-                (reportAction) =>
-                    shouldReportActionBeVisible(reportAction, reportAction.reportActionID, isWriteActionAllowed) &&
-                    reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
-                    isMoneyRequestAction(reportAction),
-            );
             if (iouMoneyAction) {
                 lastVisibleIOUMoneyActions[reportID] = iouMoneyAction;
             } else {
@@ -556,13 +567,6 @@ function isSearchStringMatchUserDetails(personalDetail: PersonalDetails, searchV
         memberDetails += ` ${personalDetail.phoneNumber}`;
     }
     return isSearchStringMatch(searchValue.trim(), memberDetails.toLowerCase());
-}
-
-/**
- * Get IOU report ID of report last action if the action is report action preview
- */
-function getCachedOneTransactionThreadReportID(reportID?: string): string | undefined {
-    return reportID ? cachedOneTransactionThreadReportIDs[reportID] : undefined;
 }
 
 function getIOUReportIDOfLastAction(report: OnyxEntry<Report>): string | undefined {
@@ -3244,7 +3248,6 @@ export {
     getHeaderMessage,
     getHeaderMessageForNonUserList,
     getIOUConfirmationOptionsFromPayeePersonalDetail,
-    getCachedOneTransactionThreadReportID,
     getIOUReportIDOfLastAction,
     getIsUserSubmittedExpenseOrScannedReceipt,
     getLastActorDisplayName,
