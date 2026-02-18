@@ -11654,17 +11654,7 @@ describe('actions/IOU', () => {
             expect(updatedTransaction?.receipt?.source).toBe(source);
 
             // Then the snapshot should have the new receipt source
-            const updatedSnapshot = await new Promise<OnyxEntry<SearchResults>>((resolve) => {
-                const connection = Onyx.connect({
-                    key: ONYXKEYS.COLLECTION.SNAPSHOT,
-                    waitForCollectionCallback: true,
-                    callback: (snapshots) => {
-                        Onyx.disconnect(connection);
-                        const newSnapshot = snapshots[`${ONYXKEYS.COLLECTION.SNAPSHOT}${unapprovedCashHash}`];
-                        resolve(newSnapshot);
-                    },
-                });
-            });
+            const updatedSnapshot = (await getOnyxValue(`${ONYXKEYS.COLLECTION.SNAPSHOT}${unapprovedCashHash}` as OnyxKey)) as OnyxEntry<SearchResults>;
 
             expect(updatedSnapshot?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]?.receipt?.source).toBe(source);
         });
