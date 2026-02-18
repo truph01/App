@@ -26,9 +26,7 @@ Onyx.connect({
     },
 });
 
-function clearReportActionErrors(reportID: string, reportAction: ReportAction, keys?: string[]) {
-    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
-
+function clearReportActionErrors(reportID: string, reportAction: ReportAction, originalReportID: string | undefined, keys?: string[]) {
     if (!reportAction?.reportActionID) {
         return;
     }
@@ -86,7 +84,8 @@ function clearAllRelatedReportActionErrors(reportID: string | undefined, reportA
         return;
     }
 
-    clearReportActionErrors(reportID, reportAction, keys);
+    const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
+    clearReportActionErrors(reportID, reportAction, originalReportID, keys);
 
     const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
     if (report?.parentReportID && report?.parentReportActionID && ignore !== 'parent') {
