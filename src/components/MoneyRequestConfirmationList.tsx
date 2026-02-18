@@ -1336,7 +1336,6 @@ function MoneyRequestConfirmationList({
                 style={selectionListStyle}
                 isScrollEnabled={!isCompactMode}
                 disableKeyboardShortcuts
-                ListFooterComponentStyle={isCompactMode ? [styles.flex1] : undefined}
             />
         </MouseProvider>
     );

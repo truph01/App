@@ -435,7 +435,6 @@ const translations: TranslationDeepObject<typeof en> = {
         required: '必填',
         automatic: '自动',
         showing: '正在显示',
-        automatic: '自动',
         of: '的',
         default: '默认',
         update: '更新',
