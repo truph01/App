@@ -12117,11 +12117,7 @@ function isChatUsedForOnboarding(
  */
 function isPostingTasksInAdminsRoom(engagementChoice?: OnboardingPurpose): boolean {
     const userHasPhonePrimaryEmail = Str.endsWith(currentUserEmail ?? '', CONST.SMS.DOMAIN);
-    return (
-        engagementChoice !== undefined &&
-        engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM &&
-        (!currentUserEmail?.includes('+') || userHasPhonePrimaryEmail)
-    );
+    return engagementChoice !== undefined && engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && (!currentUserEmail?.includes('+') || userHasPhonePrimaryEmail);
 }
 
 /**
