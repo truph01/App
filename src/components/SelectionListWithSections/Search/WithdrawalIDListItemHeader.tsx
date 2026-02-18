@@ -121,10 +121,10 @@ function WithdrawalIDListItemHeader<TItem extends ListItem>({
                 />
             </View>
         ),
-        [CONST.SEARCH.TABLE_COLUMNS.STATUS]: (
+        [CONST.SEARCH.TABLE_COLUMNS.GROUP_STATUS]: (
             <View
-                key={CONST.SEARCH.TABLE_COLUMNS.STATUS}
-                style={StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.STATUS)}
+                key={CONST.SEARCH.TABLE_COLUMNS.GROUP_STATUS}
+                style={StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.GROUP_STATUS)}
             >
                 {statusBadge}
             </View>

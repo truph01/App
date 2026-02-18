@@ -323,7 +323,7 @@ const getTransactionGroupHeaders = (groupBy: SearchGroupBy, icons: SearchHeaderI
                     translationKey: 'search.filters.withdrawn',
                 },
                 {
-                    columnName: CONST.SEARCH.TABLE_COLUMNS.STATUS,
+                    columnName: CONST.SEARCH.TABLE_COLUMNS.GROUP_STATUS,
                     translationKey: 'common.status',
                 },
                 {
