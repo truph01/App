@@ -187,13 +187,20 @@ const closeRHPFlow = (ref = navigationRef) => originalCloseRHPFlow(ref);
  */
 function closeSidePanelOnNarrowScreen(route: Route) {
     const isExtraLargeScreenWidth = Dimensions.get('window').width > variables.sidePanelResponsiveWidthBreakpoint;
-    const attachmentRoutePrefix = ROUTES.REPORT_ADD_ATTACHMENT.route.split(':').at(0) ?? ''; // "r/"
-    const isAttachmentPreviewRoute = typeof route === 'string' && route.includes('/attachment/add') && route.startsWith(attachmentRoutePrefix);
 
-    // If we have a side panel open on devices smaller than 1300px and the user wants to go to the REPORT_ADD_ATTACHMENT route,
-    // this means that the user clicked `Add Attachments` in the side panel, and in this case,
-    // there is no need to close the side panel, as we need to have access to the chat.
-    if (!sidePanelNVP?.openNarrowScreen || isExtraLargeScreenWidth || isAttachmentPreviewRoute) {
+    // Split "r/:reportID/attachment/add" by ":reportID" to get the prefix "r/" and suffix "/attachment/add"
+    const addAttachmentPrefix = ROUTES.REPORT_ADD_ATTACHMENT.route.split(':reportID').at(0) ?? '';
+    const addAttachmentSuffix = ROUTES.REPORT_ADD_ATTACHMENT.route.split(':reportID').at(1) ?? '';
+    const attachmentPreviewRoute = ROUTES.REPORT_ATTACHMENTS.route;
+    const isAddingAttachment = typeof route === 'string' && route.startsWith(addAttachmentPrefix) && route.includes(addAttachmentSuffix);
+    const isPreviewingAttachment = typeof route === 'string' && route.startsWith(attachmentPreviewRoute);
+    // If the user is navigating to an attachment route (previewing or adding), keep the side panel open
+    // so they still have access to the chat.
+    if (isAddingAttachment || isPreviewingAttachment) {
+        return;
+    }
+
+    if (!sidePanelNVP?.openNarrowScreen || isExtraLargeScreenWidth) {
         return;
     }
     SidePanelActions.closeSidePanel(true);
