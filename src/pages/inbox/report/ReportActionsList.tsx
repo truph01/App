@@ -533,6 +533,9 @@ function ReportActionsList({
                     if (action?.reportActionID) {
                         setActionIdToHighlight(action.reportActionID);
                     }
+                } else if (Navigation.getReportRHPActiveRoute()) {
+                    setIsFloatingMessageCounterVisible(false);
+                    reportScrollManager.scrollToBottom();
                 } else {
                     Navigation.setNavigationActionToMicrotaskQueue(() => {
                         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report.reportID));
