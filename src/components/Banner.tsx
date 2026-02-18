@@ -94,7 +94,7 @@ function Banner({
                             containerStyles,
                         ]}
                     >
-                        <View style={[styles.flexRow, styles.flex1, styles.alignItemsCenter]}>
+                        <View style={[styles.flexRow, styles.flex1, styles.mw100, styles.alignItemsCenter]}>
                             {shouldShowIcon && !!displayIcon && (
                                 <View style={[styles.mr3]}>
                                     <Icon
@@ -110,7 +110,7 @@ function Banner({
                                     <RenderHTML html={text} />
                                 ) : (
                                     <Text
-                                        style={[styles.flex1, textStyles]}
+                                        style={[styles.flex1, styles.flexWrap, textStyles]}
                                         onPress={onPress}
                                         suppressHighlighting
                                     >
@@ -121,7 +121,7 @@ function Banner({
                         {shouldShowButton && (
                             <Button
                                 success
-                                style={[styles.pr3, styles.flexShrink0]}
+                                style={[styles.ph3]}
                                 text={translate('common.chatNow')}
                                 onPress={onButtonPress}
                             />
@@ -132,7 +132,6 @@ function Banner({
                                     onPress={onClose}
                                     role={CONST.ROLE.BUTTON}
                                     accessibilityLabel={text ? `${translate('common.close')}, ${text}` : translate('common.close')}
-                                    sentryLabel="Banner-Close"
                                 >
                                     <Icon
                                         src={expensifyIcons.Close}
