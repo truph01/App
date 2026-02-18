@@ -79,7 +79,10 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
 
             const optionData = getSelectedOptionData(participant);
             if (optionData) {
-                acc.push(optionData);
+                acc.push({
+                    ...optionData,
+                    keyForList: optionData.keyForList ?? optionData.reportID,
+                });
             }
 
             return acc;
@@ -223,6 +226,7 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
                     style={[styles.flex1]}
                     text={translate('common.reset')}
                     onPress={resetChanges}
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_USER}
                 />
                 <Button
                     success
@@ -230,6 +234,7 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
                     style={[styles.flex1]}
                     text={translate('common.apply')}
                     onPress={applyChanges}
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_USER}
                 />
             </View>
         </View>
