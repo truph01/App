@@ -12112,7 +12112,7 @@ function isChatUsedForOnboarding(
 /**
  * Whether onboarding tasks should be posted in the #admins room instead of Concierge.
  * Only the "Manage my team's expenses" (MANAGE_TEAM) intent uses the #admins room with a guide;
- * Track and budget expenses (TRACK_WORKSPACE) uses Concierge chat. Guides are assigned to signups
+ * Track and budget expenses (TRACK_WORKSPACE) uses Concierge chat. Guides are assigned to users who sign up
  * with emails that do not contain a '+' and who select MANAGE_TEAM.
  */
 function isPostingTasksInAdminsRoom(engagementChoice?: OnboardingPurpose): boolean {
