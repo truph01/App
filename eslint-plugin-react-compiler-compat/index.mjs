@@ -85,6 +85,10 @@ const plugin = {
     meta: {name: 'eslint-plugin-react-compiler-compat'},
     processors: {
         'react-compiler-compat': {
+            meta: {
+                name: 'react-compiler-compat',
+                version: '1.0.0',
+            },
             supportsAutofix: true,
 
             preprocess(text, filename) {
