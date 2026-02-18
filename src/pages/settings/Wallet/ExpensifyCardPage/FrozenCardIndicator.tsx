@@ -1,5 +1,6 @@
 import {cardByIdSelector} from '@selectors/Card';
 import React, {useMemo} from 'react';
+import type {ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import cardScarf from '@assets/images/card-scarf.svg';
 import Button from '@components/Button';
@@ -15,6 +16,7 @@ import DateUtils from '@libs/DateUtils';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import variables from '@styles/variables';
 import ONYXKEYS from '@src/ONYXKEYS';
+import CONST from '@src/CONST';
 
 type FrozenCardIndicatorProps = {
     cardID: string;
@@ -36,7 +38,7 @@ function FrozenCardIndicator({cardID, onUnfreezePress, isDisabled = false}: Froz
     const isCurrentUser = frozenByAccountID === session?.accountID;
 
     const frozenByName = frozenByAccountID ? getDisplayNameOrDefault(personalDetails?.[frozenByAccountID]) : '';
-    const formattedDate = frozenDate ? DateUtils.formatWithUTCTimeZone(frozenDate, 'MMM d, yyyy') : '';
+    const formattedDate = frozenDate ? DateUtils.formatWithUTCTimeZone(frozenDate, CONST.DATE.MONTH_DAY_YEAR_ABBR_FORMAT) : '';
 
     const statusText = useMemo(() => {
         if (isCurrentUser) {
@@ -45,19 +47,21 @@ function FrozenCardIndicator({cardID, onUnfreezePress, isDisabled = false}: Froz
         return translate('cardPage.frozenBy', {date: formattedDate, person: frozenByName});
     }, [formattedDate, frozenByName, isCurrentUser, translate]);
 
-    const scarfOverlayWidth = 264;
-    const scarfOverlayHeight = 172;
+    const scarfOverlayStyle = useMemo<ViewStyle>(
+        () => ({
+            left: (variables.cardPreviewWidth - variables.cardScarfOverlayWidth) / 2,
+            zIndex: variables.cardScarfOverlayZIndex,
+            width: variables.cardScarfOverlayWidth,
+            height: variables.cardScarfOverlayHeight,
+        }),
+        [],
+    );
 
     return (
         <View style={[styles.ph5, styles.pb5, styles.mt9]}>
             <CardPreview
                 overlayImage={cardScarf}
-                overlayContainerStyle={{
-                    left: (variables.cardPreviewWidth - scarfOverlayWidth) / 2,
-                    zIndex: 2,
-                    width: scarfOverlayWidth,
-                    height: scarfOverlayHeight,
-                }}
+                overlayContainerStyle={scarfOverlayStyle}
             />
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt9]}>
                 <Icon
