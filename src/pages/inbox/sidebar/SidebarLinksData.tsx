@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import React, {useCallback, useRef} from 'react';
 import {View} from 'react-native';
@@ -33,6 +33,16 @@ function SidebarLinksData({insets}: SidebarLinksDataProps) {
     const onLayout = useCallback(() => {
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
     }, []);
+
+    // End the span when the screen gains focus. This covers the case where
+    // SidebarLinksData is already mounted (onLayout won't re-fire) but the
+    // user navigates back to Inbox — e.g. via the wide-layout REPORT_WITH_ID path.
+    // endSpan is idempotent: if onLayout already ended it, this is a no-op.
+    useFocusEffect(
+        useCallback(() => {
+            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
+        }, []),
+    );
 
     return (
         <View
