@@ -470,7 +470,7 @@ describe('WorkflowUtils', () => {
             expect(approvalWorkflows).toEqual([defaultWorkflow, secondWorkflow]);
         });
 
-        it('Should include all workspace members in availableMembers (fix for #598876)', () => {
+        it('Should include all workspace members in availableMembers', () => {
             // Simulates ADVANCED approval mode: Alex and Hannah submit to Carolyn (custom workflow),
             // others submit to Hannah (default). Previously availableMembers only had default workflow
             // members, excluding Alex and Hannah.
