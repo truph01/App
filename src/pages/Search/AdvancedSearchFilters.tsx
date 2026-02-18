@@ -1,6 +1,5 @@
 import {filterCardsHiddenFromSearch} from '@selectors/Card';
 import React, {useMemo} from 'react';
-
 import {View} from 'react-native';
 import type {ValueOf} from 'react-native-gesture-handler/lib/typescript/typeUtils';
 import type {OnyxCollection} from 'react-native-onyx';
