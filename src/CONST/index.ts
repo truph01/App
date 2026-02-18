@@ -8352,6 +8352,7 @@ const CONST = {
         SELECTION_LIST: {
             BASE_LIST_ITEM: 'SelectionList-BaseListItem',
             SPLIT_LIST_ITEM_EDIT_BUTTON: 'SplitListItem-EditButton',
+            LIST_HEADER_SELECT_ALL: 'SelectionList-ListHeader-SelectAll',
         },
         SELECTION_LIST_WITH_SECTIONS: {
             BASE_LIST_ITEM: 'SelectionListWithSections-BaseListItem',

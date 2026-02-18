@@ -76,6 +76,7 @@ function ListHeader<TItem extends ListItem>({
                     <PressableWithFeedback
                         style={[styles.userSelectNone, styles.flexRow, styles.alignItemsCenter]}
                         onPress={onSelectAll}
+                        sentryLabel={CONST.SENTRY_LABEL.SELECTION_LIST.LIST_HEADER_SELECT_ALL}
                         accessibilityLabel={translate('workspace.people.selectAll')}
                         accessibilityRole="button"
                         accessibilityState={{checked: dataDetails.allSelected, disabled: allDisabled}}
