@@ -6,9 +6,9 @@ import FS from '@libs/Fullstory';
 import ReportActionItem from '@pages/inbox/report/ReportActionItem';
 import variables from '@styles/variables';
 import ONYXKEYS from '@src/ONYXKEYS';
+import useOnyx from '@hooks/useOnyx';
 import BaseListItem from './BaseListItem';
 import type {ChatListItemProps, ListItem, ReportActionListItemType} from './types';
-import useOnyx from '@hooks/useOnyx';
 
 function ChatListItem<TItem extends ListItem>({
     item,
