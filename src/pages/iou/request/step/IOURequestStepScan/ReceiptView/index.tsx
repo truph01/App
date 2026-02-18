@@ -2,6 +2,7 @@ import useTransactionDraftReceipts from '@hooks/useTransactionDraftReceipts';
 import React, {useCallback, useEffect, useState} from 'react';
 import {InteractionManager} from 'react-native';
 import AttachmentCarouselView from '@components/Attachments/AttachmentCarousel/AttachmentCarouselView';
+import type {Attachment} from '@components/Attachments/types';
 import useCarouselArrows from '@components/Attachments/AttachmentCarousel/useCarouselArrows';
 import useAttachmentErrors from '@components/Attachments/AttachmentView/useAttachmentErrors';
 import Button from '@components/Button';
@@ -119,7 +120,7 @@ function ReceiptView({route}: ReceiptViewProps) {
                 />
             </HeaderWithBackButton>
             <AttachmentCarouselView
-                attachments={receipts}
+                attachments={receipts as Attachment[]}
                 source={currentReceipt?.source ?? ''}
                 page={page}
                 setPage={setPage}
