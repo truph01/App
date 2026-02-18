@@ -2241,6 +2241,8 @@ ${date} の ${merchant} への ${amount}`,
         unfreezeCard: 'カードの一時停止を解除',
         freezeDescription: '一時停止したカードは購入や取引に使用できません。いつでも再開できます。',
         unfreezeDescription: 'このカードの一時停止を解除すると、購入と取引が再び可能になります。カードが安全に使用できると確信できる場合にのみ続行してください。',
+        youFroze: ({date}: {date: string}) => `${date}にこのカードを一時停止しました。`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person}が${date}にこのカードを一時停止しました。`,
     },
     workflowsPage: {
         workflowTitle: '支出',

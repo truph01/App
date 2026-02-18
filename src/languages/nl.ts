@@ -2255,6 +2255,8 @@ ${amount} voor ${merchant} - ${date}`,
         unfreezeCard: 'Kaart deblokkeren',
         freezeDescription: 'Een geblokkeerde kaart kan niet worden gebruikt voor aankopen en transacties. Je kunt deze op elk moment deblokkeren.',
         unfreezeDescription: 'Door deze kaart te deblokkeren worden aankopen en transacties weer toegestaan. Ga alleen verder als je zeker weet dat de kaart veilig is om te gebruiken.',
+        youFroze: ({date}: {date: string}) => `Je hebt deze kaart op ${date} geblokkeerd.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} heeft deze kaart op ${date} geblokkeerd.`,
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',

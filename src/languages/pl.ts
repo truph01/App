@@ -2249,6 +2249,8 @@ ${amount} dla ${merchant} - ${date}`,
         unfreezeCard: 'Odmroź kartę',
         freezeDescription: 'Zamrożonej karty nie można używać do zakupów i transakcji. Możesz ją odmrozić w dowolnym momencie.',
         unfreezeDescription: 'Odmrożenie tej karty ponownie umożliwi zakupy i transakcje. Kontynuuj tylko wtedy, gdy masz pewność, że korzystanie z karty jest bezpieczne.',
+        youFroze: ({date}: {date: string}) => `Zamroziłeś tę kartę ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} zamroził(a) tę kartę ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Wydatki',

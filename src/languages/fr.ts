@@ -2265,6 +2265,8 @@ ${amount} pour ${merchant} - ${date}`,
         freezeDescription: 'Une carte gelée ne peut pas être utilisée pour des achats ni des transactions. Vous pouvez la dégeler à tout moment.',
         unfreezeDescription:
             'Dégeler cette carte permettra à nouveau les achats et les transactions. Continuez uniquement si vous êtes sûr(e) que la carte peut être utilisée en toute sécurité.',
+        youFroze: ({date}: {date: string}) => `Vous avez gelé cette carte le ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} a gelé cette carte le ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Dépense',

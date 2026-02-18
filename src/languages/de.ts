@@ -2260,6 +2260,8 @@ ${amount} für ${merchant} – ${date}`,
         freezeDescription: 'Eine gesperrte Karte kann nicht für Käufe und Transaktionen verwendet werden. Du kannst sie jederzeit entsperren.',
         unfreezeDescription:
             'Durch das Entsperren dieser Karte werden Käufe und Transaktionen wieder zugelassen. Fahre nur fort, wenn du sicher bist, dass die Karte sicher verwendet werden kann.',
+        youFroze: ({date}: {date: string}) => `Du hast diese Karte am ${date} gesperrt.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} hat diese Karte am ${date} gesperrt.`,
     },
     workflowsPage: {
         workflowTitle: 'Ausgaben',
