@@ -48,6 +48,26 @@ type UseCompanyCardsResult = Partial<{
 };
 
 /**
+ * For CDF assigned cards with a stale cardName and no encryptedCardNumber, attempts to find
+ * the corresponding cardList entry via lastFourPAN so the card uses the up-to-date name and encrypted value.
+ */
+function resolveEncryptedCardNumber(card: Card, cardList: AssignableCardsList | undefined): {cardName: string; encryptedCardNumber: string} | undefined {
+    const {lastFourPAN} = card;
+    if (card.encryptedCardNumber || !lastFourPAN || !cardList) {
+        return undefined;
+    }
+    const matches = Object.entries(cardList).filter(([name]) => name.endsWith(lastFourPAN));
+    if (matches.length !== 1) {
+        return undefined;
+    }
+    const match = matches.at(0);
+    if (!match) {
+        return undefined;
+    }
+    return {cardName: match[0], encryptedCardNumber: match[1]};
+}
+
+/**
  * Builds a list of card entries by starting from assignedCards (source of truth for assignments),
  * then filling in remaining unassigned cards from accountList/cardList.
  */
@@ -61,11 +81,15 @@ function buildCompanyCardEntries(accountList: string[] | undefined, cardList: As
         if (!card?.cardName) {
             continue;
         }
-        const encryptedCardNumber = card.encryptedCardNumber ?? card.cardName;
-        entries.push({cardName: card.cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
-        coveredNames.add(normalizeCardName(card.cardName));
-        if (card.encryptedCardNumber) {
-            coveredEncrypted.add(card.encryptedCardNumber);
+
+        const resolved = resolveEncryptedCardNumber(card, cardList);
+        const cardName = resolved?.cardName ?? card.cardName;
+        const encryptedCardNumber = resolved?.encryptedCardNumber ?? card.encryptedCardNumber ?? card.cardName;
+
+        entries.push({cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
+        coveredNames.add(normalizeCardName(cardName));
+        if (encryptedCardNumber !== card.cardName) {
+            coveredEncrypted.add(encryptedCardNumber);
         }
     }
 
