@@ -170,6 +170,7 @@ import type WalletOnfido from './WalletOnfido';
 import type WalletStatement from './WalletStatement';
 import type WalletTerms from './WalletTerms';
 import type WalletTransfer from './WalletTransfer';
+import type Blocklisted3DSTransactionChallenges from './Blocklisted3DSTransactionChallenges';
 
 export type {
     FileObject,
@@ -365,4 +366,5 @@ export type {
     CodingRuleMatchingTransaction,
     UserSecurityGroupData,
     DeviceBiometrics,
+    Blocklisted3DSTransactionChallenges,
 };

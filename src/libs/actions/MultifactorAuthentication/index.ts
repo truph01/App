@@ -198,7 +198,17 @@ async function authorizeTransaction({transactionID, signedChallenge, authenticat
         const response = await makeRequestWithSideEffects(
             SIDE_EFFECT_REQUEST_COMMANDS.AUTHORIZE_TRANSACTION,
             {transactionID, signedChallenge: JSON.stringify(signedChallenge), authenticationMethod},
-            {},
+            {
+                optimisticData: [
+                    {
+                        key: ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES,
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        value: {
+                            [transactionID]: 'Authorize',
+                        },
+                    },
+                ],
+            },
         );
 
         const {jsonCode, message} = response ?? {};
@@ -224,6 +234,13 @@ async function denyTransaction({transactionID}: DenyTransactionParams) {
                             [transactionID]: {
                                 isLoading: true,
                             },
+                        },
+                    },
+                    {
+                        key: ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES,
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        value: {
+                            [transactionID]: 'Deny',
                         },
                     },
                 ],
