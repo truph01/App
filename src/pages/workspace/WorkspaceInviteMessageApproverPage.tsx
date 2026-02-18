@@ -106,9 +106,11 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
         return sortAlphabetically(filteredApprovers, 'text', localeCompare);
     }, [allApprovers, debouncedSearchTerm, countryCode, localeCompare]);
 
+    const backTo = route.params.backTo;
+
     const goBack = useCallback(() => {
-        Navigation.goBack();
-    }, []);
+        Navigation.goBack(backTo);
+    }, [backTo]);
 
     const handleOnSelectRow = useCallback(
         (approver: SelectionListApprover) => {
@@ -117,10 +119,10 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
             }
             setWorkspaceInviteApproverDraft(policyID, approver.login);
             Navigation.setNavigationActionToMicrotaskQueue(() => {
-                Navigation.goBack();
+                Navigation.goBack(backTo);
             });
         },
-        [policyID],
+        [policyID, backTo],
     );
 
     const textInputOptions = useMemo(

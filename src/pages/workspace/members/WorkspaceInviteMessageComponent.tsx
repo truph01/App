@@ -94,7 +94,7 @@ function WorkspaceInviteMessageComponent({
     const validatedApprover = isApproverValid ? workspaceInviteApproverDraft : undefined;
 
     const navigateToApproverPage = useCallback(() => {
-        Navigation.navigate(ROUTES.WORKSPACE_INVITE_MESSAGE_APPROVER.getRoute(policyID));
+        Navigation.navigate(ROUTES.WORKSPACE_INVITE_MESSAGE_APPROVER.getRoute(policyID, Navigation.getActiveRoute()));
     }, [policyID]);
 
     const isOnyxLoading = isLoadingOnyxValue(workspaceInviteMessageDraftResult, invitedEmailsToAccountIDsDraftResult, formDataResult);

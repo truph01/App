@@ -1548,7 +1548,9 @@ const ROUTES = {
     },
     WORKSPACE_INVITE_MESSAGE_APPROVER: {
         route: 'workspaces/:policyID/invite-message/approver',
-        getRoute: (policyID: string) => `workspaces/${policyID}/invite-message/approver` as const,
+
+        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
+        getRoute: (policyID: string, backTo?: string) => `${getUrlWithBackToParam(`workspaces/${policyID}/invite-message/approver`, backTo)}` as const,
     },
     WORKSPACE_OVERVIEW: {
         route: 'workspaces/:policyID/overview',
