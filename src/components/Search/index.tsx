@@ -257,6 +257,7 @@ function Search({
     const [allReportMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT_METADATA, {canBeMissing: true});
     const [visibleColumns] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {canBeMissing: true, selector: columnsSelector});
     const [customCardNames] = useOnyx(ONYXKEYS.NVP_EXPENSIFY_COMPANY_CARDS_CUSTOM_NAMES, {canBeMissing: true});
+    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
 
     const isExpenseReportType = type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
     const {markReportIDAsMultiTransactionExpense, unmarkReportIDAsMultiTransactionExpense} = useWideRHPActions();
@@ -439,6 +440,7 @@ function Search({
             allTransactionViolations: violations,
             customCardNames,
             allReportMetadata,
+            cardList,
         });
         return [filteredData1, filteredData1.length, allLength];
     }, [
@@ -462,6 +464,7 @@ function Search({
         violations,
         customCardNames,
         allReportMetadata,
+        cardList,
     ]);
 
     // For group-by views, each grouped item has a transactionsQueryJSON with a hash pointing to a separate snapshot
@@ -499,6 +502,7 @@ function Search({
                 isActionLoadingSet,
                 cardFeeds,
                 allReportMetadata,
+                cardList,
             });
             return {...item, transactions: transactions1 as TransactionListItemType[]};
         });
@@ -517,6 +521,7 @@ function Search({
         cardFeeds,
         bankAccountList,
         allReportMetadata,
+        cardList,
     ]);
 
     const hasLoadedAllTransactions = useMemo(() => {
