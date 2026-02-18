@@ -360,6 +360,7 @@ function ReportActionCompose({
                 });
                 attachmentFileRef.current = null;
             } else {
+                // Pre-generate the optimistic reportActionID so we can correlate the Sentry send-message span with the exact message
                 const reportActionID = rand64();
 
                 // The list is inverted, so an offset near 0 means the user is at the bottom (newest messages visible).
