@@ -18,7 +18,7 @@ type CardPreviewProps = {
     overlayContainerStyle?: StyleProp<ViewStyle>;
 };
 
-function CardPreview({overlayImage, overlayContainerStyle, cardHolderName}: CardPreviewProps) {
+function CardPreview({overlayImage, overlayContainerStyle}: CardPreviewProps) {
     const styles = useThemeStyles();
     const lazyIllustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
 
