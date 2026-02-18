@@ -958,6 +958,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Carteira > Cartões atribuídos',
             },
         },
+        assignedCards: 'Cartões atribuídos',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} restante`,
         announcements: 'Comunicados',
         discoverSection: {
             title: 'Descobrir',

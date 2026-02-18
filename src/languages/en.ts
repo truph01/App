@@ -982,6 +982,8 @@ const translations = {
                 cta: 'Review',
             },
         },
+        assignedCards: 'Assigned cards',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} remaining`,
         announcements: 'Announcements',
         discoverSection: {
             title: 'Discover',
