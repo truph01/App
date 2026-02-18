@@ -75,8 +75,32 @@ function SuggestionMention({
     const policy = usePolicy(policyID);
     suggestionValuesRef.current = suggestionValues;
 
-    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
+    const mentionableReportsSelector = useCallback(
+        (reports: OnyxCollection<Report>) => {
+            if (!reports) {
+                return {};
+            }
+
+            return Object.keys(reports).reduce((acc, reportID) => {
+                if (!acc) {
+                    return {};
+                }
+
+                const report = reports[reportID];
+                if (canReportBeMentionedWithinPolicy(report, policyID)) {
+                    acc[reportID] = report;
+                }
+                return acc;
+            }, {} as OnyxCollection<Report>);
+        },
+        [policyID],
+    );
+
     const [conciergeReportID = ''] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
+    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
+        canBeMissing: false,
+        selector: mentionableReportsSelector,
+    });
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isMentionSuggestionsMenuVisible = !!suggestionValues.suggestedMentions.length && suggestionValues.shouldShowSuggestionMenu;
@@ -340,9 +364,6 @@ function SuggestionMention({
         (searchTerm: string, reportBatch: OnyxCollection<Report>): Mention[] => {
             const filteredRoomMentions: Mention[] = [];
             for (const report of Object.values(reportBatch ?? {})) {
-                if (!canReportBeMentionedWithinPolicy(report, policyID)) {
-                    continue;
-                }
                 if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
                     filteredRoomMentions.push({
                         text: report.reportName,
