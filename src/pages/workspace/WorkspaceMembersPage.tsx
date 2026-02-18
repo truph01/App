@@ -747,6 +747,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 isSplitButton={false}
                 style={[shouldUseNarrowLayout && styles.flexGrow1, shouldUseNarrowLayout && styles.mb3]}
                 isDisabled={!selectedEmployees.length}
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.MEMBERS.BULK_ACTIONS_DROPDOWN}
                 testID="WorkspaceMembersPage-header-dropdown-menu-button"
             />
         ) : (
@@ -754,6 +755,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 <Button
                     success
                     onPress={inviteUser}
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.MEMBERS.INVITE_BUTTON}
                     text={translate('workspace.invite.member')}
                     icon={Plus}
                     innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}
@@ -764,6 +766,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     onPress={() => {}}
                     shouldAlwaysShowDropdownMenu
                     customText={translate('common.more')}
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.MEMBERS.MORE_DROPDOWN}
                     options={secondaryActions}
                     isSplitButton={false}
                     wrapperStyle={styles.flexGrow0}
