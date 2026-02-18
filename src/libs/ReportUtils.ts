@@ -5694,6 +5694,7 @@ function getReportActionMessage({
  * Get the title for a report.
  * @deprecated Moved to src/libs/ReportNameUtils.ts.
  */
+// eslint-disable-next-line @typescript-eslint/max-params
 function getReportName(
     report: OnyxEntry<Report>,
     policy?: OnyxEntry<Policy>,
@@ -5705,6 +5706,7 @@ function getReportName(
     isReportArchived?: boolean,
     reports?: Report[],
     policies?: Policy[],
+    conciergeReportID?: string,
 ): string {
     // Check if we can use report name in derived values - only when we have report but no other params
     const canUseDerivedValue =
@@ -5879,7 +5881,7 @@ function getReportName(
         });
     }
 
-    if (isConciergeChatReport(report)) {
+    if (isConciergeChatReport(report, conciergeReportID)) {
         formattedName = CONST.CONCIERGE_DISPLAY_NAME;
     }
 
