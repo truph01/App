@@ -54,7 +54,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
     it('should redirect when user has been added to nudge migration and modal not dismissed', async () => {
         await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
             nudgeMigration: {
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 cohort: 'test',
             },
         });
@@ -70,12 +70,15 @@ describe('MigratedUserWelcomeModalGuard', () => {
     it('should allow when modal has been dismissed', async () => {
         await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
             nudgeMigration: {
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 cohort: 'test',
             },
         });
         await Onyx.merge(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {
-            migratedUserWelcomeModal: new Date().toISOString(),
+            migratedUserWelcomeModal: {
+                timestamp: new Date().toISOString(),
+                dismissedMethod: 'click',
+            },
         });
         await waitForBatchedUpdates();
 
@@ -86,7 +89,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
     it('should not redirect multiple times in the same session', async () => {
         await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
             nudgeMigration: {
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 cohort: 'test',
             },
         });
@@ -102,7 +105,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
     it('should allow when already on the migrated user welcome modal screen', async () => {
         await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
             nudgeMigration: {
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 cohort: 'test',
             },
         });
@@ -112,7 +115,12 @@ describe('MigratedUserWelcomeModalGuard', () => {
             key: 'root',
             index: 0,
             routeNames: [SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT],
-            routes: [{key: 'migratedUserModal', name: SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT}],
+            routes: [
+                {
+                    key: 'migratedUserModal',
+                    name: SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT,
+                },
+            ],
             stale: false,
             type: 'root',
         };
@@ -124,7 +132,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
     it('should allow when RESET action targets the migrated user welcome modal screen', async () => {
         await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
             nudgeMigration: {
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 cohort: 'test',
             },
         });
@@ -136,7 +144,12 @@ describe('MigratedUserWelcomeModalGuard', () => {
                 key: 'root',
                 index: 0,
                 routeNames: [SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT],
-                routes: [{key: 'migratedUserModal', name: SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT}],
+                routes: [
+                    {
+                        key: 'migratedUserModal',
+                        name: SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT,
+                    },
+                ],
                 stale: false,
                 type: 'root',
             },
@@ -149,7 +162,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
     it('should reset session flag when modal is dismissed via Onyx', async () => {
         await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
             nudgeMigration: {
-                timestamp: new Date().toISOString(),
+                timestamp: new Date(),
                 cohort: 'test',
             },
         });
@@ -165,7 +178,10 @@ describe('MigratedUserWelcomeModalGuard', () => {
 
         // Dismiss the modal via Onyx — this resets the session flag
         await Onyx.merge(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {
-            migratedUserWelcomeModal: new Date().toISOString(),
+            migratedUserWelcomeModal: {
+                timestamp: new Date().toISOString(),
+                dismissedMethod: 'click',
+            },
         });
         await waitForBatchedUpdates();
 
@@ -181,7 +197,10 @@ describe('MigratedUserWelcomeModalGuard', () => {
             routeNames: [SCREENS.HOME, NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR],
             routes: [
                 {key: 'home', name: SCREENS.HOME},
-                {key: 'migratedUserModal', name: NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR},
+                {
+                    key: 'migratedUserModal',
+                    name: NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR,
+                },
             ],
             stale: false,
             type: 'stack',
@@ -203,7 +222,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
         it('should block tab switches when the migrated user modal is on top', async () => {
             await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
                 nudgeMigration: {
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     cohort: 'test',
                 },
             });
@@ -219,7 +238,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
         it('should allow DISMISS_MODAL when the migrated user modal is on top', async () => {
             await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
                 nudgeMigration: {
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     cohort: 'test',
                 },
             });
@@ -235,7 +254,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
         it('should allow GO_BACK when the migrated user modal is on top', async () => {
             await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
                 nudgeMigration: {
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     cohort: 'test',
                 },
             });
@@ -251,7 +270,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
         it('should not block when the modal has been dismissed', async () => {
             await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
                 nudgeMigration: {
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     cohort: 'test',
                 },
             });
@@ -262,7 +281,10 @@ describe('MigratedUserWelcomeModalGuard', () => {
 
             // Dismiss the modal
             await Onyx.merge(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {
-                migratedUserWelcomeModal: new Date().toISOString(),
+                migratedUserWelcomeModal: {
+                    timestamp: new Date().toISOString(),
+                    dismissedMethod: 'click',
+                },
             });
             await waitForBatchedUpdates();
 
@@ -273,7 +295,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
         it('should not block when the modal navigator is NOT the last route', async () => {
             await Onyx.merge(ONYXKEYS.NVP_TRY_NEW_DOT, {
                 nudgeMigration: {
-                    timestamp: new Date().toISOString(),
+                    timestamp: new Date(),
                     cohort: 'test',
                 },
             });
@@ -288,7 +310,10 @@ describe('MigratedUserWelcomeModalGuard', () => {
                 index: 1,
                 routeNames: [NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR, SCREENS.HOME],
                 routes: [
-                    {key: 'migratedUserModal', name: NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR},
+                    {
+                        key: 'migratedUserModal',
+                        name: NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR,
+                    },
                     {key: 'home', name: SCREENS.HOME},
                 ],
                 stale: false,
