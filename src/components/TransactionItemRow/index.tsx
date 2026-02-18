@@ -83,6 +83,9 @@ type TransactionWithOptionalSearchFields = TransactionWithOptionalHighlight & {
     /** formatted "merchant" value used for displaying and sorting on Reports page */
     formattedMerchant?: string;
 
+    /** Whether the card feed has been deleted */
+    isCardFeedDeleted?: boolean;
+
     /** information about whether to show merchant, that is provided on Reports page */
     shouldShowMerchant?: boolean;
 
@@ -135,6 +138,7 @@ type TransactionItemRowProps = {
     shouldShowArrowRightOnNarrowLayout?: boolean;
     customCardNames?: Record<number, string>;
     reportActions?: ReportAction[];
+    checkboxSentryLabel?: string;
 };
 
 function getMerchantName(transactionItem: TransactionWithOptionalSearchFields, translate: (key: TranslationPaths) => string) {
@@ -183,6 +187,7 @@ function TransactionItemRow({
     shouldShowArrowRightOnNarrowLayout,
     customCardNames,
     reportActions,
+    checkboxSentryLabel,
 }: TransactionItemRowProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -250,6 +255,9 @@ function TransactionItemRow({
     const exchangeRateMessage = getExchangeRate(transactionItem);
 
     const cardName = useMemo(() => {
+        if (transactionItem.isCardFeedDeleted) {
+            return translate('workspace.companyCards.deletedFeed');
+        }
         if (transactionItem.cardName === CONST.EXPENSE.TYPE.CASH_CARD_NAME) {
             return '';
         }
@@ -258,7 +266,7 @@ function TransactionItemRow({
             return customCardNames[cardID];
         }
         return transactionItem.cardName;
-    }, [transactionItem.cardID, transactionItem.cardName, customCardNames]);
+    }, [transactionItem.cardID, transactionItem.cardName, transactionItem.isCardFeedDeleted, customCardNames, translate]);
 
     const columnComponent = useMemo(
         () => ({
@@ -403,6 +411,7 @@ function TransactionItemRow({
                             policyID={report?.policyID}
                             hash={transactionItem?.hash}
                             amount={report?.total}
+                            shouldDisablePointerEvents={isDisabled}
                         />
                     )}
                 </View>
@@ -596,6 +605,7 @@ function TransactionItemRow({
             isReportItemChild,
             onButtonPress,
             isActionLoading,
+            isDisabled,
             merchant,
             description,
             cardName,
@@ -630,6 +640,7 @@ function TransactionItemRow({
                                 isChecked={isSelected}
                                 style={styles.mr3}
                                 wrapperStyle={styles.justifyContentCenter}
+                                sentryLabel={checkboxSentryLabel}
                             />
                         )}
                         <ReceiptCell
@@ -758,6 +769,7 @@ function TransactionItemRow({
                             isChecked={isSelected}
                             style={styles.mr1}
                             wrapperStyle={styles.justifyContentCenter}
+                            sentryLabel={checkboxSentryLabel}
                         />
                     )}
                     {columns?.map((column) => columnComponent[column as keyof typeof columnComponent]).filter(Boolean)}
@@ -774,10 +786,12 @@ function TransactionItemRow({
                     )}
                     {!!isLargeScreenWidth && !!onArrowRightPress && (
                         <PressableWithFeedback
+                            disabled={!!isDisabled}
                             onPress={() => onArrowRightPress?.()}
                             style={[styles.p3Half, styles.pl0half, styles.pr0half, styles.justifyContentCenter, styles.alignItemsEnd]}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={CONST.ROLE.BUTTON}
+                            sentryLabel="TransactionItemRow-ArrowRight"
                         >
                             <Icon
                                 src={expensicons.ArrowRight}
