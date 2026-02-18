@@ -15,9 +15,7 @@ import {transformSync} from '@babel/core';
 
 // Rules that are unnecessary when React Compiler successfully compiles all
 // functions in a file. Add more rules here as needed.
-const RULES_SUPPRESSED_BY_REACT_COMPILER = new Set([
-    'react/jsx-no-constructed-context-values',
-]);
+const RULES_SUPPRESSED_BY_REACT_COMPILER = new Set(['react/jsx-no-constructed-context-values']);
 
 // Mirror the compiler config from babel.config.js (excluding `sources`,
 // which is only relevant for the Babel build pipeline, not for our analysis).
