@@ -236,6 +236,11 @@ type TodosDerivedValue = {
     transactionsByReportID: Record<string, Transaction[]>;
 };
 
+/**
+ * The derived value for merged personal and workspace card feeds.
+ */
+type PersonalAndWorkspaceCardListDerivedValue = CardList;
+
 export default ReportAttributesDerivedValue;
 export type {
     ReportAttributes,
@@ -244,6 +249,7 @@ export type {
     ReportTransactionsAndViolations,
     OutstandingReportsByPolicyIDDerivedValue,
     NonPersonalAndWorkspaceCardListDerivedValue,
+    PersonalAndWorkspaceCardListDerivedValue,
     CardFeedErrorsDerivedValue,
     TodosDerivedValue,
     TodoMetadata,
