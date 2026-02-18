@@ -12,6 +12,7 @@
  * 3. If any function fails to compile, preserve all lint messages as-is
  */
 import {transformSync} from '@babel/core';
+import _ from 'lodash';
 
 // Rules that are unnecessary when React Compiler successfully compiles all
 // functions in a file. Add more rules here as needed.
@@ -108,7 +109,7 @@ const plugin = {
                 compilationResults.delete(filename);
 
                 if (allCompiled) {
-                    return messages[0].filter((msg) => !RULES_SUPPRESSED_BY_REACT_COMPILER.has(msg.ruleId));
+                    return _.filter(messages[0], msg => !RULES_SUPPRESSED_BY_REACT_COMPILER.has(msg.ruleId));
                 }
 
                 return messages[0];
