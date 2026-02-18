@@ -2252,6 +2252,10 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount} voor ${merchant} - ${date}`,
         },
         freezeCard: 'Kaart blokkeren',
+        unfreeze: 'Deblokkeren',
+        unfreezeCard: 'Kaart deblokkeren',
+        freezeDescription: 'Een geblokkeerde kaart kan niet worden gebruikt voor aankopen en transacties. Je kunt deze op elk moment deblokkeren.',
+        unfreezeDescription: 'Door deze kaart te deblokkeren worden aankopen en transacties weer toegestaan. Ga alleen verder als je zeker weet dat de kaart veilig is om te gebruiken.',
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',

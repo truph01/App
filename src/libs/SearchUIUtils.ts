@@ -2346,6 +2346,45 @@ function getCardSections(
 function getWithdrawalIDSections(data: OnyxTypes.SearchResults['data'], queryJSON: SearchQueryJSON | undefined): [TransactionWithdrawalIDGroupListItemType[], number] {
     const withdrawalIDSections: Record<string, TransactionWithdrawalIDGroupListItemType> = {};
 
+    // TODO: REMOVE before merging – dev-only mock for visual testing of settlement status badges
+    if (!Object.keys(data).some((k) => isGroupEntry(k))) {
+        const mockGroups: Record<string, SearchWithdrawalIDGroup> = {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1001: {entryID: 1001, accountNumber: '1234567890', bankName: CONST.BANK_NAMES.EXPENSIFY, debitPosted: '2025-01-15', count: 5, currency: 'USD', total: -50000, state: 2},
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1002: {entryID: 1002, accountNumber: '9876543210', bankName: CONST.BANK_NAMES.CHASE, debitPosted: '2025-01-10', count: 3, currency: 'USD', total: -75000, state: 8},
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1003: {
+                entryID: 1003,
+                accountNumber: '5555666677',
+                bankName: CONST.BANK_NAMES.BANK_OF_AMERICA,
+                debitPosted: '2025-01-05',
+                count: 2,
+                currency: 'USD',
+                total: -30000,
+                state: 5,
+            },
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1004: {entryID: 1004, accountNumber: '1111222233', bankName: CONST.BANK_NAMES.CITIBANK, debitPosted: '2025-01-20', count: 8, currency: 'USD', total: -120000, state: 2},
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1005: {entryID: 1005, accountNumber: '4444555566', bankName: CONST.BANK_NAMES.CHASE, debitPosted: '2025-01-18', count: 1, currency: 'USD', total: -15000, state: 6},
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1006: {entryID: 1006, accountNumber: '7777888899', bankName: CONST.BANK_NAMES.EXPENSIFY, debitPosted: '2025-01-12', count: 4, currency: 'USD', total: -95000, state: 8},
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            group_1007: {
+                entryID: 1007,
+                accountNumber: '3333444455',
+                bankName: CONST.BANK_NAMES.BANK_OF_AMERICA,
+                debitPosted: '2025-01-08',
+                count: 6,
+                currency: 'USD',
+                total: -200000,
+                state: 7,
+            },
+        };
+        Object.assign(data, mockGroups);
+    }
+
     for (const key in data) {
         if (isGroupEntry(key)) {
             const withdrawalIDGroup = data[key] as SearchWithdrawalIDGroup;

@@ -2256,6 +2256,11 @@ const translations: TranslationDeepObject<typeof en> = {
 ${amount} für ${merchant} – ${date}`,
         },
         freezeCard: 'Karte sperren',
+        unfreeze: 'Entsperren',
+        unfreezeCard: 'Karte entsperren',
+        freezeDescription: 'Eine gesperrte Karte kann nicht für Käufe und Transaktionen verwendet werden. Du kannst sie jederzeit entsperren.',
+        unfreezeDescription:
+            'Durch das Entsperren dieser Karte werden Käufe und Transaktionen wieder zugelassen. Fahre nur fort, wenn du sicher bist, dass die Karte sicher verwendet werden kann.',
     },
     workflowsPage: {
         workflowTitle: 'Ausgaben',
