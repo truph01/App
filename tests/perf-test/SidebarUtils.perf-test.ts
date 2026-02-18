@@ -82,6 +82,7 @@ describe('SidebarUtils', () => {
                 reportNameValuePairs,
                 personalDetails,
                 policy,
+                invoiceReceiverPolicy: undefined,
                 parentReportAction,
                 conciergeReportID: '',
                 oneTransactionThreadReport: undefined,
