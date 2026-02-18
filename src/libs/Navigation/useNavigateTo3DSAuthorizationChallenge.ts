@@ -1,14 +1,14 @@
-import useOnyx from "@hooks/useOnyx";
-import { refreshTransactionsPending3DSReview } from "@libs/actions/MultifactorAuthentication";
-import ONYXKEYS from "@src/ONYXKEYS";
-import CONST from "@src/CONST";
-import type { TransactionsPending3DSReview } from "@src/types/onyx";
-import { useEffect } from "react";
-import type { OnyxEntry } from "react-native-onyx";
-import ROUTES from "@src/ROUTES";
-import useNativeBiometrics from "@components/MultifactorAuthentication/Context/useNativeBiometrics";
-import AuthorizeTransaction from "@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction";
-import Navigation from "./Navigation";
+import useOnyx from '@hooks/useOnyx';
+import {refreshTransactionsPending3DSReview} from '@libs/actions/MultifactorAuthentication';
+import ONYXKEYS from '@src/ONYXKEYS';
+import CONST from '@src/CONST';
+import type {TransactionsPending3DSReview} from '@src/types/onyx';
+import {useEffect} from 'react';
+import type {OnyxEntry} from 'react-native-onyx';
+import ROUTES from '@src/ROUTES';
+import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
+import AuthorizeTransaction from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
+import Navigation from './Navigation';
 
 function getMostUrgentTransactionPendingReview(transactions: OnyxEntry<TransactionsPending3DSReview>) {
     return transactions
@@ -31,7 +31,7 @@ function getMostUrgentTransactionPendingReview(transactions: OnyxEntry<Transacti
 function useNavigateTo3DSAuthorizationChallenge() {
     const [transactionPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true, selector: getMostUrgentTransactionPendingReview});
 
-    const { doesDeviceSupportBiometrics } = useNativeBiometrics();
+    const {doesDeviceSupportBiometrics} = useNativeBiometrics();
 
     // TODO MFA:
     // 1. [x] Listen for the TRANSACTIONS_PENDING_3DS_REVIEW Onyx Key changes
@@ -45,15 +45,15 @@ function useNavigateTo3DSAuthorizationChallenge() {
         }
 
         const {allowedAuthenticationMethods} = AuthorizeTransaction;
-        const doesDeviceSupportAnAllowedAuthenticationMethod = allowedAuthenticationMethods.some(method => {
-            switch(method) {
+        const doesDeviceSupportAnAllowedAuthenticationMethod = allowedAuthenticationMethods.some((method) => {
+            switch (method) {
                 case CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS:
-                    return doesDeviceSupportBiometrics()
+                    return doesDeviceSupportBiometrics();
                 // TODO expand when we support passkeys
                 default:
                     return false;
             }
-        })
+        });
 
         if (!doesDeviceSupportAnAllowedAuthenticationMethod) {
             return;
