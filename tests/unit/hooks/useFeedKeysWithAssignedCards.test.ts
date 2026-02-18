@@ -30,10 +30,9 @@ describe('useFeedKeysWithAssignedCards', () => {
 
     it('should return a feed key when a feed has an assigned card', async () => {
         const card = createRandomExpensifyCard(1, {state: CONST.EXPENSIFY_CARD.STATE.OPEN});
-        const workspaceCardsKey = `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}12345_${CONST.EXPENSIFY_CARD.BANK}`;
         const workspaceCards: WorkspaceCardsList = {'1': card};
 
-        await Onyx.set(workspaceCardsKey, workspaceCards);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}12345_${CONST.EXPENSIFY_CARD.BANK}`, workspaceCards);
         await waitForBatchedUpdates();
 
         const {result} = renderHook(() => useFeedKeysWithAssignedCards());
