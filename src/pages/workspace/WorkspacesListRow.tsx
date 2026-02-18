@@ -10,7 +10,6 @@ import Badge from '@components/Badge';
 import Icon from '@components/Icon';
 import * as Expensicons from '@components/Icon/Expensicons';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
-import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
 import ThreeDotsMenu from '@components/ThreeDotsMenu';
@@ -21,6 +20,7 @@ import WorkspacesListRowDisplayName from '@components/WorkspacesListRowDisplayNa
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getDisplayNameOrDefault, getPersonalDetailsByIDs} from '@libs/PersonalDetailsUtils';
@@ -85,9 +85,6 @@ type WorkspacesListRowProps = WithCurrentUserPersonalDetailsProps & {
 
     /** Whether the list item is hovered */
     isHovered?: boolean;
-
-    /** Callback when the row is pressed */
-    onPress?: () => void;
 };
 
 type BrickRoadIndicatorIconProps = {
@@ -125,10 +122,10 @@ function WorkspacesListRow({
     isLoadingBill,
     resetLoadingSpinnerIconIndex,
     isHovered,
-    onPress,
 }: WorkspacesListRowProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const theme = useTheme();
     const isFocused = useIsFocused();
     const isNarrow = layoutWidth === CONST.LAYOUT_WIDTH.NARROW;
@@ -181,7 +178,7 @@ function WorkspacesListRow({
     const isDeleted = style && Array.isArray(style) ? style.includes(styles.offlineFeedbackDeleted) : false;
 
     const ThreeDotMenuOrPendingIcon = (
-        <View style={[styles.flexRow, !isNarrow && styles.workspaceThreeDotMenu]}>
+        <View style={[styles.flexRow, !shouldUseNarrowLayout && styles.workspaceThreeDotMenu]}>
             {!!isJoinRequestPending && (
                 <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, styles.justifyContentEnd]}>
                     <Badge
@@ -227,29 +224,10 @@ function WorkspacesListRow({
         </View>
     );
 
-    const ownerName = ownerDetails ? getDisplayNameOrDefault(ownerDetails) : '';
-    const workspaceTypeName = workspaceType ? getUserFriendlyWorkspaceType(workspaceType, translate) : '';
-    const accessibilityLabel = [
-        `${translate('workspace.common.workspaceName')}: ${title}`,
-        isDefault ? translate('common.default') : '',
-        isJoinRequestPending ? translate('workspace.common.requested') : '',
-        ownerName ? `${translate('workspace.common.workspaceOwner')}: ${ownerName}` : '',
-        workspaceTypeName ? `${translate('workspace.common.workspaceType')}: ${workspaceTypeName}` : '',
-    ]
-        .filter(Boolean)
-        .join(', ');
-
     return (
         <View style={[styles.flexRow, styles.highlightBG, rowStyles, style, styles.br3]}>
             <Animated.View style={[styles.flex1, styles.flexRow, styles.bgTransparent, isWide && styles.gap5, styles.p5, styles.pr3, animatedHighlightStyle]}>
-                <PressableWithoutFeedback
-                    accessible
-                    accessibilityLabel={accessibilityLabel}
-                    role={CONST.ROLE.BUTTON}
-                    onPress={onPress}
-                    style={[isWide ? styles.flexRow : styles.flexColumn, styles.flex1, isWide && styles.gap5]}
-                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_ROW}
-                >
+                <View style={[isWide ? styles.flexRow : styles.flexColumn, styles.flex1, isWide && styles.gap5]}>
                     <View style={[styles.flexRow, styles.justifyContentBetween, styles.flex2, isNarrow && styles.mb3, styles.alignItemsCenter]}>
                         <View style={[styles.flexRow, styles.gap3, styles.flex1, styles.alignItemsCenter]}>
                             <Avatar
@@ -282,7 +260,7 @@ function WorkspacesListRow({
                                 <View style={styles.flex1}>
                                     <WorkspacesListRowDisplayName
                                         isDeleted={isDeleted}
-                                        ownerName={ownerName}
+                                        ownerName={getDisplayNameOrDefault(ownerDetails)}
                                     />
                                     <Text
                                         numberOfLines={1}
@@ -307,7 +285,7 @@ function WorkspacesListRow({
                                     numberOfLines={1}
                                     style={[styles.labelStrong, isDeleted ? styles.offlineFeedbackDeleted : {}]}
                                 >
-                                    {workspaceTypeName}
+                                    {getUserFriendlyWorkspaceType(workspaceType, translate)}
                                 </Text>
                             )}
                             <Text
@@ -318,17 +296,12 @@ function WorkspacesListRow({
                             </Text>
                         </View>
                     </View>
-                </PressableWithoutFeedback>
+                </View>
 
                 <View style={[styles.flexRow, styles.alignItemsCenter]}>
                     {!isNarrow && ThreeDotMenuOrPendingIcon}
                     {!isNarrow && (
-                        <PressableWithoutFeedback
-                            onPress={onPress}
-                            style={[styles.justifyContentCenter, styles.alignItemsCenter, styles.touchableButtonImage]}
-                            accessible={false}
-                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_ROW_ARROW}
-                        >
+                        <View style={[styles.justifyContentCenter, styles.alignItemsCenter, styles.touchableButtonImage]}>
                             <Icon
                                 src={icons.ArrowRight}
                                 fill={theme.icon}
@@ -336,7 +309,7 @@ function WorkspacesListRow({
                                 isButtonIcon
                                 medium
                             />
-                        </PressableWithoutFeedback>
+                        </View>
                     )}
                 </View>
             </Animated.View>
