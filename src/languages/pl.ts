@@ -396,6 +396,7 @@ const translations: TranslationDeepObject<typeof en> = {
         member: 'Członek',
         auditor: 'Audytor',
         role: 'Rola',
+        roleCannotBeChanged: (workflowsLinkPage: string) => `Nie można zmienić roli, ponieważ ten członek jest <a href="${workflowsLinkPage}">płatnikiem</a> w tym obszarze roboczym.`,
         currency: 'Waluta',
         groupCurrency: 'Waluta grupy',
         rate: 'Oceń',
