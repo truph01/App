@@ -96,7 +96,6 @@ export default {
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
     action: authorizeTransaction,
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION,
-    failureHeaderTitle: 'multifactorAuthentication.reviewTransaction.reviewTransaction',
     successScreen: (
         <DefaultSuccessScreen
             headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"

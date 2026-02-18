@@ -41,6 +41,7 @@ const REASON = {
         ALREADY_DENIED_APPROVE_ATTEMPTED: 'Already denied, approve attempted',
         ALREADY_REVIEWED: 'Transaction already reviewed',
         TRANSACTION_APPROVED: 'Transaction approved successfully',
+        TRANSACTION_DENIED: 'Transaction denied successfully',
     },
     CHALLENGE: {
         CHALLENGE_MISSING: 'Challenge is missing',
@@ -144,6 +145,7 @@ const API_RESPONSE_MAP = {
     // CHUCK WIP
     DENY_TRANSACTION: {
         ...MULTIFACTOR_AUTHENTICATION_COMMAND_BASE_RESPONSE_MAP,
+        200: REASON.BACKEND.TRANSACTION_DENIED,
     },
 } as const;
 /* eslint-enable @typescript-eslint/naming-convention */
