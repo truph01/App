@@ -1,5 +1,5 @@
 import type {ForwardedRef, RefObject} from 'react';
-import type {BlurEvent, StyleProp, View, ViewStyle} from 'react-native';
+import type {BlurEvent, StyleProp, TextInputProps, View, ViewStyle} from 'react-native';
 import type {Place} from 'react-native-google-places-autocomplete';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
 import type {Country} from '@src/CONST';
@@ -78,7 +78,7 @@ type AddressSearchProps = ForwardedFSClassProps & {
     renamedInputKeys?: Record<string, string>;
 
     /** Auto complete attribute for the input field */
-    autoComplete?: string;
+    autoComplete?: TextInputProps['autoComplete'];
 
     /** Maximum number of characters allowed in search input */
     maxInputLength?: number;
