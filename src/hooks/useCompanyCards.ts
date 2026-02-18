@@ -97,12 +97,11 @@ function buildCompanyCardEntries(accountList: string[] | undefined, cardList: As
         }
 
         const resolved = resolveCardListEntry(card, cardListEntries);
-        const encryptedCardNumber = resolved.encryptedCardNumber ?? card.cardName;
-        const cardName = resolved.cardName ?? card.cardName;
+        const {cardName = card.cardName, encryptedCardNumber = card.cardName} = resolved;
 
         entries.push({cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
-        coveredNames.add(normalizeCardName(card.cardName));
-        if (encryptedCardNumber !== card.cardName) {
+        coveredNames.add(normalizeCardName(cardName));
+        if (encryptedCardNumber !== cardName) {
             coveredEncrypted.add(encryptedCardNumber);
         }
     }
