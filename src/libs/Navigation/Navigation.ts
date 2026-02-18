@@ -188,6 +188,10 @@ const closeRHPFlow = (ref = navigationRef) => originalCloseRHPFlow(ref);
 function closeSidePanelOnNarrowScreen(route: Route) {
     const isExtraLargeScreenWidth = Dimensions.get('window').width > variables.sidePanelResponsiveWidthBreakpoint;
 
+    if (!sidePanelNVP?.openNarrowScreen || isExtraLargeScreenWidth) {
+        return;
+    }
+
     // Split "r/:reportID/attachment/add" by ":reportID" to get the prefix "r/" and suffix "/attachment/add"
     const addAttachmentPrefix = ROUTES.REPORT_ADD_ATTACHMENT.route.split(':reportID').at(0) ?? '';
     const addAttachmentSuffix = ROUTES.REPORT_ADD_ATTACHMENT.route.split(':reportID').at(1) ?? '';
@@ -200,9 +204,6 @@ function closeSidePanelOnNarrowScreen(route: Route) {
         return;
     }
 
-    if (!sidePanelNVP?.openNarrowScreen || isExtraLargeScreenWidth) {
-        return;
-    }
     SidePanelActions.closeSidePanel(true);
 }
 
