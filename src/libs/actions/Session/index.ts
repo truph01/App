@@ -264,8 +264,8 @@ function callSAMLSignOut(params: LogOutParams, authToken: string): Promise<void 
             Log.hmmm('SAML sign out failed', {error});
         })
         .then((result) => {
-            if (result && result.type !== 'success'){
-                return Promise.reject("Logout cancelled");
+            if (result && result.type !== 'success') {
+                return Promise.reject(Error('Logout cancelled'));
             }
             // We always want to sign out the user from the app
             // eslint-disable-next-line rulesdir/no-api-side-effects-method
