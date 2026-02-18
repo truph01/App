@@ -4179,6 +4179,9 @@ ${
                     [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: '自掏腰包的报销在支付时会导出',
                 },
             },
+            travelInvoicing: '差旅开票',
+            travelInvoicingVendor: '旅行供应商',
+            travelInvoicingPayableAccount: '差旅应付账款账户',
         },
         workspaceList: {
             joinNow: '立即加入',
