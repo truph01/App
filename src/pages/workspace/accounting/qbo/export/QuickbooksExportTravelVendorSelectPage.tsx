@@ -13,8 +13,8 @@ import Navigation from '@navigation/Navigation';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import variables from '@styles/variables';
-import * as Policy from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
+import {clearQBOErrorField} from '@libs/actions/Policy/Policy';
 
 type CardListItem = ListItem & {
     value: string;
@@ -81,7 +81,7 @@ function QuickbooksExportTravelVendorSelectPage({policy}: WithPolicyConnectionsP
             pendingAction={settingsPendingAction([CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR], qboConfig?.pendingFields)}
             errors={getLatestErrorField(qboConfig, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR)}
             errorRowStyles={[styles.ph5, styles.pv3]}
-            onClose={() => Policy.clearQBOErrorField(policyID, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR)}
+            onClose={() => clearQBOErrorField(policyID, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR)}
         />
     );
 }

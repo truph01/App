@@ -43,7 +43,12 @@ function QuickbooksExportTravelPayableAccountSelectPage({policy}: WithPolicyConn
     const selectAccount = useCallback(
         (row: CardListItem) => {
             if (row.value.id !== qboConfig?.travelInvoicingPayableAccountID) {
-                updateConnectionConfig(policyID, CONST.POLICY.CONNECTIONS.NAME.QBO, {travelInvoicingPayableAccountID: row.value.id}, {travelInvoicingPayableAccountID: qboConfig?.travelInvoicingPayableAccountID});
+                updateConnectionConfig(
+                    policyID,
+                    CONST.POLICY.CONNECTIONS.NAME.QBO,
+                    {travelInvoicingPayableAccountID: row.value.id},
+                    {travelInvoicingPayableAccountID: qboConfig?.travelInvoicingPayableAccountID},
+                );
             }
             Navigation.goBack();
         },

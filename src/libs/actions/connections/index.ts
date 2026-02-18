@@ -12,7 +12,7 @@ import type {ConnectionName, Connections, PolicyConnectionName, PolicyConnection
 import type Policy from '@src/types/onyx/Policy';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
-export type ConnectionNameExceptNetSuite = Exclude<ConnectionName, typeof CONST.POLICY.CONNECTIONS.NAME.NETSUITE>;
+type ConnectionNameExceptNetSuite = Exclude<ConnectionName, typeof CONST.POLICY.CONNECTIONS.NAME.NETSUITE>;
 
 function removePolicyConnection(policy: Policy, connectionName: PolicyConnectionName) {
     const policyID = policy.id;
@@ -346,6 +346,8 @@ function isConnectionInProgress(connectionSyncProgress: OnyxEntry<PolicyConnecti
         (!!qboConnection && !qboConnection?.data && !!qboConnection?.config?.credentials)
     );
 }
+
+export type {ConnectionNameExceptNetSuite};
 
 export {
     removePolicyConnection,

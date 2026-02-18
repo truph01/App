@@ -4,9 +4,9 @@ import * as API from '@libs/API';
 import type {OpenPolicyAccountingPageParams} from '@libs/API/parameters';
 import {READ_COMMANDS} from '@libs/API/types';
 import ONYXKEYS from '@src/ONYXKEYS';
-import * as Connections from '@libs/actions/connections';
-import type {ConnectionNameExceptNetSuite} from '@libs/actions/connections';
-import * as Policy from '@src/types/onyx/Policy';
+import type * as Policy from '@src/types/onyx/Policy';
+import {updateManyPolicyConnectionConfigs} from './connections';
+import type {ConnectionNameExceptNetSuite} from './connections';
 
 function openPolicyAccountingPage(policyID: string) {
     const hasConnectionsDataBeenFetchedKey = `${ONYXKEYS.COLLECTION.POLICY_HAS_CONNECTIONS_DATA_BEEN_FETCHED}${policyID}` as const;
@@ -42,7 +42,7 @@ function updateConnectionConfig<TConnectionName extends ConnectionNameExceptNetS
     configUpdate: TConfigUpdate,
     configCurrentData: TConfigUpdate,
 ) {
-    Connections.updateManyPolicyConnectionConfigs(policyID, connectionName, configUpdate, configCurrentData);
+    updateManyPolicyConnectionConfigs(policyID, connectionName, configUpdate, configCurrentData);
 }
 
 export {openPolicyAccountingPage, updateConnectionConfig};

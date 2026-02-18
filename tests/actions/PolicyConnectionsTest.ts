@@ -1,9 +1,8 @@
-
 import Onyx from 'react-native-onyx';
-import * as Connections from '@libs/actions/connections';
-import * as PolicyConnections from '@libs/actions/PolicyConnections';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {updateConnectionConfig} from '@libs/actions/PolicyConnections';
+import {updateManyPolicyConnectionConfigs} from '@libs/actions/connections';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 jest.mock('@libs/actions/connections');
@@ -31,9 +30,9 @@ describe('actions/PolicyConnections', () => {
                 syncPeople: false,
             };
 
-            PolicyConnections.updateConnectionConfig(policyID, connectionName, configUpdate, configCurrentData);
+            updateConnectionConfig(policyID, connectionName, configUpdate, configCurrentData);
 
-            expect(Connections.updateManyPolicyConnectionConfigs).toHaveBeenCalledWith(policyID, connectionName, configUpdate, configCurrentData);
+            expect(updateManyPolicyConnectionConfigs).toHaveBeenCalledWith(policyID, connectionName, configUpdate, configCurrentData);
         });
     });
 });

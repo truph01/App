@@ -33,7 +33,6 @@ function QuickbooksExportConfigurationPage({policy}: WithPolicyConnectionsProps)
     const policyOwner = policy?.owner ?? '';
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
     const errorFields = qboConfig?.errorFields;
-    console.log('qboConfig', qboConfig);
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);
     const [cardSettings] = useOnyx(getTravelInvoicingCardSettingsKey(workspaceAccountID), {canBeMissing: true});
@@ -78,14 +77,16 @@ function QuickbooksExportConfigurationPage({policy}: WithPolicyConnectionsProps)
             title: qboConfig?.receivableAccount?.name,
             subscribedSettings: [CONST.QUICKBOOKS_CONFIG.RECEIVABLE_ACCOUNT],
         },
-        ...(isTravelInvoicingEnabled ? [{
-            description: translate('workspace.qbo.travelInvoicing'),
-            onPress: !policyID
-                ? undefined
-                : () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID)),
-            title: travelPayableAccount?.name,
-            subscribedSettings: [CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT],
-        }] : []),
+        ...(isTravelInvoicingEnabled
+            ? [
+                  {
+                      description: translate('workspace.qbo.travelInvoicing'),
+                      onPress: !policyID ? undefined : () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID)),
+                      title: travelPayableAccount?.name,
+                      subscribedSettings: [CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT],
+                  },
+              ]
+            : []),
         {
             description: translate('workspace.accounting.exportCompanyCard'),
             onPress: !policyID
