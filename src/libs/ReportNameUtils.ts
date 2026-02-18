@@ -745,7 +745,7 @@ function computeReportName(
     }
 
     if (report?.reportName && report.type === CONST.REPORT.TYPE.EXPENSE) {
-        return generateArchivedReportName(report?.reportName);
+        return report?.reportName;
     }
 
     if (isTaskReport(report)) {
