@@ -72,10 +72,26 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
         });
         return getSortedSections(type, status ?? '', searchData, localeCompare, translate, sortBy, sortOrder, groupBy).map((value) => value.reportID);
     }, [
-        type, status, sortBy, sortOrder, groupBy, searchResultsData, searchResultsSearch,
-        currentAccountID, currentUserEmail, translate, formatPhoneNumber, bankAccountList,
-        exportReportActions, searchKey, archivedReportsIdSet, isActionLoadingSet, cardFeeds,
-        allReportMetadata, cardList, localeCompare,
+        type,
+        status,
+        sortBy,
+        sortOrder,
+        groupBy,
+        searchResultsData,
+        searchResultsSearch,
+        currentAccountID,
+        currentUserEmail,
+        translate,
+        formatPhoneNumber,
+        bankAccountList,
+        exportReportActions,
+        searchKey,
+        archivedReportsIdSet,
+        isActionLoadingSet,
+        cardFeeds,
+        allReportMetadata,
+        cardList,
+        localeCompare,
     ]);
 
     const currentIndex = allReports.indexOf(reportID);
