@@ -191,8 +191,10 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
 
     // Include ALL workspace members in availableMembers so users can assign any member to a workflow.
     // Previously we only included members from workflows (or just the first workflow in ADVANCED mode),
-    // which excluded members in custom workflows (e.g., Alex/Hannah who submit to Carolyn) or those
-    // with missing submitsTo. See https://github.com/Expensify/Expensify/issues/598876
+    // which excluded: members in custom workflows, those with submitsTo/forwardsTo pointing to
+    // non-members (orphaned approval chains), or those with missing submitsTo. We include everyone
+    // regardless so admins can fix broken approval chains from the Expenses From picker.
+    // See https://github.com/Expensify/Expensify/issues/598876
     const availableMembers: Member[] = Object.values(employees)
         .filter((employee): employee is typeof employee & {email: string} => !!employee.email && employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
         .map((employee) => buildMemberFromEmployee(employee, personalDetailsByEmail))
