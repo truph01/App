@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import Onyx from 'react-native-onyx';
 import type {OnyxKey} from 'react-native-onyx';
 import type {SetRequired} from 'type-fest';
@@ -74,7 +75,18 @@ function prepareRequest<TCommand extends ApiCommand, TKey extends OnyxKey>(
 
     if (optimisticData && shouldApplyOptimisticData) {
         Log.info('[API] Applying optimistic data', false, {command, type});
-        Onyx.update(optimisticData);
+        const span = Sentry.startInactiveSpan({
+            name: CONST.TELEMETRY.SPAN_APPLY_OPTIMISTIC_DATA,
+            op: CONST.TELEMETRY.SPAN_APPLY_OPTIMISTIC_DATA,
+            attributes: {
+                [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: command,
+                [CONST.TELEMETRY.ATTRIBUTE_ONYX_UPDATES_COUNT]: optimisticData.length,
+            },
+        });
+        Onyx.update(optimisticData).then(() => {
+            span.setStatus({code: 1});
+            span.end();
+        });
     }
 
     const isWriteRequest = type === CONST.API_REQUEST_TYPE.WRITE;
