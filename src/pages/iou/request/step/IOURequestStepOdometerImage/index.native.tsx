@@ -43,6 +43,7 @@ import type SCREENS from '@src/SCREENS';
 import type {FileObject} from '@src/types/utils/Attachment';
 import useOnyx from '@hooks/useOnyx';
 import { getEmptyObject } from '@src/types/utils/EmptyObject';
+import {useFullScreenLoaderActions, useFullScreenLoaderState} from '@components/FullScreenLoaderContext';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
@@ -56,6 +57,11 @@ function IOURequestStepOdometerImage({
     const theme = useTheme();
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'boltSlash']);
     const lazyIllustrationsOnly = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
+
+    const {isLoaderVisible} = useFullScreenLoaderState();
+    const {setIsLoaderVisible} = useFullScreenLoaderActions();
+    const [isAttachmentPickerActive, setIsAttachmentPickerActive] = useState(false);
+
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
     const [flash, setFlash] = useState(false);
     const [hasFlash, setHasFlash] = useState(false);
@@ -139,7 +145,7 @@ function IOURequestStepOdometerImage({
             const refreshCameraPermissionStatus = () => {
                 CameraPermission?.getCameraPermissionStatus?.()
                     .then(setCameraPermissionStatus)
-                    .catch(() => setCameraPermissionStatus(null));
+                    .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
             };
 
             refreshCameraPermissionStatus();
@@ -155,8 +161,12 @@ function IOURequestStepOdometerImage({
 
             return () => {
                 subscription.remove();
+
+                if (isLoaderVisible) {
+                    setIsLoaderVisible(false);
+                }
             };
-        }, []),
+        }, [isLoaderVisible, setIsLoaderVisible]),
     );
 
     useEffect(() => {
@@ -299,6 +309,7 @@ function IOURequestStepOdometerImage({
                                     photo
                                     cameraTabIndex={1}
                                     onLayout={(e) => (viewfinderLayout.current = e.nativeEvent.layout)}
+                                    forceInactive={isAttachmentPickerActive}
                                 />
                                 <View style={[styles.flashButtonContainer, styles.primaryMediumIcon, flash && styles.bgGreenSuccess, !hasFlash && styles.opacity0]}>
                                     <PressableWithFeedback
@@ -326,7 +337,10 @@ function IOURequestStepOdometerImage({
                 )}
                 <View style={[styles.flexRow, styles.justifyContentAround, styles.alignItemsCenter, styles.pv3]}>
                     <AttachmentPicker
-                        onOpenPicker={() => {}}
+                        onOpenPicker={() => {
+                            setIsAttachmentPickerActive(true);
+                            setIsLoaderVisible(true);
+                        }}
                         fileLimit={1}
                         shouldValidateImage={false}
                     >
@@ -338,8 +352,12 @@ function IOURequestStepOdometerImage({
                                 onPress={() => {
                                     openPicker({
                                         onPicked: (data) => validateFiles(data),
-                                        onCanceled: () => {},
-                                        onClosed: () => {},
+                                        onCanceled: () => setIsLoaderVisible(false),
+                                        // makes sure the loader is not visible anymore e.g. when there is an error while uploading a file
+                                        onClosed: () => {
+                                            setIsAttachmentPickerActive(false);
+                                            setIsLoaderVisible(false);
+                                        },
                                     });
                                 }}
                             >
