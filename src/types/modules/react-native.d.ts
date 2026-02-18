@@ -10,9 +10,6 @@ type AppStateTrackerModule = {
     getWasAppRelaunchedFromIcon: () => Promise<boolean>;
 };
 
-type AppStartTimeModule = {
-    APP_START_TIME: number;
-};
 
 type RNTextInputResetModule = {
     resetKeyboardInput: (nativeId: string) => void;
@@ -58,7 +55,6 @@ declare module 'react-native' {
     }
 
     interface NativeModulesStatic {
-        AppStartTime: AppStartTimeModule;
         AppStateTracker: AppStateTrackerModule;
         BootSplash: BootSplashModule;
         RNTextInputReset: RNTextInputResetModule;
