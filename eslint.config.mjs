@@ -621,6 +621,7 @@ const config = defineConfig([
         'Mobile-Expensify/**/*',
         '**/vendor',
         'modules/group-ib-fp/**/*',
+        'eslint-plugin-react-compiler-compat/**/*',
         'web/snippets/gib.js',
         // Generated language files - excluded from ESLint but still type-checked
         'src/languages/de.ts',
