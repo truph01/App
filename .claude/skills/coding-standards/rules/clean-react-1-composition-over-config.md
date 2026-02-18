@@ -450,12 +450,14 @@ Flag when ANY of these are true:
 - Each render function corresponds to an area that could be a compound component child instead
 - The component manages fallback logic between the render function and a default prop (e.g., `renderTitle ? renderTitle() : <Text>{title}</Text>`)
 
-In all cases, the rule applies to: **new components**, **new features added to existing components**, and **refactorings that create new components still following configuration patterns**
+In all cases, the rule applies to: **new components**, **new features added to existing components**, **refactorings that create new components still following configuration patterns**, and **new consumers of existing config-heavy components**.
+
+**Consumer vs. Creator:** New code that consumes a component with a known configuration-heavy API (many props controlling what/how to render) SHOULD be flagged. Each new consumer cements the config pattern and makes future refactoring harder. The fix is to advocate for a compositional wrapper or refactor — not to silently adopt the old pattern. Flag new consumers at the same severity as the component creator.
 
 **DO NOT flag if:**
 - Props are domain identifiers used for data fetching (e.g., `reportID`, `policyID`, `transactionID`)
 - Props are event handlers for abstract actions (e.g., `onPress`, `onChange`, `onSelectRow`)
-- Props are structural/presentational (e.g., `style`, `testID`) — this includes booleans that select between layout or styling strategies on a focused component (e.g., `shouldUseAspectRatio` toggling between fixed-height and aspect-ratio styles)
+- Props are **purely presentational** (e.g., `style`, `testID`, `numberOfLines`, `fill`, `iconFill`). A prop is presentational ONLY if removing it would change appearance but NOT structure, content, or layout strategy. Props that select between rendering strategies (e.g., `shouldUseAspectRatio` toggling layout modes, `shouldShowX` toggling element visibility) or control which content appears are NOT presentational — they are behavioral flags (Case 1).
 - The component already uses composition and child components for features
 - The optional prop is used for logic beyond just conditional rendering (e.g., computing derived values, passed to callbacks, used in multiple places within the component)
 - The component is a thin wrapper around a platform primitive (e.g., wrapping `TextInput`, `ScrollView`, `Pressable`) — these naturally pass through configuration props
