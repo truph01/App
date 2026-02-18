@@ -103,7 +103,8 @@ async function run() {
                 continue;
             }
             const isAuthorBot =
-                previousProposal.user?.login === CONST.COMMENT.NAME_MELVIN ||
+                previousProposal.user?.login === CONST.COMMENT.NAME_MELVIN_A ||
+                previousProposal.user?.login === CONST.COMMENT.NAME_MELVIN_B ||
                 previousProposal.user?.login === CONST.COMMENT.NAME_CODEX ||
                 previousProposal.user?.login === CONST.COMMENT.NAME_GITHUB_ACTIONS ||
                 previousProposal.user?.type === CONST.COMMENT.TYPE_BOT;
