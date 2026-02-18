@@ -45,10 +45,52 @@ const DeniedTransactionServerFailureScreen = createScreenWithDefaults(
         headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
         subtitle: 'multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompletedReachOut',
     },
-    'DeniedTransactionFailureScreen',
+    'DeniedTransactionServerFailureScreen',
 );
 
-export {DeniedTransactionServerFailureScreen, DeniedTransactionClientFailureScreen, DefaultTransactionReviewClientFailureScreen};
+const ApprovedTransactionSuccessScreen = createScreenWithDefaults(
+    DefaultSuccessScreen,
+    {
+        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionApproved',
+        illustration: 'ApprovedTransactionHand',
+        iconWidth: variables.transactionHandWidth,
+        iconHeight: variables.transactionHandHeight,
+        title: 'multifactorAuthentication.reviewTransaction.transactionApproved',
+        subtitle: 'multifactorAuthentication.reviewTransaction.goBackToTheMerchant',
+    },
+    'ApprovedTransactionSuccessScreen',
+);
+
+const DeniedTransactionSuccessScreen = createScreenWithDefaults(
+    DefaultSuccessScreen,
+    {
+        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionDenied',
+        illustration: 'DeniedTransactionHand',
+        iconWidth: variables.transactionHandWidth,
+        iconHeight: variables.transactionHandHeight,
+        title: 'multifactorAuthentication.reviewTransaction.transactionDenied',
+        subtitle: 'multifactorAuthentication.reviewTransaction.youCanTryAgainAtMerchantOrReachOut',
+    },
+    'DeniedTransactionSuccessScreen',
+);
+
+const AlreadyReviewedFailureScreen = createScreenWithDefaults(
+    DefaultServerFailureScreen,
+    {
+        headerTitle: 'multifactorAuthentication.reviewTransaction.reviewFailed',
+        subtitle: 'multifactorAuthentication.reviewTransaction.alreadyReviewedSubtitle',
+    },
+    'AlreadyReviewedFailureScreen',
+);
+
+export {
+    DeniedTransactionServerFailureScreen,
+    DeniedTransactionClientFailureScreen,
+    DefaultTransactionReviewClientFailureScreen,
+    ApprovedTransactionSuccessScreen,
+    DeniedTransactionSuccessScreen,
+    AlreadyReviewedFailureScreen,
+};
 
 export default {
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
@@ -74,6 +116,12 @@ export default {
     ),
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_EXPIRED]: <OutOfTimeFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_APPROVED_APPROVE_ATTEMPTED]: <ApprovedTransactionSuccessScreen />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_DENIED_DENY_ATTEMPTED]: <DeniedTransactionSuccessScreen />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_APPROVED_DENY_ATTEMPTED]: <AlreadyReviewedFailureScreen />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_DENIED_APPROVE_ATTEMPTED]: <AlreadyReviewedFailureScreen />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_REVIEWED]: <AlreadyReviewedFailureScreen />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.REQUESTED_TRANSACTION_UNAVAILABLE]: <AlreadyReviewedFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED]: <DeniedTransactionClientFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS]: <NoEligibleMethodsFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: <UnsupportedDeviceFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
