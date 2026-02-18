@@ -59,7 +59,7 @@ function FrozenCardIndicator({cardID, onUnfreezePress, isDisabled = false}: Froz
                     height: scarfOverlayHeight,
                 }}
             />
-            <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt4]}>
+            <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt9]}>
                 <Icon
                     src={Expensicons.FreezeCard}
                     fill={theme.icon}
