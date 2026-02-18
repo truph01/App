@@ -510,6 +510,37 @@ describe('WorkflowUtils', () => {
             const memberEmails = availableMembers.map((m) => m.email).sort();
             expect(memberEmails).toEqual(['alex@htc.us', 'carolyn@htc.us', 'gio@htc.us', 'hannahw@htc.us']);
         });
+
+        it('Should include members with orphaned submitsTo in availableMembers', () => {
+            // Member with submitsTo pointing to non-member (not in employeeList) won't appear in any
+            // workflow, but should still appear in availableMembers so admins can fix the chain.
+            const employees: PolicyEmployeeList = {
+                'alice@example.com': {
+                    email: 'alice@example.com',
+                    submitsTo: 'nonexistent@example.com',
+                },
+                'bob@example.com': {
+                    email: 'bob@example.com',
+                    submitsTo: 'bob@example.com',
+                },
+            };
+            const policy = createMockPolicy(employees, 'bob@example.com');
+            const personalDetailsForTest: PersonalDetailsList = {
+                'alice@example.com': {accountID: 1, login: 'alice@example.com', displayName: 'Alice'},
+                'bob@example.com': {accountID: 2, login: 'bob@example.com', displayName: 'Bob'},
+            };
+
+            const {approvalWorkflows, availableMembers} = convertPolicyEmployeesToApprovalWorkflows({
+                policy,
+                personalDetails: personalDetailsForTest,
+                localeCompare,
+            });
+
+            expect(approvalWorkflows).toHaveLength(1);
+            expect(approvalWorkflows[0].members).toHaveLength(1);
+            const memberEmails = availableMembers.map((m) => m.email).sort();
+            expect(memberEmails).toEqual(['alice@example.com', 'bob@example.com']);
+        });
     });
 
     describe('convertApprovalWorkflowToPolicyEmployees', () => {
