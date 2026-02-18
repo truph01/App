@@ -144,11 +144,13 @@ function sendPoliciesContext() {
 
     let userRole: string = CONST.POLICY.ROLE.USER;
     for (const policy of Object.values(policies)) {
-        if (policy?.role !== CONST.POLICY.ROLE.ADMIN) {
-            continue;
+        if (policy?.role === CONST.POLICY.ROLE.ADMIN) {
+            userRole = CONST.POLICY.ROLE.ADMIN;
+            break;
         }
-        userRole = CONST.POLICY.ROLE.ADMIN;
-        break;
+        if (policy?.role === CONST.POLICY.ROLE.AUDITOR) {
+            userRole = CONST.POLICY.ROLE.AUDITOR;
+        }
     }
 
     const policiesCountBucket = bucketPolicyCount(activePolicies.length);
