@@ -807,7 +807,8 @@ function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCar
     // Remove parent cards (2 segments) whose card type has children
     return accountList.filter((name) => {
         const segments = name.split(' - ');
-        if (segments.length === 2 && cardTypesWithChildren.has(segments.at(0) ?? '')) {
+        const cardType = segments.at(0)
+        if (segments.length === 2 && cardType && cardTypesWithChildren.has(cardType)) {
             return false;
         }
         return true;
