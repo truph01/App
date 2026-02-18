@@ -1,7 +1,7 @@
 import CONST from '@src/CONST';
 import {MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG} from '@components/MultifactorAuthentication/config';
 import type {Action, MultifactorAuthenticationState} from './types';
-import type {MultifactorAuthenticationScenarioConfig} from "@components/MultifactorAuthentication/config/types";
+import type {MultifactorAuthenticationScenarioConfig} from '@components/MultifactorAuthentication/config/types';
 
 const DEFAULT_STATE: MultifactorAuthenticationState = {
     error: undefined,
