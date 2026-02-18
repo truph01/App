@@ -356,23 +356,20 @@ function SuggestionMention({
         [localeCompare, translate, expensifyIcons.Megaphone, expensifyIcons.FallbackAvatar, formatPhoneNumber, formatLoginPrivateDomain],
     );
 
-    const getRoomMentionOptions = useCallback(
-        (searchTerm: string, reportBatch: OnyxCollection<Report>): Mention[] => {
-            const filteredRoomMentions: Mention[] = [];
-            for (const report of Object.values(reportBatch ?? {})) {
-                if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
-                    filteredRoomMentions.push({
-                        text: report.reportName,
-                        handle: report.reportName,
-                        alternateText: report.reportName,
-                    });
-                }
+    const getRoomMentionOptions = useCallback((searchTerm: string): Mention[] => {
+        const filteredRoomMentions: Mention[] = [];
+        for (const report of Object.values(mentionableReports ?? {})) {
+            if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+                filteredRoomMentions.push({
+                    text: report.reportName,
+                    handle: report.reportName,
+                    alternateText: report.reportName,
+                });
             }
+        }
 
-            return lodashSortBy(filteredRoomMentions, 'handle').slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS);
-        },
-        [policyID],
-    );
+        return lodashSortBy(filteredRoomMentions, 'handle').slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS);
+    }, []);
 
     const calculateMentionSuggestion = useCallback(
         (newValue: string, selectionStart?: number, selectionEnd?: number) => {
@@ -426,7 +423,7 @@ function SuggestionMention({
             const shouldDisplayRoomMentionsSuggestions = isGroupPolicyReport && (isValidRoomName(suggestionWord.toLowerCase()) || prefix === '');
             if (prefixType === '#' && shouldDisplayRoomMentionsSuggestions) {
                 // Filter reports by room name and current policy
-                nextState.suggestedMentions = getRoomMentionOptions(prefix, mentionableReports);
+                nextState.suggestedMentions = getRoomMentionOptions(prefix);
 
                 // Even if there are no reports, we should show the suggestion menu - to perform live search
                 nextState.shouldShowSuggestionMenu = true;
