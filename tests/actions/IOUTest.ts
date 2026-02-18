@@ -2551,7 +2551,7 @@ describe('actions/IOU', () => {
                         () =>
                             new Promise<void>((resolve) => {
                                 if (iouReportID) {
-                                    clearAllRelatedReportActionErrors(iouReportID, iouAction ?? null, undefined);
+                                    clearAllRelatedReportActionErrors(iouReportID, iouAction ?? null, iouReportID);
                                 }
                                 resolve();
                             }),
