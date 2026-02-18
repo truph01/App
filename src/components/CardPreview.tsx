@@ -16,9 +16,6 @@ type CardPreviewProps = {
 
     /** Styles for overlay container (absolute positioning, size, etc.). */
     overlayContainerStyle?: StyleProp<ViewStyle>;
-
-    /** Optional override for the displayed cardholder name. */
-    cardHolderName?: string;
 };
 
 function CardPreview({overlayImage, overlayContainerStyle, cardHolderName}: CardPreviewProps) {
@@ -29,7 +26,7 @@ function CardPreview({overlayImage, overlayContainerStyle, cardHolderName}: Card
     const [session] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: true});
 
     const {legalFirstName, legalLastName} = privatePersonalDetails ?? {};
-    const cardHolder = cardHolderName ?? (legalFirstName && legalLastName ? `${legalFirstName} ${legalLastName}` : (session?.email ?? ''));
+    const cardHolder = legalFirstName && legalLastName ? `${legalFirstName} ${legalLastName}` : (session?.email ?? '');
 
     return (
         <View

@@ -212,7 +212,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                     <FrozenCardIndicator
                         cardID={cardID}
                         onUnfreezePress={handleUnfreezePress}
-                        isDisabled={isOffline}
                     />
                 ) : (
                     <View style={[styles.flex1, styles.mb9, styles.mt9]}>

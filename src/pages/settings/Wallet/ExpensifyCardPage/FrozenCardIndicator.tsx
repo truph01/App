@@ -9,6 +9,7 @@ import Icon from '@components/Icon';
 import * as Expensicons from '@components/Icon/Expensicons';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -21,13 +22,13 @@ import CONST from '@src/CONST';
 type FrozenCardIndicatorProps = {
     cardID: string;
     onUnfreezePress: () => void;
-    isDisabled?: boolean;
 };
 
-function FrozenCardIndicator({cardID, onUnfreezePress, isDisabled = false}: FrozenCardIndicatorProps) {
+function FrozenCardIndicator({cardID, onUnfreezePress}: FrozenCardIndicatorProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
+    const {isOffline} = useNetwork();
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: true});
     const [session] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: true});
     const [card] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true, selector: cardByIdSelector(cardID)});
@@ -76,7 +77,7 @@ function FrozenCardIndicator({cardID, onUnfreezePress, isDisabled = false}: Froz
                 medium
                 text={translate('cardPage.unfreeze')}
                 onPress={onUnfreezePress}
-                isDisabled={isDisabled}
+                isDisabled={isOffline}
                 style={[styles.mt4]}
             />
         </View>
