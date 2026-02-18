@@ -418,13 +418,12 @@ function SearchFiltersBar({
         (filterKey: SearchDateFilterKeys, value: SearchDateValues, translationKey: TranslationPaths) => {
             return ({closeOverlay}: PopoverComponentProps) => {
                 const onChange = (selectedDates: SearchDateValues) => {
-                    const dateFormValues = {
-                        [`${filterKey}On`]: selectedDates[CONST.SEARCH.DATE_MODIFIERS.ON],
-                        [`${filterKey}After`]: selectedDates[CONST.SEARCH.DATE_MODIFIERS.AFTER],
-                        [`${filterKey}Before`]: selectedDates[CONST.SEARCH.DATE_MODIFIERS.BEFORE],
-                    };
+                    const dateFormValues: Record<string, string | undefined> = {};
+                    dateFormValues[`${filterKey}On`] = selectedDates[CONST.SEARCH.DATE_MODIFIERS.ON];
+                    dateFormValues[`${filterKey}After`] = selectedDates[CONST.SEARCH.DATE_MODIFIERS.AFTER];
+                    dateFormValues[`${filterKey}Before`] = selectedDates[CONST.SEARCH.DATE_MODIFIERS.BEFORE];
 
-                    updateFilterForm(dateFormValues);
+                    updateFilterForm(dateFormValues as Partial<SearchAdvancedFiltersForm>);
                 };
 
                 return (
