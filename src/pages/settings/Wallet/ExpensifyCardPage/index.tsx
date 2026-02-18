@@ -159,6 +159,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const isCardHolder = currentCard?.accountID === session?.accountID;
 
     const {isBetaEnabled} = usePermissions();
+    const canManageCardFreeze = isBetaEnabled(CONST.BETAS.FREEZE_CARD) && isCardHolder && !!currentCard && !isAccountLocked;
 
     const [isFreezeModalVisible, setIsFreezeModalVisible] = useState(false);
     const [isUnfreezeModalVisible, setIsUnfreezeModalVisible] = useState(false);
@@ -209,7 +210,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                 <View style={[styles.flex1, styles.mb9, styles.mt9]}>
                     <CardPreview />
                 </View>
-                {isBetaEnabled(CONST.BETAS.FREEZE_CARD) && isCardHolder && !!currentCard && isCardFrozen(currentCard) && (
+                {canManageCardFreeze && isCardFrozen(currentCard) && (
                     <Button
                         medium
                         style={[styles.mh4, styles.mb4]}
@@ -455,7 +456,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 );
                             }}
                         />
-                        {isBetaEnabled(CONST.BETAS.FREEZE_CARD) && isCardHolder && !!currentCard && !isCardFrozen(currentCard) && (
+                        {canManageCardFreeze && !isCardFrozen(currentCard) && (
                             <MenuItem
                                 icon={expensifyIcons.FreezeCard}
                                 title={translate('cardPage.freezeCard')}
