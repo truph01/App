@@ -591,8 +591,8 @@ describe('useCompanyCards', () => {
 
             const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
 
-            // Card keeps its own name, encryptedCardNumber resolved from cardList via lastFourPAN
-            expect(result.current.companyCardEntries).toEqual([entry('XXXXXXXXXXX1234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true)]);
+            // lastFourPAN resolves both cardName and encryptedCardNumber from cardList
+            expect(result.current.companyCardEntries).toEqual([entry('111222XXXX31234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true)]);
         });
 
         it('should resolve mixed CDF cards without creating duplicates', async () => {
@@ -630,9 +630,9 @@ describe('useCompanyCards', () => {
 
             const entries = result.current.companyCardEntries ?? [];
 
-            // Cards keep their own names; 8341 linked by encrypted, 8340 resolved via lastFourPAN
+            // 8341 linked by encrypted (keeps its name), 8340 resolved via lastFourPAN (gets cardList name)
             expect(entries).toEqual(
-                expect.arrayContaining([entry('888222XXXXX4444', 'v1:148EECFC15D818ACBC0D707FD0C44CC3', true), entry('XXXXXXXXXXX1234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true)]),
+                expect.arrayContaining([entry('888222XXXXX4444', 'v1:148EECFC15D818ACBC0D707FD0C44CC3', true), entry('111222XXXX31234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true)]),
             );
             // No duplicate unassigned entries from cardList
             expect(entries).toHaveLength(2);
@@ -692,8 +692,8 @@ describe('useCompanyCards', () => {
 
             const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
 
-            // Card keeps its own name, encryptedCardNumber resolved via lastFourPAN
-            expect(result.current.companyCardEntries).toEqual([entry('XXXXXXXXXXX1234', 'v1:NEW_ENCRYPTED', true)]);
+            // lastFourPAN resolves both cardName and encryptedCardNumber from cardList
+            expect(result.current.companyCardEntries).toEqual([entry('111222XXXX31234', 'v1:NEW_ENCRYPTED', true)]);
         });
     });
 

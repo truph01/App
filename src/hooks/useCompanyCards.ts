@@ -93,8 +93,9 @@ function buildCompanyCardEntries(accountList: string[] | undefined, cardList: As
 
         const resolved = resolveCardListEntry(card, cardListEntries);
         const encryptedCardNumber = resolved.encryptedCardNumber ?? card.cardName;
+        const cardName = resolved.cardName ?? card.cardName;
 
-        entries.push({cardName: card.cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
+        entries.push({cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
         coveredNames.add(normalizeCardName(card.cardName));
         if (encryptedCardNumber !== card.cardName) {
             coveredEncrypted.add(encryptedCardNumber);
