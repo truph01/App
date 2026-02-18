@@ -82,8 +82,7 @@ function SearchFiltersExportedToPage() {
                 };
             });
 
-        const policiesToLoadTemplatesFrom =
-            policyIDs.length > 0 ? policyIDs.map((id) => policies?.[`${ONYXKEYS.COLLECTION.POLICY}${id}`]).filter(Boolean) : Object.values(policies ?? {});
+        const policiesToLoadTemplatesFrom = policyIDs.length > 0 ? policyIDs.map((id) => policies?.[`${ONYXKEYS.COLLECTION.POLICY}${id}`]).filter(Boolean) : Object.values(policies ?? {});
         const exportTemplatesFromPolicies = policiesToLoadTemplatesFrom.flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
         const exportTemplatesFromAccount = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
         const allExportTemplates = [...exportTemplatesFromAccount, ...exportTemplatesFromPolicies];
@@ -131,19 +130,17 @@ function SearchFiltersExportedToPage() {
         if (selectedExportedToValues.length === 0) {
             return undefined;
         }
-        const normalizedSelectedValueIds = new Set(selectedExportedToValues.map((value) => value.toLowerCase()));
+        const normalizedSelectedValues = new Set(selectedExportedToValues);
         const selectedOptionsPresentInCurrentList = exportedToPickerOptions.filter((option) => {
             const optionValue = typeof option.value === 'string' ? option.value : (option.value.at(0) ?? '');
-            return normalizedSelectedValueIds.has(optionValue.toLowerCase());
+            return normalizedSelectedValues.has(optionValue);
         });
         const selectedValueIdsFoundInCurrentOptions = new Set(
-            selectedOptionsPresentInCurrentList.map((option) => (typeof option.value === 'string' ? option.value : option.value.at(0) ?? '').toLowerCase()),
+            selectedOptionsPresentInCurrentList.map((option) => (typeof option.value === 'string' ? option.value : (option.value.at(0) ?? ''))),
         );
-        const unavailableSelectedValues = selectedExportedToValues.filter((value) => !selectedValueIdsFoundInCurrentOptions.has(value.toLowerCase()));
+        const unavailableSelectedValues = selectedExportedToValues.filter((value) => !selectedValueIdsFoundInCurrentOptions.has(value));
         const unavailableSelectedOptions: SearchMultipleSelectionPickerItem[] = unavailableSelectedValues.map((value) => {
-            const connectionName = integrationConnectionNames.find(
-                (name) => CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[name] === value,
-            );
+            const connectionName = integrationConnectionNames.find((name) => CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[name] === value);
             const integrationIcon = connectionName ? getIntegrationIcon(connectionName, expensifyIcons) : null;
             const leftElement = integrationIcon ? (
                 <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter]}>

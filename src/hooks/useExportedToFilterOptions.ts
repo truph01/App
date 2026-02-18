@@ -17,14 +17,13 @@ type UseExportedToFilterDataResult = {
  * Hook that prepares all data needed for the exported to search filter.
  * It collects export templates and all connected integrations to build the filter options.
  */
-export default function useExportedToFilterOptions(policyIDs?: string[]): UseExportedToFilterDataResult {
+export default function useExportedToFilterOptions(): UseExportedToFilterDataResult {
     const {translate, localeCompare} = useLocalize();
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
 
-    const policiesToIncludeTemplatesFrom = Object.values(policies ?? {});
-    const policyLevelExportTemplates = policiesToIncludeTemplatesFrom.flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
+    const policyLevelExportTemplates = Object.values(policies ?? {}).flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
     const accountLevelExportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
     const combinedExportTemplates = [...accountLevelExportTemplates, ...policyLevelExportTemplates];
 
@@ -60,7 +59,7 @@ export default function useExportedToFilterOptions(policyIDs?: string[]): UseExp
 
     const connectedIntegrationDisplayNames = CONST.POLICY.CONNECTIONS.EXPORTED_TO_INTEGRATION_DISPLAY_NAMES.filter((displayName) => {
         const connectionName = displayNameToConnectionName.get(displayName);
-        return Boolean(connectionName && connectedIntegrationNames.has(connectionName));
+        return connectionName && connectedIntegrationNames.has(connectionName);
     });
 
     const exportedToFilterOptions = [...connectedIntegrationDisplayNames, ...customExportTemplates, ...standardExportTemplates];

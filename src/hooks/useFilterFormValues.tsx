@@ -26,7 +26,7 @@ const useFilterFormValues = (queryJSON?: SearchQueryJSON) => {
     // Helps to avoid unnecessary recalculations when user open report details screen. React Compiler does not provide same result.
     const taxRates = useMemo(() => getAllTaxRates(policies), [policies]);
     const allCards = useMemo(() => mergeCardListWithWorkspaceFeeds(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, userCardList), [workspaceCardFeeds, userCardList]);
-    const {exportedToFilterOptions} = useExportedToFilterOptions(queryJSON?.policyID);
+    const {exportedToFilterOptions} = useExportedToFilterOptions();
 
     const formValues = queryJSON
         ? buildFilterFormValuesFromQuery(queryJSON, policyCategories, policyTagsLists, currencyList, personalDetails, allCards, allReports, taxRates, exportedToFilterOptions)
