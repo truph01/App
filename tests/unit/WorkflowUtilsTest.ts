@@ -497,7 +497,7 @@ describe('WorkflowUtils', () => {
             const personalDetailsForTest: PersonalDetailsList = {
                 'alex@htc.us': {accountID: 1, login: 'alex@htc.us', displayName: 'Alex Walker'},
                 'hannahw@htc.us': {accountID: 2, login: 'hannahw@htc.us', displayName: 'Hannah Walker'},
-                'carolyn@htc.us': {accountID: 3, login: 'carolyn@htc.us', displayName: 'Carolyn Krick'},
+                'carolyn@htc.us': {accountID: 3, login: 'carolyn@htc.us', displayName: 'Carolyn Smith'},
                 'gio@htc.us': {accountID: 4, login: 'gio@htc.us', displayName: 'Gio'},
             };
 
