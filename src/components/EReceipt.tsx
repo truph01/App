@@ -46,7 +46,8 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false}:
     const {getCurrencySymbol} = useCurrencyListActions();
     const theme = useTheme();
     const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: true});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
+    const cardList = filterOutPersonalCards(allCards);
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`, {canBeMissing: true});
 
     const {primaryColor, secondaryColor, titleColor, MCCIcon, tripIcon, backgroundImage} = useEReceipt(transactionItem ?? transaction);

@@ -1,5 +1,5 @@
-import type {FeedKeysWithAssignedCards} from '@selectors/Card';
-import {feedKeysWithAssignedCardsSelector} from '@selectors/Card';
+import type {FeedKeysWithAssignedCards} from '@hooks/useFeedKeysWithAssignedCards';
+import {buildFeedKeysWithAssignedCards} from '@selectors/Card';
 import lodashSortBy from 'lodash/sortBy';
 import type {OnyxCollection} from 'react-native-onyx';
 import type IllustrationsType from '@styles/theme/illustrations/types';
@@ -1106,13 +1106,13 @@ describe('CardUtils', () => {
         });
     });
 
-    describe('feedKeysWithAssignedCardsSelector', () => {
+    describe('buildFeedKeysWithAssignedCards', () => {
         it('Should return empty object when allWorkspaceCards is undefined', () => {
-            expect(feedKeysWithAssignedCardsSelector(undefined)).toStrictEqual({});
+            expect(buildFeedKeysWithAssignedCards(undefined)).toStrictEqual({});
         });
 
         it('Should return empty object when allWorkspaceCards is empty', () => {
-            expect(feedKeysWithAssignedCardsSelector({})).toStrictEqual({});
+            expect(buildFeedKeysWithAssignedCards({})).toStrictEqual({});
         });
 
         it('Should return empty object when entries only have cardList (no assigned cards)', () => {
@@ -1123,7 +1123,7 @@ describe('CardUtils', () => {
                     },
                 },
             };
-            expect(feedKeysWithAssignedCardsSelector(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>)).toStrictEqual({});
+            expect(buildFeedKeysWithAssignedCards(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>)).toStrictEqual({});
         });
 
         it('Should extract feed keys that have assigned cards', () => {
@@ -1154,7 +1154,7 @@ describe('CardUtils', () => {
                     },
                 },
             };
-            const result = feedKeysWithAssignedCardsSelector(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
+            const result = buildFeedKeysWithAssignedCards(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
             expect(result).toStrictEqual({
                 '12345_oauth.chase.com': true,
                 '67890_plaid.ins_123456': true,
@@ -1174,7 +1174,7 @@ describe('CardUtils', () => {
                     },
                 },
             };
-            const result = feedKeysWithAssignedCardsSelector(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
+            const result = buildFeedKeysWithAssignedCards(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
             expect(result).toStrictEqual({
                 '67890_oauth.americanexpressfdx.com 3000': true,
             });
@@ -1196,7 +1196,7 @@ describe('CardUtils', () => {
                     },
                 },
             };
-            const result = feedKeysWithAssignedCardsSelector(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
+            const result = buildFeedKeysWithAssignedCards(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
             expect(result).toStrictEqual({
                 '12345_oauth.chase.com': true,
             });
@@ -1216,7 +1216,7 @@ describe('CardUtils', () => {
                     },
                 },
             };
-            const result = feedKeysWithAssignedCardsSelector(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
+            const result = buildFeedKeysWithAssignedCards(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
             expect(result).toStrictEqual({
                 '67890_plaid.ins_123456': true,
             });
@@ -1248,7 +1248,7 @@ describe('CardUtils', () => {
                     cardList: {'CARD...1': 'enc'},
                 },
             };
-            const result = feedKeysWithAssignedCardsSelector(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
+            const result = buildFeedKeysWithAssignedCards(allWorkspaceCards as unknown as OnyxCollection<WorkspaceCardsList>);
             expect(result).toStrictEqual({
                 '11111_oauth.chase.com': true,
                 '22222_oauth.chase.com': true,

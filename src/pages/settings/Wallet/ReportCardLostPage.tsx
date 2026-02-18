@@ -58,7 +58,8 @@ function ReportCardLostPage({
     const {translate} = useLocalize();
 
     const [formData] = useOnyx(ONYXKEYS.FORMS.REPORT_PHYSICAL_CARD_FORM, {canBeMissing: true});
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: true});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
+    const cardList = filterOutPersonalCards(allCards);
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
 
     const [reason, setReason] = useState<Option>();

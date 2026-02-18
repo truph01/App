@@ -29,7 +29,8 @@ function ReportVirtualCardFraudPage({route}: ReportVirtualCardFraudPageProps) {
     const {cardID = ''} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: false});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: false});
+    const cardList = filterOutPersonalCards(allCards);
     const [formData] = useOnyx(ONYXKEYS.FORMS.REPORT_VIRTUAL_CARD_FRAUD, {canBeMissing: true});
 
     const virtualCard = cardList?.[cardID];

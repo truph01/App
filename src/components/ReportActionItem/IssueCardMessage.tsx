@@ -33,7 +33,8 @@ function IssueCardMessage({action, policyID, shouldNavigateToCardDetails}: Issue
     const assigneeAccountID = (getOriginalMessage(action) as IssueNewCardOriginalMessage)?.assigneeAccountID;
     const expensifyCard = useGetExpensifyCardFromReportAction({reportAction: action, policyID});
     const isAssigneeCurrentUser = !isEmptyObject(session) && session.accountID === assigneeAccountID;
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: true});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
+    const cardList = filterOutPersonalCards(allCards);
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: false});
     const companyCard = cardList?.[(getOriginalMessage(action) as IssueNewCardOriginalMessage)?.cardID];
     const shouldShowAddMissingDetailsButton = isAssigneeCurrentUser && shouldShowAddMissingDetails(action?.actionName, privatePersonalDetails);

@@ -101,7 +101,8 @@ const getCardHintText = (validFrom: string | undefined, validThru: string | unde
 function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const {cardID} = route.params;
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: false});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: false});
+    const cardList = filterOutPersonalCards(allCards);
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: false});
     const {currencyList} = useCurrencyListState();
     const styles = useThemeStyles();

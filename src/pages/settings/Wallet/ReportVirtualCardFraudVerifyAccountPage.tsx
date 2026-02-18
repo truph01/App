@@ -23,7 +23,8 @@ function ReportVirtualCardFraudVerifyAccountPage({
         params: {cardID = ''},
     },
 }: ReportVirtualCardFraudVerifyAccountPageProps) {
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: false});
+    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: false});
+    const cardList = filterOutPersonalCards(allCards);
     const virtualCard = cardList?.[cardID];
     const {translate} = useLocalize();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
