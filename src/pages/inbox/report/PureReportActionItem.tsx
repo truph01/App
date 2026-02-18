@@ -435,7 +435,7 @@ type PureReportActionItemProps = {
     clearError?: (transactionID: string) => void;
 
     /** Function to clear all errors from a report action */
-    clearAllRelatedReportActionErrors?: (reportID: string | undefined, reportAction: OnyxTypes.ReportAction | null | undefined, ignore?: IgnoreDirection, keys?: string[]) => void;
+    clearAllRelatedReportActionErrors?: (reportID: string | undefined, reportAction: ReportAction | null | undefined, originalReportID: string | undefined, ignore?: IgnoreDirection, keys?: string[]) => void;
 
     /** Function to dismiss the actionable whisper for tracking expenses */
     dismissTrackExpenseActionableWhisper?: (reportID: string | undefined, reportAction: OnyxEntry<OnyxTypes.ReportAction>) => void;
@@ -612,14 +612,14 @@ function PureReportActionItem({
         const transactionID = isMoneyRequestAction(action) ? getOriginalMessage(action)?.IOUTransactionID : undefined;
         if (isSendingMoney && transactionID && reportID) {
             const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
-            cleanUpMoneyRequest(transactionID, action, reportID, report, chatReport, undefined, true);
+            cleanUpMoneyRequest(transactionID, action, reportID, report, chatReport, undefined, true, originalReportID);
             return;
         }
         if (transactionID) {
             clearError(transactionID);
         }
-        clearAllRelatedReportActionErrors(reportID, action);
-    }, [action, isSendingMoney, clearAllRelatedReportActionErrors, reportID, allReports, report, clearError]);
+        clearAllRelatedReportActionErrors(reportID, action, originalReportID);
+    }, [action, isSendingMoney, clearAllRelatedReportActionErrors, reportID, allReports, report, clearError, originalReportID]);
 
     const showDismissReceiptErrorModal = useCallback(async () => {
         const result = await showConfirmModal({
