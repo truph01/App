@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -5175,10 +5174,10 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 updateCard: 'カードを更新',
                 unassignCard: 'カードの割り当てを解除',
                 unassign: '割り当てを解除',
-                unassignCardDescription: 'このカードの割り当てを解除すると、カード名義人の下書きレポートから関連するすべての取引が削除されます。',
+                unassignCardDescription: 'このカードの割り当てを解除すると、未送信の取引はすべて削除されます。',
                 removeCard: 'カードを削除',
                 remove: '削除',
-                removeCardDescription: 'このカードを削除すると、下書きレポート内の関連するすべての取引が削除されます。',
+                removeCardDescription: 'このカードを削除すると、未送信のすべての取引が削除されます。',
                 assignCard: 'カードを割り当てる',
                 cardFeedName: 'カードフィード名',
                 cardFeedNameDescription: '他のカードフィードと区別できるように、一意の名前を付けてください。',

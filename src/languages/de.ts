@@ -175,7 +175,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -5234,10 +5233,10 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 updateCard: 'Karte aktualisieren',
                 unassignCard: 'Karte zuweisen aufheben',
                 unassign: 'Zuweisung aufheben',
-                unassignCardDescription: 'Das Aufheben der Zuweisung dieser Karte entfernt alle zugehörigen Transaktionen aus den Entwurfsberichten der Karteninhaberin/des Karteninhabers.',
+                unassignCardDescription: 'Das Entfernen der Zuweisung dieser Karte wird alle nicht eingereichten Transaktionen löschen.',
                 removeCard: 'Karte entfernen',
                 remove: 'Entfernen',
-                removeCardDescription: 'Wenn Sie diese Karte entfernen, werden alle zugehörigen Transaktionen aus Ihren Entwürfen von Berichten gelöscht.',
+                removeCardDescription: 'Wenn Sie diese Karte entfernen, werden alle nicht eingereichten Transaktionen gelöscht.',
                 assignCard: 'Karte zuweisen',
                 cardFeedName: 'Name des Kartenfeeds',
                 cardFeedNameDescription: 'Gib dem Kartenfeed einen eindeutigen Namen, damit du ihn von den anderen unterscheiden kannst.',
