@@ -8,99 +8,12 @@ import {Pie, PolarChart} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
+import {PIE_CHART_START_ANGLE} from '@components/Charts/constants';
 import {TOOLTIP_BAR_GAP, useChartLabelFormats, useTooltipData} from '@components/Charts/hooks';
-import type {ChartDataPoint, PieChartProps, PieSlice} from '@components/Charts/types';
-import {getChartColor} from '@components/Charts/utils';
+import type {PieChartProps, PieSlice} from '@components/Charts/types';
+import {findSliceAtPosition, processDataIntoSlices} from '@components/Charts/utils';
 import Text from '@components/Text';
 import useThemeStyles from '@hooks/useThemeStyles';
-
-/** Starting angle for pie chart (0 = 3 o'clock, -90 = 12 o'clock) */
-const PIE_CHART_START_ANGLE = -90;
-
-/**
- * Process raw data into slices.
- */
-function processDataIntoSlices(data: ChartDataPoint[], startAngle: number): PieSlice[] {
-    const total = data.reduce((sum, point) => sum + Math.abs(point.total), 0);
-    if (total === 0) {
-        return [];
-    }
-
-    return data
-        .map((point, index) => ({label: point.label, absTotal: Math.abs(point.total), originalIndex: index}))
-        .sort((a, b) => b.absTotal - a.absTotal)
-        .reduce<{slices: PieSlice[]; angle: number}>(
-            (acc, slice, index) => {
-                const fraction = slice.absTotal / total;
-                const sweepAngle = fraction * 360;
-                acc.slices.push({
-                    label: slice.label,
-                    value: slice.absTotal,
-                    color: getChartColor(index),
-                    percentage: fraction * 100,
-                    startAngle: acc.angle,
-                    endAngle: acc.angle + sweepAngle,
-                    originalIndex: slice.originalIndex,
-                });
-                acc.angle += sweepAngle;
-                return acc;
-            },
-            {slices: [], angle: startAngle},
-        ).slices;
-}
-
-/**
- * Normalize angle to 0-360 range
- */
-function normalizeAngle(angle: number): number {
-    'worklet';
-
-    let normalized = angle % 360;
-    if (normalized < 0) {
-        normalized += 360;
-    }
-    return normalized;
-}
-
-/**
- * Check if an angle is within a slice's range (handles wrap-around)
- */
-function isAngleInSlice(angle: number, startAngle: number, endAngle: number): boolean {
-    'worklet';
-
-    const normalizedAngle = normalizeAngle(angle);
-    const normalizedStart = normalizeAngle(startAngle);
-    const normalizedEnd = normalizeAngle(endAngle);
-
-    // Handle wrap-around case (slice crosses 0°)
-    if (normalizedStart > normalizedEnd) {
-        return normalizedAngle >= normalizedStart || normalizedAngle < normalizedEnd;
-    }
-    return normalizedAngle >= normalizedStart && normalizedAngle < normalizedEnd;
-}
-
-/**
- * Find which slice index contains the given cursor position
- */
-function findSliceAtPosition(cursorX: number, cursorY: number, centerX: number, centerY: number, radius: number, innerRadius: number, slices: PieSlice[]): number {
-    'worklet';
-
-    // Convert cursor to polar coordinates relative to center
-    const dx = cursorX - centerX;
-    const dy = cursorY - centerY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    // Check if within pie ring
-    if (distance < innerRadius || distance > radius) {
-        return -1;
-    }
-
-    // Calculate angle in degrees (atan2 returns radians, 0 at 3 o'clock, positive clockwise)
-    const cursorAngle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-    // Find which slice contains this angle
-    return slices.findIndex((slice) => isAngleInSlice(cursorAngle, slice.startAngle, slice.endAngle));
-}
 
 function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSlicePress}: PieChartProps) {
     const styles = useThemeStyles();
