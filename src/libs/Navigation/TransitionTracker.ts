@@ -2,36 +2,27 @@ type CancelHandle = {cancel: () => void};
 
 type TransitionType = 'keyboard' | 'navigation' | 'modal' | 'focus';
 
-type PendingEntry = {callback: () => void; type?: TransitionType};
-
 const MAX_TRANSITION_DURATION_MS = 1000;
 
 const activeTransitions = new Map<TransitionType, number>();
 
 const activeTimeouts: Array<{type: TransitionType; timeout: ReturnType<typeof setTimeout>}> = [];
 
-let pendingCallbacks: PendingEntry[] = [];
+let pendingCallbacks: Array<() => void> = [];
 
 /**
- * Invokes and removes pending callbacks.
- *
- * @param type - When provided, only flushes entries scoped to that type.
- *               When omitted, flushes all remaining entries.
+ * Invokes and removes all pending callbacks.
  */
-function flushCallbacks(type?: TransitionType): void {
-    const remaining: PendingEntry[] = [];
-    for (const entry of pendingCallbacks) {
-        if (type === undefined || entry.type === type) {
-            entry.callback();
-        } else {
-            remaining.push(entry);
-        }
+function flushCallbacks(): void {
+    const callbacks = pendingCallbacks;
+    pendingCallbacks = [];
+    for (const callback of callbacks) {
+        callback();
     }
-    pendingCallbacks = remaining;
 }
 
 /**
- * Decrements the active count for the given transition type and flushes matching callbacks.
+ * Decrements the active count for the given transition type and flushes callbacks when all transitions are idle.
  * Shared by {@link endTransition} (manual) and the auto-timeout.
  */
 function decrementAndFlush(type: TransitionType): void {
@@ -44,10 +35,7 @@ function decrementAndFlush(type: TransitionType): void {
         activeTransitions.set(type, next);
     }
 
-    // Flush callbacks scoped to this specific type
-    flushCallbacks(type);
-
-    // When all transitions end, flush remaining unscoped callbacks
+    // When all transitions end, flush all pending callbacks
     if (activeTransitions.size === 0) {
         flushCallbacks();
     }
@@ -76,8 +64,7 @@ function startTransition(type: TransitionType): void {
 /**
  * Decrements the active count for the given transition type.
  * Clears the corresponding auto-timeout since the transition ended normally.
- * When the count reaches zero, flushes callbacks scoped to that type.
- * When all transition types are idle, flushes remaining unscoped callbacks.
+ * When all transition types are idle, flushes all pending callbacks.
  */
 function endTransition(type: TransitionType): void {
     // Clear the oldest timeout for this type (FIFO order matches startTransition order)
@@ -91,21 +78,24 @@ function endTransition(type: TransitionType): void {
 }
 
 /**
- * Schedules a callback to run after transitions complete. If no transitions are active
- * (or the specified type is idle), the callback fires on the next microtask.
+ * Schedules a callback to run after all transitions complete. If no transitions are active
+ * or `runImmediately` is true, the callback fires synchronously.
  *
  * @param callback - The function to invoke once transitions finish.
- * @param type - Optional transition type to scope the wait. When provided, the callback
- *               fires as soon as that specific type finishes, even if other types are still active.
- *               When omitted, waits for all transition types to be idle.
+ * @param runImmediately - If true, the callback fires synchronously regardless of active transitions. Defaults to false.
  * @returns A handle with a `cancel` method to prevent the callback from firing.
  */
-function runAfterTransitions(callback: () => void, type?: TransitionType): CancelHandle {
-    const entry: PendingEntry = {callback, type};
-    pendingCallbacks.push(entry);
+function runAfterTransitions(callback: () => void, runImmediately = false): CancelHandle {
+    if (activeTransitions.size === 0 || runImmediately) {
+        callback();
+        return {cancel: () => {}};
+    }
+
+    pendingCallbacks.push(callback);
+
     return {
         cancel: () => {
-            const idx = pendingCallbacks.indexOf(entry);
+            const idx = pendingCallbacks.indexOf(callback);
             if (idx !== -1) {
                 pendingCallbacks.splice(idx, 1);
             }
@@ -117,6 +107,8 @@ const TransitionTracker = {
     startTransition,
     endTransition,
     runAfterTransitions,
+    activeTransitions,
+    pendingCallbacks,
 };
 
 export default TransitionTracker;

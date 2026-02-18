@@ -320,13 +320,16 @@ function navigate(route: Route, options?: LinkToOptions) {
         }
     }
 
-    const targetRoute = route.startsWith(CONST.SAML_REDIRECT_URL) ? ROUTES.HOME : route;
-    linkTo(navigationRef.current, targetRoute, options);
-    closeSidePanelOnNarrowScreen(route);
+    const runImmediately = !options?.waitForTransition;
+    TransitionTracker.runAfterTransitions(() => {
+        const targetRoute = route.startsWith(CONST.SAML_REDIRECT_URL) ? ROUTES.HOME : route;
+        linkTo(navigationRef.current, targetRoute, options);
+        closeSidePanelOnNarrowScreen(route);
 
-    if (options?.afterTransition) {
-        TransitionTracker.runAfterTransitions(options.afterTransition);
-    }
+        if (options?.afterTransition) {
+            TransitionTracker.runAfterTransitions(options.afterTransition);
+        }
+    }, runImmediately);
 }
 /**
  * When routes are compared to determine whether the fallback route passed to the goUp function is in the state,
@@ -393,11 +396,14 @@ type GoBackOptions = {
     compareParams?: boolean;
     // Callback to execute after the navigation transition animation completes.
     afterTransition?: () => void | undefined;
+    // If true, waits for ongoing transitions to finish before going back. Defaults to false (goes back immediately).
+    waitForTransition?: boolean;
 };
 
 const defaultGoBackOptions: Required<GoBackOptions> = {
     compareParams: true,
     afterTransition: () => {},
+    waitForTransition: false,
 };
 
 /**
@@ -470,28 +476,31 @@ function goBack(backToRoute?: Route, options?: GoBackOptions) {
         return;
     }
 
-    if (backToRoute) {
-        goUp(backToRoute, options);
+    const runImmediately = !options?.waitForTransition;
+    TransitionTracker.runAfterTransitions(() => {
+        if (backToRoute) {
+            goUp(backToRoute, options);
+            if (options?.afterTransition) {
+                TransitionTracker.runAfterTransitions(options.afterTransition);
+            }
+            return;
+        }
+
+        if (shouldPopToSidebar) {
+            popToSidebar();
+            return;
+        }
+
+        if (!navigationRef.current?.canGoBack()) {
+            Log.hmmm('[Navigation] Unable to go back');
+            return;
+        }
+
+        navigationRef.current?.goBack();
         if (options?.afterTransition) {
             TransitionTracker.runAfterTransitions(options.afterTransition);
         }
-        return;
-    }
-
-    if (shouldPopToSidebar) {
-        popToSidebar();
-        return;
-    }
-
-    if (!navigationRef.current?.canGoBack()) {
-        Log.hmmm('[Navigation] Unable to go back');
-        return;
-    }
-
-    navigationRef.current?.goBack();
-    if (options?.afterTransition) {
-        TransitionTracker.runAfterTransitions(options.afterTransition);
-    }
+    }, runImmediately);
 }
 
 /**
@@ -729,15 +738,22 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
  * For detailed information about dismissing modals,
  * see the NAVIGATION.md documentation.
  */
-async function dismissModal({ref = navigationRef, afterTransition}: {ref?: NavigationRef; callback?: () => void; afterTransition?: () => void} = {}) {
+async function dismissModal({
+    ref = navigationRef,
+    afterTransition,
+    waitForTransition,
+}: {ref?: NavigationRef; callback?: () => void; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedText();
     await isNavigationReady();
 
-    ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
+    const runImmediately = !waitForTransition;
+    TransitionTracker.runAfterTransitions(() => {
+        ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
 
-    if (afterTransition) {
-        TransitionTracker.runAfterTransitions(afterTransition);
-    }
+        if (afterTransition) {
+            TransitionTracker.runAfterTransitions(afterTransition);
+        }
+    }, runImmediately);
 }
 
 /**
@@ -854,7 +870,7 @@ function clearPreloadedRoutes() {
  *
  * @param modalStackNames - names of the modal stacks we want to dismiss to
  */
-function dismissToModalStack(modalStackNames: Set<string>) {
+function dismissToModalStack(modalStackNames: Set<string>, options: {afterTransition?: () => void} = {}) {
     const rootState = navigationRef.getRootState();
     if (!rootState) {
         return;
@@ -870,32 +886,36 @@ function dismissToModalStack(modalStackNames: Set<string>) {
     const routesToPop = rhpState.routes.length - lastFoundModalStackIndex - 1;
 
     if (routesToPop <= 0 || lastFoundModalStackIndex === -1) {
-        dismissModal();
+        dismissModal(options);
         return;
     }
 
     navigationRef.dispatch({...StackActions.pop(routesToPop), target: rhpState.key});
+
+    if (options?.afterTransition) {
+        TransitionTracker.runAfterTransitions(options.afterTransition);
+    }
 }
 
 /**
  * Dismiss top layer modal and go back to the Wide/Super Wide RHP.
  */
-function dismissToPreviousRHP() {
-    return dismissToModalStack(ALL_WIDE_RIGHT_MODALS);
+function dismissToPreviousRHP(options: {afterTransition?: () => void} = {}) {
+    return dismissToModalStack(ALL_WIDE_RIGHT_MODALS, options);
 }
 
-function navigateBackToLastSuperWideRHPScreen() {
-    return dismissToModalStack(SUPER_WIDE_RIGHT_MODALS);
+function navigateBackToLastSuperWideRHPScreen(options: {afterTransition?: () => void} = {}) {
+    return dismissToModalStack(SUPER_WIDE_RIGHT_MODALS, options);
 }
 
-function dismissToSuperWideRHP() {
+function dismissToSuperWideRHP(options: {afterTransition?: () => void} = {}) {
     // On narrow layouts (mobile), Super Wide RHP doesn't exist, so just dismiss the modal completely
     if (getIsNarrowLayout()) {
-        dismissModal();
+        dismissModal(options);
         return;
     }
     // On wide layouts, dismiss back to the Super Wide RHP modal stack
-    navigateBackToLastSuperWideRHPScreen();
+    navigateBackToLastSuperWideRHPScreen(options);
 }
 
 function getTopmostSearchReportRouteParams(state = navigationRef.getRootState()): RightModalNavigatorParamList[typeof SCREENS.RIGHT_MODAL.SEARCH_REPORT] | undefined {

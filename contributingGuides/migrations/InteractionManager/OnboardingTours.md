@@ -1,10 +1,10 @@
-# Onboarding Tours (~3 usages)
+# Onboarding Tours 
+
+Refer to [README.md](./README.md) for more information what's the overall strategy and why we're migrating away from `InteractionManager.runAfterInteractions`.
 
 ## Strategy
 
-**Use `Navigation.navigate({afterTransition})`**
-
-All onboarding usages defer navigation to the next onboarding step until after the current screen transition completes. Replace with the `afterTransition` option on `Navigation.navigate`.
+Onboarding usages defer navigation to the next onboarding step until after the current screen transition completes.
 
 ## Usages
 

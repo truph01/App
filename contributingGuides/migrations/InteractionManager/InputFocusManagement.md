@@ -1,12 +1,10 @@
-# Input Focus Management (~16 usages)
+# Input Focus Management
+
+Refer to [README.md](./README.md) for more information what's the overall strategy and why we're migrating away from `InteractionManager.runAfterInteractions`.
 
 ## Strategy
 
-**Skip for now — focus utilities not coded yet**
-
-Document each usage but mark as TODO. When the focus utility is implemented, it should follow the same pattern as keyboard (`TransitionTracker` called internally, expose `afterTransition` option).
-
-`TransitionTracker.runAfterTransitions()` should **never** be called directly in application code.
+Needs investigation. We need to figure out a way to handle this without using `InteractionManager.runAfterInteractions`.
 
 ## Usages
 
