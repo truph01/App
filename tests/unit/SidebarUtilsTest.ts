@@ -2508,6 +2508,7 @@ describe('SidebarUtils', () => {
                     localeCompare,
                     lastAction: undefined,
                     lastActionReport: undefined,
+                    invoiceReceiverPolicy: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
                 });
@@ -2538,6 +2539,7 @@ describe('SidebarUtils', () => {
                     localeCompare,
                     lastAction: undefined,
                     lastActionReport: undefined,
+                    invoiceReceiverPolicy: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
                 });
@@ -2567,6 +2569,7 @@ describe('SidebarUtils', () => {
                     localeCompare,
                     lastAction: undefined,
                     lastActionReport: undefined,
+                    invoiceReceiverPolicy: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
                 });
