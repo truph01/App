@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import ConfirmationPage from '@components/ConfirmationPage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 // eslint-disable-next-line no-restricted-imports
@@ -123,18 +123,9 @@ function InviteReceiptPartnerPolicyPage({route}: InviteReceiptPartnerPolicyPageP
         }
     }
 
-    // Pre-select all members only once on first load.
-    useEffect(() => {
-        if (workspaceMembers.length === 0) {
-            return;
-        }
-        setSelectedOptions((prev) => {
-            if (prev.length > 0) {
-                return prev;
-            }
-            return workspaceMembers.map((member) => ({...member, isSelected: true}));
-        });
-    }, [workspaceMembers]);
+    if (selectedOptions.length === 0 && workspaceMembers.length > 0) {
+        setSelectedOptions(workspaceMembers.map((member) => ({...member, isSelected: true})));
+    }
 
     const toggleOption = (option: MemberForList) => {
         clearErrors(policyID);
