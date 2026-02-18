@@ -1,6 +1,6 @@
 import {findFocusedRoute, StackActions, useNavigationState} from '@react-navigation/native';
 import type {NavigationState} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -87,9 +87,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
 
     // Workspace tab: track last-viewed workspace/domain across navigations
     const navigationState = useNavigationState(findFocusedRoute);
-    const initialNavigationRouteState = getWorkspaceNavigationRouteState();
-    const [lastWorkspacesTabNavigatorRoute, setLastWorkspacesTabNavigatorRoute] = useState(initialNavigationRouteState.lastWorkspacesTabNavigatorRoute);
-    const [workspacesTabState, setWorkspacesTabState] = useState(initialNavigationRouteState.workspacesTabState);
+    const {lastWorkspacesTabNavigatorRoute, workspacesTabState} = getWorkspaceNavigationRouteState();
     const params = workspacesTabState?.routes?.at(0)?.params as
         | WorkspaceSplitNavigatorParamList[typeof SCREENS.WORKSPACE.INITIAL]
         | DomainSplitNavigatorParamList[typeof SCREENS.DOMAIN.INITIAL];
@@ -125,7 +123,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
     const {indicatorColor: workspacesTabIndicatorColor, status: workspacesTabIndicatorStatus} = useWorkspacesTabIndicatorStatus();
     const {orderedReportIDs} = useSidebarOrderedReports();
     const reportAttributes = useReportAttributes();
-    const [chatTabBrickRoad, setChatTabBrickRoad] = useState<BrickRoad>(undefined);
+    const chatTabBrickRoad = getChatTabBrickRoad(orderedReportIDs, reportAttributes);
 
     const shouldRenderDebugTabViewOnWideLayout = !!isDebugModeEnabled && !isTopLevelBar;
     const inboxStatusIndicatorColor = chatTabBrickRoad ? getInboxBrickRoadColor(chatTabBrickRoad, theme) : undefined;
@@ -133,16 +131,6 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
     const inboxAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.INBOX};
     const searchAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.SEARCH};
     const workspacesAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.WORKSPACES};
-
-    useEffect(() => {
-        const newWorkspacesTabState = getWorkspaceNavigationRouteState();
-        setLastWorkspacesTabNavigatorRoute(newWorkspacesTabState.lastWorkspacesTabNavigatorRoute);
-        setWorkspacesTabState(newWorkspacesTabState.workspacesTabState);
-    }, [navigationState]);
-
-    useEffect(() => {
-        setChatTabBrickRoad(getChatTabBrickRoad(orderedReportIDs, reportAttributes));
-    }, [orderedReportIDs, reportAttributes]);
 
     // Navigation handlers
     const navigateToNewDotHome = () => {
