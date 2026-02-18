@@ -3465,7 +3465,7 @@ function getSearchColumnTranslationKey(columnId: SearchCustomColumnIds): Transla
         case CONST.SEARCH.TABLE_COLUMNS.BASE_62_REPORT_ID:
             return 'common.reportID';
         case CONST.SEARCH.TABLE_COLUMNS.GROUP_STATUS:
-            return 'common.status';
+            return 'common.withdrawalStatus';
         case CONST.SEARCH.TABLE_COLUMNS.GROUP_BANK_ACCOUNT:
             return 'common.bankAccount';
         case CONST.SEARCH.TABLE_COLUMNS.GROUP_CARD:

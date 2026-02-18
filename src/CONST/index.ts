@@ -7322,7 +7322,7 @@ const CONST = {
             GROUP_WEEK: 'groupweek',
             GROUP_YEAR: 'groupyear',
             GROUP_QUARTER: 'groupquarter',
-            GROUP_STATUS: 'groupStatus',
+            GROUP_STATUS: 'groupWithdrawalStatus',
         },
         SYNTAX_OPERATORS: {
             AND: 'and',
@@ -7521,7 +7521,7 @@ const CONST = {
                 [this.TABLE_COLUMNS.GROUP_WEEK]: 'group-week',
                 [this.TABLE_COLUMNS.GROUP_YEAR]: 'group-year',
                 [this.TABLE_COLUMNS.GROUP_QUARTER]: 'group-quarter',
-                [this.TABLE_COLUMNS.GROUP_STATUS]: 'group-status',
+                [this.TABLE_COLUMNS.GROUP_STATUS]: 'group-withdrawal-status',
             };
         },
         NOT_MODIFIER: 'Not',

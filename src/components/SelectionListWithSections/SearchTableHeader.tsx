@@ -324,7 +324,7 @@ const getTransactionGroupHeaders = (groupBy: SearchGroupBy, icons: SearchHeaderI
                 },
                 {
                     columnName: CONST.SEARCH.TABLE_COLUMNS.GROUP_STATUS,
-                    translationKey: 'common.status',
+                    translationKey: 'common.withdrawalStatus',
                 },
                 {
                     columnName: CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWAL_ID,
