@@ -4959,6 +4959,7 @@ ${amount} para ${merchant} - ${date}`,
                         confirm: 'Entendido',
                     },
                 },
+                personalDetailsDescription: 'Para poder reservar el viaje, por favor ingrese su nombre legal tal como aparece en su identificación oficial emitida por el gobierno.',
             },
             expensifyCard: {
                 title: 'Tarjeta Expensify',

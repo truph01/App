@@ -40,6 +40,7 @@ const SCREENS = {
         WORKSPACE_ADDRESS: 'Travel_WorkspaceAddress',
         TRAVEL_DOT_LINK_WEB_VIEW: 'Travel_DotLinkWebView',
         VERIFY_ACCOUNT: 'Travel_VerifyAccount',
+        MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE: 'Travel_MissingPersonalDetails_ConfirmMagicCode',
     },
     SEARCH: {
         ROOT: 'Search_Root',
@@ -761,6 +762,9 @@ const SCREENS = {
         TRAVEL: 'Travel',
         TRAVEL_SETTINGS_ACCOUNT: 'Workspace_Travel_Settings_Account',
         TRAVEL_SETTINGS_FREQUENCY: 'Workspace_Travel_Settings_Frequency',
+        TRAVEL_MISSING_PERSONAL_DETAILS_ROOT: 'Travel_Missing_Personal_Details_Root',
+        TRAVEL_MISSING_PERSONAL_DETAILS: 'Travel_Missing_Personal_Details',
+        TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE: 'Travel_Missing_Personal_Details_Confirm_Magic_Code',
         CREATE_DISTANCE_RATE: 'Create_Distance_Rate',
         CREATE_DISTANCE_RATE_UPGRADE: 'Create_Distance_Rate_Upgrade',
         DISTANCE_RATES_SETTINGS: 'Distance_Rates_Settings',

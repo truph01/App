@@ -5180,6 +5180,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                         confirm: 'Capito',
                     },
                 },
+                personalDetailsDescription: 'Per prenotare il viaggio, inserisci il tuo nome legale così come appare sul tuo documento d’identità rilasciato dal governo.',
             },
             expensifyCard: {
                 title: 'Carta Expensify',

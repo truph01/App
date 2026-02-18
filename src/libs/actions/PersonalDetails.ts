@@ -7,6 +7,7 @@ import type {
     OpenPublicProfilePageParams,
     SetPersonalDetailsAndRevealExpensifyCardParams,
     SetPersonalDetailsAndShipExpensifyCardsParams,
+    SetPrivatePersonalDetailsParams,
     UpdateAutomaticTimezoneParams,
     UpdateDateOfBirthParams,
     UpdateDisplayNameParams,
@@ -640,6 +641,35 @@ function setPersonalDetailsAndRevealExpensifyCard(
     });
 }
 
+function setPrivatePersonalDetails(values: Partial<FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>>, validateCode: string) {
+    const parameters: SetPrivatePersonalDetailsParams = {
+        legalFirstName: values.legalFirstName?.trim(),
+        legalLastName: values.legalLastName?.trim(),
+        validateCode,
+    };
+
+    API.write(WRITE_COMMANDS.SET_PRIVATE_PERSONAL_DETAILS, parameters, {
+        optimisticData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.PRIVATE_PERSONAL_DETAILS,
+                value: {
+                    isLoading: true,
+                },
+            },
+        ],
+        finallyData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.PRIVATE_PERSONAL_DETAILS,
+                value: {
+                    isLoading: false,
+                },
+            },
+        ],
+    });
+}
+
 export {
     clearAvatarErrors,
     deleteAvatar,
@@ -657,5 +687,6 @@ export {
     updateSelectedTimezone,
     updatePersonalDetailsAndShipExpensifyCards,
     setPersonalDetailsAndRevealExpensifyCard,
+    setPrivatePersonalDetails,
     clearPersonalDetailsErrors,
 };

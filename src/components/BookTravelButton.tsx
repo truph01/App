@@ -25,6 +25,7 @@ import Button from './Button';
 import ConfirmModal from './ConfirmModal';
 import DotIndicatorMessage from './DotIndicatorMessage';
 import RenderHTML from './RenderHTML';
+import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 
 type BookTravelButtonProps = {
     text: string;
@@ -68,6 +69,7 @@ function BookTravelButton({text, shouldRenderErrorMessageBelowButton = false, ac
     const {isBetaEnabled} = usePermissions();
     const [isPreventionModalVisible, setPreventionModalVisibility] = useState(false);
     const [isVerificationModalVisible, setVerificationModalVisibility] = useState(false);
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const activePolicies = getActivePolicies(policies, currentUserLogin);
@@ -83,11 +85,16 @@ function BookTravelButton({text, shouldRenderErrorMessageBelowButton = false, ac
         setShouldScrollToBottom?.(true);
     }, [errorMessage, setShouldScrollToBottom]);
 
-    const bookATrip = useCallback(() => {
+    const bookATrip = () => {
         setErrorMessage('');
 
         if (isBetaEnabled(CONST.BETAS.PREVENT_SPOTNANA_TRAVEL)) {
             setPreventionModalVisibility(true);
+            return;
+        }
+
+        if (isBetaEnabled(CONST.BETAS.TRAVEL_INVOICING) && areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS.getRoute(policy?.id ?? String(CONST.DEFAULT_NUMBER_ID)));
             return;
         }
 
@@ -161,19 +168,7 @@ function BookTravelButton({text, shouldRenderErrorMessageBelowButton = false, ac
         } else {
             Navigation.navigate(ROUTES.TRAVEL_DOMAIN_SELECTOR.getRoute(activePolicyID, Navigation.getActiveRoute()));
         }
-    }, [
-        primaryContactMethod,
-        policy,
-        groupPaidPolicies.length,
-        travelSettings?.hasAcceptedTerms,
-        travelSettings?.lastTravelSignupRequestTime,
-        isBetaEnabled,
-        translate,
-        isUserValidated,
-        phoneErrorMethodsRoute,
-        activePolicyID,
-        shouldShowVerifyAccountModal,
-    ]);
+    };
 
     return (
         <>
