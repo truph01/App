@@ -7,7 +7,8 @@ import {useEffect} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import ROUTES from '@src/ROUTES';
 import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
-import AuthorizeTransaction from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
+// see note inside useEffect
+// import AuthorizeTransaction from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
 import Navigation from './Navigation';
 
 function getMostUrgentTransactionPendingReview(transactions: OnyxEntry<TransactionsPending3DSReview>) {
@@ -44,7 +45,10 @@ function useNavigateTo3DSAuthorizationChallenge() {
             return;
         }
 
-        const {allowedAuthenticationMethods} = AuthorizeTransaction;
+        // note: importing AuthorizeTransaction in this file causes the browser to get stuck in an infinite reload loop
+        // TODO figure out why (hard-coded to BIOMETRICS for now)
+        // const allowedAuthenticationMethods = AuthorizeTransaction.allowedAuthenticationMethods;
+        const allowedAuthenticationMethods = [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS];
         const doesDeviceSupportAnAllowedAuthenticationMethod = allowedAuthenticationMethods.some((method) => {
             switch (method) {
                 case CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS:
