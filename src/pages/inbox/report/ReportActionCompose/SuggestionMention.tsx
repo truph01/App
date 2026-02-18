@@ -75,29 +75,25 @@ function SuggestionMention({
     const policy = usePolicy(policyID);
     suggestionValuesRef.current = suggestionValues;
 
+    // Filter reports to only include those that can be mentioned within the current policy
     const mentionableReportsSelector = useCallback(
         (reports: OnyxCollection<Report>) => {
-            if (!reports) {
-                return {};
-            }
-
-            return Object.keys(reports).reduce((acc, reportID) => {
-                if (!acc) {
-                    return {};
-                }
-
-                const report = reports[reportID];
-                if (canReportBeMentionedWithinPolicy(report, policyID)) {
-                    acc[reportID] = report;
-                }
-                return acc;
-            }, {} as OnyxCollection<Report>);
+            return Object.keys(reports ?? {}).reduce(
+                (acc, reportID) => {
+                    const report = reports?.[reportID];
+                    if (report && canReportBeMentionedWithinPolicy(report, policyID)) {
+                        acc[reportID] = report;
+                    }
+                    return acc;
+                },
+                {} as Record<string, Report>,
+            );
         },
         [policyID],
     );
 
     const [conciergeReportID = ''] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
-    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
+    const [mentionableReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
         canBeMissing: false,
         selector: mentionableReportsSelector,
     });
@@ -430,7 +426,7 @@ function SuggestionMention({
             const shouldDisplayRoomMentionsSuggestions = isGroupPolicyReport && (isValidRoomName(suggestionWord.toLowerCase()) || prefix === '');
             if (prefixType === '#' && shouldDisplayRoomMentionsSuggestions) {
                 // Filter reports by room name and current policy
-                nextState.suggestedMentions = getRoomMentionOptions(prefix, reports);
+                nextState.suggestedMentions = getRoomMentionOptions(prefix, mentionableReports);
 
                 // Even if there are no reports, we should show the suggestion menu - to perform live search
                 nextState.shouldShowSuggestionMenu = true;
@@ -448,7 +444,7 @@ function SuggestionMention({
             }));
             setHighlightedMentionIndex(0);
         },
-        [isComposerFocused, isGroupPolicyReport, setHighlightedMentionIndex, resetSuggestions, getUserMentionOptions, weightedPersonalDetails, getRoomMentionOptions, reports],
+        [isComposerFocused, isGroupPolicyReport, setHighlightedMentionIndex, resetSuggestions, getUserMentionOptions, weightedPersonalDetails, getRoomMentionOptions, mentionableReports],
     );
 
     const debouncedCalculateMentionSuggestion = useDebounce(
