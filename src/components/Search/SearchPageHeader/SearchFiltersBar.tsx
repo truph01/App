@@ -263,9 +263,7 @@ function SearchFiltersBar({
 
         const displayText: string[] = [];
         if (value.On) {
-            displayText.push(
-                isSearchDatePreset(value.On) ? translate(`search.filters.date.presets.${value.On}`) : `${translate('common.on')} ${DateUtils.formatToReadableString(value.On)}`,
-            );
+            displayText.push(isSearchDatePreset(value.On) ? translate(`search.filters.date.presets.${value.On}`) : `${translate('common.on')} ${DateUtils.formatToReadableString(value.On)}`);
         }
         if (value.After) {
             displayText.push(`${translate('common.after')} ${DateUtils.formatToReadableString(value.After)}`);
@@ -533,145 +531,145 @@ function SearchFiltersBar({
     const shouldDisplayWithdrawnFilter = !!searchAdvancedFiltersForm.withdrawnOn || !!searchAdvancedFiltersForm.withdrawnAfter || !!searchAdvancedFiltersForm.withdrawnBefore;
 
     const filters = [
-            {
-                label: translate('common.type'),
-                PopoverComponent: typeComponent,
-                value: type?.text ?? null,
-                filterKey: FILTER_KEYS.TYPE,
-                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_TYPE,
-            },
-            ...(shouldDisplayGroupByFilter
-                ? [
-                      {
-                          label: translate('search.groupBy'),
-                          PopoverComponent: groupByComponent,
-                          value: groupBy?.text ?? null,
-                          filterKey: FILTER_KEYS.GROUP_BY,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_GROUP_BY,
-                      },
-                  ]
-                : []),
-            ...(shouldDisplayGroupCurrencyFilter
-                ? [
-                      {
-                          label: translate('common.groupCurrency'),
-                          PopoverComponent: groupCurrencyComponent,
-                          value: groupCurrency?.value ?? null,
-                          filterKey: FILTER_KEYS.GROUP_CURRENCY,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_GROUP_CURRENCY,
-                      },
-                  ]
-                : []),
-            ...(shouldDisplayFeedFilter
-                ? [
-                      {
-                          label: translate('search.filters.feed'),
-                          PopoverComponent: feedComponent,
-                          value: feed.map((option) => option.text),
-                          filterKey: FILTER_KEYS.FEED,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_FEED,
-                      },
-                  ]
-                : []),
-            ...(shouldDisplayPostedFilter
-                ? [
-                      {
-                          label: translate('search.filters.posted'),
-                          PopoverComponent: postedPickerComponent,
-                          value: displayPosted,
-                          filterKey: FILTER_KEYS.POSTED_ON,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_POSTED,
-                      },
-                  ]
-                : []),
-            ...(shouldDisplayWithdrawalTypeFilter
-                ? [
-                      {
-                          label: translate('search.withdrawalType'),
-                          PopoverComponent: withdrawalTypeComponent,
-                          value: withdrawalType?.text ?? null,
-                          filterKey: FILTER_KEYS.WITHDRAWAL_TYPE,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WITHDRAWAL_TYPE,
-                      },
-                  ]
-                : []),
-            ...(shouldDisplayWithdrawnFilter
-                ? [
-                      {
-                          label: translate('search.filters.withdrawn'),
-                          PopoverComponent: withdrawnPickerComponent,
-                          value: displayWithdrawn,
-                          filterKey: FILTER_KEYS.WITHDRAWN_ON,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WITHDRAWN,
-                      },
-                  ]
-                : []),
-            {
-                label: translate('common.status'),
-                PopoverComponent: statusComponent,
-                value: status.map((option) => option.text),
-                filterKey: FILTER_KEYS.STATUS,
-                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_STATUS,
-            },
-            ...(type?.value === CONST.SEARCH.DATA_TYPES.CHAT
-                ? [
-                      {
-                          label: translate('search.has'),
-                          PopoverComponent: hasComponent,
-                          value: has.map((option) => option.text),
-                          filterKey: FILTER_KEYS.HAS,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_HAS,
-                      },
-                  ]
-                : []),
-            ...(type?.value === CONST.SEARCH.DATA_TYPES.CHAT
-                ? [
-                      {
-                          label: translate('search.filters.is'),
-                          PopoverComponent: isComponent,
-                          value: is.map((option) => option.text),
-                          filterKey: FILTER_KEYS.IS,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_IS,
-                      },
-                  ]
-                : []),
-            {
-                label: translate('common.date'),
-                PopoverComponent: datePickerComponent,
-                value: displayDate,
-                filterKey: FILTER_KEYS.DATE_ON,
-                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_DATE,
-            },
-            {
-                label: translate('common.from'),
-                PopoverComponent: userPickerComponent,
-                value: fromValue,
-                filterKey: FILTER_KEYS.FROM,
-                sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_FROM,
-            },
-            ...(shouldDisplayWorkspaceFilter
-                ? [
-                      {
-                          label: translate('workspace.common.workspace'),
-                          PopoverComponent: workspaceComponent,
-                          value: workspaceValue,
-                          filterKey: FILTER_KEYS.POLICY_ID,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WORKSPACE,
-                      },
-                  ]
-                : []),
-            ...(shouldDisplayGroupByFilter
-                ? [
-                      {
-                          label: translate('search.view.label'),
-                          PopoverComponent: viewComponent,
-                          value: viewValue?.text ?? null,
-                          filterKey: FILTER_KEYS.VIEW,
-                          sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_VIEW,
-                      },
-                  ]
-                : []),
-        ].filter((filterItem) => isFilterSupported(filterItem.filterKey, type?.value ?? CONST.SEARCH.DATA_TYPES.EXPENSE));
+        {
+            label: translate('common.type'),
+            PopoverComponent: typeComponent,
+            value: type?.text ?? null,
+            filterKey: FILTER_KEYS.TYPE,
+            sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_TYPE,
+        },
+        ...(shouldDisplayGroupByFilter
+            ? [
+                  {
+                      label: translate('search.groupBy'),
+                      PopoverComponent: groupByComponent,
+                      value: groupBy?.text ?? null,
+                      filterKey: FILTER_KEYS.GROUP_BY,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_GROUP_BY,
+                  },
+              ]
+            : []),
+        ...(shouldDisplayGroupCurrencyFilter
+            ? [
+                  {
+                      label: translate('common.groupCurrency'),
+                      PopoverComponent: groupCurrencyComponent,
+                      value: groupCurrency?.value ?? null,
+                      filterKey: FILTER_KEYS.GROUP_CURRENCY,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_GROUP_CURRENCY,
+                  },
+              ]
+            : []),
+        ...(shouldDisplayFeedFilter
+            ? [
+                  {
+                      label: translate('search.filters.feed'),
+                      PopoverComponent: feedComponent,
+                      value: feed.map((option) => option.text),
+                      filterKey: FILTER_KEYS.FEED,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_FEED,
+                  },
+              ]
+            : []),
+        ...(shouldDisplayPostedFilter
+            ? [
+                  {
+                      label: translate('search.filters.posted'),
+                      PopoverComponent: postedPickerComponent,
+                      value: displayPosted,
+                      filterKey: FILTER_KEYS.POSTED_ON,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_POSTED,
+                  },
+              ]
+            : []),
+        ...(shouldDisplayWithdrawalTypeFilter
+            ? [
+                  {
+                      label: translate('search.withdrawalType'),
+                      PopoverComponent: withdrawalTypeComponent,
+                      value: withdrawalType?.text ?? null,
+                      filterKey: FILTER_KEYS.WITHDRAWAL_TYPE,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WITHDRAWAL_TYPE,
+                  },
+              ]
+            : []),
+        ...(shouldDisplayWithdrawnFilter
+            ? [
+                  {
+                      label: translate('search.filters.withdrawn'),
+                      PopoverComponent: withdrawnPickerComponent,
+                      value: displayWithdrawn,
+                      filterKey: FILTER_KEYS.WITHDRAWN_ON,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WITHDRAWN,
+                  },
+              ]
+            : []),
+        {
+            label: translate('common.status'),
+            PopoverComponent: statusComponent,
+            value: status.map((option) => option.text),
+            filterKey: FILTER_KEYS.STATUS,
+            sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_STATUS,
+        },
+        ...(type?.value === CONST.SEARCH.DATA_TYPES.CHAT
+            ? [
+                  {
+                      label: translate('search.has'),
+                      PopoverComponent: hasComponent,
+                      value: has.map((option) => option.text),
+                      filterKey: FILTER_KEYS.HAS,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_HAS,
+                  },
+              ]
+            : []),
+        ...(type?.value === CONST.SEARCH.DATA_TYPES.CHAT
+            ? [
+                  {
+                      label: translate('search.filters.is'),
+                      PopoverComponent: isComponent,
+                      value: is.map((option) => option.text),
+                      filterKey: FILTER_KEYS.IS,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_IS,
+                  },
+              ]
+            : []),
+        {
+            label: translate('common.date'),
+            PopoverComponent: datePickerComponent,
+            value: displayDate,
+            filterKey: FILTER_KEYS.DATE_ON,
+            sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_DATE,
+        },
+        {
+            label: translate('common.from'),
+            PopoverComponent: userPickerComponent,
+            value: fromValue,
+            filterKey: FILTER_KEYS.FROM,
+            sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_FROM,
+        },
+        ...(shouldDisplayWorkspaceFilter
+            ? [
+                  {
+                      label: translate('workspace.common.workspace'),
+                      PopoverComponent: workspaceComponent,
+                      value: workspaceValue,
+                      filterKey: FILTER_KEYS.POLICY_ID,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_WORKSPACE,
+                  },
+              ]
+            : []),
+        ...(shouldDisplayGroupByFilter
+            ? [
+                  {
+                      label: translate('search.view.label'),
+                      PopoverComponent: viewComponent,
+                      value: viewValue?.text ?? null,
+                      filterKey: FILTER_KEYS.VIEW,
+                      sentryLabel: CONST.SENTRY_LABEL.SEARCH.FILTER_VIEW,
+                  },
+              ]
+            : []),
+    ].filter((filterItem) => isFilterSupported(filterItem.filterKey, type?.value ?? CONST.SEARCH.DATA_TYPES.EXPENSE));
 
     const hiddenSelectedFilters = (() => {
         const advancedSearchFiltersKeys = typeFiltersKeys.flat();
