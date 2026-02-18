@@ -94,13 +94,15 @@ async function run() {
         let didFindDuplicate = false;
         let originalProposal: TupleToUnion<typeof commentsResponse> | undefined;
         for (const previousProposal of commentsResponse) {
-            const isProposal = !!previousProposal.body?.includes(CONST.PROPOSAL_KEYWORD);
+            const body = previousProposal.body ?? '';
+            const lowerCaseBody = body.toLowerCase() ?? '';
+            const isProposal = !!body.includes(CONST.PROPOSAL_KEYWORD) && !!lowerCaseBody.includes(CONST.PROPOSAL_HEADER_A) && !!lowerCaseBody.includes(CONST.PROPOSAL_HEADER_B);
             const previousProposalCreatedAt = new Date(previousProposal.created_at).getTime();
             // Early continue if not a proposal or previous comment is newer than current one
             if (!isProposal || previousProposalCreatedAt >= newProposalCreatedAt) {
                 continue;
             }
-            const isAuthorBot = previousProposal.user?.login === CONST.COMMENT.NAME_GITHUB_ACTIONS || previousProposal.user?.type === CONST.COMMENT.TYPE_BOT;
+            const isAuthorBot = previousProposal.user?.login === CONST.COMMENT.NAME_MELVIN || previousProposal.user?.login === CONST.COMMENT.NAME_CODEX || previousProposal.user?.login === CONST.COMMENT.NAME_GITHUB_ACTIONS || previousProposal.user?.type === CONST.COMMENT.TYPE_BOT;
             // Skip prompting if comment author is the GH bot
             if (isAuthorBot) {
                 continue;
