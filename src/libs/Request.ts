@@ -43,8 +43,8 @@ function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan: Span 
             span.end();
             return response;
         })
-        .catch((error) => {
-            span.setStatus({code: 2, message: error?.message});
+        .catch((error: unknown) => {
+            span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
             span.end();
             throw error;
         });
@@ -82,11 +82,12 @@ function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isF
             outerSpan.end();
             return response;
         })
-        .catch((error) => {
-            currentProcessMiddlewaresSpan?.setStatus({code: 2, message: error?.message});
+        .catch((error: unknown) => {
+            const errorMessage = error instanceof Error ? error.message : undefined;
+            currentProcessMiddlewaresSpan?.setStatus({code: 2, message: errorMessage});
             currentProcessMiddlewaresSpan?.end();
             currentProcessMiddlewaresSpan = undefined;
-            outerSpan.setStatus({code: 2, message: error?.message});
+            outerSpan.setStatus({code: 2, message: errorMessage});
             outerSpan.end();
             throw error;
         });

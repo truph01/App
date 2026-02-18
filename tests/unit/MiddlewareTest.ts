@@ -40,7 +40,7 @@ beforeEach(async () => {
 describe('Middleware', () => {
     describe('HandleUnusedOptimisticID', () => {
         test('Normal request', async () => {
-            Request.addMiddleware(handleUnusedOptimisticID);
+            Request.addMiddleware(handleUnusedOptimisticID, 'HandleUnusedOptimisticID');
             const requests = [
                 {
                     command: 'OpenReport',
@@ -75,7 +75,7 @@ describe('Middleware', () => {
         });
 
         test('Request with preexistingReportID', async () => {
-            Request.addMiddleware(handleUnusedOptimisticID);
+            Request.addMiddleware(handleUnusedOptimisticID, 'HandleUnusedOptimisticID');
             const requests = [
                 {
                     command: 'OpenReport',
@@ -124,7 +124,7 @@ describe('Middleware', () => {
         });
 
         test('Request with preexistingReportID and no reportID in params', async () => {
-            Request.addMiddleware(handleUnusedOptimisticID);
+            Request.addMiddleware(handleUnusedOptimisticID, 'HandleUnusedOptimisticID');
             const requests = [
                 {
                     command: 'RequestMoney',
@@ -188,7 +188,7 @@ describe('Middleware', () => {
         });
 
         test('Request with preexistingReportID and optimisticReportID param', async () => {
-            Request.addMiddleware(handleUnusedOptimisticID);
+            Request.addMiddleware(handleUnusedOptimisticID, 'HandleUnusedOptimisticID');
             const requests = [
                 {
                     command: 'MoveIOUReportToExistingPolicy',
@@ -243,8 +243,8 @@ describe('Middleware', () => {
                 },
             });
 
-            Request.addMiddleware(handleUnusedOptimisticID);
-            Request.addMiddleware(SaveResponseInOnyx);
+            Request.addMiddleware(handleUnusedOptimisticID, 'HandleUnusedOptimisticID');
+            Request.addMiddleware(SaveResponseInOnyx, 'SaveResponseInOnyx');
 
             const requests = [
                 {
@@ -363,8 +363,8 @@ describe('Middleware', () => {
                 },
             });
 
-            Request.addMiddleware(handleUnusedOptimisticID);
-            Request.addMiddleware(SaveResponseInOnyx);
+            Request.addMiddleware(handleUnusedOptimisticID, 'HandleUnusedOptimisticID');
+            Request.addMiddleware(SaveResponseInOnyx, 'SaveResponseInOnyx');
 
             const requests = [
                 {
