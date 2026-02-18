@@ -148,6 +148,20 @@ type SplitBillActionsParams = {
     betas: OnyxEntry<OnyxTypes.Beta[]>;
 };
 
+let allTransactions: OnyxCollection<OnyxTypes.Transaction>;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.TRANSACTION,
+    waitForCollectionCallback: true,
+    callback: (value) => (allTransactions = value),
+});
+
+let allReports: OnyxCollection<OnyxTypes.Report>;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.REPORT,
+    waitForCollectionCallback: true,
+    callback: (value) => (allReports = value),
+});
+
 /**
  * @param amount - always in smallest currency unit
  * @param existingSplitChatReportID - Either a group DM or a expense chat
