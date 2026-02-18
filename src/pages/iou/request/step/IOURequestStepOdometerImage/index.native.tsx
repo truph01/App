@@ -107,7 +107,7 @@ function IOURequestStepOdometerImage({
         transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
     }));
 
-    const focusCamera = useCallback((point: Point) => {
+    const focusCamera = (point: Point) => {
         if (!camera.current) {
             return;
         }
@@ -118,7 +118,7 @@ function IOURequestStepOdometerImage({
             }
             Log.warn('Error focusing camera', error);
         });
-    }, []);
+    };
 
     const tapGesture = Gesture.Tap()
         .enabled(device?.supportsFocus ?? false)
@@ -168,27 +168,20 @@ function IOURequestStepOdometerImage({
     }, [device]);
 
     const handleImageSelected = useCallback(
-        (file: FileObject, source: string) => {
-            // On native, we need to save the URI string, not the File object
-            const imageUri = typeof file === 'string' ? file : ((file as {uri?: string}).uri ?? source);
+        (files: FileObject[]) => {
+            if (files.length === 0) {
+                return;
+            }
+
+            const file = files.at(0);
+            const imageUri = (file as {uri?: string}).uri ?? '';
             setMoneyRequestOdometerImage(transactionID, imageType, imageUri, isTransactionDraft);
             navigateBack();
         },
         [transactionID, imageType, isTransactionDraft, navigateBack],
     );
 
-    const {validateFiles, ErrorModal} = useFilesValidation((files: FileObject[]) => {
-        if (files.length === 0) {
-            return;
-        }
-        const file = files.at(0);
-        if (!file) {
-            return;
-        }
-        // For gallery selection, source is the file URI
-        const source = typeof file === 'string' ? file : URL.createObjectURL(file as Blob);
-        handleImageSelected(file, source);
-    });
+    const {validateFiles, ErrorModal} = useFilesValidation(handleImageSelected);
 
     const capturePhoto = useCallback(() => {
         if (!camera.current && (cameraPermissionStatus === RESULTS.DENIED || cameraPermissionStatus === RESULTS.BLOCKED)) {
