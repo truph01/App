@@ -48,23 +48,30 @@ type UseCompanyCardsResult = Partial<{
 };
 
 /**
- * For CDF assigned cards with a stale cardName and no encryptedCardNumber, attempts to find
- * the corresponding cardList entry via lastFourPAN so the card uses the up-to-date name and encrypted value.
+ * Resolves an assigned card to its corresponding cardList entry using a cascading lookup:
+ * 1. encryptedCardNumber — exact match against cardList values
+ * 2. cardName — normalized name match against cardList keys
+ * 3. lastFourPAN — last-4-digit suffix match (only when exactly 1 cardList entry matches)
+ *
+ * Only the lastFourPAN path enriches the card; the other two confirm the card is already linked.
  */
-function resolveEncryptedCardNumber(card: Card, cardList: AssignableCardsList | undefined): {cardName: string; encryptedCardNumber: string} | undefined {
-    const {lastFourPAN} = card;
-    if (card.encryptedCardNumber || !lastFourPAN || !cardList) {
-        return undefined;
+function resolveCardListEntry(card: Card, cardListEntries: Array<[string, string]>): Card {
+    const {cardName, encryptedCardNumber, lastFourPAN} = card;
+
+    const isLinkedByEncrypted = encryptedCardNumber && cardListEntries.some(([, enc]) => enc === encryptedCardNumber);
+    const isLinkedByName = cardName && cardListEntries.some(([name]) => normalizeCardName(name) === normalizeCardName(cardName));
+
+    if (isLinkedByEncrypted || isLinkedByName || !lastFourPAN) {
+        return card;
     }
-    const matches = Object.entries(cardList).filter(([name]) => name.endsWith(lastFourPAN));
+
+    const matches = cardListEntries.filter(([name]) => name.endsWith(lastFourPAN));
     if (matches.length !== 1) {
-        return undefined;
+        return card;
     }
-    const match = matches.at(0);
-    if (!match) {
-        return undefined;
-    }
-    return {cardName: match[0], encryptedCardNumber: match[1]};
+
+    const [name, encrypted] = matches.at(0) ?? [cardName, encryptedCardNumber];
+    return {...card, cardName: name, encryptedCardNumber: encrypted};
 }
 
 /**
@@ -76,25 +83,26 @@ function buildCompanyCardEntries(accountList: string[] | undefined, cardList: As
     const coveredNames = new Set<string>();
     const coveredEncrypted = new Set<string>();
 
+    const cardListEntries = Object.entries(cardList ?? {});
+
     // Phase 1: Assigned cards first — these are the source of truth.
     for (const card of Object.values(assignedCards)) {
         if (!card?.cardName) {
             continue;
         }
 
-        const resolved = resolveEncryptedCardNumber(card, cardList);
-        const cardName = resolved?.cardName ?? card.cardName;
-        const encryptedCardNumber = resolved?.encryptedCardNumber ?? card.encryptedCardNumber ?? card.cardName;
+        const resolved = resolveCardListEntry(card, cardListEntries);
+        const encryptedCardNumber = resolved.encryptedCardNumber ?? card.cardName;
 
-        entries.push({cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
-        coveredNames.add(normalizeCardName(cardName));
+        entries.push({cardName: card.cardName, encryptedCardNumber, isAssigned: true, assignedCard: card});
+        coveredNames.add(normalizeCardName(card.cardName));
         if (encryptedCardNumber !== card.cardName) {
             coveredEncrypted.add(encryptedCardNumber);
         }
     }
 
     // Phase 2: Add remaining unassigned cards. cardList first so its encryptedCardNumber takes precedence.
-    for (const [name, encryptedCardNumber] of Object.entries(cardList ?? {})) {
+    for (const [name, encryptedCardNumber] of cardListEntries) {
         if (coveredNames.has(normalizeCardName(name)) || coveredEncrypted.has(encryptedCardNumber)) {
             continue;
         }
