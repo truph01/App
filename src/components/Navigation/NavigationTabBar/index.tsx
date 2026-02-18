@@ -1,6 +1,6 @@
 import {findFocusedRoute, StackActions, useNavigationState} from '@react-navigation/native';
 import type {NavigationState} from '@react-navigation/native';
-import React, {memo, useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -72,18 +72,15 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
     const theme = useTheme();
     const styles = useThemeStyles();
 
-    const getIconFill = useCallback(
-        (isSelected: boolean, isHovered: boolean) => {
-            if (isSelected) {
-                return theme.iconMenu;
-            }
-            if (isHovered) {
-                return theme.success;
-            }
-            return theme.icon;
-        },
-        [theme],
-    );
+    const getIconFill = (isSelected: boolean, isHovered: boolean) => {
+        if (isSelected) {
+            return theme.iconMenu;
+        }
+        if (isHovered) {
+            return theme.success;
+        }
+        return theme.icon;
+    };
     const {translate, preferredLocale} = useLocalize();
     const {indicatorColor: workspacesTabIndicatorColor, status: workspacesTabIndicatorStatus} = useWorkspacesTabIndicatorStatus();
     const {orderedReportIDs} = useSidebarOrderedReports();
@@ -103,16 +100,13 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
     const paramsPolicyID = params && 'policyID' in params ? params.policyID : undefined;
     const paramsDomainAccountID = params && 'domainAccountID' in params ? params.domainAccountID : undefined;
 
-    const lastViewedPolicySelector = useCallback(
-        (policies: OnyxCollection<Policy>) => {
-            if (!lastWorkspacesTabNavigatorRoute || lastWorkspacesTabNavigatorRoute.name !== NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR || !paramsPolicyID) {
-                return undefined;
-            }
+    const lastViewedPolicySelector = (policies: OnyxCollection<Policy>) => {
+        if (!lastWorkspacesTabNavigatorRoute || lastWorkspacesTabNavigatorRoute.name !== NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR || !paramsPolicyID) {
+            return undefined;
+        }
 
-            return policies?.[`${ONYXKEYS.COLLECTION.POLICY}${paramsPolicyID}`];
-        },
-        [paramsPolicyID, lastWorkspacesTabNavigatorRoute],
-    );
+        return policies?.[`${ONYXKEYS.COLLECTION.POLICY}${paramsPolicyID}`];
+    };
 
     const [lastViewedPolicy] = useOnyx(
         ONYXKEYS.COLLECTION.POLICY,
@@ -123,16 +117,13 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
         [navigationState],
     );
 
-    const lastViewedDomainSelector = useCallback(
-        (domains: OnyxCollection<Domain>) => {
-            if (!lastWorkspacesTabNavigatorRoute || lastWorkspacesTabNavigatorRoute.name !== NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR || !paramsDomainAccountID) {
-                return undefined;
-            }
+    const lastViewedDomainSelector = (domains: OnyxCollection<Domain>) => {
+        if (!lastWorkspacesTabNavigatorRoute || lastWorkspacesTabNavigatorRoute.name !== NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR || !paramsDomainAccountID) {
+            return undefined;
+        }
 
-            return domains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${paramsDomainAccountID}`];
-        },
-        [paramsDomainAccountID, lastWorkspacesTabNavigatorRoute],
-    );
+        return domains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${paramsDomainAccountID}`];
+    };
 
     const [lastViewedDomain] = useOnyx(
         ONYXKEYS.COLLECTION.DOMAIN,
@@ -175,14 +166,14 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
         setChatTabBrickRoad(getChatTabBrickRoad(orderedReportIDs, reportAttributes));
     }, [orderedReportIDs, reportAttributes]);
 
-    const navigateToNewDotHome = useCallback(() => {
+    const navigateToNewDotHome = () => {
         if (selectedTab === NAVIGATION_TABS.HOME) {
             return;
         }
         Navigation.navigate(ROUTES.HOME);
-    }, [selectedTab]);
+    };
 
-    const navigateToChats = useCallback(() => {
+    const navigateToChats = () => {
         if (selectedTab === NAVIGATION_TABS.INBOX) {
             return;
         }
@@ -200,14 +191,13 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
             }
 
             if (isRoutePreloaded(NAVIGATORS.REPORTS_SPLIT_NAVIGATOR)) {
-                // We use dispatch here because the correct screens and params are preloaded and set up in usePreloadFullScreenNavigators.
                 navigationRef.dispatch(StackActions.push(NAVIGATORS.REPORTS_SPLIT_NAVIGATOR));
                 return;
             }
         }
 
         Navigation.navigate(ROUTES.INBOX);
-    }, [selectedTab, shouldUseNarrowLayout, doesLastReportExist, lastReportRoute]);
+    };
 
     const [lastSearchParams] = useOnyx(ONYXKEYS.REPORT_NAVIGATION_LAST_SEARCH_QUERY, {canBeMissing: true});
 
@@ -256,7 +246,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
         });
     };
 
-    const navigateToSettings = useCallback(() => {
+    const navigateToSettings = () => {
         if (selectedTab === NAVIGATION_TABS.SETTINGS) {
             return;
         }
@@ -264,13 +254,12 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
             const accountTabPayload = getAccountTabScreenToOpen(subscriptionPlan);
 
             if (isRoutePreloaded(NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR)) {
-                // We use dispatch here because the correct screens and params are preloaded and set up in usePreloadFullScreenNavigators.
                 navigationRef.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.PUSH, payload: {name: NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR, params: accountTabPayload}});
                 return;
             }
             navigationRef.dispatch(StackActions.push(NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR, accountTabPayload));
         });
-    }, [selectedTab, subscriptionPlan]);
+    };
 
     /**
      * The settings tab is related to SettingsSplitNavigator and WorkspaceSplitNavigator.
@@ -278,13 +267,13 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
      * If so, all previously opened screens have be pushed to the navigation stack to maintain the order of screens within the tab.
      * If the user clicks on the settings tab while on this tab, this button should go back to the previous screen within the tab.
      */
-    const showWorkspaces = useCallback(() => {
+    const showWorkspaces = () => {
         navigateToWorkspacesPage({shouldUseNarrowLayout, currentUserLogin, policy: lastViewedPolicy, domain: lastViewedDomain});
-    }, [shouldUseNarrowLayout, currentUserLogin, lastViewedPolicy, lastViewedDomain]);
+    };
 
-    const inboxAccessibilityState = useMemo(() => ({selected: selectedTab === NAVIGATION_TABS.INBOX}), [selectedTab]);
-    const searchAccessibilityState = useMemo(() => ({selected: selectedTab === NAVIGATION_TABS.SEARCH}), [selectedTab]);
-    const workspacesAccessibilityState = useMemo(() => ({selected: selectedTab === NAVIGATION_TABS.WORKSPACES}), [selectedTab]);
+    const inboxAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.INBOX};
+    const searchAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.SEARCH};
+    const workspacesAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.WORKSPACES};
 
     if (!shouldUseNarrowLayout) {
         return (
@@ -637,4 +626,4 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
     );
 }
 
-export default memo(NavigationTabBar);
+export default NavigationTabBar;

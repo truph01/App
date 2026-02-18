@@ -1,5 +1,5 @@
 import {useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import FormHelpMessage from '@components/FormHelpMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -53,7 +53,7 @@ function SelectCountryStep({policyID}: CountryStepProps) {
     const [hasError, setHasError] = useState(false);
     const doesCountrySupportPlaid = isPlaidSupportedCountry(currentCountry);
 
-    const submit = useCallback(() => {
+    const submit = () => {
         if (!currentCountry) {
             setHasError(true);
         } else {
@@ -69,7 +69,7 @@ function SelectCountryStep({policyID}: CountryStepProps) {
                 isEditing: false,
             });
         }
-    }, [addNewCard?.data.selectedCountry, currentCountry, doesCountrySupportPlaid]);
+    };
 
     useEffect(() => {
         setCurrentCountry(getCountry());
@@ -83,48 +83,38 @@ function SelectCountryStep({policyID}: CountryStepProps) {
         Navigation.goBack();
     };
 
-    const onSelectionChange = useCallback((country: Option) => {
+    const onSelectionChange = (country: Option) => {
         setCurrentCountry(country.value);
-    }, []);
+    };
 
-    const countries = useMemo(
-        () =>
-            Object.keys(CONST.ALL_COUNTRIES)
-                .filter((countryISO) => !CONST.PLAID_EXCLUDED_COUNTRIES.includes(countryISO))
-                .map((countryISO) => {
-                    const countryName = translate(`allCountries.${countryISO}` as TranslationPaths);
-                    return {
-                        value: countryISO,
-                        keyForList: countryISO,
-                        text: countryName,
-                        isSelected: currentCountry === countryISO,
-                        searchValue: StringUtils.sanitizeString(`${countryISO}${countryName}`),
-                    };
-                }),
-        [translate, currentCountry],
-    );
+    const countries = Object.keys(CONST.ALL_COUNTRIES)
+        .filter((countryISO) => !CONST.PLAID_EXCLUDED_COUNTRIES.includes(countryISO))
+        .map((countryISO) => {
+            const countryName = translate(`allCountries.${countryISO}` as TranslationPaths);
+            return {
+                value: countryISO,
+                keyForList: countryISO,
+                text: countryName,
+                isSelected: currentCountry === countryISO,
+                searchValue: StringUtils.sanitizeString(`${countryISO}${countryName}`),
+            };
+        });
 
     const searchResults = searchOptions(debouncedSearchValue, countries);
     const headerMessage = debouncedSearchValue.trim() && !searchResults.length ? translate('common.noResultsFound') : '';
 
-    const textInputOptions = useMemo(
-        () => ({
-            headerMessage,
-            value: searchValue,
-            label: translate('common.search'),
-            onChangeText: setSearchValue,
-        }),
-        [headerMessage, searchValue, setSearchValue, translate],
-    );
+    const textInputOptions = {
+        headerMessage,
+        value: searchValue,
+        label: translate('common.search'),
+        onChangeText: setSearchValue,
+    };
 
-    const confirmButtonOptions = useMemo(
-        () => ({
-            onConfirm: submit,
-            showButton: true,
-            text: translate('common.next'),
-        }),
-        [submit, translate],
-    );
+    const confirmButtonOptions = {
+        onConfirm: submit,
+        showButton: true,
+        text: translate('common.next'),
+    };
 
     return (
         <ScreenWrapper
