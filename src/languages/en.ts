@@ -2270,6 +2270,10 @@ const translations = {
                 `identified suspicious activity on card ending in ${cardLastFour}. Do you recognize this charge?\n\n${amount} for ${merchant} - ${date}`,
         },
         freezeCard: 'Freeze card',
+        unfreeze: 'Unfreeze',
+        unfreezeCard: 'Unfreeze card',
+        freezeDescription: 'A frozen card cannot be used for purchases and transactions. You can unfreeze it at any time.',
+        unfreezeDescription: "Unfreezing this card will start allowing purchases and transactions again. Only proceed if you're sure the card is safe to use.",
     },
     workflowsPage: {
         workflowTitle: 'Spend',

@@ -127,8 +127,8 @@ function SearchColumnsPage() {
         }),
     );
 
-    const groupColumnsList = allColumnsList.filter((column) => allGroupCustomColumns.includes(column.keyForList));
     const typeColumnsList = allColumnsList.filter((column) => allTypeCustomColumns.includes(column.keyForList));
+    const groupColumnsList = allColumnsList.filter((column) => allGroupCustomColumns.includes(column.keyForList));
 
     const isDefaultState =
         columns.length === defaultColumns.length &&
