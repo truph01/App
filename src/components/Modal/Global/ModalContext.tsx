@@ -28,8 +28,6 @@ const ModalContext = React.createContext<ModalContextType>({
 
 const useModal = () => useContext(ModalContext);
 
-let modalID = 1;
-
 type ModalInfo = {
     id: string;
     component: React.FunctionComponent<ModalProps>;
@@ -41,13 +39,14 @@ type CloseModalPromiseWithResolvers = ReturnType<typeof Promise.withResolvers<Mo
 
 function ModalProvider({children}: {children: React.ReactNode}) {
     const [modalStack, setModalStack] = useState<{modals: ModalInfo[]}>({modals: []});
+    const modalIDRef = useRef(1);
     const modalPromisesStack = useRef<Record<string, CloseModalPromiseWithResolvers>>({});
 
     const showModal = useCallback<ModalContextType['showModal']>(({component, props, id, isCloseable = true}) => {
         // This is a promise that will resolve when the modal is closed
         let closeModalPromise: CloseModalPromiseWithResolvers | null = id ? modalPromisesStack.current?.[id] : null;
 
-        const newModalId = id ?? String(modalID++);
+        const newModalId = id ?? String(modalIDRef.current++);
 
         if (!closeModalPromise) {
             // Create a new promise with resolvers to be resolved when the modal is closed
@@ -78,7 +77,7 @@ function ModalProvider({children}: {children: React.ReactNode}) {
                     Log.alert(`${CONST.ERROR.ENSURE_BUG_BOT} Missing modal promise while attempting to close modal with id ${lastModalId}. This should never happen.`);
                 } else {
                     lastModalPromise.resolve(data);
-                    delete modalPromisesStack.current?.[lastModalId];
+                    delete modalPromisesStack.current[lastModalId];
                 }
             }
 
