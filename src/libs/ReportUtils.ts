@@ -9486,7 +9486,6 @@ function reasonForReportToBeInOptionList({
         isChatReport(report) &&
         !isPolicyExpenseChat(report) &&
         !isTripRoom(report) &&
-        !isSystemChat(report) &&
         !isConciergeChatReport(report) &&
         !isSystemChatReport &&
         !isSelfDMWithVisiblePreference &&
