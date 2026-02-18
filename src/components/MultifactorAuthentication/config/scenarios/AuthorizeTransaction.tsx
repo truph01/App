@@ -1,5 +1,4 @@
 import React from 'react';
-import DeniedTransactionDescription from '@components/MultifactorAuthentication/components/DeniedTransactionDescription';
 import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
 import {
     DefaultClientFailureScreen,
@@ -35,7 +34,7 @@ const DefaultTransactionReviewClientFailureScreen = createScreenWithDefaults(
 const DeniedTransactionClientFailureScreen = createScreenWithDefaults(
     DefaultTransactionReviewClientFailureScreen,
     {
-        customSubtitle: <DeniedTransactionDescription />,
+        subtitle: 'multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompletedReachOut',
     },
     'DeniedTransactionFailureScreen',
 );
@@ -44,7 +43,7 @@ const DeniedTransactionServerFailureScreen = createScreenWithDefaults(
     DefaultServerFailureScreen,
     {
         headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
-        customSubtitle: <DeniedTransactionDescription />,
+        subtitle: 'multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompletedReachOut',
     },
     'DeniedTransactionFailureScreen',
 );

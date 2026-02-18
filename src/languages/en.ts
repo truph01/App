@@ -714,11 +714,8 @@ const translations = {
             authorizationFailed: 'Your approval failed, so we denied this transaction. You can try again at the merchant.',
             transactionFailed: 'Transaction failed',
             transactionCouldNotBeCompleted: 'Your transaction could not be completed. Please try again at the merchant.',
-            transactionCouldNotBeCompletedReachOut: {
-                start: "Your transaction could not be completed. If you didn't attempt this transaction, ",
-                link: 'reach out to Concierge',
-                end: ' to report potential fraud.',
-            },
+            transactionCouldNotBeCompletedReachOut:
+                "Your transaction could not be completed. If you didn't attempt this transaction, <concierge-link>reach out to Concierge</concierge-link> to report potential fraud.",
         },
         unsupportedDevice: {
             unsupportedDevice: 'Unsupported device',
