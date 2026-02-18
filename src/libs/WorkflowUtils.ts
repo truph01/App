@@ -182,8 +182,22 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
         });
     }
 
-    const availableMembers =
-        policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.BASIC ? sortedApprovalWorkflows?.flatMap((workflow) => workflow.members) : (sortedApprovalWorkflows.at(0)?.members ?? []);
+    // Include ALL workspace members in availableMembers so users can assign any member to a workflow.
+    // Previously we only included members from workflows (or just the first workflow in ADVANCED mode),
+    // which excluded members in custom workflows (e.g., Alex/Hannah who submit to Carolyn) or those
+    // with missing submitsTo. See https://github.com/Expensify/Expensify/issues/598876
+    const availableMembers: Member[] = Object.values(employees)
+        .filter(
+            (employee): employee is typeof employee & {email: string} =>
+                !!employee.email && employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+        )
+        .map((employee) => ({
+            email: employee.email,
+            avatar: personalDetailsByEmail[employee.email]?.avatar,
+            displayName: personalDetailsByEmail[employee.email]?.displayName ?? employee.email,
+            pendingFields: employee.pendingFields,
+        }))
+        .sort((a, b) => localeCompare(a.displayName ?? a.email, b.displayName ?? b.email));
 
     return {approvalWorkflows: sortedApprovalWorkflows, usedApproverEmails: [...usedApproverEmails], availableMembers};
 }

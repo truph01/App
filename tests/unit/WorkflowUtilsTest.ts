@@ -469,6 +469,47 @@ describe('WorkflowUtils', () => {
             }
             expect(approvalWorkflows).toEqual([defaultWorkflow, secondWorkflow]);
         });
+
+        it('Should include all workspace members in availableMembers (fix for #598876)', () => {
+            // Simulates ADVANCED approval mode: Alex and Hannah submit to Carolyn (custom workflow),
+            // others submit to Hannah (default). Previously availableMembers only had default workflow
+            // members, excluding Alex and Hannah.
+            const employees: PolicyEmployeeList = {
+                'alex@htc.us': {
+                    email: 'alex@htc.us',
+                    submitsTo: 'carolyn@htc.us',
+                },
+                'hannahw@htc.us': {
+                    email: 'hannahw@htc.us',
+                    submitsTo: 'carolyn@htc.us',
+                },
+                'carolyn@htc.us': {
+                    email: 'carolyn@htc.us',
+                    submitsTo: 'carolyn@htc.us',
+                },
+                'gio@htc.us': {
+                    email: 'gio@htc.us',
+                    submitsTo: 'hannahw@htc.us',
+                },
+            };
+            const policy = createMockPolicy(employees, 'hannahw@htc.us');
+            (policy as Policy).approvalMode = CONST.POLICY.APPROVAL_MODE.ADVANCED;
+            const personalDetailsForTest: PersonalDetailsList = {
+                'alex@htc.us': {accountID: 1, login: 'alex@htc.us', displayName: 'Alex Walker'},
+                'hannahw@htc.us': {accountID: 2, login: 'hannahw@htc.us', displayName: 'Hannah Walker'},
+                'carolyn@htc.us': {accountID: 3, login: 'carolyn@htc.us', displayName: 'Carolyn Krick'},
+                'gio@htc.us': {accountID: 4, login: 'gio@htc.us', displayName: 'Gio'},
+            };
+
+            const {availableMembers} = convertPolicyEmployeesToApprovalWorkflows({
+                policy,
+                personalDetails: personalDetailsForTest,
+                localeCompare,
+            });
+
+            const memberEmails = availableMembers.map((m) => m.email).sort();
+            expect(memberEmails).toEqual(['alex@htc.us', 'carolyn@htc.us', 'gio@htc.us', 'hannahw@htc.us']);
+        });
     });
 
     describe('convertApprovalWorkflowToPolicyEmployees', () => {
