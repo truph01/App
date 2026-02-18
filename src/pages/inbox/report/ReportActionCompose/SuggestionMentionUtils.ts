@@ -36,14 +36,7 @@ function getNormalizedMentionPrefix(prefixType: string, prefix: string): Normali
     };
 }
 
-function getUpdatedCommentWithInsertedMention({
-    value,
-    atSignIndex,
-    mentionPrefix,
-    prefixType,
-    mentionCode,
-    whiteSpacesLength = 0,
-}: UpdatedCommentWithInsertedMentionParams): string {
+function getUpdatedCommentWithInsertedMention({value, atSignIndex, mentionPrefix, prefixType, mentionCode, whiteSpacesLength = 0}: UpdatedCommentWithInsertedMentionParams): string {
     const commentBeforeAtSign = value.slice(0, atSignIndex);
     const originalMention = getOriginalMentionText(value, atSignIndex, whiteSpacesLength);
 
