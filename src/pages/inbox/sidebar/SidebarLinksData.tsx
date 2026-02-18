@@ -34,10 +34,7 @@ function SidebarLinksData({insets}: SidebarLinksDataProps) {
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
     }, []);
 
-    // End the span when the screen gains focus. This covers the case where
-    // SidebarLinksData is already mounted (onLayout won't re-fire) but the
-    // user navigates back to Inbox — e.g. via the wide-layout REPORT_WITH_ID path.
-    // endSpan is idempotent: if onLayout already ended it, this is a no-op.
+    // Ensures span ends when Inbox screen is focused, even if already mounted.
     useFocusEffect(
         useCallback(() => {
             endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
