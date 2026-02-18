@@ -120,6 +120,9 @@ function isAngleInSlice(angle: number, startAngle: number, endAngle: number): bo
     const normalizedStart = normalizeAngle(startAngle);
     const normalizedEnd = normalizeAngle(endAngle);
 
+    if (normalizedStart === normalizedEnd) {
+        return endAngle - startAngle >= 360;
+    }
     if (normalizedStart > normalizedEnd) {
         return normalizedAngle >= normalizedStart || normalizedAngle < normalizedEnd;
     }

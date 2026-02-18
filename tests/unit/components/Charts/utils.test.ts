@@ -46,6 +46,18 @@ describe('isAngleInSlice', () => {
         expect(isAngleInSlice(-90, 260, 280)).toBe(true);
         expect(isAngleInSlice(-90, 100, 200)).toBe(false);
     });
+
+    it('matches any angle for a full-circle slice (360 degrees)', () => {
+        expect(isAngleInSlice(0, -90, 270)).toBe(true);
+        expect(isAngleInSlice(90, -90, 270)).toBe(true);
+        expect(isAngleInSlice(-45, -90, 270)).toBe(true);
+        expect(isAngleInSlice(269, -90, 270)).toBe(true);
+    });
+
+    it('rejects all angles for a zero-sweep slice where start equals end', () => {
+        expect(isAngleInSlice(90, 90, 90)).toBe(false);
+        expect(isAngleInSlice(0, 90, 90)).toBe(false);
+    });
 });
 
 describe('findSliceAtPosition', () => {
