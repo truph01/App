@@ -56,7 +56,6 @@ import type {Screen} from '@src/SCREENS';
 import SCREENS from '@src/SCREENS';
 import type ReactComponentModule from '@src/types/utils/ReactComponentModule';
 import useModalStackScreenOptions from './useModalStackScreenOptions';
-import * as ModalStackNavigators from '@libs/Navigation/AppNavigator/ModalStackNavigators';
 
 const loadAttachmentModalScreen = () => require<ReactComponentModule>('../../../../pages/media/AttachmentModalScreen').default;
 
@@ -797,7 +796,12 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_SETTINGS_FREQUENCY]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceSettlementFrequencyPage').default,
     [SCREENS.WORKSPACE.TRAVEL_SETTINGS_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/workspace/travel/WorkspaceTravelInvoicingSettlementAccountPage').default,
     [SCREENS.WORKSPACE.TRAVEL_SETTINGS_FREQUENCY]: () => require<ReactComponentModule>('../../../../pages/workspace/travel/WorkspaceTravelInvoicingSettlementFrequencyPage').default,
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_ROOT]: () => ModalStackNavigators.TravelMissingPersonalDetailsModalStackNavigator,
+    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_ROOT]: () =>
+        createModalStackNavigator<TravelMissingPersonalDetailsParamList>({
+            [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS]: () => require<ReactComponentModule>('../../../../pages/Travel/TravelMissingPersonalDetailsPage').default,
+            [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE]: () =>
+                require<ReactComponentModule>('../../../../pages/Travel/TravelMissingPersonalDetailsConfirmMagicCodePage').default,
+        }),
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_SELECT_FEED]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceExpensifyCardSelectorPage').default,
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_BANK_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceExpensifyCardBankAccounts').default,
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceExpensifyCardDetailsPage').default,
@@ -1053,11 +1057,6 @@ const MissingPersonalDetailsModalStackNavigator = createModalStackNavigator<Miss
     [SCREENS.MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE]: () => require<ReactComponentModule>('../../../../pages/MissingPersonalDetails/MissingPersonalDetailsMagicCodePage').default,
 });
 
-const TravelMissingPersonalDetailsModalStackNavigator = createModalStackNavigator<TravelMissingPersonalDetailsParamList>({
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS]: () => require<ReactComponentModule>('../../../../pages/Travel/TravelMissingPersonalDetailsPage').default,
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE]: () => require<ReactComponentModule>('../../../../pages/Travel/TravelMissingPersonalDetailsConfirmMagicCodePage').default,
-});
-
 const AddUnreportedExpenseModalStackNavigator = createModalStackNavigator<AddUnreportedExpensesParamList>({
     [SCREENS.ADD_UNREPORTED_EXPENSES_ROOT]: () => require<ReactComponentModule>('../../../../pages/AddUnreportedExpense').default,
 });
@@ -1140,7 +1139,6 @@ export {
     TaskModalStackNavigator,
     TransactionDuplicateStackNavigator,
     TravelModalStackNavigator,
-    TravelMissingPersonalDetailsModalStackNavigator,
     TwoFactorAuthenticatorStackNavigator,
     WalletStatementStackNavigator,
     WorkspaceConfirmationModalStackNavigator,

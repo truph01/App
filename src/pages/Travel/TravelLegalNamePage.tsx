@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useRoute} from '@react-navigation/native';
 import type {RouteProp} from '@react-navigation/native';
 import {View} from 'react-native';
@@ -20,7 +20,7 @@ import {getFieldRequiredErrors, isRequiredFulfilled, isValidLegalName} from '@li
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import SCREENS from '@src/SCREENS';
+import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/PersonalDetailsForm';
 
 const STEP_FIELDS = [INPUT_IDS.LEGAL_FIRST_NAME, INPUT_IDS.LEGAL_LAST_NAME];
@@ -30,47 +30,44 @@ function TravelLegalNamePage() {
     const styles = useThemeStyles();
     const route = useRoute<RouteProp<TravelMissingPersonalDetailsParamList, typeof SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS>>();
     const policyID = route.params.policyID;
-    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
-    const [draftValues] = useOnyx(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM_DRAFT);
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
+    const [draftValues] = useOnyx(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM_DRAFT, {canBeMissing: true});
 
     useEffect(() => () => clearDraftValues(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM), []);
 
-    const validate = useCallback(
-        (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM> => {
-            const errors = getFieldRequiredErrors(values, STEP_FIELDS, translate);
+    const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM> => {
+        const errors = getFieldRequiredErrors(values, STEP_FIELDS, translate);
 
-            const firstName = values[INPUT_IDS.LEGAL_FIRST_NAME];
-            if (!isRequiredFulfilled(firstName)) {
-                errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.fieldRequired');
-            } else if (!isValidLegalName(firstName)) {
-                errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('privatePersonalDetails.error.hasInvalidCharacter');
-            } else if (firstName.length > CONST.LEGAL_NAME.MAX_LENGTH) {
-                errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.characterLimitExceedCounter', firstName.length, CONST.LEGAL_NAME.MAX_LENGTH);
-            }
+        const firstName = values[INPUT_IDS.LEGAL_FIRST_NAME];
+        if (!isRequiredFulfilled(firstName)) {
+            errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.fieldRequired');
+        } else if (!isValidLegalName(firstName)) {
+            errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('privatePersonalDetails.error.hasInvalidCharacter');
+        } else if (firstName.length > CONST.LEGAL_NAME.MAX_LENGTH) {
+            errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.characterLimitExceedCounter', firstName.length, CONST.LEGAL_NAME.MAX_LENGTH);
+        }
 
-            const lastName = values[INPUT_IDS.LEGAL_LAST_NAME];
-            if (!isRequiredFulfilled(lastName)) {
-                errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.fieldRequired');
-            } else if (!isValidLegalName(lastName)) {
-                errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('privatePersonalDetails.error.hasInvalidCharacter');
-            } else if (lastName.length > CONST.LEGAL_NAME.MAX_LENGTH) {
-                errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.characterLimitExceedCounter', lastName.length, CONST.LEGAL_NAME.MAX_LENGTH);
-            }
+        const lastName = values[INPUT_IDS.LEGAL_LAST_NAME];
+        if (!isRequiredFulfilled(lastName)) {
+            errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.fieldRequired');
+        } else if (!isValidLegalName(lastName)) {
+            errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('privatePersonalDetails.error.hasInvalidCharacter');
+        } else if (lastName.length > CONST.LEGAL_NAME.MAX_LENGTH) {
+            errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.characterLimitExceedCounter', lastName.length, CONST.LEGAL_NAME.MAX_LENGTH);
+        }
 
-            return errors;
-        },
-        [translate],
-    );
+        return errors;
+    };
 
-    const handleSubmit = useCallback(() => {
+    const handleSubmit = () => {
         resetValidateActionCodeSent();
         Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE.getRoute(policyID));
-    }, []);
+    };
 
-    const handleBackButtonPress = useCallback(() => {
+    const handleBackButtonPress = () => {
         clearDraftValues(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM);
         Navigation.closeRHPFlow();
-    }, []);
+    };
 
     return (
         <ScreenWrapper

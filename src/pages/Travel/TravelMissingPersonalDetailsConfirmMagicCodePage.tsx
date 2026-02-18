@@ -14,7 +14,7 @@ import type {TravelMissingPersonalDetailsParamList} from '@libs/Navigation/types
 import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import SCREENS from '@src/SCREENS';
+import type SCREENS from '@src/SCREENS';
 import {primaryLoginSelector} from '@src/selectors/Account';
 import type {PersonalDetailsForm} from '@src/types/form';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
