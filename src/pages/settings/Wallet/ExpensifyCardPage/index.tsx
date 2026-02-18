@@ -173,9 +173,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     }, []);
 
     const handleConfirmFreeze = useCallback(() => {
-        if (!currentCard) {
-            return;
-        }
         freezeCard(Number(currentCard?.fundID ?? CONST.DEFAULT_NUMBER_ID), currentCard, session?.accountID ?? CONST.DEFAULT_NUMBER_ID);
         handleDismissFreezeModal();
     }, [currentCard, handleDismissFreezeModal, session?.accountID]);
@@ -189,9 +186,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     }, []);
 
     const handleConfirmUnfreeze = useCallback(() => {
-        if (!currentCard) {
-            return;
-        }
         unfreezeCard(Number(currentCard?.fundID ?? CONST.DEFAULT_NUMBER_ID), currentCard);
         handleDismissUnfreezeModal();
     }, [currentCard, handleDismissUnfreezeModal]);
