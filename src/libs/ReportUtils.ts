@@ -5762,7 +5762,7 @@ function getReportName(
     isReportArchived?: boolean,
     reports?: Report[],
     policies?: Policy[],
-    conciergeReportID: string = '',
+    conciergeReportID?: string,
 ): string {
     // Check if we can use report name in derived values - only when we have report but no other params
     const canUseDerivedValue =
