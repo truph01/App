@@ -842,12 +842,7 @@ function getSuggestedSearches(
 }
 
 function getDefaultActionableSearchMenuItem(menuItems: SearchTypeMenuItem[]) {
-    return (
-        menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.REPORTS) ??
-        menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.EXPENSES) ??
-        menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.APPROVE) ??
-        menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.SUBMIT)
-    );
+    return menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.REPORTS);
 }
 
 function getSuggestedSearchesVisibility(

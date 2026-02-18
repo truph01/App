@@ -247,8 +247,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
             }
 
             const flattenedMenuItems = typeMenuSections.flatMap((section) => section.menuItems);
-            const defaultActionableSearchQuery =
-                getDefaultActionableSearchMenuItem(flattenedMenuItems)?.searchQuery ?? flattenedMenuItems.at(0)?.searchQuery ?? typeMenuSections.at(0)?.menuItems.at(0)?.searchQuery;
+            const defaultActionableSearchQuery = getDefaultActionableSearchMenuItem(flattenedMenuItems)?.searchQuery;
 
             const savedSearchQuery = Object.values(savedSearches ?? {}).at(0)?.query;
             const lastQueryFromOnyx = lastSearchParams?.queryJSON ? buildSearchQueryString(lastSearchParams.queryJSON) : undefined;
