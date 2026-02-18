@@ -708,10 +708,18 @@ const translations = {
             transactionDenied: 'Transaction denied',
             transactionApproved: 'Transaction approved!',
             areYouSureToDeny: 'Are you sure? The transaction will be denied if you close this screen.',
-            youCanTryAgainAtMerchantOrReachOut: "You can try again at the merchant. If you didn't attempt this transaction, reach out to Concierge to report potential fraud.",
+            youCanTryAgainAtMerchantOrReachOut:
+                "You can try again at the merchant. If you didn't attempt this transaction, <concierge-link>reach out to Concierge</concierge-link> to report potential fraud.",
             youNeedToTryAgainAtMerchant: "This transaction was not verified, so we denied it. You'll need to try again at the merchant.",
             goBackToTheMerchant: 'Go back to the merchant site to continue the transaction.',
             authorizationFailed: 'Your approval failed, so we denied this transaction. You can try again at the merchant.',
+            transactionFailed: 'Transaction failed',
+            transactionCouldNotBeCompleted: 'Your transaction could not be completed. Please try again at the merchant.',
+            transactionCouldNotBeCompletedReachOut:
+                "Your transaction could not be completed. If you didn't attempt this transaction, <concierge-link>reach out to Concierge</concierge-link> to report potential fraud.",
+            reviewFailed: 'Review failed',
+            alreadyReviewedSubtitle:
+                'You already reviewed this transaction. Please check your <transaction-history-link>transaction history</transaction-history-link> or contact <concierge-link>Concierge</concierge-link> to report any issues.',
         },
         unsupportedDevice: {
             unsupportedDevice: 'Unsupported device',

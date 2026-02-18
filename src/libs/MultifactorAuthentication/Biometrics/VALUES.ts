@@ -35,6 +35,11 @@ const REASON = {
         TRANSACTION_EXPIRED: 'Transaction review period has expired',
         TRANSACTION_ALREADY_APPROVED: 'Transaction already approved',
         TRANSACTION_ALREADY_DENIED: 'Transaction already denied',
+        ALREADY_APPROVED_APPROVE_ATTEMPTED: 'Already approved, approve attempted',
+        ALREADY_APPROVED_DENY_ATTEMPTED: 'Already approved, deny attempted',
+        ALREADY_DENIED_DENY_ATTEMPTED: 'Already denied, deny attempted',
+        ALREADY_DENIED_APPROVE_ATTEMPTED: 'Already denied, approve attempted',
+        ALREADY_REVIEWED: 'Transaction already reviewed',
         TRANSACTION_APPROVED: 'Transaction approved successfully',
     },
     CHALLENGE: {
@@ -57,6 +62,7 @@ const REASON = {
         BAD_REQUEST: 'Bad request',
         LOCAL_REGISTRATION_COMPLETE: 'Local registration complete',
         UNHANDLED_ERROR: 'An unhandled error occurred',
+        REQUESTED_TRANSACTION_UNAVAILABLE: 'Requested transaction is unavailable',
     },
     KEYSTORE: {
         KEY_DELETED: 'Key successfully deleted from SecureStore',
