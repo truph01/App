@@ -1,4 +1,4 @@
-# Cluster 18: Navigate After Focus (Skipped for now)
+# Navigate After Focus (Skipped for now)
 
 ## Strategy
 

@@ -1,4 +1,4 @@
-# Cluster 8: Onboarding Tours (~3 usages)
+# Onboarding Tours (~3 usages)
 
 ## Strategy
 

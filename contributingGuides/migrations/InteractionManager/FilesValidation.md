@@ -1,4 +1,4 @@
-# Cluster 17: Files Validation (2 usages)
+# Files Validation (2 usages)
 
 ## Strategy
 

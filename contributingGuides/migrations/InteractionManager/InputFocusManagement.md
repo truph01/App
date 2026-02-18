@@ -1,4 +1,4 @@
-# Cluster 3: Input Focus Management (~16 usages)
+# Input Focus Management (~16 usages)
 
 ## Strategy
 
@@ -13,9 +13,9 @@ Document each usage but mark as TODO. When the focus utility is implemented, it 
 | File                                         | Line | Description                                   | PR                                                    |
 | -------------------------------------------- | ---- | --------------------------------------------- | ----------------------------------------------------- |
 | `InputFocus/index.website.ts`                | 25   | Focus composer after modal                    | [#60073](https://github.com/Expensify/App/pull/60073) |
-| `focusEditAfterCancelDelete/index.native.ts` | 6    | Focus text input after cancel/delete          | [#47780](https://github.com/Expensify/App/pull/47780) |
+| `focusEditAfterCancelDelete/index.native.ts` | 6    | Focus text input after cancel/delete          | [#36195](https://github.com/Expensify/App/pull/36195) |
 | `useRestoreInputFocus/index.android.ts`      | 15   | `KeyboardController.setFocusTo('current')`    | [#54187](https://github.com/Expensify/App/pull/54187) |
-| `useAutoFocusInput.ts`                       | 37   | Auto-focus input after interactions           | [#47780](https://github.com/Expensify/App/pull/47780) |
+| `useAutoFocusInput.ts`                       | 37   | Auto-focus input after interactions           | [#31063](https://github.com/Expensify/App/pull/31063) |
 | `FormProvider.tsx`                           | 427  | Set blur state in Safari                      | [#55494](https://github.com/Expensify/App/pull/55494) |
 | `ContactPermissionModal/index.native.tsx`    | 41   | Permission + focus after modal                | [#54459](https://github.com/Expensify/App/pull/54459) |
 | `ContactPermissionModal/index.native.tsx`    | 59   | Permission + focus after modal                | [#64207](https://github.com/Expensify/App/pull/64207) |
@@ -29,4 +29,4 @@ Document each usage but mark as TODO. When the focus utility is implemented, it 
 | `SplitListItem.tsx`                          | 75   | Focus input after screen transition           | [#77657](https://github.com/Expensify/App/pull/77657) |
 | `ContactMethodDetailsPage.tsx`               | 215  | Focus after modal hide                        | [#54784](https://github.com/Expensify/App/pull/54784) |
 | `ContactMethodDetailsPage.tsx`               | 279  | Focus on entry transition end                 | [#55588](https://github.com/Expensify/App/pull/55588) |
-| `BaseLoginForm.tsx`                          | 221  | InteractionManager deferring login navigation | [#47780](https://github.com/Expensify/App/pull/47780) |
+| `BaseLoginForm.tsx`                          | 221  | InteractionManager deferring login navigation | [#42603](https://github.com/Expensify/App/pull/42603) |
