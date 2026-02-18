@@ -37,6 +37,10 @@ function filterReceiptViolations(violations: TransactionViolation[]): Transactio
     return violations;
 }
 
+function isMaxExpenseAmountRuleEnabled(maxAmount: number | undefined) {
+    return typeof maxAmount === 'number' && maxAmount !== CONST.DISABLED_MAX_EXPENSE_VALUE;
+}
+
 /**
  * Calculates tag out of policy and missing tag violations for the given transaction
  */
@@ -423,6 +427,7 @@ const ViolationsUtils = {
             !isInvoiceTransaction &&
             typeof categoryMaxAmountNoReceipt !== 'number' &&
             typeof maxAmountNoReceipt === 'number' &&
+            isMaxExpenseAmountRuleEnabled(maxAmountNoReceipt) &&
             expenseAmount > maxAmountNoReceipt &&
             !TransactionUtils.hasReceipt(updatedTransaction) &&
             isControlPolicy;
@@ -430,6 +435,7 @@ const ViolationsUtils = {
             canCalculateAmountViolations &&
             !isInvoiceTransaction &&
             typeof categoryMaxAmountNoReceipt === 'number' &&
+            isMaxExpenseAmountRuleEnabled(categoryMaxAmountNoReceipt) &&
             expenseAmount > categoryMaxAmountNoReceipt &&
             !TransactionUtils.hasReceipt(updatedTransaction) &&
             isControlPolicy;
@@ -441,6 +447,7 @@ const ViolationsUtils = {
             isEligibleForItemizedReceiptViolation &&
             typeof categoryMaxAmountNoItemizedReceipt !== 'number' &&
             typeof maxAmountNoItemizedReceipt === 'number' &&
+            isMaxExpenseAmountRuleEnabled(maxAmountNoItemizedReceipt) &&
             expenseAmount > maxAmountNoItemizedReceipt;
 
         // Check for itemized receipt requirement - category level override
@@ -454,6 +461,7 @@ const ViolationsUtils = {
             !isInvoiceTransaction &&
             typeof categoryOverLimit !== 'number' &&
             typeof overLimitAmount === 'number' &&
+            isMaxExpenseAmountRuleEnabled(overLimitAmount) &&
             expenseAmount > overLimitAmount &&
             isControlPolicy;
         const shouldCategoryShowOverLimitViolation =
