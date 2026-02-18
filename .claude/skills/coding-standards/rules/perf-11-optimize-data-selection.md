@@ -135,7 +135,7 @@ Flag ONLY when ANY of these are true:
 
 - The selector returns a primitive value (`boolean`, `string`, `number`, `undefined`)
 - The selector returns a small object with only a few fields picked from a single item (not a collection)
-- The selector meaningfully reduces a large dataset to a small result (e.g., a primitive or a few items) — the `deepEqual` cost on a small result is negligible, regardless of how the selector iterates internally
+- The selector meaningfully reduces a large dataset to a small result (e.g., a primitive or a few items) by iterating over the subscribed collection itself — the `deepEqual` cost on a small result is negligible
 - The `useOnyx` call is on a single-item key (not a collection), and the selector picks specific fields
 - The data structure is static or the function requires the entire object for valid operations
 
