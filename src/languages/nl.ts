@@ -681,20 +681,21 @@ const translations: TranslationDeepObject<typeof en> = {
     multifactorAuthentication: {
         reviewTransaction: {
             reviewTransaction: 'Transactie beoordelen',
-            pleaseReview: 'Beoordeel deze transactie alstublieft',
-            requiresYourReview: 'Een transactie met de Expensify kaart vereist hieronder uw beoordeling.',
+            pleaseReview: 'Controleer deze transactie alsjeblieft',
+            requiresYourReview: 'Een Expensify Card-transactie hieronder vereist je beoordeling.',
             transactionDetails: 'Transactiedetails',
             deny: 'Weigeren',
             approve: 'Goedkeuren',
             denyTransaction: 'Transactie weigeren',
             transactionDenied: 'Transactie geweigerd',
             transactionApproved: 'Transactie goedgekeurd!',
-            areYouSureToDeny: 'Weet u zeker dat u wilt weigeren? De transactie wordt geweigerd als u dit scherm sluit.',
+            areYouSureToDeny: 'Weet je het zeker? De transactie wordt geweigerd als je dit scherm sluit.',
             youCanTryAgainAtMerchantOrReachOut:
-                'U kunt het opnieuw proberen bij de handelaar. Als u deze transactie niet heeft geprobeerd, neem dan contact op met Concierge om mogelijke fraude te melden.',
-            youNeedToTryAgainAtMerchant: 'Deze transactie is niet geverifieerd, dus we hebben het geweigerd. U moet het opnieuw bij de handelaar proberen.',
-            goBackToTheMerchant: 'Ga terug naar de website van de handelaar om de transactie voort te zetten.',
-            authorizationFailed: 'Uw goedkeuring is mislukt, dus we hebben deze transactie geweigerd. U kunt het opnieuw bij de handelaar proberen.',
+                'Je kunt het opnieuw proberen bij de verkoper. Als je deze transactie niet hebt geprobeerd uit te voeren, neem dan contact op met Concierge om mogelijke fraude te melden.',
+            youNeedToTryAgainAtMerchant: 'Deze transactie is niet geverifieerd, dus we hebben deze geweigerd. Je moet het opnieuw proberen bij de handelaar.',
+            goBackToTheMerchant: 'Ga terug naar de website van de verkoper om de transactie voort te zetten.',
+            authorizationFailed: 'Je goedkeuring is mislukt, dus we hebben deze transactie geweigerd. Je kunt het opnieuw proberen bij de merchant.',
+            attemptedTransaction: 'Poging tot transactie',
         },
         biometricsTest: {
             biometricsTest: 'Biometrische test',
@@ -1873,8 +1874,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Cache wissen en opnieuw starten',
-            viewConsole: 'Debugconsole bekijken',
-            debugConsole: 'Debugconsole',
             description:
                 '<muted-text>Gebruik de onderstaande tools om problemen met de Expensify-ervaring op te lossen. Als je problemen tegenkomt, <concierge-link>dien dan een bug in</concierge-link>.</muted-text>',
             confirmResetDescription: 'Alle niet-verzonden conceptberichten gaan verloren, maar de rest van je gegevens is veilig.',
@@ -1906,23 +1905,12 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: 'Ongeldig maken met vertraging',
             leftHandNavCache: 'Cache linkernavigatie',
             clearleftHandNavCache: 'Wissen',
-            recordTroubleshootData: 'Probleemopsporingsgegevens opnemen',
             softKillTheApp: 'App zacht afsluiten',
             kill: 'Doden',
             sentryDebug: 'Sentry-debug',
             sentryDebugDescription: 'Sentry-aanvragen naar console loggen',
             sentryHighlightedSpanOps: 'Gemarkeerde span-namen',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interactie.klik, navigatie, ui.laden',
-        },
-        debugConsole: {
-            saveLog: 'Log opslaan',
-            shareLog: 'Log delen',
-            enterCommand: 'Voer opdracht in',
-            execute: 'Uitvoeren',
-            noLogsAvailable: 'Geen logs beschikbaar',
-            logSizeTooLarge: (size: number) => `Loggrootte overschrijdt de limiet van ${size} MB. Gebruik alstublieft "Log opslaan" om het logbestand te downloaden.`,
-            logs: 'Logboeken',
-            viewConsole: 'Console bekijken',
         },
         security: 'Beveiliging',
         signOut: 'Afmelden',
@@ -2203,6 +2191,11 @@ const translations: TranslationDeepObject<typeof en> = {
             `${admin} verliest de toegang tot deze zakelijke bankrekening. We verwerken nog steeds alle betalingen die al in behandeling zijn.`,
         reachOutForHelp: 'Het wordt gebruikt met de Expensify Card. <concierge-link>Neem contact op met Concierge</concierge-link> als je het moet stoppen met delen.',
         unshareErrorModalTitle: 'Kan betaalrekening niet meer ontkoppelen',
+        travelCVV: {
+            title: 'Reis-CVV',
+            subtitle: 'Gebruik dit bij het boeken van reizen',
+            description: 'Gebruik deze kaart voor je Expensify Travel-boekingen. Hij wordt weergegeven als “Travel Card” bij het afrekenen.',
+        },
         chaseAccountNumberDifferent: 'Waarom is mijn rekeningnummer anders?',
     },
     cardPage: {
@@ -2274,6 +2267,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} voor ${merchant} - ${date}`,
         },
+        freezeCard: 'Kaart blokkeren',
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',
@@ -5414,8 +5408,8 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             editTags: 'Tags bewerken',
             findTag: 'Tag zoeken',
             subtitle: 'Labels bieden meer gedetailleerde manieren om kosten te classificeren.',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Je gebruikt <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">afhankelijke labels</a>. Je kunt <a href="${importSpreadsheetLink}">een spreadsheet opnieuw importeren</a> om je labels bij te werken.</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>Labels bieden meer gedetailleerde manieren om kosten te classificeren. Je gebruikt <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">afhankelijke labels</a>. Je kunt <a href="${importSpreadsheetLink}">een spreadsheet opnieuw importeren</a> om je labels bij te werken.</muted-text>`,
             emptyTags: {
                 title: 'Je hebt nog geen labels gemaakt',
                 subtitle: 'Voeg een tag toe om projecten, locaties, afdelingen en meer bij te houden.',

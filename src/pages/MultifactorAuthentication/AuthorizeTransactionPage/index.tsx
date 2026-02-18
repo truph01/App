@@ -10,22 +10,38 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {MultifactorAuthenticationParamList} from '@libs/Navigation/types';
 import Navigation from '@navigation/Navigation';
 import type SCREENS from '@src/SCREENS';
+import CONST from '@src/CONST';
+import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
+import useOnyx from '@hooks/useOnyx';
+import ONYXKEYS from '@src/ONYXKEYS';
+import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
+import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
 type MultifactorAuthenticationAuthorizeTransactionPageProps = PlatformStackScreenProps<MultifactorAuthenticationParamList, typeof SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION>;
 
 function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: MultifactorAuthenticationAuthorizeTransactionPageProps) {
+    const transactionID = route.params.transactionID;
+
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    // TODO: Use context here when merged
-    // const {executeScenario, cancel} = useMultifactorAuthenticationContext();
+    const [transactionDenied, setTransactionDenied] = useState(false);
 
-    const transactionID = route.params.transactionID;
+    const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
+    const transaction = transactionQueue?.[transactionID];
+
+    const {executeScenario} = useMultifactorAuthentication();
+
     const [isConfirmModalVisible, setConfirmModalVisibility] = useState(false);
 
     const showConfirmModal = () => {
+        if (!transaction) {
+            // This is the event handler for the user pressing "back" in the Header
+            // if the transaction has disappeared from state at this point, just close the RHP immediately
+            Navigation.closeRHPFlow();
+        }
         setConfirmModalVisibility(true);
     };
 
@@ -34,23 +50,38 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     };
 
     const approveTransaction = () => {
-        // TODO: Use context here when merged
-        // executeScenario(CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION, {
-        //     transactionID,
-        // });
+        executeScenario(CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION, {
+            transactionID,
+        });
     };
 
-    // Remove this eslint disable when below TODO is done
-    // eslint-disable-next-line rulesdir/prefer-early-return
-    const denyTransaction = () => {
-        if (isConfirmModalVisible) {
+    const onDenyTransaction = () => {
+        if (isConfirmModalVisible || !transactionID) {
             hideConfirmModal();
         }
-        // TODO: Set state here that the outcome page should be displayed
-        Navigation.closeRHPFlow();
+
+        denyTransaction({transactionID}).then(() => setTransactionDenied(true));
+        // TODO: Set state (add a new useState at the top) here that the outcome page should be displayed instead of closing the flow
+        // CHUCK NOTE: I have done what I interpreted this to mean
     };
 
-    // TODO: Instead of navigate to outcome page, if the state above is true then render failure component here
+    if (transactionDenied) {
+        return (
+            <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
+                {/* WIP this'll be replaced with the proper outcome screen after we merge the error screens PR */}
+                <DefaultClientFailureScreen />
+            </ScreenWrapper>
+        );
+    }
+
+    if (!transaction) {
+        return (
+            <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
+                {/* WIP this'll be replaced with the proper outcome screen after we merge the error screens PR */}
+                <DefaultClientFailureScreen />
+            </ScreenWrapper>
+        );
+    }
 
     return (
         <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
@@ -61,17 +92,21 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
             />
             <FullPageOfflineBlockingView>
                 <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
-                    <MultifactorAuthenticationAuthorizeTransactionContent transactionID={transactionID} />
+                    <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
                     <MultifactorAuthenticationAuthorizeTransactionActions
+                        isLoading={transaction.isLoading}
                         onAuthorize={approveTransaction}
                         onDeny={showConfirmModal}
                     />
-                    {/* TODO: Use custom AuthorizeTransactionCancelModal */}
+                    {/*
+                        TODO: Use custom AuthorizeTransactionCancelModal (not yet implemented)
+                        The config for MFA modals should be exactly the same as `failureScreens` structure.
+                        Right now only the props for modals are stored in the config but it should be key - component pattern instead.
+                        See: FailureScreen directory and how it is used in the scenarios config.
+                    */}
                     <MultifactorAuthenticationTriggerCancelConfirmModal
-                        // TODO: Uncomment when context is merged
-                        // scenario={CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION}
                         isVisible={isConfirmModalVisible}
-                        onConfirm={denyTransaction}
+                        onConfirm={onDenyTransaction}
                         onCancel={hideConfirmModal}
                     />
                 </View>

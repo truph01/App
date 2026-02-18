@@ -2,20 +2,17 @@ import React from 'react';
 import {View} from 'react-native';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
-import ONYXKEYS from '@src/ONYXKEYS';
+import type {TransactionPending3DSReview} from '@src/types/onyx';
 import AuthorizeCardTransactionPreview from './AuthorizeCardTransactionPreview';
 
 type MultifactorAuthenticationAuthorizeTransactionContentProps = {
-    transactionID: string;
+    transaction: TransactionPending3DSReview;
 };
 
-function MultifactorAuthenticationAuthorizeTransactionContent({transactionID}: MultifactorAuthenticationAuthorizeTransactionContentProps) {
+function MultifactorAuthenticationAuthorizeTransactionContent({transaction}: MultifactorAuthenticationAuthorizeTransactionContentProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [authorizeTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.AUTHORIZE_TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`, {canBeMissing: true});
 
     return (
         <View style={styles.mh5}>
@@ -27,12 +24,12 @@ function MultifactorAuthenticationAuthorizeTransactionContent({transactionID}: M
                 <Text style={styles.textMicroSupporting}>{translate('multifactorAuthentication.reviewTransaction.transactionDetails')}</Text>
             </View>
             <AuthorizeCardTransactionPreview
-                transactionID={transactionID}
-                amount={authorizeTransaction?.amount}
-                currency={authorizeTransaction?.currency}
-                merchant={authorizeTransaction?.merchant}
-                created={authorizeTransaction?.created}
-                lastFourPAN={authorizeTransaction?.lastFourPAN}
+                transactionID={transaction.transactionID}
+                amount={transaction.amount}
+                currency={transaction.currency}
+                merchant={transaction.merchant}
+                created={transaction.created}
+                lastFourPAN={transaction.lastFourPAN}
             />
         </View>
     );

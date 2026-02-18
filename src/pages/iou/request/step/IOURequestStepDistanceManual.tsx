@@ -220,6 +220,8 @@ function IOURequestStepDistanceManual({
                 selfDMReport,
                 policyForMovingExpenses,
                 betas,
+                unit,
+                personalOutputCurrency: personalPolicy?.outputCurrency,
             });
         },
         [
@@ -261,6 +263,7 @@ function IOURequestStepDistanceManual({
             unit,
             selfDMReport,
             betas,
+            personalPolicy?.outputCurrency,
         ],
     );
 

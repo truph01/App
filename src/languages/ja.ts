@@ -680,20 +680,21 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     multifactorAuthentication: {
         reviewTransaction: {
-            reviewTransaction: '取引のレビュー',
-            pleaseReview: 'この取引をレビューしてください',
-            requiresYourReview: 'Expensifyカードの取引が以下のレビューを必要としています。',
+            reviewTransaction: '取引を確認',
+            pleaseReview: 'この取引を確認してください',
+            requiresYourReview: '以下のExpensifyカード取引の内容を確認してください。',
             transactionDetails: '取引の詳細',
             deny: '拒否',
             approve: '承認',
             denyTransaction: '取引を拒否',
             transactionDenied: '取引が拒否されました',
             transactionApproved: '取引が承認されました！',
-            areYouSureToDeny: 'よろしいですか？ この画面を閉じると取引は拒否されます。',
-            youCanTryAgainAtMerchantOrReachOut: '商店で再試行することができます。この取引を試みなかった場合は、Conciergeに連絡して潜在的な詐欺を報告してください。',
-            youNeedToTryAgainAtMerchant: 'この取引は検証されませんでしたので、拒否しました。商店で再試行する必要があります。',
-            goBackToTheMerchant: '取引を続行するために、商店のサイトに戻ってください。',
-            authorizationFailed: '承認が失敗したため、この取引は拒否されました。商店で再試行してください。',
+            areYouSureToDeny: '本当によろしいですか？この画面を閉じると、取引は拒否されます。',
+            youCanTryAgainAtMerchantOrReachOut: '加盟店で再度お試しください。もしこの取引に心当たりがない場合は、不正利用の可能性としてConciergeまでご連絡ください。',
+            youNeedToTryAgainAtMerchant: 'この取引は認証されなかったため、却下されました。加盟店でもう一度お試しください。',
+            goBackToTheMerchant: '取引を続行するには、加盟店のサイトに戻ってください。',
+            authorizationFailed: '承認が失敗したため、この取引は拒否されました。加盟店でもう一度お試しください。',
+            attemptedTransaction: '試行された取引',
         },
         biometricsTest: {
             biometricsTest: '生体認証テスト',
@@ -1866,8 +1867,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'キャッシュをクリアして再起動',
-            viewConsole: 'デバッグコンソールを表示',
-            debugConsole: 'デバッグコンソール',
             description:
                 '<muted-text>以下のツールを使用して、Expensify のご利用状況のトラブルシューティングに役立ててください。問題が発生した場合は、<concierge-link>バグを報告</concierge-link>してください。</muted-text>',
             confirmResetDescription: '送信されていない下書きメッセージはすべて失われますが、その他のデータは安全です。',
@@ -1899,23 +1898,12 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: '遅延して無効化',
             leftHandNavCache: '左側ナビキャッシュ',
             clearleftHandNavCache: 'クリア',
-            recordTroubleshootData: 'トラブルシュートデータを記録',
             softKillTheApp: 'アプリをソフトキルする',
             kill: '終了',
             sentryDebug: 'Sentry デバッグ',
             sentryDebugDescription: 'Sentry リクエストをコンソールに記録',
             sentryHighlightedSpanOps: '強調表示されたスパン名',
             sentryHighlightedSpanOpsPlaceholder: 'ui.interaction.click、ナビゲーション、ui.load',
-        },
-        debugConsole: {
-            saveLog: 'ログを保存',
-            shareLog: 'ログを共有',
-            enterCommand: 'コマンドを入力',
-            execute: '実行',
-            noLogsAvailable: 'ログはありません',
-            logSizeTooLarge: (size: number) => `ログサイズが上限の ${size} MB を超えています。"ログを保存" を使用してログファイルをダウンロードしてください。`,
-            logs: 'ログ',
-            viewConsole: 'コンソールを表示',
         },
         security: 'セキュリティ',
         signOut: 'サインアウト',
@@ -2192,6 +2180,11 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} はこのビジネス銀行口座へのアクセス権を失います。処理中の支払いは引き続き完了します。`,
         reachOutForHelp: 'そのレポートは Expensify Card と一緒に使用されています。共有を解除する必要がある場合は、<concierge-link>Concierge に連絡してください</concierge-link>。',
         unshareErrorModalTitle: '銀行口座の共有を解除できません',
+        travelCVV: {
+            title: 'トラベルCVV',
+            subtitle: '出張を予約するときにこれを使用してください',
+            description: 'このカードをExpensify Travelでの予約に使用してください。チェックアウト時には「Travel Card」と表示されます。',
+        },
         chaseAccountNumberDifferent: '口座番号が異なるのはなぜですか？',
     },
     cardPage: {
@@ -2259,6 +2252,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${date} の ${merchant} への ${amount}`,
         },
+        freezeCard: 'カードを一時停止',
     },
     workflowsPage: {
         workflowTitle: '支出',
@@ -5378,8 +5372,8 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             editTags: 'タグを編集',
             findTag: 'タグを検索',
             subtitle: 'タグを使うと、コストをより詳しく分類できます。',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>タグを使うと、コストをより詳しく分類できます。あなたは<a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">連動タグ</a>を使用しています。タグを更新するには、<a href="${importSpreadsheetLink}">スプレッドシートを再インポート</a>できます。</muted-text>`,
             emptyTags: {
                 title: 'タグがまだ作成されていません',
                 subtitle: 'タグを追加して、プロジェクト、所在地、部署などを追跡しましょう。',

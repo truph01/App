@@ -681,19 +681,21 @@ const translations: TranslationDeepObject<typeof en> = {
     multifactorAuthentication: {
         reviewTransaction: {
             reviewTransaction: 'Przejrzyj transakcję',
-            pleaseReview: 'Proszę przejrzeć tę transakcję',
-            requiresYourReview: 'Transakcja kartą Expensify wymaga poniżej Twojej recenzji.',
+            pleaseReview: 'Sprawdź tę transakcję',
+            requiresYourReview: 'Transakcja kartą Expensify wymaga Twojej weryfikacji poniżej.',
             transactionDetails: 'Szczegóły transakcji',
-            deny: 'Odmów',
+            deny: 'Odrzuć',
             approve: 'Zatwierdź',
-            denyTransaction: 'Odmów transakcję',
+            denyTransaction: 'Odrzuć transakcję',
             transactionDenied: 'Transakcja odrzucona',
             transactionApproved: 'Transakcja zatwierdzona!',
-            areYouSureToDeny: 'Czy jesteś pewien? Transakcja zostanie odrzucona, jeśli zamkniesz ten ekran.',
-            youCanTryAgainAtMerchantOrReachOut: 'Możesz spróbować ponownie u sprzedawcy. Jeśli nie próbowałeś tej transakcji, skontaktuj się z Concierge, aby zgłosić potencjalne oszustwo.',
-            youNeedToTryAgainAtMerchant: 'Ta transakcja nie została zweryfikowana, więc została odrzucona. Musisz spróbować ponownie u sprzedawcy.',
-            goBackToTheMerchant: 'Wróć na stronę sprzedawcy, aby kontynuować transakcję.',
-            authorizationFailed: 'Twoja autoryzacja nie powiodła się, więc odrzuciliśmy tę transakcję. Możesz spróbować ponownie u sprzedawcy.',
+            areYouSureToDeny: 'Na pewno? Transakcja zostanie odrzucona, jeśli zamkniesz ten ekran.',
+            youCanTryAgainAtMerchantOrReachOut:
+                'Możesz spróbować ponownie u sprzedawcy. Jeśli nie próbowałeś(-aś) wykonać tej transakcji, skontaktuj się z Concierge, aby zgłosić potencjalne oszustwo.',
+            youNeedToTryAgainAtMerchant: 'Ta transakcja nie została zweryfikowana, więc ją odrzuciliśmy. Spróbuj ponownie u sprzedawcy.',
+            goBackToTheMerchant: 'Wróć do strony sprzedawcy, aby kontynuować transakcję.',
+            authorizationFailed: 'Twoje zatwierdzenie nie powiodło się, więc odrzuciliśmy tę transakcję. Możesz spróbować ponownie u sprzedawcy.',
+            attemptedTransaction: 'Próbowana transakcja',
         },
         biometricsTest: {
             biometricsTest: 'Test biometrii',
@@ -1871,8 +1873,6 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         troubleshoot: {
             clearCacheAndRestart: 'Wyczyść pamięć podręczną i uruchom ponownie',
-            viewConsole: 'Wyświetl konsolę debugowania',
-            debugConsole: 'Konsola debugowania',
             description:
                 '<muted-text>Użyj poniższych narzędzi, aby rozwiązać problemy z działaniem Expensify. Jeśli napotkasz jakiekolwiek problemy, prosimy <concierge-link>zgłosić błąd</concierge-link>.</muted-text>',
             confirmResetDescription: 'Wszystkie niewysłane szkice wiadomości zostaną utracone, ale reszta Twoich danych jest bezpieczna.',
@@ -1904,23 +1904,12 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidateWithDelay: 'Unieważnij z opóźnieniem',
             leftHandNavCache: 'Pamięć podręczna lewego panelu nawigacji',
             clearleftHandNavCache: 'Wyczyść',
-            recordTroubleshootData: 'Rejestruj dane do rozwiązywania problemów',
             softKillTheApp: 'Miękko zamknij aplikację',
             kill: 'Zabij',
             sentryDebug: 'Debugowanie Sentry',
             sentryDebugDescription: 'Rejestruj żądania Sentry w konsoli',
             sentryHighlightedSpanOps: 'Wyróżnione nazwy zakresów',
             sentryHighlightedSpanOpsPlaceholder: 'kliknięcie interfejsu, nawigacja, ładowanie interfejsu',
-        },
-        debugConsole: {
-            saveLog: 'Zapisz dziennik',
-            shareLog: 'Udostępnij dziennik',
-            enterCommand: 'Wpisz polecenie',
-            execute: 'Wykonaj',
-            noLogsAvailable: 'Brak dostępnych dzienników',
-            logSizeTooLarge: (size: number) => `Rozmiar dziennika przekracza limit ${size} MB. Użyj proszę opcji „Zapisz dziennik”, aby zamiast tego pobrać plik dziennika.`,
-            logs: 'Dzienniki',
-            viewConsole: 'Wyświetl konsolę',
         },
         security: 'Bezpieczeństwo',
         signOut: 'Wyloguj się',
@@ -2199,6 +2188,11 @@ const translations: TranslationDeepObject<typeof en> = {
         unshareBankAccountWarning: ({admin}: {admin?: string | null}) => `${admin} straci dostęp do tego firmowego konta bankowego. Nadal zrealizujemy wszystkie płatności w toku.`,
         reachOutForHelp: 'Jest używany z kartą Expensify. <concierge-link>Skontaktuj się z Concierge</concierge-link>, jeśli musisz przestać się nim dzielić.',
         unshareErrorModalTitle: 'Nie można cofnąć udostępniania konta bankowego',
+        travelCVV: {
+            title: 'CVV podróży',
+            subtitle: 'Użyj tego podczas rezerwacji podróży',
+            description: 'Użyj tej karty do rezerwacji w Expensify Travel. Podczas płatności będzie wyświetlana jako “Travel Card”.',
+        },
         chaseAccountNumberDifferent: 'Dlaczego mój numer konta jest inny?',
     },
     cardPage: {
@@ -2267,6 +2261,7 @@ const translations: TranslationDeepObject<typeof en> = {
 
 ${amount} dla ${merchant} - ${date}`,
         },
+        freezeCard: 'Zamroź kartę',
     },
     workflowsPage: {
         workflowTitle: 'Wydatki',
@@ -5403,8 +5398,8 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             editTags: 'Edytuj tagi',
             findTag: 'Znajdź tag',
             subtitle: 'Tagi umożliwiają bardziej szczegółowe klasyfikowanie kosztów.',
-            dependentMultiLevelTagsSubtitle: (importSpreadsheetLink: string) =>
-                `<muted-text>Używasz <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">zależnych tagów</a>. Możesz <a href="${importSpreadsheetLink}">ponownie zaimportować arkusz kalkulacyjny</a>, aby zaktualizować swoje tagi.</muted-text>`,
+            subtitleWithDependentTags: (importSpreadsheetLink: string) =>
+                `<muted-text>Tagi umożliwiają bardziej szczegółowe klasyfikowanie kosztów. Używasz <a href="${CONST.IMPORT_TAGS_EXPENSIFY_URL_DEPENDENT_TAGS}">zależnych tagów</a>. Możesz <a href="${importSpreadsheetLink}">ponownie zaimportować arkusz kalkulacyjny</a>, aby zaktualizować swoje tagi.</muted-text>`,
             emptyTags: {
                 title: 'Nie utworzono jeszcze żadnych tagów',
                 subtitle: 'Dodaj tag, aby śledzić projekty, lokalizacje, działy i inne.',
