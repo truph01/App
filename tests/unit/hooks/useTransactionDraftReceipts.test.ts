@@ -48,7 +48,7 @@ describe('useTransactionDraftReceipts', () => {
             expect(result.current).toHaveLength(1);
         });
 
-        expect(result.current[0]).toEqual({
+        expect(result.current.at(0)).toEqual({
             ...draft.receipt,
             transactionID: 'draft1',
         });
@@ -72,7 +72,7 @@ describe('useTransactionDraftReceipts', () => {
             expect(result.current).toHaveLength(1);
         });
 
-        expect(result.current[0].transactionID).toBe('draft1');
+        expect(result.current.at(0)?.transactionID).toBe('draft1');
     });
 
     it('returns receipts for all drafts that have them', async () => {
