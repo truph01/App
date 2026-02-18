@@ -2529,6 +2529,7 @@ describe('SidebarUtils', () => {
                     invoiceReceiverPolicy: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
+                    chatReport: undefined,
                 });
 
                 // Then isConciergeChat should be true
@@ -2560,6 +2561,7 @@ describe('SidebarUtils', () => {
                     invoiceReceiverPolicy: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
+                    chatReport: undefined,
                 });
 
                 // Then isConciergeChat should be false
@@ -2590,6 +2592,7 @@ describe('SidebarUtils', () => {
                     invoiceReceiverPolicy: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
+                    chatReport: undefined,
                 });
 
                 // Then isConciergeChat should be false

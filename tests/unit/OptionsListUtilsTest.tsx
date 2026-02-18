@@ -6084,6 +6084,7 @@ describe('OptionsListUtils', () => {
                 draftComments: {},
                 nvpDismissedProductTraining,
                 loginList,
+                policyCollection: {},
                 currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
                 currentUserEmail: CURRENT_USER_EMAIL,
                 personalDetails: PERSONAL_DETAILS,
