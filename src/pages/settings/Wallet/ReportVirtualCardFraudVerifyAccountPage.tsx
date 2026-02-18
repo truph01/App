@@ -1,7 +1,7 @@
-import {filterOutPersonalCards} from '@selectors/Card';
 import React, {useEffect} from 'react';
 import ValidateCodeActionContent from '@components/ValidateCodeActionModal/ValidateCodeActionContent';
 import useLocalize from '@hooks/useLocalize';
+import useNonPersonalCardList from '@hooks/useNonPersonalCardList';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import {clearCardListErrors, reportVirtualExpensifyCardFraud} from '@libs/actions/Card';
@@ -23,8 +23,7 @@ function ReportVirtualCardFraudVerifyAccountPage({
         params: {cardID = ''},
     },
 }: ReportVirtualCardFraudVerifyAccountPageProps) {
-    const [allCards] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: false});
-    const cardList = filterOutPersonalCards(allCards);
+    const cardList = useNonPersonalCardList();
     const virtualCard = cardList?.[cardID];
     const {translate} = useLocalize();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
