@@ -973,6 +973,12 @@ button {
     }
 }
 
+.platform-cards-group--new-expensify .hub-card .icon[src*='simple-illustration__concierge-bot.svg'] {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
 .base-icon {
     width: 20px;
     height: 20px;
