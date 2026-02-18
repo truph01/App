@@ -68,4 +68,10 @@ function getParentReportActionDeletionStatus({
     return {hasLoadedParentReportActions: hasLoadedParentReportActionsValue, isParentActionMissingAfterLoad, isParentActionDeleted, wasParentActionDeleted};
 }
 
-export {doesDeleteNavigateBackUrlIncludeDuplicatesReview, doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus, hasLoadedReportActions, isThreadReportDeleted};
+export {
+    doesDeleteNavigateBackUrlIncludeDuplicatesReview,
+    doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview,
+    getParentReportActionDeletionStatus,
+    hasLoadedReportActions,
+    isThreadReportDeleted,
+};
