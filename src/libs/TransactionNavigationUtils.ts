@@ -1,5 +1,5 @@
 import CONST from '@src/CONST';
-import type {OnyxInputOrEntry, ReportAction, ReportMetadata} from '@src/types/onyx';
+import type {OnyxInputOrEntry, Report, ReportAction, ReportMetadata} from '@src/types/onyx';
 import {isDeletedAction} from './ReportActionsUtils';
 
 type ParentReportActionDeletionStatusParams = {
@@ -18,6 +18,11 @@ function hasLoadedReportActions(reportMetadata: OnyxInputOrEntry<ReportMetadata>
         return false;
     }
     return reportMetadata?.hasOnceLoadedReportActions === true || reportMetadata?.isLoadingInitialReportActions === false || isOffline;
+}
+
+function isThreadReportDeleted(report: OnyxInputOrEntry<Report>, reportMetadata: OnyxInputOrEntry<ReportMetadata>, isOffline = false): boolean {
+    const hasLoadedThreadReportActions = hasLoadedReportActions(reportMetadata, isOffline);
+    return (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
 }
 
 function decodeDeleteNavigateBackUrl(url: string): string {
@@ -63,4 +68,4 @@ function getParentReportActionDeletionStatus({
     return {hasLoadedParentReportActions: hasLoadedParentReportActionsValue, isParentActionMissingAfterLoad, isParentActionDeleted, wasParentActionDeleted};
 }
 
-export {doesDeleteNavigateBackUrlIncludeDuplicatesReview, doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus};
+export {doesDeleteNavigateBackUrlIncludeDuplicatesReview, doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus, hasLoadedReportActions, isThreadReportDeleted};

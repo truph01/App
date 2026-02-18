@@ -35,7 +35,7 @@ import {
     isMoneyRequestAction,
 } from '@libs/ReportActionsUtils';
 import {isMoneyRequestReportPendingDeletion, isMoneyRequestReport, isValidReportIDFromPath} from '@libs/ReportUtils';
-import {doesDeleteNavigateBackUrlIncludeDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
+import {doesDeleteNavigateBackUrlIncludeDuplicatesReview, getParentReportActionDeletionStatus, hasLoadedReportActions, isThreadReportDeleted} from '@libs/TransactionNavigationUtils';
 import {isDefaultAvatar, isLetterAvatar, isPresetAvatar} from '@libs/UserAvatarUtils';
 import Navigation from '@navigation/Navigation';
 import ReactionListWrapper from '@pages/inbox/ReactionListWrapper';
@@ -164,10 +164,9 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
 
     const reportID = report?.reportID;
     const doesReportIDLookValid = isValidReportIDFromPath(reportID);
-    const hasLoadedReportActions = reportMetadata?.hasOnceLoadedReportActions === true || reportMetadata?.isLoadingInitialReportActions === false;
+    const hasLoadedReportActionsForAccessError = hasLoadedReportActions(reportMetadata);
     const isReportPendingDeletion = isMoneyRequestReportPendingDeletion(report);
-    const hasLoadedThreadReportActions = !!reportMetadata && (reportMetadata.hasOnceLoadedReportActions === true || reportMetadata.isLoadingInitialReportActions === false);
-    const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
+    const isThreadReportDeletedForReview = isThreadReportDeleted(report, reportMetadata);
     const {wasParentActionDeleted} = getParentReportActionDeletionStatus({
         parentReportID: report?.parentReportID,
         parentReportActionID: report?.parentReportActionID,
@@ -331,24 +330,24 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
             return true;
         }
 
-        if (isReportPendingDeletion || wereAllTransactionsDeleted || wasParentActionDeleted || isThreadReportDeleted) {
+        if (isReportPendingDeletion || wereAllTransactionsDeleted || wasParentActionDeleted || isThreadReportDeletedForReview) {
             return true;
         }
 
-        return !reportID && hasLoadedReportActions && !hasAnyTransactions;
+        return !reportID && hasLoadedReportActionsForAccessError && !hasAnyTransactions;
 
         // isLoadingApp intentionally omitted to avoid re-computing after initial load completes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         reportID,
-        hasLoadedReportActions,
+        hasLoadedReportActionsForAccessError,
         doesReportIDLookValid,
         isReportPendingDeletion,
         wereAllTransactionsDeleted,
         hasAnyTransactions,
         deleteTransactionNavigateBackUrl,
         wasParentActionDeleted,
-        isThreadReportDeleted,
+        isThreadReportDeletedForReview,
     ]);
 
     const prevShouldShowAccessErrorPage = usePrevious(shouldShowAccessErrorPage);

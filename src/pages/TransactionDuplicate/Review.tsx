@@ -24,7 +24,7 @@ import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigat
 import type {TransactionDuplicateNavigatorParamList} from '@libs/Navigation/types';
 import {getLinkedTransactionID, getReportAction} from '@libs/ReportActionsUtils';
 import {isReportIDApproved, isSettled} from '@libs/ReportUtils';
-import {doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus} from '@libs/TransactionNavigationUtils';
+import {doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus, hasLoadedReportActions, isThreadReportDeleted} from '@libs/TransactionNavigationUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -125,8 +125,8 @@ function TransactionDuplicateReview() {
         getDuplicateTransactionDetails(transactionID);
     }, [transactionID]);
 
-    const hasLoadedThreadReportActions = !!reportMetadata && (reportMetadata?.hasOnceLoadedReportActions === true || reportMetadata?.isLoadingInitialReportActions === false || isOffline);
-    const isThreadReportDeleted = (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
+    const hasLoadedThreadReportActions = hasLoadedReportActions(reportMetadata, isOffline);
+    const isThreadReportDeletedForReview = isThreadReportDeleted(report, reportMetadata, isOffline);
     const {hasLoadedParentReportActions, wasParentActionDeleted} = getParentReportActionDeletionStatus({
         parentReportID: report?.parentReportID,
         parentReportActionID: report?.parentReportActionID,
@@ -136,10 +136,10 @@ function TransactionDuplicateReview() {
         shouldRequireParentReportActionID: false,
         shouldTreatMissingParentReportAsDeleted: true,
     });
-    const wasTransactionDeleted = isThreadReportDeleted || wasParentActionDeleted;
+    const wasTransactionDeleted = isThreadReportDeletedForReview || wasParentActionDeleted;
     const isLoadingPage =
-        (!report?.reportID && !hasLoadedThreadReportActions && !isThreadReportDeleted) ||
-        (!reportAction?.reportActionID && !hasLoadedParentReportActions && !wasParentActionDeleted && !isThreadReportDeleted);
+        (!report?.reportID && !hasLoadedThreadReportActions && !isThreadReportDeletedForReview) ||
+        (!reportAction?.reportActionID && !hasLoadedParentReportActions && !wasParentActionDeleted && !isThreadReportDeletedForReview);
     const isDeleteNavigateBackToThisReview = useMemo(
         () => doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview(deleteTransactionNavigateBackUrl, route.params.threadReportID),
         [deleteTransactionNavigateBackUrl, route.params.threadReportID],
