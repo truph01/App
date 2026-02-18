@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as NativeNavigation from '@react-navigation/native';
-import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react-native';
+import {act, cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react-native';
 import {addSeconds, format, subMinutes} from 'date-fns';
 import React from 'react';
 import Onyx from 'react-native-onyx';
@@ -286,6 +286,7 @@ async function signInAndGetApp(): Promise<void> {
 describe('Pagination', () => {
     afterEach(async () => {
         await waitForIdle();
+        cleanup();
         await act(async () => {
             await Onyx.clear();
 
