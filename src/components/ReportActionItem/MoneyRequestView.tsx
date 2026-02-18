@@ -1,7 +1,8 @@
 import {Str} from 'expensify-common';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
 import Icon from '@components/Icon';
 import MenuItem from '@components/MenuItem';
@@ -25,7 +26,6 @@ import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import useReportAttributes from '@hooks/useReportAttributes';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
-import usePrevious from '@hooks/usePrevious';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -252,8 +252,14 @@ function MoneyRequestView({
     const isInvoice = isInvoiceReport(moneyRequestReport);
     const isTrackExpense = !mergeTransactionID && isTrackExpenseReportNew(transactionThreadReport, moneyRequestReport, parentReportAction);
 
-    // eslint-disable-next-line no-nested-ternary
-    const iouType = isTrackExpense ? CONST.IOU.TYPE.TRACK : isInvoice ? CONST.IOU.TYPE.INVOICE : CONST.IOU.TYPE.SUBMIT;
+    let iouType: ValueOf<typeof CONST.IOU.TYPE>;
+    if (isTrackExpense) {
+        iouType = CONST.IOU.TYPE.TRACK;
+    } else if (isInvoice) {
+        iouType = CONST.IOU.TYPE.INVOICE;
+    } else {
+        iouType = CONST.IOU.TYPE.SUBMIT;
+    }
 
     const allowNegativeAmount = shouldEnableNegative(parentReport, policy, iouType);
 
@@ -674,24 +680,19 @@ function MoneyRequestView({
 
     const hasDependentTags = hasDependentTagsPolicyUtils(policy, policyTagList);
 
-    const previousTransactionTag = usePrevious(transactionTag);
-
+    const [previousTransactionTag, setPreviousTransactionTag] = useState(transactionTag);
     const [previousTag, setPreviousTag] = useState<string | undefined>(undefined);
     const [currentTransactionTag, setCurrentTransactionTag] = useState<string | undefined>(undefined);
-
-    useEffect(() => {
-        if (transactionTag === previousTransactionTag) {
-            return;
-        }
+    if (transactionTag !== previousTransactionTag) {
+        setPreviousTransactionTag(transactionTag);
         setPreviousTag(previousTransactionTag);
         setCurrentTransactionTag(transactionTag);
-    }, [transactionTag, previousTransactionTag]);
+    }
+    const previousTagLength = getLengthOfTag(previousTag ?? '');
+    const currentTagLength = getLengthOfTag(currentTransactionTag ?? '');
 
     const getAttendeesTitle = Array.isArray(actualAttendees) ? actualAttendees.map((item) => item?.displayName ?? item?.login).join(', ') : '';
     const attendeesCopyValue = !canEdit ? getAttendeesTitle : undefined;
-
-    const previousTagLength = getLengthOfTag(previousTag ?? '');
-    const currentTagLength = getLengthOfTag(currentTransactionTag ?? '');
 
     const tagList = policyTagLists.map(({name, orderWeight, tags}, index) => {
         const tagForDisplay = getTagForDisplay(updatedTransaction ?? transaction, index);
