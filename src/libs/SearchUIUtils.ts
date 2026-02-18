@@ -4199,9 +4199,6 @@ function getColumnsToShow(
                 result.push(col);
             }
 
-            const withdrawnIndex = result.indexOf(CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWN);
-            result.splice(withdrawnIndex >= 0 ? withdrawnIndex + 1 : 1, 0, CONST.SEARCH.TABLE_COLUMNS.STATUS);
-
             return result;
         }
 

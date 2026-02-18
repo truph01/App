@@ -50,7 +50,7 @@ function SearchColumnsPage() {
     const defaultGroupCustomColumns = getCustomColumnDefault(groupBy);
     const defaultTypeCustomColumns = getCustomColumnDefault(queryType);
 
-    const allCustomColumns = [...allGroupCustomColumns, ...allTypeCustomColumns];
+    const allCustomColumns = [...new Set([...allGroupCustomColumns, ...allTypeCustomColumns])];
     const defaultCustomColumns = new Set([...defaultGroupCustomColumns, ...defaultTypeCustomColumns]);
 
     // We need at least one element with flex1 in the table to ensure the table looks good in the UI, so we don't allow removing the total columns
