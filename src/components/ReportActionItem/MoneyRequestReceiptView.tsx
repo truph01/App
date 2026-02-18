@@ -27,7 +27,6 @@ import {
     canEditMoneyRequest,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
     getCreationReportErrors,
-    getOriginalReportID,
     isInvoiceReport,
     isPaidGroupPolicy,
     isTrackExpenseReportNew,
@@ -270,7 +269,16 @@ function MoneyRequestReceiptView({
                 return;
             }
             if (parentReportAction) {
-                cleanUpMoneyRequest(transaction?.transactionID ?? linkedTransactionID, parentReportAction, report.reportID, iouReport, chatIOUReport, isChatIOUReportArchived, true, originalReportID);
+                cleanUpMoneyRequest(
+                    transaction?.transactionID ?? linkedTransactionID,
+                    parentReportAction,
+                    report.reportID,
+                    iouReport,
+                    chatIOUReport,
+                    isChatIOUReportArchived,
+                    originalReportID,
+                    true,
+                );
                 return;
             }
         }
