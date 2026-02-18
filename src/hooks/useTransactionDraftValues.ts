@@ -4,7 +4,7 @@ import useOnyx from './useOnyx';
 
 function useTransactionDraftValues(): Array<Transaction | null | undefined> {
     const [drafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {canBeMissing: true});
-    
+
     return Object.values(drafts ?? {});
 }
 

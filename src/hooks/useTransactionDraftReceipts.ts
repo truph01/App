@@ -10,7 +10,7 @@ function useTransactionDraftReceipts(): ReceiptWithTransactionID[] {
     if (!drafts) {
         return [];
     }
-    
+
     return Object.values(drafts).reduce<ReceiptWithTransactionID[]>((acc, transaction) => {
         if (transaction?.receipt) {
             acc.push({...transaction.receipt, transactionID: transaction.transactionID});
