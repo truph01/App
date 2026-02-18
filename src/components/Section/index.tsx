@@ -14,6 +14,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import isIllustrationLottieAnimation from '@libs/isIllustrationLottieAnimation';
+import CONST from '@src/CONST';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 import type IconAsset from '@src/types/utils/IconAsset';
 import IconSection from './IconSection';
@@ -191,7 +192,7 @@ function Section({
                             : !!title && (
                                   <Text
                                       style={[styles.textHeadline, styles.cardSectionTitle, titleStyles]}
-                                      accessibilityRole="header"
+                                      accessibilityRole={CONST.ROLE.HEADER}
                                   >
                                       {title}
                                   </Text>

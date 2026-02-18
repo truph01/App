@@ -703,7 +703,7 @@ function AdvancedSearchFilters() {
                                 )}
                                 <Text
                                     style={[styles.headerText, styles.reportHorizontalRule, index === 0 ? null : styles.mt4, styles.mb2]}
-                                    accessibilityRole="header"
+                                    accessibilityRole={CONST.ROLE.HEADER}
                                 >
                                     {translate(section.titleTranslationKey)}
                                 </Text>

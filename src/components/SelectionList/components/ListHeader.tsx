@@ -60,7 +60,7 @@ function ListHeader<TItem extends ListItem>({
     return (
         <View
             style={[styles.userSelectNone, styles.peopleRow, styles.ph5, styles.pb3, headerStyle, styles.selectionListStickyHeader]}
-            accessibilityRole="header"
+            accessibilityRole={CONST.ROLE.HEADER}
         >
             <View style={[styles.flexRow, styles.alignItemsCenter]}>
                 <Checkbox

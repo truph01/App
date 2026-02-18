@@ -95,7 +95,7 @@ function BaseOnboardingPrivateDomain({shouldUseNativeStyles, route}: BaseOnboard
                 <View style={[styles.mb5, onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5, styles.flex1]}>
                     <Text
                         style={styles.textHeadlineH1}
-                        accessibilityRole="header"
+                        accessibilityRole={CONST.ROLE.HEADER}
                     >
                         {translate('onboarding.peopleYouMayKnow')}
                     </Text>

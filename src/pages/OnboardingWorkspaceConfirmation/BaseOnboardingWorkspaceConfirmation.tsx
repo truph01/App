@@ -149,7 +149,7 @@ function BaseOnboardingWorkspaceConfirmation({shouldUseNativeStyles}: BaseOnboar
                 <View style={[onboardingIsMediumOrLargerScreenWidth ? styles.flexRow : styles.flexColumn, styles.mb3]}>
                     <Text
                         style={styles.textHeadlineH1}
-                        accessibilityRole="header"
+                        accessibilityRole={CONST.ROLE.HEADER}
                     >
                         {translate('onboarding.confirmWorkspace.title')}
                     </Text>

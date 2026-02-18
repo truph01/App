@@ -101,7 +101,7 @@ function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSet
         <View style={[styles.mh5, styles.mt2, styles.mb1]}>
             <Text
                 style={[styles.headerText]}
-                accessibilityRole="header"
+                accessibilityRole={CONST.ROLE.HEADER}
             >
                 {translate('workspace.categories.defaultSpendCategories')}
             </Text>

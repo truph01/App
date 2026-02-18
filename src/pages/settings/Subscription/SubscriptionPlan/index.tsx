@@ -8,6 +8,7 @@ import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useSubscriptionPlan from '@hooks/useSubscriptionPlan';
 import useThemeStyles from '@hooks/useThemeStyles';
+import CONST from '@src/CONST';
 import variables from '@styles/variables';
 import ComparePlansModal from './ComparePlansModal';
 import SaveWithExpensifyButton from './SaveWithExpensifyButton';
@@ -25,7 +26,7 @@ function SubscriptionPlan() {
             <View style={[styles.flexRow, styles.justifyContentBetween, styles.alignItemsCenter]}>
                 <Text
                     style={[styles.textHeadline, styles.cardSectionTitle, styles.textStrong]}
-                    accessibilityRole="header"
+                    accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {translate('subscription.yourPlan.title')}
                 </Text>

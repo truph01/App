@@ -593,7 +593,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     renderTitle={() => (
                         <Text
                             style={styles.mutedNormalTextLabel}
-                            accessibilityRole="header"
+                            accessibilityRole={CONST.ROLE.HEADER}
                         >
                             {translate(section.titleTranslationKey)}
                         </Text>

@@ -606,7 +606,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
             <View style={[styles.optionsListSectionHeader, styles.justifyContentCenter, sectionTitleStyles]}>
                 <Text
                     style={[styles.ph5, styles.textLabelSupporting]}
-                    accessibilityRole="header"
+                    accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {section.title}
                 </Text>

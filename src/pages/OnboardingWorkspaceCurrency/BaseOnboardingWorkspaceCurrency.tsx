@@ -60,7 +60,7 @@ function BaseOnboardingWorkspaceCurrency({route, shouldUseNativeStyles}: BaseOnb
             <View style={[onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5, onboardingIsMediumOrLargerScreenWidth ? styles.flexRow : styles.flexColumn, styles.mb5]}>
                 <Text
                     style={styles.textHeadlineH1}
-                    accessibilityRole="header"
+                    accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {translate('common.currency')}
                 </Text>

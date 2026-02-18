@@ -376,7 +376,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
             <View style={[onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}>
                 <Text
                     style={[styles.textHeadlineH1, styles.mb5]}
-                    accessibilityRole="header"
+                    accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {translate('onboarding.interestedFeatures.title')}
                 </Text>

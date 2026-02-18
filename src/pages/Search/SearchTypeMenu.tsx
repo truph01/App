@@ -257,7 +257,7 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
                             <View key={section.translationPath}>
                                 <Text
                                     style={styles.sectionTitle}
-                                    accessibilityRole="header"
+                                    accessibilityRole={CONST.ROLE.HEADER}
                                 >
                                     {translate(section.translationPath)}
                                 </Text>

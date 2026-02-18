@@ -102,7 +102,7 @@ function EmptyStateComponent({
                     <View style={[shouldUseNarrowLayout ? styles.p5 : styles.p8, cardContentStyles]}>
                         <Text
                             style={[styles.textAlignCenter, styles.textHeadlineH1, styles.mb2, titleStyles]}
-                            accessibilityRole="header"
+                            accessibilityRole={CONST.ROLE.HEADER}
                         >
                             {title}
                         </Text>

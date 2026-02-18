@@ -104,7 +104,7 @@ function BaseOnboardingWorkEmailValidation({shouldUseNativeStyles}: BaseOnboardi
                 <View style={[styles.flex1, onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}>
                     <Text
                         style={styles.textHeadlineH1}
-                        accessibilityRole="header"
+                        accessibilityRole={CONST.ROLE.HEADER}
                     >
                         {translate('onboarding.workEmailValidation.title')}
                     </Text>

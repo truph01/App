@@ -178,7 +178,7 @@ function Footer({navigateFocus}: FooterProps) {
                             >
                                 <Text
                                     style={[styles.textHeadline, styles.footerTitle]}
-                                    accessibilityRole="header"
+                                    accessibilityRole={CONST.ROLE.HEADER}
                                 >
                                     {translate(column.translationPath)}
                                 </Text>

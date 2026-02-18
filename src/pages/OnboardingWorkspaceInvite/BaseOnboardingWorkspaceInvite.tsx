@@ -233,7 +233,7 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
             <View style={[onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5, onboardingIsMediumOrLargerScreenWidth ? styles.flexRow : styles.flexColumn, styles.mb3]}>
                 <Text
                     style={styles.textHeadlineH1}
-                    accessibilityRole="header"
+                    accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {translate('onboarding.inviteMembers.title')}
                 </Text>

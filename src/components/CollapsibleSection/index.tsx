@@ -57,7 +57,7 @@ function CollapsibleSection({title, children, titleStyle, textStyle, wrapperStyl
                 <Text
                     style={textStyle ?? [styles.flex1, styles.textStrong, styles.userSelectNone, titleStyle]}
                     dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
-                    accessibilityRole="header"
+                    accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {title}
                 </Text>

@@ -122,7 +122,7 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
                         </View>
                         <Text
                             style={[styles.headerText, styles.mv2, styles.textHeadlineH2]}
-                            accessibilityRole="header"
+                            accessibilityRole={CONST.ROLE.HEADER}
                         >
                             {title}
                         </Text>

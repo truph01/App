@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
 import Icon from './Icon';
 import Text from './Text';
@@ -52,7 +53,7 @@ function WorkspaceEmptyStateSection({icon, subtitle, title, containerStyle, shou
                 <View style={[styles.flexRow, styles.justifyContentCenter, styles.w100, styles.mh1, styles.flexShrink1]}>
                     <Text
                         style={[styles.textHeadline, styles.emptyCardSectionTitle]}
-                        accessibilityRole="header"
+                        accessibilityRole={CONST.ROLE.HEADER}
                     >
                         {title}
                     </Text>

@@ -189,7 +189,7 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
                     <View style={[wrapperPadding, onboardingIsMediumOrLargerScreenWidth && styles.mt5, styles.mb5]}>
                         <Text
                             style={styles.textHeadlineH1}
-                            accessibilityRole="header"
+                            accessibilityRole={CONST.ROLE.HEADER}
                         >
                             {translate('onboarding.joinAWorkspace')}
                         </Text>

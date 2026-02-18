@@ -161,7 +161,7 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                 >
                     <Text
                         style={[styles.visuallyHidden]}
-                        accessibilityRole="header"
+                        accessibilityRole={CONST.ROLE.HEADER}
                         accessibilityLabel={translate('workspace.common.distanceRates')}
                     >
                         {translate('workspace.common.distanceRates')}
