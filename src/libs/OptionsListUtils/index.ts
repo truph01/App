@@ -237,7 +237,6 @@ const lastReportActions: ReportActions = {};
 const allSortedReportActions: Record<string, ReportAction[]> = {};
 let allReportActions: OnyxCollection<ReportActions>;
 const lastVisibleReportActions: ReportActions = {};
-const lastVisibleIOUMoneyActions: ReportActions = {};
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
     waitForCollectionCallback: true,
@@ -280,47 +279,21 @@ Onyx.connect({
             const isReportArchived = !!reportNameValuePairs?.private_isArchived;
             const isWriteActionAllowed = canUserPerformWriteAction(report, isReportArchived);
 
-            // Single pass: find the first visible action for display and the first visible IOU money request action.
-            // sortedReportActions is sorted descending (newest first), so the first match is the newest.
-            let reportActionForDisplay: ReportAction | undefined;
-            let iouMoneyAction: ReportAction | undefined;
-            for (let i = 0; i < sortedReportActions.length; i++) {
-                const reportAction = sortedReportActions.at(i);
-                if (!reportAction) {
-                    continue;
-                }
-                const isPending = reportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-
-                if (!reportActionForDisplay) {
-                    const isDisplayable =
-                        (!(isWhisperAction(reportAction) && !isReportPreviewAction(reportAction) && !isMoneyRequestAction(reportAction)) || isActionableMentionWhisper(reportAction)) &&
-                        reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED;
-                    if (isDisplayable && shouldReportActionBeVisible(reportAction, i, isWriteActionAllowed) && !isPending) {
-                        reportActionForDisplay = reportAction;
-                    }
-                }
-
-                if (!iouMoneyAction && shouldReportActionBeVisible(reportAction, reportAction.reportActionID, isWriteActionAllowed) && !isPending && isMoneyRequestAction(reportAction)) {
-                    iouMoneyAction = reportAction;
-                }
-
-                if (reportActionForDisplay && iouMoneyAction) {
-                    break;
-                }
-            }
-
+            // The report is only visible if it is the last action not deleted that
+            // does not match a closed or created state.
+            const reportActionsForDisplay = sortedReportActions.filter(
+                (reportAction, actionKey) =>
+                    (!(isWhisperAction(reportAction) && !isReportPreviewAction(reportAction) && !isMoneyRequestAction(reportAction)) || isActionableMentionWhisper(reportAction)) &&
+                    shouldReportActionBeVisible(reportAction, actionKey, isWriteActionAllowed) &&
+                    reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED &&
+                    reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+            );
+            const reportActionForDisplay = reportActionsForDisplay.at(0);
             if (!reportActionForDisplay) {
                 delete lastVisibleReportActions[reportID];
-                delete lastVisibleIOUMoneyActions[reportID];
                 continue;
             }
             lastVisibleReportActions[reportID] = reportActionForDisplay;
-
-            if (iouMoneyAction) {
-                lastVisibleIOUMoneyActions[reportID] = iouMoneyAction;
-            } else {
-                delete lastVisibleIOUMoneyActions[reportID];
-            }
         }
     },
 });
@@ -674,7 +647,14 @@ function getLastMessageTextForReport({
         lastMessageTextFromReport = formatReportLastMessageText(Parser.htmlToText(properSchemaForMoneyRequestMessage));
     } else if (isReportPreviewAction(lastReportAction)) {
         const iouReport = getReportOrDraftReport(getIOUReportIDFromReportActionPreview(lastReportAction));
-        const lastIOUMoneyReportAction = iouReport?.reportID ? lastVisibleIOUMoneyActions[iouReport.reportID] : undefined;
+        const lastIOUMoneyReportAction = iouReport?.reportID
+            ? allSortedReportActions[iouReport.reportID]?.find(
+                  (reportAction, key): reportAction is ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.IOU> =>
+                      shouldReportActionBeVisible(reportAction, key, canUserPerformWriteAction(report, isReportArchived)) &&
+                      reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
+                      isMoneyRequestAction(reportAction),
+              )
+            : undefined;
         // For workspace chats, use the report title
         if (reportUtilsIsPolicyExpenseChat(report) && !isEmptyObject(iouReport)) {
             const reportName = reportAttributesDerived?.[iouReport.reportID]?.reportName ?? '';
