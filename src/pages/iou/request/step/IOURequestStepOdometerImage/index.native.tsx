@@ -38,8 +38,11 @@ import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTrans
 import type {WithFullTransactionOrNotFoundProps} from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import {setMoneyRequestOdometerImage} from '@userActions/IOU';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 import type {FileObject} from '@src/types/utils/Attachment';
+import useOnyx from '@hooks/useOnyx';
+import { getEmptyObject } from '@src/types/utils/EmptyObject';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
@@ -61,10 +64,12 @@ function IOURequestStepOdometerImage({
     const viewfinderLayout = useRef<LayoutRectangle>(null);
     const isTransactionDraft = shouldUseTransactionDraft(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.REQUEST);
 
-    const device = useCameraDevice('back');
-    const platform: Platform = getPlatform();
-
-    const isPlatformMuted = platform === CONST.PLATFORM.IOS;
+    const device = useCameraDevice('back', {
+        physicalDevices: ['wide-angle-camera', 'ultra-wide-angle-camera'],
+    });
+    const platform = getPlatform(true);
+    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS, {canBeMissing: true});
+    const isPlatformMuted = mutedPlatforms[platform];
 
     const title = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
 
