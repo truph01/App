@@ -5,7 +5,7 @@ import path from 'path';
  * Script to extract all URLs from help articles and generate a whitelist.
  * Run this at build time to update the allowed URLs list.
  *
- * Usage: npx ts-node docs/scripts/generateAllowedUrls.ts
+ * Usage: npx ts-node .github/scripts/generateAllowedUrls.ts
  */
 
 const DOCS_DIR = path.join(__dirname, '..', '..', 'docs');
@@ -16,7 +16,7 @@ const OUTPUT_FILE = path.join(DOCS_DIR, 'assets', 'js', 'allowedExternalUrls.jso
 const URL_PATTERNS = [
     /\[.*?\]\((https?:\/\/[^)\s]+)\)/g, // Markdown links [text](url)
     /<(https?:\/\/[^>\s]+)>/g, // Angle bracket URLs <url>
-    /(?<![(\[])(https?:\/\/[^\s)\]>"']+)/g, // Bare URLs
+    /(?<![([])(https?:\/\/[^\s)\]>"']+)/g, // Bare URLs
 ];
 
 function findMarkdownFiles(dir: string): string[] {
@@ -39,8 +39,8 @@ function extractUrls(content: string): Set<string> {
 
     for (const pattern of URL_PATTERNS) {
         const regex = new RegExp(pattern.source, pattern.flags);
-        let match;
-        while ((match = regex.exec(content)) !== null) {
+        let match = regex.exec(content);
+        while (match !== null) {
             // Get the captured group (URL) or the full match
             const url = match[1] || match[0];
             // Clean up trailing punctuation that might be captured
@@ -48,6 +48,7 @@ function extractUrls(content: string): Set<string> {
             if (cleanUrl.startsWith('http')) {
                 urls.add(cleanUrl);
             }
+            match = regex.exec(content);
         }
     }
     return urls;
@@ -64,7 +65,9 @@ function main() {
     for (const file of markdownFiles) {
         const content = fs.readFileSync(file, 'utf-8');
         const urls = extractUrls(content);
-        urls.forEach((url) => allUrls.add(url));
+        for (const url of urls) {
+            allUrls.add(url);
+        }
     }
 
     // Filter out Expensify URLs (check domain properly) and sort
