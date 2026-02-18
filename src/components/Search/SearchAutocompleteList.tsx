@@ -51,6 +51,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {CardFeeds, CardList, PersonalDetailsList, Policy, Report} from '@src/types/onyx';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {getSubstitutionMapKey} from './SearchRouter/getQueryWithSubstitutions';
 import type {SearchFilterKey, UserFriendlyKey} from './types';
 
@@ -104,9 +105,6 @@ type SearchAutocompleteListProps = {
 
     /** Reference to the outer element */
     ref?: ForwardedRef<SelectionListWithSectionsHandle>;
-
-    /** Whether initial data needed for the list is still loading */
-    isInitialDataLoading?: boolean;
 
     /** Optional skeleton view to render while loadings */
     skeletonView?: React.ReactNode;
@@ -171,7 +169,6 @@ function SearchAutocompleteList({
     allFeeds,
     allCards = CONST.EMPTY_OBJECT,
     ref,
-    isInitialDataLoading,
     skeletonView,
 }: SearchAutocompleteListProps) {
     const styles = useThemeStyles();
@@ -182,7 +179,7 @@ function SearchAutocompleteList({
     const [feedKeysWithCards] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {selector: feedKeysWithAssignedCardsSelector, canBeMissing: true});
     const [draftComments] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT, {canBeMissing: true});
     const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {canBeMissing: true});
-    const [recentSearches] = useOnyx(ONYXKEYS.RECENT_SEARCHES, {canBeMissing: true});
+    const [recentSearches, recentSearchesMetadata] = useOnyx(ONYXKEYS.RECENT_SEARCHES, {canBeMissing: true});
     const [countryCode] = useOnyx(ONYXKEYS.COUNTRY_CODE, {canBeMissing: false});
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST, {canBeMissing: true});
     const [policies = getEmptyObject<NonNullable<OnyxCollection<Policy>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: false});
@@ -909,7 +906,8 @@ function SearchAutocompleteList({
         }
     }, [autocompleteQueryValue, onHighlightFirstItem, normalizedReferenceText]);
 
-    const isLoading = !!isInitialDataLoading || !areOptionsInitialized;
+    const isRecentSearchesDataLoaded = !isLoadingOnyxValue(recentSearchesMetadata);
+    const isLoading = !isRecentSearchesDataLoaded || !areOptionsInitialized;
 
     if (isLoading && skeletonView) {
         return skeletonView;
