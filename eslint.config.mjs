@@ -13,6 +13,7 @@ import globals from 'globals';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import typescriptEslint from 'typescript-eslint';
+import reactCompilerCompat from './eslint-plugin-react-compiler-compat/index.mjs';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -164,6 +165,13 @@ const config = defineConfig([
     typescriptEslint.configs.recommendedTypeChecked,
     typescriptEslint.configs.stylisticTypeChecked,
     fileProgress.configs['recommended-ci'],
+
+    // Suppress lint rules that are unnecessary for files successfully compiled by React Compiler.
+    // The processor runs React Compiler on each file and filters out redundant lint messages.
+    {
+        files: ['**/*.tsx', '**/*.jsx'],
+        processor: reactCompilerCompat.processors['react-compiler-compat'],
+    },
 
     {
         extends: new FlatCompat({baseDirectory: dirname}).extends(
