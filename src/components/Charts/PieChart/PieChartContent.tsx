@@ -10,10 +10,18 @@ import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
 import {PIE_CHART_START_ANGLE} from '@components/Charts/constants';
 import {TOOLTIP_BAR_GAP, useChartLabelFormats, useTooltipData} from '@components/Charts/hooks';
-import type {PieChartProps, PieSlice} from '@components/Charts/types';
+import type {ChartDataPoint, ChartProps, PieSlice} from '@components/Charts/types';
 import {findSliceAtPosition, processDataIntoSlices} from '@components/Charts/utils';
 import Text from '@components/Text';
 import useThemeStyles from '@hooks/useThemeStyles';
+
+type PieChartProps = ChartProps & {
+    /** Callback when a slice is pressed */
+    onSlicePress?: (dataPoint: ChartDataPoint, index: number) => void;
+
+    /** Symbol/unit for value labels in tooltip (e.g., '$', '€'). */
+    valueUnit?: string;
+};
 
 function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSlicePress}: PieChartProps) {
     const styles = useThemeStyles();
@@ -33,7 +41,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     };
 
     // Process data into slices with aggregation.
-    const processedSlices: PieSlice[] = processDataIntoSlices(data, PIE_CHART_START_ANGLE);
+    const processedSlices = processDataIntoSlices(data, PIE_CHART_START_ANGLE);
 
     // Map sorted slice index back to original data index for the tooltip hook
     const activeOriginalDataIndex = activeSliceIndex >= 0 ? (processedSlices.at(activeSliceIndex)?.originalIndex ?? -1) : -1;
@@ -174,3 +182,4 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
 }
 
 export default PieChartContent;
+export type {PieChartProps};

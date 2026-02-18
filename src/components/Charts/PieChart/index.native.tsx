@@ -1,5 +1,5 @@
 import React from 'react';
-import type {PieChartProps} from '@components/Charts/types';
+import type {PieChartProps} from './PieChartContent';
 import PieChartContent from './PieChartContent';
 
 function PieChart(props: PieChartProps) {

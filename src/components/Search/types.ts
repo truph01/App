@@ -1,5 +1,5 @@
 import type {ValueOf} from 'type-fest';
-import type {UnitPosition} from '@components/Charts';
+import type {UnitPosition, UnitWithFallback} from '@components/Charts';
 import type {PaymentMethod} from '@components/KYCWall/types';
 import type {
     ReportActionListItemType,
@@ -358,8 +358,8 @@ type SearchChartProps = {
     /** Whether data is loading */
     isLoading?: boolean;
 
-    /** Currency symbol (e.g., '$', '€', 'PLN') */
-    unit?: string;
+    /** Currency unit with font fallback support */
+    unit?: UnitWithFallback;
 
     /** Position of currency symbol relative to value */
     unitPosition?: UnitPosition;

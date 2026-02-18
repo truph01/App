@@ -47,7 +47,7 @@ function SearchPieChart({
             titleIcon={titleIcon}
             isLoading={isLoading}
             onSlicePress={handleSlicePress}
-            valueUnit={unit}
+            valueUnit={unit?.value}
         />
     );
 }

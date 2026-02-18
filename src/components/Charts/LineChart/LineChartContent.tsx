@@ -133,6 +133,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
 
     const {formatValue} = useChartLabelFormats({
         data,
+        font,
         unit: yAxisUnit,
         unitPosition: yAxisUnitPosition,
     });

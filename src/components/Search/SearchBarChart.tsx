@@ -5,7 +5,6 @@ import {convertToFrontendAmountAsInteger} from '@libs/CurrencyUtils';
 import type {SearchChartProps} from './types';
 
 function SearchBarChart({data, title, titleIcon, getLabel, getFilterQuery, onItemPress, isLoading, unit, unitPosition}: SearchChartProps) {
-    // Transform grouped transaction data to BarChart format
     const chartData: ChartDataPoint[] = data.map((item) => {
         const currency = item.currency ?? 'USD';
         const totalInDisplayUnits = convertToFrontendAmountAsInteger(item.total ?? 0, currency);

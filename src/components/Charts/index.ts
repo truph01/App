@@ -5,5 +5,4 @@ import LineChart from './LineChart';
 import PieChart from './PieChart';
 
 export {BarChart, ChartHeader, ChartTooltip, LineChart, PieChart};
-export type {ChartDataPoint, CartesianChartProps, UnitPosition} from './types';
-export type {LineChartProps} from './LineChart/LineChartContent';
+export type {CartesianChartProps, ChartDataPoint, UnitPosition, UnitWithFallback} from './types';

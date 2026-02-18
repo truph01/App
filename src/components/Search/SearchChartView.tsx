@@ -17,13 +17,14 @@ import type {
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getCurrencyDisplayInfoForCharts} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
+import {formatToParts} from '@libs/NumberFormatUtils';
 import {buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUtils';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
+import useLocalize from '@hooks/useLocalize';
 import SearchBarChart from './SearchBarChart';
 import SearchLineChart from './SearchLineChart';
 import SearchPieChart from './SearchPieChart';
@@ -147,8 +148,9 @@ const CHART_VIEW_TO_COMPONENT: Record<ChartView, React.ComponentType<SearchChart
  */
 function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll, title}: SearchChartViewProps) {
     const styles = useThemeStyles();
+    const {preferredLocale} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Users', 'CreditCard', 'Send', 'Folder', 'Basket', 'Tag', 'Calendar'] as const);
+    const icons = useMemoizedLazyExpensifyIcons(['Users', 'CreditCard', 'Send', 'Folder', 'Basket', 'Tag', 'Calendar']);
     const {titleIconName, getLabel, getFilterQuery} = CHART_GROUP_BY_CONFIG[groupBy];
     const titleIcon = icons[titleIconName];
     const ChartComponent = CHART_VIEW_TO_COMPONENT[view];
@@ -170,7 +172,12 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, onScroll, t
 
     const firstItem = data.at(0);
     const currency = firstItem?.currency ?? 'USD';
-    const {symbol: unit, position: unitPosition} = getCurrencyDisplayInfoForCharts(currency);
+    const parts = formatToParts(preferredLocale, 0, {style: 'currency', currency});
+    const currencyPart = parts.find((p) => p.type === 'currency');
+    const currencyIndex = parts.findIndex((p) => p.type === 'currency');
+    const integerIndex = parts.findIndex((p) => p.type === 'integer');
+    const unit = {value: currencyPart?.value ?? currency, fallback: currency};
+    const unitPosition = currencyIndex < integerIndex ? 'left' : 'right';
 
     return (
         <Animated.ScrollView
