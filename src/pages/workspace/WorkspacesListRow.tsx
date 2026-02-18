@@ -180,15 +180,17 @@ function WorkspacesListRow({
 
     const isDeleted = style && Array.isArray(style) ? style.includes(styles.offlineFeedbackDeleted) : false;
 
-    const WorkspaceBadges = (
-        <View style={[styles.flexRow, styles.gap1, styles.alignItemsCenter]}>
+    const ThreeDotMenuOrPendingIcon = (
+        <View style={[styles.flexRow, !isNarrow && styles.workspaceThreeDotMenu]}>
             {!!isJoinRequestPending && (
-                <Badge
-                    text={translate('workspace.common.requested')}
-                    textStyles={styles.textStrong}
-                    badgeStyles={[styles.alignSelfCenter, styles.badgeBordered]}
-                    icon={icons.Hourglass}
-                />
+                <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, styles.justifyContentEnd]}>
+                    <Badge
+                        text={translate('workspace.common.requested')}
+                        textStyles={styles.textStrong}
+                        badgeStyles={[styles.alignSelfCenter, styles.badgeBordered]}
+                        icon={icons.Hourglass}
+                    />
+                </View>
             )}
             {!!isDefault && (
                 <Tooltip
@@ -196,7 +198,7 @@ function WorkspacesListRow({
                     text={translate('workspace.common.defaultNote')}
                     numberOfLines={4}
                 >
-                    <View>
+                    <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, styles.justifyContentEnd]}>
                         <Badge
                             text={translate('common.default')}
                             textStyles={styles.textStrong}
@@ -206,8 +208,20 @@ function WorkspacesListRow({
                 </Tooltip>
             )}
             {!isJoinRequestPending && (
-                <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, isNarrow && styles.workspaceListRBR]}>
-                    <BrickRoadIndicatorIcon brickRoadIndicator={brickRoadIndicator} />
+                <View style={[styles.flexRow, styles.ml2, styles.gap1]}>
+                    <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, isNarrow && styles.workspaceListRBR]}>
+                        <BrickRoadIndicatorIcon brickRoadIndicator={brickRoadIndicator} />
+                    </View>
+                    <ThreeDotsMenu
+                        isContainerFocused={isFocused}
+                        shouldSelfPosition
+                        menuItems={menuItems}
+                        anchorAlignment={{horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT, vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP}}
+                        shouldOverlay
+                        disabled={shouldDisableThreeDotsMenu}
+                        isNested
+                        threeDotsMenuRef={threeDotsMenuRef}
+                    />
                 </View>
             )}
         </View>
@@ -215,9 +229,15 @@ function WorkspacesListRow({
 
     const ownerName = ownerDetails ? getDisplayNameOrDefault(ownerDetails) : '';
     const workspaceTypeName = workspaceType ? getUserFriendlyWorkspaceType(workspaceType, translate) : '';
-    const defaultLabel = isDefault ? `, ${translate('common.default')}` : '';
-    const pendingLabel = isJoinRequestPending ? `, ${translate('workspace.common.requested')}` : '';
-    const accessibilityLabel = `${title}${ownerName ? `, ${ownerName}` : ''}${workspaceTypeName ? `, ${workspaceTypeName}` : ''}${defaultLabel}${pendingLabel}`;
+    const accessibilityLabel = [
+        `${translate('workspace.common.workspaceName')}: ${title}`,
+        isDefault ? translate('common.default') : '',
+        isJoinRequestPending ? translate('workspace.common.requested') : '',
+        ownerName ? `${translate('workspace.common.workspaceOwner')}: ${ownerName}` : '',
+        workspaceTypeName ? `${translate('workspace.common.workspaceType')}: ${workspaceTypeName}` : '',
+    ]
+        .filter(Boolean)
+        .join(', ');
 
     return (
         <View style={[styles.flexRow, styles.highlightBG, rowStyles, style, styles.br3]}>
@@ -228,7 +248,7 @@ function WorkspacesListRow({
                     role={CONST.ROLE.BUTTON}
                     onPress={onPress}
                     style={[isWide ? styles.flexRow : styles.flexColumn, styles.flex1, isWide && styles.gap5]}
-                    sentryLabel="WorkspacesListRow"
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_ROW}
                 >
                     <View style={[styles.flexRow, styles.justifyContentBetween, styles.flex2, isNarrow && styles.mb3, styles.alignItemsCenter]}>
                         <View style={[styles.flexRow, styles.gap3, styles.flex1, styles.alignItemsCenter]}>
@@ -247,7 +267,7 @@ function WorkspacesListRow({
                                 style={[styles.flex1, styles.flexGrow1, styles.textStrong, isDeleted ? styles.offlineFeedbackDeleted : {}]}
                             />
                         </View>
-                        {isNarrow && WorkspaceBadges}
+                        {isNarrow && ThreeDotMenuOrPendingIcon}
                     </View>
                     <View style={[styles.flexRow, isWide && styles.flex1, isWide && styles.workspaceOwnerSectionMinWidth, styles.gap2, styles.alignItemsCenter]}>
                         {!!ownerDetails && (
@@ -298,24 +318,17 @@ function WorkspacesListRow({
                             </Text>
                         </View>
                     </View>
-                    {!isNarrow && WorkspaceBadges}
                 </PressableWithoutFeedback>
 
-                <View style={[styles.flexRow, styles.alignItemsCenter, isNarrow && styles.alignSelfStart]}>
-                    {!isJoinRequestPending && (
-                        <ThreeDotsMenu
-                            isContainerFocused={isFocused}
-                            shouldSelfPosition
-                            menuItems={menuItems}
-                            anchorAlignment={{horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT, vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP}}
-                            shouldOverlay
-                            disabled={shouldDisableThreeDotsMenu}
-                            isNested
-                            threeDotsMenuRef={threeDotsMenuRef}
-                        />
-                    )}
+                <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                    {!isNarrow && ThreeDotMenuOrPendingIcon}
                     {!isNarrow && (
-                        <View style={[styles.justifyContentCenter, styles.alignItemsCenter, styles.touchableButtonImage]}>
+                        <PressableWithoutFeedback
+                            onPress={onPress}
+                            style={[styles.justifyContentCenter, styles.alignItemsCenter, styles.touchableButtonImage]}
+                            accessible={false}
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_ROW_ARROW}
+                        >
                             <Icon
                                 src={icons.ArrowRight}
                                 fill={theme.icon}
@@ -323,7 +336,7 @@ function WorkspacesListRow({
                                 isButtonIcon
                                 medium
                             />
-                        </View>
+                        </PressableWithoutFeedback>
                     )}
                 </View>
             </Animated.View>

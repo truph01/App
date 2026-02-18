@@ -8576,6 +8576,8 @@ const CONST = {
         WORKSPACE: {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
+            WORKSPACE_LIST_ROW: 'Workspace-WorkspacesListRow',
+            WORKSPACE_LIST_ROW_ARROW: 'Workspace-WorkspacesListRow-Arrow',
             COMPANY_CARDS: {
                 TABLE_ITEM: 'Workspace-CompanyCards-TableItem',
             },
