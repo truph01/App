@@ -474,7 +474,6 @@ function MoneyRequestReportPreviewContent({
     const viewabilityConfig = useMemo(() => {
         return {itemVisiblePercentThreshold: 100};
     }, []);
-    const numberOfScrollToIndexFailed = useRef(0);
 
     const carouselTransactionsRef = useRef(carouselTransactions);
 
@@ -496,8 +495,8 @@ function MoneyRequestReportPreviewContent({
                 if (newTransaction?.transactionID !== carouselTransactionsRef.current.at(index)?.transactionID) {
                     return;
                 }
-                numberOfScrollToIndexFailed.current = 0;
-                carouselRef.current?.scrollToIndex({index, viewOffset: 2 * styles.gap2.gap, animated: true});
+
+                carouselRef.current?.scrollToIndex({index, viewOffset: -2 * styles.gap2.gap, animated: true});
             }, CONST.ANIMATED_TRANSITION);
 
             // eslint-disable-next-line react-hooks/exhaustive-deps
