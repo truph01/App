@@ -356,20 +356,23 @@ function SuggestionMention({
         [localeCompare, translate, expensifyIcons.Megaphone, expensifyIcons.FallbackAvatar, formatPhoneNumber, formatLoginPrivateDomain],
     );
 
-    const getRoomMentionOptions = useCallback((searchTerm: string): Mention[] => {
-        const filteredRoomMentions: Mention[] = [];
-        for (const report of Object.values(mentionableReports ?? {})) {
-            if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
-                filteredRoomMentions.push({
-                    text: report.reportName,
-                    handle: report.reportName,
-                    alternateText: report.reportName,
-                });
+    const getRoomMentionOptions = useCallback(
+        (searchTerm: string): Mention[] => {
+            const filteredRoomMentions: Mention[] = [];
+            for (const report of Object.values(mentionableReports ?? {})) {
+                if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    filteredRoomMentions.push({
+                        text: report.reportName,
+                        handle: report.reportName,
+                        alternateText: report.reportName,
+                    });
+                }
             }
-        }
 
-        return lodashSortBy(filteredRoomMentions, 'handle').slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS);
-    }, []);
+            return lodashSortBy(filteredRoomMentions, 'handle').slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS);
+        },
+        [mentionableReports],
+    );
 
     const calculateMentionSuggestion = useCallback(
         (newValue: string, selectionStart?: number, selectionEnd?: number) => {
@@ -441,7 +444,7 @@ function SuggestionMention({
             }));
             setHighlightedMentionIndex(0);
         },
-        [isComposerFocused, isGroupPolicyReport, setHighlightedMentionIndex, resetSuggestions, getUserMentionOptions, weightedPersonalDetails, getRoomMentionOptions, mentionableReports],
+        [isComposerFocused, isGroupPolicyReport, setHighlightedMentionIndex, resetSuggestions, getUserMentionOptions, weightedPersonalDetails, getRoomMentionOptions],
     );
 
     const debouncedCalculateMentionSuggestion = useDebounce(
