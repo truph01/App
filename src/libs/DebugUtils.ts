@@ -987,11 +987,14 @@ function validateTransactionDraftProperty(key: keyof Transaction, value: string)
         case 'cardID':
         case 'originalAmount':
         case 'convertedAmount':
+        case 'convertedTaxAmount':
         case 'groupAmount':
         case 'groupExchangeRate':
             return validateNumber(value);
         case 'iouRequestType':
             return validateConstantEnum(value, CONST.IOU.REQUEST_TYPE);
+        case 'selectedTransactionIDs':
+            return validateArray(value, 'string');
         case 'participants':
             return validateArray<ArrayElement<Transaction, 'participants'>>(value, {
                 accountID: 'number',
@@ -1063,6 +1066,7 @@ function validateTransactionDraftProperty(key: keyof Transaction, value: string)
                     amount: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     taxAmount: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     convertedAmount: CONST.RED_BRICK_ROAD_PENDING_ACTION,
+                    convertedTaxAmount: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     taxCode: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     billable: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     category: CONST.RED_BRICK_ROAD_PENDING_ACTION,
@@ -1085,6 +1089,7 @@ function validateTransactionDraftProperty(key: keyof Transaction, value: string)
                     reportName: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     routes: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     transactionID: CONST.RED_BRICK_ROAD_PENDING_ACTION,
+                    selectedTransactionIDs: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     tag: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     transactionType: CONST.RED_BRICK_ROAD_PENDING_ACTION,
                     isFromGlobalCreate: CONST.RED_BRICK_ROAD_PENDING_ACTION,
