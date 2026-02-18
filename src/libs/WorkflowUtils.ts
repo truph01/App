@@ -10,7 +10,7 @@ import type ApprovalWorkflow from '@src/types/onyx/ApprovalWorkflow';
 import type {PersonalDetailsList} from '@src/types/onyx/PersonalDetails';
 import type PersonalDetails from '@src/types/onyx/PersonalDetails';
 import type Policy from '@src/types/onyx/Policy';
-import type {PolicyEmployeeList} from '@src/types/onyx/PolicyEmployee';
+import type PolicyEmployee, {PolicyEmployeeList} from '@src/types/onyx/PolicyEmployee';
 import {isBankAccountPartiallySetup} from './BankAccountUtils';
 import {convertToDisplayString} from './CurrencyUtils';
 import {getDefaultApprover} from './PolicyUtils';
@@ -80,6 +80,20 @@ function calculateApprovers({employees, firstEmail, personalDetailsByEmail}: Get
     return approvers;
 }
 
+/** Build a Member from a policy employee using personal details for avatar/displayName */
+function buildMemberFromEmployee(
+    employee: PolicyEmployee & {email: string},
+    personalDetailsByEmail: PersonalDetailsList,
+): Member {
+    const email = employee.email;
+    return {
+        email,
+        avatar: personalDetailsByEmail[email]?.avatar,
+        displayName: personalDetailsByEmail[email]?.displayName ?? email,
+        pendingFields: employee.pendingFields,
+    };
+}
+
 type PolicyConversionParams = {
     /** Policy data containing employees and approver information */
     policy: OnyxEntry<Policy>;
@@ -122,12 +136,7 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
             continue;
         }
 
-        const member: Member = {
-            email,
-            avatar: personalDetailsByEmail[email]?.avatar,
-            displayName: personalDetailsByEmail[email]?.displayName ?? email,
-            pendingFields: employee.pendingFields,
-        };
+        const member = buildMemberFromEmployee(employee, personalDetailsByEmail);
 
         if (!approvalWorkflows[submitsTo]) {
             const approvers = calculateApprovers({employees, firstEmail: submitsTo, personalDetailsByEmail});
@@ -191,12 +200,7 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
             (employee): employee is typeof employee & {email: string} =>
                 !!employee.email && employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
         )
-        .map((employee) => ({
-            email: employee.email,
-            avatar: personalDetailsByEmail[employee.email]?.avatar,
-            displayName: personalDetailsByEmail[employee.email]?.displayName ?? employee.email,
-            pendingFields: employee.pendingFields,
-        }))
+        .map((employee) => buildMemberFromEmployee(employee, personalDetailsByEmail))
         .sort((a, b) => localeCompare(a.displayName ?? a.email, b.displayName ?? b.email));
 
     return {approvalWorkflows: sortedApprovalWorkflows, usedApproverEmails: [...usedApproverEmails], availableMembers};
