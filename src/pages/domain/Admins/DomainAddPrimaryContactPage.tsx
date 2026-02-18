@@ -40,7 +40,6 @@ function DomainAddPrimaryContactPage({route}: DomainAddPrimaryContactPageProps) 
         canBeMissing: true,
         selector: adminPendingActionSelector,
     });
-    // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         canBeMissing: true,
         selector: (personalDetailsList: OnyxEntry<PersonalDetailsList>) => {

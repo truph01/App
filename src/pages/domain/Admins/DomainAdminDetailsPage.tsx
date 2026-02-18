@@ -36,7 +36,6 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
         selector: adminAccountIDsSelector,
     });
 
-    // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
     const [adminPersonalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         canBeMissing: true,
         selector: (personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsList?.[accountID],
