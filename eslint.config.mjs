@@ -495,6 +495,7 @@ const config = defineConfig([
             '@typescript-eslint/prefer-nullish-coalescing': 'off',
             '@typescript-eslint/no-unsafe-return': 'off',
             '@typescript-eslint/unbound-method': 'off',
+            'arrow-parens': 'off',
             'jsdoc/no-types': 'off',
             'react/jsx-filename-extension': 'off',
             'rulesdir/no-default-props': 'off',

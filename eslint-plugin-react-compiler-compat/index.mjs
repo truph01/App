@@ -109,7 +109,7 @@ const plugin = {
                 compilationResults.delete(filename);
 
                 if (allCompiled) {
-                    return _.filter(messages[0], msg => !RULES_SUPPRESSED_BY_REACT_COMPILER.has(msg.ruleId));
+                    return _.filter(messages[0], (msg) => !RULES_SUPPRESSED_BY_REACT_COMPILER.has(msg.ruleId));
                 }
 
                 return messages[0];
