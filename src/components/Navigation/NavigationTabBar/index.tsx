@@ -319,7 +319,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                             role={CONST.ROLE.TAB}
                             accessibilityLabel={translate('common.home')}
                             style={({hovered}) => [styles.leftNavigationTabBarItem, hovered && styles.navigationTabBarItemHovered]}
-                            sentryLabel="NavigationTabBar.Home"
+                            sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.HOME}
                         >
                             {({hovered}) => (
                                 <>

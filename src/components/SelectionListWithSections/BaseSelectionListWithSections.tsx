@@ -632,7 +632,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                                 style={[styles.userSelectNone, styles.flexRow, styles.alignItemsCenter]}
                                 onPress={selectAllRow}
                                 accessibilityLabel={translate('workspace.people.selectAll')}
-                                sentryLabel="SelectionList-SelectAll"
+                                sentryLabel={CONST.SENTRY_LABEL.SELECTION_LIST_WITH_SECTIONS.SELECT_ALL}
                                 role="button"
                                 accessibilityState={{checked: flattenedSections.allSelected}}
                                 disabled={flattenedSections.allOptions.length === flattenedSections.disabledOptionsIndexes.length}
