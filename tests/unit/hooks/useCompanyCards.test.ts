@@ -541,8 +541,61 @@ describe('useCompanyCards', () => {
         });
     });
 
-    describe('CDF stale card name resolution via lastFourPAN', () => {
-        it('should resolve stale assigned card name from cardList using lastFourPAN', async () => {
+    describe('CDF stale card name resolution via cascading lookup', () => {
+        it('should keep card name when encryptedCardNumber matches a cardList entry', async () => {
+            const cdfCardsList = {
+                cardList: {
+                    '888222XXXX74444': 'v1:148EECFC15D818ACBC0D707FD0C44CC3',
+                },
+                '8341': {
+                    cardID: 8341,
+                    accountID: 8393,
+                    bank: 'gl1025',
+                    cardName: '888222XXXXX4444',
+                    encryptedCardNumber: 'v1:148EECFC15D818ACBC0D707FD0C44CC3',
+                    lastFourPAN: '4444',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cdfCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Linked by encryptedCardNumber — card keeps its own name, no duplicate from cardList
+            expect(result.current.companyCardEntries).toEqual([entry('888222XXXXX4444', 'v1:148EECFC15D818ACBC0D707FD0C44CC3', true)]);
+        });
+
+        it('should resolve encryptedCardNumber via lastFourPAN when no other match exists', async () => {
+            const cdfCardsList = {
+                cardList: {
+                    '111222XXXX31234': 'v1:2D0EF0C3C834A6C5721225BAB4996799',
+                },
+                '8340': {
+                    cardID: 8340,
+                    accountID: 11,
+                    bank: 'gl1025',
+                    cardName: 'XXXXXXXXXXX1234',
+                    lastFourPAN: '1234',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cdfCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            // Card keeps its own name, encryptedCardNumber resolved from cardList via lastFourPAN
+            expect(result.current.companyCardEntries).toEqual([entry('XXXXXXXXXXX1234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true)]);
+        });
+
+        it('should resolve mixed CDF cards without creating duplicates', async () => {
             const cdfCardsList = {
                 cardList: {
                     '111222XXXX31234': 'v1:2D0EF0C3C834A6C5721225BAB4996799',
@@ -577,14 +630,12 @@ describe('useCompanyCards', () => {
 
             const entries = result.current.companyCardEntries ?? [];
 
-            // Card 8340: stale name "XXXXXXXXXXX1234" resolved to "111222XXXX31234" via lastFourPAN
+            // Cards keep their own names; 8341 linked by encrypted, 8340 resolved via lastFourPAN
             expect(entries).toEqual(
-                expect.arrayContaining([entry('111222XXXX31234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true), entry('888222XXXXX4444', 'v1:148EECFC15D818ACBC0D707FD0C44CC3', true)]),
+                expect.arrayContaining([entry('888222XXXXX4444', 'v1:148EECFC15D818ACBC0D707FD0C44CC3', true), entry('XXXXXXXXXXX1234', 'v1:2D0EF0C3C834A6C5721225BAB4996799', true)]),
             );
-
-            // No duplicates — the stale name should NOT appear
+            // No duplicate unassigned entries from cardList
             expect(entries).toHaveLength(2);
-            expect(entries.map((e) => e.cardName)).not.toContain('XXXXXXXXXXX1234');
         });
 
         it('should not resolve via lastFourPAN when multiple cardList entries share the same last 4 digits', async () => {
@@ -612,13 +663,13 @@ describe('useCompanyCards', () => {
 
             const entries = result.current.companyCardEntries ?? [];
 
-            // Ambiguous match — falls back to original card name
+            // Ambiguous lastFourPAN — falls back to original card name
             expect(entries.map((e) => e.cardName)).toContain('XXXXXXXXXXX4444');
             // The two cardList entries should also appear as unassigned
             expect(entries).toHaveLength(3);
         });
 
-        it('should not resolve via lastFourPAN when assigned card already has encryptedCardNumber', async () => {
+        it('should cascade to lastFourPAN even when card has a non-matching encryptedCardNumber', async () => {
             const cdfCardsList = {
                 cardList: {
                     '111222XXXX31234': 'v1:NEW_ENCRYPTED',
@@ -641,11 +692,8 @@ describe('useCompanyCards', () => {
 
             const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
 
-            const entries = result.current.companyCardEntries ?? [];
-
-            // Card already has encryptedCardNumber — uses its own name and encrypted value
-            expect(entries).toEqual(expect.arrayContaining([entry('XXXXXXXXXXX1234', 'v1:OLD_ENCRYPTED', true), entry('111222XXXX31234', 'v1:NEW_ENCRYPTED')]));
-            expect(entries).toHaveLength(2);
+            // Card keeps its own name, encryptedCardNumber resolved via lastFourPAN
+            expect(result.current.companyCardEntries).toEqual([entry('XXXXXXXXXXX1234', 'v1:NEW_ENCRYPTED', true)]);
         });
     });
 
