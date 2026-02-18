@@ -261,6 +261,7 @@ function MoneyReportHeader({
         'ReceiptPlus',
         'ExpenseCopy',
         'Checkmark',
+        'ReportCopy',
     ] as const);
     const [lastDistanceExpenseType] = useOnyx(ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE, {canBeMissing: true});
     const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${moneyRequestReport?.reportID}`, {canBeMissing: true});
@@ -1424,6 +1425,15 @@ function MoneyReportHeader({
                 duplicateExpenseTransaction([transaction]);
             },
             shouldCloseModalOnSelect: isPerDiemRequestOnNonDefaultWorkspace || hasCustomUnitOutOfPolicyViolation || activePolicyExpenseChat?.iouReportID === moneyRequestReport?.reportID,
+        },
+        [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_REPORT]: {
+            text: translate('common.duplicateReport'),
+            icon: expensifyIcons.ReportCopy,
+            value: CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_REPORT,
+            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.DUPLICATE_REPORT,
+            //  To be implemented in https://github.com/Expensify/App/issues/82153
+            // onSelected: () => {
+            // },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE]: {
             text: translate('iou.changeWorkspace'),
