@@ -6,7 +6,7 @@ import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchContext} from '@components/Search/SearchContext';
 import {initBulkEditDraftTransaction} from '@libs/actions/IOU';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
-import {initSplitExpense} from '@libs/actions/IOU/Split';
+import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {exportReportToCSV} from '@libs/actions/Report';
 import {getExportTemplates, handlePreventSearchAPI} from '@libs/actions/Search';

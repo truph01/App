@@ -14,7 +14,6 @@ import {
     addSplitExpenseField,
     completeSplitBill,
     evenlyDistributeSplitExpenseAmounts,
-    initSplitExpense,
     initSplitExpenseItemData,
     removeSplitExpenseField,
     resetSplitExpensesByDateRange,
@@ -24,6 +23,7 @@ import {
     updateSplitExpenseAmountField,
     updateSplitTransactionsFromSplitExpensesFlow,
 } from '@userActions/IOU/Split';
+import initSplitExpense from '@libs/actions/SplitExpenses';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
 import DateUtils from '@src/libs/DateUtils';
