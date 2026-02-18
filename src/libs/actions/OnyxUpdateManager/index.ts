@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import type {OnyxEntry, OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import {isClientTheLeader} from '@libs/ActiveClientManager';
@@ -107,6 +108,11 @@ function handleMissingOnyxUpdates<TKey extends OnyxKey>(onyxUpdatesFromServer: O
         return Promise.resolve();
     }
 
+    const span = Sentry.startInactiveSpan({
+        name: CONST.TELEMETRY.SPAN_HANDLE_MISSING_ONYX_UPDATES,
+        op: CONST.TELEMETRY.SPAN_HANDLE_MISSING_ONYX_UPDATES,
+    });
+
     // Check if one of these onyx updates is for the authToken. If it is, let's update our authToken now because our
     // current authToken is probably invalid.
     updateAuthTokenIfNecessary(onyxUpdatesFromServer);
@@ -195,9 +201,16 @@ function handleMissingOnyxUpdates<TKey extends OnyxKey>(onyxUpdatesFromServer: O
     const shouldFinalizeAndResume = checkIfClientNeedsToBeUpdated();
 
     if (shouldFinalizeAndResume) {
-        return getMissingOnyxUpdatesQueryPromise()?.finally(finalizeUpdatesAndResumeQueue) as Promise<void>;
+        return getMissingOnyxUpdatesQueryPromise()
+            ?.finally(finalizeUpdatesAndResumeQueue)
+            .finally(() => {
+                span.setStatus({code: 1});
+                span.end();
+            }) as Promise<void>;
     }
 
+    span.setStatus({code: 1});
+    span.end();
     return Promise.resolve();
 }
 
