@@ -1,5 +1,5 @@
 import noop from 'lodash/noop';
-import React, {useCallback, useContext, useMemo, useState} from 'react';
+import React, {useCallback, useContext, useMemo, useRef, useState} from 'react';
 import Log from '@libs/Log';
 import CONST from '@src/CONST';
 
@@ -28,8 +28,6 @@ const ModalContext = React.createContext<ModalContextType>({
 
 const useModal = () => useContext(ModalContext);
 
-let modalID = 1;
-
 type ModalInfo = {
     id: string;
     component: React.FunctionComponent<ModalProps>;
@@ -39,6 +37,7 @@ type ModalInfo = {
 };
 
 function ModalProvider({children}: {children: React.ReactNode}) {
+    const modalIDRef = useRef(1);
     const [modalStack, setModalStack] = useState<{modals: ModalInfo[]}>({modals: []});
 
     const showModal = useCallback<ModalContextType['showModal']>(({component, props, id, isCloseable = true}) => {
@@ -60,7 +59,10 @@ function ModalProvider({children}: {children: React.ReactNode}) {
 
             return {
                 ...prevState,
-                modals: [...prevState.modals, {component: component as React.FunctionComponent<ModalProps>, props, promiseWithResolvers, isCloseable, id: id ?? String(modalID++)}],
+                modals: [
+                    ...prevState.modals,
+                    {component: component as React.FunctionComponent<ModalProps>, props, promiseWithResolvers, isCloseable, id: id ?? String(modalIDRef.current++)},
+                ],
             };
         });
 
