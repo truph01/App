@@ -486,11 +486,11 @@ const config = defineConfig([
     },
 
     {
-        files: ['**/*.js', '**/*.jsx'],
+        files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         ...typescriptEslint.configs.disableTypeChecked,
     },
     {
-        files: ['**/*.js', '**/*.jsx'],
+        files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         rules: {
             '@typescript-eslint/prefer-nullish-coalescing': 'off',
             '@typescript-eslint/no-unsafe-return': 'off',
@@ -621,7 +621,6 @@ const config = defineConfig([
         'Mobile-Expensify/**/*',
         '**/vendor',
         'modules/group-ib-fp/**/*',
-        'eslint-plugin-react-compiler-compat/**/*',
         'web/snippets/gib.js',
         // Generated language files - excluded from ESLint but still type-checked
         'src/languages/de.ts',
