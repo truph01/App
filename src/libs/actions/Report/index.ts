@@ -1320,8 +1320,8 @@ function openReport(
 
     // Prepare guided setup data only when nvp_introSelected is set and onboarding is not completed
     // OldDot users will never have nvp_introSelected set, so they will not see guided setup messages
-    if (introSelected && !isOnboardingCompleted && !isInviteOnboardingComplete && !hasOpenReportWithGuidedSetupData) {
-        const {choice, inviteType} = introSelected;
+    if (deprecatedIntroSelected && !isOnboardingCompleted && !isInviteOnboardingComplete && !hasOpenReportWithGuidedSetupData) {
+        const {choice, inviteType} = deprecatedIntroSelected;
         const isInviteIOUorInvoice = inviteType === CONST.ONBOARDING_INVITE_TYPES.IOU || inviteType === CONST.ONBOARDING_INVITE_TYPES.INVOICE;
         const isInviteChoiceCorrect = choice === CONST.ONBOARDING_CHOICES.ADMIN || choice === CONST.ONBOARDING_CHOICES.SUBMIT || choice === CONST.ONBOARDING_CHOICES.CHAT_SPLIT;
 
@@ -1333,10 +1333,10 @@ function openReport(
             }
 
             const onboardingData = prepareOnboardingOnyxData({
-                introSelected,
+                introSelected: deprecatedIntroSelected,
                 engagementChoice: choice,
                 onboardingMessage,
-                companySize: introSelected?.companySize as OnboardingCompanySize,
+                companySize: deprecatedIntroSelected?.companySize as OnboardingCompanySize,
             });
 
             if (onboardingData) {
@@ -4497,6 +4497,7 @@ type CompleteOnboardingProps = {
     isInvitedAccountant?: boolean;
     onboardingPurposeSelected?: OnboardingPurpose;
     shouldWaitForRHPVariantInitialization?: boolean;
+    introSelected: OnyxEntry<IntroSelected>;
 };
 
 async function completeOnboarding({
@@ -4515,9 +4516,10 @@ async function completeOnboarding({
     isInvitedAccountant,
     onboardingPurposeSelected,
     shouldWaitForRHPVariantInitialization = false,
+    introSelected,
 }: CompleteOnboardingProps) {
     const onboardingData = prepareOnboardingOnyxData({
-        introSelected: deprecatedIntroSelected,
+        introSelected,
         engagementChoice,
         onboardingMessage,
         adminsChatReportID,
