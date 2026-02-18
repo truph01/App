@@ -47,8 +47,8 @@ type ToggleSettingOptionRowProps = {
     /** Used to apply styles to the Title */
     titleStyle?: StyleProp<TextStyle>;
 
-    /** Accessibility role for the title (e.g. 'header' for section headings) */
-    titleAccessibilityRole?: 'header';
+    /** Optional accessibility role for the title. Only set when the title is a section heading (e.g. CONST.ROLE.HEADER); omit for regular rows. */
+    titleAccessibilityRole?: typeof CONST.ROLE.HEADER;
 
     /** Used to apply styles to the Subtitle */
     subtitleStyle?: StyleProp<TextStyle>;

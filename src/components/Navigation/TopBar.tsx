@@ -52,7 +52,7 @@ function TopBar({breadcrumbLabel, shouldDisplaySearch = true, shouldDisplayHelpB
                         <Text
                             numberOfLines={1}
                             style={[styles.flexShrink1, styles.topBarLabel]}
-                            accessibilityRole="header"
+                            accessibilityRole={CONST.ROLE.HEADER}
                         >
                             {breadcrumbLabel}
                         </Text>

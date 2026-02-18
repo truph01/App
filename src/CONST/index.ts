@@ -5659,6 +5659,8 @@ const CONST = {
         GRID: 'grid',
         /** Use for section headers or titles. */
         HEADING: 'heading',
+        /** Use for elements that serve as a page or section header (e.g. top bar title). */
+        HEADER: 'header',
         /** Use for image elements. */
         IMG: 'img',
         /** Use for elements that navigate to other pages or content. */

@@ -522,7 +522,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
             <ToggleSettingOptionRow
                 title={item.title}
                 titleStyle={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle, styles.mb1]}
-                titleAccessibilityRole="header"
+                titleAccessibilityRole={CONST.ROLE.HEADER}
                 subtitle={item.subtitle}
                 subtitleStyle={[styles.textLabelSupportingEmptyValue, styles.lh20]}
                 switchAccessibilityLabel={item.switchAccessibilityLabel}

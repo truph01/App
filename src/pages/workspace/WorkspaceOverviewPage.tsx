@@ -626,7 +626,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                                 onPress={onPressName}
                                 shouldBreakWord
                                 numberOfLinesTitle={0}
-                                titleAccessibilityRole="header"
+                                titleAccessibilityRole={CONST.ROLE.HEADER}
                             />
                         </OfflineWithFeedback>
                         {(!StringUtils.isEmptyString(policy?.description ?? '') || !readOnly || (prevIsPendingDelete && !isPendingDelete)) && (

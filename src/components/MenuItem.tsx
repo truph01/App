@@ -217,8 +217,8 @@ type MenuItemBaseProps = ForwardedFSClassProps &
         /** Accessibility label for the menu item */
         accessibilityLabel?: string;
 
-        /** Accessibility role for the title (e.g. 'header' for section headings) */
-        titleAccessibilityRole?: 'header';
+        /** Optional accessibility role for the title. Only set when the title is a section heading (e.g. CONST.ROLE.HEADER); omit for regular menu items. */
+        titleAccessibilityRole?: typeof CONST.ROLE.HEADER;
 
         /** Component to display as the title */
         titleComponent?: ReactElement;
