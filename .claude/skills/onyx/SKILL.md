@@ -21,6 +21,8 @@ For the full API reference (initialization, storage providers, cache eviction, b
 
 ### Action File Pattern
 
+**IMPORTANT:** Onyx state must only be modified from action files (`src/libs/actions/`). Never call `Onyx.merge`, `Onyx.set`, `Onyx.clear`, or `API.write` directly from a component.
+
 ```typescript
 import Onyx from 'react-native-onyx';
 import ONYXKEYS from '@src/ONYXKEYS';
