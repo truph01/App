@@ -759,14 +759,11 @@ function getForReportActionTemp({
 
     const hasPolicyRulesModifiedFields = isReportActionOriginalMessageAnObject && 'policyRulesModifiedFields' in reportActionOriginalMessage && 'policyID' in reportActionOriginalMessage;
     if (hasPolicyRulesModifiedFields) {
-        const rulePolicyID = reportActionOriginalMessage.policyID;
         const policyRulesModifiedFields = reportActionOriginalMessage.policyRulesModifiedFields;
 
-        if (policyRulesModifiedFields && rulePolicyID) {
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            const rulePolicy = getPolicy(rulePolicyID);
-            const isAdmin = isPolicyAdmin(rulePolicy, currentUserLogin);
-            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, rulePolicyID, isAdmin);
+        if (policyRulesModifiedFields && policy?.id) {
+            const isAdmin = isPolicyAdmin(policy, currentUserLogin);
+            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, policy?.id, isAdmin);
         }
     }
 
