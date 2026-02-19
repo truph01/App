@@ -582,7 +582,6 @@ function MoneyRequestConfirmationListFooter({
                     interactive={!!rate && !isReadOnly && iouType !== CONST.IOU.TYPE.SPLIT && (!isUnreported || isTrackExpense)}
                     sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.RATE_FIELD}
                 />
-                
             ),
             shouldShow: isDistanceRequest,
         },
