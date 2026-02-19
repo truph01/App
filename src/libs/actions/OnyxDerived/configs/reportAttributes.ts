@@ -71,10 +71,9 @@ export default createOnyxDerivedValueConfig({
         ONYXKEYS.SESSION,
         ONYXKEYS.COLLECTION.POLICY,
         ONYXKEYS.COLLECTION.REPORT_METADATA,
-        ONYXKEYS.NETWORK,
     ],
     compute: (
-        [reports, preferredLocale, transactionViolations, reportActions, reportNameValuePairs, transactions, personalDetails, session, policies, network],
+        [reports, preferredLocale, transactionViolations, reportActions, reportNameValuePairs, transactions, personalDetails, session, policies],
         {currentValue, sourceValues, areAllConnectionsSet},
     ) => {
         if (!areAllConnectionsSet) {
@@ -208,7 +207,6 @@ export default createOnyxDerivedValueConfig({
                 reportActions,
                 transactionViolations,
                 isReportArchived,
-                isOffline: network?.isOffline,
             });
 
             let brickRoadStatus;
