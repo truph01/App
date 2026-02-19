@@ -2170,6 +2170,8 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         unfreezeCard: '解冻卡片',
         freezeDescription: '冻结的卡片无法用于购买和交易。你可以随时解冻。',
         unfreezeDescription: '解冻此卡后，将重新允许购买和交易。仅当你确定该卡可以安全使用时再继续。',
+        youFroze: ({date}: {date: string}) => `你于${date}冻结了此卡。`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person}于${date}冻结了此卡。`,
     },
     workflowsPage: {
         workflowTitle: '支出',

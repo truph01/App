@@ -2205,6 +2205,8 @@ ${amount} para ${merchant} - ${date}`,
         unfreezeCard: 'Desbloquear cartão',
         freezeDescription: 'Um cartão bloqueado não pode ser usado para compras e transações. Você pode desbloqueá-lo a qualquer momento.',
         unfreezeDescription: 'Ao desbloquear este cartão, compras e transações voltarão a ser permitidas. Continue apenas se tiver certeza de que o cartão é seguro para uso.',
+        youFroze: ({date}: {date: string}) => `Você bloqueou este cartão em ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} bloqueou este cartão em ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Gastos',
