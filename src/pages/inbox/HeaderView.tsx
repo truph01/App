@@ -246,7 +246,7 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
     const shouldShowEarlyDiscountBanner = shouldShowDiscount && isChatUsedForOnboarding && !isInSidePanel;
     const latestScheduledCall = reportNameValuePairs?.calendlyCalls?.at(-1);
     const hasActiveScheduledCall = latestScheduledCall && !isPast(latestScheduledCall.eventTime) && latestScheduledCall.status !== CONST.SCHEDULE_CALL_STATUS.CANCELLED;
-    const shouldShowCloseButton = isInSidePanel && !shouldUseNarrowLayout && isConciergeChatReport(report);
+    const shouldShowCloseButton = !!isInSidePanel && !shouldUseNarrowLayout && isConciergeChatReport(report);
     const shouldShowBackButton = (shouldUseNarrowLayout || !!isInSidePanel) && !shouldShowCloseButton;
 
     const onboardingHelpDropdownButton = (
