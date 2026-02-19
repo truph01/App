@@ -84,13 +84,15 @@ Once the shared bank account is verified by the new Workspace Admin, they can [r
 
 ---
 
-## How to change the default reimburser on all workspaces
+## How to change the default reimburser on a workspace
 
 If you’re the new Workspace Admin, make sure reimbursements continue without interruption.
 
 1. Go to **Settings > Workspaces > [Workspace Name] > Workflows > Payments**.
 2. Confirm that the correct bank account is selected as the **reimbursement account**.
 3. If **Direct** reimbursement is used and the former admin is listed as the **Reimburser**, assign a new Workspace Admin.
+
+![Insert alt text for accessibility here]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_01.png){:width="100%"}
 
 ---
 
@@ -117,6 +119,8 @@ If they’re leaving entirely, remove them completely.
      - Go to **Settings > Domains > [Domain Name] > Domain Members**.
      - Check the box next to their name.
      - Click **Close Accounts**, then **Confirm**.
+    
+![Insert alt text for accessibility here]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_02.png){:width="100%"}
 
 ---
 
