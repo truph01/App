@@ -17,7 +17,7 @@ type NamedMiddleware = {
 
 let middlewares: NamedMiddleware[] = [];
 
-function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan: Span | undefined): Promise<Response<TKey> | void> {
+async function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan: Span | undefined): Promise<Response<TKey> | void> {
     const span = Sentry.startInactiveSpan({
         name: CONST.TELEMETRY.SPAN_HTTP_XHR,
         op: CONST.TELEMETRY.SPAN_HTTP_XHR,
@@ -28,23 +28,20 @@ function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan: Span 
     });
 
     const finalParameters = enhanceParameters(request.command, request?.data ?? {});
-    return hasReadRequiredDataFromStorage()
-        .then((): Promise<Response<TKey> | void> => {
-            return HttpUtils.xhr(request.command, finalParameters, request.type, request.shouldUseSecure, request.initiatedOffline);
-        })
-        .then((response) => {
-            span.setStatus({code: 1});
-            span.end();
-            return response;
-        })
-        .catch((error: unknown) => {
-            span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
-            span.end();
-            throw error;
-        });
+    try {
+        await hasReadRequiredDataFromStorage();
+        const response = await HttpUtils.xhr(request.command, finalParameters, request.type, request.shouldUseSecure, request.initiatedOffline);
+        span.setStatus({code: 1});
+        span.end();
+        return response;
+    } catch (error: unknown) {
+        span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+        span.end();
+        throw error;
+    }
 }
 
-function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isFromSequentialQueue = false): Promise<Response<TKey> | void> {
+async function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isFromSequentialQueue = false): Promise<Response<TKey> | void> {
     const parentSpan = isFromSequentialQueue ? getProcessSpan() : undefined;
     const outerSpan = Sentry.startInactiveSpan({
         name: CONST.TELEMETRY.SPAN_PROCESS_WITH_MIDDLEWARE,
@@ -65,68 +62,69 @@ function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isF
         },
     });
 
-    const xhrPromise = makeXHR(request, outerSpan);
-    return middlewares
-        .reduce<Promise<Response<TKey> | void>>((last, {middleware, name}) => {
-            let mwSpan: Span | undefined;
-            const startSpan = () => {
-                mwSpan = Sentry.startInactiveSpan({
-                    name,
-                    op: `middleware.${name}`,
-                    parentSpan: middlewaresSpan,
-                    attributes: {
-                        [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
-                    },
-                });
-            };
+    let currentResponsePromise: Promise<Response<TKey> | void> = makeXHR(request, outerSpan);
 
-            // Tap into the previous promise to start the span when this middleware's work actually begins,
-            // while preserving both resolved and rejected states for the middleware to handle.
-            const tappedLast = last.then(
-                (data) => {
-                    startSpan();
-                    return data;
+    for (const {middleware, name} of middlewares) {
+        let mwSpan: Span | undefined;
+        const startMwSpan = () => {
+            mwSpan = Sentry.startInactiveSpan({
+                name,
+                op: `middleware.${name}`,
+                parentSpan: middlewaresSpan,
+                attributes: {
+                    [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
                 },
-                (error: unknown) => {
-                    startSpan();
-                    throw error;
-                },
-            );
+            });
+        };
 
-            const result = middleware(tappedLast, request, isFromSequentialQueue) ?? tappedLast;
-            return result
-                .then((data) => {
-                    if (!mwSpan) {
-                        startSpan();
-                    }
-                    mwSpan?.setStatus({code: 1});
-                    mwSpan?.end();
-                    return data;
-                })
-                .catch((error: unknown) => {
-                    if (!mwSpan) {
-                        startSpan();
-                    }
-                    mwSpan?.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
-                    mwSpan?.end();
-                    throw error;
-                });
-        }, xhrPromise)
-        .then((response) => {
-            middlewaresSpan.setStatus({code: 1});
-            middlewaresSpan.end();
-            outerSpan.setStatus({code: 1});
-            outerSpan.end();
-            return response;
-        })
-        .catch((error: unknown) => {
-            const errorMessage = error instanceof Error ? error.message : undefined;
-            middlewaresSpan.setStatus({code: 2, message: errorMessage});
-            middlewaresSpan.end();
-            outerSpan.setStatus({code: 2, message: errorMessage});
-            outerSpan.end();
-            throw error;
-        });
+        // Tap into the previous promise to start the span when this middleware's work actually begins,
+        // while preserving both resolved and rejected states for the middleware to handle.
+        const instrumentedMiddlewareInput = currentResponsePromise.then(
+            (data) => {
+                startMwSpan();
+                return data;
+            },
+            (error: unknown) => {
+                startMwSpan();
+                throw error;
+            },
+        );
+
+        const result = middleware(instrumentedMiddlewareInput, request, isFromSequentialQueue) ?? instrumentedMiddlewareInput;
+        currentResponsePromise = result
+            .then((data) => {
+                if (!mwSpan) {
+                    startMwSpan();
+                }
+                mwSpan?.setStatus({code: 1});
+                mwSpan?.end();
+                return data;
+            })
+            .catch((error: unknown) => {
+                if (!mwSpan) {
+                    startMwSpan();
+                }
+                mwSpan?.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                mwSpan?.end();
+                throw error;
+            });
+    }
+
+    try {
+        const response = await currentResponsePromise;
+        middlewaresSpan.setStatus({code: 1});
+        middlewaresSpan.end();
+        outerSpan.setStatus({code: 1});
+        outerSpan.end();
+        return response;
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : undefined;
+        middlewaresSpan.setStatus({code: 2, message: errorMessage});
+        middlewaresSpan.end();
+        outerSpan.setStatus({code: 2, message: errorMessage});
+        outerSpan.end();
+        throw error;
+    }
 }
 
 function addMiddleware(middleware: Middleware, name: string) {
