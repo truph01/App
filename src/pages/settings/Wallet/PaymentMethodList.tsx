@@ -27,6 +27,7 @@ import {
     getCardFeedWithDomainID,
     getPlaidInstitutionIconUrl,
     isCardConnectionBroken,
+    isCardFrozen,
     isExpensifyCard,
     isExpensifyCardPendingAction,
     isPersonalCard,
@@ -359,6 +360,7 @@ function PaymentMethodList({
                     iconStyles: [styles.cardIcon],
                     iconWidth: variables.cardIconWidth,
                     iconHeight: variables.cardIconHeight,
+                    isCardFrozen: isCardFrozen(card),
                 });
             }
 
