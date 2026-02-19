@@ -1,5 +1,5 @@
 import type {OnyxEntry} from 'react-native-onyx';
-import useTransactionDraftValues from '@hooks/useTransactionDraftValues';
+import useTransactionDraftValues from './useTransactionDraftValues';
 import type {Transaction} from '@src/types/onyx';
 
 /**
