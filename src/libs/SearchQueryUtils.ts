@@ -1,4 +1,4 @@
-import type {FeedKeysWithAssignedCards} from '@selectors/Card';
+import type {FeedKeysWithAssignedCards} from '@hooks/useFeedKeysWithAssignedCards';
 import cloneDeep from 'lodash/cloneDeep';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -455,7 +455,18 @@ function getRawFilterListFromQuery(rawQuery: SearchQueryString) {
     return undefined;
 }
 
+// Cache for buildSearchQueryJSON to avoid re-running the PEG parser for identical queries.
+// This is a pure function called from 64+ sites — many fire during the same render cycle
+// with identical query strings, each running the full parser from scratch.
+const buildSearchQueryJSONCache = new Map<string, SearchQueryJSON | undefined>();
+const BUILD_SEARCH_QUERY_JSON_CACHE_MAX_SIZE = 50;
+
 function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
+    const cacheKey = rawQuery ? `${query}|||${rawQuery}` : query;
+    if (buildSearchQueryJSONCache.has(cacheKey)) {
+        return buildSearchQueryJSONCache.get(cacheKey);
+    }
+
     try {
         const result = parseSearchQuery(query) as SearchQueryJSON;
         const flatFilters = getFilters(result);
@@ -486,6 +497,14 @@ function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQuerySt
         if (rawQuery) {
             result.rawFilterList = getRawFilterListFromQuery(rawQuery);
         }
+
+        if (buildSearchQueryJSONCache.size >= BUILD_SEARCH_QUERY_JSON_CACHE_MAX_SIZE) {
+            const firstKey = buildSearchQueryJSONCache.keys().next().value;
+            if (firstKey !== undefined) {
+                buildSearchQueryJSONCache.delete(firstKey);
+            }
+        }
+        buildSearchQueryJSONCache.set(cacheKey, result);
 
         return result;
     } catch (e) {
