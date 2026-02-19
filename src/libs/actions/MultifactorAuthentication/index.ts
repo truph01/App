@@ -269,6 +269,11 @@ async function denyTransaction({transactionID}: DenyTransactionParams) {
     }
 }
 
+/** Attempt to deny the transaction without handling errors or waiting for a response. We use this to clean up after something unexpected happened trying to authorize or deny a challenge */
+async function fireAndForgetDenyTransaction({transactionID}: DenyTransactionParams) {
+    makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.DENY_TRANSACTION, {transactionID}, {});
+}
+
 function markHasAcceptedSoftPrompt() {
     Onyx.merge(ONYXKEYS.DEVICE_BIOMETRICS, {
         hasAcceptedSoftPrompt: true,
@@ -324,4 +329,5 @@ export {
     fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt,
     denyTransaction,
     authorizeTransaction,
+    fireAndForgetDenyTransaction,
 };

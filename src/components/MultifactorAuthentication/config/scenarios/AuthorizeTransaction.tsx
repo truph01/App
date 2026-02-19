@@ -8,15 +8,23 @@ import {
     UnsupportedDeviceFailureScreen,
 } from '@components/MultifactorAuthentication/components/OutcomeScreen/FailureScreen/defaultScreens';
 import DefaultSuccessScreen from '@components/MultifactorAuthentication/components/OutcomeScreen/SuccessScreen/defaultScreens';
-import type {MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
+import type {
+    MultifactorAuthenticationScenario,
+    MultifactorAuthenticationScenarioAdditionalParams,
+    MultifactorAuthenticationScenarioCustomConfig,
+} from '@components/MultifactorAuthentication/config/types';
 import variables from '@styles/variables';
-import {authorizeTransaction} from '@userActions/MultifactorAuthentication';
+import {authorizeTransaction, fireAndForgetDenyTransaction} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';
 import SCREENS from '@src/SCREENS';
 
 type Payload = {
     transactionID: string;
 };
+
+function isAuthorizeTransactionPayload(payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined): payload is Payload {
+    return !!payload && 'transactionID' in payload;
+}
 
 const DefaultTransactionReviewClientFailureScreen = createScreenWithDefaults(
     DefaultClientFailureScreen,
@@ -95,6 +103,12 @@ export {
 export default {
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
     action: authorizeTransaction,
+    callback: async (isSuccessful, _callbackInput, payload) => {
+        if (!isSuccessful && isAuthorizeTransactionPayload(payload)) {
+            fireAndForgetDenyTransaction({transactionID: payload.transactionID});
+        }
+        return CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SHOW_OUTCOME_SCREEN;
+    },
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION,
     successScreen: (
         <DefaultSuccessScreen
