@@ -4,10 +4,9 @@ import React, {useEffect, useRef, useState} from 'react';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
-// eslint-disable-next-line no-restricted-imports
-import SelectionList from '@components/SelectionListWithSections';
 import SingleSelectWithAvatarListItem from '@components/SelectionListWithSections/SingleSelectWithAvatarListItem';
-import type {Section} from '@components/SelectionListWithSections/types';
+import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
+import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useSearchSelector from '@hooks/useSearchSelector';
@@ -153,15 +152,13 @@ function DomainAddAdminPage({route}: DomainAddAdminProps) {
                 />
                 <SelectionListWithSections
                     sections={sections}
-                    headerMessage={headerMessage()}
                     ListItem={SingleSelectWithAvatarListItem}
                     shouldSingleExecuteRowSelect
-                    textInputLabel={translate('selectionList.nameEmailOrPhoneNumber')}
-                    textInputValue={searchTerm}
-                    onChangeText={(value) => setSearchTerm(value)}
-                    onSelectRow={(option: OptionData) => toggleSelection(option)}
-                    onConfirm={inviteUser}
-                    showScrollIndicator
+                    onSelectRow={toggleSelection}
+                    textInputOptions={textInputOptions}
+                    confirmButtonOptions={{
+                        onConfirm: inviteUser,
+                    }}
                     showLoadingPlaceholder={!areOptionsInitialized || !didScreenTransitionEnd}
                     shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                     footerContent={footerContent}
