@@ -82,8 +82,7 @@ function calculateApprovers({employees, firstEmail, personalDetailsByEmail}: Get
 }
 
 /** Build a Member from a policy employee using personal details for avatar/displayName */
-function buildMemberFromEmployee(employee: PolicyEmployee & {email: string}, personalDetailsByEmail: PersonalDetailsList): Member {
-    const email = employee.email;
+function buildMemberFromEmployee(employee: PolicyEmployee, personalDetailsByEmail: PersonalDetailsList, email: string): Member {
     return {
         email,
         avatar: personalDetailsByEmail[email]?.avatar,
@@ -134,7 +133,7 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
             continue;
         }
 
-        const member = buildMemberFromEmployee(employee as PolicyEmployee & {email: string}, personalDetailsByEmail);
+        const member = buildMemberFromEmployee(employee, personalDetailsByEmail, email);
 
         if (!approvalWorkflows[submitsTo]) {
             const approvers = calculateApprovers({employees, firstEmail: submitsTo, personalDetailsByEmail});
@@ -197,7 +196,7 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
     // See https://github.com/Expensify/Expensify/issues/598876
     const availableMembers: Member[] = Object.values(employees)
         .filter((employee): employee is typeof employee & {email: string} => !!employee.email && employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
-        .map((employee) => buildMemberFromEmployee(employee, personalDetailsByEmail))
+        .map((employee) => buildMemberFromEmployee(employee, personalDetailsByEmail, employee.email))
         .sort((a, b) => localeCompare(a.displayName ?? a.email, b.displayName ?? b.email));
 
     return {approvalWorkflows: sortedApprovalWorkflows, usedApproverEmails: [...usedApproverEmails], availableMembers};
