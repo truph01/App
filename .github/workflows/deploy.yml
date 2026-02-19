@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   prep:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       APP_VERSION: ${{ steps.getAppVersion.outputs.VERSION }}
       TAG: ${{ steps.getTagName.outputs.TAG }}
@@ -86,7 +86,7 @@ jobs:
   androidBuild:
     name: Build Android HybridApp
     needs: prep
-    runs-on: ubuntu-latest-xl
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     outputs:
       VERSION_CODE: ${{ steps.getAndroidVersion.outputs.VERSION_CODE }}
@@ -228,7 +228,7 @@ jobs:
   androidUploadGooglePlay:
     name: Upload Android to Google Play
     needs: [prep, androidBuild]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     steps:
       - name: Checkout
@@ -275,7 +275,7 @@ jobs:
   androidSubmit:
     name: Submit Android for production rollout
     needs: [prep, androidBuild]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ github.ref == 'refs/heads/production' }}
     steps:
       - name: Checkout
@@ -343,7 +343,7 @@ jobs:
   androidUploadBrowserStack:
     name: Upload Android to BrowserStack
     needs: [prep, androidBuild]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     continue-on-error: true
     steps:
@@ -367,7 +367,7 @@ jobs:
   androidUploadApplause:
     name: Upload Android to Applause
     needs: [prep, androidBuild]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     continue-on-error: true
     steps:
@@ -673,7 +673,7 @@ jobs:
   iosUploadBrowserStack:
     name: Upload iOS to BrowserStack
     needs: [prep, iosBuild]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     continue-on-error: true
     steps:
@@ -697,7 +697,7 @@ jobs:
   iosUploadApplause:
     name: Upload iOS to Applause
     needs: [prep, iosBuild]
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     continue-on-error: true
     steps:
@@ -739,7 +739,7 @@ jobs:
   web:
     name: Build and deploy Web
     needs: prep
-    runs-on: ubuntu-latest-xl
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
         # v6
@@ -827,7 +827,7 @@ jobs:
 
   postSlackMessageOnFailure:
     name: Post a Slack message when any platform fails to build or deploy
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ failure() }}
     needs: [androidBuild, androidUploadGooglePlay, androidUploadBrowserStack, androidUploadApplause, androidSubmit, iosBuild, iosUploadTestflight, iosUploadBrowserStack, iosUploadApplause, iosSubmit, web]
     steps:
@@ -841,7 +841,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
   checkDeploymentSuccess:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       IS_AT_LEAST_ONE_PLATFORM_DEPLOYED: ${{ steps.checkDeploymentSuccessOnAtLeastOnePlatform.outputs.IS_AT_LEAST_ONE_PLATFORM_DEPLOYED }}
       IS_ALL_PLATFORMS_DEPLOYED: ${{ steps.checkDeploymentSuccessOnAllPlatforms.outputs.IS_ALL_PLATFORMS_DEPLOYED }}
@@ -901,7 +901,7 @@ jobs:
           echo "IS_ALL_PLATFORMS_DEPLOYED is $isAllPlatformsDeployed"
 
   createRelease:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ always() && fromJSON(needs.checkDeploymentSuccess.outputs.IS_AT_LEAST_ONE_PLATFORM_DEPLOYED) }}
     needs: [prep, checkDeploymentSuccess]
     steps:
@@ -1029,7 +1029,7 @@ jobs:
 
   postSlackMessageOnSuccess:
     name: Post a Slack message when all platforms deploy successfully
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ always() && fromJSON(needs.checkDeploymentSuccess.outputs.IS_ALL_PLATFORMS_DEPLOYED) }}
     needs: [prep, androidUploadGooglePlay, androidSubmit, iosUploadTestflight, iosSubmit, web, checkDeploymentSuccess, createRelease]
     steps:

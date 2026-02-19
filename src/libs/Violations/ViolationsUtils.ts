@@ -5,6 +5,7 @@ import type {OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
+import {isPersonalCard} from '@libs/CardUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
 import * as CurrencyUtils from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
@@ -17,7 +18,7 @@ import * as TransactionUtils from '@libs/TransactionUtils';
 import {hasValidModifiedAmount, isViolationDismissed, shouldShowViolation} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Policy, PolicyCategories, PolicyTagLists, Report, ReportAction, Transaction, TransactionViolation, ViolationName} from '@src/types/onyx';
+import type {Card, CardList, Policy, PolicyCategories, PolicyTagLists, Report, ReportAction, Transaction, TransactionViolation, ViolationName} from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {ReceiptError, ReceiptErrors} from '@src/types/onyx/Transaction';
 import type ViolationFixParams from './types';
@@ -34,6 +35,10 @@ function filterReceiptViolations(violations: TransactionViolation[]): Transactio
         return violations.filter((v) => v.name !== CONST.VIOLATIONS.RECEIPT_REQUIRED);
     }
     return violations;
+}
+
+function isMaxExpenseAmountRuleEnabled(maxAmount: number | undefined) {
+    return typeof maxAmount === 'number' && maxAmount !== CONST.DISABLED_MAX_EXPENSE_VALUE;
 }
 
 /**
@@ -242,7 +247,7 @@ function extractErrorMessages(errors: Errors | ReceiptErrors, errorActions: Repo
  * Returns true if the violation should be cleared, false if it should persist.
  */
 function getIsViolationFixed(violationError: string, params: ViolationFixParams): boolean {
-    const {category, tag, taxCode, policyCategories, policyTagLists, policyTaxRates, iouAttendees, currentUserPersonalDetails, isAttendeeTrackingEnabled} = params;
+    const {category, tag, taxCode, policyCategories, policyTagLists, policyTaxRates, iouAttendees, currentUserPersonalDetails, isAttendeeTrackingEnabled, isControlPolicy} = params;
 
     const violationValidators: Record<string, () => boolean> = {
         [`${CONST.VIOLATIONS_PREFIX}${CONST.VIOLATIONS.CATEGORY_OUT_OF_POLICY}`]: () => {
@@ -267,7 +272,7 @@ function getIsViolationFixed(violationError: string, params: ViolationFixParams)
         },
         [`${CONST.VIOLATIONS_PREFIX}${CONST.VIOLATIONS.MISSING_ATTENDEES}`]: () => {
             // Attendees violation is fixed if getIsMissingAttendeesViolation returns false
-            return !getIsMissingAttendeesViolation(policyCategories, category, iouAttendees, currentUserPersonalDetails, isAttendeeTrackingEnabled);
+            return !getIsMissingAttendeesViolation(policyCategories, category, iouAttendees, currentUserPersonalDetails, isAttendeeTrackingEnabled, isControlPolicy);
         },
     };
 
@@ -294,7 +299,7 @@ const ViolationsUtils = {
     ): OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS> {
         const isScanning = TransactionUtils.isScanning(updatedTransaction);
         const isScanRequest = TransactionUtils.isScanRequest(updatedTransaction);
-        const isPartialTransaction = TransactionUtils.isPartial(updatedTransaction);
+        const isPartialTransaction = TransactionUtils.isPartialTransaction(updatedTransaction);
         if (isPartialTransaction && isScanning) {
             return {
                 onyxMethod: Onyx.METHOD.SET,
@@ -314,7 +319,9 @@ const ViolationsUtils = {
         }
 
         // Only show SmartScan failed when scan failed AND the user hasn't filled required fields yet
-        const hasUserStartedFixingSmartscan = !TransactionUtils.isAmountMissing(updatedTransaction) || !TransactionUtils.isMerchantMissing(updatedTransaction);
+        // Note: amount === 0 is a placeholder value for scanning transactions, not a user-entered value
+        const hasUserStartedFixingSmartscan =
+            (!TransactionUtils.isAmountMissing(updatedTransaction) && updatedTransaction.amount !== 0) || !TransactionUtils.isMerchantMissing(updatedTransaction);
         const shouldShowSmartScanFailedError =
             isScanRequest &&
             updatedTransaction.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED &&
@@ -420,6 +427,7 @@ const ViolationsUtils = {
             !isInvoiceTransaction &&
             typeof categoryMaxAmountNoReceipt !== 'number' &&
             typeof maxAmountNoReceipt === 'number' &&
+            isMaxExpenseAmountRuleEnabled(maxAmountNoReceipt) &&
             expenseAmount > maxAmountNoReceipt &&
             !TransactionUtils.hasReceipt(updatedTransaction) &&
             isControlPolicy;
@@ -427,6 +435,7 @@ const ViolationsUtils = {
             canCalculateAmountViolations &&
             !isInvoiceTransaction &&
             typeof categoryMaxAmountNoReceipt === 'number' &&
+            isMaxExpenseAmountRuleEnabled(categoryMaxAmountNoReceipt) &&
             expenseAmount > categoryMaxAmountNoReceipt &&
             !TransactionUtils.hasReceipt(updatedTransaction) &&
             isControlPolicy;
@@ -438,6 +447,7 @@ const ViolationsUtils = {
             isEligibleForItemizedReceiptViolation &&
             typeof categoryMaxAmountNoItemizedReceipt !== 'number' &&
             typeof maxAmountNoItemizedReceipt === 'number' &&
+            isMaxExpenseAmountRuleEnabled(maxAmountNoItemizedReceipt) &&
             expenseAmount > maxAmountNoItemizedReceipt;
 
         // Check for itemized receipt requirement - category level override
@@ -451,6 +461,7 @@ const ViolationsUtils = {
             !isInvoiceTransaction &&
             typeof categoryOverLimit !== 'number' &&
             typeof overLimitAmount === 'number' &&
+            isMaxExpenseAmountRuleEnabled(overLimitAmount) &&
             expenseAmount > overLimitAmount &&
             isControlPolicy;
         const shouldCategoryShowOverLimitViolation =
@@ -591,22 +602,15 @@ const ViolationsUtils = {
             newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.MISSING_COMMENT});
         }
 
-        const shouldProcessMissingAttendees = CONST.IS_ATTENDEES_REQUIRED_ENABLED;
+        if (!hasMissingAttendeesViolation && shouldShowMissingAttendees) {
+            newTransactionViolations.push({
+                name: CONST.VIOLATIONS.MISSING_ATTENDEES,
+                type: CONST.VIOLATION_TYPES.VIOLATION,
+                showInReview: true,
+            });
+        }
 
-        if (shouldProcessMissingAttendees) {
-            if (!hasMissingAttendeesViolation && shouldShowMissingAttendees) {
-                newTransactionViolations.push({
-                    name: CONST.VIOLATIONS.MISSING_ATTENDEES,
-                    type: CONST.VIOLATION_TYPES.VIOLATION,
-                    showInReview: true,
-                });
-            }
-
-            if (hasMissingAttendeesViolation && !shouldShowMissingAttendees) {
-                newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.MISSING_ATTENDEES});
-            }
-        } else if (hasMissingAttendeesViolation) {
-            // Feature flag is disabled - always remove missingAttendees violations
+        if (hasMissingAttendeesViolation && !shouldShowMissingAttendees) {
             newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.MISSING_ATTENDEES});
         }
 
@@ -631,7 +635,16 @@ const ViolationsUtils = {
      * possible values could be either translation keys that resolve to  strings or translation keys that resolve to
      * functions.
      */
-    getViolationTranslation(violation: TransactionViolation, translate: LocaleContextProps['translate'], canEdit = true, tags?: PolicyTagLists, companyCardPageURL?: string): string {
+    getViolationTranslation(
+        violation: TransactionViolation,
+        translate: LocaleContextProps['translate'],
+        canEdit = true,
+        tags?: PolicyTagLists,
+        companyCardPageURL?: string,
+        connectionLink?: string,
+        card?: Card,
+        isMarkAsCash?: boolean,
+    ): string {
         const {
             brokenBankConnection = false,
             isAdmin = false,
@@ -646,6 +659,7 @@ const ViolationsUtils = {
             taxName,
             type,
             rterType,
+            cardID,
             message = '',
             errorIndexes = [],
         } = violation.data ?? {};
@@ -709,7 +723,11 @@ const ViolationsUtils = {
                 return translate('violations.itemizedReceiptRequired', {formattedLimit});
             case 'customRules':
                 return translate('violations.customRules', {message});
-            case 'rter':
+            case 'rter': {
+                let isPersonalCardViolation = false;
+                if (cardID !== undefined && cardID !== null && card) {
+                    isPersonalCardViolation = !!isPersonalCard(card);
+                }
                 return translate('violations.rter', {
                     brokenBankConnection,
                     isAdmin,
@@ -717,7 +735,11 @@ const ViolationsUtils = {
                     member,
                     rterType,
                     companyCardPageURL,
+                    connectionLink,
+                    isPersonalCard: isPersonalCardViolation,
+                    isMarkAsCash,
                 });
+            }
             case 'smartscanFailed':
                 return translate('violations.smartscanFailed', {canEdit});
             case 'someTagLevelsRequired':
@@ -766,6 +788,9 @@ const ViolationsUtils = {
         transactionThreadActions?: ReportAction[],
         tags?: PolicyTagLists,
         companyCardPageURL?: string,
+        connectionLink?: string,
+        cardList?: CardList,
+        isMarkAsCash?: boolean,
     ): string {
         const errorMessages = extractErrorMessages(transaction?.errors ?? {}, transactionThreadActions?.filter((e) => !!e.errors) ?? [], translate);
         const filteredViolations = filterReceiptViolations(transactionViolations);
@@ -776,7 +801,9 @@ const ViolationsUtils = {
             // Some violations end with a period already so lets make sure the connected messages have only single period between them
             // and end with a single dot.
             ...filteredViolations.map((violation) => {
-                const message = ViolationsUtils.getViolationTranslation(violation, translate, true, tags, companyCardPageURL);
+                const cardID = violation?.data?.cardID;
+                const card = cardID ? cardList?.[cardID] : undefined;
+                const message = ViolationsUtils.getViolationTranslation(violation, translate, true, tags, companyCardPageURL, connectionLink, card, isMarkAsCash);
                 if (!message) {
                     return;
                 }
@@ -816,8 +843,7 @@ const ViolationsUtils = {
             return transactionViolations.some((violation: TransactionViolation) => {
                 return (
                     !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, report, policy) &&
-                    shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction) &&
-                    (CONST.IS_ATTENDEES_REQUIRED_ENABLED || violation.name !== CONST.VIOLATIONS.MISSING_ATTENDEES)
+                    shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction)
                 );
             });
         });
