@@ -1,6 +1,5 @@
 import TestReceipt from '@assets/images/fake-receipt.png';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
-import shouldStartLocationPermissionFlowSelector from '@selectors/Location';
 import {useEffect, useState} from 'react';
 import {InteractionManager} from 'react-native';
 import {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
@@ -17,6 +16,7 @@ import {handleMoneyRequestStepScanParticipants} from '@libs/actions/IOU/MoneyReq
 import setTestReceipt from '@libs/actions/setTestReceipt';
 import {dismissProductTraining} from '@libs/actions/Welcome';
 import useReportAttributes from '@hooks/useReportAttributes';
+import DateUtils from '@libs/DateUtils';
 import HapticFeedback from '@libs/HapticFeedback';
 import {isArchivedReport, isPolicyExpenseChat} from '@libs/ReportUtils';
 import {getDefaultTaxCode, hasReceipt, shouldReuseInitialTransaction} from '@libs/TransactionUtils';
@@ -27,6 +27,19 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type Transaction from '@src/types/onyx/Transaction';
 import type {FileObject} from '@src/types/utils/Attachment';
 import type {ReceiptFile, UseReceiptScanParams} from './types';
+import type {OnyxEntry} from 'react-native-onyx';
+
+/**
+ * Selector to derive whether we should start the location permission flow from the last prompt timestamp.
+ * Returns true when the user has never been prompted, or when the last prompt was more than LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS ago.
+ */
+function shouldStartLocationPermissionFlowSelector(lastLocationPermissionPrompt: OnyxEntry<string>): boolean {
+    return (
+        !lastLocationPermissionPrompt ||
+        (DateUtils.isValidDateString(lastLocationPermissionPrompt ?? '') &&
+            DateUtils.getDifferenceInDaysFromNow(new Date(lastLocationPermissionPrompt ?? '')) > CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS)
+    );
+}
 
 function useReceiptScan({
     report,
@@ -208,8 +221,7 @@ function useReceiptScan({
             setReceiptFiles(newReceiptFiles);
             const gpsRequired = initialTransaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && files.length;
             if (gpsRequired) {
-                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow;
-                if (beginLocationPermissionFlow) {
+                if (shouldStartLocationPermissionFlow) {
                     setStartLocationPermissionFlow(true);
                     return;
                 }
@@ -226,8 +238,7 @@ function useReceiptScan({
         if (shouldSkipConfirmation) {
             const gpsRequired = initialTransaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT;
             if (gpsRequired) {
-                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow;
-                if (beginLocationPermissionFlow) {
+                if (shouldStartLocationPermissionFlow) {
                     setStartLocationPermissionFlow(true);
                     return;
                 }
