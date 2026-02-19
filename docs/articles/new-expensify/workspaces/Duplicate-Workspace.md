@@ -38,9 +38,6 @@ Follow these steps to create a new workspace based on an existing one:
 5. If you choose to copy Members, review and confirm your selections before proceeding.  
 6. Click **Continue** to create your new workspace.
 
-**ADD A SCREENSHOT HERE.**  
-_Suggestion: Confirmation screen showing the “Review and Confirm” step before duplication._
-
 ---
 
 ## What happens after duplicating a workspace
