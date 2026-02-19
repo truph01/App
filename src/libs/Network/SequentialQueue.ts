@@ -443,10 +443,6 @@ function flush(shouldResetPromise = true) {
                     });
                     endFlushSpanOk();
                 }
-
-                currentFlushSpan?.setStatus({code: 1});
-                currentFlushSpan?.end();
-                currentFlushSpan = undefined;
             });
         },
     });
