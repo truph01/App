@@ -1434,6 +1434,8 @@ function MoneyReportHeader({
             //  To be implemented in https://github.com/Expensify/App/issues/82153
             // onSelected: () => {
             // },
+            // Remove after implementation
+            shouldShow: false,
         },
         [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE]: {
             text: translate('iou.changeWorkspace'),
