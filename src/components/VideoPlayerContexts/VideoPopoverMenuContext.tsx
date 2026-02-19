@@ -29,6 +29,9 @@ function VideoPopoverMenuContextProvider({children}: ChildrenProps) {
             if (!videoPopoverMenuPlayerRef.current) {
                 return;
             }
+            if (videoPopoverMenuPlayerRef.current.playbackRate === speed) {
+                return;
+            }
             videoPopoverMenuPlayerRef.current.playbackRate = speed;
         },
         [videoPopoverMenuPlayerRef],
