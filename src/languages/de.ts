@@ -187,6 +187,7 @@ const translations: TranslationDeepObject<typeof en> = {
         workspaces: 'Workspaces',
         home: 'Startseite',
         inbox: 'Posteingang',
+        yourReviewIsRequired: 'Ihre Überprüfung ist erforderlich',
         success: 'Erfolgreich',
         group: 'Gruppe',
         profile: 'Profil',
@@ -2217,6 +2218,8 @@ ${amount} für ${merchant} – ${date}`,
         freezeDescription: 'Eine gesperrte Karte kann nicht für Käufe und Transaktionen verwendet werden. Du kannst sie jederzeit entsperren.',
         unfreezeDescription:
             'Durch das Entsperren dieser Karte werden Käufe und Transaktionen wieder zugelassen. Fahre nur fort, wenn du sicher bist, dass die Karte sicher verwendet werden kann.',
+        youFroze: ({date}: {date: string}) => `Du hast diese Karte am ${date} gesperrt.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} hat diese Karte am ${date} gesperrt.`,
     },
     workflowsPage: {
         workflowTitle: 'Ausgaben',
@@ -5124,6 +5127,11 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                     autoAddTripName: {title: 'Reisenamen zu Ausgaben hinzufügen', subtitle: 'Reisenamen für in Expensify gebuchte Reisen automatisch zu Spesenbeschreibungen hinzufügen.'},
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Reisebuchung',
+                        subtitle: 'Glückwunsch! Du kannst jetzt in diesem Workspace Reisen buchen und verwalten.',
+                        manageTravelLabel: 'Reisen verwalten',
+                    },
                     centralInvoicingSection: {
                         title: 'Zentrale Rechnungsstellung',
                         subtitle: 'Zentralisiere alle Reisekosten in einer monatlichen Rechnung, statt sie direkt beim Kauf zu bezahlen.',
@@ -5136,6 +5144,16 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                             settlementFrequencyLabel: 'Auszahlungsfrequenz',
                             settlementFrequencyDescription: 'Wie oft Expensify Ihr Geschäftskonto belastet, um aktuelle Expensify Travel-Transaktionen zu begleichen.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Reiseabrechnung deaktivieren?',
+                        body: 'Bevorstehende Hotel- und Mietwagenreservierungen müssen möglicherweise mit einer anderen Zahlungsmethode erneut gebucht werden, um eine Stornierung zu vermeiden.',
+                        confirm: 'Ausschalten',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Reiseabrechnung kann nicht deaktiviert werden',
+                        body: 'Sie haben noch einen offenen Reisensaldo. Bitte begleichen Sie zuerst Ihren Saldo.',
+                        confirm: 'Verstanden',
                     },
                 },
             },
