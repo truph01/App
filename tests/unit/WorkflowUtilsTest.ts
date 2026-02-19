@@ -537,7 +537,7 @@ describe('WorkflowUtils', () => {
             });
 
             expect(approvalWorkflows).toHaveLength(1);
-            expect(approvalWorkflows[0].members).toHaveLength(1);
+            expect(approvalWorkflows.at(0)?.members).toHaveLength(1);
             const memberEmails = availableMembers.map((m) => m.email).sort();
             expect(memberEmails).toEqual(['alice@example.com', 'bob@example.com']);
         });
