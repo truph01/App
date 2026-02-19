@@ -125,15 +125,23 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
     // Keep track of used approver emails to display hints in the UI
     const usedApproverEmails = new Set<string>();
     const personalDetailsByEmail = lodashMapKeys(personalDetails, (value, key) => value?.login ?? key);
+    const availableMembers: Member[] = [];
 
-    // Add each employee to the appropriate workflow
     for (const employee of Object.values(employees)) {
         const {email, submitsTo, pendingAction} = employee;
-        if (!email || !submitsTo || !employees[submitsTo]) {
+        if (!email) {
             continue;
         }
 
         const member = buildMemberFromEmployee(employee, personalDetailsByEmail, email);
+
+        if (pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+            availableMembers.push(member);
+        }
+
+        if (!submitsTo || !employees[submitsTo]) {
+            continue;
+        }
 
         if (!approvalWorkflows[submitsTo]) {
             const approvers = calculateApprovers({employees, firstEmail: submitsTo, personalDetailsByEmail});
@@ -188,16 +196,10 @@ function convertPolicyEmployeesToApprovalWorkflows({policy, personalDetails, fir
         });
     }
 
-    // Include ALL workspace members in availableMembers so users can assign any member to a workflow.
-    // Previously we only included members from workflows (or just the first workflow in ADVANCED mode),
-    // which excluded: members in custom workflows, those with submitsTo/forwardsTo pointing to
-    // non-members (orphaned approval chains), or those with missing submitsTo. We include everyone
-    // regardless so admins can fix broken approval chains from the Expenses From picker.
+    // availableMembers built in loop above: all employees with email, excluding pending delete.
+    // Includes members with orphaned submitsTo/forwardsTo so admins can fix chains from Expenses From picker.
     // See https://github.com/Expensify/Expensify/issues/598876
-    const availableMembers: Member[] = Object.values(employees)
-        .filter((employee): employee is typeof employee & {email: string} => !!employee.email && employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
-        .map((employee) => buildMemberFromEmployee(employee, personalDetailsByEmail, employee.email))
-        .sort((a, b) => localeCompare(a.displayName ?? a.email, b.displayName ?? b.email));
+    availableMembers.sort((a, b) => localeCompare(a.displayName ?? a.email, b.displayName ?? b.email));
 
     return {approvalWorkflows: sortedApprovalWorkflows, usedApproverEmails: [...usedApproverEmails], availableMembers};
 }
