@@ -211,7 +211,6 @@ function PaymentMethodList({
             const personalCardsGrouped: PaymentMethodItem[] = [];
             for (const card of assignedCardsSorted) {
                 const isDisabled = card.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-                const shouldShowFrozenBadge = isCardFrozen(card);
                 const isUserPersonalCard = isPersonalCard(card);
                 const isCSVCard = card.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD || card.bank.includes(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV);
                 const assignedCardsGrouped = isUserPersonalCard ? personalCardsGrouped : companyCardsGrouped;
@@ -293,7 +292,6 @@ function PaymentMethodList({
                         iconWidth: variables.cardIconWidth,
                         iconHeight: variables.cardIconHeight,
                         isMethodActive: activePaymentMethodID === card.cardID,
-                        isCardFrozen: shouldShowFrozenBadge,
                         onPress: cardOnPress,
                     });
                     continue;
@@ -357,7 +355,7 @@ function PaymentMethodList({
                     iconStyles: [styles.cardIcon],
                     iconWidth: variables.cardIconWidth,
                     iconHeight: variables.cardIconHeight,
-                    isCardFrozen: shouldShowFrozenBadge,
+                    isCardFrozen: isCardFrozen(card),
                 });
             }
 
