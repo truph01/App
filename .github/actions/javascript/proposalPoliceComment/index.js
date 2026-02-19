@@ -11651,13 +11651,18 @@ async function run() {
         let didFindDuplicate = false;
         let originalProposal;
         for (const previousProposal of commentsResponse) {
-            const isProposal = !!previousProposal.body?.includes(CONST_1.default.PROPOSAL_KEYWORD);
+            const body = previousProposal.body ?? '';
+            const lowerCaseBody = body.toLowerCase() ?? '';
+            const isProposal = !!body.includes(CONST_1.default.PROPOSAL_KEYWORD) && !!lowerCaseBody.includes(CONST_1.default.PROPOSAL_HEADER_A) && !!lowerCaseBody.includes(CONST_1.default.PROPOSAL_HEADER_B);
             const previousProposalCreatedAt = new Date(previousProposal.created_at).getTime();
             // Early continue if not a proposal or previous comment is newer than current one
             if (!isProposal || previousProposalCreatedAt >= newProposalCreatedAt) {
                 continue;
             }
-            const isAuthorBot = previousProposal.user?.login === CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS || previousProposal.user?.type === CONST_1.default.COMMENT.TYPE_BOT;
+            const isAuthorBot = previousProposal.user?.login === CONST_1.default.COMMENT.NAME_MELVIN ||
+                previousProposal.user?.login === CONST_1.default.COMMENT.NAME_CODEX ||
+                previousProposal.user?.login === CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS ||
+                previousProposal.user?.type === CONST_1.default.COMMENT.TYPE_BOT;
             // Skip prompting if comment author is the GH bot
             if (isAuthorBot) {
                 continue;
@@ -11665,6 +11670,7 @@ async function run() {
             const duplicateCheckPrompt = proposalPolice_1.default.getPromptForNewProposalDuplicateCheck(previousProposal.body, newProposalBody);
             const duplicateCheckResponse = await openAI.promptAssistant(assistantID, duplicateCheckPrompt);
             let similarityPercentage = 0;
+            // eslint-disable-next-line @typescript-eslint/no-deprecated -- TODO: refactor `parseAssistantResponse` to use `promptResponses` instead
             const parsedDuplicateCheckResponse = openAI.parseAssistantResponse(duplicateCheckResponse);
             core.startGroup('Parsed Duplicate Check Response');
             console.log('parsedDuplicateCheckResponse: ', parsedDuplicateCheckResponse);
@@ -11702,6 +11708,7 @@ async function run() {
         ? proposalPolice_1.default.getPromptForNewProposalTemplateCheck(payload.comment?.body)
         : proposalPolice_1.default.getPromptForEditedProposal(payload.changes.body?.from, payload.comment?.body);
     const assistantResponse = await openAI.promptAssistant(assistantID, prompt);
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- TODO: refactor `parseAssistantResponse` to use `promptResponses` instead
     const parsedAssistantResponse = openAI.parseAssistantResponse(assistantResponse);
     core.startGroup('Parsed Assistant Response');
     console.log('parsedAssistantResponse: ', parsedAssistantResponse);
@@ -11864,6 +11871,8 @@ const CONST = {
     },
     COMMENT: {
         TYPE_BOT: 'Bot',
+        NAME_MELVIN: 'melvin-bot',
+        NAME_CODEX: 'chatgpt-codex-connector',
         NAME_GITHUB_ACTIONS: 'github-actions',
     },
     ACTIONS: {
@@ -11889,6 +11898,8 @@ const CONST = {
     TEST_WORKFLOW_NAME: 'Jest Unit Tests',
     TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
     PROPOSAL_KEYWORD: 'Proposal',
+    PROPOSAL_HEADER_A: 'what is the root cause of that problem?',
+    PROPOSAL_HEADER_B: 'what changes do you think we should make in order to solve the problem?',
     DATE_FORMAT_STRING: 'yyyy-MM-dd',
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
@@ -12077,7 +12088,7 @@ class GithubUtils {
                 PRListMobileExpensify: this.getStagingDeployCashPRListMobileExpensify(issue),
                 deployBlockers: this.getStagingDeployCashDeployBlockers(issue),
                 internalQAPRList: this.getStagingDeployCashInternalQA(issue),
-                isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
+                isFirebaseChecked: issue.body ? /-\s\[x]\sI checked \[Firebase Crashlytics]/.test(issue.body) : false,
                 isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
                 version,
                 tag: `${version}-staging`,
@@ -12159,14 +12170,11 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], { isSentryChecked = false, isGHStatusChecked = false, previousTag = '' } = {}) {
+    static generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isFirebaseChecked = false, isGHStatusChecked = false, chronologicalSection = '', }) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
-                url: pr.html_url,
-                mergerLogin,
-            })))).then((results) => {
+            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
                 // The format of this map is following:
                 // {
                 //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',
@@ -12233,11 +12241,15 @@ class GithubUtils {
                     }
                     issueBody += '\r\n\r\n';
                 }
+                if (chronologicalSection) {
+                    issueBody += chronologicalSection;
+                    issueBody += '\r\n\r\n';
+                }
                 issueBody += '**Deployer verifications:**';
                 // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isSentryChecked ? 'x' : ' '}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
+                issueBody += `\r\n- [${isFirebaseChecked ? 'x' : ' '}] I checked [Firebase Crashlytics](https://console.firebase.google.com/u/0/project/expensify-mobile-app/crashlytics/app/ios:com.expensify.expensifylite/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
                 // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isSentryChecked ? 'x' : ' '}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${previousTag}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
+                issueBody += `\r\n- [${isFirebaseChecked ? 'x' : ' '}] I checked [Firebase Crashlytics](https://console.firebase.google.com/u/0/project/expensify-mobile-app/crashlytics/app/android:org.me.mobiexpensifyg/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount) for **the previous release version** and verified that the release did not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
                 // eslint-disable-next-line max-len
                 issueBody += `\r\n- [${isGHStatusChecked ? 'x' : ' '}] I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.`;
                 issueBody += '\r\n\r\ncc @Expensify/applauseleads\r\n';
@@ -12347,6 +12359,26 @@ class GithubUtils {
             per_page: options.per_page ?? 50,
             ...(options.status && { status: options.status }),
         });
+    }
+    /**
+     * Get the workflow run URL for a specific commit SHA and workflow file.
+     * Returns the HTML URL of the matching run, or undefined if not found.
+     */
+    static async getWorkflowRunURLForCommit(commitSha, workflowFile) {
+        try {
+            const response = await this.octokit.actions.listWorkflowRuns({
+                owner: CONST_1.default.GITHUB_OWNER,
+                repo: CONST_1.default.APP_REPO,
+                workflow_id: workflowFile,
+                head_sha: commitSha,
+                per_page: 1,
+            });
+            return response.data.workflow_runs.at(0)?.html_url;
+        }
+        catch (error) {
+            console.warn(`Failed to find workflow run for commit ${commitSha}:`, error);
+            return undefined;
+        }
     }
     /**
      * Generate the URL of an New Expensify pull request given the PR number.
@@ -12505,6 +12537,7 @@ class GithubUtils {
                 commit: commit.sha,
                 subject: commit.commit.message,
                 authorName: commit.commit.author?.name ?? 'Unknown',
+                date: commit.commit.committer?.date ?? '',
             }));
         }
         catch (error) {
