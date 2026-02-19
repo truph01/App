@@ -360,14 +360,14 @@ function ReportActionCompose({
                 });
                 attachmentFileRef.current = null;
             } else {
-                // Pre-generate the optimistic reportActionID so we can correlate the Sentry send-message span with the exact message
-                const reportActionID = rand64();
+                // Pre-generate the reportActionID so we can correlate the Sentry send-message span with the exact message
+                const optimisticReportActionID = rand64();
 
                 // The list is inverted, so an offset near 0 means the user is at the bottom (newest messages visible).
                 const isScrolledToBottom = scrollOffsetRef.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
                 if (isScrolledToBottom) {
                     Performance.markStart(CONST.TIMING.SEND_MESSAGE, {message: newCommentTrimmed});
-                    startSpan(`${CONST.TELEMETRY.SPAN_SEND_MESSAGE}_${reportActionID}`, {
+                    startSpan(`${CONST.TELEMETRY.SPAN_SEND_MESSAGE}_${optimisticReportActionID}`, {
                         name: 'send-message',
                         op: CONST.TELEMETRY.SPAN_SEND_MESSAGE,
                         attributes: {
@@ -376,7 +376,7 @@ function ReportActionCompose({
                         },
                     });
                 }
-                onSubmit(newCommentTrimmed, reportActionID);
+                onSubmit(newCommentTrimmed, optimisticReportActionID);
             }
         },
         [
