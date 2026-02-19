@@ -77,6 +77,18 @@ If the former Workspace Admin shared a business bank account with you, follow th
 
 ---
 
+## How to change the default Payer on a workspace
+
+If you’re the new Workspace Admin, make sure reimbursements continue without interruption.
+
+1.  In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Workspaces > [workspace name] > Workflows**. 
+2. Under **Payments**, confirm the correct payment account is selected. 
+3. Under **Payer**, select a current Workspace Admin. 
+
+![Payments section showing account and member selection]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_03.png){:width="100%"}
+
+---
+
 ## How to revoke the former Workspace Admin's access to a verified bank account
 
 Once the shared bank account is verified by the new Workspace Admin, they can [revoke the previous admin’s access](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Unshare-a-Business-Bank-Account) to maintain secure control.
