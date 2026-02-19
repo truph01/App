@@ -170,7 +170,7 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                     title: form?.merchant,
                     onPress: () => navigateTo(CONST.EXPENSE_RULES.FIELDS.RENAME_MERCHANT, hash),
                 },
-                (form?.category || hasPolicyCategories)
+                form?.category || hasPolicyCategories
                     ? {
                           key: 'category',
                           description: translate('common.category'),
