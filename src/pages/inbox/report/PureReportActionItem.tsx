@@ -1625,7 +1625,6 @@ function PureReportActionItem({
                         <ActionableItemButtons
                             items={actionableItemButtons}
                             layout="horizontal"
-                            isBackgroundHovered={hovered}
                         />
                     )}
                 </View>
@@ -1639,7 +1638,6 @@ function PureReportActionItem({
                             items={actionableItemButtons}
                             shouldUseLocalization
                             layout={isActionableTrackExpense(action) ? 'vertical' : 'horizontal'}
-                            isBackgroundHovered={hovered}
                         />
                     )}
                 </View>
@@ -1762,7 +1760,6 @@ function PureReportActionItem({
                             items={actionableItemButtons}
                             shouldUseLocalization
                             layout="vertical"
-                            isBackgroundHovered={hovered}
                         />
                     )}
                 </ReportActionItemBasicMessage>
@@ -1838,9 +1835,9 @@ function PureReportActionItem({
                                             }
                                             shouldUseLocalization={!isConciergeOptions && !actionContainsFollowUps}
                                             primaryTextNumberOfLines={actionableButtonsNoLines}
-                                            isBackgroundHovered={hovered}
                                             styles={{
-                                                text: [styles.textAlignLeft, styles.breakWord],
+                                                text: [isConciergeOptions || actionContainsFollowUps ? styles.textAlignLeft : undefined],
+                                                button: actionContainsFollowUps ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
                                                 container: [
                                                     actionContainsFollowUps && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
                                                     actionContainsFollowUps ? styles.mt5 : undefined,
