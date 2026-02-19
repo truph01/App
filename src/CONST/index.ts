@@ -5661,6 +5661,8 @@ const CONST = {
         GRID: 'grid',
         /** Use for section headers or titles. */
         HEADING: 'heading',
+        /** Use for elements that serve as a page or section header (e.g. top bar title). */
+        HEADER: 'header',
         /** Use for image elements. */
         IMG: 'img',
         /** Use for elements that navigate to other pages or content. */
@@ -8103,7 +8105,8 @@ const CONST = {
          * The Travel Invoicing feed type constant.
          * This feed is used for Travel Invoicing cards which are separate from regular Expensify Cards.
          */
-        PROGRAM_TRAVEL_US: 'PROGRAM_TRAVEL_US',
+        PROGRAM_TRAVEL_US: 'TRAVEL_US',
+        MONTHLY_SETTLEMENT_DATE: 'monthlySettlementDate',
     },
     LAST_PAYMENT_METHOD: {
         LAST_USED: 'lastUsed',
@@ -8224,6 +8227,12 @@ const CONST = {
             ROTATE_BUTTON: 'Header-RotateButton',
             CLOSE_BUTTON: 'Header-CloseButton',
             MORE_BUTTON: 'Header-MoreButton',
+        },
+        TOP_BAR: {
+            CANCEL_BUTTON: 'TopBar-CancelButton',
+        },
+        COLLAPSIBLE_SECTION: {
+            TOGGLE: 'CollapsibleSection-Toggle',
         },
         VIDEO_PLAYER: {
             PLAY_PAUSE_BUTTON: 'VideoPlayer-PlayPauseButton',
@@ -8346,9 +8355,12 @@ const CONST = {
         },
         SELECTION_LIST: {
             BASE_LIST_ITEM: 'SelectionList-BaseListItem',
+            SPLIT_LIST_ITEM_EDIT_BUTTON: 'SplitListItem-EditButton',
+            LIST_HEADER_SELECT_ALL: 'SelectionList-ListHeader-SelectAll',
         },
         SELECTION_LIST_WITH_SECTIONS: {
             BASE_LIST_ITEM: 'SelectionListWithSections-BaseListItem',
+            SELECT_ALL: 'SelectionList-SelectAll',
         },
         CONTEXT_MENU: {
             REPLY_IN_THREAD: 'ContextMenu-ReplyInThread',
@@ -8438,6 +8450,12 @@ const CONST = {
         },
         TRANSACTION_PREVIEW: {
             CARD: 'TransactionPreview-Card',
+        },
+        TRANSACTION_ITEM_ROW: {
+            ARROW_RIGHT: 'TransactionItemRow-ArrowRight',
+        },
+        PAYMENT_METHOD_LIST_ITEM: {
+            CHASE_ACCOUNT_HELP: 'PaymentMethodListItem-ChaseAccountHelp',
         },
         EMOJI_PICKER: {
             BUTTON: 'EmojiPicker-Button',
@@ -8571,6 +8589,7 @@ const CONST = {
         WORKSPACE: {
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
+            INVITE_MESSAGE_PRIVACY_LINK: 'WorkspaceInviteMessage-PrivacyLink',
             COMPANY_CARDS: {
                 TABLE_ITEM: 'Workspace-CompanyCards-TableItem',
                 MORE_DROPDOWN: 'WorkspaceCompanyCards-MoreDropdown',
@@ -8707,6 +8726,7 @@ const CONST = {
         },
         ONBOARDING: {
             INTERESTED_FEATURES_ITEM: 'Onboarding-InterestedFeaturesItem',
+            ACCOUNTING_SELECT_INTEGRATION: 'OnboardingAccounting-SelectIntegration',
         },
         REPORT_HEADER_SKELETON: {
             GO_BACK: 'ReportHeaderSkeleton-GoBack',

@@ -188,6 +188,7 @@ const translations: TranslationDeepObject<typeof en> = {
         workspaces: 'Espaces de travail',
         home: 'Accueil',
         inbox: 'Boîte de réception',
+        yourReviewIsRequired: 'Votre révision est requise',
         success: 'Réussi',
         group: 'Groupe',
         profile: 'Profil',
@@ -397,6 +398,7 @@ const translations: TranslationDeepObject<typeof en> = {
         member: 'Membre',
         auditor: 'Auditeur',
         role: 'Rôle',
+        roleCannotBeChanged: (workflowsLinkPage: string) => `Le rôle ne peut pas être modifié car ce membre est un <a href="${workflowsLinkPage}">payeur</a> dans cet espace de travail.`,
         currency: 'Devise',
         groupCurrency: 'Devise du groupe',
         rate: 'Taux',
@@ -2232,6 +2234,8 @@ ${amount} pour ${merchant} - ${date}`,
         freezeDescription: 'Une carte gelée ne peut pas être utilisée pour des achats ni des transactions. Vous pouvez la dégeler à tout moment.',
         unfreezeDescription:
             'Dégeler cette carte permettra à nouveau les achats et les transactions. Continuez uniquement si vous êtes sûr(e) que la carte peut être utilisée en toute sécurité.',
+        youFroze: ({date}: {date: string}) => `Vous avez gelé cette carte le ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} a gelé cette carte le ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Dépense',
@@ -5150,6 +5154,11 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Réservation de voyage',
+                        subtitle: 'Félicitations ! Vous êtes prêt à réserver et gérer des voyages sur cet espace de travail.',
+                        manageTravelLabel: 'Gérer les déplacements',
+                    },
                     centralInvoicingSection: {
                         title: 'Facturation centralisée',
                         subtitle: 'Centralisez toutes les dépenses de voyage dans une facture mensuelle au lieu de payer au moment de l’achat.',
@@ -5163,6 +5172,16 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                             settlementFrequencyDescription:
                                 'Fréquence à laquelle Expensify prélèvera sur votre compte bancaire professionnel pour régler les transactions récentes d’Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Désactiver la facturation de voyage?',
+                        body: "Les prochaines réservations d'hôtel et de location de voiture devront peut-être être réservées à nouveau avec un autre mode de paiement pour éviter une annulation.",
+                        confirm: 'Désactiver',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Impossible de désactiver la facturation Voyage',
+                        body: 'Vous avez encore un solde de voyage impayé. Veuillez d’abord régler ce solde.',
+                        confirm: 'Compris',
                     },
                 },
             },

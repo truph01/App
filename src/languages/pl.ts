@@ -188,6 +188,7 @@ const translations: TranslationDeepObject<typeof en> = {
         workspaces: 'Przestrzenie robocze',
         home: 'Strona główna',
         inbox: 'Skrzynka odbiorcza',
+        yourReviewIsRequired: 'Wymagana jest Twoja weryfikacja',
         success: 'Sukces',
         group: 'Grupa',
         profile: 'Profil',
@@ -397,6 +398,7 @@ const translations: TranslationDeepObject<typeof en> = {
         member: 'Członek',
         auditor: 'Audytor',
         role: 'Rola',
+        roleCannotBeChanged: (workflowsLinkPage: string) => `Nie można zmienić roli, ponieważ ten członek jest <a href="${workflowsLinkPage}">płatnikiem</a> w tym obszarze roboczym.`,
         currency: 'Waluta',
         groupCurrency: 'Waluta grupy',
         rate: 'Oceń',
@@ -2215,6 +2217,8 @@ ${amount} dla ${merchant} - ${date}`,
         unfreezeCard: 'Odmroź kartę',
         freezeDescription: 'Zamrożonej karty nie można używać do zakupów i transakcji. Możesz ją odmrozić w dowolnym momencie.',
         unfreezeDescription: 'Odmrożenie tej karty ponownie umożliwi zakupy i transakcje. Kontynuuj tylko wtedy, gdy masz pewność, że korzystanie z karty jest bezpieczne.',
+        youFroze: ({date}: {date: string}) => `Zamroziłeś tę kartę ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} zamroził(a) tę kartę ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Wydatki',
@@ -5099,6 +5103,11 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                     autoAddTripName: {title: 'Dodaj nazwy podróży do wydatków', subtitle: 'Automatycznie dodawaj nazwy podróży do opisów wydatków za podróże zarezerwowane w Expensify.'},
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Rezerwacja podróży',
+                        subtitle: 'Gratulacje! Wszystko gotowe, aby rezerwować i zarządzać podróżami w tym obszarze roboczym.',
+                        manageTravelLabel: 'Zarządzaj podróżami',
+                    },
                     centralInvoicingSection: {
                         title: 'Centralne fakturowanie',
                         subtitle: 'Skonsoliduj wszystkie wydatki na podróże w jednym miesięcznym rachunku zamiast płacić w momencie zakupu.',
@@ -5111,6 +5120,16 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                             settlementFrequencyLabel: 'Częstotliwość rozliczeń',
                             settlementFrequencyDescription: 'Jak często Expensify będzie pobierać środki z firmowego konta bankowego, aby rozliczyć ostatnie transakcje Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Wyłączyć fakturowanie podróży?',
+                        body: 'Nadchodzące rezerwacje hoteli i wynajmu samochodów mogą wymagać ponownej rezerwacji z użyciem innej metody płatności, aby uniknąć anulowania.',
+                        confirm: 'Wyłącz',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Nie można wyłączyć fakturowania podróży',
+                        body: 'Masz nadal zaległe saldo za podróż. Najpierw ureguluj swoje saldo.',
+                        confirm: 'Rozumiem',
                     },
                 },
             },

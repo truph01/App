@@ -188,6 +188,7 @@ const translations: TranslationDeepObject<typeof en> = {
         workspaces: 'Werkruimtes',
         home: 'Home',
         inbox: 'Inbox',
+        yourReviewIsRequired: 'Uw beoordeling is vereist',
         success: 'Gelukt',
         group: 'Groep',
         profile: 'Profiel',
@@ -397,6 +398,7 @@ const translations: TranslationDeepObject<typeof en> = {
         member: 'Lid',
         auditor: 'Auditor',
         role: 'Rol',
+        roleCannotBeChanged: (workflowsLinkPage: string) => `De rol kan niet worden gewijzigd omdat dit lid een <a href="${workflowsLinkPage}">betaler</a> is in deze werkruimte.`,
         currency: 'Valuta',
         groupCurrency: 'Groepsvaluta',
         rate: 'Beoordeling',
@@ -2221,6 +2223,8 @@ ${amount} voor ${merchant} - ${date}`,
         unfreezeCard: 'Kaart deblokkeren',
         freezeDescription: 'Een geblokkeerde kaart kan niet worden gebruikt voor aankopen en transacties. Je kunt deze op elk moment deblokkeren.',
         unfreezeDescription: 'Door deze kaart te deblokkeren worden aankopen en transacties weer toegestaan. Ga alleen verder als je zeker weet dat de kaart veilig is om te gebruiken.',
+        youFroze: ({date}: {date: string}) => `Je hebt deze kaart op ${date} geblokkeerd.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} heeft deze kaart op ${date} geblokkeerd.`,
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',
@@ -5109,6 +5113,11 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                     autoAddTripName: {title: 'Reisnamen aan uitgaven toevoegen', subtitle: 'Voeg automatisch reisnamen toe aan onkostomemo’s voor reizen die in Expensify zijn geboekt.'},
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Reisboeking',
+                        subtitle: 'Gefeliciteerd! Je bent helemaal klaar om reizen in deze workspace te boeken en te beheren.',
+                        manageTravelLabel: 'Reizen beheren',
+                    },
                     centralInvoicingSection: {
                         title: 'Gecentraliseerde facturatie',
                         subtitle: 'Centraliseer alle reiskosten op één maandelijkse factuur in plaats van bij aankoop te betalen.',
@@ -5122,6 +5131,12 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                             settlementFrequencyDescription: 'Hoe vaak Expensify geld van uw zakelijke bankrekening zal incasseren om recente Expensify Travel-transacties te vereffenen.',
                         },
                     },
+                    disableModal: {
+                        title: 'Reisfacturatie uitschakelen?',
+                        body: 'Toekomstige hotel en autoverhuurreserveringen moeten mogelijk opnieuw worden geboekt met een andere betaalmethode om annulering te voorkomen.',
+                        confirm: 'Uitschakelen',
+                    },
+                    outstandingBalanceModal: {title: 'Kan Reiskostenfacturatie niet uitschakelen', body: 'Je hebt nog een openstaand reissaldo. Betaal eerst je saldo.', confirm: 'Begrepen'},
                 },
             },
             expensifyCard: {

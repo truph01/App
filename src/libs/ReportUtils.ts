@@ -100,7 +100,6 @@ import {
 } from './actions/IOU';
 import type {IOURequestType} from './actions/IOU';
 import {unholdRequest} from './actions/IOU/Hold';
-import {isApprover as isApproverUtils} from './actions/Policy/Member';
 import {createDraftWorkspace} from './actions/Policy/Policy';
 import {hasCreditBankAccount} from './actions/ReimbursementAccount/store';
 import {openUnreportedExpense} from './actions/Report';
@@ -12517,17 +12516,14 @@ function getReportPersonalDetailsParticipants(report: Report, personalDetailsPar
     };
 }
 
-function canRejectReportAction(currentUserLogin: string, report: Report, policy?: Policy): boolean {
-    const isReportApprover = isApproverUtils(policy, currentUserLogin);
+function canRejectReportAction(currentUserLogin: string, report: Report): boolean {
     const isReportBeingProcessed = isProcessingReport(report);
     const isIOU = isIOUReport(report);
     const isInvoice = isInvoiceReport(report);
     const isCurrentUserManager = report?.managerID === currentUserAccountID;
 
-    const userCanReject = isReportApprover && isCurrentUserManager;
-
-    if (!userCanReject) {
-        return false; // must be approver or payer
+    if (!isCurrentUserManager) {
+        return false;
     }
 
     if (isIOU) {
@@ -12573,17 +12569,6 @@ function hasReportBeenRetracted(report: OnyxEntry<Report>, reportActions?: OnyxE
 
     const reportActionList = Array.isArray(reportActions) ? reportActions : Object.values(reportActions);
     return reportActionList.some((action) => isRetractedAction(action));
-}
-
-function getMoneyReportPreviewName(action: ReportAction, iouReport: OnyxEntry<Report>, isInvoice?: boolean, reportAttributes?: ReportAttributesDerivedValue['reports']) {
-    if (isInvoice && isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW)) {
-        const originalMessage = getOriginalMessage(action);
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        return originalMessage && translateLocal('iou.invoiceReportName', originalMessage);
-    }
-    // This will be fixed as follow up https://github.com/Expensify/App/pull/75357
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    return getReportName(iouReport, undefined, undefined, undefined, undefined, reportAttributes) || action.childReportName;
 }
 
 function selectFilteredReportActions(
@@ -13243,7 +13228,6 @@ export {
     canRejectReportAction,
     hasReportBeenReopened,
     hasReportBeenRetracted,
-    getMoneyReportPreviewName,
     getNextApproverAccountID,
     isWorkspaceTaskReport,
     isWorkspaceThread,

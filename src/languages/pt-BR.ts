@@ -188,6 +188,7 @@ const translations: TranslationDeepObject<typeof en> = {
         workspaces: 'Espaços de trabalho',
         home: 'Início',
         inbox: 'Caixa de entrada',
+        yourReviewIsRequired: 'Sua revisão é necessária',
         success: 'Concluído',
         group: 'Grupo',
         profile: 'Perfil',
@@ -397,6 +398,7 @@ const translations: TranslationDeepObject<typeof en> = {
         member: 'Membro',
         auditor: 'Auditor',
         role: 'Função',
+        roleCannotBeChanged: (workflowsLinkPage: string) => `A função não pode ser alterada porque este membro é um <a href="${workflowsLinkPage}">pagador</a> neste espaço de trabalho.`,
         currency: 'Moeda',
         groupCurrency: 'Moeda do grupo',
         rate: 'Avaliar',
@@ -2214,6 +2216,8 @@ ${amount} para ${merchant} - ${date}`,
         unfreezeCard: 'Desbloquear cartão',
         freezeDescription: 'Um cartão bloqueado não pode ser usado para compras e transações. Você pode desbloqueá-lo a qualquer momento.',
         unfreezeDescription: 'Ao desbloquear este cartão, compras e transações voltarão a ser permitidas. Continue apenas se tiver certeza de que o cartão é seguro para uso.',
+        youFroze: ({date}: {date: string}) => `Você bloqueou este cartão em ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} bloqueou este cartão em ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Gastos',
@@ -5104,6 +5108,11 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Reserva de viagem',
+                        subtitle: 'Parabéns! Agora você está pronto para reservar e gerenciar viagens neste workspace.',
+                        manageTravelLabel: 'Gerenciar viagens',
+                    },
                     centralInvoicingSection: {
                         title: 'Faturamento centralizado',
                         subtitle: 'Centralize todos os gastos de viagem em uma fatura mensal em vez de pagar no momento da compra.',
@@ -5117,6 +5126,16 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                             settlementFrequencyDescription:
                                 'Com que frequência o Expensify vai debitar da sua conta bancária empresarial para liquidar as transações recentes do Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Desativar faturamento de viagens?',
+                        body: 'Próximas reservas de hotel e aluguel de carro podem precisar ser refeitas com um método de pagamento diferente para evitar cancelamento.',
+                        confirm: 'Desativar',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Não é possível desativar o faturamento de viagens',
+                        body: 'Você ainda tem um saldo de viagem pendente. Pague esse saldo primeiro.',
+                        confirm: 'Entendi',
                     },
                 },
             },
