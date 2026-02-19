@@ -264,7 +264,7 @@ async function denyTransaction({transactionID}: DenyTransactionParams) {
 
         return parseHttpRequest(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.DENY_TRANSACTION, message);
     } catch (error) {
-        Log.hmmm('[MultifactorAuthentication] Failed to authorize transaction', {error});
+        Log.hmmm('[MultifactorAuthentication] Failed to deny transaction', {error});
         return parseHttpRequest(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.DENY_TRANSACTION, undefined);
     }
 }
