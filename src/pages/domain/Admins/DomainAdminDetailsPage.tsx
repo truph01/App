@@ -5,6 +5,7 @@ import MenuItem from '@components/MenuItem';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
@@ -24,6 +25,7 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
     const {domainAccountID, accountID} = route.params;
 
     const {translate, formatPhoneNumber} = useLocalize();
+    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const icons = useMemoizedLazyExpensifyIcons(['Info', 'ClosedSign'] as const);
 
     const [primaryContact] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
@@ -63,7 +65,8 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
         }
 
         revokeDomainAdminAccess(route.params.domainAccountID, route.params.accountID);
-        Navigation.goBack(ROUTES.WORKSPACES_LIST.route);
+        const isSelfRevoke = Number(route.params.accountID) === currentUserAccountID;
+        Navigation.goBack(isSelfRevoke ? ROUTES.WORKSPACES_LIST.route : ROUTES.DOMAIN_ADMINS.getRoute(Number(route.params.domainAccountID)));
     };
 
     return (
