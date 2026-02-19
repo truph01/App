@@ -38,6 +38,4 @@ function DomainMemberResetTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPa
     );
 }
 
-DomainMemberResetTwoFactorAuthPage.displayName = 'DomainMemberTwoFactorAuthPage';
-
 export default DomainMemberResetTwoFactorAuthPage;

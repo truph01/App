@@ -15,7 +15,7 @@ type GeneralDomainMemberErrors = {
  */
 type DomainMemberErrors = GeneralDomainMemberErrors & {
     /**
-     *
+     * Errors related to the list of emails exempt from the 2FA requirement
      */
     twoFactorAuthExemptEmailsError?: OnyxCommon.Errors;
 };

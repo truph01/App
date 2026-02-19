@@ -39,7 +39,7 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
             <ScreenWrapper
                 shouldEnableMaxHeight
                 shouldUseCachedViewportHeight
-                testID={BaseDomainRequireTwoFactorAuthPage.displayName}
+                testID="BaseDomainRequireTwoFactorAuthPage"
                 enableEdgeToEdgeBottomSafeAreaPadding
             >
                 <HeaderWithBackButton
@@ -81,7 +81,5 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
         </DomainNotFoundPageWrapper>
     );
 }
-
-BaseDomainRequireTwoFactorAuthPage.displayName = 'BaseDomainRequireTwoFactorAuthPage';
 
 export default BaseDomainRequireTwoFactorAuthPage;
