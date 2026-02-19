@@ -104,9 +104,10 @@ function ShareTab({ref}: ShareTabProps) {
         recentReportsOptions = reportOptions.slice(0, 20);
     }
 
+    const trimmedDebouncedTextInputValue = debouncedTextInputValue.trim();
     useEffect(() => {
-        searchInServer(debouncedTextInputValue.trim());
-    }, [debouncedTextInputValue]);
+        searchInServer(trimmedDebouncedTextInputValue);
+    }, [trimmedDebouncedTextInputValue]);
 
     const styledRecentReports = recentReportsOptions.map((item, index) => ({
         ...item,

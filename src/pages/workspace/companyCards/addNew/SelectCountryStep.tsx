@@ -1,5 +1,5 @@
 import {useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import FormHelpMessage from '@components/FormHelpMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -15,7 +15,6 @@ import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getPlaidCountry, isPlaidSupportedCountry} from '@libs/CardUtils';
 import searchOptions from '@libs/searchOptions';
-import type {Option} from '@libs/searchOptions';
 import StringUtils from '@libs/StringUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackRouteProp} from '@navigation/PlatformStackNavigation/types';
@@ -41,15 +40,9 @@ function SelectCountryStep({policyID}: CountryStepProps) {
 
     const [searchValue, debouncedSearchValue, setSearchValue] = useDebouncedState('');
 
-    const getCountry = () => {
-        if (addNewCard?.data?.selectedCountry) {
-            return addNewCard.data.selectedCountry;
-        }
+    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+    const currentCountry = selectedCountry ?? addNewCard?.data?.selectedCountry ?? getPlaidCountry(policy?.outputCurrency, currencyList, countryByIp);
 
-        return getPlaidCountry(policy?.outputCurrency, currencyList, countryByIp);
-    };
-
-    const [currentCountry, setCurrentCountry] = useState<string | undefined>(getCountry);
     const [hasError, setHasError] = useState(false);
     const doesCountrySupportPlaid = isPlaidSupportedCountry(currentCountry);
 
@@ -71,20 +64,12 @@ function SelectCountryStep({policyID}: CountryStepProps) {
         }
     };
 
-    useEffect(() => {
-        setCurrentCountry(getCountry());
-    }, [getCountry]);
-
     const handleBackButtonPress = () => {
         if (route?.params?.backTo) {
             Navigation.navigate(route.params.backTo);
             return;
         }
         Navigation.goBack();
-    };
-
-    const onSelectionChange = (country: Option) => {
-        setCurrentCountry(country.value);
     };
 
     const countries = Object.keys(CONST.ALL_COUNTRIES)
@@ -132,7 +117,9 @@ function SelectCountryStep({policyID}: CountryStepProps) {
             <SelectionList
                 data={searchResults}
                 ListItem={RadioListItem}
-                onSelectRow={onSelectionChange}
+                onSelectRow={(countryOption) => {
+                    setSelectedCountry(countryOption.value ?? null);
+                }}
                 textInputOptions={textInputOptions}
                 confirmButtonOptions={confirmButtonOptions}
                 initiallyFocusedItemKey={currentCountry}

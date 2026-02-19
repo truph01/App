@@ -128,10 +128,6 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
         getAccessiblePolicies();
     });
 
-    const handleBackButtonPress = () => {
-        Navigation.goBack();
-    };
-
     const skipJoiningWorkspaces = () => {
         if (isVsb) {
             Navigation.navigate(ROUTES.ONBOARDING_ACCOUNTING.getRoute(route.params?.backTo));
@@ -156,7 +152,7 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
             <HeaderWithBackButton
                 shouldShowBackButton
                 progressBarPercentage={60}
-                onBackButtonPress={handleBackButtonPress}
+                onBackButtonPress={() => Navigation.goBack()}
                 shouldDisplayHelpButton={false}
             />
             <SelectionList

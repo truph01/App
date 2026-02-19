@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import ConfirmationPage from '@components/ConfirmationPage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-// eslint-disable-next-line no-restricted-imports
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
@@ -156,10 +155,6 @@ function InviteReceiptPartnerPolicyPage({route}: InviteReceiptPartnerPolicyPageP
         setIsInvitationSent(true);
     };
 
-    const handleGotIt = () => {
-        Navigation.dismissModal();
-    };
-
     // Check if we should skip to "All set" page immediately
     const shouldSkipToAllSet = workspaceMembers.length === 0;
 
@@ -192,7 +187,7 @@ function InviteReceiptPartnerPolicyPage({route}: InviteReceiptPartnerPolicyPageP
                     description={translate('workspace.receiptPartners.uber.takeBusinessRideMessage')}
                     shouldShowButton
                     buttonText={translate('common.buttonConfirm')}
-                    onButtonPress={handleGotIt}
+                    onButtonPress={() => Navigation.dismissModal()}
                     descriptionStyle={styles.colorMuted}
                 />
             </ScreenWrapper>
