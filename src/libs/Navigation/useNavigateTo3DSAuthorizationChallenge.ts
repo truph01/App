@@ -10,7 +10,24 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import Navigation from './Navigation';
 
 function getOldestTransactionPendingReview(transactions: TransactionPending3DSReview[]) {
-    return transactions.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()).at(0);
+    return transactions
+        .sort((a, b) => {
+            // We really really want predictable, stable ordering for transaction challenges.
+            // Prioritize created date, but if they're the same sort by expired date,
+            // and if those are the same, sort by ID
+            const createdDiff = new Date(a.created).getTime() - new Date(b.created).getTime();
+            if (createdDiff !== 0) {
+                return createdDiff;
+            }
+
+            const expiresDiff = new Date(a.expires).getTime() - new Date(b.expires).getTime();
+            if (expiresDiff !== 0) {
+                return createdDiff;
+            }
+            
+            return Number(a.transactionID) - Number(b.transactionID)
+        })
+        .at(0);
 }
 
 function useNavigateTo3DSAuthorizationChallenge() {
