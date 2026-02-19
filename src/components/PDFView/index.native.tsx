@@ -4,6 +4,7 @@ import {Linking, View} from 'react-native';
 import PDF from 'react-native-pdf';
 import KeyboardAvoidingView from '@components/KeyboardAvoidingView';
 import LoadingIndicator from '@components/LoadingIndicator';
+import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import useKeyboardState from '@hooks/useKeyboardState';
 import useLocalize from '@hooks/useLocalize';
@@ -36,6 +37,7 @@ import type {PDFViewNativeProps} from './types';
 
 const LOADING_THUMBNAIL_HEIGHT = 250;
 const LOADING_THUMBNAIL_WIDTH = 250;
+const PDF_VIEW_REASON_ATTRIBUTES: SkeletonSpanReasonAttributes = {context: 'PDFView'};
 
 function PDFView({onToggleKeyboard, onLoadComplete, fileName, onPress, isFocused, onScaleChanged, sourceURL, onLoadError, isUsedAsChatAttachment}: PDFViewNativeProps) {
     const [shouldRequestPassword, setShouldRequestPassword] = useState(false);
@@ -164,7 +166,12 @@ function PDFView({onToggleKeyboard, onLoadComplete, fileName, onPress, isFocused
                     <PDF
                         fitPolicy={0}
                         trustAllCerts={false}
-                        renderActivityIndicator={() => <LoadingIndicator style={loadingIndicatorStyles} />}
+                        renderActivityIndicator={() => (
+                            <LoadingIndicator
+                                style={loadingIndicatorStyles}
+                                reasonAttributes={PDF_VIEW_REASON_ATTRIBUTES}
+                            />
+                        )}
                         source={{uri: sourceURL, cache: true, expiration: 864000}}
                         style={pdfStyles}
                         onError={handleFailureToLoadPDF}
