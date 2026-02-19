@@ -131,7 +131,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -962,8 +961,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Boekhouding`,
             },
             fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `Repareer de persoonlijke kaartverbinding van ${cardName}` : 'Repareer de persoonlijke kaartverbinding'),
-                subtitle: 'Portemonnee > Toegewezen kaarten',
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Verbinding van persoonlijke kaart ${cardName} herstellen` : 'Verbinding persoonlijke kaart herstellen'),
+                subtitle: 'Wallet > Toegewezen kaarten',
             },
         },
         announcements: 'Aankondigingen',
@@ -2082,10 +2081,10 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     personalCard: {
-        fixCard: 'Kaart repareren',
-        brokenConnection: 'De verbinding met uw netwerkkaart is verbroken.',
+        fixCard: 'Kaart herstellen',
+        brokenConnection: 'Je kaartkoppeling is verbroken.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `De verbinding met uw kaart ${cardName} is verbroken. <a href="${connectionLink}">Log in bij uw bank</a> om de kaart te herstellen.`,
+            `Je verbinding met de kaart ${cardName} is verbroken. <a href="${connectionLink}">Log in bij je bank</a> om de kaart te herstellen.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7719,23 +7718,23 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         reviewRequired: 'Beoordeling vereist',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Kan bon niet automatisch koppelen vanwege een verbroken bankverbinding';
+                return 'Bon kan automatisch aan bon koppelen vanwege verbroken bankverbinding';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'Automatische koppeling van ontvangstbewijs mislukt vanwege verbroken bankverbinding.';
+                    return 'Kan bon niet automatisch koppelen door een verbroken bankverbinding.';
                 }
                 return isMarkAsCash
-                    ? `Automatische koppeling van bon mislukt vanwege verbroken kaartverbinding. Markeer als contant om te negeren, of <a href="${connectionLink}">corrigeer de kaart</a> zodat deze overeenkomt met de bon.`
-                    : `Automatische koppeling van bon mislukt vanwege verbroken kaartverbinding. <a href="${connectionLink}">Corrigeer de kaart</a> zodat deze overeenkomt met de bon.`;
+                    ? `Kan bon niet automatisch koppelen vanwege een verbroken kaartverbinding. Markeer als contant om te negeren, of <a href="${connectionLink}">repareer de kaart</a> om de bon te koppelen.`
+                    : `Kan bon automatisch koppelen aan bon vanwege verbroken kaartverbinding. <a href="${connectionLink}">Herstel de kaart</a> om de bon te koppelen.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
-                    ? `Bankkoppeling verbroken. <a href="${companyCardPageURL}">Opnieuw verbinden om bon te matchen</a>`
-                    : 'Bankverbinding verbroken. Vraag een beheerder om opnieuw te verbinden om het met de bon te matchen.';
+                    ? `Bankkoppeling verbroken. <a href="${companyCardPageURL}">Opnieuw verbinden om bon te koppelen</a>`
+                    : 'Bankkoppeling verbroken. Vraag een beheerder om de verbinding opnieuw te maken om de bon te laten overeenkomen.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Vraag ${member} om het als contant te markeren of wacht 7 dagen en probeer het opnieuw` : 'In afwachting van samenvoeging met kaarttransactie.';
+                return isAdmin ? `Vraag ${member} om het als contant te markeren of wacht 7 dagen en probeer het opnieuw` : 'In afwachting van koppeling met kaarttransactie.';
             }
             return '';
         },

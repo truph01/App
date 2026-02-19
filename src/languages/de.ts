@@ -131,7 +131,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -964,7 +963,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Buchhaltung`,
             },
             fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `Fix ${cardName} personal card connection` : 'Fix personal card connection'),
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Verbindung der persönlichen Karte ${cardName} reparieren` : 'Verbindung der persönlichen Karte reparieren'),
                 subtitle: 'Wallet > Zugewiesene Karten',
             },
         },
@@ -2089,7 +2088,7 @@ const translations: TranslationDeepObject<typeof en> = {
     personalCard: {
         brokenConnection: 'Ihre Kartenverbindung ist unterbrochen.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `Die Verbindung zu Ihrer Karte ${cardName} ist unterbrochen. <a href="${connectionLink}">Melden Sie sich bei Ihrem Online-Banking an</a>, um die Karte zu reparieren.`,
+            `Die Verbindung Ihrer ${cardName}-Karte ist unterbrochen. <a href="${connectionLink}">Melden Sie sich bei Ihrer Bank an</a>, um die Karte zu reparieren.`,
         fixCard: 'Karte reparieren',
     },
     walletPage: {
@@ -7759,19 +7758,19 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'Die automatische Zuordnung des Belegs ist aufgrund einer unterbrochenen Bankverbindung nicht möglich.';
+                    return 'Beleg kann wegen einer unterbrochenen Bankverbindung nicht automatisch zugeordnet werden.';
                 }
                 return isMarkAsCash
-                    ? `Der Beleg kann aufgrund einer fehlerhaften Kartenverbindung nicht automatisch zugeordnet werden. Markieren Sie ihn als Bargeld, um ihn zu ignorieren, oder <a href="${connectionLink}">korrigieren Sie die Kartenverbindung</a>, damit er zum Beleg passt.`
-                    : `Der Beleg kann aufgrund einer fehlerhaften Kartenverbindung nicht automatisch zugeordnet werden. <a href="${connectionLink}">Korrigieren Sie die Kartenverbindung</a>, damit er zum Beleg passt.`;
+                    ? `Beleg kann wegen einer unterbrochenen Kartenverbindung nicht automatisch zugeordnet werden. Markiere ihn als Barzahlung, um ihn zu ignorieren, oder <a href="${connectionLink}">repariere die Karte</a>, um den Beleg zuzuordnen.`
+                    : `Quittung kann aufgrund einer unterbrochenen Kartenverbindung nicht automatisch zugeordnet werden. <a href="${connectionLink}">Karte reparieren</a>, um die Quittung zuzuordnen.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
-                    ? `Bankverbindung unterbrochen. <a href="${companyCardPageURL}">Erneut verbinden, um Beleg abzugleichen</a>`
-                    : 'Bankverbindung unterbrochen. Bitte eine:n Admin darum bitten, sie neu zu verbinden, um den Beleg abzugleichen.';
+                    ? `Bankverbindung unterbrochen. <a href="${companyCardPageURL}">Erneut verbinden, um Beleg zuzuordnen</a>`
+                    : 'Bankverbindung unterbrochen. Bitte eine:n Admin bitten, die Verbindung wiederherzustellen, um den Beleg abzugleichen.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Bitte ${member} darum, als Barzahlung zu markieren, oder warte 7 Tage und versuche es dann erneut` : 'Warten auf Abgleich mit Kartentransaktion.';
+                return isAdmin ? `Bitte ${member} darum, es als Barzahlung zu markieren, oder warte 7 Tage und versuche es dann erneut` : 'Wartet auf Abgleich mit Kartentransaktion.';
             }
             return '';
         },

@@ -131,7 +131,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -958,7 +957,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会計`,
             },
             fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `${cardName} 個人カード接続を修正` : '個人カード接続を修正'),
+                title: ({cardName}: {cardName?: string}) => (cardName ? `${cardName}個人カードの接続を修正` : '個人カードの連携を修正'),
                 subtitle: 'ウォレット > 割り当てられたカード',
             },
         },
@@ -2076,9 +2075,9 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     personalCard: {
         fixCard: 'カードを修正',
-        brokenConnection: 'カード接続が切断されました。',
+        brokenConnection: 'カード接続が切断されています。',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `${cardName} カードの接続が切断されました。<a href="${connectionLink}">銀行にログイン</a>してカードを修復してください。`,
+            `${cardName}カードとの接続が切れています。カードを修正するには、<a href="${connectionLink}">銀行にログイン</a>してください。`,
     },
     walletPage: {
         balance: '残高',
@@ -7665,23 +7664,23 @@ ${reportName}
         reviewRequired: '要レビュー',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return '銀行連携の不具合によりレシートを自動照合できません';
+                return '銀行連携の不具合により、領収書を自動照合できません';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return '銀行接続が切断されているため、領収書を自動照合できません。';
+                    return '銀行接続が壊れているため、領収書を自動照合できません。';
                 }
                 return isMarkAsCash
-                    ? `カード接続が切断されているため、レシートを自動照合できません。現金としてマークして無視するか、レシートと一致するように<a href="${connectionLink}">カードを修正</a>してください。`
-                    : `カード接続が切断されているため、レシートを自動照合できません。<a href="${connectionLink}">カードを修正</a>してください。`;
+                    ? `カード連携の不具合により領収書を自動照合できません。無視するには現金としてマークするか、<a href="${connectionLink}">カードを修正</a>して領収書と照合してください。`
+                    : `カード連携が壊れているため、領収書を自動照合できません。領収書を照合するには、<a href="${connectionLink}">カードの問題を解決</a>してください。`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
-                    ? `銀行接続が切断されました。<a href="${companyCardPageURL}">再接続してレシートと照合</a>`
-                    : '銀行連携が切断されています。管理者に依頼して再接続し、レシートとの照合を行ってください。';
+                    ? `銀行連携が切断されました。<a href="${companyCardPageURL}">レシートと照合するために再接続</a>`
+                    : '銀行連携が切断されています。管理者に依頼して再接続し、領収書と照合してください。';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `${member} に現金としてマークするよう依頼するか、7日待ってからもう一度お試しください` : 'カード取引との統合待ちです。';
+                return isAdmin ? `${member} に現金としてマークするよう依頼するか、7日待ってから再試行してください` : 'カード取引との照合待ちです。';
             }
             return '';
         },

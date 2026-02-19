@@ -131,7 +131,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -963,7 +962,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Contabilità`,
             },
             fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `Correggi la connessione della scheda personale ${cardName}` : 'Correggi la connessione della scheda personale'),
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Correggi la connessione della carta personale ${cardName}` : 'Correggi connessione carta personale'),
                 subtitle: 'Portafoglio > Carte assegnate',
             },
         },
@@ -2083,10 +2082,10 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     personalCard: {
-        fixCard: 'Correggi la carta',
-        brokenConnection: 'La connessione della tua scheda è interrotta.',
+        fixCard: 'Correggi carta',
+        brokenConnection: 'La connessione della tua carta è interrotta.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `La connessione alla tua carta ${cardName} è interrotta. <a href="${connectionLink}">Accedi alla tua banca</a> per riparare la carta.`,
+            `La connessione della tua carta ${cardName} non funziona. <a href="${connectionLink}">Accedi alla tua banca</a> per sistemare la carta.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7740,23 +7739,23 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
         reviewRequired: 'Revisione richiesta',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Impossibile abbinare automaticamente la ricevuta a causa di un collegamento bancario interrotto';
+                return 'Impossibile abbinare automaticamente la ricevuta a causa di un problema di connessione bancaria';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return "Impossibile abbinare automaticamente la ricevuta a causa dell'interruzione della connessione bancaria.";
+                    return 'Impossibile abbinare automaticamente la ricevuta a causa di un problema di connessione bancaria.';
                 }
                 return isMarkAsCash
-                    ? `Impossibile associare automaticamente la ricevuta a causa di una connessione interrotta con la carta. Contrassegna come contanti per ignorare o <a href="${connectionLink}">correggi la carta</a> per farla corrispondere alla ricevuta.`
-                    : `Impossibile associare automaticamente la ricevuta a causa di una connessione interrotta con la carta. <a href="${connectionLink}">Correggi la carta</a> per farla corrispondere alla ricevuta.`;
+                    ? `Impossibile abbinare automaticamente la ricevuta a causa di un problema di connessione della carta. Contrassegna come contanti per ignorare oppure <a href="${connectionLink}">sistema la carta</a> per abbinare la ricevuta.`
+                    : `Impossibile abbinare automaticamente la ricevuta a causa di un problema di connessione con la carta. <a href="${connectionLink}">Correggi la carta</a> per abbinarla alla ricevuta.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
                     ? `Connessione bancaria interrotta. <a href="${companyCardPageURL}">Riconnetti per abbinare la ricevuta</a>`
-                    : 'Collegamento bancario interrotto. Chiedi a un amministratore di ricollegarlo per abbinare la ricevuta.';
+                    : 'Connessione bancaria interrotta. Chiedi a un amministratore di riconnetterla per abbinare la ricevuta.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Chiedi a ${member} di contrassegnarla come contante oppure attendi 7 giorni e riprova` : 'In attesa di unione con la transazione della carta.';
+                return isAdmin ? `Chiedi a ${member} di contrassegnarla come contante oppure attendi 7 giorni e riprova` : 'In attesa di abbinamento con la transazione della carta.';
             }
             return '';
         },

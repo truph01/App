@@ -131,7 +131,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -942,10 +941,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 defaultSubtitle: '工作区 > 公司卡片',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 公司卡片`,
             },
-            fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `修复 ${cardName} 个人卡连接` : '修复个人卡连接'),
-                subtitle: '钱包 > 已分配卡片',
-            },
+            fixPersonalCardConnection: {title: ({cardName}: {cardName?: string}) => (cardName ? `修复 ${cardName} 个人卡连接` : '修复个人银行卡连接'), subtitle: '钱包 > 已分配的卡片'},
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`,
                 defaultSubtitle: '工作区 > 会计',
@@ -2052,9 +2048,9 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     personalCard: {
         fixCard: '修复卡片',
-        brokenConnection: '您的卡连接已断开。',
+        brokenConnection: '您的银行卡连接已断开。',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `您的 ${cardName} 卡连接已断开。<a href="${connectionLink}">登录您的银行</a> 以修复卡片。`,
+            `您的 ${cardName} 卡连接已中断。<a href="${connectionLink}">登录您的网上银行</a>以修复该卡。`,
     },
     walletPage: {
         balance: '余额',
@@ -7554,14 +7550,14 @@ ${reportName}
                     return '由于银行连接中断，无法自动匹配收据。';
                 }
                 return isMarkAsCash
-                    ? `由于卡片连接故障，无法自动匹配收据。请将其标记为现金以忽略，或<a href="${connectionLink}">修复卡片</a>以匹配收据。`
-                    : `由于卡片连接故障，无法自动匹配收据。<a href="${connectionLink}">修复卡片</a>以匹配收据。`;
+                    ? `由于银行卡连接异常，无法自动匹配收据。标记为现金以忽略，或<a href="${connectionLink}">修复银行卡</a>以匹配收据。`
+                    : `由于银行卡连接异常，无法自动匹配收据。请<a href="${connectionLink}">修复银行卡</a>以匹配该收据。`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
-                return isAdmin ? `银行连接已断开。<a href="${companyCardPageURL}">重新连接以匹配收据</a>` : '银行连接已中断。请联系管理员重新连接以匹配收据。';
+                return isAdmin ? `银行连接已断开。<a href="${companyCardPageURL}">重新连接以匹配收据</a>` : '银行连接已断开。请让管理员重新连接以匹配收据。';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `请让 ${member} 标记为现金，或等待 7 天后再试` : '正在等待与银行卡交易合并。';
+                return isAdmin ? `请让 ${member} 将其标记为现金，或等待 7 天后再试` : '正在等待与信用卡交易合并。';
             }
             return '';
         },

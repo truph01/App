@@ -131,7 +131,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -963,7 +962,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Księgowość`,
             },
             fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `Napraw połączenie karty osobistej ${cardName}` : 'Napraw połączenie karty osobistej'),
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Napraw połączenie z prywatną kartą ${cardName}` : 'Napraw połączenie karty prywatnej'),
                 subtitle: 'Portfel > Przypisane karty',
             },
         },
@@ -2081,10 +2080,10 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     personalCard: {
-        fixCard: 'Karta Fix',
-        brokenConnection: 'Połączenie z Twoją kartą jest zerwane.',
+        fixCard: 'Napraw kartę',
+        brokenConnection: 'Połączenie Twojej karty jest przerwane.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `Połączenie z Twoją kartą ${cardName} jest zerwane. <a href="${connectionLink}">Zaloguj się do swojego banku</a>, aby naprawić kartę.`,
+            `Połączenie Twojej karty ${cardName} jest przerwane. <a href="${connectionLink}">Zaloguj się do swojego banku</a>, aby naprawić kartę.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7707,23 +7706,23 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
         reviewRequired: 'Wymagana weryfikacja',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Nie można automatycznie dopasować paragonu z powodu przerwanego połączenia z bankiem';
+                return 'Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z bankiem';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia bankowego.';
+                    return 'Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z bankiem.';
                 }
                 return isMarkAsCash
-                    ? `Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z kartą. Oznacz jako gotówkę, aby zignorować, lub <a href="${connectionLink}">napraw kartę</a>, aby dopasować ją do paragonu.`
-                    : `Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z kartą. <a href="${connectionLink}">Napraw kartę</a>, aby dopasować ją do paragonu.`;
+                    ? `Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z kartą. Oznacz jako gotówkę, aby zignorować, lub <a href="${connectionLink}">napraw kartę</a>, aby dopasować paragon.`
+                    : `Nie można automatycznie dopasować paragonu z powodu przerwanego połączenia karty. <a href="${connectionLink}">Napraw kartę</a>, aby dopasować paragon.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
                     ? `Połączenie z bankiem przerwane. <a href="${companyCardPageURL}">Połącz ponownie, aby dopasować paragon</a>`
-                    : 'Połączenie z bankiem zostało zerwane. Poproś administratora o ponowne połączenie, aby dopasować paragon.';
+                    : 'Połączenie z bankiem zostało przerwane. Poproś administratora o ponowne połączenie, aby dopasować paragon.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Poproś ${member}, aby oznaczył to jako gotówkę lub poczekaj 7 dni i spróbuj ponownie` : 'Oczekuje na połączenie z transakcją kartową.';
+                return isAdmin ? `Poproś ${member}, aby oznaczył to jako gotówkę, albo poczekaj 7 dni i spróbuj ponownie` : 'Oczekiwanie na połączenie z transakcją kartową.';
             }
             return '';
         },
