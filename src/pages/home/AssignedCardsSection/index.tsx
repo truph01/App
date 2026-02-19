@@ -12,7 +12,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getAssignedCardSortKey, getCardDescription, hasDisplayableAssignedCards, isExpensifyCard} from '@libs/CardUtils';
+import {filterAllInactiveCards, getAssignedCardSortKey, getCardDescription, hasDisplayableAssignedCards, isExpensifyCard} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
 import getButtonState from '@libs/getButtonState';
 import Navigation from '@libs/Navigation/Navigation';
@@ -20,7 +20,43 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import type {Card, CardList} from '@src/types/onyx';
 import RemainingLimitCircle from './RemainingLimitCircle';
+
+/**
+ * Gets displayable Expensify cards, filtering out inactive cards and grouping combo cards
+ * (physical + virtual pairs) so only the physical card is shown per domain.
+ */
+function getDisplayableExpensifyCards(cardList: CardList | undefined): Card[] {
+    if (!hasDisplayableAssignedCards(cardList)) {
+        return [];
+    }
+
+    const activeCards = filterAllInactiveCards(cardList);
+    const activeExpensifyCards = Object.values(activeCards).filter((card) => isExpensifyCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH);
+
+    const sortedCards = [...activeExpensifyCards].sort(getAssignedCardSortKey);
+    const seenDomains = new Set<string>();
+
+    return sortedCards.filter((card) => {
+        const isAdminIssuedVirtualCard = !!card.nameValuePairs?.issuedBy && !!card.nameValuePairs?.isVirtual;
+        const isTravelCard = !!card.nameValuePairs?.isVirtual && !!card.nameValuePairs?.isTravelCard;
+        const isComboCard = !!card.domainName && !isAdminIssuedVirtualCard && !isTravelCard;
+
+        // Always show non-combo cards (admin-issued virtual, travel cards, or cards without domain)
+        if (!isComboCard) {
+            return true;
+        }
+
+        // For combo cards, only show the first one per domain (physical card comes first due to sorting)
+        if (seenDomains.has(card.domainName)) {
+            return false;
+        }
+
+        seenDomains.add(card.domainName);
+        return true;
+    });
+}
 
 function AssignedCardsSection() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -31,37 +67,7 @@ function AssignedCardsSection() {
     const {currencyList} = useCurrencyListState();
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
-    const displayableCards = useMemo(() => {
-        if (!hasDisplayableAssignedCards(cardList)) {
-            return [];
-        }
-
-        const activeExpensifyCards = Object.values(cardList ?? {}).filter(
-            (card) => CONST.EXPENSIFY_CARD.ACTIVE_STATES.includes(card.state ?? 0) && isExpensifyCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH,
-        );
-
-        const sortedCards = [...activeExpensifyCards].sort(getAssignedCardSortKey);
-        const seenDomains = new Set<string>();
-
-        return sortedCards.filter((card) => {
-            const isAdminIssuedVirtualCard = !!card.nameValuePairs?.issuedBy && !!card.nameValuePairs?.isVirtual;
-            const isTravelCard = !!card.nameValuePairs?.isVirtual && !!card.nameValuePairs?.isTravelCard;
-            const isComboCard = !!card.domainName && !isAdminIssuedVirtualCard && !isTravelCard;
-
-            // Always show non-combo cards (admin-issued virtual, travel cards, or cards without domain)
-            if (!isComboCard) {
-                return true;
-            }
-
-            // For combo cards, only show the first one per domain (physical card comes first due to sorting)
-            if (seenDomains.has(card.domainName)) {
-                return false;
-            }
-
-            seenDomains.add(card.domainName);
-            return true;
-        });
-    }, [cardList]);
+    const displayableCards = useMemo(() => getDisplayableExpensifyCards(cardList), [cardList]);
 
     if (displayableCards.length === 0) {
         return null;
@@ -74,7 +80,7 @@ function AssignedCardsSection() {
         >
             {displayableCards.map((card) => {
                 const customTitle = card.nameValuePairs?.cardTitle;
-                const description = customTitle && card.lastFourPAN ? `${customTitle} ${card.lastFourPAN}` : (customTitle ?? getCardDescription(card, translate));
+                const description = customTitle && card.lastFourPAN ? `${customTitle} - ${card.lastFourPAN}` : (customTitle ?? getCardDescription(card, translate));
                 const currency = getCurrencyKeyByCountryCode(currencyList, card.nameValuePairs?.country ?? card.nameValuePairs?.feedCountry);
                 const formattedAvailableSpend = convertToDisplayString(card.availableSpend, currency);
                 const title = translate('homePage.assignedCardsRemaining', {amount: formattedAvailableSpend});
