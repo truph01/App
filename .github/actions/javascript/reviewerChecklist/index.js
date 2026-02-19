@@ -11697,8 +11697,8 @@ const CONST = {
     },
     COMMENT: {
         TYPE_BOT: 'Bot',
-        NAME_MELVIN_A: 'melvin-bot',
-        NAME_MELVIN_B: 'MelvinBot',
+        NAME_MELVIN_BOT: 'melvin-bot',
+        NAME_MELVIN_USER: 'MelvinBot',
         NAME_CODEX: 'chatgpt-codex-connector',
         NAME_GITHUB_ACTIONS: 'github-actions',
     },

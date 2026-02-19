@@ -47,7 +47,7 @@ function getIsBotAuthor(user: {login?: string; type?: string} | null | undefined
         return false;
     }
 
-    const knownBotLogins: string[] = [CONST.COMMENT.NAME_MELVIN_A, CONST.COMMENT.NAME_MELVIN_B, CONST.COMMENT.NAME_CODEX, CONST.COMMENT.NAME_GITHUB_ACTIONS];
+    const knownBotLogins: string[] = [CONST.COMMENT.NAME_MELVIN_BOT, CONST.COMMENT.NAME_MELVIN_USER, CONST.COMMENT.NAME_CODEX, CONST.COMMENT.NAME_GITHUB_ACTIONS];
 
     const isBotType = user.type === CONST.COMMENT.TYPE_BOT;
     const isKnownLogin = knownBotLogins.includes(user.login ?? '');

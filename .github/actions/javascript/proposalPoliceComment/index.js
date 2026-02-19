@@ -11613,7 +11613,7 @@ function getIsBotAuthor(user) {
     if (!user) {
         return false;
     }
-    const knownBotLogins = [CONST_1.default.COMMENT.NAME_MELVIN_A, CONST_1.default.COMMENT.NAME_MELVIN_B, CONST_1.default.COMMENT.NAME_CODEX, CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS];
+    const knownBotLogins = [CONST_1.default.COMMENT.NAME_MELVIN_BOT, CONST_1.default.COMMENT.NAME_MELVIN_USER, CONST_1.default.COMMENT.NAME_CODEX, CONST_1.default.COMMENT.NAME_GITHUB_ACTIONS];
     const isBotType = user.type === CONST_1.default.COMMENT.TYPE_BOT;
     const isKnownLogin = knownBotLogins.includes(user.login ?? '');
     return isBotType || isKnownLogin;
@@ -11894,8 +11894,8 @@ const CONST = {
     },
     COMMENT: {
         TYPE_BOT: 'Bot',
-        NAME_MELVIN_A: 'melvin-bot',
-        NAME_MELVIN_B: 'MelvinBot',
+        NAME_MELVIN_BOT: 'melvin-bot',
+        NAME_MELVIN_USER: 'MelvinBot',
         NAME_CODEX: 'chatgpt-codex-connector',
         NAME_GITHUB_ACTIONS: 'github-actions',
     },
