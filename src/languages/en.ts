@@ -5498,7 +5498,10 @@ const translations = {
             welcomeNote: 'Please start using my new workspace',
             delayedSubmission: 'delayed submission',
             merchantRules: 'Merchant rules',
-            merchantRulesCount: ({count}: {count: number}) => `${count} merchant ${count === 1 ? 'rule' : 'rules'}`,
+            merchantRulesCount: () => ({
+                one: '1 merchant rule',
+                other: (count: number) => `${count} merchant rules`,
+            }),
             confirmTitle: ({newWorkspaceName, totalMembers}: {newWorkspaceName?: string; totalMembers?: number}) =>
                 `You’re about to create and share ${newWorkspaceName ?? ''} with ${totalMembers ?? 0} members from the original workspace.`,
             error: 'An error occurred while duplicating your new workspace. Please try again.',

@@ -5541,7 +5541,10 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             welcomeNote: 'Bitte verwende meinen neuen Arbeitsbereich',
             delayedSubmission: 'verspätete Einreichung',
             merchantRules: 'Händlerregeln',
-            merchantRulesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'Händlerregel' : 'Händlerregeln'}`,
+            merchantRulesCount: () => ({
+                one: '1 Händlerregel',
+                other: (count: number) => `${count} Händlerregeln`,
+            }),
             confirmTitle: ({newWorkspaceName, totalMembers}: {newWorkspaceName?: string; totalMembers?: number}) =>
                 `Sie sind dabei, ${newWorkspaceName ?? ''} mit ${totalMembers ?? 0} Mitgliedern aus dem ursprünglichen Workspace zu erstellen und zu teilen.`,
             error: 'Beim Duplizieren deines neuen Workspace ist ein Fehler aufgetreten. Bitte versuche es erneut.',
