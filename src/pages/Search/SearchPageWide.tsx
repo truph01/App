@@ -46,6 +46,7 @@ type SearchPageWideProps = {
     initScanRequest: (e: DragEvent) => void;
     PDFValidationComponent: React.ReactNode;
     ErrorModal: React.ReactNode;
+    isDragDisabled: boolean;
     shouldShowFooter: boolean;
 };
 
@@ -67,6 +68,7 @@ function SearchPageWide({
     initScanRequest,
     PDFValidationComponent,
     ErrorModal,
+    isDragDisabled,
     shouldShowFooter,
 }: SearchPageWideProps) {
     const styles = useThemeStyles();
@@ -99,7 +101,7 @@ function SearchPageWide({
                     shouldShowLink={false}
                 >
                     {!!queryJSON && (
-                        <DragAndDropProvider>
+                        <DragAndDropProvider isDisabled={isDragDisabled}>
                             {PDFValidationComponent}
                             <SearchPageHeader
                                 queryJSON={queryJSON}

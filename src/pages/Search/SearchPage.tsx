@@ -1113,7 +1113,7 @@ function SearchPage({route}: SearchPageProps) {
         personalPolicyID,
     ]);
 
-    const {initScanRequest, PDFValidationComponent, ErrorModal} = useReceiptScanDrop();
+    const {initScanRequest, PDFValidationComponent, ErrorModal, isDragDisabled} = useReceiptScanDrop();
 
     const {resetVideoPlayerData} = usePlaybackActionsContext();
 
@@ -1231,7 +1231,7 @@ function SearchPage({route}: SearchPageProps) {
         <>
             <Animated.View style={[styles.flex1]}>
                 {shouldUseNarrowLayout ? (
-                    <DragAndDropProvider>
+                    <DragAndDropProvider isDisabled={isDragDisabled}>
                         {PDFValidationComponent}
                         <SearchPageNarrow
                             queryJSON={queryJSON}
@@ -1277,6 +1277,7 @@ function SearchPage({route}: SearchPageProps) {
                         initScanRequest={initScanRequest}
                         PDFValidationComponent={PDFValidationComponent}
                         ErrorModal={ErrorModal}
+                        isDragDisabled={isDragDisabled}
                         shouldShowFooter={shouldShowFooter}
                     />
                 )}
