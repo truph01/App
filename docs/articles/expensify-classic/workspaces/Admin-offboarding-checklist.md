@@ -92,7 +92,7 @@ If you’re the new Workspace Admin, make sure reimbursements continue without i
 2. Confirm that the correct bank account is selected as the **reimbursement account**.
 3. If **Direct** reimbursement is used and the former admin is listed as the **Reimburser**, assign a new Workspace Admin.
 
-![Insert alt text for accessibility here]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_01.png){:width="100%"}
+![Payments section showing account and member selection]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_01.png){:width="100%"}
 
 ---
 
@@ -120,7 +120,7 @@ If they’re leaving entirely, remove them completely.
      - Check the box next to their name.
      - Click **Close Accounts**, then **Confirm**.
     
-![Insert alt text for accessibility here]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_02.png){:width="100%"}
+![Domains section showing Close Account button]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_02.png){:width="100%"}
 
 ---
 
