@@ -324,7 +324,7 @@ function WorkspaceInviteMessageComponent({
                             shouldSaveDraft
                         />
                         <PressableWithoutFeedback
-                            sentryLabel="WorkspaceInviteMessage-PrivacyLink"
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.INVITE_MESSAGE_PRIVACY_LINK}
                             onPress={openPrivacyURL}
                             role={CONST.ROLE.LINK}
                             accessibilityLabel={translate('common.privacy')}

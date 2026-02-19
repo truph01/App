@@ -187,6 +187,7 @@ const translations: TranslationDeepObject<typeof en> = {
         workspaces: 'Area di lavoro',
         home: 'Home',
         inbox: 'Posta in arrivo',
+        yourReviewIsRequired: 'È richiesta la tua revisione',
         success: 'Operazione riuscita',
         group: 'Gruppo',
         profile: 'Profilo',
@@ -5111,6 +5112,11 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Prenotazione viaggi',
+                        subtitle: 'Complimenti! Ora sei prontə per prenotare e gestire i viaggi in questo spazio di lavoro.',
+                        manageTravelLabel: 'Gestisci viaggi',
+                    },
                     centralInvoicingSection: {
                         title: 'Fatturazione centralizzata',
                         subtitle: 'Centralizza tutte le spese di viaggio in una fattura mensile invece di pagare al momento dell’acquisto.',
@@ -5124,6 +5130,16 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                             settlementFrequencyDescription:
                                 'Con quale frequenza Expensify preleverà dal tuo conto bancario aziendale per saldare le recenti transazioni di Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Disattivare la fatturazione viaggi?',
+                        body: 'Le prossime prenotazioni di hotel e autonoleggio potrebbero dover essere rifatte con un diverso metodo di pagamento per evitare la cancellazione.',
+                        confirm: 'Disattiva',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Impossibile disattivare la fatturazione viaggi',
+                        body: 'Hai ancora un saldo di viaggio in sospeso. Paga prima il tuo saldo.',
+                        confirm: 'Capito',
                     },
                 },
             },
