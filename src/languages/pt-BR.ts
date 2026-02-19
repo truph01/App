@@ -6376,8 +6376,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
                 matchTypeContains: 'Contém',
                 matchTypeExact: 'Corresponde exatamente',
                 duplicateRuleTitle: 'Já existe uma regra semelhante para este comerciante',
-                duplicateRulePrompt: (merchantName: string) =>
-                    `Você quer salvar uma nova regra para “${merchantName}” mesmo já tendo uma existente? Apenas a regra correspondente mais antiga será aplicada.`,
+                duplicateRulePrompt: (merchantName: string) => `Sua regra existente para "${merchantName}" terá prioridade sobre esta. Salvar mesmo assim?`,
                 saveAnyway: 'Salvar mesmo assim',
                 applyToExistingUnsubmittedExpenses: 'Aplicar às despesas existentes não enviadas',
             },
