@@ -14,6 +14,7 @@ const DOMAIN_TO_RHP: Partial<Record<keyof DomainSplitNavigatorParamList, string[
         SCREENS.DOMAIN.MEMBER_FORCE_TWO_FACTOR_AUTH,
         SCREENS.DOMAIN.MEMBER_RESET_TWO_FACTOR_AUTH,
     ],
+    [SCREENS.DOMAIN.GROUPS]: [],
 };
 
 export default DOMAIN_TO_RHP;
