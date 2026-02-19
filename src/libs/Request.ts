@@ -76,23 +76,17 @@ function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isF
                     [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
                 },
             });
-            const endSpanOk = () => {
-                mwSpan.setStatus({code: 1});
-                mwSpan.end();
-            };
-            const endSpanErr = (error: unknown) => {
-                mwSpan.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
-                mwSpan.end();
-            };
 
             const result = middleware(last, request, isFromSequentialQueue) ?? last;
             return result
                 .then((data) => {
-                    endSpanOk();
+                    mwSpan.setStatus({code: 1});
+                    mwSpan.end();
                     return data;
                 })
                 .catch((error: unknown) => {
-                    endSpanErr(error);
+                    mwSpan.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                    mwSpan.end();
                     throw error;
                 });
         }, xhrPromise)
