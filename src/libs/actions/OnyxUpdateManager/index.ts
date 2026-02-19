@@ -201,12 +201,20 @@ function handleMissingOnyxUpdates<TKey extends OnyxKey>(onyxUpdatesFromServer: O
     const shouldFinalizeAndResume = checkIfClientNeedsToBeUpdated();
 
     if (shouldFinalizeAndResume) {
-        return getMissingOnyxUpdatesQueryPromise()
-            ?.finally(finalizeUpdatesAndResumeQueue)
-            .finally(() => {
-                span.setStatus({code: 1});
-                span.end();
-            }) as Promise<void>;
+        const promise = getMissingOnyxUpdatesQueryPromise();
+        if (promise) {
+            return promise
+                .finally(finalizeUpdatesAndResumeQueue)
+                .then(() => {
+                    span.setStatus({code: 1});
+                    span.end();
+                })
+                .catch((error: unknown) => {
+                    span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                    span.end();
+                    throw error;
+                });
+        }
     }
 
     span.setStatus({code: 1});
