@@ -108,7 +108,7 @@ function mapTransactionItemToSelectedEntry(
     allowNegativeAmount = true,
 ): [string, SelectedTransactionInfo] {
     const {canHoldRequest, canUnholdRequest} = canHoldUnholdReportAction(item.report, item.reportAction, item.holdReportAction, item, item.policy);
-    const canRejectRequest = item.report ? canRejectReportAction(currentUserLogin, item.report, item.policy) : false;
+    const canRejectRequest = item.report ? canRejectReportAction(currentUserLogin, item.report) : false;
     const amount = hasValidModifiedAmount(item) ? Number(item.modifiedAmount) : item.amount;
 
     return [
@@ -639,7 +639,7 @@ function Search({
                         transactionItem,
                         transactionItem.policy,
                     );
-                    const canRejectRequest = email && transactionItem.report ? canRejectReportAction(email, transactionItem.report, transactionItem.policy) : false;
+                    const canRejectRequest = email && transactionItem.report ? canRejectReportAction(email, transactionItem.report) : false;
 
                     const itemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`] as OnyxEntry<Transaction>;
                     const originalItemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`];
@@ -695,7 +695,7 @@ function Search({
                     transactionItem,
                     transactionItem.policy,
                 );
-                const canRejectRequest = email && transactionItem.report ? canRejectReportAction(email, transactionItem.report, transactionItem.policy) : false;
+                const canRejectRequest = email && transactionItem.report ? canRejectReportAction(email, transactionItem.report) : false;
 
                 const itemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionItem.transactionID}`] as OnyxEntry<Transaction>;
                 const originalItemTransaction = searchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${itemTransaction?.comment?.originalTransactionID}`];
