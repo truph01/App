@@ -61,7 +61,8 @@ import {
     isReportOutstanding,
     isSelectedManagerMcTest,
 } from '@libs/ReportUtils';
-import {cancelSpan, endSpan, startSpan} from '@libs/telemetry/activeSpans';
+import {endSpan, startSpan} from '@libs/telemetry/activeSpans';
+import getSubmitExpenseScenario from '@libs/telemetry/getSubmitExpenseScenario';
 import markSubmitExpenseEnd from '@libs/telemetry/markSubmitExpenseEnd';
 import {
     getAttendees,
@@ -324,16 +325,6 @@ function IOURequestStepConfirmation({
     useEffect(() => {
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
         Performance.markEnd(CONST.TIMING.OPEN_CREATE_EXPENSE_APPROVE);
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            // Cancel submit expense span if user abandons the confirmation page without submitting
-            if (formHasBeenSubmitted.current) {
-                return;
-            }
-            cancelSpan(CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE);
-        };
     }, []);
 
     useEffect(() => {
@@ -988,31 +979,20 @@ function IOURequestStepConfirmation({
 
             formHasBeenSubmitted.current = true;
 
-            // Determine scenario for telemetry before branching
             const hasReceiptFiles = Object.values(receiptFiles).some((receipt) => !!receipt);
             const isFromGlobalCreate = transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton ?? false;
 
-            const {SUBMIT_EXPENSE_SCENARIO} = CONST.TELEMETRY;
-            let scenario: string = SUBMIT_EXPENSE_SCENARIO.REQUEST_MONEY_MANUAL;
-            if (iouType !== CONST.IOU.TYPE.TRACK && isDistanceRequest && !isMovingTransactionFromTrackExpense && !isUnreported) {
-                scenario = SUBMIT_EXPENSE_SCENARIO.DISTANCE;
-            } else if (iouType === CONST.IOU.TYPE.SPLIT) {
-                if (hasReceiptFiles) {
-                    scenario = SUBMIT_EXPENSE_SCENARIO.SPLIT_RECEIPT;
-                } else if (isFromGlobalCreate) {
-                    scenario = SUBMIT_EXPENSE_SCENARIO.SPLIT_GLOBAL;
-                } else {
-                    scenario = SUBMIT_EXPENSE_SCENARIO.SPLIT;
-                }
-            } else if (iouType === CONST.IOU.TYPE.INVOICE) {
-                scenario = SUBMIT_EXPENSE_SCENARIO.INVOICE;
-            } else if (iouType === CONST.IOU.TYPE.TRACK || isCategorizingTrackExpense || isSharingTrackExpense) {
-                scenario = SUBMIT_EXPENSE_SCENARIO.TRACK_EXPENSE;
-            } else if (isPerDiemRequest) {
-                scenario = SUBMIT_EXPENSE_SCENARIO.PER_DIEM;
-            } else if (hasReceiptFiles) {
-                scenario = SUBMIT_EXPENSE_SCENARIO.REQUEST_MONEY_SCAN;
-            }
+            const scenario = getSubmitExpenseScenario({
+                iouType,
+                isDistanceRequest,
+                isMovingTransactionFromTrackExpense,
+                isUnreported,
+                isCategorizingTrackExpense,
+                isSharingTrackExpense,
+                isPerDiemRequest,
+                isFromGlobalCreate,
+                hasReceiptFiles,
+            });
 
             Performance.markStart(CONST.TIMING.SUBMIT_EXPENSE);
             startSpan(CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE, {
@@ -1029,6 +1009,7 @@ function IOURequestStepConfirmation({
 
             // IMPORTANT: Every branch below must call markSubmitExpenseEnd() after dispatching the expense action.
             // This ensures the telemetry span started above is always closed, including inside async getCurrentPosition callbacks.
+            // If missed, the impact is benign (an orphaned Sentry span), but it pollutes telemetry data.
             if (iouType !== CONST.IOU.TYPE.TRACK && isDistanceRequest && !isMovingTransactionFromTrackExpense && !isUnreported) {
                 createDistanceRequest(iouType === CONST.IOU.TYPE.SPLIT ? splitParticipants : selectedParticipants, trimmedComment);
                 markSubmitExpenseEnd();
