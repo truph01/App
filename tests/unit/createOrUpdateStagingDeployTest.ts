@@ -917,8 +917,8 @@ describe('createOrUpdateStagingDeployCash', () => {
                     `${lineBreak}${closedCheckbox}${basePRList.at(6)}` +
                     `${lineBreak}${openCheckbox}${basePRList.at(7)}${lineBreak}` +
                     `${lineBreakDouble}${deployerVerificationsHeader}` +
-                    `${lineBreak}${closedCheckbox}${firebaseVerificationCurrentRelease}` +
-                    `${lineBreak}${closedCheckbox}${firebaseVerificationPreviousRelease}` +
+                    `${lineBreak}${closedCheckbox}${sentryVerificationCurrentRelease('1.0.2-1')}` +
+                    `${lineBreak}${closedCheckbox}${sentryVerificationPreviousRelease('1.0.1-0')}` +
                     `${lineBreak}${closedCheckbox}${ghVerification}` +
                     `${lineBreakDouble}${ccApplauseLeads}`,
                 state: 'open',

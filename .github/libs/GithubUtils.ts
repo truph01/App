@@ -33,6 +33,7 @@ type CommitType = {
     commit: string;
     subject: string;
     authorName: string;
+    date: string;
 };
 
 type StagingDeployCashPR = {
@@ -577,6 +578,22 @@ class GithubUtils {
         });
     }
 
+    static async getWorkflowRunURLForCommit(commitSha: string, workflowFile: string): Promise<string | undefined> {
+        try {
+            const response = await this.octokit.actions.listWorkflowRuns({
+                owner: CONST.GITHUB_OWNER,
+                repo: CONST.APP_REPO,
+                workflow_id: workflowFile,
+                head_sha: commitSha,
+                per_page: 1,
+            });
+            return response.data.workflow_runs.at(0)?.html_url;
+        } catch (error) {
+            console.warn(`Failed to find workflow run for commit ${commitSha}:`, error);
+            return undefined;
+        }
+    }
+
     /**
      * Generate the URL of an New Expensify pull request given the PR number.
      */
@@ -754,6 +771,7 @@ class GithubUtils {
                     commit: commit.sha,
                     subject: commit.commit.message,
                     authorName: commit.commit.author?.name ?? 'Unknown',
+                    date: commit.commit.committer?.date ?? '',
                 }),
             );
         } catch (error) {
