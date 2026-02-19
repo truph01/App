@@ -273,7 +273,7 @@ function WorkspaceInviteMessageComponent({
                                     numberOfLinesTitle={2}
                                     shouldShowRightIcon
                                     onPress={() => {
-                                        Navigation.goBack(backTo);
+                                        Navigation.navigate(ROUTES.WORKSPACE_INVITE.getRoute(policyID, Navigation.getActiveRoute()));
                                     }}
                                 />
                             )}
