@@ -254,7 +254,7 @@ API.write('SomeCommand', params, {optimisticData, successData, failureData});
 
 - `@../react-native-onyx/README.md` - Full Onyx API reference (initialization, merge/set/connect, collections, loading state, cache eviction, Redux DevTools, benchmarks)
 - `@contributingGuides/philosophies/OFFLINE.md` - Full offline UX patterns, decision flowchart, and when to use each pattern (A/B/C/D)
-- `/src/ONYXKEYS.ts` - All Onyx key definitions
-- `/src/libs/actions/` - Action files that update Onyx
-- `/src/hooks/useOnyx.ts` - useOnyx hook implementation
-- `/src/types/onyx/` - TypeScript types for Onyx data
+- `@./src/ONYXKEYS.ts` - All Onyx key definitions
+- `@./src/libs/actions/` - Action files that update Onyx
+- `@./src/hooks/useOnyx.ts` - useOnyx hook implementation
+- `@./src/types/onyx/` - TypeScript types for Onyx data
