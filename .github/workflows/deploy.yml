@@ -86,7 +86,7 @@ jobs:
   androidBuild:
     name: Build Android HybridApp
     needs: prep
-    runs-on: blacksmith-16vcpu-ubuntu-2404
+    runs-on: blacksmith-32vcpu-ubuntu-2404
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     outputs:
       VERSION_CODE: ${{ steps.getAndroidVersion.outputs.VERSION_CODE }}
@@ -739,7 +739,7 @@ jobs:
   web:
     name: Build and deploy Web
     needs: prep
-    runs-on: blacksmith-16vcpu-ubuntu-2404
+    runs-on: blacksmith-32vcpu-ubuntu-2404
     steps:
       - name: Checkout
         # v6
