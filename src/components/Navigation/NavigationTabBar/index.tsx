@@ -77,7 +77,12 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
 
     const shouldRenderDebugTabViewOnWideLayout = !!isDebugModeEnabled && !isTopLevelBar;
 
-    const inboxStatusIndicatorColor = chatTabBrickRoad ? (chatTabBrickRoad === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO ? theme.iconSuccessFill : theme.danger) : undefined;
+    let inboxStatusIndicatorColor: string | undefined;
+    if (chatTabBrickRoad === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO) {
+        inboxStatusIndicatorColor = theme.iconSuccessFill;
+    } else if (chatTabBrickRoad) {
+        inboxStatusIndicatorColor = theme.danger;
+    }
 
     const inboxAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.INBOX};
 
