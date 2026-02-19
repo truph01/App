@@ -56,7 +56,7 @@ Once duplication is complete:
 ## Does duplicating a workspace copy approval workflows?
 Yes. If you select **Workflows** when duplicating, all approval steps and settings from the original workspace will carry over.
 
-## Can I change what’s copied after duplication?
+## Can I change which workspace settings are copied after duplication?
 No. Once the new workspace is created, you’ll need to manually adjust any settings you didn’t include during duplication.
 
 ## Does duplicating a workspace affect the original one?
