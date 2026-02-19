@@ -245,7 +245,7 @@ describe('actions/Domain', () => {
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_DOMAIN_MEMBER,
-                {domain: domainName, targetEmail, overrideProcessingReports: false},
+                {domain: domainName, domainAccountID, targetEmail, overrideProcessingReports: false},
                 {
                     optimisticData: expect.arrayContaining([
                         expect.objectContaining({
