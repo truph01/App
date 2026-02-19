@@ -45,7 +45,7 @@ addMiddleware(HandleUnusedOptimisticID, 'HandleUnusedOptimisticID');
 addMiddleware(Pagination, 'Pagination');
 
 // SentryServerTiming - Tracks server round-trip time for configured command groups via Sentry spans.
-addMiddleware(SentryServerTiming);
+addMiddleware(SentryServerTiming, 'SentryServerTiming');
 
 // SaveResponseInOnyx - Merges either the successData or failureData (or finallyData, if included in place of the former two values) into Onyx depending on if the call was successful or not. This needs to be the LAST middleware we use, don't add any
 // middlewares after this, because the SequentialQueue depends on the result of this middleware to pause the queue (if needed) to bring the app to an up-to-date state.
