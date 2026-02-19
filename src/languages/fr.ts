@@ -435,6 +435,7 @@ const translations: TranslationDeepObject<typeof en> = {
         reportID: 'ID de note de frais',
         longReportID: 'ID de note de frais longue',
         withdrawalID: 'ID de retrait',
+        withdrawalStatus: 'Statut de retrait',
         bankAccounts: 'Comptes bancaires',
         chooseFile: 'Choisir un fichier',
         chooseFiles: 'Choisir des fichiers',

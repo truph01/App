@@ -7,6 +7,7 @@ import type {AnyRequestMatcher, EnablePolicyFeatureCommand} from '@libs/actions/
 import Log from '@libs/Log';
 import {handleDeletedAccount, HandleUnusedOptimisticID, Logging, Pagination, Reauthentication, RecheckConnection, SaveResponseInOnyx, SupportalPermission} from '@libs/Middleware';
 import FraudMonitoring from '@libs/Middleware/FraudMonitoring';
+import SentryServerTiming from '@libs/Middleware/SentryServerTiming';
 import {isOffline} from '@libs/Network/NetworkStore';
 import {push as pushToSequentialQueue, waitForIdle as waitForSequentialQueueIdle} from '@libs/Network/SequentialQueue';
 import Pusher from '@libs/Pusher';
@@ -42,6 +43,9 @@ addMiddleware(SupportalPermission, 'SupportalPermission');
 addMiddleware(HandleUnusedOptimisticID, 'HandleUnusedOptimisticID');
 
 addMiddleware(Pagination, 'Pagination');
+
+// SentryServerTiming - Tracks server round-trip time for configured command groups via Sentry spans.
+addMiddleware(SentryServerTiming);
 
 // SaveResponseInOnyx - Merges either the successData or failureData (or finallyData, if included in place of the former two values) into Onyx depending on if the call was successful or not. This needs to be the LAST middleware we use, don't add any
 // middlewares after this, because the SequentialQueue depends on the result of this middleware to pause the queue (if needed) to bring the app to an up-to-date state.
