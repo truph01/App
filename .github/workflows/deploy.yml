@@ -21,6 +21,8 @@ jobs:
       IS_CHERRY_PICK: ${{ steps.isCherryPick.outputs.IS_CHERRY_PICK }}
       # Should we build native apps? (only on staging or cherry-pick, not production)
       SHOULD_BUILD_NATIVE: ${{ github.ref == 'refs/heads/staging' || fromJSON(steps.isCherryPick.outputs.IS_CHERRY_PICK) }}
+      VERSION_CODE: ${{ steps.getAndroidVersion.outputs.VERSION_CODE }}
+      IOS_VERSION: ${{ steps.getIOSVersion.outputs.IOS_VERSION }}
     steps:
       - name: Checkout
         # v6
@@ -74,6 +76,14 @@ jobs:
                 'IS_CHERRY_PICK',
                 isCherryPick,
             );
+
+      - name: Get Android native version
+        id: getAndroidVersion
+        run: echo "VERSION_CODE=$(grep -oP 'android:versionCode="\K[0-9]+' Mobile-Expensify/Android/AndroidManifest.xml)" >> "$GITHUB_OUTPUT"
+
+      - name: Get iOS native version
+        id: getIOSVersion
+        run: echo "IOS_VERSION=$(echo '${{ steps.getAppVersion.outputs.VERSION }}' | tr '-' '.')" >> "$GITHUB_OUTPUT"
 
   # Note: we're updating the checklist before running the deploys and assuming that it will succeed on at least one platform
   deployChecklist:
@@ -269,12 +279,12 @@ jobs:
       - name: Upload Android app to Google Play
         run: bundle exec fastlane android ${{ vars.ANDROID_UPLOAD_COMMAND }}
         env:
-          VERSION: ${{ needs.androidBuild.outputs.VERSION_CODE }}
+          VERSION: ${{ needs.prep.outputs.VERSION_CODE }}
           ANDROID_PACKAGE_NAME: ${{ vars.ANDROID_PACKAGE_NAME }}
 
   androidSubmit:
     name: Submit Android for production rollout
-    needs: [prep, androidBuild]
+    needs: [prep]
     runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ github.ref == 'refs/heads/production' }}
     steps:
@@ -319,7 +329,7 @@ jobs:
       - name: Submit production build for Google Play review and a slow rollout
         run: bundle exec fastlane android upload_google_play_production_hybrid_rollout
         env:
-          VERSION: ${{ needs.androidBuild.outputs.VERSION_CODE }}
+          VERSION: ${{ needs.prep.outputs.VERSION_CODE }}
 
       - name: Warn deployers if Android production deploy failed
         if: ${{ failure() }}
@@ -610,7 +620,7 @@ jobs:
 
   iosSubmit:
     name: Submit iOS for production rollout
-    needs: [prep, iosBuild]
+    needs: [prep]
     runs-on: macos-15-xlarge
     if: ${{ github.ref == 'refs/heads/production' }}
     env:
@@ -648,7 +658,7 @@ jobs:
       - name: Submit production build for App Store review and a slow rollout
         run: bundle exec fastlane ios submit_hybrid_for_rollout
         env:
-          VERSION: ${{ needs.iosBuild.outputs.IOS_VERSION }}
+          VERSION: ${{ needs.prep.outputs.IOS_VERSION }}
           APPLE_ID: ${{ vars.APPLE_ID }}
 
       - name: Warn deployers if iOS production deploy failed
@@ -663,7 +673,7 @@ jobs:
               attachments: [{
                 color: "#DB4545",
                 pretext: `<!subteam^S4TJJ3PSL>`,
-                text: `💥 iOS HybridApp production deploy failed. Please <https://stackoverflowteams.com/c/expensify/questions/5740|manually submit> ${{ needs.iosBuild.outputs.IOS_VERSION }} in the <https://appstoreconnect.apple.com/apps/471713959/appstore|App Store>. 💥`,
+                text: `💥 iOS HybridApp production deploy failed. Please <https://stackoverflowteams.com/c/expensify/questions/5740|manually submit> ${{ needs.prep.outputs.IOS_VERSION }} in the <https://appstoreconnect.apple.com/apps/471713959/appstore|App Store>. 💥`,
               }]
             }
         env:
