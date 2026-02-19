@@ -30,7 +30,7 @@ async function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan:
     const finalParameters = enhanceParameters(request.command, request?.data ?? {});
     try {
         await hasReadRequiredDataFromStorage();
-        const response = await HttpUtils.xhr(request.command, finalParameters, request.type, request.shouldUseSecure, request.initiatedOffline);
+        const response = await HttpUtils.xhr<TKey>(request.command, finalParameters, request.type, request.shouldUseSecure, request.initiatedOffline);
         span.setStatus({code: 1});
         span.end();
         return response;
