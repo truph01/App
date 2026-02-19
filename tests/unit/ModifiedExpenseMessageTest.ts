@@ -814,8 +814,16 @@ describe('ModifiedExpenseMessage', () => {
 
         describe('when policy rules modify an expense', () => {
             let environmentURL: string;
+            const policyRulesPolicyId = '1234';
+
             beforeAll(async () => {
                 environmentURL = await getEnvironmentURL();
+            });
+
+            beforeEach(() => {
+                // Default: current user is workspace admin, so link points to workspace rules
+                jest.spyOn(PolicyUtils, 'getPolicy').mockReturnValue({id: policyRulesPolicyId} as Policy);
+                jest.spyOn(PolicyUtils, 'isPolicyAdmin').mockReturnValue(true);
             });
 
             it('returns the correct text message with multiple overrides', () => {
@@ -923,6 +931,28 @@ describe('ModifiedExpenseMessage', () => {
                 const expectedResult = `marked the expense as "reimbursable" and marked the expense as "billable" via <a href="${environmentURL}/workspaces/1234/rules">workspace rules</a>`;
 
                 expect(result).toEqual(expectedResult);
+            });
+
+            it('returns the correct text message with help link for non-admin', () => {
+                jest.spyOn(PolicyUtils, 'isPolicyAdmin').mockReturnValue(false);
+
+                const reportAction = {
+                    ...createRandomReportAction(1),
+                    actionName: CONST.REPORT.ACTIONS.TYPE.MODIFIED_EXPENSE,
+                    originalMessage: {
+                        policyID: policyRulesPolicyId,
+                        policyRulesModifiedFields: {
+                            category: 'Travel',
+                            merchant: "McDonald's",
+                        },
+                    } as OriginalMessageModifiedExpense,
+                };
+
+                const result = getForReportAction({reportAction, policyID: report.policyID});
+
+                expect(result).toContain(CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL);
+                expect(result).toContain('workspace rules</a>');
+                expect(result).toContain('set the category to "Travel" and merchant to "McDonald\'s"');
             });
         });
 
