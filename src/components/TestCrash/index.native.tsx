@@ -6,7 +6,7 @@ import useLocalize from '@hooks/useLocalize';
 import testCrash from '@libs/testCrash';
 
 /**
- * Adds a button in native dev builds to test the Sentry crash reporting integration.
+ * Adds a button in native builds to test the Sentry crash reporting integration.
  */
 function TestCrash() {
     const {translate} = useLocalize();
@@ -15,15 +15,13 @@ function TestCrash() {
 
     return (
         <View>
-            {!__DEV__ ? (
-                <TestToolRow title={toolRowTitle}>
-                    <Button
-                        small
-                        text={toolRowTitle}
-                        onPress={testCrash}
-                    />
-                </TestToolRow>
-            ) : null}
+            <TestToolRow title={toolRowTitle}>
+                <Button
+                    small
+                    text={toolRowTitle}
+                    onPress={testCrash}
+                />
+            </TestToolRow>
         </View>
     );
 }
