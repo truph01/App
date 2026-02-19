@@ -5,7 +5,7 @@
 
     <p>{{ platform.hub-description }}</p>
 
-    <div class="platform-cards-group{% if selectedPlatform == 'new-expensify' %} platform-cards-group--new-expensify{% endif %}">
+    <div class="platform-cards-group">
         {% for hub in platform.hubs %}
             {% include hub-card.html hub=hub platform=selectedPlatform %}
         {% endfor %}
