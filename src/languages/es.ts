@@ -789,7 +789,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Tarjetas de empresa`,
             },
             fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `Corregir la conexión de la tarjeta personal de ${cardName}` : 'Corregir la conexión de la tarjeta personal'),
+                title: ({cardName}: {cardName?: string}) => (cardName ? `Arreglar la conexión de la tarjeta personal de ${cardName}` : 'Arreglar la conexión de la tarjeta personal'),
                 subtitle: 'Monedero > Tarjetas asignadas',
             },
             fixAccountingConnection: {
@@ -1936,12 +1936,12 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     personalCard: {
-        brokenConnection: 'La conexión de tu tarjeta está rota.',
-        fixCard: 'Reparar tarjeta',
+        brokenConnection: 'Hay un problema con la conexión de tu tarjeta.',
+        fixCard: 'Arreglar conexión de la tarjeta',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
             connectionLink
-                ? `La conexión de tu tarjeta ${cardName} está interrumpida. <a href="${connectionLink}">Inicia sesión en tu banco</a> para reparar la tarjeta.`
-                : `La conexión de tu tarjeta ${cardName} está interrumpida. Inicia sesión en tu banco para reparar la tarjeta.`,
+                ? `La conexión de tu tarjeta ${cardName} se ha interrumpido. <a href="${connectionLink}">Inicia sesión en tu banco</a> para arreglarla.`
+                : `La conexión de tu tarjeta ${cardName} se ha interrumpido. Inicia sesión en tu banco para arreglarla.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7950,8 +7950,8 @@ ${amount} para ${merchant} - ${date}`,
                     return 'No se puede emparejar automáticamente el recibo debido a una conexión bancaria interrumpida.';
                 }
                 return isMarkAsCash
-                    ? `No se puede vincular automáticamente el recibo debido a una conexión de tarjeta defectuosa. Márquelo como efectivo para ignorarlo o <a href="${connectionLink}">arregle la tarjeta</a> para que coincida con el recibo.`
-                    : `No se puede vincular automáticamente el recibo debido a una conexión de tarjeta defectuosa. <a href="${connectionLink}">Arregle la tarjeta</a> para que coincida con el recibo.`;
+                    ? `No se puede vincular automáticamente el recibo debido a un problema de conexión de la tarjeta. Márcalo como efectivo para ignorarlo o <a href="${connectionLink}">soluciona la conexión de la tarjeta</a> para asociar el recibo.`
+                    : `No se puede vincular automáticamente el recibo debido a un problema de conexión de la tarjeta. <a href="${connectionLink}">Soluciona la conexión de la tarjeta</a> para asociar el recibo.`;
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
