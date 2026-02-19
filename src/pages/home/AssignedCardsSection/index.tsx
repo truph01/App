@@ -12,7 +12,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getCardDescription, hasDisplayableAssignedCards, isExpensifyCard} from '@libs/CardUtils';
+import {getAssignedCardSortKey, getCardDescription, hasDisplayableAssignedCards, isExpensifyCard} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
 import getButtonState from '@libs/getButtonState';
 import Navigation from '@libs/Navigation/Navigation';
@@ -36,9 +36,29 @@ function AssignedCardsSection() {
             return [];
         }
 
-        return Object.values(cardList ?? {}).filter(
+        const activeExpensifyCards = Object.values(cardList ?? {}).filter(
             (card) => CONST.EXPENSIFY_CARD.ACTIVE_STATES.includes(card.state ?? 0) && isExpensifyCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH,
         );
+
+        const sortedCards = activeExpensifyCards.slice().sort(getAssignedCardSortKey);
+        const seenDomains = new Set<string>();
+
+        return sortedCards.filter((card) => {
+            const isAdminIssuedVirtualCard = !!card.nameValuePairs?.issuedBy && !!card.nameValuePairs?.isVirtual;
+            const isTravelCard = !!card.nameValuePairs?.isVirtual && !!card.nameValuePairs?.isTravelCard;
+            const shouldGroupByDomain = !!card.domainName && !isAdminIssuedVirtualCard && !isTravelCard;
+
+            if (!shouldGroupByDomain) {
+                return true;
+            }
+
+            if (seenDomains.has(card.domainName)) {
+                return false;
+            }
+
+            seenDomains.add(card.domainName);
+            return true;
+        });
     }, [cardList]);
 
     if (displayableCards.length === 0) {
