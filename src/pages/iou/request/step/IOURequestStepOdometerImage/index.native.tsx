@@ -389,20 +389,6 @@ function IOURequestStepOdometerImage({
                             height={CONST.RECEIPT.SHUTTER_SIZE}
                         />
                     </PressableWithFeedback>
-                    <PressableWithFeedback
-                        role={CONST.ROLE.BUTTON}
-                        accessibilityLabel={translate('receipt.flash')}
-                        style={[styles.alignItemsEnd, !hasFlash && styles.opacity0]}
-                        onPress={() => setFlash((prevFlash) => !prevFlash)}
-                        disabled={!hasFlash}
-                    >
-                        <Icon
-                            height={32}
-                            width={32}
-                            src={flash ? lazyIcons.Bolt : lazyIcons.boltSlash}
-                            fill={theme.textSupporting}
-                        />
-                    </PressableWithFeedback>
                 </View>
                 {ErrorModal}
             </View>
