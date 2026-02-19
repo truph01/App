@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -5180,7 +5179,10 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 updateCard: 'Atualizar cartão',
                 unassignCard: 'Remover cartão',
                 unassign: 'Desatribuir',
-                unassignCardDescription: 'Desatribuir este cartão removerá todas as transações em relatórios em rascunho da conta do titular do cartão.',
+                unassignCardDescription: 'Desvincular este cartão excluirá todas as transações não enviadas.',
+                removeCard: 'Remover cartão',
+                remove: 'Remover',
+                removeCardDescription: 'Remover este cartão excluirá todas as transações não enviadas.',
                 assignCard: 'Atribuir cartão',
                 cardFeedName: 'Nome do feed do cartão',
                 cardFeedNameDescription: 'Dê um nome exclusivo ao feed do cartão para diferenciá-lo dos outros.',

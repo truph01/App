@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -5197,8 +5196,11 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 updateCard: 'Aggiorna carta',
                 unassignCard: 'Rimuovi carta',
                 unassign: 'Rimuovi assegnazione',
-                unassignCardDescription: 'La rimozione dell’assegnazione di questa carta eliminerà tutte le transazioni nei report in bozza dall’account del titolare della carta.',
+                unassignCardDescription: 'La rimozione dell’assegnazione di questa carta eliminerà tutte le transazioni non inviate.',
                 assignCard: 'Assegna carta',
+                removeCard: 'Rimuovi carta',
+                remove: 'Rimuovi',
+                removeCardDescription: 'La rimozione di questa carta eliminerà tutte le transazioni non inviate.',
                 cardFeedName: 'Nome feed carta',
                 cardFeedNameDescription: 'Dai al feed della carta un nome univoco, così puoi distinguerlo dagli altri.',
                 cardFeedTransaction: 'Elimina transazioni',

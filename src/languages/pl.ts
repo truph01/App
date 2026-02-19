@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -5174,7 +5173,10 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 updateCard: 'Zaktualizuj kartę',
                 unassignCard: 'Cofnij przypisanie karty',
                 unassign: 'Cofnij przypisanie',
-                unassignCardDescription: 'Odłączenie tej karty spowoduje usunięcie wszystkich transakcji z raportów w wersji roboczej z konta posiadacza karty.',
+                unassignCardDescription: 'Cofnięcie przypisania tej karty spowoduje usunięcie wszystkich niewysłanych transakcji.',
+                removeCard: 'Usuń kartę',
+                remove: 'Usuń',
+                removeCardDescription: 'Usunięcie tej karty spowoduje usunięcie wszystkich niewysłanych transakcji.',
                 assignCard: 'Przypisz kartę',
                 cardFeedName: 'Nazwa źródła karty',
                 cardFeedNameDescription: 'Nadaj kanałowi karty unikalną nazwę, aby odróżnić go od pozostałych.',
