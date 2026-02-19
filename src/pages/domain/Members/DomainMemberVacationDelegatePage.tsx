@@ -14,7 +14,7 @@ import type {Participant} from '@src/types/onyx/IOU';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {personalDetailsSelector} from '@selectors/PersonalDetails';
-import useVacationDelegate from './hooks/useVacationDelegate';
+import {vacationDelegateSelector} from '@selectors/Domain';
 
 type DomainMemberVacationDelegatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.VACATION_DELEGATE>;
 
@@ -24,7 +24,10 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
 
     const currentUserEmail = getCurrentUserEmail();
 
-    const vacationDelegate = useVacationDelegate(domainAccountID, accountID);
+    const [vacationDelegate] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
+        canBeMissing: true,
+        selector: vacationDelegateSelector(accountID),
+    });
 
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         canBeMissing: true,
