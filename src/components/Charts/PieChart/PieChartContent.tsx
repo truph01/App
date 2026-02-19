@@ -10,7 +10,7 @@ import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
 import {PIE_CHART_START_ANGLE} from '@components/Charts/constants';
 import {TOOLTIP_BAR_GAP, useChartLabelFormats, useTooltipData} from '@components/Charts/hooks';
-import type {ChartDataPoint, ChartProps, PieSlice} from '@components/Charts/types';
+import type {ChartDataPoint, ChartProps, PieSlice, UnitPosition} from '@components/Charts/types';
 import {findSliceAtPosition, processDataIntoSlices} from '@components/Charts/utils';
 import Text from '@components/Text';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -21,9 +21,12 @@ type PieChartProps = ChartProps & {
 
     /** Symbol/unit for value labels in tooltip (e.g., '$', '€'). */
     valueUnit?: string;
+
+    /** Position of the unit symbol relative to the value. Defaults to 'left'. */
+    valueUnitPosition?: UnitPosition;
 };
 
-function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSlicePress}: PieChartProps) {
+function PieChartContent({data, title, titleIcon, isLoading, valueUnit, valueUnitPosition, onSlicePress}: PieChartProps) {
     const styles = useThemeStyles();
     const [canvasWidth, setCanvasWidth] = useState(0);
     const [canvasHeight, setCanvasHeight] = useState(0);
@@ -46,7 +49,7 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, onSliceP
     // Map sorted slice index back to original data index for the tooltip hook
     const activeOriginalDataIndex = activeSliceIndex >= 0 ? (processedSlices.at(activeSliceIndex)?.originalIndex ?? -1) : -1;
 
-    const {formatValue} = useChartLabelFormats({data, unit: valueUnit});
+    const {formatValue} = useChartLabelFormats({data, unit: valueUnit, unitPosition: valueUnitPosition});
     const tooltipData = useTooltipData(activeOriginalDataIndex, data, formatValue);
 
     // Calculate pie geometry

@@ -4,19 +4,7 @@ import type {ChartDataPoint} from '@components/Charts/types';
 import {convertToFrontendAmountAsInteger} from '@libs/CurrencyUtils';
 import type {SearchChartProps} from './types';
 
-function SearchPieChart({
-    data,
-    title,
-    titleIcon,
-    getLabel,
-    getFilterQuery,
-    onItemPress,
-    isLoading,
-    unit,
-    // Accepted for API compatibility with SearchChartView; pie chart does not use unit position
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    unitPosition,
-}: SearchChartProps) {
+function SearchPieChart({data, title, titleIcon, getLabel, getFilterQuery, onItemPress, isLoading, unit, unitPosition}: SearchChartProps) {
     // Transform grouped transaction data to PieChart format
     const chartData: ChartDataPoint[] = data.map((item) => {
         const currency = item.currency ?? 'USD';
@@ -48,6 +36,7 @@ function SearchPieChart({
             isLoading={isLoading}
             onSlicePress={handleSlicePress}
             valueUnit={unit?.value}
+            valueUnitPosition={unitPosition}
         />
     );
 }
