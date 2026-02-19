@@ -253,7 +253,7 @@ jobs:
           path: ./
 
       - name: Set aabPath for Fastlane
-        run: echo "aabPath=$(find $(pwd) -name '*.aab' | head -1)" >> "$GITHUB_ENV"
+        run: echo "aabPath=$(find "$(pwd)" -name '*.aab' | head -1)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby
         # v1.229.0
@@ -366,7 +366,7 @@ jobs:
 
       - name: Find APK path
         id: find-apk
-        run: echo "APK_PATH=$(find $(pwd) -name '*.apk' | head -1)" >> "$GITHUB_OUTPUT"
+        run: echo "APK_PATH=$(find "$(pwd)" -name '*.apk' | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload Android build to BrowserStack
         if: ${{ fromJSON(env.IS_APP_REPO) }}
@@ -406,7 +406,7 @@ jobs:
 
       - name: Find APK path
         id: find-apk
-        run: echo "APK_PATH=$(find $(pwd) -name '*.apk' | head -1)" >> "$GITHUB_OUTPUT"
+        run: echo "APK_PATH=$(find "$(pwd)" -name '*.apk' | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload Android build to Applause
         if: ${{ fromJSON(env.IS_APP_REPO) }}
@@ -555,8 +555,8 @@ jobs:
 
       - name: Set artifact paths for Fastlane
         run: |
-          echo "ipaPath=$(find $(pwd) -name '*.ipa' | head -1)" >> "$GITHUB_ENV"
-          echo "dsymPath=$(find $(pwd) -name '*.dSYM.zip' | head -1)" >> "$GITHUB_ENV"
+          echo "ipaPath=$(find "$(pwd)" -name '*.ipa' | head -1)" >> "$GITHUB_ENV"
+          echo "dsymPath=$(find "$(pwd)" -name '*.dSYM.zip' | head -1)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby
         # v1.229.0
@@ -696,7 +696,7 @@ jobs:
 
       - name: Find IPA path
         id: find-ipa
-        run: echo "IPA_PATH=$(find $(pwd) -name '*.ipa' | head -1)" >> "$GITHUB_OUTPUT"
+        run: echo "IPA_PATH=$(find "$(pwd)" -name '*.ipa' | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload iOS build to BrowserStack
         if: ${{ fromJSON(env.IS_APP_REPO) }}
@@ -736,7 +736,7 @@ jobs:
 
       - name: Find IPA path
         id: find-ipa
-        run: echo "IPA_PATH=$(find $(pwd) -name '*.ipa' | head -1)" >> "$GITHUB_OUTPUT"
+        run: echo "IPA_PATH=$(find "$(pwd)" -name '*.ipa' | head -1)" >> "$GITHUB_OUTPUT"
 
       - name: Upload iOS build to Applause
         if: ${{ fromJSON(env.IS_APP_REPO) }}
