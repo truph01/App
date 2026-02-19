@@ -435,6 +435,7 @@ const translations: TranslationDeepObject<typeof en> = {
         reportID: '报销单编号',
         longReportID: '长报表 ID',
         withdrawalID: '提现编号',
+        withdrawalStatus: '提现状态',
         bankAccounts: '银行账户',
         chooseFile: '选择文件',
         chooseFiles: '选择文件',
