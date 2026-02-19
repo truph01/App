@@ -13,17 +13,11 @@ import SCREENS from '@src/SCREENS';
 import type {DismissedProductTraining} from '@src/types/onyx';
 import type {GuardResult, NavigationGuard} from './types';
 
-/**
- * Module-level Onyx subscriptions for MigratedUserWelcomeModalGuard
- */
 let hasBeenAddedToNudgeMigration = false;
 let dismissedProductTraining: OnyxEntry<DismissedProductTraining>;
 
 let hasRedirectedToMigratedUserModal = false;
 
-/**
- * Reset the session flag (for testing purposes)
- */
 function resetSessionFlag() {
     hasRedirectedToMigratedUserModal = false;
 }
@@ -40,8 +34,6 @@ Onyx.connectWithoutView({
     key: ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING,
     callback: (value) => {
         dismissedProductTraining = value;
-
-        // Reset the session flag when modal is dismissed
         if (isProductTrainingElementDismissed('migratedUserWelcomeModal', value)) {
             hasRedirectedToMigratedUserModal = false;
         }
@@ -49,49 +41,26 @@ Onyx.connectWithoutView({
 });
 
 /**
- * Check if navigation should be blocked while the migrated user modal is active.
- * After the guard redirects to the modal, there's a delay before the native Modal overlay becomes visible.
- * During this window, tab switches can push screens on top of the modal navigator,
- * causing DISMISS_MODAL to fail since it only checks the last route.
+ * Block navigation while the migrated user modal is active (on top of the stack).
+ * Prevents tab switches from pushing screens before the modal overlay becomes visible,
+ * which would cause DISMISS_MODAL to fail.
  */
 function shouldBlockWhileModalActive(state: NavigationState, action: NavigationAction): boolean {
-    const isModalDismissed = isProductTrainingElementDismissed('migratedUserWelcomeModal', dismissedProductTraining);
-    if (!hasRedirectedToMigratedUserModal || isModalDismissed) {
-        return false;
-    }
-
-    // Only block when the migrated user modal is the LAST route (on top of the stack).
-    const lastRoute = state.routes.at(-1);
-    if (lastRoute?.name !== NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR) {
-        return false;
-    }
-
-    // Allow DISMISS_MODAL and GO_BACK actions
-    if (action.type === CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL || action.type === CONST.NAVIGATION.ACTION_TYPE.GO_BACK) {
-        return false;
-    }
-
-    return true;
+    const isAllowedAction = action.type === CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL || action.type === CONST.NAVIGATION.ACTION_TYPE.GO_BACK;
+    return (
+        hasRedirectedToMigratedUserModal &&
+        !isProductTrainingElementDismissed('migratedUserWelcomeModal', dismissedProductTraining) &&
+        state.routes.at(-1)?.name === NAVIGATORS.MIGRATED_USER_MODAL_NAVIGATOR &&
+        !isAllowedAction
+    );
 }
 
-/**
- * Check if we're already on or navigating to the migrated user modal
- * This prevents redirect loops where our redirect creates new navigation actions
- */
+/** Prevents redirect loops by detecting when we're already on or resetting to the modal. */
 function isNavigatingToMigratedUserModal(state: NavigationState, action: NavigationAction): boolean {
-    const currentRoute = findFocusedRoute(state);
-    if (currentRoute?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT) {
-        return true;
-    }
-
-    if (action.type === 'RESET' && action.payload) {
-        const targetRoute = findFocusedRoute(action.payload as NavigationState);
-        if (targetRoute?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT) {
-            return true;
-        }
-    }
-
-    return false;
+    const isOnModal = findFocusedRoute(state)?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT;
+    const isResettingToModal = action.type === 'RESET' && !!action.payload && findFocusedRoute(action.payload as NavigationState)?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT;
+    
+    return isOnModal || isResettingToModal;
 }
 
 /**
@@ -110,17 +79,10 @@ const MigratedUserWelcomeModalGuard: NavigationGuard = {
             return {type: 'BLOCK', reason: '[MigratedUserWelcomeModalGuard] Blocking navigation while migrated user modal is active'};
         }
 
-        // Allow if we're already navigating to the modal (prevents redirect loops)
-        if (isNavigatingToMigratedUserModal(state, action)) {
+        if (isNavigatingToMigratedUserModal(state, action) || hasRedirectedToMigratedUserModal) {
             return {type: 'ALLOW'};
         }
 
-        // Skip if already redirected this session
-        if (hasRedirectedToMigratedUserModal) {
-            return {type: 'ALLOW'};
-        }
-
-        // Check if user needs the migrated user welcome modal
         if (hasBeenAddedToNudgeMigration && !isProductTrainingElementDismissed('migratedUserWelcomeModal', dismissedProductTraining)) {
             Log.info('[MigratedUserWelcomeModalGuard] Redirecting to migrated user welcome modal');
             hasRedirectedToMigratedUserModal = true;
