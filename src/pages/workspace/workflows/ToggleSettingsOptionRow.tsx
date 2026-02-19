@@ -47,6 +47,9 @@ type ToggleSettingOptionRowProps = {
     /** Used to apply styles to the Title */
     titleStyle?: StyleProp<TextStyle>;
 
+    /** Optional accessibility role for the title. Only set when the title is a section heading (e.g. CONST.ROLE.HEADER); omit for regular rows. */
+    titleAccessibilityRole?: typeof CONST.ROLE.HEADER;
+
     /** Used to apply styles to the Subtitle */
     subtitleStyle?: StyleProp<TextStyle>;
 
@@ -98,6 +101,7 @@ function ToggleSettingOptionRow({
     shouldParseSubtitle = false,
     wrapperStyle,
     titleStyle,
+    titleAccessibilityRole,
     onToggle,
     subMenuItems,
     isActive,
@@ -113,7 +117,7 @@ function ToggleSettingOptionRow({
     const {isAccordionExpanded, shouldAnimateAccordionSection} = useAccordionAnimation(isActive);
 
     // We are disabling the announcement for subtitle if subtitle and switchAccessibilityLabel are equal
-    const isSubtitleAndSwitchAccessibilityLabelAreEqual = switchAccessibilityLabel === subtitle;
+    const areSubtitleAndSwitchAccessibilityLabelEqual = switchAccessibilityLabel === subtitle;
 
     useEffect(() => {
         isAccordionExpanded.set(isActive);
@@ -146,14 +150,13 @@ function ToggleSettingOptionRow({
                 );
             }
             /**
-             * We hide the subtitle from screen readers if it is identical to the switch's accessibility label.
-             * 'aria-hidden' is used for compatibility with iOS mWeb, while 'accessible={false}'
-             * is required for iOS native.
+             * We hide the subtitle from screen readers to avoid double announcements
+             * 'aria-hidden' is used for compatibility with iOS mWeb, while 'accessible={false}' works on iOS native.
              */
             return (
                 <Text
-                    accessible={!isSubtitleAndSwitchAccessibilityLabelAreEqual}
-                    aria-hidden={isSubtitleAndSwitchAccessibilityLabelAreEqual}
+                    accessible={!areSubtitleAndSwitchAccessibilityLabelEqual}
+                    aria-hidden={areSubtitleAndSwitchAccessibilityLabelEqual}
                     style={[styles.mutedNormalTextLabel, shouldPlaceSubtitleBelowSwitch ? styles.mt1 : {...styles.mt1, ...styles.mr5}, subtitleStyle]}
                 >
                     {subtitle}
@@ -173,7 +176,7 @@ function ToggleSettingOptionRow({
         shouldPlaceSubtitleBelowSwitch,
         subtitleStyle,
         processedSubtitle,
-        isSubtitleAndSwitchAccessibilityLabelAreEqual,
+        areSubtitleAndSwitchAccessibilityLabelEqual,
     ]);
 
     const contentArea = (
@@ -188,7 +191,12 @@ function ToggleSettingOptionRow({
             )}
             {customTitle ?? (
                 <View style={[styles.flexColumn, styles.flex1]}>
-                    <Text style={[styles.textNormal, styles.lh20, titleStyle]}>{title}</Text>
+                    <Text
+                        style={[styles.textNormal, styles.lh20, titleStyle]}
+                        accessibilityRole={titleAccessibilityRole}
+                    >
+                        {title}
+                    </Text>
                     {!shouldPlaceSubtitleBelowSwitch && subtitle && subTitleView}
                 </View>
             )}
@@ -220,7 +228,7 @@ function ToggleSettingOptionRow({
                     <Switch
                         disabledAction={disabledAction}
                         accessibilityLabel={
-                            typeof subtitle === 'string' && subtitle && !isSubtitleAndSwitchAccessibilityLabelAreEqual ? `${switchAccessibilityLabel}, ${subtitle}` : switchAccessibilityLabel
+                            typeof subtitle === 'string' && subtitle && !areSubtitleAndSwitchAccessibilityLabelEqual ? `${switchAccessibilityLabel}, ${subtitle}` : switchAccessibilityLabel
                         }
                         onToggle={(isOn) => {
                             shouldAnimateAccordionSection.set(true);

@@ -5,6 +5,7 @@ import type {GestureResponderEvent, Role, StyleProp, TextStyle, ViewStyle} from 
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
@@ -15,7 +16,6 @@ import {canUseTouchScreen, hasHoverSupport} from '@libs/DeviceCapabilities';
 import {containsCustomEmoji, containsOnlyCustomEmoji} from '@libs/EmojiUtils';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
 import getButtonState from '@libs/getButtonState';
-import getOperatingSystem from '@libs/getOperatingSystem';
 import getPlatform from '@libs/getPlatform';
 import mergeRefs from '@libs/mergeRefs';
 import Parser from '@libs/Parser';
@@ -218,6 +218,9 @@ type MenuItemBaseProps = ForwardedFSClassProps &
 
         /** Accessibility label for the menu item */
         accessibilityLabel?: string;
+
+        /** Optional accessibility role for the title. Only set when the title is a section heading (e.g. CONST.ROLE.HEADER); omit for regular menu items. */
+        titleAccessibilityRole?: typeof CONST.ROLE.HEADER;
 
         /** Component to display as the title */
         titleComponent?: ReactElement;
@@ -567,8 +570,10 @@ function MenuItem({
     shouldBeAccessible = true,
     tabIndex = 0,
     rightIconWrapperStyle,
+    titleAccessibilityRole,
 }: MenuItemProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FallbackAvatar', 'DotIndicator', 'Checkmark']);
+    const {translate} = useLocalize();
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -718,10 +723,6 @@ function MenuItem({
 
     const isIDPassed = !!iconReportID || !!iconAccountID || iconAccountID === CONST.DEFAULT_NUMBER_ID;
 
-    const platform = getPlatform(true);
-    // This is required because we are preventing the "double tap to activate" announcement on Android web
-    const isAndroidWeb = platform === CONST.PLATFORM.MOBILE_WEB && getOperatingSystem() === CONST.OS.ANDROID;
-
     return (
         <View
             style={rootWrapperStyle}
@@ -773,10 +774,9 @@ function MenuItem({
                                 disabled={disabled || isExecuting}
                                 ref={mergeRefs(ref, popoverAnchor)}
                                 role={role}
-                                accessibilityLabel={accessibilityLabel ?? defaultAccessibilityLabel}
+                                accessibilityLabel={`${accessibilityLabel ?? defaultAccessibilityLabel}${brickRoadIndicator ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
                                 accessible={shouldBeAccessible}
-                                tabIndex={platform === CONST.PLATFORM.ANDROID && !interactive ? -1 : tabIndex}
-                                fullDisabled={!interactive && isAndroidWeb}
+                                tabIndex={getPlatform() !== CONST.PLATFORM.WEB && !interactive ? -1 : tabIndex}
                                 onFocus={onFocus}
                                 sentryLabel={sentryLabel}
                             >
@@ -923,6 +923,7 @@ function MenuItem({
                                                                         style={combinedTitleTextStyle}
                                                                         numberOfLines={numberOfLinesTitle || undefined}
                                                                         dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: interactive && disabled}}
+                                                                        accessibilityRole={titleAccessibilityRole}
                                                                     >
                                                                         {renderTitleContent()}
                                                                     </Text>
