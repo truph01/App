@@ -44,6 +44,8 @@ import type {FileObject} from '@src/types/utils/Attachment';
 import useOnyx from '@hooks/useOnyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import {useFullScreenLoaderActions, useFullScreenLoaderState} from '@components/FullScreenLoaderContext';
+import variables from '@styles/variables';
+import RenderHTML from '@components/RenderHTML';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
@@ -55,7 +57,7 @@ function IOURequestStepOdometerImage({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'boltSlash']);
+    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'boltSlash', 'OdometerStart', 'OdometerEnd']);
     const lazyIllustrationsOnly = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
 
     const {isLoaderVisible} = useFullScreenLoaderState();
@@ -78,6 +80,8 @@ function IOURequestStepOdometerImage({
     const isTransactionDraft = shouldUseTransactionDraft(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.REQUEST);
 
     const title = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
+    const snapPhotoText = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.snapPhotoStart') : translate('distance.odometer.snapPhotoEnd');
+    const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? lazyIcons.OdometerStart : lazyIcons.OdometerEnd;
 
     const navigateBack = useCallback(() => {
         Navigation.goBack();
@@ -316,6 +320,17 @@ function IOURequestStepOdometerImage({
                                             fill={flash ? theme.white : theme.icon}
                                         />
                                     </PressableWithFeedback>
+                                </View>
+                                <View style={[styles.odometerPhotoInformationContainer]}>
+                                    <Icon
+                                        height={variables.menuIconSize}
+                                        width={variables.menuIconSize}
+                                        src={icon}
+                                    />
+                                    <View style={[styles.flex1, styles.flexColumn]}>
+                                        <Text style={[styles.labelStrong,styles.mb1]}>{title}</Text>
+                                        <RenderHTML html={snapPhotoText} />
+                                    </View>
                                 </View>
                                 <Animated.View
                                     pointerEvents="none"
