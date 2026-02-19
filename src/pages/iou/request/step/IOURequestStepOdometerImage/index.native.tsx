@@ -328,7 +328,7 @@ function IOURequestStepOdometerImage({
                                         src={icon}
                                     />
                                     <View style={[styles.flex1, styles.flexColumn]}>
-                                        <Text style={[styles.labelStrong,styles.mb1]}>{title}</Text>
+                                        <Text style={[styles.labelStrong, styles.mb1]}>{title}</Text>
                                         <RenderHTML html={snapPhotoText} />
                                     </View>
                                 </View>
