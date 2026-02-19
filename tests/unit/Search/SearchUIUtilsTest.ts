@@ -4710,6 +4710,27 @@ describe('SearchUIUtils', () => {
         });
     });
 
+    describe('getItemBadgeText', () => {
+        const reportCounts = {submit: 5, approve: 0, pay: 51, export: 1};
+
+        it('should return formatted badge text for a matching key', () => {
+            expect(SearchUIUtils.getItemBadgeText('submit', reportCounts)).toBe('5');
+            expect(SearchUIUtils.getItemBadgeText('export', reportCounts)).toBe('1');
+        });
+
+        it('should return empty string when count is 0', () => {
+            expect(SearchUIUtils.getItemBadgeText('approve', reportCounts)).toBe('');
+        });
+
+        it('should return max+ when count exceeds max', () => {
+            expect(SearchUIUtils.getItemBadgeText('pay', reportCounts)).toBe('50+');
+        });
+
+        it('should return undefined for non-matching key', () => {
+            expect(SearchUIUtils.getItemBadgeText('unknown', reportCounts)).toBeUndefined();
+        });
+    });
+
     describe('Test createTypeMenuItems', () => {
         it('should return the default menu items', () => {
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Send', 'ThumbsUp']));

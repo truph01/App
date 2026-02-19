@@ -28,7 +28,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import {buildSearchQueryJSON, buildUserReadableQueryString, shouldSkipSuggestedSearchNavigation as shouldSkipSuggestedSearchNavigationForQuery} from '@libs/SearchQueryUtils';
 import type {SavedSearchMenuItem} from '@libs/SearchUIUtils';
-import {createBaseSavedSearchMenuItem, formatBadgeText, getOverflowMenu as getOverflowMenuUtil} from '@libs/SearchUIUtils';
+import {createBaseSavedSearchMenuItem, getItemBadgeText, getOverflowMenu as getOverflowMenuUtil} from '@libs/SearchUIUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -291,7 +291,7 @@ function SearchTypeMenu({queryJSON}: SearchTypeMenuProps) {
                                                     iconWidth={variables.iconSizeNormal}
                                                     iconHeight={variables.iconSizeNormal}
                                                     wrapperStyle={styles.sectionMenuItem}
-                                                    badgeText={item.key in reportCounts ? formatBadgeText(reportCounts[item.key as keyof typeof reportCounts]) : undefined}
+                                                    badgeText={getItemBadgeText(item.key, reportCounts)}
                                                     focused={focused}
                                                     onPress={onPress}
                                                     shouldIconUseAutoWidthStyle

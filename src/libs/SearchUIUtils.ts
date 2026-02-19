@@ -347,6 +347,13 @@ function formatBadgeText(count: number): string {
     return count > CONST.SEARCH.TODO_BADGE_MAX_COUNT ? `${CONST.SEARCH.TODO_BADGE_MAX_COUNT}+` : count.toString();
 }
 
+function getItemBadgeText(itemKey: string, reportCounts: Record<string, number>): string | undefined {
+    if (itemKey in reportCounts) {
+        return formatBadgeText(reportCounts[itemKey]);
+    }
+    return undefined;
+}
+
 function getExpenseStatusOptions(translate: LocalizedTranslate): Array<MultiSelectItem<SingularSearchStatus>> {
     return [
         {text: translate('common.unreported'), value: CONST.SEARCH.STATUS.EXPENSE.UNREPORTED},
@@ -4377,6 +4384,7 @@ export {
     getActions,
     createTypeMenuSections,
     formatBadgeText,
+    getItemBadgeText,
     createBaseSavedSearchMenuItem,
     shouldShowEmptyState,
     compareValues,
