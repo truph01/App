@@ -49,9 +49,10 @@ const sessionSelector = (session: OnyxEntry<Session>) => ({
  * 3. Otherwise → return default canned search query (expenses)
  */
 function useDefaultSearchQuery(): string {
-    const [session] = useOnyx(ONYXKEYS.SESSION, {selector: sessionSelector});
+    const [session] = useOnyx(ONYXKEYS.SESSION, {selector: sessionSelector, canBeMissing: false});
     const [paidPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
         selector: policyCollectionSelector,
+        canBeMissing: true,
     });
 
     const accountID = session?.accountID;

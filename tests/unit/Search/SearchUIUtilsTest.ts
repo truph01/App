@@ -5519,7 +5519,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.spendOverTime).toBe(true);
+            expect(response.visibility.spendOverTime).toBe(true);
         });
 
         test('Should show Spend Over Time for Auditor role in paid policy', () => {
@@ -5534,7 +5534,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility('auditor@policy.com', {}, policies, undefined);
-            expect(response.spendOverTime).toBe(true);
+            expect(response.visibility.spendOverTime).toBe(true);
         });
 
         test('Should show Spend Over Time for Approver role in paid policy', () => {
@@ -5549,7 +5549,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(approverEmail, {}, policies, undefined);
-            expect(response.spendOverTime).toBe(true);
+            expect(response.visibility.spendOverTime).toBe(true);
         });
 
         test('Should hide Spend Over Time for User role in paid policy', () => {
@@ -5564,7 +5564,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility('user@policy.com', {}, policies, undefined);
-            expect(response.spendOverTime).toBe(false);
+            expect(response.visibility.spendOverTime).toBe(false);
         });
 
         test('Should hide Spend Over Time for free policies even with Admin role', () => {
@@ -5579,7 +5579,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.spendOverTime).toBe(false);
+            expect(response.visibility.spendOverTime).toBe(false);
         });
 
         test('Should show Spend Over Time if at least one policy has Admin/Auditor/Approver role', () => {
@@ -5597,7 +5597,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.spendOverTime).toBe(true);
+            expect(response.visibility.spendOverTime).toBe(true);
         });
 
         test('Should hide Spend Over Time if all policies have User role', () => {
@@ -5615,7 +5615,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility('user@policy.com', {}, policies, undefined);
-            expect(response.spendOverTime).toBe(false);
+            expect(response.visibility.spendOverTime).toBe(false);
         });
 
         test('Should return Spend Over Time search with correct properties', () => {
