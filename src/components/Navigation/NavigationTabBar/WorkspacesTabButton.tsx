@@ -99,7 +99,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
             <PressableWithFeedback
                 onPress={showWorkspaces}
                 role={CONST.ROLE.TAB}
-                accessibilityLabel={translate('common.workspacesTabTitle')}
+                accessibilityLabel={`${translate('common.workspacesTabTitle')}${workspacesTabIndicatorStatus ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
                 accessibilityState={workspacesAccessibilityState}
                 style={({hovered}) => [styles.leftNavigationTabBarItem, hovered && styles.navigationTabBarItemHovered]}
                 sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.WORKSPACES}
@@ -141,7 +141,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
         <PressableWithFeedback
             onPress={showWorkspaces}
             role={CONST.ROLE.TAB}
-            accessibilityLabel={translate('common.workspacesTabTitle')}
+            accessibilityLabel={`${translate('common.workspacesTabTitle')}${workspacesTabIndicatorStatus ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
             accessibilityState={workspacesAccessibilityState}
             wrapperStyle={styles.flex1}
             style={styles.navigationTabBarItem}
