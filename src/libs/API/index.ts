@@ -83,10 +83,15 @@ function prepareRequest<TCommand extends ApiCommand, TKey extends OnyxKey>(
                 [CONST.TELEMETRY.ATTRIBUTE_ONYX_UPDATES_COUNT]: optimisticData.length,
             },
         });
-        Onyx.update(optimisticData).then(() => {
-            span.setStatus({code: 1});
-            span.end();
-        });
+        Onyx.update(optimisticData)
+            .then(() => {
+                span.setStatus({code: 1});
+                span.end();
+            })
+            .catch((error: unknown) => {
+                span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                span.end();
+            });
     }
 
     const isWriteRequest = type === CONST.API_REQUEST_TYPE.WRITE;
