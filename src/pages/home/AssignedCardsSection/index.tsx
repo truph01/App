@@ -40,18 +40,20 @@ function AssignedCardsSection() {
             (card) => CONST.EXPENSIFY_CARD.ACTIVE_STATES.includes(card.state ?? 0) && isExpensifyCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH,
         );
 
-        const sortedCards = activeExpensifyCards.slice().sort(getAssignedCardSortKey);
+        const sortedCards = [...activeExpensifyCards].sort(getAssignedCardSortKey);
         const seenDomains = new Set<string>();
 
         return sortedCards.filter((card) => {
             const isAdminIssuedVirtualCard = !!card.nameValuePairs?.issuedBy && !!card.nameValuePairs?.isVirtual;
             const isTravelCard = !!card.nameValuePairs?.isVirtual && !!card.nameValuePairs?.isTravelCard;
-            const shouldGroupByDomain = !!card.domainName && !isAdminIssuedVirtualCard && !isTravelCard;
+            const isComboCard = !!card.domainName && !isAdminIssuedVirtualCard && !isTravelCard;
 
-            if (!shouldGroupByDomain) {
+            // Always show non-combo cards (admin-issued virtual, travel cards, or cards without domain)
+            if (!isComboCard) {
                 return true;
             }
 
+            // For combo cards, only show the first one per domain (physical card comes first due to sorting)
             if (seenDomains.has(card.domainName)) {
                 return false;
             }
