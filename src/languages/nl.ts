@@ -3943,7 +3943,7 @@ ${
             budgetFrequency: {monthly: 'maandelijks', yearly: 'jaarlijks'},
             budgetFrequencyUnit: {monthly: 'maand', yearly: 'jaar'},
             budgetTypeForNotificationMessage: {tag: 'tag', category: 'categorie'},
-            deepDiveExpensifyCard: `<muted-text-label>Transacties met de Expensify Kaart worden automatisch geëxporteerd naar een "Expensify Card Liability Account" dat wordt aangemaakt via <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">onze integratie</a>.</muted-text-label>`,
+            deepDiveExpensifyCard: `<muted-text-label>Transacties met de Expensify Kaart worden automatisch geëxporteerd naar een "Expensify Kaart Passivarekening" dat wordt aangemaakt via <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">onze integratie</a>.</muted-text-label>`,
         },
         receiptPartners: {
             uber: {
@@ -7149,7 +7149,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             },
             feed: 'Feed',
             withdrawalType: {
-                [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify Card',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify Kaart',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Vergoeding',
             },
             is: 'Is',
