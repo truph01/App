@@ -1,5 +1,6 @@
 import TestReceipt from '@assets/images/fake-receipt.png';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
+import {shouldStartLocationPermissionFlowSelector} from '@selectors/Location';
 import {useEffect, useState} from 'react';
 import {InteractionManager} from 'react-native';
 import {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
@@ -15,7 +16,6 @@ import useSelfDMReport from '@hooks/useSelfDMReport';
 import {handleMoneyRequestStepScanParticipants} from '@libs/actions/IOU/MoneyRequest';
 import setTestReceipt from '@libs/actions/setTestReceipt';
 import {dismissProductTraining} from '@libs/actions/Welcome';
-import DateUtils from '@libs/DateUtils';
 import useReportAttributes from '@hooks/useReportAttributes';
 import HapticFeedback from '@libs/HapticFeedback';
 import {isArchivedReport, isPolicyExpenseChat} from '@libs/ReportUtils';
@@ -45,28 +45,10 @@ function useReceiptScan({
     setIsMultiScanEnabled,
 }: UseReceiptScanParams) {
     const {isBetaEnabled} = usePermissions();
-    const [lastLocationPermissionPrompt] = useOnyx(ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT, {canBeMissing: true});
-
-    function shouldStartLocationPermissionFlow() {
-        return (
-            !lastLocationPermissionPrompt ||
-            (DateUtils.isValidDateString(lastLocationPermissionPrompt ?? '') &&
-                DateUtils.getDifferenceInDaysFromNow(new Date(lastLocationPermissionPrompt ?? '')) > CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS)
-        );
-    }
-
-    const blinkOpacity = useSharedValue(0);
-    const blinkStyle = useAnimatedStyle(() => ({
-        opacity: blinkOpacity.get(),
-    }));
-    function showBlink() {
-        blinkOpacity.set(
-            withTiming(0.4, {duration: 10}, () => {
-                blinkOpacity.set(withTiming(0, {duration: 50}));
-            }),
-        );
-        HapticFeedback.press();
-    }
+    const [shouldStartLocationPermissionFlow] = useOnyx(ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT, {
+        canBeMissing: true,
+        selector: shouldStartLocationPermissionFlowSelector,
+    });
 
     const policy = usePolicy(report?.policyID);
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
@@ -115,6 +97,20 @@ function useReceiptScan({
         }
         setReceiptFiles([]);
     }, [isMultiScanEnabled]);
+
+    const blinkOpacity = useSharedValue(0);
+    const blinkStyle = useAnimatedStyle(() => ({
+        opacity: blinkOpacity.get(),
+    }));
+
+    function showBlink() {
+        blinkOpacity.set(
+            withTiming(0.4, {duration: 10}, () => {
+                blinkOpacity.set(withTiming(0, {duration: 50}));
+            }),
+        );
+        HapticFeedback.press();
+    }
 
     function navigateToConfirmationStep(files: ReceiptFile[], locationPermissionGranted = false, isTestTransaction = false) {
         handleMoneyRequestStepScanParticipants({
@@ -175,6 +171,7 @@ function useReceiptScan({
         if (files.length === 0) {
             return;
         }
+        // Store the receipt on the transaction object in Onyx
         const newReceiptFiles: ReceiptFile[] = [];
 
         if (isEditing) {
@@ -211,7 +208,7 @@ function useReceiptScan({
             setReceiptFiles(newReceiptFiles);
             const gpsRequired = initialTransaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && files.length;
             if (gpsRequired) {
-                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow;
                 if (beginLocationPermissionFlow) {
                     setStartLocationPermissionFlow(true);
                     return;
@@ -229,7 +226,7 @@ function useReceiptScan({
         if (shouldSkipConfirmation) {
             const gpsRequired = initialTransaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT;
             if (gpsRequired) {
-                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow;
                 if (beginLocationPermissionFlow) {
                     setStartLocationPermissionFlow(true);
                     return;

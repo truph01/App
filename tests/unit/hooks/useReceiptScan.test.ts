@@ -109,7 +109,7 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(true);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(true);
         });
 
         it('should return true when lastLocationPermissionPrompt is null', async () => {
@@ -119,7 +119,7 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(true);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(true);
         });
 
         it('should return true when lastLocationPermissionPrompt is empty string', async () => {
@@ -129,7 +129,7 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(true);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(true);
         });
 
         it('should return false when lastLocationPermissionPrompt is within threshold', async () => {
@@ -140,7 +140,7 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(false);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(false);
         });
 
         it('should return true when lastLocationPermissionPrompt is outside threshold', async () => {
@@ -151,7 +151,7 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(true);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(true);
         });
 
         it('should return false when lastLocationPermissionPrompt is invalid date string', async () => {
@@ -161,7 +161,7 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(false);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(false);
         });
 
         it('should return false when lastLocationPermissionPrompt is exactly at threshold', async () => {
@@ -172,26 +172,26 @@ describe('useReceiptScan', () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(false);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(false);
         });
 
         it('should react to changes in lastLocationPermissionPrompt', async () => {
             const {result} = renderHook(() => useReceiptScan(params));
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(true);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(true);
 
             const recentDate = daysAgo(CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS - 1);
             Onyx.set(ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT, recentDate);
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(false);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(false);
 
             const oldDate = daysAgo(CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS + 1);
             Onyx.set(ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT, oldDate);
             await waitForBatchedUpdatesWithAct();
 
-            expect(result.current.shouldStartLocationPermissionFlow()).toBe(true);
+            expect(result.current.shouldStartLocationPermissionFlow).toBe(true);
         });
     });
 
