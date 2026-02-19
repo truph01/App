@@ -166,7 +166,7 @@ async function getMergedPRsDeployedBetween(fromTag: string, toTag: string, repos
  */
 async function getPullRequestsDeployedBetween(fromTag: string, toTag: string, repositoryName: string): Promise<number[]> {
     const {mergedPRs} = await getMergedPRsDeployedBetween(fromTag, toTag, repositoryName);
-    return mergedPRs.map((pr) => pr.prNumber);
+    return mergedPRs.map((pr) => pr.prNumber).sort((a, b) => a - b);
 }
 
 export default {

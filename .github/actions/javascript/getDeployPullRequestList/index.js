@@ -12006,7 +12006,7 @@ async function getMergedPRsDeployedBetween(fromTag, toTag, repositoryName) {
  */
 async function getPullRequestsDeployedBetween(fromTag, toTag, repositoryName) {
     const { mergedPRs } = await getMergedPRsDeployedBetween(fromTag, toTag, repositoryName);
-    return mergedPRs.map((pr) => pr.prNumber);
+    return mergedPRs.map((pr) => pr.prNumber).sort((a, b) => a - b);
 }
 exports["default"] = {
     getPreviousExistingTag,
