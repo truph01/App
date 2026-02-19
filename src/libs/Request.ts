@@ -73,7 +73,7 @@ function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isF
 
     const xhrPromise = makeXHR(request, outerSpan);
     return middlewares
-        .reduce<Promise<Response<TKey> | void>>((last, {middleware}) => middleware(last, request, isFromSequentialQueue), xhrPromise)
+        .reduce<Promise<Response<TKey> | void>>((last, {middleware}) => middleware(last, request, isFromSequentialQueue) ?? last, xhrPromise)
         .then((response) => {
             currentProcessMiddlewaresSpan?.setStatus({code: 1});
             currentProcessMiddlewaresSpan?.end();
