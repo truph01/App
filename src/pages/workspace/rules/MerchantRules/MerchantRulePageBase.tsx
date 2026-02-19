@@ -34,7 +34,7 @@ import type {MerchantRuleForm} from '@src/types/form';
 import type {PolicyTagLists} from '@src/types/onyx';
 import type {CodingRule} from '@src/types/onyx/Policy';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
-import { hasEnabledOptions } from '@libs/OptionsListUtils';
+import {hasEnabledOptions} from '@libs/OptionsListUtils';
 
 type MerchantRulePageBaseProps = {
     policyID: string;
