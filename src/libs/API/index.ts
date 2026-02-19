@@ -25,34 +25,34 @@ import {READ_COMMANDS} from './types';
 // e.g. an error thrown in Logging or Reauthenticate logic will be caught by the next middleware or the SequentialQueue which retries failing requests.
 
 // Logging - Logs request details and errors.
-addMiddleware(Logging, 'Logging');
+addMiddleware(Logging, CONST.TELEMETRY.MIDDLEWARE_LOGGING);
 
 // RecheckConnection - Sets a timer for a request that will "recheck" if we are connected to the internet if time runs out. Also triggers the connection recheck when we encounter any error.
-addMiddleware(RecheckConnection, 'RecheckConnection');
+addMiddleware(RecheckConnection, CONST.TELEMETRY.MIDDLEWARE_RECHECK_CONNECTION);
 
 // Reauthentication - Handles jsonCode 407 which indicates an expired authToken. We need to reauthenticate and get a new authToken with our stored credentials.
-addMiddleware(Reauthentication, 'Reauthentication');
+addMiddleware(Reauthentication, CONST.TELEMETRY.MIDDLEWARE_REAUTHENTICATION);
 
 // Handles the case when the copilot has been deleted. The response contains jsonCode 408 and a message indicating account deletion
-addMiddleware(handleDeletedAccount, 'HandleDeletedAccount');
+addMiddleware(handleDeletedAccount, CONST.TELEMETRY.MIDDLEWARE_HANDLE_DELETED_ACCOUNT);
 
 // Handle supportal permission denial centrally
-addMiddleware(SupportalPermission, 'SupportalPermission');
+addMiddleware(SupportalPermission, CONST.TELEMETRY.MIDDLEWARE_SUPPORTAL_PERMISSION);
 
 // If an optimistic ID is not used by the server, this will update the remaining serialized requests using that optimistic ID to use the correct ID instead.
-addMiddleware(HandleUnusedOptimisticID, 'HandleUnusedOptimisticID');
+addMiddleware(HandleUnusedOptimisticID, CONST.TELEMETRY.MIDDLEWARE_HANDLE_UNUSED_OPTIMISTIC_ID);
 
-addMiddleware(Pagination, 'Pagination');
+addMiddleware(Pagination, CONST.TELEMETRY.MIDDLEWARE_PAGINATION);
 
 // SentryServerTiming - Tracks server round-trip time for configured command groups via Sentry spans.
-addMiddleware(SentryServerTiming, 'SentryServerTiming');
+addMiddleware(SentryServerTiming, CONST.TELEMETRY.MIDDLEWARE_SENTRY_SERVER_TIMING);
 
 // SaveResponseInOnyx - Merges either the successData or failureData (or finallyData, if included in place of the former two values) into Onyx depending on if the call was successful or not. This needs to be the LAST middleware we use, don't add any
 // middlewares after this, because the SequentialQueue depends on the result of this middleware to pause the queue (if needed) to bring the app to an up-to-date state.
-addMiddleware(SaveResponseInOnyx, 'SaveResponseInOnyx');
+addMiddleware(SaveResponseInOnyx, CONST.TELEMETRY.MIDDLEWARE_SAVE_RESPONSE_IN_ONYX);
 
 // FraudMonitoring - Tags the request with the appropriate Fraud Protection event.
-addMiddleware(FraudMonitoring, 'FraudMonitoring');
+addMiddleware(FraudMonitoring, CONST.TELEMETRY.MIDDLEWARE_FRAUD_MONITORING);
 
 let requestIndex = 0;
 
