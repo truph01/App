@@ -14,6 +14,7 @@ import SearchFiltersBar from '@components/Search/SearchPageHeader/SearchFiltersB
 import SearchPageHeader from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {BankAccountMenuItem, SearchParams, SearchQueryJSON} from '@components/Search/types';
+import useIsAnonymousUser from '@hooks/useIsAnonymousUser';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
@@ -46,7 +47,6 @@ type SearchPageWideProps = {
     initScanRequest: (e: DragEvent) => void;
     PDFValidationComponent: React.ReactNode;
     ErrorModal: React.ReactNode;
-    isDragDisabled: boolean;
     shouldShowFooter: boolean;
 };
 
@@ -68,9 +68,9 @@ function SearchPageWide({
     initScanRequest,
     PDFValidationComponent,
     ErrorModal,
-    isDragDisabled,
     shouldShowFooter,
 }: SearchPageWideProps) {
+    const isAnonymousUser = useIsAnonymousUser();
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -101,7 +101,7 @@ function SearchPageWide({
                     shouldShowLink={false}
                 >
                     {!!queryJSON && (
-                        <DragAndDropProvider isDisabled={isDragDisabled}>
+                        <DragAndDropProvider isDisabled={isAnonymousUser}>
                             {PDFValidationComponent}
                             <SearchPageHeader
                                 queryJSON={queryJSON}

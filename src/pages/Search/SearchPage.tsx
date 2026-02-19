@@ -1277,7 +1277,6 @@ function SearchPage({route}: SearchPageProps) {
                         initScanRequest={initScanRequest}
                         PDFValidationComponent={PDFValidationComponent}
                         ErrorModal={ErrorModal}
-                        isDragDisabled={isDragDisabled}
                         shouldShowFooter={shouldShowFooter}
                     />
                 )}
