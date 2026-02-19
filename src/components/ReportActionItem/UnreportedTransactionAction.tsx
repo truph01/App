@@ -21,10 +21,10 @@ function UnreportedTransactionAction({action}: UnreportedTransactionActionProps)
     const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`, {canBeMissing: true});
 
     const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-    const hasUnreportedTransaction = getUnreportedTransactionMessage(translate, action);
+    const unreportedTransactionMessage = getUnreportedTransactionMessage(translate, action);
     const htmlContent = isPendingDelete
-        ? `<del><comment><muted-text>${Parser.htmlToText(hasUnreportedTransaction)}</muted-text></comment></del>`
-        : `<comment><muted-text>${getUnreportedTransactionMessage(translate, action)}</muted-text></comment>`;
+        ? `<del><comment><muted-text>${Parser.htmlToText(unreportedTransactionMessage)}</muted-text></comment></del>`
+        : `<comment><muted-text>${unreportedTransactionMessage}</muted-text></comment>`;
 
     return (
         <ReportActionItemBasicMessage message="">

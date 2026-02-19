@@ -1,3 +1,4 @@
+import React from 'react';
 import useLocalize from '@hooks/useLocalize';
 import Parser from '@libs/Parser';
 import RenderHTML from '@components/RenderHTML';
@@ -10,7 +11,10 @@ import type {ReportAction} from '@src/types/onyx';
 import useOnyx from '@hooks/useOnyx';
 
 type MovedTransactionActionProps = {
+    /** The moved transaction action data */
     action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION>;
+
+    /** The element to render when there is no report that the transaction was moved to or from */
     emptyHTML: React.JSX.Element;
 };
 
