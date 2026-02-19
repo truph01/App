@@ -8451,6 +8451,12 @@ const CONST = {
         TRANSACTION_ITEM_ROW: {
             ARROW_RIGHT: 'TransactionItemRow-ArrowRight',
         },
+        PDF_VIEW: {
+            DOCUMENT: 'PDFView-Document',
+        },
+        AVATAR_CROP_MODAL: {
+            ZOOM_SLIDER: 'AvatarCropModal-ZoomSlider',
+        },
         PAYMENT_METHOD_LIST_ITEM: {
             CHASE_ACCOUNT_HELP: 'PaymentMethodListItem-ChaseAccountHelp',
         },

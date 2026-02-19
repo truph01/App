@@ -420,6 +420,7 @@ function AvatarCropModal({imageUri = '', imageName = '', imageType = '', onClose
                                         onPressIn={(e) => scheduleOnUI(sliderOnPress, e.nativeEvent.locationX)}
                                         accessibilityLabel="slider"
                                         role={CONST.ROLE.SLIDER}
+                                        sentryLabel={CONST.SENTRY_LABEL.AVATAR_CROP_MODAL.ZOOM_SLIDER}
                                     >
                                         <Slider
                                             sliderValue={translateSlider}
