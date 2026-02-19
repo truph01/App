@@ -22,7 +22,7 @@ function getOldestTransactionPendingReview(transactions: TransactionPending3DSRe
 
             const expiresDiff = new Date(a.expires).getTime() - new Date(b.expires).getTime();
             if (expiresDiff !== 0) {
-                return createdDiff;
+                return expiresDiff;
             }
             
             return Number(a.transactionID) - Number(b.transactionID)
