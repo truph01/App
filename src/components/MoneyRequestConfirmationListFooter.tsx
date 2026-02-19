@@ -61,6 +61,7 @@ import MentionReportContext from './HTMLEngineProvider/HTMLRenderers/MentionRepo
 import Icon from './Icon';
 import MenuItem from './MenuItem';
 import MenuItemWithTopDescription from './MenuItemWithTopDescription';
+import getCompactReceiptDimensions from './MoneyRequestConfirmationListFooter/getCompactReceiptDimensions';
 import getImageCompactModeStyle from './MoneyRequestConfirmationListFooter/getImageCompactModeStyle';
 import getReceiptContainerCompactModeStyle from './MoneyRequestConfirmationListFooter/getReceiptContainerCompactModeStyle';
 import PDFThumbnail from './PDFThumbnail';
@@ -69,9 +70,6 @@ import ReceiptEmptyState from './ReceiptEmptyState';
 import ReceiptImage from './ReceiptImage';
 import {ShowContextMenuContext} from './ShowContextMenuContext';
 import Text from './Text';
-
-const COMPACT_RECEIPT_MAX_WIDTH = 440;
-const COMPACT_RECEIPT_DEFAULT_ASPECT_RATIO = 16 / 9;
 
 type MoneyRequestConfirmationListFooterProps = {
     /** The action to perform */
@@ -1040,11 +1038,16 @@ function MoneyRequestConfirmationListFooter({
 
     const hasReceiptImageOrThumbnail = !!(receiptImage ?? receiptThumbnail);
     const horizontalMargin = typeof styles.moneyRequestImage.marginHorizontal === 'number' ? styles.moneyRequestImage.marginHorizontal : 0;
-    const availableWidth = Math.max(windowWidth - horizontalMargin * 2, 0);
-    const compactReceiptMaxWidth = Math.min(COMPACT_RECEIPT_MAX_WIDTH, availableWidth || COMPACT_RECEIPT_MAX_WIDTH);
-    const compactReceiptAspectRatio = receiptAspectRatio && receiptAspectRatio > 0 ? receiptAspectRatio : COMPACT_RECEIPT_DEFAULT_ASPECT_RATIO;
-    const effectiveCompactReceiptWidth = compactReceiptContainerWidth > 0 ? compactReceiptContainerWidth : compactReceiptMaxWidth;
-    const compactReceiptMaxHeight = Math.round(effectiveCompactReceiptWidth / compactReceiptAspectRatio);
+    const {compactReceiptMaxWidth, compactReceiptMaxHeight} = useMemo(
+        () =>
+            getCompactReceiptDimensions({
+                windowWidth,
+                horizontalMargin,
+                containerWidth: compactReceiptContainerWidth,
+                aspectRatio: receiptAspectRatio,
+            }),
+        [windowWidth, horizontalMargin, compactReceiptContainerWidth, receiptAspectRatio],
+    );
 
     const compactReceiptStyle = useMemo(() => {
         if (!isCompactMode) {
