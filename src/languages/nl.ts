@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -6311,7 +6310,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 adultEntertainment: 'Volwassenenentertainment',
                 requireCompanyCard: 'Verplicht bedrijfskaarten voor alle aankopen',
                 requireCompanyCardDescription: 'Markeer alle contante uitgaven, inclusief kilometer- en dagvergoedingen.',
-                requireCompanyCardDisabledTooltip: 'Koppel een bedrijfskaart om deze functie in te schakelen.',
+                requireCompanyCardDisabledTooltip: 'Schakel Bedrijfskaarten in (onder Meer functies) om te ontgrendelen.',
             },
             expenseReportRules: {
                 title: 'Geavanceerd',
