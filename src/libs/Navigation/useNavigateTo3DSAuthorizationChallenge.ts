@@ -9,20 +9,8 @@ import useNativeBiometrics from '@components/MultifactorAuthentication/Context/u
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import Navigation from './Navigation';
 
-function getMostUrgentTransactionPendingReview(transactions: TransactionPending3DSReview[]) {
-    return transactions
-        .sort((a, b) => {
-            const aExpires = new Date(a.expires);
-            const bExpires = new Date(b.expires);
-            if (aExpires < bExpires) {
-                return -1;
-            }
-            if (aExpires > bExpires) {
-                return 1;
-            }
-            return 0;
-        })
-        .at(0);
+function getOldestTransactionPendingReview(transactions: TransactionPending3DSReview[]) {
+    return transactions.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()).at(0);
 }
 
 function useNavigateTo3DSAuthorizationChallenge() {
@@ -38,7 +26,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
         const nonBlocklistedTransactions = Object.values(transactionsPending3DSReview).filter((challenge) =>
             blocklistedTransactionChallenges && challenge.transactionID ? !blocklistedTransactionChallenges[challenge.transactionID] : true,
         );
-        return getMostUrgentTransactionPendingReview(nonBlocklistedTransactions);
+        return getOldestTransactionPendingReview(nonBlocklistedTransactions);
     }, [transactionsPending3DSReview, blocklistedTransactionChallenges, blocklistResult]);
 
     useEffect(() => {
