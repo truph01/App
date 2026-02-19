@@ -42,6 +42,7 @@ import UnreadActionIndicator from '@components/UnreadActionIndicator';
 import useActivePolicy from '@hooks/useActivePolicy';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
@@ -75,6 +76,7 @@ import {
     getAddedConnectionMessage,
     getAutoPayApprovedReportsEnabledMessage,
     getAutoReimbursementMessage,
+    getCardConnectionBrokenMessage,
     getChangedApproverActionMessage,
     getCompanyAddressUpdateMessage,
     getCompanyCardConnectionBrokenMessage,
@@ -161,6 +163,7 @@ import {
     isActionableReportMentionWhisper,
     isActionableTrackExpense,
     isActionOfType,
+    isCardBrokenConnectionAction,
     isCardIssuedAction,
     isChronosOOOListAction,
     isConciergeCategoryOptions,
@@ -239,6 +242,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {JoinWorkspaceResolution, OriginalMessageMovedTransaction, OriginalMessageUnreportedTransaction} from '@src/types/onyx/OriginalMessage';
 import {isEmptyObject, isEmptyValueObject} from '@src/types/utils/EmptyObject';
+import {isPersonalCardBrokenConnection} from '@libs/CardUtils';
 import {RestrictedReadOnlyContextMenuActions} from './ContextMenu/ContextMenuActions';
 import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMenu';
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
@@ -372,6 +376,9 @@ type PureReportActionItemProps = {
 
     /** Whether the room is a chronos report */
     isChronosReport?: boolean;
+
+    /** All cards */
+    cardList?: OnyxTypes.CardList;
 
     /** Function to toggle emoji reaction */
     toggleEmojiReaction?: (
@@ -515,6 +522,7 @@ function PureReportActionItem({
     iouReportOfLinkedReport,
     emojiReactions,
     linkedTransactionRouteError,
+    cardList,
     isUserValidated,
     parentReport,
     personalDetails,
@@ -580,6 +588,7 @@ function PureReportActionItem({
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Eye'] as const);
+    const {environmentURL} = useEnvironment();
 
     const highlightedBackgroundColorIfNeeded = useMemo(
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -1622,7 +1631,6 @@ function PureReportActionItem({
                         <ActionableItemButtons
                             items={actionableItemButtons}
                             layout="horizontal"
-                            isBackgroundHovered={hovered}
                         />
                     )}
                 </View>
@@ -1636,7 +1644,6 @@ function PureReportActionItem({
                             items={actionableItemButtons}
                             shouldUseLocalization
                             layout={isActionableTrackExpense(action) ? 'vertical' : 'horizontal'}
-                            isBackgroundHovered={hovered}
                         />
                     )}
                 </View>
@@ -1653,6 +1660,15 @@ function PureReportActionItem({
                     policyID={report?.policyID}
                     shouldNavigateToCardDetails={shouldNavigateToCardDetails}
                 />
+            );
+        } else if (isCardBrokenConnectionAction(action)) {
+            const cardID = getOriginalMessage(action)?.cardID;
+            const card = cardID ? cardList?.[cardID] : undefined;
+            const connectionLink = cardID && isPersonalCardBrokenConnection(card) ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : undefined;
+            children = (
+                <ReportActionItemBasicMessage message="">
+                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
+                </ReportActionItemBasicMessage>
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {
             children = <ExportIntegration action={action} />;
@@ -1750,7 +1766,6 @@ function PureReportActionItem({
                             items={actionableItemButtons}
                             shouldUseLocalization
                             layout="vertical"
-                            isBackgroundHovered={hovered}
                         />
                     )}
                 </ReportActionItemBasicMessage>
@@ -1826,9 +1841,9 @@ function PureReportActionItem({
                                             }
                                             shouldUseLocalization={!isConciergeOptions && !actionContainsFollowUps}
                                             primaryTextNumberOfLines={actionableButtonsNoLines}
-                                            isBackgroundHovered={hovered}
                                             styles={{
-                                                text: [styles.textAlignLeft, styles.breakWord],
+                                                text: [isConciergeOptions || actionContainsFollowUps ? styles.textAlignLeft : undefined],
+                                                button: actionContainsFollowUps ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
                                                 container: [
                                                     actionContainsFollowUps && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
                                                     actionContainsFollowUps ? styles.mt5 : undefined,
@@ -2228,6 +2243,7 @@ export default memo(PureReportActionItem, (prevProps, nextProps) => {
         deepEqual(prevProps.taskReport, nextProps.taskReport) &&
         prevProps.shouldHighlight === nextProps.shouldHighlight &&
         deepEqual(prevProps.bankAccountList, nextProps.bankAccountList) &&
+        deepEqual(prevProps.cardList, nextProps.cardList) &&
         prevProps.reportNameValuePairsOrigin === nextProps.reportNameValuePairsOrigin &&
         prevProps.reportNameValuePairsOriginalID === nextProps.reportNameValuePairsOriginalID &&
         prevProps.reportMetadata?.pendingExpenseAction === nextProps.reportMetadata?.pendingExpenseAction
