@@ -8,7 +8,7 @@ type RemainingLimitCircleProps = {
     spentFraction: number;
 };
 
-const SIZE = 28;
+const SIZE = 24;
 const STROKE_WIDTH = 4;
 const RADIUS = (SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
