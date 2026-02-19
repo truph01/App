@@ -16251,7 +16251,7 @@ class GithubUtils {
                 commit: commit.sha,
                 subject: commit.commit.message,
                 authorName: commit.commit.author?.name ?? 'Unknown',
-                authorDate: commit.commit.author?.date ?? '',
+                date: commit.commit.committer?.date ?? '',
             }));
         }
         catch (error) {

@@ -92,7 +92,7 @@ function getSubmoduleUpdates(commits: CommitType[]): SubmoduleUpdate[] {
         if (match) {
             updates.push({
                 version: match[1],
-                date: commit.authorDate,
+                date: commit.date,
                 commit: commit.commit,
             });
         }
@@ -125,7 +125,7 @@ function getValidMergedPRs(commits: CommitType[]): MergedPR[] {
             continue;
         }
 
-        mergedPRs.set(pr, commit.authorDate);
+        mergedPRs.set(pr, commit.date);
     }
 
     return Array.from(mergedPRs.entries()).map(([prNumber, date]) => ({prNumber, date}));

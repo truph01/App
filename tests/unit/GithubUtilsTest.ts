@@ -690,6 +690,9 @@ describe('GithubUtils', () => {
                                 name: 'Test Author',
                                 date: '2024-01-01T00:00:00Z',
                             },
+                            committer: {
+                                date: '2024-01-01T00:00:00Z',
+                            },
                         },
                         author: {
                             login: 'username',
@@ -703,7 +706,7 @@ describe('GithubUtils', () => {
                 commit: 'abc123',
                 subject: 'Test commit message',
                 authorName: 'Test Author',
-                authorDate: '2024-01-01T00:00:00Z',
+                date: '2024-01-01T00:00:00Z',
             },
         ],
         multipleCommitsResponse: {
@@ -714,6 +717,7 @@ describe('GithubUtils', () => {
                         commit: {
                             message: 'First commit',
                             author: {name: 'Author One', date: '2024-01-02T00:00:00Z'},
+                            committer: {date: '2024-01-02T00:00:00Z'},
                         },
                     },
                     {
@@ -721,6 +725,7 @@ describe('GithubUtils', () => {
                         commit: {
                             message: 'Second commit',
                             author: {name: 'Author Two', date: '2024-01-03T00:00:00Z'},
+                            committer: {date: '2024-01-03T00:00:00Z'},
                         },
                     },
                 ],
@@ -798,13 +803,13 @@ describe('GithubUtils', () => {
                 commit: 'abc123',
                 subject: 'First commit',
                 authorName: 'Author One',
-                authorDate: '2024-01-02T00:00:00Z',
+                date: '2024-01-02T00:00:00Z',
             });
             expect(result.at(1)).toEqual({
                 commit: 'def456',
                 subject: 'Second commit',
                 authorName: 'Author Two',
-                authorDate: '2024-01-03T00:00:00Z',
+                date: '2024-01-03T00:00:00Z',
             });
         });
 

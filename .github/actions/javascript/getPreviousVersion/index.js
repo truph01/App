@@ -11758,7 +11758,7 @@ function getSubmoduleUpdates(commits) {
         if (match) {
             updates.push({
                 version: match[1],
-                date: commit.authorDate,
+                date: commit.date,
                 commit: commit.commit,
             });
         }
@@ -11787,7 +11787,7 @@ function getValidMergedPRs(commits) {
             mergedPRs.delete(pr);
             continue;
         }
-        mergedPRs.set(pr, commit.authorDate);
+        mergedPRs.set(pr, commit.date);
     }
     return Array.from(mergedPRs.entries()).map(([prNumber, date]) => ({ prNumber, date }));
 }
@@ -12449,7 +12449,7 @@ class GithubUtils {
                 commit: commit.sha,
                 subject: commit.commit.message,
                 authorName: commit.commit.author?.name ?? 'Unknown',
-                authorDate: commit.commit.author?.date ?? '',
+                date: commit.commit.committer?.date ?? '',
             }));
         }
         catch (error) {

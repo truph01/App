@@ -29,7 +29,7 @@ type CommitType = {
     commit: string;
     subject: string;
     authorName: string;
-    authorDate: string;
+    date: string;
 };
 
 type StagingDeployCashPR = {
@@ -785,7 +785,7 @@ class GithubUtils {
                     commit: commit.sha,
                     subject: commit.commit.message,
                     authorName: commit.commit.author?.name ?? 'Unknown',
-                    authorDate: commit.commit.author?.date ?? '',
+                    date: commit.commit.committer?.date ?? '',
                 }),
             );
         } catch (error) {
