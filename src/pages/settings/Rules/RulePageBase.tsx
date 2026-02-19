@@ -29,6 +29,7 @@ import ROUTES from '@src/ROUTES';
 import type {ExpenseRuleForm} from '@src/types/form';
 import type {ExpenseRule, PolicyCategories, PolicyTagLists} from '@src/types/onyx';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
+import {hasEnabledOptions} from '@libs/OptionsListUtils';
 
 type RulePageBaseProps = {
     titleKey: TranslationPaths;
@@ -101,7 +102,7 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
     const categoriesSelector = useCallback(
         (allPolicyCategories: OnyxCollection<PolicyCategories>) => {
             const categories = getAvailableNonPersonalPolicyCategories(allPolicyCategories, personalPolicyID);
-            return Object.values(categories ?? {}).flatMap((policyCategories) => Object.values(policyCategories ?? {})).length > 0;
+            return Object.values(categories ?? {}).filter((policyCategories) => hasEnabledOptions(policyCategories ?? {})).flatMap((policyCategories) => Object.values(policyCategories ?? {})).length > 0;
         },
         [personalPolicyID],
     );
