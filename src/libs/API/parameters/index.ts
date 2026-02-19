@@ -1,4 +1,5 @@
 export type {default as GetTransactionsForMergingParams} from './GetTransactionsForMergingParams';
+export type {default as GetTransactionsPending3DSReviewParams} from './GetTransactionsPending3DSReviewParams';
 export type {default as ImportCSVTransactionsParams} from './ImportCSVTransactionsParams';
 export type {default as ImportMultiLevelTagsParams} from './ImportMultiLevelTagsParams';
 export type {default as CleanPolicyTagsParams} from './CleanPolicyTagsParams';

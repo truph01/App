@@ -1,12 +1,12 @@
 import useOnyx from '@hooks/useOnyx';
-import {refreshTransactionsPending3DSReview} from '@libs/actions/MultifactorAuthentication';
+import {fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt} from '@libs/actions/MultifactorAuthentication';
 import ONYXKEYS from '@src/ONYXKEYS';
 import CONST from '@src/CONST';
 import type {TransactionPending3DSReview} from '@src/types/onyx';
 import {useEffect, useMemo} from 'react';
 import ROUTES from '@src/ROUTES';
 import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
-// see note inside useEffect
+// move TODO about this to scenario config
 // import AuthorizeTransaction from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import Navigation from './Navigation';
@@ -30,6 +30,10 @@ function getMostUrgentTransactionPendingReview(transactions: TransactionPending3
 function useNavigateTo3DSAuthorizationChallenge() {
     const [blocklistedTransactionChallenges, blocklistResult] = useOnyx(ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES, {canBeMissing: true});
     const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
+
+    console.log("[useNavigateTo3DSAuthorizationChallenge] transactionsPending3DSReview", transactionsPending3DSReview);
+    console.log("[useNavigateTo3DSAuthorizationChallenge] blocklistedTransactionChallenges", blocklistedTransactionChallenges);
+
 
     const {doesDeviceSupportBiometrics} = useNativeBiometrics();
 
@@ -56,6 +60,8 @@ function useNavigateTo3DSAuthorizationChallenge() {
             return;
         }
 
+        console.log('[useNavigateTo3DSAuthorizationChallenge] maybe navigating to queued challenge', transactionPending3DSReview?.transactionID);
+
         // note: importing AuthorizeTransaction in this file causes the browser to get stuck in an infinite reload loop
         // TODO figure out why (hard-coded to BIOMETRICS for now)
         // const allowedAuthenticationMethods = AuthorizeTransaction.allowedAuthenticationMethods;
@@ -71,14 +77,18 @@ function useNavigateTo3DSAuthorizationChallenge() {
         });
 
         if (!doesDeviceSupportAnAllowedAuthenticationMethod) {
-            return;
+            // return;
         }
 
         let cancel = false;
 
         async function maybeNavigateTo3DSChallenge() {
-            const challengeStillValid = await refreshTransactionsPending3DSReview();
-            if (!challengeStillValid || cancel || !transactionPending3DSReview?.transactionID) {
+            if (!transactionPending3DSReview?.transactionID) {
+                return;
+            }
+            const challengeStillValid = await fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt({transactionID: transactionPending3DSReview.transactionID});
+            console.log("challengeStillValid", challengeStillValid);
+            if (!challengeStillValid || cancel) {
                 return;
             }
             Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION.getRoute(transactionPending3DSReview.transactionID));

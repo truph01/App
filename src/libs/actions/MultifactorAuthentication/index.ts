@@ -189,9 +189,10 @@ async function revokeMultifactorAuthenticationCredentials() {
     }
 }
 
-async function refreshTransactionsPending3DSReview() {
-    // TODO call GetTransactionsPending3DSReview
-    return true;
+// CHUCK TODO named type somewhere
+async function fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt({transactionID}: {transactionID: string}) {
+    const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.GET_TRANSACTIONS_PENDING_3DS_REVIEW, {transactionID}, {});
+    return !!response?.transactionsPending3DSReview?.[transactionID];
 }
 
 async function authorizeTransaction({transactionID, signedChallenge, authenticationMethod}: MultifactorAuthenticationScenarioParameters['AUTHORIZE-TRANSACTION']) {
@@ -320,7 +321,7 @@ export {
     revokeMultifactorAuthenticationCredentials,
     markHasAcceptedSoftPrompt,
     clearLocalMFAPublicKeyList,
-    refreshTransactionsPending3DSReview,
+    fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt,
     denyTransaction,
     authorizeTransaction,
 };
