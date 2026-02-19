@@ -10,6 +10,7 @@ import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBa
 import RenderHTML from '@components/RenderHTML';
 
 type UnreportedTransactionActionProps = {
+    /** The action when a transaction is unreported */
     action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION>;
 };
 

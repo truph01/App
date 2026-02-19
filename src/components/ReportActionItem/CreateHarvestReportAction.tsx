@@ -7,6 +7,7 @@ import useLocalize from '@hooks/useLocalize';
 import {getHarvestCreatedExpenseReportMessage} from '@libs/ReportActionsUtils';
 
 type CreateHarvestReportActionProps = {
+    /** The original ID of the report */
     reportNameValuePairsOriginalID: string | undefined;
 };
 

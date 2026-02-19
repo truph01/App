@@ -9,6 +9,7 @@ import type {ReportAction} from '@src/types/onyx';
 import type CONST from '@src/CONST';
 
 type CreatedReportForUnapprovedTransactionsActionProps = {
+    /** The report action when a report was created for unapproved transactions  */
     action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.CREATED_REPORT_FOR_UNAPPROVED_TRANSACTIONS>;
 };
 
