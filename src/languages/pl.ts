@@ -5090,6 +5090,11 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                     autoAddTripName: {title: 'Dodaj nazwy podróży do wydatków', subtitle: 'Automatycznie dodawaj nazwy podróży do opisów wydatków za podróże zarezerwowane w Expensify.'},
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Rezerwacja podróży',
+                        subtitle: 'Gratulacje! Wszystko gotowe, aby rezerwować i zarządzać podróżami w tym obszarze roboczym.',
+                        manageTravelLabel: 'Zarządzaj podróżami',
+                    },
                     centralInvoicingSection: {
                         title: 'Centralne fakturowanie',
                         subtitle: 'Skonsoliduj wszystkie wydatki na podróże w jednym miesięcznym rachunku zamiast płacić w momencie zakupu.',
@@ -5102,6 +5107,16 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                             settlementFrequencyLabel: 'Częstotliwość rozliczeń',
                             settlementFrequencyDescription: 'Jak często Expensify będzie pobierać środki z firmowego konta bankowego, aby rozliczyć ostatnie transakcje Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Wyłączyć fakturowanie podróży?',
+                        body: 'Nadchodzące rezerwacje hoteli i wynajmu samochodów mogą wymagać ponownej rezerwacji z użyciem innej metody płatności, aby uniknąć anulowania.',
+                        confirm: 'Wyłącz',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Nie można wyłączyć fakturowania podróży',
+                        body: 'Masz nadal zaległe saldo za podróż. Najpierw ureguluj swoje saldo.',
+                        confirm: 'Rozumiem',
                     },
                 },
             },

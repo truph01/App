@@ -5064,6 +5064,11 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 bookOrManageYourTrip: {title: '出張予約', subtitle: 'おめでとうございます！このワークスペースで旅行の予約と管理を行う準備が整いました。', ctaText: '出張を管理'},
                 settings: {autoAddTripName: {title: '経費に出張名を追加', subtitle: 'Expensifyで予約した出張について、経費の説明に出張名を自動的に追加します。'}},
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: '出張予約',
+                        subtitle: 'おめでとうございます！このワークスペースで旅行の予約と管理を行う準備ができました。',
+                        manageTravelLabel: '出張を管理',
+                    },
                     centralInvoicingSection: {
                         title: '集中請求',
                         subtitle: '購入時に支払うのではなく、すべての出張費を月次請求書に集約しましょう。',
@@ -5077,6 +5082,12 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                             settlementFrequencyDescription: 'Expensify が直近の Expensify Travel 取引を精算するために、あなたのビジネス銀行口座から資金を引き落とす頻度。',
                         },
                     },
+                    disableModal: {
+                        title: '旅費請求書発行をオフにしますか？',
+                        body: '今後のホテルおよびレンタカーの予約は、キャンセルを避けるために別のお支払い方法で再予約する必要がある場合があります。',
+                        confirm: 'オフにする',
+                    },
+                    outstandingBalanceModal: {title: 'トラベル請求書作成をオフにできません', body: '未清算の出張残高があります。先に残高を精算してください。', confirm: '了解しました'},
                 },
             },
             expensifyCard: {

@@ -5100,6 +5100,11 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                     autoAddTripName: {title: 'Reisnamen aan uitgaven toevoegen', subtitle: 'Voeg automatisch reisnamen toe aan onkostomemo’s voor reizen die in Expensify zijn geboekt.'},
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Reisboeking',
+                        subtitle: 'Gefeliciteerd! Je bent helemaal klaar om reizen in deze workspace te boeken en te beheren.',
+                        manageTravelLabel: 'Reizen beheren',
+                    },
                     centralInvoicingSection: {
                         title: 'Gecentraliseerde facturatie',
                         subtitle: 'Centraliseer alle reiskosten op één maandelijkse factuur in plaats van bij aankoop te betalen.',
@@ -5113,6 +5118,12 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                             settlementFrequencyDescription: 'Hoe vaak Expensify geld van uw zakelijke bankrekening zal incasseren om recente Expensify Travel-transacties te vereffenen.',
                         },
                     },
+                    disableModal: {
+                        title: 'Reisfacturatie uitschakelen?',
+                        body: 'Toekomstige hotel en autoverhuurreserveringen moeten mogelijk opnieuw worden geboekt met een andere betaalmethode om annulering te voorkomen.',
+                        confirm: 'Uitschakelen',
+                    },
+                    outstandingBalanceModal: {title: 'Kan Reiskostenfacturatie niet uitschakelen', body: 'Je hebt nog een openstaand reissaldo. Betaal eerst je saldo.', confirm: 'Begrepen'},
                 },
             },
             expensifyCard: {

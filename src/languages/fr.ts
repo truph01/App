@@ -5141,6 +5141,11 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Réservation de voyage',
+                        subtitle: 'Félicitations ! Vous êtes prêt à réserver et gérer des voyages sur cet espace de travail.',
+                        manageTravelLabel: 'Gérer les déplacements',
+                    },
                     centralInvoicingSection: {
                         title: 'Facturation centralisée',
                         subtitle: 'Centralisez toutes les dépenses de voyage dans une facture mensuelle au lieu de payer au moment de l’achat.',
@@ -5154,6 +5159,16 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                             settlementFrequencyDescription:
                                 'Fréquence à laquelle Expensify prélèvera sur votre compte bancaire professionnel pour régler les transactions récentes d’Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Désactiver la facturation de voyage?',
+                        body: "Les prochaines réservations d'hôtel et de location de voiture devront peut-être être réservées à nouveau avec un autre mode de paiement pour éviter une annulation.",
+                        confirm: 'Désactiver',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Impossible de désactiver la facturation Voyage',
+                        body: 'Vous avez encore un solde de voyage impayé. Veuillez d’abord régler ce solde.',
+                        confirm: 'Compris',
                     },
                 },
             },
