@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import PrevNextButtons from '@components/PrevNextButtons';
 import Text from '@components/Text';
@@ -49,10 +49,8 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
     const currentUserEmail = currentUserDetails.email ?? '';
     const searchKey = lastSearchQuery?.searchKey;
 
-    const allReports = useMemo(() => {
-        if (!type || !searchResultsData || !searchResultsSearch) {
-            return [];
-        }
+    let allReports: Array<string | undefined> = [];
+    if (!!type && !!searchResultsData && !!searchResultsSearch) {
         const [searchData] = getSections({
             type,
             data: searchResultsData,
@@ -70,29 +68,8 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
             allReportMetadata,
             cardList,
         });
-        return getSortedSections(type, status ?? '', searchData, localeCompare, translate, sortBy, sortOrder, groupBy).map((value) => value.reportID);
-    }, [
-        type,
-        status,
-        sortBy,
-        sortOrder,
-        groupBy,
-        searchResultsData,
-        searchResultsSearch,
-        currentAccountID,
-        currentUserEmail,
-        translate,
-        formatPhoneNumber,
-        bankAccountList,
-        exportReportActions,
-        searchKey,
-        archivedReportsIdSet,
-        isActionLoadingSet,
-        cardFeeds,
-        allReportMetadata,
-        cardList,
-        localeCompare,
-    ]);
+        allReports = getSortedSections(type, status ?? '', searchData, localeCompare, translate, sortBy, sortOrder, groupBy).map((value) => value.reportID);
+    }
 
     const currentIndex = allReports.indexOf(reportID);
     const allReportsCount = lastSearchQuery?.previousLengthOfResults ?? 0;
