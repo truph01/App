@@ -4382,16 +4382,9 @@ describe('SearchUIUtils', () => {
     });
 
     describe('Test createTypeMenuItems', () => {
-        const reportCounts = {
-            [CONST.SEARCH.SEARCH_KEYS.SUBMIT]: 0,
-            [CONST.SEARCH.SEARCH_KEYS.APPROVE]: 0,
-            [CONST.SEARCH.SEARCH_KEYS.PAY]: 0,
-            [CONST.SEARCH.SEARCH_KEYS.EXPORT]: 0,
-        };
-
         it('should return the default menu items', () => {
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const menuItems = SearchUIUtils.createTypeMenuSections(icons.current, undefined, undefined, {}, undefined, {}, {}, false, undefined, false, {}, reportCounts)
+            const menuItems = SearchUIUtils.createTypeMenuSections(icons.current, undefined, undefined, {}, undefined, {}, {}, false, undefined, false)
                 .map((section) => section.menuItems)
                 .flat();
 
@@ -4481,8 +4474,6 @@ describe('SearchUIUtils', () => {
                 false,
                 undefined,
                 false,
-                {},
-                reportCounts,
             );
 
             const todoSection = sections.find((section) => section.translationPath === 'common.todo');
@@ -4545,8 +4536,6 @@ describe('SearchUIUtils', () => {
                 false,
                 undefined,
                 false,
-                {},
-                reportCounts,
             );
 
             const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
@@ -4577,7 +4566,7 @@ describe('SearchUIUtils', () => {
             };
 
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, {}, mockSavedSearches, false, undefined, false, {}, reportCounts);
+            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, {}, mockSavedSearches, false, undefined, false);
 
             const savedSection = sections.find((section) => section.translationPath === 'search.savedSearchesMenuItemTitle');
             expect(savedSection).toBeDefined();
@@ -4587,7 +4576,7 @@ describe('SearchUIUtils', () => {
             const mockSavedSearches = {};
 
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, {}, mockSavedSearches, false, undefined, false, {}, reportCounts);
+            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, {}, mockSavedSearches, false, undefined, false);
 
             const savedSection = sections.find((section) => section.translationPath === 'search.savedSearchesMenuItemTitle');
             expect(savedSection).toBeUndefined();
@@ -4615,8 +4604,6 @@ describe('SearchUIUtils', () => {
                 false, // not offline
                 undefined,
                 false,
-                {},
-                reportCounts,
             );
 
             const savedSection = sections.find((section) => section.translationPath === 'search.savedSearchesMenuItemTitle');
@@ -4645,8 +4632,6 @@ describe('SearchUIUtils', () => {
                 true, // offline
                 undefined,
                 false,
-                {},
-                reportCounts,
             );
 
             const savedSection = sections.find((section) => section.translationPath === 'search.savedSearchesMenuItemTitle');
@@ -4668,7 +4653,7 @@ describe('SearchUIUtils', () => {
             };
 
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, mockPolicies, {}, false, undefined, false, {}, reportCounts);
+            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, mockPolicies, {}, false, undefined, false);
 
             const todoSection = sections.find((section) => section.translationPath === 'common.todo');
             expect(todoSection).toBeUndefined();
@@ -4700,8 +4685,6 @@ describe('SearchUIUtils', () => {
                 false,
                 undefined,
                 false,
-                {},
-                reportCounts,
             );
 
             const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
@@ -4733,7 +4716,7 @@ describe('SearchUIUtils', () => {
             };
 
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, mockPolicies, {}, false, undefined, false, {}, reportCounts);
+            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, {}, undefined, mockPolicies, {}, false, undefined, false);
 
             const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
             expect(accountingSection).toBeDefined();
@@ -4759,20 +4742,7 @@ describe('SearchUIUtils', () => {
 
             const mockCardFeedsByPolicy: Record<string, CardFeedForDisplay[]> = {};
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const sections = SearchUIUtils.createTypeMenuSections(
-                icons.current,
-                adminEmail,
-                adminAccountID,
-                mockCardFeedsByPolicy,
-                undefined,
-                mockPolicies,
-                {},
-                false,
-                undefined,
-                false,
-                {},
-                reportCounts,
-            );
+            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, mockCardFeedsByPolicy, undefined, mockPolicies, {}, false, undefined, false);
             const accountingSection = sections.find((section) => section.translationPath === 'workspace.common.accounting');
 
             expect(accountingSection).toBeDefined();
@@ -4782,7 +4752,7 @@ describe('SearchUIUtils', () => {
 
         it('should generate correct routes', () => {
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const menuItems = SearchUIUtils.createTypeMenuSections(icons.current, undefined, undefined, {}, undefined, {}, {}, false, undefined, false, {}, reportCounts)
+            const menuItems = SearchUIUtils.createTypeMenuSections(icons.current, undefined, undefined, {}, undefined, {}, {}, false, undefined, false)
                 .map((section) => section.menuItems)
                 .flat();
 
@@ -4845,20 +4815,7 @@ describe('SearchUIUtils', () => {
             };
 
             const {result: icons} = renderHook(() => useMemoizedLazyExpensifyIcons(['Document', 'Pencil', 'ThumbsUp']));
-            const sections = SearchUIUtils.createTypeMenuSections(
-                icons.current,
-                adminEmail,
-                adminAccountID,
-                mockCardFeedsByPolicy,
-                undefined,
-                mockPolicies,
-                {},
-                false,
-                undefined,
-                false,
-                {},
-                reportCounts,
-            );
+            const sections = SearchUIUtils.createTypeMenuSections(icons.current, adminEmail, adminAccountID, mockCardFeedsByPolicy, undefined, mockPolicies, {}, false, undefined, false);
             const todoSection = sections.find((section) => section.translationPath === 'common.todo');
             expect(todoSection).toBeDefined();
 
@@ -4867,10 +4824,10 @@ describe('SearchUIUtils', () => {
             const payItem = todoSection?.menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.PAY);
             const exportItem = todoSection?.menuItems.find((item) => item.key === CONST.SEARCH.SEARCH_KEYS.EXPORT);
 
-            expect(submitItem?.badgeText).toBe('');
-            expect(approveItem?.badgeText).toBe('');
-            expect(payItem?.badgeText).toBe('');
-            expect(exportItem?.badgeText).toBe('');
+            expect(submitItem).toBeDefined();
+            expect(approveItem).toBeDefined();
+            expect(payItem).toBeDefined();
+            expect(exportItem).toBeDefined();
         });
     });
 
@@ -5117,7 +5074,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.export).toBe(false);
+            expect(response.visibility.export).toBe(false);
 
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             policies[policyKey]!.connections![CONST.POLICY.CONNECTIONS.NAME.NETSUITE].lastSync = {
@@ -5131,7 +5088,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response2 = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response2.export).toBe(true);
+            expect(response2.visibility.export).toBe(true);
         });
 
         test('Should show Top Categories when areCategoriesEnabled is true', () => {
@@ -5147,7 +5104,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.topCategories).toBe(true);
+            expect(response.visibility.topCategories).toBe(true);
         });
 
         test('Should hide Top Categories when areCategoriesEnabled is false', () => {
@@ -5163,7 +5120,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.topCategories).toBe(false);
+            expect(response.visibility.topCategories).toBe(false);
         });
 
         test('Should not show Top Categories when areCategoriesEnabled is undefined', () => {
@@ -5179,7 +5136,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.topCategories).toBe(false);
+            expect(response.visibility.topCategories).toBe(false);
         });
 
         test('Should not show Top Categories for free policies even if categories are enabled', () => {
@@ -5195,7 +5152,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.topCategories).toBe(false);
+            expect(response.visibility.topCategories).toBe(false);
         });
 
         test('Should show Top Categories if at least one policy has categories enabled', () => {
@@ -5215,7 +5172,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.topCategories).toBe(true);
+            expect(response.visibility.topCategories).toBe(true);
         });
 
         test('Should hide Top Categories if all policies have categories disabled', () => {
@@ -5235,7 +5192,7 @@ describe('SearchUIUtils', () => {
             };
 
             const response = SearchUIUtils.getSuggestedSearchesVisibility(adminEmail, {}, policies, undefined);
-            expect(response.topCategories).toBe(false);
+            expect(response.visibility.topCategories).toBe(false);
         });
     });
 

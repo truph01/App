@@ -12,11 +12,11 @@ import DebugTabView from '@components/Navigation/DebugTabView';
 import {PressableWithFeedback} from '@components/Pressable';
 import Text from '@components/Text';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDefaultSearchQuery from '@hooks/useDefaultSearchQuery';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useSearchTypeMenuSections from '@hooks/useSearchTypeMenuSections';
 import {useSidebarOrderedReports} from '@hooks/useSidebarOrderedReports';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useSubscriptionPlan from '@hooks/useSubscriptionPlan';
@@ -31,7 +31,6 @@ import isRoutePreloaded from '@libs/Navigation/helpers/isRoutePreloaded';
 import navigateToWorkspacesPage, {getWorkspaceNavigationRouteState} from '@libs/Navigation/helpers/navigateToWorkspacesPage';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildCannedSearchQuery, buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUtils';
-import {getDefaultActionableSearchMenuItem} from '@libs/SearchUIUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import type {BrickRoad} from '@libs/WorkspacesSettingsUtils';
 import {getChatTabBrickRoad} from '@libs/WorkspacesSettingsUtils';
@@ -82,7 +81,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
     const params = workspacesTabState?.routes?.at(0)?.params as
         | WorkspaceSplitNavigatorParamList[typeof SCREENS.WORKSPACE.INITIAL]
         | DomainSplitNavigatorParamList[typeof SCREENS.DOMAIN.INITIAL];
-    const {typeMenuSections} = useSearchTypeMenuSections();
+    const defaultSearchQuery = useDefaultSearchQuery();
     const subscriptionPlan = useSubscriptionPlan();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['ExpensifyAppIcon', 'Home', 'Inbox', 'MoneySearch', 'Buildings']);
 
@@ -217,15 +216,11 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                 }
             }
 
-            const flattenedMenuItems = typeMenuSections.flatMap((section) => section.menuItems);
-            const defaultActionableSearchQuery =
-                getDefaultActionableSearchMenuItem(flattenedMenuItems)?.searchQuery ?? flattenedMenuItems.at(0)?.searchQuery ?? typeMenuSections.at(0)?.menuItems.at(0)?.searchQuery;
-
             const savedSearchQuery = Object.values(savedSearches ?? {}).at(0)?.query;
             const lastQueryFromOnyx = lastSearchParams?.queryJSON ? buildSearchQueryString(lastSearchParams.queryJSON) : undefined;
-            Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: lastQueryFromOnyx ?? defaultActionableSearchQuery ?? savedSearchQuery ?? buildCannedSearchQuery()}));
+            Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: lastQueryFromOnyx ?? defaultSearchQuery ?? savedSearchQuery ?? buildCannedSearchQuery()}));
         });
-    }, [selectedTab, typeMenuSections, savedSearches, lastSearchParams?.queryJSON]);
+    }, [selectedTab, defaultSearchQuery, savedSearches, lastSearchParams?.queryJSON]);
 
     const navigateToSettings = useCallback(() => {
         if (selectedTab === NAVIGATION_TABS.SETTINGS) {
