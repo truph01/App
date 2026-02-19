@@ -92,10 +92,17 @@ function flushOnyxUpdatesQueue() {
         op: CONST.TELEMETRY.SPAN_FLUSH_ONYX_UPDATES_QUEUE,
         parentSpan: currentFlushSpan,
     });
-    return flushQueue()?.finally(() => {
-        span.setStatus({code: 1});
-        span.end();
-    });
+    return flushQueue()
+        ?.then((result) => {
+            span.setStatus({code: 1});
+            span.end();
+            return result;
+        })
+        .catch((error: unknown) => {
+            span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+            span.end();
+            throw error;
+        });
 }
 
 let queueFlushedDataToStore: Array<OnyxUpdate<OnyxKey>> = [];
