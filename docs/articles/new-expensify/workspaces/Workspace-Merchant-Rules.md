@@ -36,6 +36,8 @@ To create a Workspace Merchant Rule:
 
 **Note:** Workspace Merchant Rules are only available after **Workspace Rules** are enabled for the workspace. If you don't see the Merchant Rules section, first [enable Workspace Rules](https://help.expensify.com/articles/new-expensify/workspaces/Workspace-Rules#enable-workspace-rules). 
 
+![Creating a Workspace Merchant Rule]({{site.url}}/assets/images/ExpensiHelp-MerchantRules-1.png){:width="100%"}
+
 ---
 
 ## When Workspace Merchant Rules apply to expenses 
@@ -107,6 +109,8 @@ Examples:
  - If the merchant contains “Amazon Business”, apply Category: Office Supplies, Tag: Office
 
 This ensures office-related purchases follow company coding standards.
+
+![Image of an expense with Workspace Merchant Rule applied]({{site.url}}/assets/images/ExpensiHelp-MerchantRules-2.png){:width="100%"}
 
 ---
 

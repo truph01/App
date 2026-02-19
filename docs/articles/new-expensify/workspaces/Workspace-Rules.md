@@ -41,13 +41,15 @@ Once enabled, go to the **Rules** tab in the left menu to manage expense-level s
 - **Merchant-based automation** – Automatically apply categories, tags, and other fields using Workspace Merchant Rules.
 
  
-![Rules page showing all available workspace-level expense rules]({{site.url}}/assets/images/new-expensify-rules.png){:width="100%"}
+![Rules page showing all available workspace-level expense rules with Itemized Receipt flagged]({{site.url}}/assets/images/ExpensifyHelp-FlagExpensesMissing|temizedReceipts_01.png){:width="100%"}
 
 ---
 
 # What happens if Expense Rules are broken 
 
 When an expense breaks a Workspace Rule or Category Rule, the expense is flagged with a violation and the approver is prompted to manually review it before approval.
+
+![Expense showing violations]({{site.url}}/assets/images/ExpensifyHelp-FlagExpensesMissing|temizedReceipts_02.png){:width="100%"}
 
 ---
 
