@@ -1,6 +1,6 @@
 import TestReceipt from '@assets/images/fake-receipt.png';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
-import {shouldStartLocationPermissionFlowSelector} from '@selectors/Location';
+import shouldStartLocationPermissionFlowSelector from '@selectors/Location';
 import {useEffect, useState} from 'react';
 import {InteractionManager} from 'react-native';
 import {useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
