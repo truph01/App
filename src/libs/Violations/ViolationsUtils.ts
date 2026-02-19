@@ -462,8 +462,10 @@ const ViolationsUtils = {
             isMaxExpenseAmountRuleEnabled(overLimitAmount) &&
             expenseAmount > overLimitAmount &&
             isControlPolicy;
+        // Ensure we are comparing amounts in the same currency
+        const isSameCurrency = updatedTransaction.currency === currency;
         const shouldShowOverTripLimitViolation =
-            canCalculateAmountViolations && !isInvoiceTransaction && TransactionUtils.hasReservationList(updatedTransaction) && expenseAmount > -updatedTransaction.amount;
+            canCalculateAmountViolations && !isInvoiceTransaction && TransactionUtils.hasReservationList(updatedTransaction) && isSameCurrency && expenseAmount > -updatedTransaction.amount;
         const shouldCategoryShowOverLimitViolation =
             canCalculateAmountViolations && !isInvoiceTransaction && typeof categoryOverLimit === 'number' && expenseAmount > categoryOverLimit && isControlPolicy;
         const shouldShowMissingComment =
