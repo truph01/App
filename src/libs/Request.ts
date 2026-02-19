@@ -17,12 +17,6 @@ type NamedMiddleware = {
 
 let middlewares: NamedMiddleware[] = [];
 
-let currentProcessMiddlewaresSpan: Span | undefined;
-
-function getProcessMiddlewaresSpan(): Span | undefined {
-    return currentProcessMiddlewaresSpan;
-}
-
 function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan: Span | undefined): Promise<Response<TKey> | void> {
     const span = Sentry.startInactiveSpan({
         name: CONST.TELEMETRY.SPAN_HTTP_XHR,
@@ -51,18 +45,18 @@ function makeXHR<TKey extends OnyxKey>(request: Request<TKey>, parentSpan: Span 
 }
 
 function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isFromSequentialQueue = false): Promise<Response<TKey> | void> {
-    const processSpan = getProcessSpan();
+    const parentSpan = isFromSequentialQueue ? getProcessSpan() : undefined;
     const outerSpan = Sentry.startInactiveSpan({
         name: CONST.TELEMETRY.SPAN_PROCESS_WITH_MIDDLEWARE,
         op: CONST.TELEMETRY.SPAN_PROCESS_WITH_MIDDLEWARE,
-        parentSpan: processSpan,
+        parentSpan,
         attributes: {
             [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
             [CONST.TELEMETRY.ATTRIBUTE_IS_FROM_SEQUENTIAL_QUEUE]: isFromSequentialQueue,
         },
     });
 
-    currentProcessMiddlewaresSpan = Sentry.startInactiveSpan({
+    const middlewaresSpan = Sentry.startInactiveSpan({
         name: CONST.TELEMETRY.SPAN_PROCESS_MIDDLEWARES,
         op: CONST.TELEMETRY.SPAN_PROCESS_MIDDLEWARES,
         parentSpan: outerSpan,
@@ -73,20 +67,46 @@ function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isF
 
     const xhrPromise = makeXHR(request, outerSpan);
     return middlewares
-        .reduce<Promise<Response<TKey> | void>>((last, {middleware}) => middleware(last, request, isFromSequentialQueue) ?? last, xhrPromise)
+        .reduce<Promise<Response<TKey> | void>>((last, {middleware, name}) => {
+            const mwSpan = Sentry.startInactiveSpan({
+                name,
+                op: `middleware.${name}`,
+                parentSpan: middlewaresSpan,
+                attributes: {
+                    [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
+                },
+            });
+            const endSpanOk = () => {
+                mwSpan.setStatus({code: 1});
+                mwSpan.end();
+            };
+            const endSpanErr = (error: unknown) => {
+                mwSpan.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                mwSpan.end();
+            };
+
+            const result = middleware(last, request, isFromSequentialQueue) ?? last;
+            return result
+                .then((data) => {
+                    endSpanOk();
+                    return data;
+                })
+                .catch((error: unknown) => {
+                    endSpanErr(error);
+                    throw error;
+                });
+        }, xhrPromise)
         .then((response) => {
-            currentProcessMiddlewaresSpan?.setStatus({code: 1});
-            currentProcessMiddlewaresSpan?.end();
-            currentProcessMiddlewaresSpan = undefined;
+            middlewaresSpan.setStatus({code: 1});
+            middlewaresSpan.end();
             outerSpan.setStatus({code: 1});
             outerSpan.end();
             return response;
         })
         .catch((error: unknown) => {
             const errorMessage = error instanceof Error ? error.message : undefined;
-            currentProcessMiddlewaresSpan?.setStatus({code: 2, message: errorMessage});
-            currentProcessMiddlewaresSpan?.end();
-            currentProcessMiddlewaresSpan = undefined;
+            middlewaresSpan.setStatus({code: 2, message: errorMessage});
+            middlewaresSpan.end();
             outerSpan.setStatus({code: 2, message: errorMessage});
             outerSpan.end();
             throw error;
@@ -101,5 +121,5 @@ function clearMiddlewares() {
     middlewares = [];
 }
 
-export {clearMiddlewares, processWithMiddleware, addMiddleware, getProcessMiddlewaresSpan};
+export {clearMiddlewares, processWithMiddleware, addMiddleware};
 export type {Middleware};
