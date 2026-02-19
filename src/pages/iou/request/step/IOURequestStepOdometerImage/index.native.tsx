@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/core';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {Alert, AppState, StyleSheet, View} from 'react-native';
 import type {LayoutRectangle} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -100,14 +100,13 @@ function IOURequestStepOdometerImage({
     }, [translate]);
 
     const blinkOpacity = useSharedValue(0);
-    const focusIndicatorOpacity = useSharedValue(0);
-    const focusIndicatorScale = useSharedValue(1);
-    const focusIndicatorPosition = useSharedValue({x: 0, y: 0});
-
     const blinkStyle = useAnimatedStyle(() => ({
         opacity: blinkOpacity.get(),
     }));
 
+    const focusIndicatorOpacity = useSharedValue(0);
+    const focusIndicatorScale = useSharedValue(1);
+    const focusIndicatorPosition = useSharedValue({x: 0, y: 0});
     const cameraFocusIndicatorAnimatedStyle = useAnimatedStyle(() => ({
         opacity: focusIndicatorOpacity.get(),
         transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
@@ -270,7 +269,7 @@ function IOURequestStepOdometerImage({
                         />
 
                         <Text style={[styles.textFileUpload]}>{translate('receipt.takePhoto')}</Text>
-                        <Text style={[styles.subTextFileUpload]}>TODO: ADD TRANSLATION - Camera access is required to take photos.</Text>
+                        <Text style={[styles.subTextFileUpload]}>{translate('distance.odometer.cameraAccessRequired')}</Text>
                         <Button
                             success
                             text={translate('common.continue')}
