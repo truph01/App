@@ -59,7 +59,7 @@ function shouldBlockWhileModalActive(state: NavigationState, action: NavigationA
 function isNavigatingToMigratedUserModal(state: NavigationState, action: NavigationAction): boolean {
     const isOnModal = findFocusedRoute(state)?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT;
     const isResettingToModal = action.type === 'RESET' && !!action.payload && findFocusedRoute(action.payload as NavigationState)?.name === SCREENS.MIGRATED_USER_WELCOME_MODAL.ROOT;
-    
+
     return isOnModal || isResettingToModal;
 }
 
