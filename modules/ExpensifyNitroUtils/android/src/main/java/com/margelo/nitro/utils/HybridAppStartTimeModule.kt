@@ -8,14 +8,14 @@ class HybridAppStartTimeModule : HybridAppStartTimeModuleSpec() {
 
     override fun recordAppStartTime() {
         val context = NitroModules.applicationContext ?: return
-        val prefs = context.getSharedPreferences("AppStartTime", Context.MODE_PRIVATE)
-        prefs.edit().putLong("AppStartTime", System.currentTimeMillis()).apply()
+        val sharedPreferences = context.getSharedPreferences("AppStartTime", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putLong("AppStartTime", System.currentTimeMillis()).apply()
     }
 
     override val appStartTime: Double
         get() {
             val context = NitroModules.applicationContext ?: return 0.0
-            val prefs = context.getSharedPreferences("AppStartTime", Context.MODE_PRIVATE)
-            return prefs.getLong("AppStartTime", 0L).toDouble()
+            val sharedPreferences = context.getSharedPreferences("AppStartTime", Context.MODE_PRIVATE)
+            return sharedPreferences.getLong("AppStartTime", 0L).toDouble()
         }
 }
