@@ -2052,6 +2052,8 @@ ${amount} para ${merchant} - ${date}`,
         unfreezeCard: 'Descongelar tarjeta',
         freezeDescription: 'Una tarjeta congelada no se puede usar para compras ni transacciones. Puedes descongelarla en cualquier momento.',
         unfreezeDescription: 'Al descongelar esta tarjeta se volverán a permitir compras y transacciones. Continúa solo si estás seguro de que la tarjeta es segura para usar.',
+        youFroze: ({date}: {date: string}) => `Congelaste esta tarjeta el ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} congeló esta tarjeta el ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Gasto',
@@ -4928,6 +4930,11 @@ ${amount} para ${merchant} - ${date}`,
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Reserva de viajes',
+                        subtitle: '¡Felicidades! Todo está listo para reservar y gestionar viajes en este espacio de trabajo.',
+                        manageTravelLabel: 'Gestionar viajes',
+                    },
                     centralInvoicingSection: {
                         title: 'Facturación centralizada',
                         subtitle: 'Centraliza todos los gastos de viaje en una factura mensual en lugar de pagar en el momento de la compra.',
@@ -4941,6 +4948,16 @@ ${amount} para ${merchant} - ${date}`,
                             settlementFrequencyDescription:
                                 'Con qué frecuencia Expensify retirará fondos de la cuenta bancaria de tu empresa para liquidar transacciones recientes de Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: '¿Desactivar la facturación de viajes?',
+                        body: 'Es posible que las próximas reservas de hotel y alquiler de coches deban volver a reservarse con un método de pago diferente para evitar su cancelación.',
+                        confirm: 'Desactivar',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'No se puede desactivar la facturación de viajes',
+                        body: 'Aún tienes un saldo pendiente de viajes. Por favor, paga tu saldo primero.',
+                        confirm: 'Entendido',
                     },
                 },
             },

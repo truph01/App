@@ -2230,6 +2230,8 @@ const translations = {
         unfreezeCard: 'Unfreeze card',
         freezeDescription: 'A frozen card cannot be used for purchases and transactions. You can unfreeze it at any time.',
         unfreezeDescription: "Unfreezing this card will start allowing purchases and transactions again. Only proceed if you're sure the card is safe to use.",
+        youFroze: ({date}: {date: string}) => `You froze this card on ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} froze this card on ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Spend',
@@ -5079,6 +5081,11 @@ const translations = {
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Travel booking',
+                        subtitle: "Congrats! You're all set to book and manage travel on this workspace.",
+                        manageTravelLabel: 'Manage travel',
+                    },
                     centralInvoicingSection: {
                         title: 'Central invoicing',
                         subtitle: 'Centralize all travel spend in a monthly invoice instead of paying at time of purchase.',
@@ -5091,6 +5098,16 @@ const translations = {
                             settlementFrequencyLabel: 'Settlement frequency',
                             settlementFrequencyDescription: 'How often Expensify will pull from your business bank account to settle recent Expensify Travel transactions.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Turn off Travel Invoicing?',
+                        body: 'Upcoming hotel and car rental reservations may need to be re-booked with a different payment method to avoid cancellation.',
+                        confirm: 'Turn off',
+                    },
+                    outstandingBalanceModal: {
+                        title: "Can't turn off Travel Invoicing",
+                        body: 'You still have an outstanding travel balance. Please pay your balance first.',
+                        confirm: 'Got it',
                     },
                 },
             },

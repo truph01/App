@@ -8102,7 +8102,8 @@ const CONST = {
          * The Travel Invoicing feed type constant.
          * This feed is used for Travel Invoicing cards which are separate from regular Expensify Cards.
          */
-        PROGRAM_TRAVEL_US: 'PROGRAM_TRAVEL_US',
+        PROGRAM_TRAVEL_US: 'TRAVEL_US',
+        MONTHLY_SETTLEMENT_DATE: 'monthlySettlementDate',
     },
     LAST_PAYMENT_METHOD: {
         LAST_USED: 'lastUsed',

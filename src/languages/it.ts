@@ -2212,6 +2212,8 @@ ${amount} per ${merchant} - ${date}`,
         unfreezeCard: 'Sblocca carta',
         freezeDescription: 'Una carta bloccata non può essere usata per acquisti e transazioni. Puoi sbloccarla in qualsiasi momento.',
         unfreezeDescription: 'Sbloccando questa carta torneranno ad essere consentiti acquisti e transazioni. Procedi solo se sei sicuro che la carta sia sicura da usare.',
+        youFroze: ({date}: {date: string}) => `Hai bloccato questa carta il ${date}.`,
+        frozenBy: ({person, date}: {person: string; date: string}) => `${person} ha bloccato questa carta il ${date}.`,
     },
     workflowsPage: {
         workflowTitle: 'Spesa',
@@ -5112,6 +5114,11 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                     },
                 },
                 travelInvoicing: {
+                    travelBookingSection: {
+                        title: 'Prenotazione viaggi',
+                        subtitle: 'Complimenti! Ora sei prontə per prenotare e gestire i viaggi in questo spazio di lavoro.',
+                        manageTravelLabel: 'Gestisci viaggi',
+                    },
                     centralInvoicingSection: {
                         title: 'Fatturazione centralizzata',
                         subtitle: 'Centralizza tutte le spese di viaggio in una fattura mensile invece di pagare al momento dell’acquisto.',
@@ -5125,6 +5132,16 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                             settlementFrequencyDescription:
                                 'Con quale frequenza Expensify preleverà dal tuo conto bancario aziendale per saldare le recenti transazioni di Expensify Travel.',
                         },
+                    },
+                    disableModal: {
+                        title: 'Disattivare la fatturazione viaggi?',
+                        body: 'Le prossime prenotazioni di hotel e autonoleggio potrebbero dover essere rifatte con un diverso metodo di pagamento per evitare la cancellazione.',
+                        confirm: 'Disattiva',
+                    },
+                    outstandingBalanceModal: {
+                        title: 'Impossibile disattivare la fatturazione viaggi',
+                        body: 'Hai ancora un saldo di viaggio in sospeso. Paga prima il tuo saldo.',
+                        confirm: 'Capito',
                     },
                 },
             },
