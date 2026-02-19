@@ -8225,12 +8225,15 @@ ${reportName}
                 removeMember: '无法移除此用户。请重试。',
                 addMember: '无法添加此成员。请重试。',
             },
+        },
+        common: {
+            settings: '设置',
             forceTwoFactorAuth: '强制启用双重身份验证',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) => `<muted-text>请禁用<a href="${samlPageUrl}">SAML</a>以强制启用双重身份验证。</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>要求此域的所有成员使用双重身份验证。域成员在登录时将被提示为其账户设置双重身份验证。</muted-text>`,
             forceTwoFactorAuthError: '无法更改强制启用双重身份验证设置。请稍后再试。',
+            resetTwoFactorAuth: '重置双重身份验证',
         },
-        common: {settings: '设置'},
         groups: {title: '群组', memberCount: () => ({one: '1 名成员', other: (count: number) => `${count} 名成员`})},
     },
 };

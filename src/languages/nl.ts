@@ -8414,13 +8414,16 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
                 removeMember: 'Kan deze gebruiker niet verwijderen. Probeer het opnieuw.',
                 addMember: 'Kan dit lid niet toevoegen. Probeer het opnieuw.',
             },
+        },
+        common: {
+            settings: 'Instellingen',
             forceTwoFactorAuth: 'Tweeledige verificatie afdwingen',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Schakel <a href="${samlPageUrl}">SAML</a> uit om het gebruik van twee-factor-authenticatie af te dwingen.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Tweeledige verificatie vereisen voor alle leden van dit domein. Domeinleden worden gevraagd om tweefactorauthenticatie voor hun account in te stellen wanneer ze zich aanmelden.</muted-text>`,
             forceTwoFactorAuthError: 'Verplichte twee-factor-authenticatie kon niet worden gewijzigd. Probeer het later opnieuw.',
+            resetTwoFactorAuth: 'Tweeledige verificatie opnieuw instellen',
         },
-        common: {settings: 'Instellingen'},
         groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
     },
 };

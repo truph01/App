@@ -8400,13 +8400,16 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
                 removeMember: 'Nie można usunąć tego użytkownika. Spróbuj ponownie.',
                 addMember: 'Nie można dodać tego członka. Spróbuj ponownie.',
             },
+        },
+        common: {
+            settings: 'Ustawienia',
             forceTwoFactorAuth: 'Wymuś uwierzytelnianie dwuskładnikowe',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Wyłącz proszę <a href="${samlPageUrl}">SAML</a>, aby wymusić uwierzytelnianie dwuskładnikowe.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Wymagaj uwierzytelniania dwuskładnikowego od wszystkich członków tej domeny. Członkowie domeny zostaną poproszeni o skonfigurowanie uwierzytelniania dwuskładnikowego na swoim koncie po zalogowaniu.</muted-text>`,
             forceTwoFactorAuthError: 'Nie udało się zmienić wymuszania uwierzytelniania dwuskładnikowego. Spróbuj ponownie później.',
+            resetTwoFactorAuth: 'Zresetuj uwierzytelnianie dwuskładnikowe',
         },
-        common: {settings: 'Ustawienia'},
         groups: {title: 'Grupy', memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`})},
     },
 };

@@ -8453,13 +8453,16 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
                 removeMember: 'Dieser Benutzer kann nicht entfernt werden. Bitte versuche es erneut.',
                 addMember: 'Dieses Mitglied kann nicht hinzugefügt werden. Bitte versuche es erneut.',
             },
+        },
+        common: {
+            settings: 'Einstellungen',
             forceTwoFactorAuth: 'Zwei-Faktor-Authentifizierung erzwingen',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Bitte deaktiviere <a href="${samlPageUrl}">SAML</a>, um die Zwei-Faktor-Authentifizierung zu erzwingen.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Zwei-Faktor-Authentifizierung für alle Mitglieder dieser Domain verlangen. Domänenmitglieder werden beim Anmelden aufgefordert, die Zwei-Faktor-Authentifizierung für ihr Konto einzurichten.</muted-text>`,
             forceTwoFactorAuthError: 'Die Erzwingung der Zwei-Faktor-Authentifizierung konnte nicht geändert werden. Bitte versuche es später erneut.',
+            resetTwoFactorAuth: 'Zwei-Faktor-Authentifizierung zurücksetzen'
         },
-        common: {settings: 'Einstellungen'},
         groups: {title: 'Gruppen', memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`})},
     },
 };

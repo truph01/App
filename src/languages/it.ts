@@ -8435,13 +8435,16 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
                 removeMember: 'Impossibile rimuovere questo utente. Riprova.',
                 addMember: 'Impossibile aggiungere questo membro. Riprova.',
             },
+        },
+        common: {
+            settings: 'Impostazioni',
             forceTwoFactorAuth: 'Imponi l’autenticazione a due fattori',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Disabilita <a href="${samlPageUrl}">SAML</a> per imporre l’autenticazione a due fattori.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Richiedi l’autenticazione a due fattori per tutti i membri di questo dominio. Ai membri del dominio verrà chiesto di configurare l’autenticazione a due fattori sul proprio account quando effettuano l’accesso.</muted-text>`,
             forceTwoFactorAuthError: 'Impossibile modificare l’impostazione “Forza l’autenticazione a due fattori”. Riprova più tardi.',
+            resetTwoFactorAuth: 'Reimposta l’autenticazione a due fattori',
         },
-        common: {settings: 'Impostazioni'},
         groups: {title: 'Gruppi', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`})},
     },
 };

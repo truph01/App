@@ -8405,13 +8405,16 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
                 removeMember: 'Não foi possível remover este usuário. Tente novamente.',
                 addMember: 'Não foi possível adicionar este membro. Tente novamente.',
             },
+        },
+        common: {
+            settings: 'Configurações',
             forceTwoFactorAuth: 'Forçar autenticação em duas etapas',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Desative o <a href="${samlPageUrl}">SAML</a> para forçar a autenticação em duas etapas.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Exigir autenticação em duas etapas para todos os membros deste domínio. Os membros do domínio serão solicitados a configurar a autenticação em duas etapas na conta ao fazer login.</muted-text>`,
             forceTwoFactorAuthError: 'Não foi possível alterar a exigência de autenticação em duas etapas. Tente novamente mais tarde.',
+            resetTwoFactorAuth: 'Redefinir autenticação de dois fatores',
         },
-        common: {settings: 'Configurações'},
         groups: {title: 'Grupos', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`})},
     },
 };
