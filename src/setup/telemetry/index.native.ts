@@ -6,7 +6,6 @@ import setupSentry from './setupSentry';
 export default function (): void {
     setupSentry();
 
-    
     let nativeAppStartTimeMs: number | undefined;
     try {
         nativeAppStartTimeMs = AppStartTimeNitroModule.appStartTime;

@@ -10,7 +10,6 @@ type AppStateTrackerModule = {
     getWasAppRelaunchedFromIcon: () => Promise<boolean>;
 };
 
-
 type RNTextInputResetModule = {
     resetKeyboardInput: (nativeId: string) => void;
 };

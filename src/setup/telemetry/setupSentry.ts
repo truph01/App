@@ -31,8 +31,6 @@ function setupSentry(): void {
         beforeSendTransaction: processBeforeSendTransactions,
         enableLogs: true,
     });
-
-
 }
 
 export default setupSentry;

@@ -15,4 +15,4 @@ interface AppStartTimeModule extends HybridObject<{ios: 'swift'; android: 'kotli
     readonly appStartTime: number;
 }
 
-export type {AppStartTimeModule};
+export default AppStartTimeModule;
