@@ -12,12 +12,12 @@ const httpStatusCodeIsDefined = (source: ParseHTTPSource, httpStatusCode: number
 
 const findMessageInSource = (source: ParseHTTPSource[keyof ParseHTTPSource], message: string | undefined): MultifactorAuthenticationReason => {
     if (!message) {
-        return VALUES.REASON.BACKEND.UNKNOWN_RESPONSE;
+        return VALUES.REASON.GENERIC.UNKNOWN_RESPONSE;
     }
 
     const sourceEntries = Object.entries(source) as Entries<typeof source>;
     const [, value] = sourceEntries.find(([backendMessage]) => message.endsWith(backendMessage)) ?? [];
-    return value ?? VALUES.REASON.BACKEND.UNKNOWN_RESPONSE;
+    return value ?? VALUES.REASON.GENERIC.UNKNOWN_RESPONSE;
 };
 
 /**
@@ -37,7 +37,7 @@ function parseHttpRequest(
     if (!httpStatusCodeIsDefined(source, httpStatusCode)) {
         return {
             httpStatusCode,
-            reason: VALUES.REASON.BACKEND.UNKNOWN_RESPONSE,
+            reason: VALUES.REASON.GENERIC.UNKNOWN_RESPONSE,
             message,
         };
     }

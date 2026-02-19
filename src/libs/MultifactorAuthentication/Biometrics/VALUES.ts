@@ -52,7 +52,6 @@ const REASON = {
         INVALID_VALIDATE_CODE: 'Invalid validate code',
         SIGNATURE_VERIFICATION_FAILED: 'Signature verification failed',
         NO_PENDING_REGISTRATION_CHALLENGE: 'No pending registration challenge',
-        UNKNOWN_RESPONSE: 'Unknown response',
         REVOKE_SUCCESSFUL: 'Revoked successfully',
         TRANSACTION_NOT_FOUND: 'Transaction not found',
         TRANSACTION_EXPIRED: 'Transaction review period has expired',
@@ -85,6 +84,7 @@ const REASON = {
         LOCAL_REGISTRATION_COMPLETE: 'Local registration complete',
         UNHANDLED_ERROR: 'An unhandled error occurred',
         REQUESTED_TRANSACTION_UNAVAILABLE: 'Requested transaction is unavailable',
+        UNKNOWN_RESPONSE: 'Unknown response',
     },
     KEYSTORE: {
         KEY_DELETED: 'Key successfully deleted from SecureStore',

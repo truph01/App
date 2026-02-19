@@ -16,6 +16,7 @@ import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
 import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
+import {AlreadyReviewedFailureScreen} from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -61,14 +62,11 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         }
 
         denyTransaction({transactionID}).then(() => setTransactionDenied(true));
-        // TODO: Set state (add a new useState at the top) here that the outcome page should be displayed instead of closing the flow
-        // CHUCK NOTE: I have done what I interpreted this to mean
     };
 
     if (transactionDenied) {
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                {/* WIP this'll be replaced with the proper outcome screen after we merge the error screens PR */}
                 <DefaultClientFailureScreen />
             </ScreenWrapper>
         );
@@ -77,8 +75,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     if (!transaction) {
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                {/* WIP this'll be replaced with the proper outcome screen after we merge the error screens PR */}
-                <DefaultClientFailureScreen />
+                <AlreadyReviewedFailureScreen />
             </ScreenWrapper>
         );
     }

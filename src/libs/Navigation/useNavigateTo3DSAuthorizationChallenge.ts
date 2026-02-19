@@ -31,9 +31,8 @@ function useNavigateTo3DSAuthorizationChallenge() {
     const [blocklistedTransactionChallenges, blocklistResult] = useOnyx(ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES, {canBeMissing: true});
     const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
 
-    console.log("[useNavigateTo3DSAuthorizationChallenge] transactionsPending3DSReview", transactionsPending3DSReview);
-    console.log("[useNavigateTo3DSAuthorizationChallenge] blocklistedTransactionChallenges", blocklistedTransactionChallenges);
-
+    console.log('[useNavigateTo3DSAuthorizationChallenge] transactionsPending3DSReview', transactionsPending3DSReview);
+    console.log('[useNavigateTo3DSAuthorizationChallenge] blocklistedTransactionChallenges', blocklistedTransactionChallenges);
 
     const {doesDeviceSupportBiometrics} = useNativeBiometrics();
 
@@ -87,7 +86,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
                 return;
             }
             const challengeStillValid = await fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt({transactionID: transactionPending3DSReview.transactionID});
-            console.log("challengeStillValid", challengeStillValid);
+            console.log('challengeStillValid', challengeStillValid);
             if (!challengeStillValid || cancel) {
                 return;
             }
