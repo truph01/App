@@ -7,7 +7,7 @@ internalScope: Audience is Workspace Admins. Covers how to duplicate an existing
 
 # Duplicate Workspace 
 
-Duplicating a workspace helps Workspace Admins quickly create a new workspace using the same structure, settings, and configurations from an existing one. This is ideal when setting up multiple workspaces with similar policies, categories, or accounting connections.
+Duplicating a workspace helps Workspace Admins quickly create a new workspace using the same structure, settings, and configurations from an existing one. This is ideal when setting up multiple workspaces with similar configurations, categories, or accounting connections.
 
 ---
 
