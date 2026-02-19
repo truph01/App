@@ -1,7 +1,7 @@
 import type {Log} from './types';
 
 const log: Log = () => {
-    // crashlytics is not supported on WEB
+    // logging is a no-op on web
 };
 
 export default {
