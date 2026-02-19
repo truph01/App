@@ -15,11 +15,7 @@ import arrayDifference from './arrayDifference';
 import CONST from './CONST';
 import {isEmptyObject} from './isEmptyObject';
 
-type OctokitOptions = {
-    method: string;
-    url: string;
-    request: {retryCount: number};
-};
+type OctokitOptions = {method: string; url: string; request: {retryCount: number}};
 
 type ListForRepoResult = RestEndpointMethodTypes['issues']['listForRepo']['response'];
 
@@ -51,6 +47,21 @@ type StagingDeployCashBlocker = {
 type StagingDeployCashBody = {
     issueBody: string;
     issueAssignees: Array<string | undefined>;
+};
+
+type StagingDeployCashParams = {
+    tag: string;
+    PRList: string[];
+    PRListMobileExpensify?: string[];
+    verifiedPRList?: string[];
+    verifiedPRListMobileExpensify?: string[];
+    deployBlockers?: string[];
+    resolvedDeployBlockers?: string[];
+    resolvedInternalQAPRs?: string[];
+    isSentryChecked?: boolean;
+    isGHStatusChecked?: boolean;
+    previousTag?: string;
+    chronologicalSection?: string;
 };
 
 type OctokitArtifact = OctokitComponents['schemas']['artifact'];
@@ -310,28 +321,24 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(
-        tag: string,
-        PRList: string[],
-        PRListMobileExpensify: string[],
-        verifiedPRList: string[] = [],
-        verifiedPRListMobileExpensify: string[] = [],
-        deployBlockers: string[] = [],
-        resolvedDeployBlockers: string[] = [],
-        resolvedInternalQAPRs: string[] = [],
-        {isSentryChecked = false, isGHStatusChecked = false, previousTag = ''} = {},
-    ): Promise<void | StagingDeployCashBody> {
+    static generateStagingDeployCashBodyAndAssignees({
+        tag,
+        PRList,
+        PRListMobileExpensify = [],
+        verifiedPRList = [],
+        verifiedPRListMobileExpensify = [],
+        deployBlockers = [],
+        resolvedDeployBlockers = [],
+        resolvedInternalQAPRs = [],
+        isSentryChecked = false,
+        isGHStatusChecked = false,
+        previousTag = '',
+        chronologicalSection = '',
+    }: StagingDeployCashParams): Promise<void | StagingDeployCashBody> {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
                 const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !isEmptyObject(pr.labels.find((item) => item.name === CONST.LABELS.INTERNAL_QA))) : [];
-                return Promise.all(
-                    internalQAPRs.map((pr) =>
-                        this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({
-                            url: pr.html_url,
-                            mergerLogin,
-                        })),
-                    ),
-                ).then((results) => {
+                return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({url: pr.html_url, mergerLogin})))).then((results) => {
                     // The format of this map is following:
                     // {
                     //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',
@@ -411,6 +418,11 @@ class GithubUtils {
                             issueBody += URL;
                             issueBody += '\r\n';
                         }
+                        issueBody += '\r\n\r\n';
+                    }
+
+                    if (chronologicalSection) {
+                        issueBody += chronologicalSection;
                         issueBody += '\r\n\r\n';
                     }
 
@@ -578,6 +590,10 @@ class GithubUtils {
         });
     }
 
+    /**
+     * Get the workflow run URL for a specific commit SHA and workflow file.
+     * Returns the HTML URL of the matching run, or undefined if not found.
+     */
     static async getWorkflowRunURLForCommit(commitSha: string, workflowFile: string): Promise<string | undefined> {
         try {
             const response = await this.octokit.actions.listWorkflowRuns({

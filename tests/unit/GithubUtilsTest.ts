@@ -422,7 +422,6 @@ describe('GithubUtils', () => {
         const assignOctocat = ' - @octocat';
         const deployerVerificationsHeader = '\r\n**Deployer verifications:**';
         // eslint-disable-next-line max-len
-        // eslint-disable-next-line max-len
         const sentryVerificationCurrentRelease = `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
         // eslint-disable-next-line max-len
         const sentryVerificationPreviousRelease = `I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
@@ -440,7 +439,7 @@ describe('GithubUtils', () => {
             `${lineBreak}`;
 
         test('Test no verified PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, PRListMobileExpensify).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -467,7 +466,7 @@ describe('GithubUtils', () => {
         });
 
         test('Test Mobile-Expensify compare link with Mobile-Expensify PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, PRListMobileExpensify).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -478,7 +477,7 @@ describe('GithubUtils', () => {
         });
 
         test('Test no Mobile-Expensify compare link without Mobile-Expensify PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, []).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify: []}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -489,7 +488,7 @@ describe('GithubUtils', () => {
         });
 
         test('Test some verified PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, [], [basePRList.at(0) ?? '']).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: [basePRList.at(0) ?? '']}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -512,7 +511,7 @@ describe('GithubUtils', () => {
         });
 
         test('Test all verified PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, [], basePRList).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: basePRList}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -530,7 +529,7 @@ describe('GithubUtils', () => {
         });
 
         test('Test no resolved deploy blockers', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, [], basePRList, [], baseDeployBlockerList).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: basePRList, deployBlockers: baseDeployBlockerList}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -551,53 +550,69 @@ describe('GithubUtils', () => {
         });
 
         test('Test some resolved deploy blockers', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, [], basePRList, [], baseDeployBlockerList, [baseDeployBlockerList.at(0) ?? '']).then((issue) => {
-                if (typeof issue !== 'object') {
-                    return;
-                }
+            githubUtils
+                .generateStagingDeployCashBodyAndAssignees({
+                    tag,
+                    PRList: basePRList,
+                    verifiedPRList: basePRList,
+                    deployBlockers: baseDeployBlockerList,
+                    resolvedDeployBlockers: [baseDeployBlockerList.at(0) ?? ''],
+                })
+                .then((issue) => {
+                    if (typeof issue !== 'object') {
+                        return;
+                    }
 
-                expect(issue.issueBody).toBe(
-                    `${allVerifiedExpectedOutput}` +
-                        `${lineBreak}${deployBlockerHeader}` +
-                        `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
-                        `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(1)}` +
-                        `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
-                        `${lineBreak}${openCheckbox}${ghVerification}` +
-                        `${lineBreakDouble}${ccApplauseLeads}`,
-                );
-                expect(issue.issueAssignees).toEqual([]);
-            });
+                    expect(issue.issueBody).toBe(
+                        `${allVerifiedExpectedOutput}` +
+                            `${lineBreak}${deployBlockerHeader}` +
+                            `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
+                            `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(1)}` +
+                            `${lineBreakDouble}${deployerVerificationsHeader}` +
+                            `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                            `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
+                            `${lineBreak}${openCheckbox}${ghVerification}` +
+                            `${lineBreakDouble}${ccApplauseLeads}`,
+                    );
+                    expect(issue.issueAssignees).toEqual([]);
+                });
         });
 
         test('Test all resolved deploy blockers', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, basePRList, [], basePRList, [], baseDeployBlockerList, baseDeployBlockerList).then((issue) => {
-                if (typeof issue !== 'object') {
-                    return;
-                }
-                expect(issue.issueBody).toBe(
-                    `${baseExpectedOutput}` +
-                        `${closedCheckbox}${basePRList.at(2)}` +
-                        `${lineBreak}${closedCheckbox}${basePRList.at(0)}` +
-                        `${lineBreak}${closedCheckbox}${basePRList.at(1)}` +
-                        `${lineBreak}${closedCheckbox}${basePRList.at(4)}` +
-                        `${lineBreak}${closedCheckbox}${basePRList.at(5)}` +
-                        `${lineBreakDouble}${deployBlockerHeader}` +
-                        `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
-                        `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(1)}` +
-                        `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
-                        `${lineBreak}${openCheckbox}${ghVerification}` +
-                        `${lineBreakDouble}${ccApplauseLeads}`,
-                );
-                expect(issue.issueAssignees).toEqual([]);
-            });
+            githubUtils
+                .generateStagingDeployCashBodyAndAssignees({
+                    tag,
+                    PRList: basePRList,
+                    verifiedPRList: basePRList,
+                    deployBlockers: baseDeployBlockerList,
+                    resolvedDeployBlockers: baseDeployBlockerList,
+                })
+                .then((issue) => {
+                    if (typeof issue !== 'object') {
+                        return;
+                    }
+                    expect(issue.issueBody).toBe(
+                        `${baseExpectedOutput}` +
+                            `${closedCheckbox}${basePRList.at(2)}` +
+                            `${lineBreak}${closedCheckbox}${basePRList.at(0)}` +
+                            `${lineBreak}${closedCheckbox}${basePRList.at(1)}` +
+                            `${lineBreak}${closedCheckbox}${basePRList.at(4)}` +
+                            `${lineBreak}${closedCheckbox}${basePRList.at(5)}` +
+                            `${lineBreakDouble}${deployBlockerHeader}` +
+                            `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
+                            `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(1)}` +
+                            `${lineBreakDouble}${deployerVerificationsHeader}` +
+                            `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                            `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
+                            `${lineBreak}${openCheckbox}${ghVerification}` +
+                            `${lineBreakDouble}${ccApplauseLeads}`,
+                    );
+                    expect(issue.issueAssignees).toEqual([]);
+                });
         });
 
         test('Test internalQA PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, [...basePRList, ...internalQAPRList], PRListMobileExpensify).then((issue) => {
+            githubUtils.generateStagingDeployCashBodyAndAssignees({tag, PRList: [...basePRList, ...internalQAPRList], PRListMobileExpensify}).then((issue) => {
                 if (typeof issue !== 'object') {
                     return;
                 }
@@ -628,29 +643,31 @@ describe('GithubUtils', () => {
         });
 
         test('Test some verified internalQA PRs', () => {
-            githubUtils.generateStagingDeployCashBodyAndAssignees(tag, [...basePRList, ...internalQAPRList], [], [], [], [], [], [internalQAPRList.at(0) ?? '']).then((issue) => {
-                if (typeof issue !== 'object') {
-                    return;
-                }
+            githubUtils
+                .generateStagingDeployCashBodyAndAssignees({tag, PRList: [...basePRList, ...internalQAPRList], resolvedInternalQAPRs: [internalQAPRList.at(0) ?? '']})
+                .then((issue) => {
+                    if (typeof issue !== 'object') {
+                        return;
+                    }
 
-                expect(issue.issueBody).toBe(
-                    `${baseExpectedOutput}` +
-                        `${openCheckbox}${basePRList.at(2)}` +
-                        `${lineBreak}${openCheckbox}${basePRList.at(0)}` +
-                        `${lineBreak}${openCheckbox}${basePRList.at(1)}` +
-                        `${lineBreak}${closedCheckbox}${basePRList.at(4)}` +
-                        `${lineBreak}${closedCheckbox}${basePRList.at(5)}` +
-                        `${lineBreak}${internalQAHeader}` +
-                        `${lineBreak}${closedCheckbox}${internalQAPRList.at(0)}${assignOctocat}` +
-                        `${lineBreak}${openCheckbox}${internalQAPRList.at(1)}${assignOctocat}` +
-                        `${lineBreakDouble}${deployerVerificationsHeader}` +
-                        `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
-                        `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
-                        `${lineBreak}${openCheckbox}${ghVerification}` +
-                        `${lineBreakDouble}${ccApplauseLeads}`,
-                );
-                expect(issue.issueAssignees).toEqual(['octocat']);
-            });
+                    expect(issue.issueBody).toBe(
+                        `${baseExpectedOutput}` +
+                            `${openCheckbox}${basePRList.at(2)}` +
+                            `${lineBreak}${openCheckbox}${basePRList.at(0)}` +
+                            `${lineBreak}${openCheckbox}${basePRList.at(1)}` +
+                            `${lineBreak}${closedCheckbox}${basePRList.at(4)}` +
+                            `${lineBreak}${closedCheckbox}${basePRList.at(5)}` +
+                            `${lineBreak}${internalQAHeader}` +
+                            `${lineBreak}${closedCheckbox}${internalQAPRList.at(0)}${assignOctocat}` +
+                            `${lineBreak}${openCheckbox}${internalQAPRList.at(1)}${assignOctocat}` +
+                            `${lineBreakDouble}${deployerVerificationsHeader}` +
+                            `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
+                            `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
+                            `${lineBreak}${openCheckbox}${ghVerification}` +
+                            `${lineBreakDouble}${ccApplauseLeads}`,
+                    );
+                    expect(issue.issueAssignees).toEqual(['octocat']);
+                });
         });
     });
 
@@ -669,6 +686,10 @@ describe('GithubUtils', () => {
                             message: 'Test commit message',
                             author: {
                                 name: 'Test Author',
+                                date: '2024-01-01T00:00:00Z',
+                            },
+                            committer: {
+                                date: '2024-01-01T00:00:00Z',
                             },
                         },
                         author: {
@@ -683,6 +704,7 @@ describe('GithubUtils', () => {
                 commit: 'abc123',
                 subject: 'Test commit message',
                 authorName: 'Test Author',
+                date: '2024-01-01T00:00:00Z',
             },
         ],
         multipleCommitsResponse: {
@@ -692,14 +714,16 @@ describe('GithubUtils', () => {
                         sha: 'abc123',
                         commit: {
                             message: 'First commit',
-                            author: {name: 'Author One'},
+                            author: {name: 'Author One', date: '2024-01-02T00:00:00Z'},
+                            committer: {date: '2024-01-02T00:00:00Z'},
                         },
                     },
                     {
                         sha: 'def456',
                         commit: {
                             message: 'Second commit',
-                            author: {name: 'Author Two'},
+                            author: {name: 'Author Two', date: '2024-01-03T00:00:00Z'},
+                            committer: {date: '2024-01-03T00:00:00Z'},
                         },
                     },
                 ],
@@ -777,11 +801,13 @@ describe('GithubUtils', () => {
                 commit: 'abc123',
                 subject: 'First commit',
                 authorName: 'Author One',
+                date: '2024-01-02T00:00:00Z',
             });
             expect(result.at(1)).toEqual({
                 commit: 'def456',
                 subject: 'Second commit',
                 authorName: 'Author Two',
+                date: '2024-01-03T00:00:00Z',
             });
         });
 
