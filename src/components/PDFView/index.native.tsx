@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import {Linking, View} from 'react-native';
 import PDF from 'react-native-pdf';
 import KeyboardAvoidingView from '@components/KeyboardAvoidingView';
 import LoadingIndicator from '@components/LoadingIndicator';
-import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import useKeyboardState from '@hooks/useKeyboardState';
 import useLocalize from '@hooks/useLocalize';
@@ -14,6 +13,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {openTravelDotLink} from '@libs/openTravelDotLink';
+import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {getRelativeUrl, isTravelLink} from '@libs/TravelUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -37,7 +37,6 @@ import type {PDFViewNativeProps} from './types';
 
 const LOADING_THUMBNAIL_HEIGHT = 250;
 const LOADING_THUMBNAIL_WIDTH = 250;
-const PDF_VIEW_REASON_ATTRIBUTES: SkeletonSpanReasonAttributes = {context: 'PDFView'};
 
 function PDFView({onToggleKeyboard, onLoadComplete, fileName, onPress, isFocused, onScaleChanged, sourceURL, onLoadError, isUsedAsChatAttachment}: PDFViewNativeProps) {
     const [shouldRequestPassword, setShouldRequestPassword] = useState(false);
@@ -55,6 +54,16 @@ function PDFView({onToggleKeyboard, onLoadComplete, fileName, onPress, isFocused
     const StyleUtils = useStyleUtils();
 
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
+
+    const reasonAttributes = useMemo<SkeletonSpanReasonAttributes>(
+        () => ({
+            context: 'PDFView',
+            shouldRequestPassword,
+            isPasswordInvalid,
+            shouldAttemptPDFLoad,
+        }),
+        [shouldRequestPassword, isPasswordInvalid, shouldAttemptPDFLoad],
+    );
 
     useEffect(() => {
         onToggleKeyboard?.(isKeyboardShown);
@@ -169,7 +178,7 @@ function PDFView({onToggleKeyboard, onLoadComplete, fileName, onPress, isFocused
                         renderActivityIndicator={() => (
                             <LoadingIndicator
                                 style={loadingIndicatorStyles}
-                                reasonAttributes={PDF_VIEW_REASON_ATTRIBUTES}
+                                reasonAttributes={reasonAttributes}
                             />
                         )}
                         source={{uri: sourceURL, cache: true, expiration: 864000}}
