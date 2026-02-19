@@ -202,8 +202,8 @@ function getMovedFromOrToReportMessage(translate: LocalizedTranslate, movedFromR
     }
 }
 
-function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields, policyID: string, isAdmin: boolean) {
-    const route = isAdmin ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
+function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields, policyID: string, hasPolicyRuleAccess: boolean) {
+    const route = hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
     const entries = ObjectUtils.typedEntries(fields);
 
     const fragments = entries.map(([key, value], i) => {
@@ -518,9 +518,9 @@ function getForReportAction({
         if (policyRulesModifiedFields && rulePolicyID) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             const rulePolicy = getPolicy(rulePolicyID);
-            const isAdmin = isPolicyAdmin(rulePolicy, storedCurrentUserLogin);
+            const hasPolicyRuleAccess = !!rulePolicy?.areRulesEnabled && isPolicyAdmin(rulePolicy, storedCurrentUserLogin);
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            return getPolicyRulesModifiedMessage(translateLocal, policyRulesModifiedFields, rulePolicyID, isAdmin);
+            return getPolicyRulesModifiedMessage(translateLocal, policyRulesModifiedFields, rulePolicyID, hasPolicyRuleAccess);
         }
     }
 
@@ -762,8 +762,8 @@ function getForReportActionTemp({
         const policyRulesModifiedFields = reportActionOriginalMessage.policyRulesModifiedFields;
 
         if (policyRulesModifiedFields && policy?.id) {
-            const isAdmin = isPolicyAdmin(policy, currentUserLogin);
-            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, policy?.id, isAdmin);
+            const hasPolicyRuleAccess = !!policy?.areRulesEnabled && isPolicyAdmin(policy, currentUserLogin);
+            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, policy?.id, hasPolicyRuleAccess);
         }
     }
 
