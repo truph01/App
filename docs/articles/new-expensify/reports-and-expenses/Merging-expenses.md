@@ -27,7 +27,7 @@ You can merge two expenses if at least one is a cash expense. You cannot merge t
 
 ## Merging from the Reports or Expenses page
 
-1. In the left-hand menu, select **Reports > Expense Reports** or **Reports > Expenses**
+1. In the left-hand menu, select **Reports > Expense Reports** or **Reports > Expenses**.
 2. Select two eligible expenses.
 3. Tap the **2 selected** button and choose **Merge**.
 4. If both expenses have receipts, select the one you want to keep.
