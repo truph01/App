@@ -24,8 +24,8 @@ function getOldestTransactionPendingReview(transactions: TransactionPending3DSRe
             if (expiresDiff !== 0) {
                 return expiresDiff;
             }
-            
-            return Number(a.transactionID) - Number(b.transactionID)
+
+            return Number(a.transactionID) - Number(b.transactionID);
         })
         .at(0);
 }
