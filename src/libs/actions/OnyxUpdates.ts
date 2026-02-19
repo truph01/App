@@ -89,6 +89,11 @@ function applyHTTPSOnyxUpdates<TKey extends OnyxKey>(request: Request<TKey>, res
             span.end();
             Log.info('[OnyxUpdateManager] Done applying HTTPS update', false, {lastUpdateID});
             return Promise.resolve(response);
+        })
+        .catch((error: unknown) => {
+            span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+            span.end();
+            throw error;
         });
 }
 
@@ -113,6 +118,11 @@ function applyPusherOnyxUpdates<TKey extends OnyxKey>(updates: Array<OnyxUpdateE
             span.setStatus({code: 1});
             span.end();
             Log.info('[OnyxUpdateManager] Done applying Pusher update', false, {lastUpdateID});
+        })
+        .catch((error: unknown) => {
+            span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+            span.end();
+            throw error;
         });
 
     return pusherEventsPromise;
@@ -139,6 +149,11 @@ function applyAirshipOnyxUpdates<TKey extends OnyxKey>(updates: Array<OnyxUpdate
             span.setStatus({code: 1});
             span.end();
             Log.info('[OnyxUpdateManager] Done applying Airship updates', false, {lastUpdateID});
+        })
+        .catch((error: unknown) => {
+            span.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+            span.end();
+            throw error;
         });
 
     return airshipEventsPromise;
