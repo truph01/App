@@ -7,6 +7,9 @@ import type {SplitNavigatorName} from '@libs/Navigation/types';
 function useIsSidebarRouteActive(splitNavigatorName: SplitNavigatorName, isNarrowLayout: boolean) {
     const currentSplitNavigatorRoute = useRootNavigationState((rootState) => rootState?.routes.at(-1));
 
+    // Reproduce crash: findFocusedRoute called with empty routes — routes[index] is undefined, accessing .state throws
+    findFocusedRoute({routes: [], index: 0} as unknown as NavigationState);
+
     if (currentSplitNavigatorRoute?.name !== splitNavigatorName) {
         return false;
     }
