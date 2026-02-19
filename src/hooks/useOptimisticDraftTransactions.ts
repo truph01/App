@@ -1,6 +1,6 @@
 import type {OnyxEntry} from 'react-native-onyx';
-import useTransactionDraftValues from './useTransactionDraftValues';
 import type {Transaction} from '@src/types/onyx';
+import useTransactionDraftValues from './useTransactionDraftValues';
 
 /**
  * A hook that retrieves all optimistic draft transactions,
