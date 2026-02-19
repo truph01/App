@@ -18,7 +18,7 @@ const logError: LogError = (errorMessage, error, errorInfo) => {
 
     /* Since the error was handled by the boundary, Sentry's global handler won't catch it.
      * We manually capture it here so it appears in Sentry alongside Crashlytics. */
-    // Sentry.captureException(error, {extra: {errorInfo}});
+    Sentry.captureException(error, {extra: {errorInfo}});
 };
 
 function ErrorBoundary({errorMessage, children}: Omit<BaseErrorBoundaryProps, 'logError'>) {
