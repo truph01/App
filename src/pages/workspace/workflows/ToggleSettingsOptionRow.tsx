@@ -48,6 +48,9 @@ type ToggleSettingOptionRowProps = {
     /** Used to apply styles to the Title */
     titleStyle?: StyleProp<TextStyle>;
 
+    /** Optional accessibility role for the title. Only set when the title is a section heading (e.g. CONST.ROLE.HEADER); omit for regular rows. */
+    titleAccessibilityRole?: typeof CONST.ROLE.HEADER;
+
     /** Used to apply styles to the Subtitle */
     subtitleStyle?: StyleProp<TextStyle>;
 
@@ -102,6 +105,7 @@ function ToggleSettingOptionRow({
     shouldParseSubtitle = false,
     wrapperStyle,
     titleStyle,
+    titleAccessibilityRole,
     onToggle,
     subMenuItems,
     isActive,
@@ -176,7 +180,12 @@ function ToggleSettingOptionRow({
             )}
             {customTitle ?? (
                 <View style={[styles.flexColumn, styles.flex1]}>
-                    <Text style={[styles.textNormal, styles.lh20, titleStyle]}>{title}</Text>
+                    <Text
+                        style={[styles.textNormal, styles.lh20, titleStyle]}
+                        accessibilityRole={titleAccessibilityRole}
+                    >
+                        {title}
+                    </Text>
                     {!shouldPlaceSubtitleBelowSwitch && subtitle && subTitleView}
                 </View>
             )}
