@@ -33,6 +33,7 @@
     "build-staging": "tsx ./node_modules/.bin/webpack-cli --config config/webpack/webpack.common.ts --env file=.env.staging && tsx ./scripts/combine-web-sourcemaps.ts",
     "build-adhoc": "tsx ./node_modules/.bin/webpack-cli --config config/webpack/webpack.common.ts --env file=.env.adhoc && tsx ./scripts/combine-web-sourcemaps.ts",
     "createDocsRoutes": "ts-node .github/scripts/createDocsRoutes.ts",
+    "generateAllowedUrls": "ts-node .github/scripts/generateAllowedUrls.ts",
     "detectRedirectCycle": "ts-node .github/scripts/detectRedirectCycle.ts",
     "ios-build": "bundle exec fastlane ios build_unsigned",
     "ios-hybrid-build": "bundle exec fastlane ios build_unsigned_hybrid",
