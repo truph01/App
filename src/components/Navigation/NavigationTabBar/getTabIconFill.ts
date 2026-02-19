@@ -1,6 +1,11 @@
 import type {ThemeColors} from '@styles/theme/types';
 
-function getTabIconFill(theme: ThemeColors, isSelected: boolean, isHovered: boolean): string {
+type GetTabIconFillConfig = {
+    isSelected: boolean;
+    isHovered: boolean;
+};
+
+function getTabIconFill(theme: ThemeColors, {isSelected, isHovered}: GetTabIconFillConfig): string {
     if (isSelected) {
         return theme.iconMenu;
     }

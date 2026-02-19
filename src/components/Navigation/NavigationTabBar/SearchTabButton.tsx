@@ -105,7 +105,7 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
                         <View>
                             <Icon
                                 src={expensifyIcons.MoneySearch}
-                                fill={getTabIconFill(theme, selectedTab === NAVIGATION_TABS.SEARCH, hovered)}
+                                fill={getTabIconFill(theme, {isSelected: selectedTab === NAVIGATION_TABS.SEARCH, isHovered: hovered})}
                                 width={variables.iconBottomBar}
                                 height={variables.iconBottomBar}
                             />

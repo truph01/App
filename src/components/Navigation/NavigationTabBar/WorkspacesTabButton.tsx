@@ -109,7 +109,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
                         <View>
                             <Icon
                                 src={expensifyIcons.Buildings}
-                                fill={getTabIconFill(theme, selectedTab === NAVIGATION_TABS.WORKSPACES, hovered)}
+                                fill={getTabIconFill(theme, {isSelected: selectedTab === NAVIGATION_TABS.WORKSPACES, isHovered: hovered})}
                                 width={variables.iconBottomBar}
                                 height={variables.iconBottomBar}
                             />

@@ -178,7 +178,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                                     <View>
                                         <Icon
                                             src={expensifyIcons.Home}
-                                            fill={getTabIconFill(theme, selectedTab === NAVIGATION_TABS.HOME, hovered)}
+                                            fill={getTabIconFill(theme, {isSelected: selectedTab === NAVIGATION_TABS.HOME, isHovered: hovered})}
                                             width={variables.iconBottomBar}
                                             height={variables.iconBottomBar}
                                         />
@@ -211,7 +211,7 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                                     <View>
                                         <Icon
                                             src={expensifyIcons.Inbox}
-                                            fill={getTabIconFill(theme, selectedTab === NAVIGATION_TABS.INBOX, hovered)}
+                                            fill={getTabIconFill(theme, {isSelected: selectedTab === NAVIGATION_TABS.INBOX, isHovered: hovered})}
                                             width={variables.iconBottomBar}
                                             height={variables.iconBottomBar}
                                         />
