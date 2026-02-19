@@ -202,8 +202,8 @@ function getMovedFromOrToReportMessage(translate: LocalizedTranslate, movedFromR
     }
 }
 
-function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields, policyID: string) {
-    const route = `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}`;
+function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields, policyID: string, isAdmin: boolean) {
+    const route = isAdmin ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
     const entries = ObjectUtils.typedEntries(fields);
 
     const fragments = entries.map(([key, value], i) => {
@@ -517,7 +517,10 @@ function getForReportAction({
 
         if (policyRulesModifiedFields && rulePolicyID) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            return getPolicyRulesModifiedMessage(translateLocal, policyRulesModifiedFields, rulePolicyID);
+            const rulePolicy = getPolicy(rulePolicyID);
+            const isAdmin = isPolicyAdmin(rulePolicy, storedCurrentUserLogin);
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            return getPolicyRulesModifiedMessage(translateLocal, policyRulesModifiedFields, rulePolicyID, isAdmin);
         }
     }
 
@@ -760,7 +763,10 @@ function getForReportActionTemp({
         const policyRulesModifiedFields = reportActionOriginalMessage.policyRulesModifiedFields;
 
         if (policyRulesModifiedFields && rulePolicyID) {
-            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, rulePolicyID);
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            const rulePolicy = getPolicy(rulePolicyID);
+            const isAdmin = isPolicyAdmin(rulePolicy, currentUserLogin);
+            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, rulePolicyID, isAdmin);
         }
     }
 
