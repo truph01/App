@@ -1,12 +1,10 @@
 type CancelHandle = {cancel: () => void};
 
-type TransitionType = 'keyboard' | 'navigation' | 'modal' | 'focus';
-
 const MAX_TRANSITION_DURATION_MS = 1000;
 
-const activeTransitions = new Map<TransitionType, number>();
+let activeCount = 0;
 
-const activeTimeouts: Array<{type: TransitionType; timeout: ReturnType<typeof setTimeout>}> = [];
+const activeTimeouts: Array<ReturnType<typeof setTimeout>> = [];
 
 let pendingCallbacks: Array<() => void> = [];
 
@@ -22,59 +20,48 @@ function flushCallbacks(): void {
 }
 
 /**
- * Decrements the active count for the given transition type and flushes callbacks when all transitions are idle.
+ * Decrements the active count and flushes callbacks when all transitions are idle.
  * Shared by {@link endTransition} (manual) and the auto-timeout.
  */
-function decrementAndFlush(type: TransitionType): void {
-    const current = activeTransitions.get(type) ?? 0;
-    const next = Math.max(0, current - 1);
+function decrementAndFlush(): void {
+    activeCount = Math.max(0, activeCount - 1);
 
-    if (next === 0) {
-        activeTransitions.delete(type);
-    } else {
-        activeTransitions.set(type, next);
-    }
-
-    // When all transitions end, flush all pending callbacks
-    if (activeTransitions.size === 0) {
+    if (activeCount === 0) {
         flushCallbacks();
     }
 }
 
 /**
- * Increments the active count for the given transition type.
- * Multiple overlapping transitions of the same type are counted.
+ * Increments the active transition count.
+ * Multiple overlapping transitions are counted.
  * Each transition automatically ends after {@link MAX_TRANSITION_DURATION_MS} as a safety net.
  */
-function startTransition(type: TransitionType): void {
-    const current = activeTransitions.get(type) ?? 0;
-    activeTransitions.set(type, current + 1);
+function startTransition(): void {
+    activeCount += 1;
 
     const timeout = setTimeout(() => {
-        const idx = activeTimeouts.findIndex((entry) => entry.timeout === timeout);
+        const idx = activeTimeouts.indexOf(timeout);
         if (idx !== -1) {
             activeTimeouts.splice(idx, 1);
         }
-        decrementAndFlush(type);
+        decrementAndFlush();
     }, MAX_TRANSITION_DURATION_MS);
 
-    activeTimeouts.push({type, timeout});
+    activeTimeouts.push(timeout);
 }
 
 /**
- * Decrements the active count for the given transition type.
+ * Decrements the active transition count.
  * Clears the corresponding auto-timeout since the transition ended normally.
- * When all transition types are idle, flushes all pending callbacks.
+ * When the count reaches zero, flushes all pending callbacks.
  */
-function endTransition(type: TransitionType): void {
-    // Clear the oldest timeout for this type (FIFO order matches startTransition order)
-    const timeoutIdx = activeTimeouts.findIndex((entry) => entry.type === type);
-    if (timeoutIdx !== -1) {
-        clearTimeout(activeTimeouts.at(timeoutIdx)?.timeout);
-        activeTimeouts.splice(timeoutIdx, 1);
+function endTransition(): void {
+    const timeout = activeTimeouts.shift();
+    if (timeout !== undefined) {
+        clearTimeout(timeout);
     }
 
-    decrementAndFlush(type);
+    decrementAndFlush();
 }
 
 /**
@@ -86,7 +73,7 @@ function endTransition(type: TransitionType): void {
  * @returns A handle with a `cancel` method to prevent the callback from firing.
  */
 function runAfterTransitions(callback: () => void, runImmediately = false): CancelHandle {
-    if (activeTransitions.size === 0 || runImmediately) {
+    if (activeCount === 0 || runImmediately) {
         callback();
         return {cancel: () => {}};
     }
@@ -107,9 +94,7 @@ const TransitionTracker = {
     startTransition,
     endTransition,
     runAfterTransitions,
-    activeTransitions,
-    pendingCallbacks,
 };
 
 export default TransitionTracker;
-export type {TransitionType, CancelHandle};
+export type {CancelHandle};

@@ -60,13 +60,13 @@ const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
             }
 
             window.visualViewport?.removeEventListener('resize', handleDismissResize);
-            TransitionTracker.endTransition('keyboard');
+            TransitionTracker.endTransition();
             return resolve();
         };
 
         window.visualViewport?.addEventListener('resize', handleDismissResize);
         Keyboard.dismiss();
-        TransitionTracker.startTransition('keyboard');
+        TransitionTracker.startTransition();
         if (options?.afterTransition) {
             TransitionTracker.runAfterTransitions(options.afterTransition);
         }

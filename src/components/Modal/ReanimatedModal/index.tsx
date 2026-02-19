@@ -103,7 +103,7 @@ function ReanimatedModal({
                 // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.clearInteractionHandle(handleRef.current);
             }
-            TransitionTracker.endTransition('modal');
+            TransitionTracker.endTransition();
 
             setIsVisibleState(false);
             setIsContainerOpen(false);
@@ -116,7 +116,7 @@ function ReanimatedModal({
         if (isVisible && !isContainerOpen && !isTransitioning) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             handleRef.current = InteractionManager.createInteractionHandle();
-            TransitionTracker.startTransition('modal');
+            TransitionTracker.startTransition();
             onModalWillShow();
 
             setIsVisibleState(true);
@@ -124,7 +124,7 @@ function ReanimatedModal({
         } else if (!isVisible && isContainerOpen && !isTransitioning) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             handleRef.current = InteractionManager.createInteractionHandle();
-            TransitionTracker.startTransition('modal');
+            TransitionTracker.startTransition();
             onModalWillHide();
 
             blurActiveElement();
@@ -145,7 +145,7 @@ function ReanimatedModal({
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             InteractionManager.clearInteractionHandle(handleRef.current);
         }
-        TransitionTracker.endTransition('modal');
+        TransitionTracker.endTransition();
         onModalShow();
     }, [onModalShow]);
 
@@ -156,7 +156,7 @@ function ReanimatedModal({
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             InteractionManager.clearInteractionHandle(handleRef.current);
         }
-        TransitionTracker.endTransition('modal');
+        TransitionTracker.endTransition();
 
         // Because on Android, the Modal's onDismiss callback does not work reliably. There's a reported issue at:
         // https://stackoverflow.com/questions/58937956/react-native-modal-ondismiss-not-invoked

@@ -33,12 +33,12 @@ const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
 
         const subscription = Keyboard.addListener('keyboardDidHide', () => {
             resolve();
-            TransitionTracker.endTransition('keyboard');
+            TransitionTracker.endTransition();
             subscription.remove();
         });
 
         Keyboard.dismiss();
-        TransitionTracker.startTransition('keyboard');
+        TransitionTracker.startTransition();
         if (options?.afterTransition) {
             TransitionTracker.runAfterTransitions(options.afterTransition);
         }

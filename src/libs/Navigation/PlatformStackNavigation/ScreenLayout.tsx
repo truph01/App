@@ -12,10 +12,10 @@ function ScreenLayout({
 }: ScreenLayoutArgs<ParamListBase, string, StackNavigationOptions | PlatformStackNavigationOptions, PlatformStackNavigationProp<ParamListBase>>) {
     useLayoutEffect(() => {
         const transitionStartListener = navigation.addListener('transitionStart', () => {
-            TransitionTracker.startTransition('navigation');
+            TransitionTracker.startTransition();
         });
         const transitionEndListener = navigation.addListener('transitionEnd', () => {
-            TransitionTracker.endTransition('navigation');
+            TransitionTracker.endTransition();
         });
 
         return () => {
