@@ -865,18 +865,28 @@ jobs:
       - name: Determine platform results
         id: platformResults
         run: |
-          # Android: use submit result for production, upload result for staging
+          # Android: use submit result for production, upload result for staging.
+          # On production cherry-picks, propagate build/upload failures that caused submit to be skipped.
           if [ "${{ github.ref }}" == "refs/heads/production" ]; then
-            echo "ANDROID_RESULT=${{ needs.androidSubmit.result }}" >> "$GITHUB_OUTPUT"
+            if [ "${{ needs.androidBuild.result }}" == "failure" ] || [ "${{ needs.androidUploadGooglePlay.result }}" == "failure" ]; then
+              echo "ANDROID_RESULT=failure" >> "$GITHUB_OUTPUT"
+            else
+              echo "ANDROID_RESULT=${{ needs.androidSubmit.result }}" >> "$GITHUB_OUTPUT"
+            fi
           elif [ "${{ needs.androidBuild.result }}" == "failure" ]; then
             echo "ANDROID_RESULT=failure" >> "$GITHUB_OUTPUT"
           else
             echo "ANDROID_RESULT=${{ needs.androidUploadGooglePlay.result }}" >> "$GITHUB_OUTPUT"
           fi
 
-          # iOS: use submit result for production, upload result for staging
+          # iOS: use submit result for production, upload result for staging.
+          # On production cherry-picks, propagate build/upload failures that caused submit to be skipped.
           if [ "${{ github.ref }}" == "refs/heads/production" ]; then
-            echo "IOS_RESULT=${{ needs.iosSubmit.result }}" >> "$GITHUB_OUTPUT"
+            if [ "${{ needs.iosBuild.result }}" == "failure" ] || [ "${{ needs.iosUploadTestflight.result }}" == "failure" ]; then
+              echo "IOS_RESULT=failure" >> "$GITHUB_OUTPUT"
+            else
+              echo "IOS_RESULT=${{ needs.iosSubmit.result }}" >> "$GITHUB_OUTPUT"
+            fi
           elif [ "${{ needs.iosBuild.result }}" == "failure" ]; then
             echo "IOS_RESULT=failure" >> "$GITHUB_OUTPUT"
           else
