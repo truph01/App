@@ -2119,7 +2119,9 @@ const translations = {
         brokenConnection: 'Your card connection is broken.',
         fixCard: 'Fix card',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `Your ${cardName} card connection is broken. <a href="${connectionLink}">Log into your bank</a> to fix the card.`,
+            connectionLink
+                ? `Your ${cardName} card connection is broken. <a href="${connectionLink}">Log into your bank</a> to fix the card.`
+                : `Your ${cardName} card connection is broken. Log into your bank to fix the card.`,
     },
     walletPage: {
         balance: 'Balance',
@@ -7697,7 +7699,7 @@ const translations = {
         reviewRequired: 'Review required',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return "Can't auto-match receipt due to broken bank connection";
+                return "Can't auto-match receipt due to broken bank connection.";
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {

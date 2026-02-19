@@ -2077,7 +2077,9 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: 'カードを修正',
         brokenConnection: 'カード接続が切断されています。',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `${cardName}カードとの接続が切れています。カードを修正するには、<a href="${connectionLink}">銀行にログイン</a>してください。`,
+            connectionLink
+                ? `${cardName}カードとの接続が切れています。カードを修正するには、<a href="${connectionLink}">銀行にログイン</a>してください。`
+                : `${cardName}カードとの接続が切れています。カードを修正するには、銀行にログインしてください。`,
     },
     walletPage: {
         balance: '残高',
@@ -7664,11 +7666,11 @@ ${reportName}
         reviewRequired: '要レビュー',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return '銀行連携の不具合により、領収書を自動照合できません';
+                return '銀行連携の不具合により、領収書を自動照合できません。';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return '銀行接続が壊れているため、領収書を自動照合できません。';
+                    return '銀行連携の不具合により、領収書を自動照合できません。';
                 }
                 return isMarkAsCash
                     ? `カード連携の不具合により領収書を自動照合できません。無視するには現金としてマークするか、<a href="${connectionLink}">カードを修正</a>して領収書と照合してください。`

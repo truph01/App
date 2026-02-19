@@ -2084,7 +2084,9 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: 'Kaart herstellen',
         brokenConnection: 'Je kaartkoppeling is verbroken.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `Je verbinding met de kaart ${cardName} is verbroken. <a href="${connectionLink}">Log in bij je bank</a> om de kaart te herstellen.`,
+            connectionLink
+                ? `Je verbinding met de kaart ${cardName} is verbroken. <a href="${connectionLink}">Log in bij je bank</a> om de kaart te herstellen.`
+                : `Je verbinding met de kaart ${cardName} is verbroken. Log in bij je bank om de kaart te herstellen.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7718,11 +7720,11 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         reviewRequired: 'Beoordeling vereist',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Bon kan automatisch aan bon koppelen vanwege verbroken bankverbinding';
+                return 'Bon kan automatisch aan bon koppelen vanwege verbroken bankverbinding.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'Kan bon niet automatisch koppelen door een verbroken bankverbinding.';
+                    return 'Bon kan automatisch aan bon koppelen vanwege verbroken bankverbinding.';
                 }
                 return isMarkAsCash
                     ? `Kan bon niet automatisch koppelen vanwege een verbroken kaartverbinding. Markeer als contant om te negeren, of <a href="${connectionLink}">repareer de kaart</a> om de bon te koppelen.`

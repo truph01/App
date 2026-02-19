@@ -378,7 +378,7 @@ type NextStepParams = {
 
 type ConciergeBrokenCardConnectionParams = {
     cardName: string;
-    connectionLink: string;
+    connectionLink?: string;
 };
 
 export type {

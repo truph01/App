@@ -2050,7 +2050,7 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: '修复卡片',
         brokenConnection: '您的银行卡连接已断开。',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `您的 ${cardName} 卡连接已中断。<a href="${connectionLink}">登录您的网上银行</a>以修复该卡。`,
+            connectionLink ? `您的 ${cardName} 卡连接已中断。<a href="${connectionLink}">登录您的网上银行</a>以修复该卡。` : `您的 ${cardName} 卡连接已中断。登录您的网上银行以修复该卡。`,
     },
     walletPage: {
         balance: '余额',
@@ -7543,7 +7543,7 @@ ${reportName}
         reviewRequired: '需要审核',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return '由于银行连接中断，无法自动匹配收据';
+                return '由于银行连接中断，无法自动匹配收据。';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {

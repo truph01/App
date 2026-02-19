@@ -6074,7 +6074,6 @@ const CONST = {
     },
     RTER_VIOLATION_TYPES: {
         BROKEN_CARD_CONNECTION: 'brokenCardConnection',
-        BROKEN_PERSONAL_CARD_CONNECTION: 'brokenCardConnection',
         BROKEN_CARD_CONNECTION_530: 'brokenCardConnection530',
         SEVEN_DAY_HOLD: 'sevenDayHold',
     },

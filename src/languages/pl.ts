@@ -2083,7 +2083,9 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: 'Napraw kartę',
         brokenConnection: 'Połączenie Twojej karty jest przerwane.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `Połączenie Twojej karty ${cardName} jest przerwane. <a href="${connectionLink}">Zaloguj się do swojego banku</a>, aby naprawić kartę.`,
+            connectionLink
+                ? `Połączenie Twojej karty ${cardName} jest przerwane. <a href="${connectionLink}">Zaloguj się do swojego banku</a>, aby naprawić kartę.`
+                : `Połączenie Twojej karty ${cardName} jest przerwane. Zaloguj się do swojego banku, aby naprawić kartę.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7706,7 +7708,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
         reviewRequired: 'Wymagana weryfikacja',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z bankiem';
+                return 'Nie można automatycznie dopasować paragonu z powodu zerwanego połączenia z bankiem.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {

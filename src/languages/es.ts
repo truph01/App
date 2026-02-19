@@ -1939,7 +1939,9 @@ const translations: TranslationDeepObject<typeof en> = {
         brokenConnection: 'La conexión de tu tarjeta está rota.',
         fixCard: 'Reparar tarjeta',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `La conexión de tu tarjeta ${cardName} está interrumpida. <a href="${connectionLink}">Inicia sesión en tu banco</a> para reparar la tarjeta.`,
+            connectionLink
+                ? `La conexión de tu tarjeta ${cardName} está interrumpida. <a href="${connectionLink}">Inicia sesión en tu banco</a> para reparar la tarjeta.`
+                : `La conexión de tu tarjeta ${cardName} está interrumpida. Inicia sesión en tu banco para reparar la tarjeta.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7945,7 +7947,7 @@ ${amount} para ${merchant} - ${date}`,
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'No se puede hacer coincidir automáticamente el recibo debido a una conexión bancaria interrumpida.';
+                    return 'No se puede emparejar automáticamente el recibo debido a una conexión bancaria interrumpida.';
                 }
                 return isMarkAsCash
                     ? `No se puede vincular automáticamente el recibo debido a una conexión de tarjeta defectuosa. Márquelo como efectivo para ignorarlo o <a href="${connectionLink}">arregle la tarjeta</a> para que coincida con el recibo.`

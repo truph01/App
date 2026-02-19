@@ -2080,7 +2080,9 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: 'Corrigir cartão',
         brokenConnection: 'A conexão do seu cartão está com problema.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `A conexão do seu cartão ${cardName} está com problemas. <a href="${connectionLink}">Acesse seu banco</a> para corrigir o cartão.`,
+            connectionLink
+                ? `A conexão do seu cartão ${cardName} está com problemas. <a href="${connectionLink}">Acesse seu banco</a> para corrigir o cartão.`
+                : `A conexão do seu cartão ${cardName} está com problemas. Acesse seu banco para corrigir o cartão.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7710,11 +7712,11 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
         reviewRequired: 'Revisão necessária',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Não é possível conciliar automaticamente o recibo devido a uma conexão bancária com erro';
+                return 'Não é possível conciliar automaticamente o recibo devido a uma conexão bancária com erro.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'Não foi possível associar automaticamente o recibo devido a uma conexão bancária com problema.';
+                    return 'Não é possível conciliar automaticamente o recibo devido a uma conexão bancária com erro.';
                 }
                 return isMarkAsCash
                     ? `Não é possível corresponder automaticamente o recibo devido a uma conexão de cartão com problema. Marque como dinheiro para ignorar ou <a href="${connectionLink}">corrija o cartão</a> para corresponder o recibo.`

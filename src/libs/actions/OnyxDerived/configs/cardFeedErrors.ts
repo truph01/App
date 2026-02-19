@@ -191,16 +191,16 @@ export default createOnyxDerivedValueConfig({
             shouldShowRbrForWorkspaceAccountID,
             shouldShowRbrForFeedNameWithDomainID,
 
-            // Whether any of the feeds has one of the below errors
+            // Whether any of the feeds have one of the below errors
             all: allFeedsState,
 
-            // Whether any of the company cards has one of the below errors
+            // Whether any of the company cards have one of the below errors
             companyCards: companyCardFeedsState,
 
-            // Whether any of the expensify cards has one of the below errors
+            // Whether any of the expensify cards have one of the below errors
             expensifyCard: expensifyCardFeedStates,
 
-            // Whether any of the personal cards has one of the below errors
+            // Whether any of the personal cards have one of the below errors
             personalCard: personalCardStates,
         };
     },

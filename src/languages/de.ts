@@ -2088,7 +2088,9 @@ const translations: TranslationDeepObject<typeof en> = {
     personalCard: {
         brokenConnection: 'Ihre Kartenverbindung ist unterbrochen.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `Die Verbindung Ihrer ${cardName}-Karte ist unterbrochen. <a href="${connectionLink}">Melden Sie sich bei Ihrer Bank an</a>, um die Karte zu reparieren.`,
+            connectionLink
+                ? `Die Verbindung Ihrer ${cardName}-Karte ist unterbrochen. <a href="${connectionLink}">Melden Sie sich bei Ihrer Bank an</a>, um die Karte zu reparieren.`
+                : `Die Verbindung Ihrer ${cardName}-Karte ist unterbrochen. Melden Sie sich bei Ihrer Bank an, um die Karte zu reparieren.`,
         fixCard: 'Karte reparieren',
     },
     walletPage: {
@@ -7754,11 +7756,11 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
         reviewRequired: 'Überprüfung erforderlich',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Beleg kann wegen unterbrochener Bankverbindung nicht automatisch zugeordnet werden';
+                return 'Beleg kann wegen unterbrochener Bankverbindung nicht automatisch zugeordnet werden.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return 'Beleg kann wegen einer unterbrochenen Bankverbindung nicht automatisch zugeordnet werden.';
+                    return 'Beleg kann wegen unterbrochener Bankverbindung nicht automatisch zugeordnet werden.';
                 }
                 return isMarkAsCash
                     ? `Beleg kann wegen einer unterbrochenen Kartenverbindung nicht automatisch zugeordnet werden. Markiere ihn als Barzahlung, um ihn zu ignorieren, oder <a href="${connectionLink}">repariere die Karte</a>, um den Beleg zuzuordnen.`

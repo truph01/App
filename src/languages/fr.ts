@@ -2095,7 +2095,9 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: 'Réparer la carte',
         brokenConnection: 'La connexion de votre carte est rompue.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `La connexion de votre carte ${cardName} est rompue. <a href="${connectionLink}">Connectez-vous à votre banque</a> pour corriger la carte.`,
+            connectionLink
+                ? `La connexion de votre carte ${cardName} est rompue. <a href="${connectionLink}">Connectez-vous à votre banque</a> pour corriger la carte.`
+                : `La connexion de votre carte ${cardName} est rompue. Connectez-vous à votre banque pour corriger la carte.`,
     },
     walletPage: {
         balance: 'Solde',
@@ -7776,11 +7778,11 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
         reviewRequired: 'Examen requis',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Impossible d’apparier automatiquement le reçu en raison d’une connexion bancaire rompue';
+                return 'Impossible d’apparier automatiquement le reçu en raison d’une connexion bancaire rompue.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
-                    return "Impossible d'associer automatiquement le reçu en raison d'une connexion bancaire rompue.";
+                    return 'Impossible d’apparier automatiquement le reçu en raison d’une connexion bancaire rompue.';
                 }
                 return isMarkAsCash
                     ? `Impossible d'associer automatiquement le reçu en raison d'une connexion de carte défectueuse. Marquez-le comme paiement en espèces pour l'ignorer, ou <a href="${connectionLink}">corrigez la carte</a> pour associer le reçu.`

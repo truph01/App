@@ -242,7 +242,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {JoinWorkspaceResolution, OriginalMessageMovedTransaction, OriginalMessageUnreportedTransaction} from '@src/types/onyx/OriginalMessage';
 import {isEmptyObject, isEmptyValueObject} from '@src/types/utils/EmptyObject';
-import {isPersonalCard} from '@libs/CardUtils';
+import {isPersonalCard, isPersonalCardBrokenConnection} from '@libs/CardUtils';
 import {RestrictedReadOnlyContextMenuActions} from './ContextMenu/ContextMenuActions';
 import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMenu';
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
@@ -1660,16 +1660,12 @@ function PureReportActionItem({
         } else if (isCardBrokenConnectionAction(action)) {
             const cardID = getOriginalMessage(action)?.cardID;
             const card = cardID ? cardList?.[cardID] : undefined;
-            const connectionLink = cardID ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : '';
-            if (isPersonalCard(card)) {
-                children = (
-                    <ReportActionItemBasicMessage message="">
-                        <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
-                    </ReportActionItemBasicMessage>
-                );
-            } else {
-                children = emptyHTML;
-            }
+            const connectionLink = cardID && isPersonalCardBrokenConnection(card) ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : undefined;
+            children = (
+                <ReportActionItemBasicMessage message="">
+                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
+                </ReportActionItemBasicMessage>
+            );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {
             children = <ExportIntegration action={action} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED)) {

@@ -2085,7 +2085,9 @@ const translations: TranslationDeepObject<typeof en> = {
         fixCard: 'Correggi carta',
         brokenConnection: 'La connessione della tua carta è interrotta.',
         conciergeBrokenConnection: ({cardName, connectionLink}: ConciergeBrokenCardConnectionParams) =>
-            `La connessione della tua carta ${cardName} non funziona. <a href="${connectionLink}">Accedi alla tua banca</a> per sistemare la carta.`,
+            connectionLink
+                ? `La connessione della tua carta ${cardName} non funziona. <a href="${connectionLink}">Accedi alla tua banca</a> per sistemare la carta.`
+                : `La connessione della tua carta ${cardName} non funziona. Accedi alla tua banca per sistemare la carta.`,
     },
     walletPage: {
         balance: 'Saldo',
@@ -7739,7 +7741,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
         reviewRequired: 'Revisione richiesta',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL, connectionLink, isPersonalCard, isMarkAsCash}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Impossibile abbinare automaticamente la ricevuta a causa di un problema di connessione bancaria';
+                return 'Impossibile abbinare automaticamente la ricevuta a causa di un problema di connessione bancaria.';
             }
             if (isPersonalCard && (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION || brokenBankConnection)) {
                 if (!connectionLink) {
