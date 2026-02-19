@@ -122,6 +122,8 @@ function IOURequestStepDistanceGPS({
             policyForMovingExpenses,
             betas,
             recentWaypoints,
+            unit,
+            personalOutputCurrency: personalPolicy?.outputCurrency,
         });
     };
 

@@ -292,6 +292,7 @@ export type {default as UpdateSubscriptionAutoRenewParams} from './UpdateSubscri
 export type {default as UpdateSubscriptionAddNewUsersAutomaticallyParams} from './UpdateSubscriptionAddNewUsersAutomaticallyParams';
 export type {default as GenerateSpotnanaTokenParams} from './GenerateSpotnanaTokenParams';
 export type {default as UpdateSubscriptionSizeParams} from './UpdateSubscriptionSizeParams';
+export type {default as SetPromoCodeParams} from './SetPromoCodeParams';
 export type {default as ReportExportParams} from './ReportExportParams';
 export type {default as MarkAsExportedParams} from './MarkAsExportedParams';
 export type {default as UpgradeToCorporateParams} from './UpgradeToCorporateParams';
@@ -381,6 +382,7 @@ export type {default as ExportTagsSpreadsheetParams} from './ExportTagsSpreadshe
 export type {default as UpdateXeroGenericTypeParams} from './UpdateXeroGenericTypeParams';
 export type {default as UpdateCardSettlementFrequencyParams} from './UpdateCardSettlementFrequencyParams';
 export type {default as UpdateCardSettlementAccountParams} from './UpdateCardSettlementAccountParams';
+export type {default as ToggleTravelInvoicingParams} from './ToggleTravelInvoicingParams';
 export type {default as SetTravelInvoicingSettlementAccountParams} from './SetTravelInvoicingSettlementAccountParams';
 export type {default as SetCompanyCardFeedName} from './SetCompanyCardFeedName';
 export type {default as DeleteCompanyCardFeed} from './DeleteCompanyCardFeed';

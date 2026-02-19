@@ -423,6 +423,8 @@ function IOURequestStepDistanceOdometer({
             odometerDistance: calculatedDistance,
             betas,
             recentWaypoints,
+            unit,
+            personalOutputCurrency: personalPolicy?.outputCurrency,
         });
     };
 
@@ -465,7 +467,7 @@ function IOURequestStepDistanceOdometer({
             <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween, styles.ph5, styles.pt5, styles.mb5]}>
                 <View>
                     {/* Start Reading */}
-                    <View style={[styles.mb6, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
+                    <View style={[styles.mb6, styles.flexRow, !isEditing && [styles.alignItemsCenter, styles.gap3]]}>
                         <View style={[styles.flex1]}>
                             <TextInput
                                 key={`start-${inputKey}`}
@@ -478,40 +480,42 @@ function IOURequestStepDistanceOdometer({
                                 inputMode={CONST.INPUT_MODE.DECIMAL}
                             />
                         </View>
-                        <PressableWithFeedback
-                            accessible={false}
-                            accessibilityRole="button"
-                            sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_START}
-                            onPress={() => {
-                                if (odometerStartImage) {
-                                    handleViewOdometerImage(CONST.IOU.ODOMETER_IMAGE_TYPE.START);
-                                } else {
-                                    handleCaptureImage(CONST.IOU.ODOMETER_IMAGE_TYPE.START);
-                                }
-                            }}
-                            style={[
-                                StyleUtils.getWidthAndHeightStyle(variables.inputHeight, variables.inputHeight),
-                                StyleUtils.getBorderRadiusStyle(variables.componentBorderRadiusMedium),
-                                styles.overflowHidden,
-                                StyleUtils.getBackgroundColorStyle(theme.border),
-                            ]}
-                        >
-                            <ReceiptImage
-                                source={startImageSource ?? ''}
-                                shouldUseThumbnailImage
-                                thumbnailContainerStyles={styles.bgTransparent}
-                                isAuthTokenRequired
-                                fallbackIcon={GalleryPlus}
-                                fallbackIconSize={20}
-                                fallbackIconColor={theme.icon}
-                                iconSize="x-small"
-                                loadingIconSize="small"
-                                shouldUseInitialObjectPosition
-                            />
-                        </PressableWithFeedback>
+                        {!isEditing && (
+                            <PressableWithFeedback
+                                accessibilityRole="button"
+                                accessibilityLabel={translate('distance.odometer.startTitle')}
+                                sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_START}
+                                onPress={() => {
+                                    if (odometerStartImage) {
+                                        handleViewOdometerImage(CONST.IOU.ODOMETER_IMAGE_TYPE.START);
+                                    } else {
+                                        handleCaptureImage(CONST.IOU.ODOMETER_IMAGE_TYPE.START);
+                                    }
+                                }}
+                                style={[
+                                    StyleUtils.getWidthAndHeightStyle(variables.inputHeight, variables.inputHeight),
+                                    StyleUtils.getBorderRadiusStyle(variables.componentBorderRadiusMedium),
+                                    styles.overflowHidden,
+                                    StyleUtils.getBackgroundColorStyle(theme.border),
+                                ]}
+                            >
+                                <ReceiptImage
+                                    source={startImageSource ?? ''}
+                                    shouldUseThumbnailImage
+                                    thumbnailContainerStyles={styles.bgTransparent}
+                                    isAuthTokenRequired
+                                    fallbackIcon={GalleryPlus}
+                                    fallbackIconSize={variables.iconSizeNormal}
+                                    fallbackIconColor={theme.icon}
+                                    iconSize="x-small"
+                                    loadingIconSize="small"
+                                    shouldUseInitialObjectPosition
+                                />
+                            </PressableWithFeedback>
+                        )}
                     </View>
                     {/* End Reading */}
-                    <View style={[styles.mb6, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
+                    <View style={[styles.mb6, styles.flexRow, !isEditing && [styles.alignItemsCenter, styles.gap3]]}>
                         <View style={[styles.flex1]}>
                             <TextInput
                                 key={`end-${inputKey}`}
@@ -524,37 +528,39 @@ function IOURequestStepDistanceOdometer({
                                 inputMode={CONST.INPUT_MODE.DECIMAL}
                             />
                         </View>
-                        <PressableWithFeedback
-                            accessible={false}
-                            accessibilityRole="button"
-                            sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_END}
-                            onPress={() => {
-                                if (odometerEndImage) {
-                                    handleViewOdometerImage(CONST.IOU.ODOMETER_IMAGE_TYPE.END);
-                                } else {
-                                    handleCaptureImage(CONST.IOU.ODOMETER_IMAGE_TYPE.END);
-                                }
-                            }}
-                            style={[
-                                StyleUtils.getWidthAndHeightStyle(variables.inputHeight, variables.inputHeight),
-                                StyleUtils.getBorderRadiusStyle(variables.componentBorderRadiusMedium),
-                                styles.overflowHidden,
-                                StyleUtils.getBackgroundColorStyle(theme.border),
-                            ]}
-                        >
-                            <ReceiptImage
-                                source={endImageSource ?? ''}
-                                shouldUseThumbnailImage
-                                thumbnailContainerStyles={styles.bgTransparent}
-                                isAuthTokenRequired
-                                fallbackIcon={GalleryPlus}
-                                fallbackIconSize={20}
-                                fallbackIconColor={theme.icon}
-                                iconSize="x-small"
-                                loadingIconSize="small"
-                                shouldUseInitialObjectPosition
-                            />
-                        </PressableWithFeedback>
+                        {!isEditing && (
+                            <PressableWithFeedback
+                                accessibilityRole="button"
+                                accessibilityLabel={translate('distance.odometer.endTitle')}
+                                sentryLabel={CONST.SENTRY_LABEL.ODOMETER_EXPENSE.CAPTURE_IMAGE_END}
+                                onPress={() => {
+                                    if (odometerEndImage) {
+                                        handleViewOdometerImage(CONST.IOU.ODOMETER_IMAGE_TYPE.END);
+                                    } else {
+                                        handleCaptureImage(CONST.IOU.ODOMETER_IMAGE_TYPE.END);
+                                    }
+                                }}
+                                style={[
+                                    StyleUtils.getWidthAndHeightStyle(variables.inputHeight, variables.inputHeight),
+                                    StyleUtils.getBorderRadiusStyle(variables.componentBorderRadiusMedium),
+                                    styles.overflowHidden,
+                                    StyleUtils.getBackgroundColorStyle(theme.border),
+                                ]}
+                            >
+                                <ReceiptImage
+                                    source={endImageSource ?? ''}
+                                    shouldUseThumbnailImage
+                                    thumbnailContainerStyles={styles.bgTransparent}
+                                    isAuthTokenRequired
+                                    fallbackIcon={GalleryPlus}
+                                    fallbackIconSize={variables.iconSizeNormal}
+                                    fallbackIconColor={theme.icon}
+                                    iconSize="x-small"
+                                    loadingIconSize="small"
+                                    shouldUseInitialObjectPosition
+                                />
+                            </PressableWithFeedback>
+                        )}
                     </View>
 
                     {/* Total Distance Display - always shown, updated live */}
