@@ -66,7 +66,7 @@ For **which pattern to use** (A / B / C / D) and UX behavior for each, see `@con
 
 3. **failureData** (Applied when API fails)
    - Reverts optimisticData changes
-   - Clears `pendingAction`, sets `isLoading: false`
+   - Clears `pendingAction`. (e.g. sets `isLoading: false`)
    - Adds `errors` field for the user to see
    - Always include this to handle unexpected failures
 
