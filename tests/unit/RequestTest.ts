@@ -4,6 +4,15 @@ import type * as OnyxTypes from '@src/types/onyx';
 import * as TestHelper from '../utils/TestHelper';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
+jest.mock('@src/libs/Network/NetworkStore', () => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const actual = jest.requireActual<typeof import('@src/libs/Network/NetworkStore')>('@src/libs/Network/NetworkStore');
+    return {
+        ...actual,
+        hasReadRequiredDataFromStorage: jest.fn(() => Promise.resolve()),
+    };
+});
+
 beforeAll(() => {
     global.fetch = TestHelper.getGlobalFetchMock();
 });
@@ -36,19 +45,15 @@ test('Request.addMiddleware() can register a middleware and it will run', () => 
 });
 
 test('Request.addMiddleware() can register two middlewares. They can pass a response to the next and throw errors', () => {
-    // Given an initial middleware that returns a promise with a resolved value
     const testMiddleware = jest.fn().mockResolvedValue({
         jsonCode: 404,
     });
 
-    // And another middleware that will throw when it sees this jsonCode
     const errorThrowingMiddleware: Middleware = (promise) =>
         promise.then((response) => {
             if (typeof response === 'object' && response.jsonCode !== 404) {
-                // Pass the response through to the next middleware
                 return response;
             }
-            // Reject so the chain receives an error
             throw new Error('Oops');
         });
 
@@ -57,8 +62,11 @@ test('Request.addMiddleware() can register two middlewares. They can pass a resp
 
     const catchHandler = jest.fn();
     Request.processWithMiddleware(request).catch(catchHandler);
-    return waitForBatchedUpdates().then(() => {
-        expect(catchHandler).toHaveBeenCalled();
-        expect(catchHandler).toHaveBeenCalledWith(new Error('Oops'));
-    });
+
+    return waitForBatchedUpdates()
+        .then(waitForBatchedUpdates)
+        .then(() => {
+            expect(catchHandler).toHaveBeenCalled();
+            expect(catchHandler).toHaveBeenCalledWith(new Error('Oops'));
+        });
 });

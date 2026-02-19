@@ -402,10 +402,21 @@ function flush(shouldResetPromise = true) {
                 }
                 currentRequestPromise = null;
 
+                const endFlushSpanOk = () => {
+                    currentFlushSpan?.setStatus({code: 1});
+                    currentFlushSpan?.end();
+                    currentFlushSpan = undefined;
+                };
+                const endFlushSpanErr = (error: unknown) => {
+                    currentFlushSpan?.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                    currentFlushSpan?.end();
+                    currentFlushSpan = undefined;
+                };
+
                 // The queue can be paused when we sync the data with backend so we should only update the Onyx data when the queue is empty
                 if (remainingRequests === 0) {
                     Log.info('[SequentialQueue] Queue is empty, flushing Onyx updates');
-                    flushOnyxUpdatesQueue()?.then(() => {
+                    const flushPromise = flushOnyxUpdatesQueue()?.then(() => {
                         const queueFlushedData = getQueueFlushedData();
                         if (queueFlushedData.length === 0) {
                             Log.info('[SequentialQueue] No queueFlushedData to apply');
@@ -414,17 +425,23 @@ function flush(shouldResetPromise = true) {
                         Log.info('[SequentialQueue] Applying queueFlushedData', false, {
                             queueFlushedDataLength: queueFlushedData.length,
                         });
-                        Onyx.update(queueFlushedData).then(() => {
+                        return Onyx.update(queueFlushedData).then(() => {
                             Log.info('[SequentialQueue] QueueFlushedData has been applied and stored', false, {
                                 queueFlushedDataLength: queueFlushedData.length,
                             });
                             clearQueueFlushedData();
                         });
                     });
+                    if (flushPromise) {
+                        flushPromise.then(endFlushSpanOk).catch(endFlushSpanErr);
+                    } else {
+                        endFlushSpanOk();
+                    }
                 } else {
                     Log.info('[SequentialQueue] Queue still has requests, NOT flushing Onyx updates', false, {
                         remainingRequests,
                     });
+                    endFlushSpanOk();
                 }
 
                 currentFlushSpan?.setStatus({code: 1});

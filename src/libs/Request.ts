@@ -67,29 +67,34 @@ function processWithMiddleware<TKey extends OnyxKey>(request: Request<TKey>, isF
 
     const xhrPromise = makeXHR(request, outerSpan);
     return middlewares
-        .reduce<Promise<Response<TKey> | void>>((last, {middleware, name}) => {
-            const mwSpan = Sentry.startInactiveSpan({
-                name,
-                op: `middleware.${name}`,
-                parentSpan: middlewaresSpan,
-                attributes: {
-                    [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
-                },
-            });
+        .reduce<Promise<Response<TKey> | void>>(
+            (last, {middleware, name}) =>
+                last.then((previousData) => {
+                    const mwSpan = Sentry.startInactiveSpan({
+                        name,
+                        op: `middleware.${name}`,
+                        parentSpan: middlewaresSpan,
+                        attributes: {
+                            [CONST.TELEMETRY.ATTRIBUTE_COMMAND]: request.command,
+                        },
+                    });
 
-            const result = middleware(last, request, isFromSequentialQueue) ?? last;
-            return result
-                .then((data) => {
-                    mwSpan.setStatus({code: 1});
-                    mwSpan.end();
-                    return data;
-                })
-                .catch((error: unknown) => {
-                    mwSpan.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
-                    mwSpan.end();
-                    throw error;
-                });
-        }, xhrPromise)
+                    const previousPromise = Promise.resolve(previousData);
+                    const result = middleware(previousPromise, request, isFromSequentialQueue) ?? previousPromise;
+                    return result
+                        .then((data) => {
+                            mwSpan.setStatus({code: 1});
+                            mwSpan.end();
+                            return data;
+                        })
+                        .catch((error: unknown) => {
+                            mwSpan.setStatus({code: 2, message: error instanceof Error ? error.message : undefined});
+                            mwSpan.end();
+                            throw error;
+                        });
+                }),
+            xhrPromise,
+        )
         .then((response) => {
             middlewaresSpan.setStatus({code: 1});
             middlewaresSpan.end();
