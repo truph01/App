@@ -152,7 +152,7 @@ If the departing admin is removed too early, you may lose access to:
 
 To recover access, another Domain Admin must step in or contact Concierge for help. We recommend completing this checklist before offboarding the admin.
 
-## Can multiple people share access to a business bank account?
+## What's the difference between a Workspace Admin and a Domain Admin?
 
 Yes. A verified business bank account can be shared with multiple Workspace Admins. This ensures more than one person can reimburse, pay bills, or act as reimburser.
 
