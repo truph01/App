@@ -29,8 +29,9 @@ jest.mock('@libs/actions/Search', () => ({
     getExportTemplates: jest.fn(() => []),
 }));
 
-jest.mock('@libs/actions/IOU/Split', () => ({
-    initSplitExpense: jest.fn(),
+jest.mock('@libs/actions/SplitExpenses.ts', () => ({
+    __esModule: true,
+    default: jest.fn(),
 }));
 
 jest.mock('@libs/actions/IOU/Hold', () => ({
