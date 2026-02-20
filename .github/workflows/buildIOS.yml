@@ -66,6 +66,13 @@ jobs:
           git fetch origin ${{ inputs.mobile-expensify-ref }}
           git checkout ${{ inputs.mobile-expensify-ref }}
 
+      - name: Compute custom build identifier
+        id: computeIdentifier
+        run: |
+          APP_SHORT_SHA=$(git rev-parse --short HEAD)
+          MOBILE_EXPENSIFY_SHORT_SHA=$(cd Mobile-Expensify && git rev-parse --short HEAD)
+          echo "IDENTIFIER=${APP_SHORT_SHA}-${MOBILE_EXPENSIFY_SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
       - name: Configure MapBox SDK
         run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
 
@@ -225,6 +232,7 @@ jobs:
           certificate-file: './Certificates.p12'
           provisioning-profiles: ${{ steps.prepare-profiles.outputs.PROFILES }}
           comment-bot: false
+          custom-identifier: ${{ steps.computeIdentifier.outputs.IDENTIFIER }}
 
       - name: Set artifact URL output
         id: set-artifact-url

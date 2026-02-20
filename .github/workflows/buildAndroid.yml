@@ -65,6 +65,13 @@ jobs:
           git fetch origin ${{ inputs.mobile-expensify-ref }}
           git checkout ${{ inputs.mobile-expensify-ref }}
 
+      - name: Compute custom build identifier
+        id: computeIdentifier
+        run: |
+          APP_SHORT_SHA=$(git rev-parse --short HEAD)
+          MOBILE_EXPENSIFY_SHORT_SHA=$(cd Mobile-Expensify && git rev-parse --short HEAD)
+          echo "IDENTIFIER=${APP_SHORT_SHA}-${MOBILE_EXPENSIFY_SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
       - name: Configure MapBox SDK
         run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
 
@@ -165,6 +172,7 @@ jobs:
           keystore-path: '../tools/buildtools/upload-key.keystore'
           comment-bot: false
           rock-build-extra-params: ${{ inputs.variant == 'Adhoc' && '--extra-params "-PreactNativeArchitectures=arm64-v8a,x86_64 --profile"' || '--extra-params "--profile"' }}
+          custom-identifier: ${{ steps.computeIdentifier.outputs.IDENTIFIER }}
           validate-elf-alignment: false
 
       - name: Clear Gradle cache
@@ -194,6 +202,7 @@ jobs:
           keystore-path: '../tools/buildtools/upload-key.keystore'
           comment-bot: false
           rock-build-extra-params: ${{ inputs.variant == 'Adhoc' && '--extra-params "-PreactNativeArchitectures=arm64-v8a,x86_64 --profile"' || '--extra-params "--profile"' }}
+          custom-identifier: ${{ steps.computeIdentifier.outputs.IDENTIFIER }}
           validate-elf-alignment: false
 
       - name: Upload Gradle profile report
