@@ -51,7 +51,7 @@ Domain Admins control company-wide permission, so this step is required before o
 ## How to share a business bank account with a new Workspace Admin
 
 If you’re the current bank account owner in Expensify, [share the bank account](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Share-a-Business-Bank-Account) with the new Workspace Admin or another Workspace Admin so they can continue reimbursements and payments.
-
+Domain Admins control company-wide permissions, so this step is required before offboarding the previous Domain Admin.
 ---
 
 ## How to take over billing and payment responsibilities
