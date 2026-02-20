@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/core';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Alert, AppState, StyleSheet, View} from 'react-native';
 import type {LayoutRectangle} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -12,13 +12,16 @@ import {scheduleOnRN} from 'react-native-worklets';
 import ActivityIndicator from '@components/ActivityIndicator';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
+import {useFullScreenLoaderActions, useFullScreenLoaderState} from '@components/FullScreenLoaderContext';
 import Icon from '@components/Icon';
 import ImageSVG from '@components/ImageSVG';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
+import RenderHTML from '@components/RenderHTML';
 import Text from '@components/Text';
 import useFilesValidation from '@hooks/useFilesValidation';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {showCameraPermissionsAlert} from '@libs/fileDownload/FileUtils';
@@ -36,16 +39,13 @@ import NavigationAwareCamera from '@pages/iou/request/step/IOURequestStepScan/Na
 import StepScreenWrapper from '@pages/iou/request/step/StepScreenWrapper';
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import type {WithFullTransactionOrNotFoundProps} from '@pages/iou/request/step/withFullTransactionOrNotFound';
+import variables from '@styles/variables';
 import {setMoneyRequestOdometerImage} from '@userActions/IOU';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
-import type {FileObject} from '@src/types/utils/Attachment';
-import useOnyx from '@hooks/useOnyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
-import {useFullScreenLoaderActions, useFullScreenLoaderState} from '@components/FullScreenLoaderContext';
-import variables from '@styles/variables';
-import RenderHTML from '@components/RenderHTML';
+import type {FileObject} from '@src/types/utils/Attachment';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
@@ -83,11 +83,11 @@ function IOURequestStepOdometerImage({
     const snapPhotoText = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.snapPhotoStart') : translate('distance.odometer.snapPhotoEnd');
     const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? lazyIcons.OdometerStart : lazyIcons.OdometerEnd;
 
-    const navigateBack = useCallback(() => {
+    const navigateBack = () => {
         Navigation.goBack();
-    }, []);
+    };
 
-    const askForPermissions = useCallback(() => {
+    const askForPermissions = () => {
         // There's no way we can check for the BLOCKED status without requesting the permission first
         // https://github.com/zoontek/react-native-permissions/blob/a836e114ce3a180b2b23916292c79841a267d828/README.md?plain=1#L670
         CameraPermission.requestCameraPermission?.()
@@ -101,7 +101,7 @@ function IOURequestStepOdometerImage({
             .catch(() => {
                 setCameraPermissionStatus(RESULTS.UNAVAILABLE);
             });
-    }, [translate]);
+    };
 
     const blinkOpacity = useSharedValue(0);
     const blinkStyle = useAnimatedStyle(() => ({
@@ -142,53 +142,48 @@ function IOURequestStepOdometerImage({
             scheduleOnRN(focusCamera, point);
         });
 
-    useFocusEffect(
-        useCallback(() => {
-            setDidCapturePhoto(false);
-            const refreshCameraPermissionStatus = () => {
-                CameraPermission?.getCameraPermissionStatus?.()
-                    .then(setCameraPermissionStatus)
-                    .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
-            };
+    useFocusEffect(() => {
+        setDidCapturePhoto(false);
+        const refreshCameraPermissionStatus = () => {
+            CameraPermission?.getCameraPermissionStatus?.()
+                .then(setCameraPermissionStatus)
+                .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
+        };
 
-            refreshCameraPermissionStatus();
+        refreshCameraPermissionStatus();
 
-            // Refresh permission status when app gain focus
-            const subscription = AppState.addEventListener('change', (appState) => {
-                if (appState !== 'active') {
-                    return;
-                }
-
-                refreshCameraPermissionStatus();
-            });
-
-            return () => {
-                subscription.remove();
-
-                if (isLoaderVisible) {
-                    setIsLoaderVisible(false);
-                }
-            };
-        }, [isLoaderVisible, setIsLoaderVisible]),
-    );
-
-    const handleImageSelected = useCallback(
-        (files: FileObject[]) => {
-            if (files.length === 0) {
+        // Refresh permission status when app gains focus
+        const subscription = AppState.addEventListener('change', (appState) => {
+            if (appState !== 'active') {
                 return;
             }
 
-            const file = files.at(0);
-            const imageUri = (file as {uri?: string}).uri ?? '';
-            setMoneyRequestOdometerImage(transactionID, imageType, imageUri, isTransactionDraft);
-            navigateBack();
-        },
-        [transactionID, imageType, isTransactionDraft, navigateBack],
-    );
+            refreshCameraPermissionStatus();
+        });
+
+        return () => {
+            subscription.remove();
+
+            if (isLoaderVisible) {
+                setIsLoaderVisible(false);
+            }
+        };
+    });
+
+    const handleImageSelected = (files: FileObject[]) => {
+        if (files.length === 0) {
+            return;
+        }
+
+        const file = files.at(0);
+        const imageUri = (file as {uri?: string}).uri ?? '';
+        setMoneyRequestOdometerImage(transactionID, imageType, imageUri, isTransactionDraft);
+        navigateBack();
+    };
 
     const {validateFiles, ErrorModal} = useFilesValidation(handleImageSelected);
 
-    const capturePhoto = useCallback(() => {
+    const capturePhoto = () => {
         if (!camera.current && (cameraPermissionStatus === RESULTS.DENIED || cameraPermissionStatus === RESULTS.BLOCKED)) {
             askForPermissions();
             return;
@@ -246,7 +241,7 @@ function IOURequestStepOdometerImage({
                         Log.warn('Error taking photo', errorMessage);
                     });
             });
-    }, [cameraPermissionStatus, didCapturePhoto, translate, flash, hasFlash, isPlatformMuted, transactionID, imageType, isTransactionDraft, navigateBack, askForPermissions]);
+    };
 
     // Wait for camera permission status to render
     if (cameraPermissionStatus == null) {
@@ -392,7 +387,7 @@ function IOURequestStepOdometerImage({
                             height={CONST.RECEIPT.SHUTTER_SIZE}
                         />
                     </PressableWithFeedback>
-                    {/* Spacer matching gallery size so justifyContentAround keeps the shutter exactly centered - it's the simples sollution */}
+                    {/* Empty View matching gallery size so justifyContentAround keeps the shutter exactly centered - it's the simplest solution */}
                     <View style={{width: variables.iconSizeMenuItem, height: variables.iconSizeMenuItem}} />
                 </View>
                 {ErrorModal}
