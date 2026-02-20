@@ -627,6 +627,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
         activePolicy,
         parentReport,
         reportActionsForOriginalReportID,
+        userBillingGraceEndPeriodCollection,
     ]);
 
     const displayNamesWithTooltips = useMemo(() => {
