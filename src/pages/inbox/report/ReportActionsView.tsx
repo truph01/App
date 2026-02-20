@@ -19,7 +19,6 @@ import {getAllNonDeletedTransactions} from '@libs/MoneyRequestReportUtils';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {ReportsSplitNavigatorParamList} from '@libs/Navigation/types';
 import {generateNewRandomInt, rand64} from '@libs/NumberUtils';
-import Performance from '@libs/Performance';
 import {
     getCombinedReportActions,
     getMostRecentIOURequestActionID,
@@ -337,4 +336,4 @@ function ReportActionsView({
     );
 }
 
-export default Performance.withRenderTrace({id: '<ReportActionsView> rendering'})(ReportActionsView);
+export default ReportActionsView;
