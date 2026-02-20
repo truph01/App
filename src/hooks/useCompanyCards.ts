@@ -70,12 +70,14 @@ function resolveCardListEntry(card: Card, cardListEntries: Array<[string, string
         return card;
     }
 
-    const matches = cardListEntries.filter(([name]) => name.endsWith(lastFourPAN));
-    if (matches.length !== 1) {
+    const [matchedCard, ...otherMatchedCards] = cardListEntries.filter(([name]) => name.endsWith(lastFourPAN)).slice(0, 2);
+
+    // If there are other matched cards, return the original card.
+    if (otherMatchedCards.length > 0) {
         return card;
     }
 
-    const [name = cardName, encrypted = encryptedCardNumber] = matches.at(0) ?? [];
+    const [name = cardName, encrypted = encryptedCardNumber] = matchedCard;
     return {...card, cardName: name, encryptedCardNumber: encrypted};
 }
 
