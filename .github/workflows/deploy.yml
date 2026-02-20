@@ -378,7 +378,7 @@ jobs:
     name: Upload Android to Applause
     needs: [prep, androidBuild]
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
+    if: ${{ github.repository == 'Expensify/App' && github.ref == 'refs/heads/staging' && !fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     continue-on-error: true
     steps:
       - name: Download Android APK artifact
@@ -708,7 +708,7 @@ jobs:
     name: Upload iOS to Applause
     needs: [prep, iosBuild]
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
+    if: ${{ github.repository == 'Expensify/App' && github.ref == 'refs/heads/staging' && !fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     continue-on-error: true
     steps:
       - name: Download iOS build artifact
