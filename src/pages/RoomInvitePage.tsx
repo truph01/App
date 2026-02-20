@@ -205,7 +205,7 @@ function RoomInvitePage({
     const ancestors = useAncestors(report);
 
     const inviteUsers = () => {
-        HttpUtils.cancelPendingRequests(READ_COMMANDS.SEARCH_FOR_REPORTS);
+        HttpUtils.cancelPendingRequests(READ_COMMANDS.SEARCH_FOR_USERS);
 
         if (selectedOptions.length === 0) {
             return;
