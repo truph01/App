@@ -1,3 +1,4 @@
+// Policy and session mock data uses property names that do not follow camelCase convention
 /* eslint-disable @typescript-eslint/naming-convention */
 import {renderHook} from '@testing-library/react-native';
 import useDefaultSearchQuery from '@hooks/useDefaultSearchQuery';
