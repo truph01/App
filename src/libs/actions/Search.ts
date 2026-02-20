@@ -804,6 +804,7 @@ function bulkDeleteReports(
     const transactionIDList: string[] = [];
     const reportIDList: string[] = [];
 
+    // Collect all report IDs that are being deleted
     for (const key of Object.keys(selectedTransactions)) {
         const selectedItem = selectedTransactions[key];
         if (selectedItem.action === CONST.SEARCH.ACTION_TYPES.VIEW && key === selectedItem.reportID) {
@@ -811,6 +812,7 @@ function bulkDeleteReports(
         }
     }
 
+    // Collect transaction IDs, but exclude any transactions whose reportID is in the list of reports being deleted
     for (const key of Object.keys(selectedTransactions)) {
         const selectedItem = selectedTransactions[key];
         if (selectedItem.action === CONST.SEARCH.ACTION_TYPES.VIEW && key === selectedItem.reportID) {
