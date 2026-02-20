@@ -126,35 +126,6 @@ platform :android do
     setGradleOutputsInEnv()
   end
 
-  desc "Generate a new local APK for e2e testing"
-  lane :build_e2e do
-    ENV["ENVFILE"]="tests/e2e/.env.e2e"
-    ENV["ENTRY_FILE"]="src/libs/E2E/reactNativeLaunchingTest.ts"
-    ENV["E2E_TESTING"]="true"
-
-    gradle(
-      project_dir: './android',
-      task: ':app:assemble',
-      flavor: 'e2e',
-      build_type: 'Release',
-    )
-    setGradleOutputsInEnv()
-  end
-
-  lane :build_e2eDelta do
-    ENV["ENVFILE"]="tests/e2e/.env.e2edelta"
-    ENV["ENTRY_FILE"]="src/libs/E2E/reactNativeLaunchingTest.ts"
-    ENV["E2E_TESTING"]="true"
-
-    gradle(
-      project_dir: './android',
-      task: ':app:assemble',
-      flavor: 'e2edelta',
-      build_type: 'Release',
-    )
-    setGradleOutputsInEnv()
-  end
-
   desc "Build AdHoc testing build"
   lane :build_adhoc do
     ENV["ENVFILE"]=".env.adhoc"
