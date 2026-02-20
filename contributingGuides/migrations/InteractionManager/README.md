@@ -23,7 +23,7 @@ This makes the migration non-trivial: you have to understand *what each call is 
 On top of TransitionTracker, existing APIs gain transition-aware callbacks:
 
 - Navigation methods accept `afterTransition` — a callback that runs after the triggered navigation transition completes
-- Navigation methods accept `waitForTransition` — the call waits for any ongoing transition to finish before navigating
+- Navigation methods accept `waitForTransition` — the call waits for all ongoing transitions to finish before navigating
 - Keyboard methods accept `afterTransition` — a callback that runs after the keyboard transition completes
 - `ConfirmModal` and similar modal APIs will accept `afterTransition` callback to defer work until the modal close transition finishes (will be implemented in a separate PR)
 
