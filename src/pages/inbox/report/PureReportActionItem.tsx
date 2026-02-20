@@ -1789,6 +1789,7 @@ function PureReportActionItem({
             if (actionContainsFollowUps) {
                 actionableButtonsNoLines = 0;
             }
+            const isPhrasalConciergeOptions = isConciergeOptions || actionContainsFollowUps;
             children = (
                 <MentionReportContext.Provider value={mentionReportContextValue}>
                     <ShowContextMenuContext.Provider value={contextValue}>
@@ -1824,22 +1825,14 @@ function PureReportActionItem({
                                     {actionableItemButtons.length > 0 && (
                                         <ActionableItemButtons
                                             items={actionableItemButtons}
-                                            layout={
-                                                isActionableTrackExpense(action) ||
-                                                isConciergeCategoryOptions(action) ||
-                                                isConciergeDescriptionOptions(action) ||
-                                                isActionableMentionWhisper(action) ||
-                                                actionContainsFollowUps
-                                                    ? 'vertical'
-                                                    : 'horizontal'
-                                            }
-                                            shouldUseLocalization={!isConciergeOptions && !actionContainsFollowUps}
+                                            layout={isActionableTrackExpense(action) || isActionableMentionWhisper(action) || isPhrasalConciergeOptions ? 'vertical' : 'horizontal'}
+                                            shouldUseLocalization={!isPhrasalConciergeOptions}
                                             primaryTextNumberOfLines={actionableButtonsNoLines}
                                             styles={{
-                                                text: [isConciergeOptions || actionContainsFollowUps ? styles.textAlignLeft : undefined],
-                                                button: actionContainsFollowUps ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
+                                                text: [isPhrasalConciergeOptions ? styles.textAlignLeft : undefined],
+                                                button: isPhrasalConciergeOptions ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
                                                 container: [
-                                                    actionContainsFollowUps && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
+                                                    isPhrasalConciergeOptions && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
                                                     actionContainsFollowUps ? styles.mt5 : undefined,
                                                 ],
                                             }}
