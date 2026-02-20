@@ -55,7 +55,10 @@ class MainApplication : MultiDexApplication(), ReactApplication {
 
     override fun onCreate() {
         super.onCreate()
-        AppStartTimeModule.appStartTime = System.currentTimeMillis().toDouble()
+        getSharedPreferences("AppStartTime", MODE_PRIVATE)
+            .edit()
+            .putLong("AppStartTime", System.currentTimeMillis())
+            .apply()
         ReactFontManager.getInstance().addCustomFont(this, "Custom Emoji Font", R.font.custom_emoji_font)
         ReactFontManager.getInstance().addCustomFont(this, "Expensify New Kansas", R.font.expensify_new_kansas)
         ReactFontManager.getInstance().addCustomFont(this, "Expensify Neue", R.font.expensify_neue)

@@ -20,7 +20,7 @@ class AppDelegate: ExpoAppDelegate, UNUserNotificationCenterDelegate {
   var reactNativeFactory: RCTReactNativeFactory?
 
   override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    AppStartTime.setAppStartTime(Date().timeIntervalSince1970 * 1000)
+    UserDefaults.standard.set(Date().timeIntervalSince1970 * 1000, forKey: "AppStartTime")
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
