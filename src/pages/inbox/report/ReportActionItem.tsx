@@ -120,6 +120,7 @@ function ReportActionItem({
     const [iouReportOfLinkedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportOfLinkedReportID}`, {canBeMissing: true});
 
     const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`];
+    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
     const blockedFromConcierge = useBlockedFromConcierge();
@@ -141,6 +142,7 @@ function ReportActionItem({
             draftMessage={draftMessage}
             iouReport={iouReport}
             taskReport={taskReport}
+            cardList={cardList}
             linkedReport={linkedReport}
             iouReportOfLinkedReport={iouReportOfLinkedReport}
             emojiReactions={emojiReactions}
