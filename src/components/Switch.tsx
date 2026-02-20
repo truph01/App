@@ -46,7 +46,9 @@ function Switch({isOn, onToggle, accessibilityLabel, disabled, showLockIcon, dis
 
     // Track when user toggles vs when props change due to recycling
     useLayoutEffect(() => {
-        if (prevIsOn.current === isOn) return;
+        if (prevIsOn.current === isOn) {
+            return;
+        }
         if (hasUserToggled.current) {
             // User just toggled - animate to new position
             offsetX.set(withTiming(targetOffsetX, {duration: 300}));
