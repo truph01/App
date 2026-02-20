@@ -312,6 +312,7 @@ function IOURequestStepOdometerImage({
                                         accessibilityLabel={translate('receipt.flash')}
                                         disabled={cameraPermissionStatus !== RESULTS.GRANTED || !hasFlash}
                                         onPress={() => setFlash((prevFlash) => !prevFlash)}
+                                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.FLASH}
                                     >
                                         <Icon
                                             height={variables.iconSizeSmall}
@@ -355,6 +356,7 @@ function IOURequestStepOdometerImage({
                                 role={CONST.ROLE.BUTTON}
                                 accessibilityLabel={translate('receipt.gallery')}
                                 style={[styles.alignItemsStart]}
+                                sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.GALLERY}
                                 onPress={() => {
                                     openPicker({
                                         onPicked: (data) => validateFiles(data),
@@ -381,6 +383,7 @@ function IOURequestStepOdometerImage({
                         accessibilityLabel={translate('receipt.shutter')}
                         style={[styles.alignItemsCenter]}
                         onPress={capturePhoto}
+                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.SHUTTER}
                     >
                         <ImageSVG
                             contentFit="contain"
