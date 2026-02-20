@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import {Platform} from 'react-native';
 import {isDevelopment} from '@libs/Environment/Environment';
-import {browserProfilingIntegration, navigationIntegration, tracingIntegration} from '@libs/telemetry/integrations';
+import {breadcrumbsIntegration, browserProfilingIntegration, consoleIntegration, navigationIntegration, tracingIntegration} from '@libs/telemetry/integrations';
 import processBeforeSendTransactions from '@libs/telemetry/middlewares';
 import CONFIG from '@src/CONFIG';
 import pkg from '../../../package.json';
@@ -14,7 +14,7 @@ function setupSentry(): void {
         return;
     }
 
-    const integrations = [navigationIntegration, tracingIntegration, browserProfilingIntegration].filter((integration) => !!integration);
+    const integrations = [navigationIntegration, tracingIntegration, browserProfilingIntegration, breadcrumbsIntegration, consoleIntegration].filter((integration) => !!integration);
 
     Sentry.init({
         dsn: CONFIG.SENTRY_DSN,
