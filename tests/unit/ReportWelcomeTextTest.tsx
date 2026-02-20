@@ -87,7 +87,7 @@ function renderComponent(report: OnyxEntry<Report>, policy?: OnyxEntry<Policy>) 
     return render(
         <ReportWelcomeText
             report={report}
-            policy={policy ?? null}
+            policy={policy ?? undefined}
         />,
     );
 }

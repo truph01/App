@@ -13,7 +13,7 @@ import type SCREENS from '@src/SCREENS';
 import type {Participant} from '@src/types/onyx/IOU';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {personalDetailsSelector} from '@selectors/PersonalDetails';
+import personalDetailsSelector from '@selectors/PersonalDetails';
 import {vacationDelegateSelector} from '@selectors/Domain';
 
 type DomainMemberVacationDelegatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.VACATION_DELEGATE>;
