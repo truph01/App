@@ -1254,7 +1254,7 @@ function MoneyRequestConfirmationList({
             contentContainerStyle: isCompactMode ? [styles.flexGrow1] : undefined,
             listFooterContentStyle: isCompactMode ? [styles.flex1, styles.mv3] : [styles.mv3],
         }),
-        [isCompactMode, styles.flexBasisAuto, styles.flexGrow1, styles.mv3],
+        [isCompactMode, styles.flexBasisAuto, styles.flexGrow1, styles.mv3, styles.flex1],
     );
 
     const listFooterContent = (
