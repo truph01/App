@@ -378,7 +378,7 @@ function MoneyRequestReportActionsList({
             // To handle this, we use the 'referrer' parameter to check if the current navigation is triggered from a notification.
             const isFromNotification = route?.params?.referrer === CONST.REFERRER.NOTIFICATION;
             if ((isVisible || isFromNotification) && scrollingVerticalBottomOffset.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD) {
-                readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
+                readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
                 if (isFromNotification) {
                     Navigation.setParams({referrer: undefined});
                 }
@@ -411,7 +411,7 @@ function MoneyRequestReportActionsList({
             return;
         }
 
-        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
+        readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
         userActiveSince.current = DateUtils.getDBTime();
 
         // This effect logic to `mark as read` will only run when the report focused has new messages and the App visibility
@@ -676,7 +676,7 @@ function MoneyRequestReportActionsList({
 
         reportScrollManager.scrollToEnd();
         readActionSkipped.current = false;
-        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
+        readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
     }, [setIsFloatingMessageCounterVisible, hasNewestReportAction, reportScrollManager, report.reportID, reportMetadata?.hasOnceLoadedReportActions]);
 
     const scrollToNewTransaction = useCallback(

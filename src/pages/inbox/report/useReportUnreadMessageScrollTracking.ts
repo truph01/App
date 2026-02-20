@@ -122,7 +122,7 @@ export default function useReportUnreadMessageScrollTracking({
         if (unreadActionVisible && readActionSkippedRef.current) {
             // eslint-disable-next-line no-param-reassign
             readActionSkippedRef.current = false;
-            readNewestAction(ref.current.reportID, false, ref.current.hasOnceLoadedReportActions);
+            readNewestAction(ref.current.reportID, ref.current.hasOnceLoadedReportActions);
         }
 
         // FlatList requires a stable onViewableItemsChanged callback for optimal performance.

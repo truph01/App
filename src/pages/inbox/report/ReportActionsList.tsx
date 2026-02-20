@@ -412,7 +412,7 @@ function ReportActionsList({
             // To handle this, we use the 'referrer' parameter to check if the current navigation is triggered from a notification.
             const isFromNotification = route?.params?.referrer === CONST.REFERRER.NOTIFICATION;
             if ((isVisible || isFromNotification) && scrollOffsetRef.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD) {
-                readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
+                readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
                 if (isFromNotification) {
                     Navigation.setParams({referrer: undefined});
                 }
@@ -454,7 +454,7 @@ function ReportActionsList({
             return;
         }
 
-        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
+        readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
         userActiveSince.current = DateUtils.getDBTime();
         return true;
 
@@ -630,7 +630,7 @@ function ReportActionsList({
         }
         reportScrollManager.scrollToBottom();
         readActionSkipped.current = false;
-        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
+        readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
     }, [setIsFloatingMessageCounterVisible, hasNewestReportAction, reportScrollManager, report.reportID, backTo, introSelected, reportMetadata?.hasOnceLoadedReportActions]);
 
     /**
