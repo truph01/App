@@ -17,6 +17,7 @@ import variables from '@styles/variables';
 import {authorizeTransaction, fireAndForgetDenyTransaction} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';
 import SCREENS from '@src/SCREENS';
+import {AuthorizeTransactionCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 
 type Payload = {
     transactionID: string;
@@ -150,11 +151,8 @@ export default {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.NO_ELIGIBLE_METHODS]: <NoEligibleMethodsFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.UNSUPPORTED_DEVICE]: <UnsupportedDeviceFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
     },
-    MODALS: {
-        cancelConfirmation: {
-            description: 'multifactorAuthentication.reviewTransaction.areYouSureToDeny',
-            confirmButtonText: 'multifactorAuthentication.reviewTransaction.denyTransaction',
-        },
+    modals: {
+        cancelConfirmation: AuthorizeTransactionCancelConfirmModal,
     },
 } as const satisfies MultifactorAuthenticationScenarioCustomConfig<Payload>;
 

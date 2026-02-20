@@ -8,14 +8,8 @@ describe('MultifactorAuthentication Scenarios Config', () => {
         const config = MULTIFACTOR_AUTHENTICATION_SCENARIO_CONFIG as MultifactorAuthenticationScenarioConfigRecord;
 
         for (const scenarioConfig of Object.values(config)) {
-            expect(scenarioConfig).toHaveProperty('MODALS');
-            expect(scenarioConfig.MODALS).toHaveProperty('cancelConfirmation');
-
-            const cancelConfirmation = scenarioConfig.MODALS.cancelConfirmation;
-            expect(cancelConfirmation).toHaveProperty('title');
-            expect(cancelConfirmation).toHaveProperty('description');
-            expect(cancelConfirmation).toHaveProperty('confirmButtonText');
-            expect(cancelConfirmation).toHaveProperty('cancelButtonText');
+            expect(scenarioConfig).toHaveProperty('modals');
+            expect(scenarioConfig.modals).toHaveProperty('cancelConfirmation');
 
             expect(scenarioConfig).toHaveProperty('successScreen');
             expect(scenarioConfig).toHaveProperty('defaultClientFailureScreen');

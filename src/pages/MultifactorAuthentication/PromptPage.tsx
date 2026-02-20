@@ -7,7 +7,6 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import LoadingIndicator from '@components/LoadingIndicator';
 import {useMultifactorAuthentication, useMultifactorAuthenticationActions, useMultifactorAuthenticationState, usePromptContent} from '@components/MultifactorAuthentication/Context';
 import MultifactorAuthenticationPromptContent from '@components/MultifactorAuthentication/PromptContent';
-import MultifactorAuthenticationTriggerCancelConfirmModal from '@components/MultifactorAuthentication/TriggerCancelConfirmModal';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -17,6 +16,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {MultifactorAuthenticationParamList} from '@libs/Navigation/types';
 import Navigation from '@navigation/Navigation';
 import type SCREENS from '@src/SCREENS';
+import {DefaultCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 
 type MultifactorAuthenticationPromptPageProps = PlatformStackScreenProps<MultifactorAuthenticationParamList, typeof SCREENS.MULTIFACTOR_AUTHENTICATION.PROMPT>;
 
@@ -61,6 +61,8 @@ function MultifactorAuthenticationPromptPage({route}: MultifactorAuthenticationP
         return false;
     };
 
+    const CancelConfirmModal = state.scenario?.modals.cancelConfirmation ?? DefaultCancelConfirmModal;
+
     return (
         <ScreenWrapper
             testID={MultifactorAuthenticationPromptPage.displayName}
@@ -98,8 +100,7 @@ function MultifactorAuthenticationPromptPage({route}: MultifactorAuthenticationP
                     )}
                 </FixedFooter>
 
-                <MultifactorAuthenticationTriggerCancelConfirmModal
-                    scenario={state.scenario}
+                <CancelConfirmModal
                     isVisible={isCancelModalVisible}
                     onConfirm={cancelFlow}
                     onCancel={hideCancelModal}

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import MultifactorAuthenticationTriggerCancelConfirmModal from '@components/MultifactorAuthentication/TriggerCancelConfirmModal';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -15,6 +14,7 @@ import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
 import {AlreadyReviewedFailureScreen, DeniedTransactionSuccessScreen} from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
+import {AuthorizeTransactionCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -88,13 +88,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                         onAuthorize={approveTransaction}
                         onDeny={onDenyTransaction}
                     />
-                    {/*
-                        TODO: Use custom AuthorizeTransactionCancelModal (not yet implemented)
-                        The config for MFA modals should be exactly the same as `failureScreens` structure.
-                        Right now only the props for modals are stored in the config but it should be key - component pattern instead.
-                        See: FailureScreen directory and how it is used in the scenarios config.
-                    */}
-                    <MultifactorAuthenticationTriggerCancelConfirmModal
+                    <AuthorizeTransactionCancelConfirmModal
                         isVisible={isConfirmModalVisible}
                         onConfirm={onDenyTransaction}
                         onCancel={hideConfirmModal}
