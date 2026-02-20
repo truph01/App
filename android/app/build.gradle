@@ -75,8 +75,6 @@ project.ext.envConfigFiles = [
     adhocRelease: ".env.adhoc",
     developmentRelease: ".env",
     developmentDebug: ".env",
-    e2eRelease: "tests/e2e/.env.e2e",
-    e2edeltaRelease: "tests/e2e/.env.e2edelta"
 ]
 
 /**
@@ -124,20 +122,6 @@ android {
     productFlavors {
         // we need to define a production flavor but since it has default config, we can leave it empty
         production
-        e2e {
-            // If  are building a version that won't be uploaded to the play store, we don't have to use production keys
-            // applies all non-production flavors
-            applicationIdSuffix ".e2e"
-            signingConfig signingConfigs.debug
-            resValue "string", "build_config_package", "com.expensify.chat"
-        }
-        e2edelta {
-            // If  are building a version that won't be uploaded to the play store, we don't have to use production keys
-            // applies all non-production flavors
-            applicationIdSuffix ".e2edelta"
-            signingConfig signingConfigs.debug
-            resValue "string", "build_config_package", "com.expensify.chat"
-        }
         adhoc {
             applicationIdSuffix ".adhoc"
             signingConfig signingConfigs.debug
