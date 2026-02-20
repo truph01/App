@@ -82,7 +82,7 @@ After the upgrade:
 - Billing is based on workspace members
 
 ### Collect Plan Billing for Submit Workspaces With 2 Members
-
+To make the transition smooth for customers that submit expenses to others in Expensify using our previous Classic Submit plan, we're applying a discount.
 To make the transition smooth for customers who submit expenses to others in Expensify using our previous Classic Submit plan, we're applying a discount.
 
 If your workspace has:
