@@ -95,154 +95,13 @@ jobs:
 
   androidBuild:
     name: Build Android HybridApp
-    needs: prep
-    runs-on: blacksmith-32vcpu-ubuntu-2404
+    needs: [prep]
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
-    outputs:
-      VERSION_CODE: ${{ steps.getAndroidVersion.outputs.VERSION_CODE }}
-    steps:
-      - name: Checkout App and Mobile-Expensify repo
-        # v6
-        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
-        with:
-          submodules: true
-          token: ${{ secrets.OS_BOTIFY_TOKEN }}
-
-      - name: Configure MapBox SDK
-        run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
-
-      - name: Setup Node
-        id: setup-node
-        uses: ./.github/actions/composite/setupNode
-        with:
-          IS_HYBRID_BUILD: 'true'
-
-      - name: Run grunt build
-        run: |
-            cd Mobile-Expensify
-            npm run grunt:build:shared
-
-      - name: Get Java version
-        id: get-java-version
-        uses: ./.github/actions/composite/getJavaVersion
-
-      - name: Setup Java
-        # v4
-        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12
-        with:
-          distribution: oracle
-          java-version: ${{ steps.get-java-version.outputs.version }}
-
-      - name: Setup Gradle
-        # v4
-        uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244
-
-      - name: Setup Ruby
-        # v1.229.0
-        uses: ruby/setup-ruby@354a1ad156761f5ee2b7b13fa8e09943a5e8d252
-        with:
-          bundler-cache: true
-
-      - name: Install New Expensify Gems
-        run: bundle install
-
-      - name: Setup 1Password CLI and certificates
-        uses: Expensify/GitHub-Actions/setup-certificate-1p@main
-        with:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          SHOULD_LOAD_SSL_CERTIFICATES: 'false'
-
-      - name: Load files from 1Password
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        run: |
-          op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
-          op read "op://${{ vars.OP_VAULT }}/upload-key.keystore/upload-key.keystore" --force --out-file ./upload-key.keystore
-
-          # Copy the keystore to the Android directory for Fullstory
-          cp ./upload-key.keystore Mobile-Expensify/Android 
-
-      - name: Load Android upload keystore credentials from 1Password
-        id: load-credentials
-        # v2
-        uses: 1password/load-secrets-action@581a835fb51b8e7ec56b71cf2ffddd7e68bb25e0
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          ANDROID_UPLOAD_KEYSTORE_PASSWORD: op://${{ vars.OP_VAULT }}/Repository-Secrets/ANDROID_UPLOAD_KEYSTORE_PASSWORD
-          ANDROID_UPLOAD_KEYSTORE_ALIAS: op://${{ vars.OP_VAULT }}/Repository-Secrets/ANDROID_UPLOAD_KEYSTORE_ALIAS
-          ANDROID_UPLOAD_KEY_PASSWORD: op://${{ vars.OP_VAULT }}/Repository-Secrets/ANDROID_UPLOAD_KEY_PASSWORD
-
-      - name: Get Android native version
-        id: getAndroidVersion
-        run: echo "VERSION_CODE=$(grep -oP 'android:versionCode="\K[0-9]+' Mobile-Expensify/Android/AndroidManifest.xml)" >> "$GITHUB_OUTPUT"
-
-      - name: Build Android app
-        run: |
-          if ! bundle exec fastlane android build_hybrid; then
-            echo "::warning::Android build failed, clearing Gradle caches and retrying…"
-            rm -rf ~/.gradle/caches
-            bundle exec fastlane android build_hybrid
-          fi
-        env:
-          ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
-          ANDROID_UPLOAD_KEYSTORE_ALIAS: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_ALIAS }}
-          ANDROID_UPLOAD_KEY_PASSWORD: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEY_PASSWORD }}
-          ANDROID_BUILD_TYPE: ${{ vars.ANDROID_BUILD_TYPE }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Upload Android build artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: androidBuild-artifact
-          path: ${{ env.aabPath }}
-
-      - name: Upload Android sourcemap artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: android-sourcemap-artifact
-          path: /home/runner/work/App/App/Mobile-Expensify/Android/build/generated/sourcemaps/react/release/index.android.bundle.map
-
-      - name: Install bundletool
-        run: |
-          readonly BUNDLETOOL_VERSION="1.18.1"
-          readonly BUNDLETOOL_URL="https://github.com/google/bundletool/releases/download/${BUNDLETOOL_VERSION}/bundletool-all-${BUNDLETOOL_VERSION}.jar"
-
-          # Download jar from GitHub Release
-          curl -L -o bundletool.jar "$BUNDLETOOL_URL"
-
-          # Validate checksum
-          readonly EXPECTED_SHA="675786493983787ffa11550bdb7c0715679a44e1643f3ff980a529e9c822595c"
-          SHA="$(sha256sum bundletool.jar | cut -d ' ' -f1)"
-          if [[ "$SHA" != "$EXPECTED_SHA" ]]; then
-            echo "SHA mismatch: expected $EXPECTED_SHA but got $ACTUAL_SHA"
-            exit 1
-          fi
-
-      - name: Generate APK from AAB
-        run: |
-          # Generate apks using bundletool
-          java -jar bundletool.jar build-apks --bundle=${{ env.aabPath }} --output=Expensify.apks \
-            --mode=universal \
-            --ks=upload-key.keystore \
-            --ks-pass=pass:${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_PASSWORD }} \
-            --ks-key-alias=${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_ALIAS }} \
-            --key-pass=pass:${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEY_PASSWORD }}
-
-          # Unzip just the universal apk
-          unzip -p Expensify.apks universal.apk > Expensify.apk
-
-      - name: Upload Android APK build artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: android-apk-artifact
-          path: Expensify.apk
+    uses: ./.github/workflows/buildAndroid.yml
+    with:
+      ref: ${{ github.ref }}
+      variant: Release
+    secrets: inherit
 
   androidUploadGooglePlay:
     name: Upload Android to Google Play
@@ -427,111 +286,13 @@ jobs:
 
   iosBuild:
     name: Build iOS HybridApp
-    needs: prep
-    runs-on: macos-15-xlarge
+    needs: [prep]
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
-    outputs:
-      IOS_VERSION: ${{ steps.getIOSVersion.outputs.IOS_VERSION }}
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
-    steps:
-      - name: Checkout
-        # v6
-        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
-        with:
-          submodules: true
-          token: ${{ secrets.OS_BOTIFY_TOKEN }}
-
-      - name: Configure MapBox SDK
-        run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
-
-      - name: Setup Node
-        id: setup-node
-        uses: ./.github/actions/composite/setupNode
-        with:
-          IS_HYBRID_BUILD: 'true'
-
-      - name: Setup Ruby
-        # v1.229.0
-        uses: ruby/setup-ruby@354a1ad156761f5ee2b7b13fa8e09943a5e8d252
-        with:
-          bundler-cache: true
-
-      - name: Install New Expensify Gems
-        run: bundle install
-
-      - name: Cache Pod dependencies
-        # v5.0.1
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb
-        id: pods-cache
-        with:
-          path: Mobile-Expensify/iOS/Pods
-          key: ${{ runner.os }}-pods-cache-${{ hashFiles('Mobile-Expensify/iOS/Podfile.lock', 'firebase.json') }}
-
-      - name: Compare Podfile.lock and Manifest.lock
-        id: compare-podfile-and-manifest
-        run: echo "IS_PODFILE_SAME_AS_MANIFEST=${{ hashFiles('Mobile-Expensify/iOS/Podfile.lock') == hashFiles('Mobile-Expensify/iOS/Pods/Manifest.lock') }}" >> "$GITHUB_OUTPUT"
-
-      - name: Install cocoapods
-        uses: nick-fields/retry@3f757583fb1b1f940bc8ef4bf4734c8dc02a5847
-        if: steps.pods-cache.outputs.cache-hit != 'true' || steps.compare-podfile-and-manifest.outputs.IS_PODFILE_SAME_AS_MANIFEST != 'true' || steps.setup-node.outputs.cache-hit != 'true'
-        with:
-          timeout_minutes: 10
-          max_attempts: 5
-          command: npm run pod-install
-
-      - name: Setup 1Password CLI and certificates
-        uses: Expensify/GitHub-Actions/setup-certificate-1p@main
-        with:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          SHOULD_LOAD_SSL_CERTIFICATES: 'false'
-
-      - name: Load files from 1Password
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-        run: |
-          op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore/${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Share_Extension/${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Notification_Service/${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}
-          op read "op://${{ vars.OP_VAULT }}/New Expensify Distribution Certificate/Certificates.p12" --force --out-file ./Certificates.p12
-
-      - name: Get iOS native version
-        id: getIOSVersion
-        run: echo "IOS_VERSION=$(echo '${{ needs.prep.outputs.APP_VERSION }}' | tr '-' '.')" >> "$GITHUB_OUTPUT"
-
-      - name: Build iOS HybridApp
-        run: bundle exec fastlane ios build_hybrid
-        env:
-          APPLE_ID: ${{ vars.APPLE_ID }}
-          APPLE_STORE_PROVISIONING_PROFILE_FILE: ${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}
-          APPLE_STORE_PROVISIONING_PROFILE_NAME: ${{ vars.APPLE_STORE_PROVISIONING_PROFILE_NAME }}
-          APPLE_SHARE_PROVISIONING_PROFILE_FILE: ${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}
-          APPLE_SHARE_PROVISIONING_PROFILE_NAME: ${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_NAME }}
-          APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE: ${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}
-          APPLE_NOTIFICATION_PROVISIONING_PROFILE_NAME: ${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_NAME }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Upload iOS build artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: iosBuild-artifact
-          path: ${{ env.ipaPath }}
-
-      - name: Upload iOS dSYM artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: ios-dsym-artifact
-          path: ${{ env.dsymPath }}
-
-      - name: Upload iOS sourcemap artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: ios-sourcemap-artifact
-          path: /Users/runner/work/App/App/Mobile-Expensify/main.jsbundle.map
+    uses: ./.github/workflows/buildIOS.yml
+    with:
+      ref: ${{ github.ref }}
+      variant: Release
+    secrets: inherit
 
   iosUploadTestflight:
     name: Upload iOS to TestFlight
@@ -757,92 +518,15 @@ jobs:
 
   web:
     name: Build and deploy Web
-    needs: prep
-    runs-on: blacksmith-32vcpu-ubuntu-2404
-    steps:
-      - name: Checkout
-        # v6
-        uses: actions/checkout@0c366fd6a839edf440554fa01a7085ccba70ac98
-
-      - name: Setup Node
-        uses: ./.github/actions/composite/setupNode
-
-      - name: Setup Cloudflare CLI
-        run: pip3 install cloudflare==2.19.0
-
-      - name: Configure AWS Credentials
-        # v4
-        uses: aws-actions/configure-aws-credentials@ececac1a45f3b08a01d2dd070d28d111c5fe6722
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Build web
-        run: |
-          if [[ '${{ github.ref }}' == 'refs/heads/production' ]]; then
-            npm run build
-          else
-            npm run build-staging
-          fi
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Build storybook docs
-        continue-on-error: true
-        run: |
-          if [[ ${{ github.ref }} == 'refs/heads/production' ]]; then
-            npm run storybook-build
-          else
-            npm run storybook-build-staging
-          fi
-
-      - name: Deploy to S3
-        run: |
-          aws s3 cp --recursive --acl public-read "$GITHUB_WORKSPACE"/dist ${{ env.S3_URL }}/
-          aws s3 cp --acl public-read --content-type 'application/json' --metadata-directive REPLACE ${{ env.S3_URL }}/.well-known/apple-app-site-association ${{ env.S3_URL }}/.well-known/apple-app-site-association
-          aws s3 cp --acl public-read --content-type 'application/json' --metadata-directive REPLACE ${{ env.S3_URL }}/.well-known/apple-app-site-association ${{env.S3_URL }}/apple-app-site-association
-        env:
-          S3_URL: s3://${{ github.ref == 'refs/heads/staging' && 'staging-' || '' }}${{ vars.PRODUCTION_S3_BUCKET }}
-
-      - name: Purge Cloudflare cache
-        run: |
-          /home/runner/.local/bin/cli4 --verbose --delete hosts=["$HOST"] /zones/:9ee042e6cfc7fd45e74aa7d2f78d617b/purge_cache
-        env:
-          CF_API_KEY: ${{ secrets.CLOUDFLARE_TOKEN }}
-          HOST: ${{ github.ref == 'refs/heads/production' && vars.WEB_PRODUCTION_HOST || vars.WEB_STAGING_HOST }}
-
-      - name: Verify deploy
-        run: |
-          ./.github/scripts/verifyDeploy.sh "$HOST" "${{ needs.prep.outputs.APP_VERSION }}"
-        env:
-          HOST: ${{ github.ref == 'refs/heads/production' && vars.WEB_PRODUCTION_HOST || vars.WEB_STAGING_HOST }}
-
-      - name: Upload web sourcemaps artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: web-sourcemaps-artifact
-          path: ./dist/merged-source-map.js.map
-
-      - name: Compress web build .tar.gz and .zip
-        run: |
-          tar -czvf webBuild.tar.gz dist
-          zip -r webBuild.zip dist
-
-      - name: Upload .tar.gz web build artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: web-build-tar-gz-artifact
-          path: ./webBuild.tar.gz
-
-      - name: Upload .zip web build artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: web-build-zip-artifact
-          path: ./webBuild.zip
+    needs: [prep]
+    uses: ./.github/workflows/buildWeb.yml
+    with:
+      ref: ${{ github.ref }}
+      environment: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
+      deploy-to-s3: true
+      build-storybook: true
+      upload-artifacts: true
+    secrets: inherit
 
   postSlackMessageOnFailure:
     name: Post a Slack message when any platform fails to build or deploy
