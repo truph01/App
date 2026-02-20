@@ -52,6 +52,4 @@ function RemainingLimitCircle({spentFraction}: RemainingLimitCircleProps) {
     );
 }
 
-RemainingLimitCircle.displayName = 'RemainingLimitCircle';
-
 export default RemainingLimitCircle;
