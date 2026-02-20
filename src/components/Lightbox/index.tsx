@@ -238,8 +238,11 @@ function Lightbox({attachmentID, isAuthTokenRequired = false, uri, onScaleChange
             context: 'Lightbox',
             isImageLoaded,
             isLoadingPreviousUri: previousUri !== uri,
+            isOffline,
+            isLoading,
+            isALocalFile,
         }),
-        [isImageLoaded, previousUri, uri],
+        [isImageLoaded, previousUri, uri, isOffline, isLoading, isALocalFile],
     );
 
     return (
