@@ -52,6 +52,7 @@ function TopBar({breadcrumbLabel, shouldDisplaySearch = true, shouldDisplayHelpB
                         <Text
                             numberOfLines={1}
                             style={[styles.flexShrink1, styles.topBarLabel]}
+                            accessibilityRole={CONST.ROLE.HEADER}
                         >
                             {breadcrumbLabel}
                         </Text>
@@ -63,6 +64,7 @@ function TopBar({breadcrumbLabel, shouldDisplaySearch = true, shouldDisplayHelpB
                     <PressableWithoutFeedback
                         accessibilityLabel={translate('common.cancel')}
                         style={styles.textBlue}
+                        sentryLabel={CONST.SENTRY_LABEL.TOP_BAR.CANCEL_BUTTON}
                         onPress={() => {
                             cancelSearch();
                         }}

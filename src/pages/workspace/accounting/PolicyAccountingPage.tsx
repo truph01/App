@@ -324,6 +324,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                                     }
                                     popoverAnchorRefs.current[integration].current = ref;
                                 }}
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.SETUP_BUTTON}
                             />
                         ),
                     };
@@ -354,7 +355,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
         } else if (!isConnectionVerified) {
             connectionMessage = translate('workspace.accounting.notSync');
         } else {
-            connectionMessage = translate('workspace.accounting.lastSync', {relativeDate: datetimeToRelative});
+            connectionMessage = translate('workspace.accounting.lastSync', datetimeToRelative);
         }
 
         const configurationOptions = [
@@ -426,6 +427,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                             horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
                             vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
                         }}
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.THREE_DOT_MENU}
                     />
                 ),
             },
@@ -502,6 +504,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                                 }
                                 popoverAnchorRefs.current[integration].current = r;
                             }}
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.SETUP_BUTTON}
                         />
                     ),
                     interactive: false,
@@ -558,7 +561,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                     icon={illustrations.Accounting}
                     shouldUseHeadlineHeader
                     shouldDisplayHelpButton
-                    onBackButtonPress={Navigation.popToSidebar}
+                    onBackButtonPress={Navigation.goBack}
                 />
                 <ScrollView
                     contentContainerStyle={styles.pt3}
