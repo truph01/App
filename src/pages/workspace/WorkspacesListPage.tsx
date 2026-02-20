@@ -338,7 +338,6 @@ function WorkspacesListPage() {
      */
     const getWorkspaceMenuItem = useCallback(
         ({item, index}: GetWorkspaceMenuItem) => {
-            const isTableActive = !isLessThanMediumScreen;
             const isAdmin = isPolicyAdmin(item as unknown as PolicyType, session?.email);
             const isOwner = item.ownerAccountID === session?.accountID;
             const isDefault = activePolicyID === item.policyID;
@@ -463,22 +462,11 @@ function WorkspacesListPage() {
                     shouldHideOnDelete={false}
                 >
                     <PressableWithoutFeedback
-                        role={isTableActive ? CONST.ROLE.ROW : CONST.ROLE.BUTTON}
+                        role={isLessThanMediumScreen ? CONST.ROLE.BUTTON : CONST.ROLE.ROW}
                         accessibilityLabel={accessibilityLabel}
                         style={[styles.mh5]}
                         disabled={item.disabled}
                         onPress={item.action}
-                        onKeyDown={
-                            isTableActive
-                                ? (event: React.KeyboardEvent<Element>) => {
-                                      if (event.key !== ' ') {
-                                          return;
-                                      }
-                                      event.preventDefault();
-                                      item.action();
-                                  }
-                                : undefined
-                        }
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_MENU_ITEM}
                     >
                         {({hovered}) => (
@@ -650,8 +638,6 @@ function WorkspacesListPage() {
     const sortWorkspace = useCallback((workspaceItems: WorkspaceItem[]) => workspaceItems.sort((a, b) => localeCompare(a.title, b.title)), [localeCompare]);
     const [inputValue, setInputValue, filteredWorkspaces] = useSearchResults(workspaces, filterWorkspace, sortWorkspace);
 
-    const shouldApplyTableRole = !isLessThanMediumScreen && filteredWorkspaces.length > 0;
-
     const domains = useMemo(() => {
         if (!allDomains) {
             return [];
@@ -707,12 +693,12 @@ function WorkspacesListPage() {
             )}
             {!isLessThanMediumScreen && filteredWorkspaces.length > 0 && (
                 <View
+                    role={CONST.ROLE.ROW}
                     style={[styles.flexRow, styles.gap5, styles.pt2, styles.pb3, styles.pr5, styles.pl10, styles.appBG]}
-                    role={shouldApplyTableRole ? CONST.ROLE.ROW : undefined}
                 >
                     <View
+                        role={CONST.ROLE.COLUMNHEADER}
                         style={[styles.flexRow, styles.flex2]}
-                        role={shouldApplyTableRole ? CONST.ROLE.COLUMNHEADER : undefined}
                     >
                         <Text
                             numberOfLines={1}
@@ -722,8 +708,8 @@ function WorkspacesListPage() {
                         </Text>
                     </View>
                     <View
+                        role={CONST.ROLE.COLUMNHEADER}
                         style={[styles.flexRow, styles.flex1, styles.workspaceOwnerSectionTitle, styles.workspaceOwnerSectionMinWidth]}
-                        role={shouldApplyTableRole ? CONST.ROLE.COLUMNHEADER : undefined}
                     >
                         <Text
                             numberOfLines={1}
@@ -733,8 +719,8 @@ function WorkspacesListPage() {
                         </Text>
                     </View>
                     <View
+                        role={CONST.ROLE.COLUMNHEADER}
                         style={[styles.flexRow, styles.flex1, styles.workspaceTypeSectionTitle]}
-                        role={shouldApplyTableRole ? CONST.ROLE.COLUMNHEADER : undefined}
                     >
                         <Text
                             numberOfLines={1}
@@ -743,7 +729,10 @@ function WorkspacesListPage() {
                             {translate('workspace.common.workspaceType')}
                         </Text>
                     </View>
-                    <View style={[styles.workspaceRightColumn, styles.mr7]} />
+                    <View
+                        role={CONST.ROLE.COLUMNHEADER}
+                        style={[styles.workspaceRightColumn, styles.mr7]}
+                    />
                 </View>
             )}
         </>
@@ -838,8 +827,8 @@ function WorkspacesListPage() {
                 ) : (
                     <View
                         style={styles.flex1}
-                        role={shouldApplyTableRole ? CONST.ROLE.TABLE : undefined}
-                        aria-label={shouldApplyTableRole ? translate('common.workspaces') : undefined}
+                        role={isLessThanMediumScreen ? undefined : CONST.ROLE.TABLE}
+                        aria-label={isLessThanMediumScreen ? undefined : translate('common.workspaces')}
                     >
                         <FlatList
                             ref={flatlistRef}

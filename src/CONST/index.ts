@@ -5732,14 +5732,6 @@ const CONST = {
         LIST: 'list',
         /** Use for individual items within a list. */
         LISTITEM: 'listitem',
-        /** Use for data table containers. */
-        TABLE: 'table',
-        /** Use for table rows. */
-        ROW: 'row',
-        /** Use for column header cells in a table. */
-        COLUMNHEADER: 'columnheader',
-        /** Use for data cells in a table. */
-        CELL: 'cell',
         /** Use for a list of choices or options. */
         MENU: 'menu',
         /** Use for a container of multiple menus. */
@@ -5780,6 +5772,14 @@ const CONST = {
         NAVIGATION: 'navigation',
         /** Use for Tooltips */
         TOOLTIP: 'tooltip',
+        /** Use for data table containers. */
+        TABLE: 'table',
+        /** Use for table rows. */
+        ROW: 'row',
+        /** Use for column header cells in a table. */
+        COLUMNHEADER: 'columnheader',
+        /** Use for data cells in a table row. */
+        CELL: 'cell',
     },
     TRANSLATION_KEYS: {
         ATTACHMENT: 'common.attachment',
