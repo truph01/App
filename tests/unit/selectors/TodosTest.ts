@@ -95,6 +95,36 @@ describe('todosReportCountsSelector', () => {
 });
 
 describe('todosSingleReportIDsSelector', () => {
+    it('returns EMPTY_TODOS_SINGLE_REPORT_IDS when todos is undefined', () => {
+        const result = todosSingleReportIDsSelector(undefined);
+
+        expect(result).toEqual({
+            [CONST.SEARCH.SEARCH_KEYS.SUBMIT]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.APPROVE]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.PAY]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.EXPORT]: undefined,
+        });
+    });
+
+    it('returns EMPTY_TODOS_SINGLE_REPORT_IDS when all arrays are empty', () => {
+        const todos: TodosDerivedValue = {
+            reportsToSubmit: [],
+            reportsToApprove: [],
+            reportsToPay: [],
+            reportsToExport: [],
+            transactionsByReportID: {},
+        };
+
+        const result = todosSingleReportIDsSelector(todos);
+
+        expect(result).toEqual({
+            [CONST.SEARCH.SEARCH_KEYS.SUBMIT]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.APPROVE]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.PAY]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.EXPORT]: undefined,
+        });
+    });
+
     it('returns report ID when exactly one report exists in each array', () => {
         const todos: TodosDerivedValue = {
             reportsToSubmit: [{reportID: '1'}] as TodosDerivedValue['reportsToSubmit'],
@@ -131,5 +161,54 @@ describe('todosSingleReportIDsSelector', () => {
             [CONST.SEARCH.SEARCH_KEYS.PAY]: '6',
             [CONST.SEARCH.SEARCH_KEYS.EXPORT]: undefined,
         });
+    });
+
+    it('returns the same object reference when called twice with shallowly equal values (memoization)', () => {
+        const todos: TodosDerivedValue = {
+            reportsToSubmit: [{reportID: '10'}] as TodosDerivedValue['reportsToSubmit'],
+            reportsToApprove: [] as unknown as TodosDerivedValue['reportsToApprove'],
+            reportsToPay: [] as unknown as TodosDerivedValue['reportsToPay'],
+            reportsToExport: [] as unknown as TodosDerivedValue['reportsToExport'],
+            transactionsByReportID: {},
+        };
+
+        const first = todosSingleReportIDsSelector(todos);
+
+        const todosClone: TodosDerivedValue = {
+            reportsToSubmit: [{reportID: '10'}] as TodosDerivedValue['reportsToSubmit'],
+            reportsToApprove: [] as unknown as TodosDerivedValue['reportsToApprove'],
+            reportsToPay: [] as unknown as TodosDerivedValue['reportsToPay'],
+            reportsToExport: [] as unknown as TodosDerivedValue['reportsToExport'],
+            transactionsByReportID: {},
+        };
+
+        const second = todosSingleReportIDsSelector(todosClone);
+
+        expect(second).toBe(first);
+    });
+
+    it('returns a new object reference when values change (memoization invalidation)', () => {
+        const todos: TodosDerivedValue = {
+            reportsToSubmit: [{reportID: '20'}] as TodosDerivedValue['reportsToSubmit'],
+            reportsToApprove: [] as unknown as TodosDerivedValue['reportsToApprove'],
+            reportsToPay: [] as unknown as TodosDerivedValue['reportsToPay'],
+            reportsToExport: [] as unknown as TodosDerivedValue['reportsToExport'],
+            transactionsByReportID: {},
+        };
+
+        const first = todosSingleReportIDsSelector(todos);
+
+        const todosChanged: TodosDerivedValue = {
+            reportsToSubmit: [{reportID: '21'}] as TodosDerivedValue['reportsToSubmit'],
+            reportsToApprove: [] as unknown as TodosDerivedValue['reportsToApprove'],
+            reportsToPay: [] as unknown as TodosDerivedValue['reportsToPay'],
+            reportsToExport: [] as unknown as TodosDerivedValue['reportsToExport'],
+            transactionsByReportID: {},
+        };
+
+        const second = todosSingleReportIDsSelector(todosChanged);
+
+        expect(second).not.toBe(first);
+        expect(second[CONST.SEARCH.SEARCH_KEYS.SUBMIT]).toBe('21');
     });
 });
