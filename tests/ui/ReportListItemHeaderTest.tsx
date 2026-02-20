@@ -21,6 +21,7 @@ jest.mock('@components/AvatarWithDisplayName.tsx');
 // Mock search context
 const mockSearchContext = {
     currentSearchHash: 12345,
+    currentSimilarSearchHash: 12345,
     selectedReports: {},
     selectedTransactionIDs: [],
     selectedTransactions: {},
