@@ -185,6 +185,20 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
+      - name: Upload Android build artifact
+        # v6
+        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
+        with:
+          name: androidBuild-artifact
+          path: ${{ env.aabPath }}
+
+      - name: Upload Android sourcemap artifact
+        # v6
+        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
+        with:
+          name: android-sourcemap-artifact
+          path: /home/runner/work/App/App/Mobile-Expensify/Android/build/generated/sourcemaps/react/release/index.android.bundle.map
+
       - name: Install bundletool
         run: |
           readonly BUNDLETOOL_VERSION="1.18.1"
@@ -220,20 +234,6 @@ jobs:
         with:
           name: android-apk-artifact
           path: Expensify.apk
-
-      - name: Upload Android build artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: androidBuild-artifact
-          path: ${{ env.aabPath }}
-
-      - name: Upload Android sourcemap artifact
-        # v6
-        uses: actions/upload-artifact@47309c993abb98030a35d55ef7ff34b7fa1074b5
-        with:
-          name: android-sourcemap-artifact
-          path: /home/runner/work/App/App/Mobile-Expensify/Android/build/generated/sourcemaps/react/release/index.android.bundle.map
 
   androidUploadGooglePlay:
     name: Upload Android to Google Play
