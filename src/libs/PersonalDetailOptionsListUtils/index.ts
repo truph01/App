@@ -10,10 +10,10 @@ import {getDisplayNameForParticipant} from '@libs/ReportUtils';
 import {generateAccountID} from '@libs/UserUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {LoginList, OnyxInputOrEntry, PersonalDetails, PersonalDetailsList, Report, ReportAttributesDerivedValue, ReportNameValuePairs} from '@src/types/onyx';
+import type {LoginList, OnyxInputOrEntry, PersonalDetails, PersonalDetailsList, Report, ReportAttributesDerivedValue} from '@src/types/onyx';
 import type {ReportAttributes} from '@src/types/onyx/DerivedValues';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import type {GetOptionsConfig, GetUserToInviteConfig, OptionData, Options, PreviewConfig} from './types';
+import type {GetOptionsConfig, GetUserToInviteConfig, OptionData, Options, PreviewConfig, PrivateIsArchivedMap} from './types';
 
 /**
  * Creates a personal details list option
@@ -178,15 +178,18 @@ function filterUserToInvite(options: Omit<Options, 'userToInvite'>, currentUserL
     });
 }
 
+function matchesSearchTerms(option: OptionData, searchTerms: string[]): boolean {
+    const searchText = deburr(`${option.text} ${option.login ?? ''}`.toLocaleLowerCase());
+    return searchTerms.every((term) => searchText.includes(term));
+}
+
 function filterOption(option: OptionData | undefined, searchValue: string | undefined) {
     if (!option) {
         return null;
     }
 
     const searchTerms = processSearchString(searchValue);
-    const searchText = deburr(`${option.text} ${option.login ?? ''}`.toLocaleLowerCase());
-
-    const isMatchingSearch = searchTerms.every((term) => searchText.includes(term));
+    const isMatchingSearch = matchesSearchTerms(option, searchTerms);
 
     if (isMatchingSearch) {
         return option;
@@ -248,9 +251,8 @@ function getValidOptions(
         if (loginsToExclude[personalDetail.login]) {
             return false;
         }
-        const searchText = deburr(`${personalDetail.text} ${personalDetail.login ?? ''}`.toLocaleLowerCase());
 
-        return searchTerms.every((term) => searchText.includes(term));
+        return matchesSearchTerms(personalDetail, searchTerms);
     };
 
     const selectedOptions = optionsOrderBy(extendedOptions, personalDetailsComparator, maxElements, selectedFilteringFunction, true);
@@ -276,10 +278,7 @@ function getValidOptions(
             if (!option.login) {
                 continue;
             }
-            let searchText = `${option.text} ${option.login ?? ''}`;
-
-            searchText = deburr(searchText.toLocaleLowerCase());
-            const searchTermsFound = searchTerms.every((term) => searchText.includes(term));
+            const searchTermsFound = matchesSearchTerms(option, searchTerms);
             if (searchTermsFound && recentAttendeesSet.has(option.login ?? '')) {
                 potentialRecentOptions[option.login] = option;
             }
@@ -302,10 +301,7 @@ function getValidOptions(
     } else if (includeRecentReports) {
         // if maxElements is passed, filter the recent reports by searchString and return only most recent reports (@see recentReportsComparator)
         const filteringFunction = (option: OptionData) => {
-            let searchText = `${option.text} ${option.login ?? ''}`;
-
-            searchText = deburr(searchText.toLocaleLowerCase());
-            const searchTermsFound = searchTerms.every((term) => searchText.includes(term));
+            const searchTermsFound = matchesSearchTerms(option, searchTerms);
 
             if (!searchTermsFound || !option.reportID) {
                 return false;
@@ -342,9 +338,8 @@ function getValidOptions(
         if (loginsToExclude[personalDetail.login]) {
             return false;
         }
-        const searchText = deburr(`${personalDetail.text} ${personalDetail.login ?? ''}`.toLocaleLowerCase());
 
-        return searchTerms.every((term) => searchText.includes(term));
+        return matchesSearchTerms(personalDetail, searchTerms);
     };
 
     personalDetailsOptions = optionsOrderBy(options, personalDetailsComparator, maxElements, filteringFunction, true);
@@ -375,7 +370,7 @@ function createOptionList(
     accountIDToReportIDMap: Record<number, string>,
     reports: OnyxCollection<Report>,
     reportAttributesDerived: ReportAttributesDerivedValue['reports'] | undefined,
-    allReportNameValuePairs: OnyxCollection<ReportNameValuePairs>,
+    privateIsArchivedMap: PrivateIsArchivedMap,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
     config?: PreviewConfig,
 ) {
@@ -395,7 +390,7 @@ function createOptionList(
         const reportID = accountIDToReportIDMap[personalDetail.accountID];
         const report = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
         const reportAttributes = report?.reportID ? reportAttributesDerived?.[report.reportID] : undefined;
-        const isReportArchived = allReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`]?.private_isArchived;
+        const isReportArchived = privateIsArchivedMap[reportID];
         const option = createOption(personalDetail, report, formatPhoneNumber, config, reportAttributes, isReportArchived);
         if (option.accountID === currentUserAccountID) {
             currentUserRef.current = option;

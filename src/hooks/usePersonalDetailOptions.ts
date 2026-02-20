@@ -1,7 +1,7 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {createOptionList} from '@libs/PersonalDetailOptionsListUtils';
-import type {OptionData} from '@libs/PersonalDetailOptionsListUtils/types';
+import type {OptionData, PrivateIsArchivedMap} from '@libs/PersonalDetailOptionsListUtils/types';
 import {isOneOnOneChat, isSelfDM} from '@libs/ReportUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportAttributesDerivedValue, ReportNameValuePairs} from '@src/types/onyx';
@@ -73,26 +73,31 @@ const reportsSelector = (reports: OnyxCollection<Report>) => {
     });
 };
 
-const rNVPSelector = (rNVPCollection: OnyxCollection<ReportNameValuePairs>, reportIDsSet: Set<string>): OnyxCollection<ReportNameValuePairs> => {
-    return Object.entries(rNVPCollection ?? {}).reduce((acc: NonNullable<OnyxCollection<ReportNameValuePairs>>, [reportID, rNVP]) => {
-        if (!rNVP) {
-            return acc;
+/** Filters the ReportNameValuePairs collection to create a map of reportID to private_isArchived value for the given set of reportIDs. */
+const filterRNVPs = (rNVPCollection: OnyxCollection<ReportNameValuePairs>, reportIDsSet: Set<string>): PrivateIsArchivedMap => {
+    const map: PrivateIsArchivedMap = {};
+    if (rNVPCollection) {
+        for (const [key, value] of Object.entries(rNVPCollection)) {
+            const reportID = key.replace(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, '');
+            if (reportIDsSet.has(reportID)) {
+                map[reportID] = value?.private_isArchived;
+            }
         }
-        if (reportIDsSet.has(reportID.replace(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, ''))) {
-            acc[reportID] = {private_isArchived: rNVP.private_isArchived};
-        }
-        return acc;
-    }, {});
+    }
+    return map;
 };
 
-const reportAttributesSelector = (reportAttributes: OnyxEntry<ReportAttributesDerivedValue>, reportIDsSet: Set<string>) => {
-    return Object.entries(reportAttributes?.reports ?? {}).reduce((acc: Record<string, ReportAttributes>, [key, entry]) => {
-        if (reportIDsSet.has(key)) {
-            acc[key] = entry;
+/** Filters the ReportAttributesDerivedValue collection to include only entries for the given set of reportIDs. */
+const filterReportAttributes = (reportAttributes: OnyxEntry<ReportAttributesDerivedValue>, reportIDsSet: Set<string>): Record<string, ReportAttributes> => {
+    const map: Record<string, ReportAttributes> = {};
+    if (reportAttributes?.reports) {
+        for (const [reportID, value] of Object.entries(reportAttributes.reports)) {
+            if (reportIDsSet.has(reportID)) {
+                map[reportID] = value;
+            }
         }
-
-        return acc;
-    }, {});
+    }
+    return map;
 };
 
 /**
@@ -123,25 +128,31 @@ function usePersonalDetailOptions(config: UseFilteredOptionsConfig = {}): UseFil
         canBeMissing: true,
         selector: reportsSelector,
     });
-    const reportIDsSet = new Set(
-        Object.entries(reports ?? {})
-            .filter(([, report]) => report)
-            .map(([key]) => key.replace(ONYXKEYS.COLLECTION.REPORT, '')),
-    );
-    const reportAttributesSelectorWithReportIDs = (reportAttributes: OnyxEntry<ReportAttributesDerivedValue>) => reportAttributesSelector(reportAttributes, reportIDsSet);
-    const rNVPSelectorWithReportIDs = (rNVPCollection: OnyxCollection<ReportNameValuePairs>) => rNVPSelector(rNVPCollection, reportIDsSet);
-    const [reportAttributes, reportAttributesMetadata] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportAttributesSelectorWithReportIDs});
-    const [reportNameValuePairs, reportNameValuePairsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {
-        canBeMissing: true,
-        selector: rNVPSelectorWithReportIDs,
-    });
+    const reportIDsSet = (() => {
+        if (!reports) {
+            return new Set<string>();
+        }
+        const validReportIDs = new Set<string>();
+        for (const report of Object.values(reports)) {
+            if (report) {
+                validReportIDs.add(report.reportID);
+            }
+        }
+        return validReportIDs;
+    })();
+
+    const [reportAttributes, reportAttributesMetadata] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true});
+    const [reportNameValuePairs, reportNameValuePairsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {canBeMissing: true});
     const personalDetails = usePersonalDetails();
 
     const isLoading = !enabled || isLoadingOnyxValue(reportsMetadata, reportAttributesMetadata, reportNameValuePairsMetadata);
 
     const accountIDToReportIDMap = generateAccountIDToReportIDMap(reports, accountID);
+    const privateIsArchivedMap = filterRNVPs(reportNameValuePairs, reportIDsSet);
+    const filteredReportAttributes = filterReportAttributes(reportAttributes, reportIDsSet);
+
     const optionsData = !isLoading
-        ? createOptionList(accountID, personalDetails, accountIDToReportIDMap, reports, reportAttributes, reportNameValuePairs, formatPhoneNumber, {
+        ? createOptionList(accountID, personalDetails, accountIDToReportIDMap, reports, filteredReportAttributes, privateIsArchivedMap, formatPhoneNumber, {
               shouldStoreReportErrors,
               shouldShowBrickRoadIndicator,
           })

@@ -45,7 +45,7 @@ for (let i = 0; i < REPORTS_COUNT; i++) {
     accountIDToReportIDMap[i] = reports[`${ONYXKEYS.COLLECTION.REPORT}${i}`].reportID;
 }
 
-const options = createOptionList(REPORTS_COUNT + 1, personalDetails, accountIDToReportIDMap, reports, undefined, undefined, formatPhoneNumber);
+const options = createOptionList(REPORTS_COUNT + 1, personalDetails, accountIDToReportIDMap, reports, undefined, {}, formatPhoneNumber);
 
 const selectedOptions = options.options.map((option, index) => ({
     ...option,

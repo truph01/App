@@ -1,3 +1,4 @@
+// The rule is disabled for this file as test data uses numeric keys that don't follow naming conventions
 /* eslint-disable @typescript-eslint/naming-convention */
 import type {OnyxCollection} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
@@ -346,15 +347,13 @@ describe('PersonalDetailOptionsListUtils', () => {
     let OPTIONS_WITH_MANAGER_MCTEST: OptionList;
     let OPTIONS_WITH_SELF_DM: OptionList;
 
-    function translateReportObjectToOnyxCollection(reports: OnyxCollection<Report>): NonNullable<OnyxCollection<Report>> {
+    function translateReportObjectToOnyxCollection(reports: OnyxCollection<Report>): OnyxCollection<Report> {
         return Object.entries(reports ?? {}).reduce(
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            (obj, [_, value]) => {
+            (acc, [, value]) => {
                 if (value?.reportID) {
-                    // eslint-disable-next-line no-param-reassign
-                    obj[`${ONYXKEYS.COLLECTION.REPORT}${value.reportID}`] = value;
+                    acc[`${ONYXKEYS.COLLECTION.REPORT}${value.reportID}`] = value;
                 }
-                return obj;
+                return acc;
             },
             {} as NonNullable<OnyxCollection<Report>>,
         );
@@ -362,22 +361,14 @@ describe('PersonalDetailOptionsListUtils', () => {
 
     beforeEach(() => {
         Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}10`, reportNameValuePairs);
-        OPTIONS = createOptionList(
-            currentUserAccountID,
-            PERSONAL_DETAILS,
-            ACCOUNT_ID_TO_REPORT_ID_MAP,
-            translateReportObjectToOnyxCollection(REPORTS),
-            undefined,
-            undefined,
-            formatPhoneNumber,
-        );
+        OPTIONS = createOptionList(currentUserAccountID, PERSONAL_DETAILS, ACCOUNT_ID_TO_REPORT_ID_MAP, translateReportObjectToOnyxCollection(REPORTS), undefined, {}, formatPhoneNumber);
         OPTIONS_WITH_SELF_DM = createOptionList(
             currentUserAccountID,
             PERSONAL_DETAILS,
             ACCOUNT_ID_TO_REPORT_ID_MAP,
             translateReportObjectToOnyxCollection(REPORTS_WITH_SELF_DM),
             undefined,
-            undefined,
+            {},
             formatPhoneNumber,
         );
         OPTIONS_WITH_CONCIERGE = createOptionList(
@@ -386,7 +377,7 @@ describe('PersonalDetailOptionsListUtils', () => {
             ACCOUNT_ID_TO_REPORT_ID_MAP,
             translateReportObjectToOnyxCollection(REPORTS_WITH_CONCIERGE),
             undefined,
-            undefined,
+            {},
             formatPhoneNumber,
         );
         OPTIONS_WITH_CHRONOS = createOptionList(
@@ -395,7 +386,7 @@ describe('PersonalDetailOptionsListUtils', () => {
             ACCOUNT_ID_TO_REPORT_ID_MAP,
             translateReportObjectToOnyxCollection(REPORTS_WITH_CHRONOS),
             undefined,
-            undefined,
+            {},
             formatPhoneNumber,
         );
         OPTIONS_WITH_RECEIPTS = createOptionList(
@@ -404,7 +395,7 @@ describe('PersonalDetailOptionsListUtils', () => {
             ACCOUNT_ID_TO_REPORT_ID_MAP,
             translateReportObjectToOnyxCollection(REPORTS_WITH_RECEIPTS),
             undefined,
-            undefined,
+            {},
             formatPhoneNumber,
         );
         OPTIONS_WITH_MANAGER_MCTEST = createOptionList(
@@ -413,7 +404,7 @@ describe('PersonalDetailOptionsListUtils', () => {
             ACCOUNT_ID_TO_REPORT_ID_MAP,
             translateReportObjectToOnyxCollection(REPORTS),
             undefined,
-            undefined,
+            {},
             formatPhoneNumber,
         );
     });

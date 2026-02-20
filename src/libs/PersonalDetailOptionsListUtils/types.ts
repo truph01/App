@@ -66,4 +66,6 @@ type Options = {
     userToInvite: OptionData | null;
 };
 
-export type {OptionData, GetOptionsConfig, GetUserToInviteConfig, Options, PreviewConfig};
+type PrivateIsArchivedMap = Record<string, string | undefined>;
+
+export type {OptionData, GetOptionsConfig, GetUserToInviteConfig, Options, PreviewConfig, PrivateIsArchivedMap};
