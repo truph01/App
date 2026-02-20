@@ -34,10 +34,10 @@ import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOpt
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import CentralInvoicingLearnHow from './CentralInvoicingLearnHow';
-import CentralInvoicingSubtitleWrapper from './CentralInvoicingSubtitleWrapper';
 import usePermissions from '@hooks/usePermissions';
 import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
+import CentralInvoicingLearnHow from './CentralInvoicingLearnHow';
+import CentralInvoicingSubtitleWrapper from './CentralInvoicingSubtitleWrapper';
 
 type WorkspaceTravelInvoicingSectionProps = {
     /** The ID of the policy */
