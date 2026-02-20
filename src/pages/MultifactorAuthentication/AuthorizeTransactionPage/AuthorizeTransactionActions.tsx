@@ -3,6 +3,8 @@ import Button from '@components/Button';
 import FixedFooter from '@components/FixedFooter';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
+import LoadingIndicator from '@components/LoadingIndicator';
+import {View} from 'react-native';
 
 type MultifactorAuthenticationAuthorizeTransactionActionsProps = {
     onAuthorize: () => void;
@@ -16,22 +18,28 @@ function MultifactorAuthenticationAuthorizeTransactionActions({onAuthorize, onDe
 
     return (
         <FixedFooter style={[styles.flexRow, styles.gap2]}>
-            <Button
-                isLoading={isLoading}
-                danger
-                large
-                style={styles.flex1}
-                onPress={onDeny}
-                text={translate('multifactorAuthentication.reviewTransaction.deny')}
-            />
-            <Button
-                isLoading={isLoading}
-                success
-                large
-                style={styles.flex1}
-                onPress={onAuthorize}
-                text={translate('multifactorAuthentication.reviewTransaction.approve')}
-            />
+            {isLoading ? (
+                <View style={[styles.w100, styles.h10]}>
+                    <LoadingIndicator />
+                </View>
+            ) : (
+                <>
+                    <Button
+                        danger
+                        large
+                        style={styles.flex1}
+                        onPress={onDeny}
+                        text={translate('multifactorAuthentication.reviewTransaction.deny')}
+                    />
+                    <Button
+                        success
+                        large
+                        style={styles.flex1}
+                        onPress={onAuthorize}
+                        text={translate('multifactorAuthentication.reviewTransaction.approve')}
+                    />
+                </>
+            )}
         </FixedFooter>
     );
 }

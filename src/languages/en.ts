@@ -699,7 +699,7 @@ const translations = {
         reviewTransaction: {
             reviewTransaction: 'Review transaction',
             pleaseReview: 'Please review this transaction',
-            requiresYourReview: 'An Expensify Card transaction requires your review below.',
+            requiresYourReview: 'An Expensify Card transaction requires your review.',
             transactionDetails: 'Transaction details',
             attemptedTransaction: 'Attempted transaction',
             deny: 'Deny',
@@ -7332,7 +7332,8 @@ const translations = {
                 unshare: ({to}: UnshareParams) => `removed member ${to}`,
                 stripePaid: ({amount, currency}: StripePaidParams) => `paid ${currency}${amount}`,
                 takeControl: `took control`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) => `Open the Expensify mobile app to review your ${amount} ${merchant} transaction`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string) =>
+                    `Open the Expensify mobile app to review your ${amount}${merchant?.length > 0 ? ` ${merchant}` : ''} transaction`,
                 integrationSyncFailed: (label: string, errorMessage: string, workspaceAccountingLink?: string) =>
                     `there was a problem syncing with ${label}${errorMessage ? ` ("${errorMessage}")` : ''}. Please fix the issue in <a href="${workspaceAccountingLink}">workspace settings</a>.`,
                 companyCardConnectionBroken: ({feedName, workspaceCompanyCardRoute}: {feedName: string; workspaceCompanyCardRoute: string}) =>

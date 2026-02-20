@@ -12,6 +12,7 @@ import ROUTES from '@src/ROUTES';
 
 type TransactionHistoryLinkRendererProps = CustomRendererProps<TText | TPhrasing>;
 
+// This component is rendered whenever a locale string uses the <transaction-history-link> custom tag
 function TransactionHistoryLinkRenderer({tnode, style}: TransactionHistoryLinkRendererProps) {
     const styles = useThemeStyles();
 

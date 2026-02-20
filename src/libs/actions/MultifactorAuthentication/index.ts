@@ -13,7 +13,7 @@ import type {MultifactorAuthenticationReason} from '@libs/MultifactorAuthenticat
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {DenyTransactionParams} from '@libs/API/parameters';
-import type {Blocklisted3DSTransactionChallenges} from '@src/types/onyx';
+import type {LocallyProcessed3DSChallengeReviews} from '@src/types/onyx';
 
 /**
  * To keep the code clean and readable, these functions return parsed data in order to:
@@ -189,9 +189,9 @@ async function revokeMultifactorAuthenticationCredentials() {
     }
 }
 
-// CHUCK TODO named type somewhere
-async function fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt({transactionID}: {transactionID: string}) {
-    const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.GET_TRANSACTIONS_PENDING_3DS_REVIEW, {transactionID}, {});
+/** Check whether a given transaction is still pending review _and_ update the transactionsPending3DSReview key in Onyx */
+async function isTransactionStillPending3DSReview(transactionID: string) {
+    const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.GET_TRANSACTIONS_PENDING_3DS_REVIEW, null, {});
     return !!response?.transactionsPending3DSReview?.[transactionID];
 }
 
@@ -203,7 +203,7 @@ async function authorizeTransaction({transactionID, signedChallenge, authenticat
             {
                 optimisticData: [
                     {
-                        key: ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES,
+                        key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
                         onyxMethod: Onyx.METHOD.MERGE,
                         value: {
                             [transactionID]: 'Authorize',
@@ -239,21 +239,10 @@ async function denyTransaction({transactionID}: DenyTransactionParams) {
                         },
                     },
                     {
-                        key: ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES,
+                        key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
                         onyxMethod: Onyx.METHOD.MERGE,
                         value: {
                             [transactionID]: 'Deny',
-                        },
-                    },
-                ],
-                finallyData: [
-                    {
-                        key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
-                        onyxMethod: Onyx.METHOD.MERGE,
-                        value: {
-                            [transactionID]: {
-                                isLoading: false,
-                            },
                         },
                     },
                 ],
@@ -291,27 +280,27 @@ function cleanUpLocalChallengeBlocklist(entriesToDelete: string[]) {
     for (const entry of entriesToDelete) {
         value[entry] = null;
     }
-    Onyx.merge(ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES, value);
+    Onyx.merge(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS, value);
 }
 
-let blocklisted3DSTransactionChallenges: OnyxEntry<Blocklisted3DSTransactionChallenges> = {};
+let locallyProcessed3DSTransactionReviews: OnyxEntry<LocallyProcessed3DSChallengeReviews> = {};
 
 Onyx.connectWithoutView({
-    key: ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES,
+    key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
     callback: (blocklist) => {
-        blocklisted3DSTransactionChallenges = blocklist;
+        locallyProcessed3DSTransactionReviews = blocklist;
     },
 });
 
-// clean up blocklisted challenges when they are removed from the queue
+// Clean up list of locally-reviewed transactions when they are removed from queue by the server
 Onyx.connectWithoutView({
     key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
     callback: (queue) => {
-        if (!blocklisted3DSTransactionChallenges || !queue) {
+        if (!locallyProcessed3DSTransactionReviews || !queue) {
             return;
         }
         const queuedTransactionIDs = Object.keys(queue);
-        const blocklistEntriesToCleanup = Object.keys(blocklisted3DSTransactionChallenges).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
+        const blocklistEntriesToCleanup = Object.keys(locallyProcessed3DSTransactionReviews).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
         if (blocklistEntriesToCleanup.length > 0) {
             cleanUpLocalChallengeBlocklist(blocklistEntriesToCleanup);
         }
@@ -326,7 +315,7 @@ export {
     revokeMultifactorAuthenticationCredentials,
     markHasAcceptedSoftPrompt,
     clearLocalMFAPublicKeyList,
-    fetchLatestTransactionsPendingReviewAndCheckIfThisOneIsInIt,
+    isTransactionStillPending3DSReview,
     denyTransaction,
     authorizeTransaction,
     fireAndForgetDenyTransaction,

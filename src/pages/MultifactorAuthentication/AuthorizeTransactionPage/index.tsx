@@ -8,15 +8,13 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {MultifactorAuthenticationParamList} from '@libs/Navigation/types';
-import Navigation from '@navigation/Navigation';
 import type SCREENS from '@src/SCREENS';
 import CONST from '@src/CONST';
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
-import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/components/OutcomeScreen';
-import {AlreadyReviewedFailureScreen} from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
+import {AlreadyReviewedFailureScreen, DeniedTransactionSuccessScreen} from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -38,11 +36,6 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const [isConfirmModalVisible, setConfirmModalVisibility] = useState(false);
 
     const showConfirmModal = () => {
-        if (!transaction) {
-            // This is the event handler for the user pressing "back" in the Header
-            // if the transaction has disappeared from state at this point, just close the RHP immediately
-            Navigation.closeRHPFlow();
-        }
         setConfirmModalVisibility(true);
     };
 
@@ -67,7 +60,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     if (transactionDenied) {
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                <DefaultClientFailureScreen />
+                <DeniedTransactionSuccessScreen />
             </ScreenWrapper>
         );
     }
@@ -93,7 +86,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                     <MultifactorAuthenticationAuthorizeTransactionActions
                         isLoading={transaction.isLoading}
                         onAuthorize={approveTransaction}
-                        onDeny={showConfirmModal}
+                        onDeny={onDenyTransaction}
                     />
                     {/*
                         TODO: Use custom AuthorizeTransactionCancelModal (not yet implemented)

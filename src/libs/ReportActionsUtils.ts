@@ -4057,6 +4057,7 @@ function getRoomChangeLogMessage(translate: LocalizedTranslate, reportAction: Re
     return `${actionText} ${targetAccountIDs.length} ${userText}`;
 }
 
+// Renders content of ACTIONABLE_CARD_3DS_TRANSACTION_APPROVAL reportActions
 function getActionableCard3DSTransactionApprovalMessage(
     translate: LocalizedTranslate,
     reportAction: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_3DS_TRANSACTION_APPROVAL>,

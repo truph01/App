@@ -31,6 +31,7 @@ const DefaultServerFailureScreen = createScreenWithDefaults(
 const OutOfTimeFailureScreen = createScreenWithDefaults(
     FailureScreenBase,
     {
+        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
         illustration: 'RunOutOfTime',
         iconWidth: variables.runOutOfTimeWidth,
         iconHeight: variables.runOutOfTimeHeight,

@@ -103,23 +103,18 @@ export {
 export default {
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
     action: authorizeTransaction,
+
+    // AuthorizeTransaction's callback navigates to the outcome screen, but if it knows the user is going to see an error outcome, we explicitly deny the transaction to make sure the user can't re-approve it on another device
     callback: async (isSuccessful, _callbackInput, payload) => {
+        // isAuthorizeTransactionPayload is a type guard - we know that payload here will always be an AuthorizeTransaction Payload, but the type guard lets Typescript guarantee it
         if (!isSuccessful && isAuthorizeTransactionPayload(payload)) {
             fireAndForgetDenyTransaction({transactionID: payload.transactionID});
         }
+
         return CONST.MULTIFACTOR_AUTHENTICATION.CALLBACK_RESPONSE.SHOW_OUTCOME_SCREEN;
     },
     screen: SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION,
-    successScreen: (
-        <DefaultSuccessScreen
-            headerTitle="multifactorAuthentication.reviewTransaction.reviewTransaction"
-            illustration="ApprovedTransactionHand"
-            iconWidth={variables.transactionHandWidth}
-            iconHeight={variables.transactionHandHeight}
-            title="multifactorAuthentication.reviewTransaction.transactionApproved"
-            subtitle="multifactorAuthentication.reviewTransaction.goBackToTheMerchant"
-        />
-    ),
+    successScreen: <ApprovedTransactionSuccessScreen />,
     defaultClientFailureScreen: <DefaultTransactionReviewClientFailureScreen />,
     defaultServerFailureScreen: (
         <DefaultServerFailureScreen
@@ -128,7 +123,7 @@ export default {
         />
     ),
     failureScreens: {
-        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_EXPIRED]: <OutOfTimeFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />,
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_EXPIRED]: <OutOfTimeFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_APPROVED_APPROVE_ATTEMPTED]: <ApprovedTransactionSuccessScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_DENIED_DENY_ATTEMPTED]: <DeniedTransactionSuccessScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_APPROVED_DENY_ATTEMPTED]: <AlreadyReviewedFailureScreen />,

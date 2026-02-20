@@ -644,7 +644,7 @@ const ONYXKEYS = {
     TRANSACTIONS_PENDING_3DS_REVIEW: 'transactionsPending3DSReview',
 
     /** List of transaction authorization challenges we have attempted to respond to */
-    BLOCKLISTED_3DS_TRANSACTION_CHALLENGES: 'blocklisted3DSTransactionChallenges',
+    LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS: 'locallyProcessed3DSTransactionReviews',
 
     /** Whether the user has denied the contact import permission prompt */
     HAS_DENIED_CONTACT_IMPORT_PROMPT: 'hasDeniedContactImportPrompt',
@@ -1273,7 +1273,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_BLOCKED_FROM_CONCIERGE]: OnyxTypes.BlockedFromConcierge;
     [ONYXKEYS.QUEUE_FLUSHED_DATA]: AnyOnyxUpdate[];
     [ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW]: OnyxTypes.TransactionsPending3DSReview;
-    [ONYXKEYS.BLOCKLISTED_3DS_TRANSACTION_CHALLENGES]: OnyxTypes.Blocklisted3DSTransactionChallenges;
+    [ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS]: OnyxTypes.LocallyProcessed3DSChallengeReviews;
 
     // The value of this nvp is a string representation of the date when the block expires, or an empty string if the user is not blocked
     [ONYXKEYS.NVP_BLOCKED_FROM_CHAT]: string;
