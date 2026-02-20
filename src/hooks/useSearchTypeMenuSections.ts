@@ -25,6 +25,7 @@ const policyMapper = (policy: OnyxEntry<Policy>): OnyxEntry<Policy> =>
         isPolicyExpenseChatEnabled: policy.isPolicyExpenseChatEnabled,
         isJoinRequestPending: policy.isJoinRequestPending,
         pendingAction: policy.pendingAction,
+        errors: policy.errors,
         reimburser: policy.reimburser,
         exporter: policy.exporter,
         approver: policy.approver,
