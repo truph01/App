@@ -133,6 +133,10 @@ jobs:
           distribution: oracle
           java-version: ${{ steps.get-java-version.outputs.version }}
 
+      - name: Setup Gradle
+        # v4
+        uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244
+
       - name: Setup Ruby
         # v1.229.0
         uses: ruby/setup-ruby@354a1ad156761f5ee2b7b13fa8e09943a5e8d252
