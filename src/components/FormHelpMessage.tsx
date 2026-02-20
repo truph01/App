@@ -71,6 +71,8 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
         AccessibilityInfo.announceForAccessibility(message);
     }, [isIOS, message, shouldAnnounceError]);
 
+    const errorIconLabel = isError && shouldShowRedDotIndicator ? CONST.ACCESSIBILITY_LABELS.ERROR : undefined;
+
     if (isEmpty(message) && isEmpty(children)) {
         return null;
     }
@@ -78,10 +80,16 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt2, styles.mb1, style]}>
             {isError && shouldShowRedDotIndicator && (
-                <Icon
-                    src={icons.DotIndicator}
-                    fill={theme.danger}
-                />
+                <View
+                    accessible
+                    role={CONST.ROLE.IMG}
+                    accessibilityLabel={errorIconLabel}
+                >
+                    <Icon
+                        src={icons.DotIndicator}
+                        fill={theme.danger}
+                    />
+                </View>
             )}
             {isInfo && (
                 <Icon

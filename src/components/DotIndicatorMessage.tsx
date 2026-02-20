@@ -66,7 +66,6 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
 
     const isErrorMessage = type === 'error';
     const receiptError = uniqueMessages.find(isReceiptError);
-
     const handleLinkPress = (href: string) => {
         if (!receiptError) {
             return;
@@ -121,7 +120,12 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
 
     return (
         <View style={[styles.dotIndicatorMessage, style]}>
-            <View style={styles.offlineFeedbackErrorDot}>
+            <View
+                style={styles.offlineFeedbackErrorDot}
+                accessible={isErrorMessage}
+                role={isErrorMessage ? CONST.ROLE.IMG : undefined}
+                accessibilityLabel={isErrorMessage ? (CONST.ACCESSIBILITY_LABELS.ERROR as string) : undefined}
+            >
                 <Icon
                     src={expensifyIcons.DotIndicator}
                     fill={isErrorMessage ? theme.danger : theme.success}
