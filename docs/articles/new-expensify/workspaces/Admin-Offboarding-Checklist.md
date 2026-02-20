@@ -16,7 +16,7 @@ If a key admin is leaving your company or changing roles, follow this checklist 
 
 **Important:**  This checklist applies **only when a Workspace Admin or Domain Admin is being offboarded**.
 
- - If you’re **adding a new Workspace Admin or Domain Admin while others remain active**, not all steps are required.  
+**Important:** This checklist applies **only when a Workspace Admin or Domain Admin is being offboarded**.
  - All steps **must** be completed if the **sole Workspace Admin or billing owner** is leaving the company.
 
 **Note:** If you're only taking over billing or payment management, follow [these steps to switch billing owners and add a payment account](https://help.expensify.com/articles/new-expensify/billing-and-subscriptions/Billing-Overview#how-to-transfer-billing-ownership). You don’t need the full checklist.
