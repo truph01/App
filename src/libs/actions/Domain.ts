@@ -1080,7 +1080,12 @@ function closeUserAccount(domainAccountID: number, domain: string, targetEmail: 
 
 function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainName: string, twoFactorAuthRequired: boolean, twoFactorAuthCode?: string) {
     const optimisticData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS
+            | typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE
+        >
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -1111,7 +1116,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
             value: null,
         },
     ];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -1133,7 +1138,12 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
         },
     ];
     const failureData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS
+            | typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE
+        >
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -1159,7 +1169,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
                       value: {
                           errors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
                       },
-                  },
+                  } as OnyxUpdate<typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE>,
               ]
             : []),
         {
