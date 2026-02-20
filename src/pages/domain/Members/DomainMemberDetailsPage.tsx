@@ -149,7 +149,6 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 />
                 {!!account?.requiresTwoFactorAuth && (
                     <MenuItem
-                        style={styles.mb5}
                         title={translate('domain.common.resetTwoFactorAuth')}
                         icon={icons.Flag}
                         onPress={() => {
