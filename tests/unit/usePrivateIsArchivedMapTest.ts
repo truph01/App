@@ -41,7 +41,7 @@ describe('usePrivateIsArchivedMap', () => {
 
     it('returns undefined for reports that are not archived', async () => {
         await act(async () => {
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_3}`, {someOtherField: 'value'});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_3}`, {origin: 'email'});
         });
 
         const {result} = renderHook(() => usePrivateIsArchivedMap());
@@ -51,7 +51,7 @@ describe('usePrivateIsArchivedMap', () => {
 
     it('updates the map when Onyx data changes', async () => {
         await act(async () => {
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_1}`, {someOtherField: 'value'});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_1}`, {origin: 'email'});
         });
 
         const {result} = renderHook(() => usePrivateIsArchivedMap());
@@ -70,7 +70,7 @@ describe('usePrivateIsArchivedMap', () => {
     it('handles a mix of archived and non-archived reports', async () => {
         await act(async () => {
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_1}`, {private_isArchived: ARCHIVED_DATE});
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_2}`, {someOtherField: 'value'});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${REPORT_ID_2}`, {origin: 'email'});
         });
 
         const {result} = renderHook(() => usePrivateIsArchivedMap());
