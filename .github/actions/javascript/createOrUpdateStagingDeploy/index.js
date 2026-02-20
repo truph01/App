@@ -11537,290 +11537,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const format_1 = __nccwpck_require__(2464);
-const fs_1 = __importDefault(__nccwpck_require__(7147));
-const CONST_1 = __importDefault(__nccwpck_require__(9873));
-const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
-const GitUtils_1 = __importDefault(__nccwpck_require__(1547));
-async function buildChronologicalSection({ chronologicalPREntries, submoduleUpdates, mergedMobileExpensifyPREntries, }) {
-    if (chronologicalPREntries.length === 0 && submoduleUpdates.length === 0 && mergedMobileExpensifyPREntries.length === 0) {
-        return '';
-    }
-    // Look up workflow run URLs for each submodule update commit
-    const submoduleRunURLs = new Map();
-    const results = await Promise.allSettled(submoduleUpdates.map(async (update) => {
-        const runURL = await GithubUtils_1.default.getWorkflowRunURLForCommit(update.commit, 'testBuildOnPush.yml');
-        return { commit: update.commit, runURL };
-    }));
-    for (const result of results) {
-        if (result.status === 'fulfilled') {
-            submoduleRunURLs.set(result.value.commit, result.value.runURL);
-        }
-    }
-    // Group Mobile-Expensify PRs by the submodule update that introduced them.
-    // A Mobile-Expensify PR is assigned to the first submodule bump whose date >= PR merge date,
-    // because merging to Mobile-Expensify doesn't matter until the submodule is actually bumped in App.
-    const sortedSubmoduleUpdates = [...submoduleUpdates].sort((a, b) => a.date.localeCompare(b.date));
-    const mobileExpensifyPRsBySubmodule = new Map();
-    const mobileExpensifyPRsPendingSubmoduleUpdate = [];
-    for (const mobileExpensifyPR of mergedMobileExpensifyPREntries) {
-        const matchingUpdate = sortedSubmoduleUpdates.find((update) => update.date.localeCompare(mobileExpensifyPR.date) >= 0);
-        if (matchingUpdate) {
-            const existing = mobileExpensifyPRsBySubmodule.get(matchingUpdate.commit) ?? [];
-            existing.push(mobileExpensifyPR);
-            mobileExpensifyPRsBySubmodule.set(matchingUpdate.commit, existing);
-        }
-        else {
-            mobileExpensifyPRsPendingSubmoduleUpdate.push(mobileExpensifyPR);
-        }
-    }
-    // Merge PRs and submodule updates into a single chronological timeline
-    const timeline = [
-        ...chronologicalPREntries.map((pr) => ({ type: 'pr', prNumber: pr.prNumber, date: pr.date })),
-        ...submoduleUpdates.map((update) => ({ type: 'submodule', version: update.version, date: update.date, commit: update.commit })),
-    ].sort((a, b) => a.date.localeCompare(b.date));
-    let section = '<details>\r\n<summary><b>Chronologically ordered merged PRs (oldest first)</b></summary>\r\n\r\n';
-    let prIndex = 0;
-    for (const entry of timeline) {
-        if (entry.type === 'submodule') {
-            prIndex++;
-            const runURL = submoduleRunURLs.get(entry.commit);
-            const buildLink = runURL ? ` — [Adhoc Build](${runURL})` : ` — ${entry.commit.substring(0, 7)}`;
-            section += `${prIndex}. Mobile-Expensify submodule update to \`${entry.version}\`${buildLink}\r\n`;
-            const mobileExpensifyPRs = mobileExpensifyPRsBySubmodule.get(entry.commit);
-            if (mobileExpensifyPRs) {
-                const sortedMobileExpensifyPRs = [...mobileExpensifyPRs].sort((a, b) => a.date.localeCompare(b.date));
-                for (const mobileExpensifyPR of sortedMobileExpensifyPRs) {
-                    const mobileExpensifyUrl = GithubUtils_1.default.getPullRequestURLFromNumber(mobileExpensifyPR.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
-                    section += `   ↳ ${mobileExpensifyUrl}\r\n`;
-                }
-            }
-        }
-        else {
-            prIndex++;
-            const url = GithubUtils_1.default.getPullRequestURLFromNumber(entry.prNumber, CONST_1.default.APP_REPO_URL);
-            section += `${prIndex}. ${url}\r\n`;
-        }
-    }
-    if (mobileExpensifyPRsPendingSubmoduleUpdate.length > 0) {
-        const sortedPending = [...mobileExpensifyPRsPendingSubmoduleUpdate].sort((a, b) => a.date.localeCompare(b.date));
-        section += `\r\n--- PRs waiting for Mobile-Expensify submodule update\r\n`;
-        for (const mobileExpensifyPR of sortedPending) {
-            const mobileExpensifyUrl = GithubUtils_1.default.getPullRequestURLFromNumber(mobileExpensifyPR.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
-            section += `${mobileExpensifyUrl}\r\n`;
-        }
-    }
-    section += '\r\n</details>';
-    return section;
-}
-async function run() {
-    // Note: require('package.json').version does not work because ncc will resolve that to a plain string at compile time
-    const packageJson = JSON.parse(fs_1.default.readFileSync('package.json', 'utf8'));
-    // The checklist will use the package.json version, e.g. '1.2.3-4'
-    const newVersion = packageJson.version;
-    // The staging tag will use the package.json version with a '-staging' suffix, e.g. '1.2.3-4-staging'
-    const newStagingTag = `${packageJson.version}-staging`;
+const createOrUpdateStagingDeploy_1 = __importDefault(__nccwpck_require__(4287));
+async function main() {
     try {
-        // Start by fetching the list of recent StagingDeployCash issues, along with the list of open deploy blockers
-        const { data: recentDeployChecklists } = await GithubUtils_1.default.octokit.issues.listForRepo({
-            log: console,
-            owner: CONST_1.default.GITHUB_OWNER,
-            repo: CONST_1.default.APP_REPO,
-            labels: CONST_1.default.LABELS.STAGING_DEPLOY,
-            state: 'all',
-        });
-        // Look at the state of the most recent StagingDeployCash,
-        // if it is open then we'll update the existing one, otherwise, we'll create a new one.
-        const mostRecentChecklist = recentDeployChecklists.at(0);
-        if (!mostRecentChecklist) {
-            throw new Error('Could not find the most recent checklist');
-        }
-        const shouldCreateNewDeployChecklist = mostRecentChecklist.state !== 'open';
-        const previousChecklist = shouldCreateNewDeployChecklist ? mostRecentChecklist : recentDeployChecklists.at(1);
-        if (shouldCreateNewDeployChecklist) {
-            console.log('Latest StagingDeployCash is closed, creating a new one.', mostRecentChecklist);
-        }
-        else {
-            console.log('Latest StagingDeployCash is open, updating it instead of creating a new one.', 'Current:', mostRecentChecklist, 'Previous:', previousChecklist);
-        }
-        if (!previousChecklist) {
-            throw new Error('Could not find the previous checklist');
-        }
-        // Parse the data from the previous and current checklists into the format used to generate the checklist
-        const previousChecklistData = GithubUtils_1.default.getStagingDeployCashData(previousChecklist);
-        const currentChecklistData = shouldCreateNewDeployChecklist ? undefined : GithubUtils_1.default.getStagingDeployCashData(mostRecentChecklist);
-        // Find the list of PRs merged between the current checklist and the previous checklist
-        const { mergedPRs: mergedPREntries, submoduleUpdates } = await GitUtils_1.default.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST_1.default.APP_REPO);
-        const mergedPRs = mergedPREntries.map((pr) => pr.prNumber).sort((a, b) => a - b);
-        // mergedPRs includes cherry-picked PRs that have already been released with previous checklist, so we need to filter these out
-        const previousPRNumbers = new Set(previousChecklistData.PRList.map((pr) => pr.number));
-        const previousMobileExpensifyPRNumbers = new Set(previousChecklistData.PRListMobileExpensify.map((pr) => pr.number));
-        core.startGroup('Filtering PRs:');
-        core.info('mergedPRs includes cherry-picked PRs that have already been released with previous checklist, so we need to filter these out');
-        core.info(`Found ${previousPRNumbers.size} PRs in the previous checklist:`);
-        core.info(JSON.stringify(Array.from(previousPRNumbers)));
-        const newPRNumbers = mergedPRs.filter((prNum) => !previousPRNumbers.has(prNum));
-        core.info(`Found ${newPRNumbers.length} PRs deployed since the previous checklist:`);
-        core.info(JSON.stringify(newPRNumbers));
-        // Filter out cherry-picked PRs that were released with the previous checklist
-        const removedPRs = mergedPRs.filter((prNum) => previousPRNumbers.has(prNum));
-        if (removedPRs.length > 0) {
-            core.info(`⚠️⚠️ Filtered out the following cherry-picked PRs that were released with the previous checklist: ${removedPRs.join(', ')} ⚠️⚠️`);
-        }
-        core.endGroup();
-        console.info(`[api] Checklist PRs: ${newPRNumbers.join(', ')}`);
-        // Get merged Mobile-Expensify PRs (with dates for chronological grouping by submodule update)
-        let mergedMobileExpensifyPREntries = [];
-        try {
-            const { mergedPRs: allMobileExpensifyPREntries } = await GitUtils_1.default.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST_1.default.MOBILE_EXPENSIFY_REPO);
-            mergedMobileExpensifyPREntries = allMobileExpensifyPREntries.filter((pr) => !previousMobileExpensifyPRNumbers.has(pr.prNumber));
-            const allCount = allMobileExpensifyPREntries.length;
-            const newCount = mergedMobileExpensifyPREntries.length;
-            console.info(`Found ${allCount} total Mobile-Expensify PRs, ${newCount} new ones after filtering:`);
-            console.info(`Mobile-Expensify PRs: ${mergedMobileExpensifyPREntries.map((pr) => pr.prNumber).join(', ')}`);
-            // Log the Mobile-Expensify PRs that were filtered out
-            const removedMobileExpensifyPRs = allMobileExpensifyPREntries.filter((pr) => previousMobileExpensifyPRNumbers.has(pr.prNumber));
-            if (removedMobileExpensifyPRs.length > 0) {
-                core.info(`⚠️⚠️ Filtered out the following cherry-picked Mobile-Expensify PRs that were released with the previous checklist: ${removedMobileExpensifyPRs.map((pr) => pr.prNumber).join(', ')} ⚠️⚠️`);
-            }
-        }
-        catch (error) {
-            // Check if this is a forked repository
-            if (process.env.GITHUB_REPOSITORY !== `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
-                console.warn("⚠️ Unable to fetch Mobile-Expensify PRs because this workflow is running on a forked repository and secrets aren't accessble. This is expected for development/testing on forks.");
-            }
-            else {
-                console.error('Failed to fetch Mobile-Expensify PRs:', error);
-            }
-        }
-        const chronologicalPREntries = mergedPREntries.filter((pr) => !previousPRNumbers.has(pr.prNumber)).sort((a, b) => a.date.localeCompare(b.date));
-        const chronologicalSection = await buildChronologicalSection({
-            chronologicalPREntries,
-            submoduleUpdates,
-            mergedMobileExpensifyPREntries,
-        });
-        // Next, we generate the checklist body
-        let checklistBody = '';
-        let checklistAssignees = [];
-        if (shouldCreateNewDeployChecklist) {
-            const stagingDeployCashBodyAndAssignees = await GithubUtils_1.default.generateStagingDeployCashBodyAndAssignees({
-                tag: newVersion,
-                PRList: newPRNumbers.map((value) => GithubUtils_1.default.getPullRequestURLFromNumber(value, CONST_1.default.APP_REPO_URL)),
-                PRListMobileExpensify: mergedMobileExpensifyPREntries.map((pr) => GithubUtils_1.default.getPullRequestURLFromNumber(pr.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL)),
-                previousTag: previousChecklistData.version,
-                chronologicalSection,
-            });
-            if (stagingDeployCashBodyAndAssignees) {
-                checklistBody = stagingDeployCashBodyAndAssignees.issueBody;
-                checklistAssignees = stagingDeployCashBodyAndAssignees.issueAssignees.filter(Boolean);
-            }
-        }
-        else {
-            // Generate the updated PR list, preserving the previous state of `isVerified` for existing PRs
-            const PRList = newPRNumbers.map((prNum) => {
-                const indexOfPRInCurrentChecklist = currentChecklistData?.PRList.findIndex((pr) => pr.number === prNum) ?? -1;
-                const isVerified = indexOfPRInCurrentChecklist >= 0 ? currentChecklistData?.PRList[indexOfPRInCurrentChecklist].isVerified : false;
-                return {
-                    number: prNum,
-                    url: GithubUtils_1.default.getPullRequestURLFromNumber(prNum, CONST_1.default.APP_REPO_URL),
-                    isVerified,
-                };
-            });
-            // Generate the updated Mobile-Expensify PR list, preserving the previous state of `isVerified` for existing PRs
-            const PRListMobileExpensify = mergedMobileExpensifyPREntries.map((entry) => {
-                const indexOfPRInCurrentChecklist = currentChecklistData?.PRListMobileExpensify.findIndex((pr) => pr.number === entry.prNumber) ?? -1;
-                const isVerified = indexOfPRInCurrentChecklist >= 0 ? currentChecklistData?.PRListMobileExpensify[indexOfPRInCurrentChecklist].isVerified : false;
-                return {
-                    number: entry.prNumber,
-                    url: GithubUtils_1.default.getPullRequestURLFromNumber(entry.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL),
-                    isVerified,
-                };
-            });
-            // Generate the deploy blocker list, preserving the previous state of `isResolved`
-            const openDeployBlockers = await GithubUtils_1.default.paginate(GithubUtils_1.default.octokit.issues.listForRepo, {
-                log: console,
-                owner: CONST_1.default.GITHUB_OWNER,
-                repo: CONST_1.default.APP_REPO,
-                labels: CONST_1.default.LABELS.DEPLOY_BLOCKER,
-            });
-            // First, make sure we include all current deploy blockers
-            const deployBlockers = openDeployBlockers.map((deployBlocker) => {
-                const indexInCurrentChecklist = currentChecklistData?.deployBlockers.findIndex((item) => item.number === deployBlocker.number) ?? -1;
-                const isResolved = indexInCurrentChecklist >= 0 ? currentChecklistData?.deployBlockers[indexInCurrentChecklist].isResolved : false;
-                return {
-                    number: deployBlocker.number,
-                    url: deployBlocker.html_url,
-                    isResolved,
-                };
-            });
-            // Then make sure we include any demoted or closed blockers as well, and just check them off automatically
-            for (const deployBlocker of currentChecklistData?.deployBlockers ?? []) {
-                const isResolved = deployBlockers.findIndex((openBlocker) => openBlocker.number === deployBlocker.number) < 0;
-                deployBlockers.push({
-                    ...deployBlocker,
-                    isResolved,
-                });
-            }
-            // Include any existing Mobile-Expensify PRs from the current checklist that aren't in the new merged list
-            for (const existingPR of currentChecklistData?.PRListMobileExpensify ?? []) {
-                const isAlreadyIncluded = PRListMobileExpensify.findIndex((pr) => pr.number === existingPR.number) >= 0;
-                if (!isAlreadyIncluded) {
-                    PRListMobileExpensify.push(existingPR);
-                }
-            }
-            const didVersionChange = newVersion !== currentChecklistData?.version;
-            const stagingDeployCashBodyAndAssignees = await GithubUtils_1.default.generateStagingDeployCashBodyAndAssignees({
-                tag: newVersion,
-                PRList: PRList.map((pr) => pr.url),
-                PRListMobileExpensify: PRListMobileExpensify.map((pr) => pr.url),
-                verifiedPRList: PRList.filter((pr) => pr.isVerified).map((pr) => pr.url),
-                verifiedPRListMobileExpensify: PRListMobileExpensify.filter((pr) => pr.isVerified).map((pr) => pr.url),
-                deployBlockers: deployBlockers.map((blocker) => blocker.url),
-                resolvedDeployBlockers: deployBlockers.filter((blocker) => blocker.isResolved).map((blocker) => blocker.url),
-                resolvedInternalQAPRs: currentChecklistData?.internalQAPRList.filter((pr) => pr.isResolved).map((pr) => pr.url),
-                isSentryChecked: didVersionChange ? false : currentChecklistData.isSentryChecked,
-                isGHStatusChecked: didVersionChange ? false : currentChecklistData.isGHStatusChecked,
-                previousTag: previousChecklistData.version,
-                chronologicalSection,
-            });
-            if (stagingDeployCashBodyAndAssignees) {
-                checklistBody = stagingDeployCashBodyAndAssignees.issueBody;
-                checklistAssignees = stagingDeployCashBodyAndAssignees.issueAssignees.filter(Boolean);
-            }
-        }
-        // Finally, create or update the checklist
-        const defaultPayload = {
-            owner: CONST_1.default.GITHUB_OWNER,
-            repo: CONST_1.default.APP_REPO,
-            body: checklistBody,
-        };
-        if (shouldCreateNewDeployChecklist) {
-            const { data: newChecklist } = await GithubUtils_1.default.octokit.issues.create({
-                ...defaultPayload,
-                title: `Deploy Checklist: New Expensify ${(0, format_1.format)(new Date(), CONST_1.default.DATE_FORMAT_STRING)}`,
-                labels: [CONST_1.default.LABELS.STAGING_DEPLOY, CONST_1.default.LABELS.LOCK_DEPLOY],
-                assignees: [CONST_1.default.APPLAUSE_BOT].concat(checklistAssignees),
-            });
-            console.log(`Successfully created new StagingDeployCash! 🎉 ${newChecklist.html_url}`);
-            return newChecklist;
-        }
-        const { data: updatedChecklist } = await GithubUtils_1.default.octokit.issues.update({
-            ...defaultPayload,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            issue_number: currentChecklistData?.number ?? 0,
-        });
-        console.log(`Successfully updated StagingDeployCash! 🎉 ${updatedChecklist.html_url}`);
-        return updatedChecklist;
+        const token = core.getInput('GITHUB_TOKEN', { required: true });
+        process.env.GITHUB_TOKEN = token;
+        await (0, createOrUpdateStagingDeploy_1.default)();
     }
-    catch (err) {
-        console.error('An unknown error occurred!', err);
-        core.setFailed(err);
+    catch (e) {
+        if (e instanceof Error) {
+            core.setFailed(e);
+            return;
+        }
+        core.setFailed('An unknown error occurred.');
     }
 }
 if (require.main === require.cache[eval('__filename')]) {
-    run();
+    main();
 }
-exports["default"] = run;
+exports["default"] = createOrUpdateStagingDeploy_1.default;
 
 
 /***/ }),
@@ -12145,9 +11880,7 @@ const utils_1 = __nccwpck_require__(3030);
 const plugin_paginate_rest_1 = __nccwpck_require__(4193);
 const plugin_throttling_1 = __nccwpck_require__(9968);
 const request_error_1 = __nccwpck_require__(537);
-const arrayDifference_1 = __importDefault(__nccwpck_require__(7532));
 const CONST_1 = __importDefault(__nccwpck_require__(9873));
-const isEmptyObject_1 = __nccwpck_require__(6497);
 class GithubUtils {
     static internalOctokit;
     /**
@@ -12225,219 +11958,6 @@ class GithubUtils {
         }
         // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
         return this.internalOctokit.paginate;
-    }
-    /**
-     * Finds one open `StagingDeployCash` issue via GitHub octokit library.
-     */
-    static getStagingDeployCash() {
-        return this.octokit.issues
-            .listForRepo({
-            owner: CONST_1.default.GITHUB_OWNER,
-            repo: CONST_1.default.APP_REPO,
-            labels: CONST_1.default.LABELS.STAGING_DEPLOY,
-            state: 'open',
-        })
-            .then(({ data }) => {
-            if (!data.length) {
-                throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
-            }
-            if (data.length > 1) {
-                throw new Error(`Found more than one ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
-            }
-            const issue = data.at(0);
-            if (!issue) {
-                throw new Error(`Found an undefined ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
-            }
-            return this.getStagingDeployCashData(issue);
-        });
-    }
-    /**
-     * Takes in a GitHub issue object and returns the data we want.
-     */
-    static getStagingDeployCashData(issue) {
-        try {
-            const versionRegex = new RegExp('([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9]+))?', 'g');
-            const version = (issue.body?.match(versionRegex)?.[0] ?? '').replaceAll('`', '');
-            return {
-                title: issue.title,
-                url: issue.url,
-                number: this.getIssueOrPullRequestNumberFromURL(issue.url),
-                labels: issue.labels,
-                PRList: this.getStagingDeployCashPRList(issue),
-                PRListMobileExpensify: this.getStagingDeployCashPRListMobileExpensify(issue),
-                deployBlockers: this.getStagingDeployCashDeployBlockers(issue),
-                internalQAPRList: this.getStagingDeployCashInternalQA(issue),
-                isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
-                isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
-                version,
-                tag: `${version}-staging`,
-            };
-        }
-        catch (exception) {
-            throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue with correct data.`);
-        }
-    }
-    /**
-     * Parse the PRList and Internal QA section of the StagingDeployCash issue body.
-     *
-     * @private
-     */
-    static getStagingDeployCashPRList(issue) {
-        let PRListSection = issue.body?.match(/pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/) ?? null;
-        if (PRListSection?.length !== 2) {
-            // No PRs, return an empty array
-            console.log('Hmmm...The open StagingDeployCash does not list any pull requests, continuing...');
-            return [];
-        }
-        PRListSection = PRListSection[1];
-        const PRList = [...PRListSection.matchAll(new RegExp(`- \\[([ x])] (${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'))].map((match) => ({
-            url: match[2],
-            number: Number.parseInt(match[3], 10),
-            isVerified: match[1] === 'x',
-        }));
-        return PRList.sort((a, b) => a.number - b.number);
-    }
-    static getStagingDeployCashPRListMobileExpensify(issue) {
-        let mobileExpensifySection = issue.body?.match(/Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/) ?? null;
-        if (mobileExpensifySection?.length !== 2) {
-            return [];
-        }
-        mobileExpensifySection = mobileExpensifySection[1];
-        const mobileExpensifyPRs = [...mobileExpensifySection.matchAll(new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'))].map((match) => ({
-            url: match[2],
-            number: Number.parseInt(match[3], 10),
-            isVerified: match[1] === 'x',
-        }));
-        return mobileExpensifyPRs.sort((a, b) => a.number - b.number);
-    }
-    /**
-     * Parse DeployBlocker section of the StagingDeployCash issue body.
-     *
-     * @private
-     */
-    static getStagingDeployCashDeployBlockers(issue) {
-        let deployBlockerSection = issue.body?.match(/Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/) ?? null;
-        if (deployBlockerSection?.length !== 2) {
-            return [];
-        }
-        deployBlockerSection = deployBlockerSection[1];
-        const deployBlockers = [...deployBlockerSection.matchAll(new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'))].map((match) => ({
-            url: match[2],
-            number: Number.parseInt(match[3], 10),
-            isResolved: match[1] === 'x',
-        }));
-        return deployBlockers.sort((a, b) => a.number - b.number);
-    }
-    /**
-     * Parse InternalQA section of the StagingDeployCash issue body.
-     *
-     * @private
-     */
-    static getStagingDeployCashInternalQA(issue) {
-        let internalQASection = issue.body?.match(/Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/) ?? null;
-        if (internalQASection?.length !== 2) {
-            return [];
-        }
-        internalQASection = internalQASection[1];
-        const internalQAPRs = [...internalQASection.matchAll(new RegExp(`- \\[([ x])]\\s(${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'))].map((match) => ({
-            url: match[2].split('-').at(0)?.trim() ?? '',
-            number: Number.parseInt(match[3], 10),
-            isResolved: match[1] === 'x',
-        }));
-        return internalQAPRs.sort((a, b) => a.number - b.number);
-    }
-    /**
-     * Generate the issue body and assignees for a StagingDeployCash.
-     */
-    static generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '', chronologicalSection = '', }) {
-        return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
-            .then((data) => {
-            const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
-            return Promise.all(internalQAPRs.map((pr) => this.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ url: pr.html_url, mergerLogin })))).then((results) => {
-                // The format of this map is following:
-                // {
-                //    'https://github.com/Expensify/App/pull/9641': 'PauloGasparSv',
-                //    'https://github.com/Expensify/App/pull/9642': 'mountiny'
-                // }
-                const internalQAPRMap = results.reduce((acc, { url, mergerLogin }) => {
-                    acc[url] = mergerLogin;
-                    return acc;
-                }, {});
-                console.log('Found the following Internal QA PRs:', internalQAPRMap);
-                const noQAPRs = Array.isArray(data) ? data.filter((PR) => /\[No\s?QA]/i.test(PR.title)).map((item) => item.html_url) : [];
-                console.log('Found the following NO QA PRs:', noQAPRs);
-                const verifiedOrNoQAPRs = new Set([...verifiedPRList, ...verifiedPRListMobileExpensify, ...noQAPRs]);
-                const sortedPRList = [...new Set((0, arrayDifference_1.default)(PRList, Object.keys(internalQAPRMap)))].sort((a, b) => GithubUtils.getPullRequestNumberFromURL(a) - GithubUtils.getPullRequestNumberFromURL(b));
-                const sortedPRListMobileExpensify = [...new Set(PRListMobileExpensify)].sort((a, b) => GithubUtils.getPullRequestNumberFromURL(a) - GithubUtils.getPullRequestNumberFromURL(b));
-                const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => GithubUtils.getIssueOrPullRequestNumberFromURL(a) - GithubUtils.getIssueOrPullRequestNumberFromURL(b));
-                // Tag version and comparison URL
-                // eslint-disable-next-line max-len
-                let issueBody = `**Release Version:** \`${tag}\`\r\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\r\n`;
-                // Add Mobile-Expensify compare link if there are Mobile-Expensify PRs
-                if (sortedPRListMobileExpensify.length > 0) {
-                    issueBody += `**Mobile-Expensify Changes:** https://github.com/${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.MOBILE_EXPENSIFY_REPO}/compare/production...staging\r\n`;
-                }
-                issueBody += '\r\n';
-                // PR list
-                if (sortedPRList.length > 0) {
-                    issueBody += '**This release contains changes from the following pull requests:**\r\n';
-                    for (const URL of sortedPRList) {
-                        issueBody += verifiedOrNoQAPRs.has(URL) ? '- [x]' : '- [ ]';
-                        issueBody += ` ${URL}\r\n`;
-                    }
-                    issueBody += '\r\n\r\n';
-                }
-                // Mobile-Expensify PR list
-                if (sortedPRListMobileExpensify.length > 0) {
-                    issueBody += '**Mobile-Expensify PRs:**\r\n';
-                    for (const URL of sortedPRListMobileExpensify) {
-                        issueBody += verifiedOrNoQAPRs.has(URL) ? '- [x]' : '- [ ]';
-                        issueBody += ` ${URL}\r\n`;
-                    }
-                    issueBody += '\r\n\r\n';
-                }
-                // Internal QA PR list
-                if (!(0, isEmptyObject_1.isEmptyObject)(internalQAPRMap)) {
-                    console.log('Found the following verified Internal QA PRs:', resolvedInternalQAPRs);
-                    issueBody += '**Internal QA:**\r\n';
-                    for (const URL of Object.keys(internalQAPRMap)) {
-                        const merger = internalQAPRMap[URL];
-                        const mergerMention = `@${merger}`;
-                        issueBody += `${resolvedInternalQAPRs.includes(URL) ? '- [x]' : '- [ ]'} `;
-                        issueBody += `${URL}`;
-                        issueBody += ` - ${mergerMention}`;
-                        issueBody += '\r\n';
-                    }
-                    issueBody += '\r\n\r\n';
-                }
-                // Deploy blockers
-                if (deployBlockers.length > 0) {
-                    issueBody += '**Deploy Blockers:**\r\n';
-                    for (const URL of sortedDeployBlockers) {
-                        issueBody += resolvedDeployBlockers.includes(URL) ? '- [x] ' : '- [ ] ';
-                        issueBody += URL;
-                        issueBody += '\r\n';
-                    }
-                    issueBody += '\r\n\r\n';
-                }
-                if (chronologicalSection) {
-                    issueBody += chronologicalSection;
-                    issueBody += '\r\n\r\n';
-                }
-                issueBody += '**Deployer verifications:**';
-                // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isSentryChecked ? 'x' : ' '}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
-                // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isSentryChecked ? 'x' : ' '}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${previousTag}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
-                // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isGHStatusChecked ? 'x' : ' '}] I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.`;
-                issueBody += '\r\n\r\ncc @Expensify/applauseleads\r\n';
-                const issueAssignees = [...new Set(Object.values(internalQAPRMap))];
-                const issue = { issueBody, issueAssignees };
-                return issue;
-            });
-        })
-            .catch((err) => console.warn('Error generating StagingDeployCash issue body! Continuing...', err));
     }
     /**
      * Fetch all pull requests given a list of PR numbers.
@@ -12749,6 +12269,189 @@ exports["default"] = GithubUtils;
 
 /***/ }),
 
+/***/ 3318:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getStagingDeployCash = getStagingDeployCash;
+exports.getStagingDeployCashData = getStagingDeployCashData;
+exports.generateStagingDeployCashBodyAndAssignees = generateStagingDeployCashBodyAndAssignees;
+exports.parseChecklistSection = parseChecklistSection;
+const dedent_1 = __importDefault(__nccwpck_require__(6762));
+const arrayDifference_1 = __importDefault(__nccwpck_require__(7532));
+const CONST_1 = __importDefault(__nccwpck_require__(9873));
+const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
+const isEmptyObject_1 = __nccwpck_require__(6497);
+/**
+ * Generic checklist section parser. Extracts a section from the issue body,
+ * parses checkbox items within it, and returns typed objects sorted by number.
+ */
+function parseChecklistSection(issueBody, sectionRegex, itemRegex, checkedKey, urlTransform) {
+    const sectionMatch = issueBody?.match(sectionRegex) ?? null;
+    if (sectionMatch?.length !== 2) {
+        return [];
+    }
+    const items = [...sectionMatch[1].matchAll(itemRegex)].map((match) => {
+        const rawUrl = match[2];
+        return {
+            url: urlTransform ? urlTransform(rawUrl) : rawUrl,
+            number: Number.parseInt(match[3], 10),
+            [checkedKey]: match[1] === 'x',
+        };
+    });
+    return items.sort((a, b) => a.number - b.number);
+}
+function getStagingDeployCashPRList(issue) {
+    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), 'isVerified');
+    if (result.length === 0) {
+        console.log('Hmmm...The open StagingDeployCash does not list any pull requests, continuing...');
+    }
+    return result;
+}
+function getStagingDeployCashPRListMobileExpensify(issue) {
+    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'), 'isVerified');
+}
+function getStagingDeployCashDeployBlockers(issue) {
+    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'), 'isResolved');
+}
+function getStagingDeployCashInternalQA(issue) {
+    return parseChecklistSection(issue.body, /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), 'isResolved', (url) => url.split('-').at(0)?.trim() ?? '');
+}
+async function getStagingDeployCash() {
+    const { data } = await GithubUtils_1.default.octokit.issues.listForRepo({
+        owner: CONST_1.default.GITHUB_OWNER,
+        repo: CONST_1.default.APP_REPO,
+        labels: CONST_1.default.LABELS.STAGING_DEPLOY,
+        state: 'open',
+    });
+    if (!data.length) {
+        throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
+    }
+    if (data.length > 1) {
+        throw new Error(`Found more than one ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
+    }
+    const issue = data.at(0);
+    if (!issue) {
+        throw new Error(`Found an undefined ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
+    }
+    return getStagingDeployCashData(issue);
+}
+function getStagingDeployCashData(issue) {
+    try {
+        const versionRegex = new RegExp('([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9]+))?', 'g');
+        const version = (issue.body?.match(versionRegex)?.[0] ?? '').replaceAll('`', '');
+        return {
+            title: issue.title,
+            url: issue.url,
+            number: GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(issue.url),
+            labels: issue.labels,
+            PRList: getStagingDeployCashPRList(issue),
+            PRListMobileExpensify: getStagingDeployCashPRListMobileExpensify(issue),
+            deployBlockers: getStagingDeployCashDeployBlockers(issue),
+            internalQAPRList: getStagingDeployCashInternalQA(issue),
+            isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
+            isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
+            version,
+            tag: `${version}-staging`,
+        };
+    }
+    catch (exception) {
+        throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue with correct data.`);
+    }
+}
+/**
+ * Generate the issue body and assignees for a StagingDeployCash checklist.
+ * Accepts PR numbers directly (not URLs) to avoid unnecessary roundtripping.
+ */
+async function generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '', chronologicalSection = '', }) {
+    const data = await GithubUtils_1.default.fetchAllPullRequests(PRList);
+    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
+    const mergerResults = await Promise.all(internalQAPRs.map((pr) => GithubUtils_1.default.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ number: pr.number, mergerLogin }))));
+    const internalQAPRMap = new Map();
+    for (const { number, mergerLogin } of mergerResults) {
+        internalQAPRMap.set(number, mergerLogin);
+    }
+    console.log('Found the following Internal QA PRs:', Object.fromEntries(internalQAPRMap));
+    const noQAPRNumbers = Array.isArray(data) ? data.filter((PR) => /\[No\s?QA]/i.test(PR.title)).map((item) => item.number) : [];
+    console.log('Found the following NO QA PRs:', noQAPRNumbers);
+    const verifiedAppPRs = new Set([...verifiedPRList, ...noQAPRNumbers]);
+    const verifiedMobileExpensifyPRs = new Set(verifiedPRListMobileExpensify);
+    const resolvedInternalQAPRSet = new Set(resolvedInternalQAPRs);
+    const resolvedDeployBlockerSet = new Set(resolvedDeployBlockers);
+    const internalQAPRNumbers = new Set(internalQAPRMap.keys());
+    const sortedPRList = [...new Set((0, arrayDifference_1.default)(PRList, [...internalQAPRNumbers]))].sort((a, b) => a - b);
+    const sortedPRListMobileExpensify = [...new Set(PRListMobileExpensify)].sort((a, b) => a - b);
+    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(a) - GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(b));
+    const sections = [];
+    // Header
+    let header = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n`;
+    if (sortedPRListMobileExpensify.length > 0) {
+        header += `**Mobile-Expensify Changes:** https://github.com/${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.MOBILE_EXPENSIFY_REPO}/compare/production...staging\n`;
+    }
+    sections.push(header);
+    // PR list
+    if (sortedPRList.length > 0) {
+        const items = sortedPRList
+            .map((prNumber) => {
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.APP_REPO_URL);
+            return `${verifiedAppPRs.has(prNumber) ? '- [x]' : '- [ ]'} ${url}`;
+        })
+            .join('\n');
+        sections.push(`**This release contains changes from the following pull requests:**\n${items}\n`);
+    }
+    // Mobile-Expensify PR list
+    if (sortedPRListMobileExpensify.length > 0) {
+        const items = sortedPRListMobileExpensify
+            .map((prNumber) => {
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
+            return `${verifiedMobileExpensifyPRs.has(prNumber) ? '- [x]' : '- [ ]'} ${url}`;
+        })
+            .join('\n');
+        sections.push(`**Mobile-Expensify PRs:**\n${items}\n`);
+    }
+    // Internal QA PR list
+    if (internalQAPRMap.size > 0) {
+        console.log('Found the following verified Internal QA PRs:', resolvedInternalQAPRs);
+        const items = [...internalQAPRMap.entries()]
+            .map(([prNumber, merger]) => {
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.APP_REPO_URL);
+            return `${resolvedInternalQAPRSet.has(prNumber) ? '- [x]' : '- [ ]'} ${url} - @${merger}`;
+        })
+            .join('\n');
+        sections.push(`**Internal QA:**\n${items}\n`);
+    }
+    // Deploy blockers
+    if (deployBlockers.length > 0) {
+        const items = sortedDeployBlockers.map((url) => `${resolvedDeployBlockerSet.has(url) ? '- [x] ' : '- [ ] '}${url}`).join('\n');
+        sections.push(`**Deploy Blockers:**\n${items}\n`);
+    }
+    // Chronological section
+    if (chronologicalSection) {
+        sections.push(chronologicalSection);
+    }
+    // Deployer verifications
+    const check = (checked) => (checked ? 'x' : ' ');
+    sections.push((0, dedent_1.default)(`
+            **Deployer verifications:**
+            - [${check(isSentryChecked)}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).
+            - [${check(isSentryChecked)}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${previousTag}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).
+            - [${check(isGHStatusChecked)}] I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.
+        `).trimEnd());
+    // Footer
+    sections.push('cc @Expensify/applauseleads\n');
+    const issueBody = sections.join('\n');
+    const issueAssignees = [...new Set(internalQAPRMap.values())].filter((login) => login !== undefined);
+    return { issueBody, issueAssignees };
+}
+
+
+/***/ }),
+
 /***/ 7532:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -12881,6 +12584,389 @@ function getPreviousVersion(currentVersion, level) {
         return getPreviousVersion(currentVersion, SEMANTIC_VERSION_LEVELS.PATCH);
     }
     return getVersionStringFromNumber(major, minor, patch, build - 1);
+}
+
+
+/***/ }),
+
+/***/ 4287:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.buildChronologicalSection = buildChronologicalSection;
+exports.buildNewChecklistParams = buildNewChecklistParams;
+exports.buildUpdateChecklistParams = buildUpdateChecklistParams;
+exports.preserveCheckboxState = preserveCheckboxState;
+/* eslint-disable @typescript-eslint/naming-convention */
+const core = __importStar(__nccwpck_require__(2186));
+const format_1 = __nccwpck_require__(2464);
+const fs_1 = __importDefault(__nccwpck_require__(7147));
+const CONST_1 = __importDefault(__nccwpck_require__(9873));
+const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
+const GitUtils_1 = __importDefault(__nccwpck_require__(1547));
+const StagingDeployUtils_1 = __nccwpck_require__(3318);
+/**
+ * Preserve the checked state (isVerified/isResolved) from a previous checklist when building a new one.
+ */
+function preserveCheckboxState(items, currentList, checkedKey) {
+    return items.map((item) => {
+        const existing = currentList?.find((c) => c.number === item.number);
+        return { ...item, [checkedKey]: existing ? existing[checkedKey] : false };
+    });
+}
+async function buildChronologicalSection({ chronologicalPREntries, submoduleUpdates, mergedMobileExpensifyPREntries, }) {
+    if (chronologicalPREntries.length === 0 && submoduleUpdates.length === 0 && mergedMobileExpensifyPREntries.length === 0) {
+        return '';
+    }
+    const submoduleRunURLs = new Map();
+    const results = await Promise.allSettled(submoduleUpdates.map(async (update) => {
+        const runURL = await GithubUtils_1.default.getWorkflowRunURLForCommit(update.commit, 'testBuildOnPush.yml');
+        return { commit: update.commit, runURL };
+    }));
+    for (const result of results) {
+        if (result.status === 'fulfilled') {
+            submoduleRunURLs.set(result.value.commit, result.value.runURL);
+        }
+    }
+    const sortedSubmoduleUpdates = [...submoduleUpdates].sort((a, b) => a.date.localeCompare(b.date));
+    const mobileExpensifyPRsBySubmodule = new Map();
+    const mobileExpensifyPRsPendingSubmoduleUpdate = [];
+    for (const mobileExpensifyPR of mergedMobileExpensifyPREntries) {
+        const matchingUpdate = sortedSubmoduleUpdates.find((update) => update.date.localeCompare(mobileExpensifyPR.date) >= 0);
+        if (matchingUpdate) {
+            const existing = mobileExpensifyPRsBySubmodule.get(matchingUpdate.commit) ?? [];
+            existing.push(mobileExpensifyPR);
+            mobileExpensifyPRsBySubmodule.set(matchingUpdate.commit, existing);
+        }
+        else {
+            mobileExpensifyPRsPendingSubmoduleUpdate.push(mobileExpensifyPR);
+        }
+    }
+    const timeline = [
+        ...chronologicalPREntries.map((pr) => ({ type: 'pr', prNumber: pr.prNumber, date: pr.date })),
+        ...submoduleUpdates.map((update) => ({ type: 'submodule', version: update.version, date: update.date, commit: update.commit })),
+    ].sort((a, b) => a.date.localeCompare(b.date));
+    let section = '<details>\n<summary><b>Chronologically ordered merged PRs (oldest first)</b></summary>\n\n';
+    let prIndex = 0;
+    for (const entry of timeline) {
+        if (entry.type === 'submodule') {
+            prIndex++;
+            const runURL = submoduleRunURLs.get(entry.commit);
+            const buildLink = runURL ? ` — [Adhoc Build](${runURL})` : ` — ${entry.commit.substring(0, 7)}`;
+            section += `${prIndex}. Mobile-Expensify submodule update to \`${entry.version}\`${buildLink}\n`;
+            const mobileExpensifyPRs = mobileExpensifyPRsBySubmodule.get(entry.commit);
+            if (mobileExpensifyPRs) {
+                const sortedMobileExpensifyPRs = [...mobileExpensifyPRs].sort((a, b) => a.date.localeCompare(b.date));
+                for (const mobileExpensifyPR of sortedMobileExpensifyPRs) {
+                    const mobileExpensifyUrl = GithubUtils_1.default.getPullRequestURLFromNumber(mobileExpensifyPR.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
+                    section += `   ↳ ${mobileExpensifyUrl}\n`;
+                }
+            }
+        }
+        else {
+            prIndex++;
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(entry.prNumber, CONST_1.default.APP_REPO_URL);
+            section += `${prIndex}. ${url}\n`;
+        }
+    }
+    if (mobileExpensifyPRsPendingSubmoduleUpdate.length > 0) {
+        const sortedPending = [...mobileExpensifyPRsPendingSubmoduleUpdate].sort((a, b) => a.date.localeCompare(b.date));
+        section += `\n--- PRs waiting for Mobile-Expensify submodule update\n`;
+        for (const mobileExpensifyPR of sortedPending) {
+            const mobileExpensifyUrl = GithubUtils_1.default.getPullRequestURLFromNumber(mobileExpensifyPR.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
+            section += `${mobileExpensifyUrl}\n`;
+        }
+    }
+    section += '\n</details>';
+    return section;
+}
+/**
+ * Build params for creating a brand-new deploy checklist.
+ */
+function buildNewChecklistParams({ newVersion, newPRNumbers, mergedMobileExpensifyPREntries, previousChecklistData, chronologicalSection, }) {
+    return {
+        tag: newVersion,
+        PRList: newPRNumbers,
+        PRListMobileExpensify: mergedMobileExpensifyPREntries.map((pr) => pr.prNumber),
+        previousTag: previousChecklistData.version,
+        chronologicalSection,
+    };
+}
+/**
+ * Build params for updating an existing open deploy checklist, preserving verified/resolved state.
+ */
+async function buildUpdateChecklistParams({ newVersion, newPRNumbers, mergedMobileExpensifyPREntries, previousChecklistData, currentChecklistData, chronologicalSection, }) {
+    const PRList = preserveCheckboxState(newPRNumbers.map((prNum) => ({
+        number: prNum,
+        url: GithubUtils_1.default.getPullRequestURLFromNumber(prNum, CONST_1.default.APP_REPO_URL),
+    })), currentChecklistData.PRList, 'isVerified');
+    const PRListMobileExpensify = preserveCheckboxState(mergedMobileExpensifyPREntries.map((entry) => ({
+        number: entry.prNumber,
+        url: GithubUtils_1.default.getPullRequestURLFromNumber(entry.prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL),
+    })), currentChecklistData.PRListMobileExpensify, 'isVerified');
+    // Include existing Mobile-Expensify PRs from the current checklist that aren't in the new merged list
+    for (const existingPR of currentChecklistData.PRListMobileExpensify) {
+        if (!PRListMobileExpensify.some((pr) => pr.number === existingPR.number)) {
+            PRListMobileExpensify.push(existingPR);
+        }
+    }
+    const openDeployBlockers = await GithubUtils_1.default.paginate(GithubUtils_1.default.octokit.issues.listForRepo, {
+        log: console,
+        owner: CONST_1.default.GITHUB_OWNER,
+        repo: CONST_1.default.APP_REPO,
+        labels: CONST_1.default.LABELS.DEPLOY_BLOCKER,
+    });
+    const deployBlockers = preserveCheckboxState(openDeployBlockers.map((db) => ({ number: db.number, url: db.html_url })), currentChecklistData.deployBlockers, 'isResolved');
+    // Add demoted/closed blockers from current checklist and auto-check them
+    for (const deployBlocker of currentChecklistData.deployBlockers) {
+        const isResolved = !deployBlockers.some((openBlocker) => openBlocker.number === deployBlocker.number);
+        deployBlockers.push({ ...deployBlocker, isResolved });
+    }
+    const didVersionChange = newVersion !== currentChecklistData.version;
+    return {
+        tag: newVersion,
+        PRList: PRList.map((pr) => pr.number),
+        PRListMobileExpensify: PRListMobileExpensify.map((pr) => pr.number),
+        verifiedPRList: PRList.filter((pr) => pr.isVerified).map((pr) => pr.number),
+        verifiedPRListMobileExpensify: PRListMobileExpensify.filter((pr) => pr.isVerified).map((pr) => pr.number),
+        deployBlockers: deployBlockers.map((blocker) => blocker.url),
+        resolvedDeployBlockers: deployBlockers.filter((blocker) => blocker.isResolved).map((blocker) => blocker.url),
+        resolvedInternalQAPRs: currentChecklistData.internalQAPRList.filter((pr) => pr.isResolved).map((pr) => pr.number),
+        isSentryChecked: didVersionChange ? false : currentChecklistData.isSentryChecked,
+        isGHStatusChecked: didVersionChange ? false : currentChecklistData.isGHStatusChecked,
+        previousTag: previousChecklistData.version,
+        chronologicalSection,
+    };
+}
+async function run() {
+    // Note: require('package.json').version does not work because ncc will resolve that to a plain string at compile time
+    const packageJson = JSON.parse(fs_1.default.readFileSync('package.json', 'utf8'));
+    const newVersion = packageJson.version;
+    const newStagingTag = `${packageJson.version}-staging`;
+    try {
+        const { data: recentDeployChecklists } = await GithubUtils_1.default.octokit.issues.listForRepo({
+            log: console,
+            owner: CONST_1.default.GITHUB_OWNER,
+            repo: CONST_1.default.APP_REPO,
+            labels: CONST_1.default.LABELS.STAGING_DEPLOY,
+            state: 'all',
+        });
+        const mostRecentChecklist = recentDeployChecklists.at(0);
+        if (!mostRecentChecklist) {
+            throw new Error('Could not find the most recent checklist');
+        }
+        const shouldCreateNewDeployChecklist = mostRecentChecklist.state !== 'open';
+        const previousChecklist = shouldCreateNewDeployChecklist ? mostRecentChecklist : recentDeployChecklists.at(1);
+        if (shouldCreateNewDeployChecklist) {
+            console.log('Latest StagingDeployCash is closed, creating a new one.', mostRecentChecklist);
+        }
+        else {
+            console.log('Latest StagingDeployCash is open, updating it instead of creating a new one.', 'Current:', mostRecentChecklist, 'Previous:', previousChecklist);
+        }
+        if (!previousChecklist) {
+            throw new Error('Could not find the previous checklist');
+        }
+        const previousChecklistData = (0, StagingDeployUtils_1.getStagingDeployCashData)(previousChecklist);
+        const currentChecklistData = shouldCreateNewDeployChecklist ? undefined : (0, StagingDeployUtils_1.getStagingDeployCashData)(mostRecentChecklist);
+        const { mergedPRs: mergedPREntries, submoduleUpdates } = await GitUtils_1.default.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST_1.default.APP_REPO);
+        const mergedPRs = mergedPREntries.map((pr) => pr.prNumber).sort((a, b) => a - b);
+        const previousPRNumbers = new Set(previousChecklistData.PRList.map((pr) => pr.number));
+        const previousMobileExpensifyPRNumbers = new Set(previousChecklistData.PRListMobileExpensify.map((pr) => pr.number));
+        core.startGroup('Filtering PRs:');
+        core.info('mergedPRs includes cherry-picked PRs that have already been released with previous checklist, so we need to filter these out');
+        core.info(`Found ${previousPRNumbers.size} PRs in the previous checklist:`);
+        core.info(JSON.stringify(Array.from(previousPRNumbers)));
+        const newPRNumbers = mergedPRs.filter((prNum) => !previousPRNumbers.has(prNum));
+        core.info(`Found ${newPRNumbers.length} PRs deployed since the previous checklist:`);
+        core.info(JSON.stringify(newPRNumbers));
+        const removedPRs = mergedPRs.filter((prNum) => previousPRNumbers.has(prNum));
+        if (removedPRs.length > 0) {
+            core.info(`⚠️⚠️ Filtered out the following cherry-picked PRs that were released with the previous checklist: ${removedPRs.join(', ')} ⚠️⚠️`);
+        }
+        core.endGroup();
+        console.info(`[api] Checklist PRs: ${newPRNumbers.join(', ')}`);
+        let mergedMobileExpensifyPREntries = [];
+        try {
+            const { mergedPRs: allMobileExpensifyPREntries } = await GitUtils_1.default.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST_1.default.MOBILE_EXPENSIFY_REPO);
+            mergedMobileExpensifyPREntries = allMobileExpensifyPREntries.filter((pr) => !previousMobileExpensifyPRNumbers.has(pr.prNumber));
+            const allCount = allMobileExpensifyPREntries.length;
+            const newCount = mergedMobileExpensifyPREntries.length;
+            console.info(`Found ${allCount} total Mobile-Expensify PRs, ${newCount} new ones after filtering:`);
+            console.info(`Mobile-Expensify PRs: ${mergedMobileExpensifyPREntries.map((pr) => pr.prNumber).join(', ')}`);
+            const removedMobileExpensifyPRs = allMobileExpensifyPREntries.filter((pr) => previousMobileExpensifyPRNumbers.has(pr.prNumber));
+            if (removedMobileExpensifyPRs.length > 0) {
+                core.info(`⚠️⚠️ Filtered out the following cherry-picked Mobile-Expensify PRs that were released with the previous checklist: ${removedMobileExpensifyPRs.map((pr) => pr.prNumber).join(', ')} ⚠️⚠️`);
+            }
+        }
+        catch (error) {
+            if (process.env.GITHUB_REPOSITORY !== `${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.APP_REPO}`) {
+                console.warn("⚠️ Unable to fetch Mobile-Expensify PRs because this workflow is running on a forked repository and secrets aren't accessible. This is expected for development/testing on forks.");
+            }
+            else {
+                console.error('Failed to fetch Mobile-Expensify PRs:', error);
+            }
+        }
+        const chronologicalPREntries = mergedPREntries.filter((pr) => !previousPRNumbers.has(pr.prNumber)).sort((a, b) => a.date.localeCompare(b.date));
+        const chronologicalSection = await buildChronologicalSection({
+            chronologicalPREntries,
+            submoduleUpdates,
+            mergedMobileExpensifyPREntries,
+        });
+        let checklistParams;
+        if (shouldCreateNewDeployChecklist) {
+            checklistParams = buildNewChecklistParams({
+                newVersion,
+                newPRNumbers,
+                mergedMobileExpensifyPREntries,
+                previousChecklistData,
+                chronologicalSection,
+            });
+        }
+        else if (currentChecklistData) {
+            checklistParams = await buildUpdateChecklistParams({
+                newVersion,
+                newPRNumbers,
+                mergedMobileExpensifyPREntries,
+                previousChecklistData,
+                currentChecklistData,
+                chronologicalSection,
+            });
+        }
+        else {
+            throw new Error('Expected current checklist data for update but it was undefined');
+        }
+        const { issueBody: checklistBody, issueAssignees: checklistAssignees } = await (0, StagingDeployUtils_1.generateStagingDeployCashBodyAndAssignees)(checklistParams);
+        const defaultPayload = {
+            owner: CONST_1.default.GITHUB_OWNER,
+            repo: CONST_1.default.APP_REPO,
+            body: checklistBody,
+        };
+        if (shouldCreateNewDeployChecklist) {
+            const { data: newChecklist } = await GithubUtils_1.default.octokit.issues.create({
+                ...defaultPayload,
+                title: `Deploy Checklist: New Expensify ${(0, format_1.format)(new Date(), CONST_1.default.DATE_FORMAT_STRING)}`,
+                labels: [CONST_1.default.LABELS.STAGING_DEPLOY, CONST_1.default.LABELS.LOCK_DEPLOY],
+                assignees: [CONST_1.default.APPLAUSE_BOT].concat(checklistAssignees),
+            });
+            console.log(`Successfully created new StagingDeployCash! 🎉 ${newChecklist.html_url}`);
+            return newChecklist;
+        }
+        const { data: updatedChecklist } = await GithubUtils_1.default.octokit.issues.update({
+            ...defaultPayload,
+            issue_number: currentChecklistData?.number ?? 0,
+        });
+        console.log(`Successfully updated StagingDeployCash! 🎉 ${updatedChecklist.html_url}`);
+        return updatedChecklist;
+    }
+    catch (err) {
+        console.error('An unknown error occurred!', err);
+        core.setFailed(err);
+    }
+}
+if (false) {}
+exports["default"] = run;
+
+
+/***/ }),
+
+/***/ 6762:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+/*
+ * Note: This file is separated from StringUtils because it is imported by a ts-node script.
+ *       ts-node scripts can't import react-native (because it is written in flow),
+ *       and StringUtils indirectly imports react-native.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports["default"] = dedent;
+/**
+ * Find the minimum indentation of any line in the string,
+ * and remove that number of leading spaces from every line in the string.
+ *
+ * It also removes at most one leading newline, to reflect a common usage:
+ *
+ * ```
+ * StringUtils.dedent(`
+ *    const myIndentedStr = 'Hello, world!';
+ *    console.log(myIndentedStr);
+ * `)
+ * ```
+ *
+ * This implementation assumes you'd want that to be:
+ *
+ * ```
+ * const myIndentedStr = 'Hello, world!';
+ * console.log(myIndentedStr);
+ *
+ * ```
+ *
+ * Rather than:
+ *
+ * ```
+ *
+ * const myIndentedStr = 'Hello, world!';
+ * console.log(myIndentedStr);
+ *
+ * ```
+ */
+function dedent(str) {
+    // Remove at most one leading newline
+    const stringWithoutLeadingNewlines = str.replaceAll(/^\r?\n/g, '');
+    // Split string by remaining newlines
+    const lines = stringWithoutLeadingNewlines.replaceAll('\r\n', '\n').split('\n');
+    // Find the minimum indentation of non-empty lines
+    let minIndent = Number.MAX_SAFE_INTEGER;
+    for (const line of lines) {
+        if (line.trim().length === 0) {
+            continue;
+        }
+        const indentation = line.match(/^ */)?.[0].length ?? 0;
+        if (indentation < minIndent) {
+            minIndent = indentation;
+        }
+    }
+    // Remove the common indentation
+    return lines.map((line) => line.slice(minIndent)).join('\n');
 }
 
 
