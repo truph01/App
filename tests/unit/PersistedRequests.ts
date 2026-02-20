@@ -93,3 +93,50 @@ describe('PersistedRequests', () => {
         expect(PersistedRequests.getAll().length).toBe(0);
     });
 });
+
+// Issue: https://github.com/Expensify/App/issues/80759
+describe('PersistedRequests persistence guarantees', () => {
+    // BUG: processNextRequest() moves the first request from the queue to
+    // ongoingRequest (in-memory only). The request is only persisted to
+    // PERSISTED_ONGOING_REQUESTS on disk when persistWhenOngoing is true —
+    // but no production code ever sets this flag. Every write request in the
+    // app uses the default (false), so ALL ongoing requests are unprotected.
+    // If the app dies while a request is in-flight, the ongoing request is
+    // lost from memory and has no disk backup. On restart, the dedup check
+    // in the connect callback (PersistedRequests.ts:53-67) cannot detect
+    // that this request was already being processed.
+    it('Issue 3a: ongoing request should be persisted to disk (persistWhenOngoing is never set in production)', () =>
+        waitForBatchedUpdates().then(() => {
+            // The request from beforeEach has no persistWhenOngoing — same as every
+            // write request in production. No code path ever sets it to true.
+            expect(request.persistWhenOngoing).toBeUndefined();
+            expect(PersistedRequests.getAll()).toHaveLength(1);
+
+            // Spy on Onyx.set AFTER beforeEach has settled to avoid capturing setup calls
+            const setMock = jest.spyOn(Onyx, 'set');
+
+            // Move the request from queue to ongoingRequest
+            PersistedRequests.processNextRequest();
+
+            // In-memory: request is now ongoingRequest, queue is empty
+            expect(PersistedRequests.getOngoingRequest()).toEqual(request);
+            expect(PersistedRequests.getAll()).toHaveLength(0);
+
+            return waitForBatchedUpdates()
+                .then(() => {
+                    // BUG: Onyx.set was never called for PERSISTED_ONGOING_REQUESTS
+                    // because persistWhenOngoing is undefined (PersistedRequests.ts:273).
+                    // The ongoing request exists only in memory — no disk backup.
+                    // When fixed, this should persist ALL ongoing requests regardless
+                    // of the persistWhenOngoing flag. Change to:
+                    //   expect(setMock).toHaveBeenCalledWith(
+                    //     ONYXKEYS.PERSISTED_ONGOING_REQUESTS,
+                    //     expect.objectContaining({command: 'OpenReport'}),
+                    //   );
+                    expect(setMock).not.toHaveBeenCalledWith(ONYXKEYS.PERSISTED_ONGOING_REQUESTS, expect.objectContaining({command: 'OpenReport'}));
+                })
+                .finally(() => {
+                    setMock.mockRestore();
+                });
+        }));
+});
