@@ -204,6 +204,7 @@ jobs:
 
       - name: Rock Remote Build - Android
         id: rock-remote-build-android
+        continue-on-error: true
         uses: callstackincubator/android@4cedf4d9b5c167452c96fe67233577e0fde9a025
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -219,7 +220,35 @@ jobs:
           keystore-store-password: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
           keystore-key-alias: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_ALIAS }}
           keystore-key-password: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEY_PASSWORD }}
-          # Specify the path (relative to the Android source directory) where the keystore should be placed.
+          keystore-path: '../tools/buildtools/upload-key.keystore'
+          comment-bot: false
+          rock-build-extra-params: '--extra-params "-PreactNativeArchitectures=arm64-v8a,x86_64 --profile"'
+          custom-identifier: ${{ steps.computeIdentifier.outputs.IDENTIFIER }}
+          validate-elf-alignment: false
+
+      - name: Clear Gradle cache
+        if: steps.rock-remote-build-android.outcome == 'failure'
+        run: |
+          echo "::warning::Android build failed, clearing Gradle caches and retrying…"
+          rm -rf ~/.gradle/caches
+
+      - name: Rock Remote Build - Android (retry)
+        if: steps.rock-remote-build-android.outcome == 'failure'
+        uses: callstackincubator/android@4cedf4d9b5c167452c96fe67233577e0fde9a025
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          IS_HYBRID_APP: true
+        with:
+          variant: 'Adhoc'
+          sign: true
+          re-sign: true
+          ad-hoc: true
+          keystore-file: './upload-key.keystore'
+          keystore-store-file: 'upload-key.keystore'
+          keystore-store-password: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          keystore-key-alias: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_ALIAS }}
+          keystore-key-password: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEY_PASSWORD }}
           keystore-path: '../tools/buildtools/upload-key.keystore'
           comment-bot: false
           rock-build-extra-params: '--extra-params "-PreactNativeArchitectures=arm64-v8a,x86_64 --profile"'

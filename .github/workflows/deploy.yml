@@ -179,7 +179,12 @@ jobs:
         run: echo "VERSION_CODE=$(grep -oP 'android:versionCode="\K[0-9]+' Mobile-Expensify/Android/AndroidManifest.xml)" >> "$GITHUB_OUTPUT"
 
       - name: Build Android app
-        run: bundle exec fastlane android build_hybrid
+        run: |
+          if ! bundle exec fastlane android build_hybrid; then
+            echo "::warning::Android build failed, clearing Gradle caches and retrying…"
+            rm -rf ~/.gradle/caches
+            bundle exec fastlane android build_hybrid
+          fi
         env:
           ANDROID_UPLOAD_KEYSTORE_PASSWORD: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
           ANDROID_UPLOAD_KEYSTORE_ALIAS: ${{ steps.load-credentials.outputs.ANDROID_UPLOAD_KEYSTORE_ALIAS }}
