@@ -1553,7 +1553,7 @@ describe('ReportActionsUtils', () => {
             };
 
             const actual = ReportActionsUtils.getPolicyChangeLogUpdateEmployee(translateLocal, action);
-            const expected = translateLocal('report.actions.type.updatedCustomField1', {email: formatPhoneNumber(email), newValue, previousValue});
+            const expected = translateLocal('report.actions.type.updatedCustomField1', formatPhoneNumber(email), newValue, previousValue);
             expect(actual).toBe(expected);
         });
 
@@ -1586,11 +1586,7 @@ describe('ReportActionsUtils', () => {
             };
 
             const formattedEmail = formatPhoneNumber(email);
-            const expectedCustomFieldMessage = translateLocal('report.actions.type.updatedCustomField1', {
-                email: formattedEmail,
-                newValue: customFieldNewValue,
-                previousValue: customFieldOldValue,
-            });
+            const expectedCustomFieldMessage = translateLocal('report.actions.type.updatedCustomField1', formattedEmail, customFieldNewValue, customFieldOldValue);
             const expectedRoleMessage = translateLocal('report.actions.type.updateRole', {
                 email: formattedEmail,
                 newRole: translateLocal('workspace.common.roleName', newRole).toLowerCase(),
