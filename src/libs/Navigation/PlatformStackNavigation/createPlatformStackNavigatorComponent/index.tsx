@@ -13,7 +13,7 @@ import type {
     PlatformStackNavigatorProps,
     PlatformStackRouterOptions,
 } from '@libs/Navigation/PlatformStackNavigation/types';
-import ScreenLayout from '@libs/Navigation/PlatformStackNavigation/ScreenLayout';
+import screenLayout from '@libs/Navigation/PlatformStackNavigation/ScreenLayout';
 
 function createPlatformStackNavigatorComponent<RouterOptions extends PlatformStackRouterOptions = PlatformStackRouterOptions>(
     displayName: string,
@@ -36,7 +36,6 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
         defaultCentralScreen,
         parentRoute,
         persistentScreens,
-        screenLayout,
         ...props
     }: PlatformStackNavigatorProps<ParamListBase>) {
         const {
@@ -64,7 +63,7 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
                 sidebarScreen,
                 parentRoute,
                 persistentScreens,
-                screenLayout: ScreenLayout,
+                screenLayout,
             },
             convertToWebNavigationOptions,
         );
