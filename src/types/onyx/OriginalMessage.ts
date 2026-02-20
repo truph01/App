@@ -1226,6 +1226,9 @@ type OriginalPersonalCard = {
 
     /** The id of the card */
     cardID: number;
+
+    /** The name of the card */
+    cardName?: string;
 };
 
 /**
