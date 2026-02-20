@@ -247,12 +247,18 @@ jobs:
           path: .rock/cache/ios/export/*.ipa
 
       - name: Find and upload dSYM artifact
+        id: upload-dsym
+        continue-on-error: true
         # v6
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: ${{ inputs.artifact-prefix }}ios-dsym-artifact
           path: .rock/cache/ios/export/*.dSYM.zip
           if-no-files-found: warn
+
+      - name: Log dSYM upload failure
+        if: steps.upload-dsym.outcome == 'failure'
+        run: echo "::error::Failed to upload dSYM artifact – symbolication data may be missing for this build"
 
       - name: Upload iOS sourcemap artifact
         if: ${{ inputs.upload-sourcemaps }}

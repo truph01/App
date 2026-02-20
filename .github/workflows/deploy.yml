@@ -317,11 +317,17 @@ jobs:
           path: ./
 
       - name: Download iOS dSYM artifact
+        id: download-dsym
+        continue-on-error: true
         # v7
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
         with:
           name: ios-dsym-artifact
           path: ./
+
+      - name: Log dSYM download failure
+        if: steps.download-dsym.outcome == 'failure'
+        run: echo "::error::Failed to download dSYM artifact – symbolication data may be missing for this build"
 
       - name: Set artifact paths for Fastlane
         run: |
