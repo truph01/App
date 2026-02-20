@@ -18,8 +18,8 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
-import useReportAttributes from '@hooks/useReportAttributes';
 import usePrevious from '@hooks/usePrevious';
+import useReportAttributes from '@hooks/useReportAttributes';
 import useRootNavigationState from '@hooks/useRootNavigationState';
 import useScrollEventEmitter from '@hooks/useScrollEventEmitter';
 import useTheme from '@hooks/useTheme';
@@ -75,6 +75,8 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
     const [isFullscreenVisible] = useOnyx(ONYXKEYS.FULLSCREEN_VISIBILITY, {canBeMissing: true});
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
+    const {login} = useCurrentUserPersonalDetails();
+    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}`, {canBeMissing: true});
 
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -183,6 +185,7 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
             const itemParentReportActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${item?.parentReportID}`];
             const itemParentReportAction = item?.parentReportActionID ? itemParentReportActions?.[item?.parentReportActionID] : undefined;
             const itemReportAttributes = reportAttributes?.[reportID];
+            const itemPolicyTags = policyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item?.policyID}`];
 
             let invoiceReceiverPolicyID = '-1';
             if (item?.invoiceReceiver && 'policyID' in item.invoiceReceiver) {
@@ -241,6 +244,8 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
                 policyForMovingExpensesID,
                 reportMetadata: itemReportMetadata,
                 reportAttributesDerived: reportAttributes,
+                policyTags: itemPolicyTags,
+                currentUserLogin: login,
             });
 
             const shouldShowRBRorGBRTooltip = firstReportIDWithGBRorRBR === reportID;
@@ -333,6 +338,8 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
             localeCompare,
             translate,
             currentUserAccountID,
+            login,
+            policyTags,
         ],
     );
 
