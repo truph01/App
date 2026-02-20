@@ -15,7 +15,7 @@ If a key admin is leaving your company or changing roles, follow this checklist 
 - **Technical Contact**
 - **Bank Account Owner**
 
-**Important:**  This checklist applies **only when a Workspace Admin or Domain Admin is being offboarded**.
+**Important:** This checklist applies **only when a Workspace Admin or Domain Admin is being offboarded**.
 
  - If you’re **adding a new Workspace Admin or Domain Admin while others remain active**, not all steps are required.  
  - All steps **must** be completed if the **sole Workspace Admin or billing owner** is leaving the company.
