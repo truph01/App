@@ -137,10 +137,7 @@ describe('ForYouSection', () => {
             await act(async () => {
                 await Onyx.set(ONYXKEYS.DERIVED.TODOS, {
                     ...BASE_TODOS,
-                    reportsToSubmit: [
-                        {reportID: '1'} as TodosDerivedValue['reportsToSubmit'][number],
-                        {reportID: '2'} as TodosDerivedValue['reportsToSubmit'][number],
-                    ],
+                    reportsToSubmit: [{reportID: '1'} as TodosDerivedValue['reportsToSubmit'][number], {reportID: '2'} as TodosDerivedValue['reportsToSubmit'][number]],
                 });
             });
             await waitForBatchedUpdatesWithAct();
@@ -159,10 +156,7 @@ describe('ForYouSection', () => {
             await act(async () => {
                 await Onyx.set(ONYXKEYS.DERIVED.TODOS, {
                     ...BASE_TODOS,
-                    reportsToApprove: [
-                        {reportID: '3'} as TodosDerivedValue['reportsToApprove'][number],
-                        {reportID: '4'} as TodosDerivedValue['reportsToApprove'][number],
-                    ],
+                    reportsToApprove: [{reportID: '3'} as TodosDerivedValue['reportsToApprove'][number], {reportID: '4'} as TodosDerivedValue['reportsToApprove'][number]],
                 });
             });
             await waitForBatchedUpdatesWithAct();
