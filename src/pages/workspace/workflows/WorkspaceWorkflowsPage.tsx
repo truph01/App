@@ -175,7 +175,9 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EXPENSES_FROM.getRoute(route.params.policyID));
     }, [policy, route.params.policyID, availableMembers, usedApproverEmails]);
 
-    const filteredApprovalWorkflows = [CONST.POLICY.APPROVAL_MODE.ADVANCED, CONST.POLICY.APPROVAL_MODE.DYNAMICEXTERNAL].includes(policy?.approvalMode) ? approvalWorkflows : approvalWorkflows.filter((workflow) => workflow.isDefault);
+    const filteredApprovalWorkflows = [CONST.POLICY.APPROVAL_MODE.ADVANCED, CONST.POLICY.APPROVAL_MODE.DYNAMICEXTERNAL].includes(policy?.approvalMode)
+        ? approvalWorkflows
+        : approvalWorkflows.filter((workflow) => workflow.isDefault);
 
     const everyoneText = translate('workspace.common.everyone');
 
