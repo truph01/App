@@ -62,7 +62,7 @@ Certain advanced features (like Rules, Accounting integrations, Expensify Card, 
 
 ## How Submit Workspaces Work After the Collect Plan Upgrade
 
-If you previously had a Classic Submit personal workpsace and used the **“Submit my expenses to”** setting:
+If you previously had a Classic Submit personal workspace and used the **“Submit my expenses to”** setting:
 
 - The submit email is added as a workspace member on your Collect workspace
 - Approvals are enabled
@@ -83,7 +83,7 @@ After the upgrade:
 
 ### Collect Plan Billing for Submit Workspaces With 2 Members
 
-To make the transition smooth for customers that submit expenses to others in Expensify using our previous Classic Submit plan, we're applying a disocount.
+To make the transition smooth for customers who submit expenses to others in Expensify using our previous Classic Submit plan, we're applying a discount.
 
 If your workspace has:
 
@@ -105,7 +105,7 @@ The Collect plan includes:
 - Workspace rules
 - Expensify Travel
 - Access to New Expensify
-- Realtime collaboration and chat
+- Real-time collaboration and chat
 - AI-powered categorization via Concierge
 
 This upgrade allows full access across web and mobile.
