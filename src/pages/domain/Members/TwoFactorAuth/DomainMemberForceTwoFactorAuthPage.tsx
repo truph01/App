@@ -54,6 +54,4 @@ function DomainMemberForceTwoFactorAuthPage({route}: DomainMemberForceTwoFactorA
     );
 }
 
-DomainMemberForceTwoFactorAuthPage.displayName = 'DomainMemberForceTwoFactorAuthPage';
-
 export default DomainMemberForceTwoFactorAuthPage;
