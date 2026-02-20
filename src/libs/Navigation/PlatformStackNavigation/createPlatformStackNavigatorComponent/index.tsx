@@ -1,6 +1,6 @@
 import type {ParamListBase, StackActionHelpers} from '@react-navigation/native';
 import {StackRouter, useNavigationBuilder} from '@react-navigation/native';
-import type {StackNavigationEventMap, StackNavigationOptions, StackNavigationProp} from '@react-navigation/stack';
+import type {StackNavigationEventMap, StackNavigationOptions} from '@react-navigation/stack';
 import {StackView} from '@react-navigation/stack';
 import React, {useMemo} from 'react';
 import {addCustomHistoryRouterExtension} from '@libs/Navigation/AppNavigator/customHistory';
@@ -64,14 +64,7 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
                 sidebarScreen,
                 parentRoute,
                 persistentScreens,
-                // eslint-disable-next-line react/no-unstable-nested-components
-                screenLayout: ({navigation: navigationFromScreenLayout, ...layoutProps}) => (
-                    <ScreenLayout
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...layoutProps}
-                        navigation={navigationFromScreenLayout as unknown as StackNavigationProp<ParamListBase>}
-                    />
-                ),
+                screenLayout: ScreenLayout,
             },
             convertToWebNavigationOptions,
         );

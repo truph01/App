@@ -1,15 +1,13 @@
 import type {ParamListBase, ScreenLayoutArgs} from '@react-navigation/native';
-import type {StackNavigationOptions} from '@react-navigation/stack';
+import type {StackNavigationOptions, StackNavigationProp} from '@react-navigation/stack';
 import {useLayoutEffect} from 'react';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
-import type {PlatformStackNavigationOptions, PlatformStackNavigationProp} from './types';
+import type {PlatformStackNavigationOptions} from './types';
 
-function ScreenLayout({
-    children,
-    navigation,
-    options,
-    route,
-}: ScreenLayoutArgs<ParamListBase, string, StackNavigationOptions | PlatformStackNavigationOptions, PlatformStackNavigationProp<ParamListBase>>) {
+function ScreenLayout({children, navigation: navigationProp, options, route}: ScreenLayoutArgs<ParamListBase, string, StackNavigationOptions | PlatformStackNavigationOptions, string>) {
+    // useNavigationBuilder hardcodes the Navigation generic to `string`, but the actual runtime value is a full navigation object.
+    const navigation = navigationProp as unknown as StackNavigationProp<ParamListBase>;
+
     useLayoutEffect(() => {
         const transitionStartListener = navigation.addListener('transitionStart', () => {
             TransitionTracker.startTransition();
