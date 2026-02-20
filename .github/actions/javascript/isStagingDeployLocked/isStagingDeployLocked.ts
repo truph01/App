@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
-import GithubUtils from '@github/libs/GithubUtils';
+import {getStagingDeployCash} from '@github/libs/StagingDeployUtils';
 
 const run = function (): Promise<void> {
-    return GithubUtils.getStagingDeployCash()
+    return getStagingDeployCash()
         .then(({labels, number}) => {
             const labelsNames = labels.map((label) => {
                 if (typeof label === 'string') {
