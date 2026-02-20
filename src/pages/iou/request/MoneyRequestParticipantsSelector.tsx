@@ -30,7 +30,7 @@ import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionS
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import useUserToInviteReports from '@hooks/useUserToInviteReports';
 import getPlatform from '@libs/getPlatform';
 import goToSettings from '@libs/goToSettings';
 import {isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
@@ -239,9 +239,7 @@ function MoneyRequestParticipantsSelector({
 
     const cleanSearchTerm = useMemo(() => debouncedSearchTerm.trim().toLowerCase(), [debouncedSearchTerm]);
 
-    const userToInviteReportID = availableOptions?.userToInvite?.isPolicyExpenseChat ? availableOptions.userToInvite.reportID : undefined;
-    const [userToInviteExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteReportID)}`, {canBeMissing: true});
-    const [userToInviteChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteExpenseReport?.chatReportID)}`, {canBeMissing: true});
+    const {userToInviteExpenseReport, userToInviteChatReport} = useUserToInviteReports(availableOptions?.userToInvite);
 
     useEffect(() => {
         searchInServer(debouncedSearchTerm.trim());

@@ -14,7 +14,7 @@ import useOnyx from '@hooks/useOnyx';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import useUserToInviteReports from '@hooks/useUserToInviteReports';
 import memoize from '@libs/memoize';
 import {
     filterAndOrderOptions,
@@ -141,9 +141,7 @@ function MoneyRequestAccountantSelector({onFinish, onAccountantSelected, iouType
         return newOptions;
     }, [areOptionsInitialized, defaultOptions, debouncedSearchTerm, countryCode, loginList, currentUserAccountID, currentUserEmail, personalDetails]);
 
-    const userToInviteReportID = chatOptions?.userToInvite?.isPolicyExpenseChat ? chatOptions.userToInvite.reportID : undefined;
-    const [userToInviteExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteReportID)}`, {canBeMissing: true});
-    const [userToInviteChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteExpenseReport?.chatReportID)}`, {canBeMissing: true});
+    const {userToInviteExpenseReport, userToInviteChatReport} = useUserToInviteReports(chatOptions?.userToInvite);
 
     /**
      * Returns the sections needed for the OptionsSelector

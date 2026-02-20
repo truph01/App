@@ -19,7 +19,7 @@ import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import useUserToInviteReports from '@hooks/useUserToInviteReports';
 import {
     formatSectionsFromSearchTerm,
     getFilteredRecentAttendees,
@@ -152,9 +152,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
         };
     }
 
-    const userToInviteReportID = availableOptions?.userToInvite?.isPolicyExpenseChat ? availableOptions.userToInvite.reportID : undefined;
-    const [userToInviteExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteReportID)}`, {canBeMissing: true});
-    const [userToInviteChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(userToInviteExpenseReport?.chatReportID)}`, {canBeMissing: true});
+    const {userToInviteExpenseReport, userToInviteChatReport} = useUserToInviteReports(availableOptions?.userToInvite);
 
     const shouldShowErrorMessage = selectedOptions.length < 1;
 
