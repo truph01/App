@@ -115,6 +115,12 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
      * When turning OFF: show confirmation modal, then call toggleTravelInvoicing(false).
      */
     const handleToggle = (isEnabled: boolean) => {
+        // Check if user is on a public domain - Travel Invoicing requires a private domain
+        if (account?.isFromPublicDomain) {
+            Navigation.navigate(ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.getRoute(Navigation.getActiveRoute()));
+            return;
+        }
+
         if (!isEnabled) {
             // Trying to disable - check for outstanding balance first
             if (hasOutstandingTravelBalance(cardSettings)) {
@@ -124,12 +130,6 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             }
             // Show confirmation modal before disabling
             setIsDisableConfirmModalVisible(true);
-            return;
-        }
-
-        // Check if user is on a public domain - Travel Invoicing requires a private domain
-        if (account?.isFromPublicDomain) {
-            Navigation.navigate(ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.getRoute(Navigation.getActiveRoute()));
             return;
         }
 

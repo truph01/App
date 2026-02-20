@@ -288,7 +288,6 @@ function toggleTravelInvoicing(policyID: string, workspaceAccountID: number, ena
                     isEnabled: !enabled,
                 },
                 pendingAction: null,
-                errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
             },
         },
     ];
