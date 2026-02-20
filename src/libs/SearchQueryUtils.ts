@@ -465,7 +465,8 @@ const BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR = '\x00'; // Null byte prevent
 function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
     const cacheKey = rawQuery ? `${query}${BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR}${rawQuery}` : query;
     if (buildSearchQueryJSONCache.has(cacheKey)) {
-        return buildSearchQueryJSONCache.get(cacheKey);
+        const cached = buildSearchQueryJSONCache.get(cacheKey);
+        return cached ? {...cached} : cached;
     }
 
     try {
@@ -507,7 +508,7 @@ function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQuerySt
         }
         buildSearchQueryJSONCache.set(cacheKey, result);
 
-        return result;
+        return {...result};
     } catch (e) {
         console.error(`Error when parsing SearchQuery: "${query}"`, e);
     }
