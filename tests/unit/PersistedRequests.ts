@@ -139,4 +139,132 @@ describe('PersistedRequests persistence guarantees', () => {
                     setMock.mockRestore();
                 });
         }));
+
+    // BUG: processNextRequest() at PersistedRequests.ts:264-266 does
+    // persistedRequests = persistedRequests.slice(1) but never writes the
+    // updated queue back to ONYXKEYS.PERSISTED_REQUESTS via Onyx.set().
+    // The disk update only happens much later when endRequestAndRemoveFromQueue()
+    // is called after successful processing. Between these two points, in-memory
+    // and disk are diverged — if the app crashes, the disk state is stale.
+    it('Issue 3c: in-memory queue should match disk after processNextRequest()', () => {
+        const requestB: Request<'reportMetadata_3' | 'reportMetadata_4'> = {
+            command: 'AddComment',
+            successData: [{key: 'reportMetadata_3', onyxMethod: 'merge', value: {}}],
+            failureData: [{key: 'reportMetadata_4', onyxMethod: 'merge', value: {}}],
+            requestID: 2,
+        };
+
+        PersistedRequests.save(requestB);
+
+        // Wait for both saves (beforeEach + this one) to settle on disk
+        return waitForBatchedUpdates().then(() => {
+            // Both requests are in memory and on disk
+            expect(PersistedRequests.getAll()).toHaveLength(2);
+
+            // processNextRequest moves first request to ongoingRequest
+            PersistedRequests.processNextRequest();
+
+            // In-memory: only requestB remains
+            expect(PersistedRequests.getAll()).toHaveLength(1);
+
+            // Read disk state via a fresh Onyx connection to see what's actually persisted
+            return new Promise<void>((resolve) => {
+                const connection = Onyx.connectWithoutView({
+                    key: ONYXKEYS.PERSISTED_REQUESTS,
+                    reuseConnection: false,
+                    callback: (diskRequests) => {
+                        Onyx.disconnect(connection);
+                        const diskArray = diskRequests ?? [];
+
+                        // BUG: processNextRequest() updates in-memory immediately but does NOT
+                        // write the updated queue back to ONYXKEYS.PERSISTED_REQUESTS.
+                        // In-memory has [requestB] but disk still has [request, requestB].
+                        // When fixed, disk should match in-memory.
+                        // Change to: expect(diskArray).toHaveLength(1);
+                        expect(diskArray).toHaveLength(2);
+
+                        resolve();
+                    },
+                });
+            });
+        });
+    });
+
+    // BUG: save() at PersistedRequests.ts:124-134 does a read-modify-write
+    // on the in-memory array and fires Onyx.set() without awaiting. The connect
+    // callback at PersistedRequests.ts:32 (persistedRequests = diskRequests)
+    // blindly overwrites the in-memory state with whatever disk returns.
+    // When Onyx.set() calls resolve out of order, the last callback to fire
+    // wins, permanently losing any data from the overwritten write.
+    it('Issue 4: rapid concurrent saves should not lose requests due to out-of-order persistence', async () => {
+        // Start fresh — clear the request added by beforeEach
+        PersistedRequests.clear();
+        await waitForBatchedUpdates();
+        expect(PersistedRequests.getAll()).toHaveLength(0);
+
+        // Intercept Onyx.set for PERSISTED_REQUESTS so we can control resolution order
+        type CapturedSet = {value: unknown; triggerRealSet: () => Promise<void>};
+        const capturedSets: CapturedSet[] = [];
+        const originalSet = Onyx.set.bind(Onyx);
+        const setMock = jest.spyOn(Onyx, 'set').mockImplementation((key, value) => {
+            if (key === ONYXKEYS.PERSISTED_REQUESTS && Array.isArray(value) && value.length > 0) {
+                return new Promise<void>((resolvePromise) => {
+                    capturedSets.push({
+                        value,
+                        triggerRealSet: () => originalSet(key, value).then(resolvePromise),
+                    });
+                });
+            }
+            return originalSet(key, value);
+        });
+
+        try {
+            const requestA: Request<'reportMetadata_1' | 'reportMetadata_2'> = {
+                command: 'CommandA',
+                successData: [{key: 'reportMetadata_1', onyxMethod: 'merge', value: {}}],
+                failureData: [{key: 'reportMetadata_2', onyxMethod: 'merge', value: {}}],
+                requestID: 10,
+            };
+
+            const requestB: Request<'reportMetadata_3' | 'reportMetadata_4'> = {
+                command: 'CommandB',
+                successData: [{key: 'reportMetadata_3', onyxMethod: 'merge', value: {}}],
+                failureData: [{key: 'reportMetadata_4', onyxMethod: 'merge', value: {}}],
+                requestID: 11,
+            };
+
+            // save(requestA): in-memory = [A], Onyx.set([A]) captured but not executed
+            PersistedRequests.save(requestA);
+            expect(PersistedRequests.getAll()).toHaveLength(1);
+
+            // save(requestB): in-memory = [A, B], Onyx.set([A, B]) captured but not executed
+            PersistedRequests.save(requestB);
+            expect(PersistedRequests.getAll()).toHaveLength(2);
+
+            // Two Onyx.set calls were captured
+            expect(capturedSets).toHaveLength(2);
+
+            // Resolve in REVERSE order to simulate out-of-order disk I/O:
+            // First, resolve the second set: Onyx.set([A, B])
+            await capturedSets.at(1)?.triggerRealSet();
+            await waitForBatchedUpdates();
+
+            // Connect callback fired with [A, B] — both requests present
+            expect(PersistedRequests.getAll()).toHaveLength(2);
+
+            // Now resolve the first set: Onyx.set([A]) — this is the STALE write
+            await capturedSets.at(0)?.triggerRealSet();
+            await waitForBatchedUpdates();
+
+            // BUG: The connect callback at PersistedRequests.ts:32 blindly overwrites
+            // in-memory state with whatever disk returns. The stale Onyx.set([A])
+            // resolved last, so the callback received [A] and overwrote [A, B].
+            // requestB is permanently lost.
+            // When fixed, both requests should survive regardless of resolution order.
+            // Change to: expect(PersistedRequests.getAll()).toHaveLength(2);
+            expect(PersistedRequests.getAll()).toHaveLength(1);
+        } finally {
+            setMock.mockRestore();
+        }
+    });
 });
