@@ -197,7 +197,6 @@ The skill provides guidance on:
 
 ### Testing
 - **Unit Tests**: Jest with React Native Testing Library
-- **E2E Tests**: Custom test runner
 - **Performance Tests**: Reassure framework
 
 ## Special Considerations
