@@ -78,7 +78,9 @@ const REASON = {
     },
     GENERIC: {
         SIGNATURE_MISSING: 'Signature is missing',
+        /** The device supports biometrics but the user has none enrolled (e.g. no fingerprint/face set up in device settings). */
         NO_ELIGIBLE_METHODS: 'No eligible methods available',
+        /** The device hardware does not support biometrics at all. */
         UNSUPPORTED_DEVICE: 'Unsupported device',
         BAD_REQUEST: 'Bad request',
         LOCAL_REGISTRATION_COMPLETE: 'Local registration complete',
