@@ -1298,7 +1298,7 @@ describe('SearchQueryUtils', () => {
 
     describe('buildSearchQueryJSON cache', () => {
         test('mutating the returned object does not affect subsequent calls for the same query', () => {
-            const query = `type:expense groupBy:category view:bar date:last-month merchant:mutationtest${Date.now()}`;
+            const query = `type:expense groupBy:category view:bar date:last-month merchant:test${Date.now()}`;
 
             const first = buildSearchQueryJSON(query);
             if (first) {
@@ -1338,7 +1338,7 @@ describe('SearchQueryUtils', () => {
             const searchParserModule: {parse: jest.Mock} = jest.requireMock('@libs/SearchParser/searchParser');
             const originalImpl = jest.requireActual<{parse: (...args: unknown[]) => unknown}>('@libs/SearchParser/searchParser').parse;
 
-            const query = `type:expense merchant:cacheerrtest${Date.now()}`;
+            const query = `type:expense merchant:cache-err-test${Date.now()}`;
             let callCount = 0;
             searchParserModule.parse.mockImplementation((...args: unknown[]) => {
                 callCount++;
