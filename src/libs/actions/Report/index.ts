@@ -4512,7 +4512,7 @@ async function completeOnboarding({
     companySize,
     userReportedIntegration,
     wasInvited,
-    selectedInterestedFeatures = [],
+    selectedInterestedFeatures,
     shouldSkipTestDriveModal,
     isInvitedAccountant,
     onboardingPurposeSelected,
