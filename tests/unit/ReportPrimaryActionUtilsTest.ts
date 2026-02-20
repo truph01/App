@@ -86,6 +86,116 @@ describe('getPrimaryAction', () => {
         ).toBe('');
     });
 
+    it('should return empty string when all transactions are pending delete', async () => {
+        const report = {
+            reportID: REPORT_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            stateNum: CONST.REPORT.STATE_NUM.OPEN,
+            statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+        } as unknown as Report;
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const policy = {
+            autoReportingFrequency: CONST.POLICY.AUTO_REPORTING_FREQUENCIES.IMMEDIATE,
+        };
+        // When all transactions are pending delete, passing an empty filtered array should return ''
+        expect(
+            getReportPrimaryAction({
+                currentUserLogin: CURRENT_USER_EMAIL,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                report,
+                chatReport,
+                reportTransactions: [],
+                violations: {},
+                bankAccountList: {},
+                policy: policy as Policy,
+                isChatReportArchived: false,
+            }),
+        ).toBe('');
+
+        // Confirm the same report would return SUBMIT if non-pending-delete transactions are present
+        const normalTransaction = {
+            reportID: `${REPORT_ID}`,
+        } as unknown as Transaction;
+        expect(
+            getReportPrimaryAction({
+                currentUserLogin: CURRENT_USER_EMAIL,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                report,
+                chatReport,
+                reportTransactions: [normalTransaction],
+                violations: {},
+                bankAccountList: {},
+                policy: policy as Policy,
+                isChatReportArchived: false,
+            }),
+        ).toBe(CONST.REPORT.PRIMARY_ACTIONS.SUBMIT);
+    });
+
+    it('should return SUBMIT when only non-pending-delete transactions remain after filtering', async () => {
+        const report = {
+            reportID: REPORT_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            stateNum: CONST.REPORT.STATE_NUM.OPEN,
+            statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+        } as unknown as Report;
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const policy = {
+            autoReportingFrequency: CONST.POLICY.AUTO_REPORTING_FREQUENCIES.IMMEDIATE,
+        };
+
+        // Simulate the filtering that MoneyReportHeader does: only non-pending-delete transactions are passed
+        const normalTransaction = {
+            reportID: `${REPORT_ID}`,
+        } as unknown as Transaction;
+
+        expect(
+            getReportPrimaryAction({
+                currentUserLogin: CURRENT_USER_EMAIL,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                report,
+                chatReport,
+                reportTransactions: [normalTransaction],
+                violations: {},
+                bankAccountList: {},
+                policy: policy as Policy,
+                isChatReportArchived: false,
+            }),
+        ).toBe(CONST.REPORT.PRIMARY_ACTIONS.SUBMIT);
+    });
+
+    it('should return empty string for approve-eligible report when all transactions are pending delete', async () => {
+        const report = {
+            reportID: REPORT_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+            statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+            managerID: CURRENT_USER_ACCOUNT_ID,
+        } as unknown as Report;
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const policy = {
+            approver: CURRENT_USER_EMAIL,
+            approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+        };
+
+        // When all transactions are pending delete (filtered to empty), approve should not be available
+        expect(
+            getReportPrimaryAction({
+                currentUserLogin: CURRENT_USER_EMAIL,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                report,
+                chatReport,
+                reportTransactions: [],
+                violations: {},
+                bankAccountList: {},
+                policy: policy as Policy,
+                isChatReportArchived: false,
+            }),
+        ).toBe('');
+    });
+
     it('should return SUBMIT for expense report with manual submit', async () => {
         const report = {
             reportID: REPORT_ID,
