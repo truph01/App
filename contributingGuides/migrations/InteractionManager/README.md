@@ -25,11 +25,11 @@ On top of TransitionTracker, existing APIs gain transition-aware callbacks:
 - Navigation methods accept `afterTransition` — a callback that runs after the triggered navigation transition completes
 - Navigation methods accept `waitForTransition` — the call waits for all ongoing transitions to finish before navigating
 - Keyboard methods accept `afterTransition` — a callback that runs after the keyboard transition completes
-- `ConfirmModal` and similar modal APIs will accept `afterTransition` callback to defer work until the modal close transition finishes (will be implemented in a separate PR)
+- `useConfirmModal` hook's `showConfirmModal` returns a Promise that resolves **after the modal close transition completes**, so any work awaited after it naturally runs post-transition — no explicit `afterTransition` callback needed
 
 This makes the code self-descriptive: instead of a generic `runAfterInteractions`, each call site says exactly what it's waiting for and why.
 
-> **Note:** `TransitionTracker.runAfterTransitions` is an internal primitive. Application code should use the higher-level APIs (`Navigation`, `ConfirmModal`, etc.) rather than importing TransitionTracker directly.
+> **Note:** `TransitionTracker.runAfterTransitions` is an internal primitive. Application code should use the higher-level APIs (`Navigation`, `useConfirmModal`, etc.) rather than importing TransitionTracker directly.
 
 ## How
 
@@ -37,7 +37,7 @@ The migration is split into 9 subcategories. Each is worked on by a single perso
 
 1. [NavigationWaitForTransition](./NavigationWaitForTransition.md) — Navigation calls that need to wait for an ongoing transition before proceeding
 2. [NavigationAfterTransition](./NavigationAfterTransition.md) — Callbacks that should run after a navigation transition completes
-3. [ModalAfterTransition](./ModalAfterTransition.md) — Work deferred until a modal close transition finishes
+3. [ModalAfterTransition](./ModalAfterTransition.md) — Work deferred until a modal close transition finishes (migrate to `useConfirmModal` hook)
 4. [ScrollOperations](./ScrollOperations.md) — Scroll-related operations that were waiting on transitions
 5. [RequestIdleCallback](./RequestIdleCallback.md) — Non-urgent background work that should use `requestIdleCallback` instead
 6. [TransitionTrackerDirect](./TransitionTrackerDirect.md) — Cases that need `TransitionTracker.runAfterTransitions` directly
