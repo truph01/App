@@ -481,7 +481,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             introSelected,
                             allTransactionDrafts,
                             activePolicy,
-                            userBillingGraceEndPeriodCollection
+                            userBillingGraceEndPeriodCollection,
                         );
                     },
                 });
