@@ -19,6 +19,6 @@ export default function (): void {
     startSpan(CONST.TELEMETRY.SPAN_APP_STARTUP, {
         name: CONST.TELEMETRY.SPAN_APP_STARTUP,
         op: CONST.TELEMETRY.SPAN_APP_STARTUP,
-        startTime: nativeAppStartTimeMs ?? undefined,
+        startTime: nativeAppStartTimeMs,
     });
 }
