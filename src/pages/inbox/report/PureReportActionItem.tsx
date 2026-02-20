@@ -1829,8 +1829,8 @@ function PureReportActionItem({
                                             shouldUseLocalization={!isPhrasalConciergeOptions}
                                             primaryTextNumberOfLines={actionableButtonsNoLines}
                                             styles={{
-                                                text: [isPhrasalConciergeOptions ? [styles.textAlignLeft, styles.breakWord] : undefined],
-                                                button: isPhrasalConciergeOptions ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
+                                                text: isPhrasalConciergeOptions ? styles.actionableItemButtonText : undefined,
+                                                button: isPhrasalConciergeOptions ? styles.actionableItemButton : undefined,
                                                 container: [
                                                     isPhrasalConciergeOptions && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
                                                     actionContainsFollowUps ? styles.mt5 : undefined,

@@ -932,11 +932,11 @@ const staticStyles = (theme: ThemeColors) =>
             paddingTop: 8,
             paddingBottom: 8,
             alignItems: 'flex-start',
-            borderRadius: variables.componentBorderRadiusMedium,
         },
 
-        actionableItemButtonBackgroundHovered: {
-            borderColor: theme.buttonPressedBG,
+        actionableItemButtonText: {
+            textAlign: 'left',
+            ...wordBreak.breakWord,
         },
 
         hoveredComponentBG: {
