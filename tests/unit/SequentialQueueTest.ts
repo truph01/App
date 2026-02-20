@@ -216,7 +216,7 @@ describe('SequentialQueue', () => {
         });
 
         await Promise.resolve();
-        await waitForBatchedUpdates();
+        await Promise.resolve();
         const persistedRequests = getAll();
 
         // We know ReconnectApp is at index 9 in the queue, so we can get it to verify
