@@ -2121,7 +2121,7 @@ describe('CardUtils', () => {
                 state: 3,
             };
             const description = getCardDescription(card, translateLocal);
-            expect(description).toBe('Visa - 2554');
+            expect(description).toBe('Visa • 2554');
         });
 
         it('should return the correct card description for Expensify card', () => {

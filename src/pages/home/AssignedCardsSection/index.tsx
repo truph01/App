@@ -80,7 +80,7 @@ function AssignedCardsSection() {
         >
             {displayableCards.map((card) => {
                 const customTitle = card.nameValuePairs?.cardTitle;
-                const description = customTitle && card.lastFourPAN ? `${customTitle} - ${card.lastFourPAN}` : (customTitle ?? getCardDescription(card, translate));
+                const description = customTitle && card.lastFourPAN ? `${customTitle} ${CONST.DOT_SEPARATOR} ${card.lastFourPAN}` : (customTitle ?? getCardDescription(card, translate));
                 const currency = getCurrencyKeyByCountryCode(currencyList, card.nameValuePairs?.country ?? card.nameValuePairs?.feedCountry);
                 const formattedAvailableSpend = convertToDisplayString(card.availableSpend, currency);
                 const title = translate('homePage.assignedCardsRemaining', {amount: formattedAvailableSpend});
