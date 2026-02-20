@@ -12,7 +12,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {filterAllInactiveCards, getAssignedCardSortKey, getCardDescription, hasDisplayableAssignedCards, isExpensifyCard} from '@libs/CardUtils';
+import {getCardDescription, getDisplayableExpensifyCards} from '@libs/CardUtils';
 import {convertToDisplayString, getCurrencyKeyByCountryCode} from '@libs/CurrencyUtils';
 import getButtonState from '@libs/getButtonState';
 import Navigation from '@libs/Navigation/Navigation';
@@ -20,43 +20,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {Card, CardList} from '@src/types/onyx';
 import RemainingLimitCircle from './RemainingLimitCircle';
-
-/**
- * Gets displayable Expensify cards, filtering out inactive cards and grouping combo cards
- * (physical + virtual pairs) so only the physical card is shown per domain.
- */
-function getDisplayableExpensifyCards(cardList: CardList | undefined): Card[] {
-    if (!hasDisplayableAssignedCards(cardList)) {
-        return [];
-    }
-
-    const activeCards = filterAllInactiveCards(cardList);
-    const activeExpensifyCards = Object.values(activeCards).filter((card) => isExpensifyCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH);
-
-    const sortedCards = [...activeExpensifyCards].sort(getAssignedCardSortKey);
-    const seenDomains = new Set<string>();
-
-    return sortedCards.filter((card) => {
-        const isAdminIssuedVirtualCard = !!card.nameValuePairs?.issuedBy && !!card.nameValuePairs?.isVirtual;
-        const isTravelCard = !!card.nameValuePairs?.isVirtual && !!card.nameValuePairs?.isTravelCard;
-        const isComboCard = !!card.domainName && !isAdminIssuedVirtualCard && !isTravelCard;
-
-        // Always show non-combo cards (admin-issued virtual, travel cards, or cards without domain)
-        if (!isComboCard) {
-            return true;
-        }
-
-        // For combo cards, only show the first one per domain (physical card comes first due to sorting)
-        if (seenDomains.has(card.domainName)) {
-            return false;
-        }
-
-        seenDomains.add(card.domainName);
-        return true;
-    });
-}
 
 function AssignedCardsSection() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
