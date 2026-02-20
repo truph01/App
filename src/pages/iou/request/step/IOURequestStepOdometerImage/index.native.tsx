@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/core';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Alert, AppState, StyleSheet, View} from 'react-native';
 import type {LayoutRectangle} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -8,7 +8,6 @@ import {RESULTS} from 'react-native-permissions';
 import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming} from 'react-native-reanimated';
 import type {Camera, PhotoFile, Point} from 'react-native-vision-camera';
 import {useCameraDevice} from 'react-native-vision-camera';
-import {scheduleOnRN} from 'react-native-worklets';
 import ActivityIndicator from '@components/ActivityIndicator';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
@@ -49,6 +48,19 @@ import type {FileObject} from '@src/types/utils/Attachment';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
+function focusCamera(cameraRef: React.RefObject<Camera | null>, point: Point) {
+    if (!cameraRef.current) {
+        return;
+    }
+
+    cameraRef.current.focus(point).catch((error: Record<string, unknown>) => {
+        if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
+            return;
+        }
+        Log.warn('Error focusing camera', error);
+    });
+}
+
 function IOURequestStepOdometerImage({
     route: {
         params: {transactionID, imageType},
@@ -74,6 +86,7 @@ function IOURequestStepOdometerImage({
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
     const hasFlash = !!device?.hasFlash;
     const [flash, setFlash] = useState(false);
+    const [focusPoint, setFocusPoint] = useState<Point | null>(null);
     const [didCapturePhoto, setDidCapturePhoto] = useState(false);
     const camera = useRef<Camera>(null);
     const viewfinderLayout = useRef<LayoutRectangle>(null);
@@ -116,21 +129,16 @@ function IOURequestStepOdometerImage({
         transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
     }));
 
-    const focusCamera = (point: Point) => {
-        if (!camera.current) {
+    useEffect(() => {
+        if (!focusPoint) {
             return;
         }
-
-        camera.current.focus(point).catch((error: Record<string, unknown>) => {
-            if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
-                return;
-            }
-            Log.warn('Error focusing camera', error);
-        });
-    };
+        focusCamera(camera, focusPoint);
+    }, [focusPoint]);
 
     const tapGesture = Gesture.Tap()
         .enabled(device?.supportsFocus ?? false)
+        .runOnJS(true)
         .onStart((ev: {x: number; y: number}) => {
             const point = {x: ev.x, y: ev.y};
 
@@ -139,7 +147,7 @@ function IOURequestStepOdometerImage({
             focusIndicatorScale.set(withSpring(1, {damping: 10, stiffness: 200}));
             focusIndicatorPosition.set(point);
 
-            scheduleOnRN(focusCamera, point);
+            setFocusPoint(point);
         });
 
     useFocusEffect(() => {
