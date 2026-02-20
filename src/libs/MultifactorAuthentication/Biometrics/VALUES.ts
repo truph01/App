@@ -275,6 +275,14 @@ const MULTIFACTOR_AUTHENTICATION_VALUES = {
     PUBLIC_KEYS_AUTHENTICATION_NEVER_REGISTERED: undefined,
 
     /**
+     * Used to determine the action for a particular transaction under LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS Onyx key
+     */
+    LOCALLY_PROCESSED_TRANSACTION_ACTION: {
+        AUTHORIZE: 'Authorize',
+        DENY: 'Deny',
+    },
+
+    /**
      * Callback response values that determine what the MultifactorAuthenticationContext should do
      * after a scenario callback is executed.
      */

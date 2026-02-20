@@ -206,7 +206,7 @@ async function authorizeTransaction({transactionID, signedChallenge, authenticat
                         key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
                         onyxMethod: Onyx.METHOD.MERGE,
                         value: {
-                            [transactionID]: 'Authorize',
+                            [transactionID]: CONST.MULTIFACTOR_AUTHENTICATION.LOCALLY_PROCESSED_TRANSACTION_ACTION.AUTHORIZE,
                         },
                     },
                 ],
@@ -242,7 +242,7 @@ async function denyTransaction({transactionID}: DenyTransactionParams) {
                         key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
                         onyxMethod: Onyx.METHOD.MERGE,
                         value: {
-                            [transactionID]: 'Deny',
+                            [transactionID]: CONST.MULTIFACTOR_AUTHENTICATION.LOCALLY_PROCESSED_TRANSACTION_ACTION.DENY,
                         },
                     },
                 ],
