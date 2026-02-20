@@ -1,10 +1,11 @@
-import {domainMemberSettingsSelector, domainNameSelector, selectSecurityGroupForAccount} from '@selectors/Domain';
+import {domainMemberSettingsSelector, domainNameSelector, selectSecurityGroupForAccount, vacationDelegateSelector} from '@selectors/Domain';
 import {personalDetailsSelector} from '@selectors/PersonalDetails';
 import React, {useState} from 'react';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
 import MenuItem from '@components/MenuItem';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -18,6 +19,7 @@ import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import BaseDomainMemberDetailsComponent from '@pages/domain/BaseDomainMemberDetailsComponent';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
+import {clearVacationDelegateError} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -48,6 +50,11 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
 
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
 
+    const [vacationDelegate] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
+        canBeMissing: true,
+        selector: vacationDelegateSelector(accountID),
+    });
+
     const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
         canBeMissing: false,
         selector: domainMemberSettingsSelector,
@@ -58,9 +65,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
         canBeMissing: true,
     });
-    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
+    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {canBeMissing: true});
 
     const memberLogin = personalDetails?.login ?? '';
 
@@ -114,6 +119,13 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 accountID={accountID}
                 avatarButton={avatarButton}
             >
+                <VacationDelegateMenuItem
+                    vacationDelegate={vacationDelegate}
+                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
+                    pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
+                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
+                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, vacationDelegate?.previousDelegate)}
+                />
                 <ToggleSettingOptionRow
                     wrapperStyle={[styles.mv3, styles.ph5]}
                     switchAccessibilityLabel={translate('domain.common.forceTwoFactorAuth')}
@@ -135,7 +147,6 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
                     onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
                 />
-
                 {!!account?.requiresTwoFactorAuth && (
                     <MenuItem
                         style={styles.mb5}

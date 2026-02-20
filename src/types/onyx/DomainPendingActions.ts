@@ -22,6 +22,16 @@ type DomainMemberPendingActions = GeneralDomainMemberPendingAction & {
 };
 
 /**
+ * Pending actions structure for domain members
+ */
+type DomainMemberPendingActions = GeneralDomainMemberPendingAction & {
+    /**
+     * Pending action related to a specific domain vacation delegate
+     */
+    vacationDelegate?: OnyxCommon.PendingAction;
+};
+
+/**
  * Pending actions triggered by user operations on the domain
  */
 type DomainPendingAction = {

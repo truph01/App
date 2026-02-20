@@ -34,8 +34,8 @@ function hasDomainMembersErrors(domainErrors?: DomainErrors): boolean {
     return Object.values(domainErrors?.memberErrors ?? {}).some((member) => !isEmptyObject(member?.errors) || hasDomainMemberDetailsErrors(member));
 }
 
-function hasDomainMemberDetailsErrors(domainMemberErrors?: DomainMemberErrors): boolean {
-    return !isEmptyObject(domainMemberErrors?.twoFactorAuthExemptEmailsError);
+function hasDomainMemberDetailsErrors(memberDetailsErrors: DomainMemberErrors): boolean {
+    return !isEmptyObject(memberDetailsErrors?.vacationDelegateErrors) || !isEmptyObject(memberDetailsErrors?.twoFactorAuthExemptEmailsError);
 }
 
 export {hasDomainErrors, hasDomainAdminsSettingsErrors, hasDomainAdminsErrors, hasDomainMembersErrors, hasDomainMemberDetailsErrors};
