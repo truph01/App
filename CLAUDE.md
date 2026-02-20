@@ -154,7 +154,6 @@ Key GitHub Actions workflows:
 - `test.yml`: Unit tests
 - `typecheck.yml`: TypeScript validation
 - `lint.yml`: Code quality checks
-- `e2ePerformanceTests.yml`: Performance testing
 
 ## Related Repositories
 
