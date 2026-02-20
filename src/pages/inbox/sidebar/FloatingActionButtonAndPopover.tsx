@@ -150,7 +150,10 @@ function FloatingActionButtonAndPopover({onHideCreateMenu, onShowCreateMenu, ref
         [activePolicyID, session?.accountID],
     );
 
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: true});
+    const [policyChatsForActivePolicy] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
+        canBeMissing: true,
+        selector: workspaceChatsSelector,
+    });
 
     const policyChatForActivePolicy = useMemo(() => {
         if (isEmptyObject(activePolicy) || !activePolicy?.isPolicyExpenseChatEnabled) {
