@@ -158,6 +158,8 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
 
+            // buildTypes take precedence over productFlavors when it comes to the signing configuration,
+            // so we need to manually set the signing config per flavor in release mode.
             signingConfig null
             productFlavors.all { flavor ->
                 flavor.signingConfig signingConfigs.release
@@ -165,6 +167,7 @@ android {
         }
     }
 
+    // Filter out unnecessary build variants
     variantFilter { variant ->
         if (variant.name == "adhocDebug") {
             setIgnore(true)
