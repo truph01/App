@@ -113,7 +113,7 @@ function ContactMethodDetailsPage({route}: ContactMethodDetailsPageProps) {
 
         /// Restrict the user from switching their default contact method if their security group
         // restricts primary login switching.
-        return Boolean(securityGroups?.[`${ONYXKEYS.COLLECTION.SECURITY_GROUP}${primaryDomainSecurityGroupID}`]?.enableRestrictedPrimaryLogin);
+        return !!securityGroups?.[`${ONYXKEYS.COLLECTION.SECURITY_GROUP}${primaryDomainSecurityGroupID}`]?.enableRestrictedPrimaryLogin;
     }, [session?.email, myDomainSecurityGroups, securityGroups]);
 
     /**
