@@ -46,7 +46,6 @@ import type {
     TeachersUniteNavigatorParamList,
     TransactionDuplicateNavigatorParamList,
     TravelNavigatorParamList,
-    TravelMissingPersonalDetailsParamList,
     WalletStatementNavigatorParamList,
     WorkspaceConfirmationNavigatorParamList,
     WorkspaceDuplicateNavigatorParamList,
@@ -796,12 +795,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_SETTINGS_FREQUENCY]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceSettlementFrequencyPage').default,
     [SCREENS.WORKSPACE.TRAVEL_SETTINGS_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/workspace/travel/WorkspaceTravelInvoicingSettlementAccountPage').default,
     [SCREENS.WORKSPACE.TRAVEL_SETTINGS_FREQUENCY]: () => require<ReactComponentModule>('../../../../pages/workspace/travel/WorkspaceTravelInvoicingSettlementFrequencyPage').default,
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_ROOT]: () =>
-        createModalStackNavigator<TravelMissingPersonalDetailsParamList>({
-            [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS]: () => require<ReactComponentModule>('../../../../pages/Travel/TravelMissingPersonalDetailsPage').default,
-            [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE]: () =>
-                require<ReactComponentModule>('../../../../pages/Travel/TravelMissingPersonalDetailsConfirmMagicCodePage').default,
-        }),
+    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS]: () => require<ReactComponentModule>('../../../../pages/Travel/TravelLegalNamePage').default,
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_SELECT_FEED]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceExpensifyCardSelectorPage').default,
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_BANK_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceExpensifyCardBankAccounts').default,
     [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS]: () => require<ReactComponentModule>('../../../../pages/workspace/expensifyCard/WorkspaceExpensifyCardDetailsPage').default,

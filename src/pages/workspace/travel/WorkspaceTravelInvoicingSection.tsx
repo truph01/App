@@ -36,6 +36,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import CentralInvoicingLearnHow from './CentralInvoicingLearnHow';
 import CentralInvoicingSubtitleWrapper from './CentralInvoicingSubtitleWrapper';
+import usePermissions from '@hooks/usePermissions';
+import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 
 type WorkspaceTravelInvoicingSectionProps = {
     /** The ID of the policy */
@@ -49,6 +51,7 @@ type WorkspaceTravelInvoicingSectionProps = {
 function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSectionProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const {isBetaEnabled} = usePermissions();
     const workspaceAccountID = useWorkspaceAccountID(policyID);
 
     // Modal states
@@ -61,6 +64,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {canBeMissing: true});
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
 
     // Use pure selectors to derive state
     const hasSettlementAccount = hasTravelInvoicingSettlementAccount(cardSettings);
@@ -124,6 +128,11 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             }
             // Show confirmation modal before disabling
             setIsDisableConfirmModalVisible(true);
+            return;
+        }
+
+        if (isBetaEnabled(CONST.BETAS.TRAVEL_INVOICING) && areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS.getRoute(policyID));
             return;
         }
 

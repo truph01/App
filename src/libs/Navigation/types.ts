@@ -1277,7 +1277,9 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.TRAVEL_SETTINGS_FREQUENCY]: {
         policyID: string;
     };
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_ROOT]: NavigatorScreenParams<TravelMissingPersonalDetailsParamList>;
+    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS]: {
+        policyID: string;
+    };
     [SCREENS.WORKSPACE.COMPANY_CARDS_SETTINGS]: {
         policyID: string;
     };
@@ -3012,15 +3014,6 @@ type MissingPersonalDetailsParamList = {
     [SCREENS.MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE]: undefined;
 };
 
-type TravelMissingPersonalDetailsParamList = {
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS]: {
-        policyID: string;
-    };
-    [SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE]: {
-        policyID: string;
-    };
-};
-
 type SplitExpenseParamList = {
     [SCREENS.MONEY_REQUEST.SPLIT_EXPENSE]: {
         reportID: string;
@@ -3171,7 +3164,6 @@ export type {
     FlagCommentNavigatorParamList,
     FullScreenName,
     MissingPersonalDetailsParamList,
-    TravelMissingPersonalDetailsParamList,
     MoneyRequestNavigatorParamList,
     NavigationPartialRoute,
     NavigationRef,

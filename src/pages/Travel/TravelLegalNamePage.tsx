@@ -14,21 +14,23 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDraftValues} from '@libs/actions/FormActions';
 import Navigation from '@libs/Navigation/Navigation';
-import type {TravelMissingPersonalDetailsParamList} from '@libs/Navigation/types';
-import {resetValidateActionCodeSent} from '@libs/actions/User';
 import {getFieldRequiredErrors, isRequiredFulfilled, isValidLegalName} from '@libs/ValidationUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/PersonalDetailsForm';
+import {updateLegalName} from '@libs/actions/PersonalDetails';
+import {formatPhoneNumber} from '@libs/LocalePhoneNumber';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 
 const STEP_FIELDS = [INPUT_IDS.LEGAL_FIRST_NAME, INPUT_IDS.LEGAL_LAST_NAME];
 
 function TravelLegalNamePage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const route = useRoute<RouteProp<TravelMissingPersonalDetailsParamList, typeof SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS>>();
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const route = useRoute<RouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.TRAVEL_MISSING_PERSONAL_DETAILS>>();
     const policyID = route.params.policyID;
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {canBeMissing: true});
     const [draftValues] = useOnyx(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM_DRAFT, {canBeMissing: true});
@@ -59,9 +61,8 @@ function TravelLegalNamePage() {
         return errors;
     };
 
-    const handleSubmit = () => {
-        resetValidateActionCodeSent();
-        Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS_CONFIRM_MAGIC_CODE.getRoute(policyID));
+    const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>) => {
+        updateLegalName(values.legalFirstName?.trim() ?? '', values.legalLastName?.trim() ?? '', formatPhoneNumber, currentUserPersonalDetails);
     };
 
     const handleBackButtonPress = () => {
