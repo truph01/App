@@ -27,6 +27,10 @@ on:
         description: Whether to upload sourcemap artifacts
         type: boolean
         default: true
+      force-native-build:
+        description: Force a full native build, bypassing Rock remote cache
+        type: string
+        default: 'false'
 
     outputs:
       IOS_VERSION:
@@ -211,6 +215,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           IS_HYBRID_APP: true
+          FORCE_NATIVE_BUILD: ${{ inputs.force-native-build == 'true' && github.run_id || '' }}
         with:
           destination: device
           re-sign: true

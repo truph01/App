@@ -802,6 +802,8 @@ const CONST = {
         PR: 'PR',
         GU: 'GU',
         VI: 'VI',
+        AS: 'AS',
+        MP: 'MP',
     },
     SWIPE_DIRECTION: {
         DOWN: 'down',
@@ -1835,6 +1837,28 @@ const CONST = {
             PUSHER_INIT: 'NavigationPusherInit',
             APP_OPEN: 'NavigationAppOpen',
         },
+        // Network span names
+        SPAN_SEQUENTIAL_QUEUE_FLUSH: 'ManualSequentialQueueFlush',
+        SPAN_SEQUENTIAL_QUEUE_PROCESS: 'ManualSequentialQueueProcess',
+        SPAN_PROCESS_WITH_MIDDLEWARE: 'ManualProcessWithMiddleware',
+        SPAN_PROCESS_MIDDLEWARES: 'ManualProcessMiddlewares',
+        SPAN_HTTP_XHR: 'ManualHttpXhr',
+        SPAN_APPLY_ONYX_UPDATES: 'ManualApplyOnyxUpdates',
+        SPAN_FLUSH_ONYX_UPDATES_QUEUE: 'ManualFlushOnyxUpdatesQueue',
+        SPAN_REQUEST_THROTTLE_SLEEP: 'ManualRequestThrottleSleep',
+        SPAN_APPLY_OPTIMISTIC_DATA: 'ManualApplyOptimisticData',
+        SPAN_HANDLE_MISSING_ONYX_UPDATES: 'ManualHandleMissingOnyxUpdates',
+        // Middleware names
+        MIDDLEWARE_LOGGING: 'Logging',
+        MIDDLEWARE_RECHECK_CONNECTION: 'RecheckConnection',
+        MIDDLEWARE_REAUTHENTICATION: 'Reauthentication',
+        MIDDLEWARE_HANDLE_DELETED_ACCOUNT: 'HandleDeletedAccount',
+        MIDDLEWARE_SUPPORTAL_PERMISSION: 'SupportalPermission',
+        MIDDLEWARE_HANDLE_UNUSED_OPTIMISTIC_ID: 'HandleUnusedOptimisticID',
+        MIDDLEWARE_PAGINATION: 'Pagination',
+        MIDDLEWARE_SENTRY_SERVER_TIMING: 'SentryServerTiming',
+        MIDDLEWARE_SAVE_RESPONSE_IN_ONYX: 'SaveResponseInOnyx',
+        MIDDLEWARE_FRAUD_MONITORING: 'FraudMonitoring',
         // Attribute names
         ATTRIBUTE_IOU_TYPE: 'iou_type',
         ATTRIBUTE_IS_ONE_TRANSACTION_REPORT: 'is_one_transaction_report',
@@ -1854,7 +1878,12 @@ const CONST = {
         ATTRIBUTE_HAS_RECEIPT: 'has_receipt',
         ATTRIBUTE_IS_FROM_GLOBAL_CREATE: 'is_from_global_create',
         ATTRIBUTE_COMMAND: 'command',
+        ATTRIBUTE_QUEUE_LENGTH: 'queue_length',
+        ATTRIBUTE_IS_FROM_SEQUENTIAL_QUEUE: 'is_from_sequential_queue',
+        ATTRIBUTE_RETRY_COUNT: 'retry_count',
+        ATTRIBUTE_THROTTLE_WAIT_MS: 'throttle_wait_ms',
         ATTRIBUTE_JSON_CODE: 'json_code',
+        ATTRIBUTE_ONYX_UPDATES_COUNT: 'onyx_updates_count',
         SUBMIT_EXPENSE_SCENARIO: {
             REQUEST_MONEY_MANUAL: 'request_money_manual',
             REQUEST_MONEY_SCAN: 'request_money_scan',
@@ -8790,9 +8819,6 @@ const CONST = {
         INTERACTIVE_STEP_SUB_HEADER: {
             STEP_BUTTON: 'InteractiveStepSubHeader-StepButton',
         },
-        WALLET: {
-            ADD_BANK_ACCOUNT: 'Wallet-AddBankAccount',
-        },
         SOCIALS: {
             LINK: 'Socials',
         },
@@ -8808,6 +8834,82 @@ const CONST = {
             SEND: 'SignIn-Send',
             CONFIRM: 'SignIn-Confirm',
         },
+        SETTINGS_GENERAL: {
+            HELP: 'SettingsGeneral-Help',
+            WHATS_NEW: 'SettingsGeneral-WhatsNew',
+            ABOUT: 'SettingsGeneral-About',
+            TROUBLESHOOT: 'SettingsGeneral-Troubleshoot',
+            SAVE_THE_WORLD: 'SettingsGeneral-SaveTheWorld',
+            SIGN_OUT: 'SettingsGeneral-SignOut',
+            GO_TO_CLASSIC: 'SettingsGeneral-GoToExpensifyClassic',
+        },
+        SETTINGS_PROFILE: {
+            AVATAR: 'SettingsProfile-Avatar',
+            DISPLAY_NAME: 'SettingsProfile-DisplayName',
+            CONTACT_METHODS: 'SettingsProfile-ContactMethods',
+            STATUS: 'SettingsProfile-Status',
+            PRONOUNS: 'SettingsProfile-Pronouns',
+            TIMEZONE: 'SettingsProfile-Timezone',
+            SHARE_CODE: 'SettingsProfile-ShareCode',
+            LEGAL_NAME: 'SettingsProfile-LegalName',
+            DATE_OF_BIRTH: 'SettingsProfile-DateOfBirth',
+            PHONE_NUMBER: 'SettingsProfile-PhoneNumber',
+            ADDRESS: 'SettingsProfile-Address',
+        },
+        SETTINGS_PREFERENCES: {
+            PRIORITY_MODE: 'SettingsPreferences-PriorityMode',
+            LANGUAGE: 'SettingsPreferences-Language',
+            PAYMENT_CURRENCY: 'SettingsPreferences-PaymentCurrency',
+            THEME: 'SettingsPreferences-Theme',
+        },
+        SETTINGS_SECURITY: {
+            TWO_FACTOR_AUTH: 'SettingsSecurity-TwoFactorAuth',
+            REVOKE_MFA: 'SettingsSecurity-RevokeMFA',
+            MERGE_ACCOUNTS: 'SettingsSecurity-MergeAccounts',
+            LOCK_UNLOCK_ACCOUNT: 'SettingsSecurity-LockUnlockAccount',
+            CLOSE_ACCOUNT: 'SettingsSecurity-CloseAccount',
+            ADD_COPILOT: 'SettingsSecurity-AddCopilot',
+            DELEGATE_ITEM: 'SettingsSecurity-DelegateItem',
+            DELEGATE_CHANGE_ACCESS: 'SettingsSecurity-DelegateChangeAccess',
+            DELEGATE_REMOVE: 'SettingsSecurity-DelegateRemove',
+        },
+        SETTINGS_WALLET: {
+            ADD_BANK_ACCOUNT: 'SettingsWallet-AddBankAccount',
+            IMPORT_TRANSACTIONS: 'SettingsWallet-ImportTransactions',
+            TRANSFER_BALANCE: 'SettingsWallet-TransferBalance',
+            ENABLE_WALLET: 'SettingsWallet-EnableWallet',
+        },
+        SETTINGS_RULES: {
+            NEW_RULE: 'SettingsRules-NewRule',
+        },
+        SETTINGS_TEACHERS_UNITE: {
+            I_KNOW_A_TEACHER: 'SettingsTeachersUnite-IKnowATeacher',
+            I_AM_A_TEACHER: 'SettingsTeachersUnite-IAmATeacher',
+        },
+        SETTINGS_SUBSCRIPTION: {
+            EXPLORE_PLANS: 'SettingsSubscription-ExplorePlans',
+            SAVE_WITH_EXPENSIFY: 'SettingsSubscription-SaveWithExpensify',
+            RETRY_PAYMENT: 'SettingsSubscription-RetryPayment',
+            AUTHENTICATE_PAYMENT: 'SettingsSubscription-AuthenticatePayment',
+            VIEW_PAYMENT_HISTORY: 'SettingsSubscription-ViewPaymentHistory',
+            REQUEST_REFUND: 'SettingsSubscription-RequestRefund',
+            REQUEST_EARLY_CANCELLATION: 'SettingsSubscription-RequestEarlyCancellation',
+        },
+        SETTINGS_ABOUT: {
+            APP_DOWNLOAD_LINKS: 'SettingsAbout-AppDownloadLinks',
+            VIEW_KEYBOARD_SHORTCUTS: 'SettingsAbout-ViewKeyboardShortcuts',
+            VIEW_THE_CODE: 'SettingsAbout-ViewTheCode',
+            VIEW_OPEN_JOBS: 'SettingsAbout-ViewOpenJobs',
+            REPORT_A_BUG: 'SettingsAbout-ReportABug',
+        },
+        SETTINGS_TROUBLESHOOT: {
+            CLEAR_CACHE: 'SettingsTroubleshoot-ClearCache',
+            EXPORT_ONYX: 'SettingsTroubleshoot-ExportOnyx',
+            GO_TO_CLASSIC: 'SettingsTroubleshoot-GoToExpensifyClassic',
+        },
+        SETTINGS_EXIT_SURVEY: {
+            GO_TO_CLASSIC: 'SettingsExitSurvey-GoToExpensifyClassic',
+        },
     },
 
     DOMAIN: {
@@ -8815,6 +8917,8 @@ const CONST = {
         EXPENSIFY_ADMIN_ACCESS_PREFIX: 'expensify_adminPermissions_',
         /** Onyx prefix for domain security groups */
         DOMAIN_SECURITY_GROUP_PREFIX: 'domain_securityGroup_',
+        /** Onyx prefix for vacation delegate */
+        PRIVATE_VACATION_DELEGATE_PREFIX: 'private_vacationDelegate_',
 
         MEMBERS: {
             SECONDARY_ACTIONS: {

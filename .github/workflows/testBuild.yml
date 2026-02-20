@@ -30,6 +30,10 @@ on:
         description: Should build android app?
         type: boolean
         default: true
+      FORCE_NATIVE_BUILD:
+        description: Force a full native build, bypassing Rock remote cache
+        type: boolean
+        default: false
 
 jobs:
   prep:
@@ -192,6 +196,7 @@ jobs:
       variant: Adhoc
       mobile-expensify-ref: ${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}
       pull-request-number: ${{ needs.prep.outputs.APP_PR_NUMBER }}
+      force-native-build: ${{ inputs.FORCE_NATIVE_BUILD && 'true' || 'false' }}
     secrets: inherit
 
   buildIOS:
@@ -204,6 +209,7 @@ jobs:
       variant: Adhoc
       mobile-expensify-ref: ${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}
       pull-request-number: ${{ needs.prep.outputs.APP_PR_NUMBER }}
+      force-native-build: ${{ inputs.FORCE_NATIVE_BUILD && 'true' || 'false' }}
     secrets: inherit
 
   buildWeb:
