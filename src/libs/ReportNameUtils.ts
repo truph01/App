@@ -837,20 +837,20 @@ function computeReportName(
  *
  * @param report
  * @param reportAttributesDerivedValue
+ * @param reports
+ * @param parentReportActionParam
  */
 function getReportName(
     report?: Report,
     reportAttributesDerivedValue?: ReportAttributesDerivedValue['reports'],
     reports?: OnyxCollection<Report>,
-    reportActions?: OnyxCollection<ReportActions>,
     parentReportActionParam?: OnyxEntry<ReportAction> | null,
 ): string {
     if (!report || !report.reportID) {
         return '';
     }
 
-    const parentReportAction =
-        parentReportActionParam ?? (isThread(report) ? reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`]?.[report.parentReportActionID] : undefined);
+    const parentReportAction = parentReportActionParam;
     if (isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.CREATED_REPORT_FOR_UNAPPROVED_TRANSACTIONS)) {
         const {originalID} = getOriginalMessage(parentReportAction) ?? {};
         const originalReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalID}`];
