@@ -1,5 +1,5 @@
 import type {OnyxCollection, OnyxEntry, ResultMetadata} from 'react-native-onyx';
-import {filterAmexDirectParentCard, getCompanyCardFeed, getCompanyFeeds, getSelectedFeed, normalizeCardName} from '@libs/CardUtils';
+import {filterAmexDirectParentCard, getAmexDirectParentCardNames, getCompanyCardFeed, getCompanyFeeds, getSelectedFeed, normalizeCardName} from '@libs/CardUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {CardFeeds, CardList} from '@src/types/onyx';
@@ -60,10 +60,12 @@ function buildCompanyCardEntries(
     const entries: CompanyCardEntry[] = [];
     const coveredNames = new Set<string>();
     const coveredEncrypted = new Set<string>();
+    const parentCardNames = getAmexDirectParentCardNames(accountList ?? [], feedName);
 
     // Phase 1: Assigned cards first — these are the source of truth.
+    // Skip Amex Direct parent cards even if they were previously assigned.
     for (const card of Object.values(assignedCards)) {
-        if (!card?.cardName) {
+        if (!card?.cardName || parentCardNames.has(card.cardName)) {
             continue;
         }
         const encryptedCardNumber = card.encryptedCardNumber ?? card.cardName;

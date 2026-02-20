@@ -787,11 +787,13 @@ function isSelectedFeedExpired(cardFeed: CombinedCardFeed | undefined): boolean 
  * Parent cards follow the format "CardType - Digits" (2 segments separated by " - "),
  * while child cards include a cardholder name: "CardType - NAME - Digits" (3 segments).
  * A parent card is removed only when at least one child card with the same card type exists.
+ *
+ * Returns the set of parent card names that should be filtered out.
  */
-function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCardFeedWithDomainID): string[] {
+function getAmexDirectParentCardNames(accountList: string[], feedName?: CompanyCardFeedWithDomainID): Set<string> {
     const isAmexDirectFeed = feedName ? getCompanyCardFeed(feedName).startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT) : false;
     if (!isAmexDirectFeed) {
-        return accountList;
+        return new Set();
     }
 
     // Collect card type prefixes that have at least one child card (3+ segments)
@@ -804,15 +806,27 @@ function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCar
         }
     }
 
-    // Remove parent cards (2 segments) whose card type has children
-    return accountList.filter((name) => {
+    // Identify parent cards (2 segments) whose card type has children
+    const parentCards = new Set<string>();
+    for (const name of accountList) {
         const segments = name.split(' - ');
         const cardType = segments.at(0);
         if (segments.length === 2 && cardType && cardTypesWithChildren.has(cardType)) {
-            return false;
+            parentCards.add(name);
         }
-        return true;
-    });
+    }
+    return parentCards;
+}
+
+/**
+ * Filters out Amex Direct parent cards from the account list.
+ */
+function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCardFeedWithDomainID): string[] {
+    const parentCards = getAmexDirectParentCardNames(accountList, feedName);
+    if (parentCards.size === 0) {
+        return accountList;
+    }
+    return accountList.filter((name) => !parentCards.has(name));
 }
 
 /**
@@ -1231,6 +1245,7 @@ export {
     isCardClosed,
     isPlaidSupportedCountry,
     filterAmexDirectParentCard,
+    getAmexDirectParentCardNames,
     getFilteredCardList,
     hasOnlyOneCardToAssign,
     checkIfNewFeedConnected,
