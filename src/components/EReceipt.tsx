@@ -1,4 +1,3 @@
-import {filterOutPersonalCards} from '@selectors/Card';
 import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import type {SvgProps} from 'react-native-svg';
@@ -6,6 +5,7 @@ import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useEReceipt from '@hooks/useEReceipt';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useNonPersonalCardList from '@hooks/useNonPersonalCardList';
 import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
@@ -74,7 +74,7 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false, 
     const {getCurrencySymbol} = useCurrencyListActions();
     const theme = useTheme();
     const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: filterOutPersonalCards, canBeMissing: true});
+    const cardList = useNonPersonalCardList();
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`, {canBeMissing: true});
 
     const {

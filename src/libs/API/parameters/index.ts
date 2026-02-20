@@ -383,6 +383,7 @@ export type {default as ExportTagsSpreadsheetParams} from './ExportTagsSpreadshe
 export type {default as UpdateXeroGenericTypeParams} from './UpdateXeroGenericTypeParams';
 export type {default as UpdateCardSettlementFrequencyParams} from './UpdateCardSettlementFrequencyParams';
 export type {default as UpdateCardSettlementAccountParams} from './UpdateCardSettlementAccountParams';
+export type {default as ToggleTravelInvoicingParams} from './ToggleTravelInvoicingParams';
 export type {default as SetTravelInvoicingSettlementAccountParams} from './SetTravelInvoicingSettlementAccountParams';
 export type {default as SetCompanyCardFeedName} from './SetCompanyCardFeedName';
 export type {default as DeleteCompanyCardFeed} from './DeleteCompanyCardFeed';
@@ -484,5 +485,6 @@ export type {default as RequestAuthenticationChallengeParams} from './RequestAut
 export type {default as GetTransactionsMatchingCodingRuleParams} from './GetTransactionsMatchingCodingRuleParams';
 export type {default as SetPolicyTimeTrackingDefaultRateParams} from './SetPolicyTimeTrackingDefaultRateParams';
 export type {default as ToggleTwoFactorAuthRequiredForDomainParams} from './ToggleTwoFactorAuthRequiredForDomainParams';
+export type {default as DeleteVacationDelegateParams} from './DeleteVacationDelegateParams';
 export type {default as AuthorizeTransactionParams} from './AuthorizeTransactionParams';
 export type {default as DenyTransactionParams} from './DenyTransactionParams';
