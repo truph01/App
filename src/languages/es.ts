@@ -816,6 +816,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 cta: 'Revisar',
             },
         },
+        assignedCards: 'Tarjetas asignadas',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} restantes`,
         announcements: 'Anuncios',
         discoverSection: {
             title: 'Descubrir',

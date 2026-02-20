@@ -942,6 +942,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会计`,
             },
         },
+        assignedCards: '已分配的卡片',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `剩余 ${amount}`,
         announcements: '公告',
         discoverSection: {
             title: '发现',

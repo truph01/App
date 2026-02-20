@@ -955,6 +955,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'ウォレット > 割り当てられたカード',
             },
         },
+        assignedCards: '割り当て済みカード',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `残額：${amount}`,
         announcements: 'お知らせ',
         discoverSection: {
             title: '発見',
