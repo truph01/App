@@ -12,9 +12,10 @@ import CONST from '@src/CONST';
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {denyTransaction} from '@libs/actions/MultifactorAuthentication';
+import {denyTransaction, fireAndForgetDenyTransaction} from '@libs/actions/MultifactorAuthentication';
 import {AlreadyReviewedFailureScreen, DeniedTransactionSuccessScreen} from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
 import {AuthorizeTransactionCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
+import Navigation from '@libs/Navigation/Navigation';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -50,11 +51,12 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     };
 
     const onDenyTransaction = () => {
-        if (isConfirmModalVisible || !transactionID) {
-            hideConfirmModal();
-        }
-
         denyTransaction({transactionID}).then(() => setTransactionDenied(true));
+    };
+
+    const onSilentlyDenyTransaction = () => {
+        fireAndForgetDenyTransaction({transactionID});
+        Navigation.closeRHPFlow();
     };
 
     if (transactionDenied) {
@@ -90,7 +92,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                     />
                     <AuthorizeTransactionCancelConfirmModal
                         isVisible={isConfirmModalVisible}
-                        onConfirm={onDenyTransaction}
+                        onConfirm={onSilentlyDenyTransaction}
                         onCancel={hideConfirmModal}
                     />
                 </View>

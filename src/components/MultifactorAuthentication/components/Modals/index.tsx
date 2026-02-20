@@ -8,7 +8,7 @@ const DefaultCancelConfirmModal = createCancelConfirmModal('DefaultCancelConfirm
 });
 
 const AuthorizeTransactionCancelConfirmModal = createCancelConfirmModal('AuthorizeTransactionCancelConfirmModal', {
-    title: 'common.areYouSure',
+    title: 'multifactorAuthentication.reviewTransaction.denyTransaction',
     description: 'multifactorAuthentication.reviewTransaction.areYouSureToDeny',
     confirmButtonText: 'multifactorAuthentication.reviewTransaction.denyTransaction',
     cancelButtonText: 'common.cancel',
