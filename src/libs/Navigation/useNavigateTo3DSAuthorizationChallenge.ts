@@ -7,6 +7,7 @@ import {useEffect, useMemo} from 'react';
 import ROUTES from '@src/ROUTES';
 import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+import Log from '@libs/Log';
 import Navigation from './Navigation';
 
 // We want predictable, stable ordering for transaction challenges to ensurewe don't
@@ -31,6 +32,7 @@ function sortTransactionsPending3DSReview(transactions: TransactionPending3DSRev
         .at(0);
 }
 
+/** Listens to changes to ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS and navigates to ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION if necessary */
 function useNavigateTo3DSAuthorizationChallenge() {
     const [locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult] = useOnyx(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS, {canBeMissing: true});
     const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
@@ -66,6 +68,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
 
         // Do not navigate the user to the 3DS challenge if we can tell that they won't be able to complete it on this device
         if (!doesDeviceSupportAnAllowedAuthenticationMethod) {
+            Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - device does not support an allowed authentication method');
             return;
         }
 
@@ -85,7 +88,13 @@ function useNavigateTo3DSAuthorizationChallenge() {
             const challengeStillValid = await isTransactionStillPending3DSReview(transactionPending3DSReview.transactionID);
 
             // If we know that a challenge isn't valid anymore, better to bail out of navigating to the flow rather than showing the user the "already reviewed" outcome screen
-            if (!challengeStillValid || cancel) {
+            if (!challengeStillValid) {
+                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - challenge is no longer valid');
+                return;
+            }
+
+            if (cancel) {
+                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - effect was cleaned up while GetTransactionsPending3DSReview was in-flight');
                 return;
             }
 
