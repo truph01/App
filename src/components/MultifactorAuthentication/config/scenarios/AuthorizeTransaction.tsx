@@ -82,6 +82,11 @@ const DeniedTransactionSuccessScreen = createScreenWithDefaults(
     'DeniedTransactionSuccessScreen',
 );
 
+// Used for:
+// 1. Approve requested, but transaction already denied
+// 2. Deny requested, but transaction already approved
+// 3. Approve/deny requested, but transaction already reviewed with unknown outcome
+// 4. Onyx data removed for current transaction while on review screen
 const AlreadyReviewedFailureScreen = createScreenWithDefaults(
     DefaultServerFailureScreen,
     {
@@ -101,6 +106,7 @@ export {
 };
 
 export default {
+    // Make sure to update the switch-case in useNavigateTo3DSAuthorizationChallenge when we add Passkey support
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
     action: authorizeTransaction,
 

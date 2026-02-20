@@ -52,15 +52,13 @@ function useNavigateTo3DSAuthorizationChallenge() {
             return;
         }
 
-        // note: importing AuthorizeTransaction in this file causes the browser to get stuck in an infinite reload loop
-        // TODO figure out why (hard-coded to BIOMETRICS for now)
-        // const allowedAuthenticationMethods = AuthorizeTransaction.allowedAuthenticationMethods;
+        // Note: Importing AuthorizeTransaction in this file causes the browser to get stuck in an infinite reload loop
+        // Issue to fix this: https://github.com/Expensify/App/issues/83021
         const allowedAuthenticationMethods = [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS];
         const doesDeviceSupportAnAllowedAuthenticationMethod = allowedAuthenticationMethods.some((method) => {
             switch (method) {
                 case CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS:
                     return doesDeviceSupportBiometrics();
-                // TODO expand when we support passkeys
                 default:
                     return false;
             }
