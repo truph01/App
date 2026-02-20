@@ -902,8 +902,8 @@ function getUpdatedTransaction({
         updatedTransaction.amount = updatedAmount;
         updatedTransaction.modifiedAmount = updatedAmount;
         updatedTransaction.modifiedMerchant = transactionChanges.merchant;
-        lodashSet(updatedTransaction, 'comment.customUnit.quantity', transactionChanges.quantity);
-        lodashSet(updatedTransaction, 'comment.customUnit.customUnitRateID', transactionChanges.customUnitRateID ?? transaction?.comment?.customUnit?.customUnitRateID);
+        lodashSet(updatedTransaction, 'comment.customUnit.quantity', transactionChanges.quantity ?? updatedTransaction?.comment?.customUnit?.quantity);
+        lodashSet(updatedTransaction, 'comment.customUnit.customUnitRateID', transactionChanges.customUnitRateID ?? updatedTransaction?.comment?.customUnit?.customUnitRateID);
     }
 
     updatedTransaction.pendingFields = {
