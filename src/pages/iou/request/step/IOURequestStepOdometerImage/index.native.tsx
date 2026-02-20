@@ -389,6 +389,8 @@ function IOURequestStepOdometerImage({
                             height={CONST.RECEIPT.SHUTTER_SIZE}
                         />
                     </PressableWithFeedback>
+                    {/* Spacer matching gallery size so justifyContentAround keeps the shutter exactly centered - it's the simples sollution */}
+                    <View style={{width: variables.iconSizeMenuItem, height: variables.iconSizeMenuItem}} />
                 </View>
                 {ErrorModal}
             </View>
