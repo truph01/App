@@ -1,4 +1,5 @@
 import {AppStartTimeNitroModule} from '@expensify/nitro-utils';
+import Log from '@libs/Log';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
 import setupSentry from './setupSentry';
@@ -8,8 +9,10 @@ export default function (): void {
 
     let nativeAppStartTimeMs: number | undefined;
     try {
-        nativeAppStartTimeMs = AppStartTimeNitroModule.appStartTime;
+        const appStartTime = AppStartTimeNitroModule.appStartTime;
+        nativeAppStartTimeMs = appStartTime > 0 ? appStartTime : undefined;
     } catch (error) {
+        Log.warn('[Telemetry] Failed to read native app start time from NitroModule', {error});
         nativeAppStartTimeMs = undefined;
     }
 
