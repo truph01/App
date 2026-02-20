@@ -176,19 +176,19 @@ function SearchAutocompleteInput({
         });
     }, [exportedToSharedValue, exportedToFilterOptions]);
 
+    useEffect(() => {
+        scheduleOnLiveMarkdownRuntime(() => {
+            'worklet';
+
+            exportedToSharedValue.set(exportedToFilterOptions);
+        });
+    }, [exportedToSharedValue, exportedToFilterOptions]);
+
+    const currentUserDisplayName = currentUserPersonalDetails.displayName ?? '';
     const parser = (input: string) => {
         'worklet';
 
-        return parseForLiveMarkdown(
-            input,
-            currentUserPersonalDetails.displayName ?? '',
-            substitutionMap,
-            emailListSharedValue,
-            currencySharedValue,
-            categorySharedValue,
-            tagSharedValue,
-            exportedToSharedValue,
-        );
+        return parseForLiveMarkdown(input, currentUserDisplayName, substitutionMap, emailListSharedValue, currencySharedValue, categorySharedValue, tagSharedValue, exportedToSharedValue);
     };
 
     const clearInput = () => {
