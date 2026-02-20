@@ -916,7 +916,11 @@ function getSuggestedSearchesVisibility(
         shouldShowTopCategoriesSuggestion ||= isEligibleForTopCategoriesSuggestion;
         shouldShowTopMerchantsSuggestion ||= isEligibleForTopMerchantsSuggestion;
         hasGroupPoliciesWithExpenseChat ||=
-            isPaidPolicy && !!policy.isPolicyExpenseChatEnabled && !policy.isJoinRequestPending && policy.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && !!policy.role;
+            isPaidPolicy &&
+            !!policy.isPolicyExpenseChatEnabled &&
+            !policy.isJoinRequestPending &&
+            (policy.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || Object.keys(policy.errors ?? {}).length > 0) &&
+            !!policy.role;
         shouldShowSpendOverTimeSuggestion ||= isEligibleForSpendOverTimeSuggestion;
 
         // We don't need to check the rest of the policies if we already determined that all suggestions should be displayed
