@@ -28,15 +28,16 @@ type OutcomeScreenBaseProps = {
 
 function HTMLSubtitle({htmlString = '', style}: {htmlString?: string; style?: ViewStyle}) {
     const styles = useThemeStyles();
+    
+    // RenderHTML expands vertically beyond its content height. We render
+    // invisible Text to establish natural height, then overlay RenderHTML
+    // absolutely positioned to support HTML features (links, formatting).
     return (
-        <View>
-            {/* We create an invisible Text component to ensure proper layout */}
-            <View style={[styles.opacity0, style]}>
-                <Text style={[styles.textAlignCenter]}>{Parser.htmlToText(htmlString)}</Text>
-            </View>
-
-            {/* But the actual text is rendered using RenderHTML */}
-            <View style={[styles.pAbsolute, style]}>
+        <View style={style}>
+            <Text style={[styles.textAlignCenter, styles.opacity0]}>
+                {Parser.htmlToText(htmlString)}
+            </Text>
+            <View style={styles.pAbsolute}>
                 <RenderHTML html={`<centered-text><muted-text>${htmlString}</muted-text></centered-text>`} />
             </View>
         </View>
