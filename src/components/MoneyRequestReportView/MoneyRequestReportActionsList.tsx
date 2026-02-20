@@ -338,18 +338,13 @@ function MoneyRequestReportActionsList({
             return;
         }
 
-        // Do not try to mark the report as read if the report has not been loaded and shared with the user
-        if (!reportMetadata?.hasOnceLoadedReportActions) {
-            return;
-        }
-
         if (isUnread(report, transactionThreadReport, isReportArchived) || (lastAction && isCurrentActionUnread(report, lastAction, visibleReportActions))) {
             // On desktop, when the notification center is displayed, isVisible will return false.
             // Currently, there's no programmatic way to dismiss the notification center panel.
             // To handle this, we use the 'referrer' parameter to check if the current navigation is triggered from a notification.
             const isFromNotification = route?.params?.referrer === CONST.REFERRER.NOTIFICATION;
             if ((isVisible || isFromNotification) && scrollingVerticalBottomOffset.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD) {
-                readNewestAction(report.reportID);
+                readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
                 if (isFromNotification) {
                     Navigation.setParams({referrer: undefined});
                 }
@@ -368,11 +363,6 @@ function MoneyRequestReportActionsList({
             return;
         }
 
-        // Do not try to mark the report as read if the report has not been loaded and shared with the user
-        if (!reportMetadata?.hasOnceLoadedReportActions) {
-            return;
-        }
-
         // In case the user read new messages (after being inactive) with other device we should
         // show marker based on report.lastReadTime
         const newMessageTimeReference = lastMessageTime.current && report.lastReadTime && lastMessageTime.current > report.lastReadTime ? userActiveSince.current : report.lastReadTime;
@@ -387,7 +377,7 @@ function MoneyRequestReportActionsList({
             return;
         }
 
-        readNewestAction(report.reportID);
+        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
         userActiveSince.current = DateUtils.getDBTime();
 
         // This effect logic to `mark as read` will only run when the report focused has new messages and the App visibility
@@ -651,10 +641,7 @@ function MoneyRequestReportActionsList({
 
         reportScrollManager.scrollToEnd();
         readActionSkipped.current = false;
-        // Do not try to mark the report as read if the report has not been loaded and shared with the user
-        if (reportMetadata?.hasOnceLoadedReportActions) {
-            readNewestAction(report.reportID);
-        }
+        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
     }, [setIsFloatingMessageCounterVisible, hasNewestReportAction, reportScrollManager, report.reportID, reportMetadata?.hasOnceLoadedReportActions]);
 
     const scrollToNewTransaction = useCallback(

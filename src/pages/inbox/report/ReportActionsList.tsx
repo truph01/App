@@ -405,18 +405,13 @@ function ReportActionsList({
             return;
         }
 
-        // Do not try to mark the report as read if the report has not been loaded and shared with the user
-        if (!reportMetadata?.hasOnceLoadedReportActions) {
-            return;
-        }
-
         if (isUnread(report, transactionThreadReport, isReportArchived) || (lastAction && isCurrentActionUnread(report, lastAction, sortedVisibleReportActions))) {
             // On desktop, when the notification center is displayed, isVisible will return false.
             // Currently, there's no programmatic way to dismiss the notification center panel.
             // To handle this, we use the 'referrer' parameter to check if the current navigation is triggered from a notification.
             const isFromNotification = route?.params?.referrer === CONST.REFERRER.NOTIFICATION;
             if ((isVisible || isFromNotification) && scrollingVerticalOffset.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD) {
-                readNewestAction(report.reportID);
+                readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
                 if (isFromNotification) {
                     Navigation.setParams({referrer: undefined});
                 }
@@ -430,11 +425,6 @@ function ReportActionsList({
 
     const handleAppVisibilityMarkAsRead = useCallback(() => {
         if (report.reportID !== prevReportID) {
-            return;
-        }
-
-        // Do not try to mark the report as read if the report has not been loaded and shared with the user
-        if (!reportMetadata?.hasOnceLoadedReportActions) {
             return;
         }
 
@@ -463,7 +453,7 @@ function ReportActionsList({
             return;
         }
 
-        readNewestAction(report.reportID);
+        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
         userActiveSince.current = DateUtils.getDBTime();
         return true;
 
@@ -639,10 +629,7 @@ function ReportActionsList({
         }
         reportScrollManager.scrollToBottom();
         readActionSkipped.current = false;
-        // Do not try to mark the report as read if the report has not been loaded and shared with the user
-        if (reportMetadata?.hasOnceLoadedReportActions) {
-            readNewestAction(report.reportID);
-        }
+        readNewestAction(report.reportID, false, !!reportMetadata?.hasOnceLoadedReportActions);
     }, [setIsFloatingMessageCounterVisible, hasNewestReportAction, reportScrollManager, report.reportID, backTo, introSelected, reportMetadata?.hasOnceLoadedReportActions]);
 
     /**
