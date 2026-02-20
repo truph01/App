@@ -20,6 +20,7 @@ import colors from '@styles/theme/colors';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 import Button from './Button';
@@ -27,7 +28,7 @@ import ConfirmModal from './ConfirmModal';
 import DotIndicatorMessage from './DotIndicatorMessage';
 import RenderHTML from './RenderHTML';
 
-type BookTravelButtonProps = {
+type BookTravelButtonProps = WithSentryLabel & {
     text: string;
     activePolicyID?: string;
 
@@ -50,7 +51,14 @@ const navigateToAcceptTerms = (domain: string, isUserValidated?: boolean, policy
     Navigation.navigate(ROUTES.TRAVEL_VERIFY_ACCOUNT.getRoute(domain, policyID, Navigation.getActiveRoute()));
 };
 
-function BookTravelButton({text, shouldRenderErrorMessageBelowButton = false, activePolicyID, setShouldScrollToBottom, shouldShowVerifyAccountModal = true}: BookTravelButtonProps) {
+function BookTravelButton({
+    text,
+    shouldRenderErrorMessageBelowButton = false,
+    activePolicyID,
+    setShouldScrollToBottom,
+    shouldShowVerifyAccountModal = true,
+    sentryLabel,
+}: BookTravelButtonProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const illustrations = useMemoizedLazyIllustrations(['RocketDude']);
@@ -187,6 +195,7 @@ function BookTravelButton({text, shouldRenderErrorMessageBelowButton = false, ac
                 isDisabled={!activePolicyID}
                 success
                 large
+                sentryLabel={sentryLabel}
             />
             {shouldRenderErrorMessageBelowButton && !!errorMessage && (
                 <DotIndicatorMessage
