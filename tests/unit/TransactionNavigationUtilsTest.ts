@@ -15,6 +15,8 @@ jest.mock('@libs/ReportActionsUtils', () => ({
 }));
 
 const mockedIsDeletedAction = jest.mocked(isDeletedAction);
+const DUPLICATES_REVIEW_URL = '/r/duplicates/review/123';
+const ENCODED_DUPLICATES_REVIEW_URL = `/r/${encodeURIComponent('/duplicates/review/123')}`;
 
 function createReportMetadata(overrides: Partial<ReportMetadata> = {}): ReportMetadata {
     return {
@@ -73,11 +75,11 @@ describe('TransactionNavigationUtils', () => {
 
     describe('decodeDeleteNavigateBackUrl', () => {
         it('decodes encoded URLs', () => {
-            expect(decodeDeleteNavigateBackUrl('/r/%2Fduplicates%2Freview%2F123')).toBe('/r//duplicates/review/123');
+            expect(decodeDeleteNavigateBackUrl(ENCODED_DUPLICATES_REVIEW_URL)).toBe('/r//duplicates/review/123');
         });
 
         it('returns already-decoded URL unchanged', () => {
-            expect(decodeDeleteNavigateBackUrl('/r/duplicates/review/123')).toBe('/r/duplicates/review/123');
+            expect(decodeDeleteNavigateBackUrl(DUPLICATES_REVIEW_URL)).toBe(DUPLICATES_REVIEW_URL);
         });
 
         it('returns original URL when decoding fails', () => {
@@ -91,11 +93,11 @@ describe('TransactionNavigationUtils', () => {
         });
 
         it('returns true for plain duplicates review URL', () => {
-            expect(doesDeleteNavigateBackUrlIncludeDuplicatesReview('/r/duplicates/review/123')).toBe(true);
+            expect(doesDeleteNavigateBackUrlIncludeDuplicatesReview(DUPLICATES_REVIEW_URL)).toBe(true);
         });
 
         it('returns true for encoded duplicates review URL', () => {
-            expect(doesDeleteNavigateBackUrlIncludeDuplicatesReview('/r/%2Fduplicates%2Freview%2F123')).toBe(true);
+            expect(doesDeleteNavigateBackUrlIncludeDuplicatesReview(ENCODED_DUPLICATES_REVIEW_URL)).toBe(true);
         });
 
         it('returns false for unrelated URL', () => {
@@ -105,15 +107,15 @@ describe('TransactionNavigationUtils', () => {
 
     describe('doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview', () => {
         it('returns false when threadReportID is missing', () => {
-            expect(doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview('/r/duplicates/review/123')).toBe(false);
+            expect(doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview(DUPLICATES_REVIEW_URL)).toBe(false);
         });
 
         it('returns true when URL matches duplicates review and threadReportID', () => {
-            expect(doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview('/r/duplicates/review/123', '123')).toBe(true);
+            expect(doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview(DUPLICATES_REVIEW_URL, '123')).toBe(true);
         });
 
         it('returns false when URL matches duplicates review with different threadReportID', () => {
-            expect(doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview('/r/duplicates/review/123', '456')).toBe(false);
+            expect(doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview(DUPLICATES_REVIEW_URL, '456')).toBe(false);
         });
     });
 
