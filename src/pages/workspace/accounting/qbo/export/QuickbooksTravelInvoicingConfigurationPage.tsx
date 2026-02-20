@@ -12,6 +12,10 @@ import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
+import {useRoute} from '@react-navigation/native';
+import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import type SCREENS from '@src/SCREENS';
 
 type QBOSectionType = {
     title?: string;
@@ -31,7 +35,11 @@ const payableAccount = [CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT
 function QuickbooksTravelInvoicingConfigurationPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const policyID = policy?.id;
+    const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.QUICKBOOKS_ONLINE_TRAVEL_INVOICING_CONFIGURATION>>();
+    const params = route.params;
+    const backTo = params.backTo;
+
+    const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
 
     const {vendors, accountPayable} = policy?.connections?.quickbooksOnline?.data ?? {};
@@ -77,7 +85,7 @@ function QuickbooksTravelInvoicingConfigurationPage({policy}: WithPolicyConnecti
             contentContainerStyle={styles.pb2}
             titleStyle={styles.ph5}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.QBO}
-            onBackButtonPress={() => Navigation.goBack()}
+            onBackButtonPress={() => Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_EXPORT.getRoute(policyID))}
         >
             {sections.map((section, index) => (
                 <OfflineWithFeedback

@@ -16,6 +16,11 @@ import variables from '@styles/variables';
 import {clearQBOErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import type {Account} from '@src/types/onyx/Policy';
+import {useRoute} from '@react-navigation/native';
+import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import type SCREENS from '@src/SCREENS';
+import ROUTES from '@src/ROUTES';
 
 type CardListItem = ListItem & {
     value: Account;
@@ -25,10 +30,14 @@ function QuickbooksExportTravelPayableAccountSelectPage({policy}: WithPolicyConn
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.QUICKBOOKS_ONLINE_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT>>();
+    const params = route.params;
+    const backTo = params.backTo;
+
     const {accountPayable} = policy?.connections?.quickbooksOnline?.data ?? {};
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
 
-    const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
+    const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
     const data: CardListItem[] = useMemo(
         () =>
             accountPayable?.map((account) => ({
@@ -83,7 +92,7 @@ function QuickbooksExportTravelPayableAccountSelectPage({policy}: WithPolicyConn
             initiallyFocusedOptionKey={data.find((mode) => mode.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.QBO}
-            onBackButtonPress={() => Navigation.goBack()}
+            onBackButtonPress={() => Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID))}
             pendingAction={settingsPendingAction([CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT], qboConfig?.pendingFields)}
             errors={getLatestErrorField(qboConfig, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT)}
             errorRowStyles={[styles.ph5, styles.pv3]}

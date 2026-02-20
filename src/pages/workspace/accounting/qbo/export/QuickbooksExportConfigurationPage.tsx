@@ -33,6 +33,8 @@ function QuickbooksExportConfigurationPage({policy}: WithPolicyConnectionsProps)
     const policyOwner = policy?.owner ?? '';
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
     const errorFields = qboConfig?.errorFields;
+    const {accountPayable} = policy?.connections?.quickbooksOnline?.data ?? {};
+    const travelPayableAccount = accountPayable?.find((account) => account.id === qboConfig?.travelInvoicingPayableAccountID);
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);
     const [cardSettings] = useOnyx(getTravelInvoicingCardSettingsKey(workspaceAccountID), {canBeMissing: true});
@@ -46,9 +48,6 @@ function QuickbooksExportConfigurationPage({policy}: WithPolicyConnectionsProps)
     const goBack = useCallback(() => {
         return goBackFromExportConnection(shouldShowVendorMenuItems, backTo);
     }, [backTo, shouldShowVendorMenuItems]);
-
-    const {accountPayable} = policy?.connections?.quickbooksOnline?.data ?? {};
-    const travelPayableAccount = accountPayable?.find((account) => account.id === qboConfig?.travelInvoicingPayableAccountID);
 
     const menuItems = [
         {

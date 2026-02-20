@@ -15,6 +15,11 @@ import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {clearQBOErrorField} from '@libs/actions/Policy/Policy';
+import {useRoute} from '@react-navigation/native';
+import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import type SCREENS from '@src/SCREENS';
+import ROUTES from '@src/ROUTES';
 
 type CardListItem = ListItem & {
     value: string;
@@ -24,10 +29,14 @@ function QuickbooksExportTravelVendorSelectPage({policy}: WithPolicyConnectionsP
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.QUICKBOOKS_ONLINE_TRAVEL_INVOICING_VENDOR_SELECT>>();
+    const params = route.params;
+    const backTo = params.backTo;
+
     const {vendors} = policy?.connections?.quickbooksOnline?.data ?? {};
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
 
-    const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
+    const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
     const data: CardListItem[] = useMemo(
         () =>
             vendors?.map((vendor) => ({
@@ -77,7 +86,7 @@ function QuickbooksExportTravelVendorSelectPage({policy}: WithPolicyConnectionsP
             initiallyFocusedOptionKey={data.find((mode) => mode.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.QBO}
-            onBackButtonPress={() => Navigation.goBack()}
+            onBackButtonPress={() => Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID))}
             pendingAction={settingsPendingAction([CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR], qboConfig?.pendingFields)}
             errors={getLatestErrorField(qboConfig, CONST.QUICKBOOKS_CONFIG.TRAVEL_INVOICING_VENDOR)}
             errorRowStyles={[styles.ph5, styles.pv3]}
