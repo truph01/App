@@ -58,7 +58,6 @@ function Switch({isOn, onToggle, accessibilityLabel, disabled, showLockIcon, dis
             offsetX.set(targetOffsetX);
         }
         prevIsOn.current = isOn;
-
     }, [isOn, offsetX, targetOffsetX]);
 
     const handleSwitchPress = () => {
