@@ -35,14 +35,14 @@ If you subscribe through Apple (In-App Purchase), this change does not apply.
 
 When your workspace is upgraded, we:
 
+When your workspace was upgraded, we:
+
 1. Created a new **Collect** workspace
 2. Copied your relevant settings from your personal workspace
 3. Moved your reports and expenses to the Collect workspace
 4. Set the Collect workspace as your default workspace
 5. Canceled your personal SmartScan subscription
 6. Hid the Individual workspace settings to prevent duplicate configuration
-
-Your expense history, reports, and receipts are preserved and editable on your new Collect workspace.
 
 ---
 
