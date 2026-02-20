@@ -68,7 +68,6 @@ function TopBar({breadcrumbLabel, shouldDisplaySearch = true, shouldDisplayHelpB
                         onPress={() => {
                             cancelSearch();
                         }}
-                        sentryLabel={CONST.SENTRY_LABEL.SEARCH.CANCEL_BUTTON}
                     >
                         <Text style={[styles.textBlue]}>{translate('common.cancel')}</Text>
                     </PressableWithoutFeedback>

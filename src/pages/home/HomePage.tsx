@@ -59,7 +59,7 @@ function HomePage() {
                     breadcrumbLabel={translate('common.home')}
                     shouldShowLoadingBar={false}
                     shouldDisplayHelpButton
-            />
+                />
                 <ScrollView
                     contentContainerStyle={styles.homePageContentContainer}
                     addBottomSafeAreaPadding
