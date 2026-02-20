@@ -460,9 +460,10 @@ function getRawFilterListFromQuery(rawQuery: SearchQueryString) {
 // with identical query strings, each running the full parser from scratch.
 const buildSearchQueryJSONCache = new Map<string, SearchQueryJSON | undefined>();
 const BUILD_SEARCH_QUERY_JSON_CACHE_MAX_SIZE = 50;
+const BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR = '\x00'; // Null byte prevents collisions if query/rawQuery contain arbitrary strings
 
 function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
-    const cacheKey = rawQuery ? `${query}|||${rawQuery}` : query;
+    const cacheKey = rawQuery ? `${query}${BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR}${rawQuery}` : query;
     if (buildSearchQueryJSONCache.has(cacheKey)) {
         return buildSearchQueryJSONCache.get(cacheKey);
     }
