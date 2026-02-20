@@ -830,6 +830,7 @@ describe('ModifiedExpenseMessage', () => {
 
             beforeEach(() => {
                 // Default: current user has policy rule access (admin + rules enabled), so link points to workspace rules
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
                 (PolicyUtils.getPolicy as jest.Mock).mockReturnValue({
                     id: policyRulesPolicyId,
                     areRulesEnabled: true,
