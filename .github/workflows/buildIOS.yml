@@ -23,10 +23,6 @@ on:
         description: Prefix for build artifact names
         type: string
         default: ''
-      upload-sourcemaps:
-        description: Whether to upload sourcemap artifacts
-        type: boolean
-        default: true
       force-native-build:
         description: Force a full native build, bypassing Rock remote cache
         type: string
@@ -261,7 +257,6 @@ jobs:
         run: echo "::error::Failed to upload dSYM artifact – symbolication data may be missing for this build"
 
       - name: Upload iOS sourcemap artifact
-        if: ${{ inputs.upload-sourcemaps }}
         # v6
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
