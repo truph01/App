@@ -1656,12 +1656,14 @@ function PureReportActionItem({
                 />
             );
         } else if (isCardBrokenConnectionAction(action)) {
-            const cardID = getOriginalMessage(action)?.cardID;
+            const message = getOriginalMessage(action);
+            const cardID = message?.cardID;
+            const cardName = message?.cardName;
             const card = cardID ? cardList?.[cardID] : undefined;
             const connectionLink = cardID && isPersonalCardBrokenConnection(card) ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : undefined;
             children = (
                 <ReportActionItemBasicMessage message="">
-                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
+                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, cardName, translate, connectionLink)}</comment>`} />
                 </ReportActionItemBasicMessage>
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {

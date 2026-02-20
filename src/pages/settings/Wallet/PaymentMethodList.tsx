@@ -27,6 +27,7 @@ import {
     getCardFeedWithDomainID,
     getPlaidInstitutionIconUrl,
     isCardConnectionBroken,
+    isCardFrozen,
     isExpensifyCard,
     isExpensifyCardPendingAction,
     isPersonalCard,
@@ -359,6 +360,7 @@ function PaymentMethodList({
                     iconStyles: [styles.cardIcon],
                     iconWidth: variables.cardIconWidth,
                     iconHeight: variables.cardIconHeight,
+                    isCardFrozen: isCardFrozen(card),
                 });
             }
 
@@ -478,7 +480,7 @@ function PaymentMethodList({
                 title={translate('bankAccount.addBankAccount')}
                 icon={Expensicons.Plus}
                 wrapperStyle={[styles.paymentMethod, listItemStyle]}
-                sentryLabel={CONST.SENTRY_LABEL.WALLET.ADD_BANK_ACCOUNT}
+                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.ADD_BANK_ACCOUNT}
             />
         ),
 
