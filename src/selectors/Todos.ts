@@ -3,6 +3,13 @@ import {shallowEqual} from 'fast-equals';
 import CONST from '@src/CONST';
 import type {TodosDerivedValue} from '@src/types/onyx';
 
+const EMPTY_TODOS_SINGLE_REPORT_IDS = Object.freeze({
+    submit: undefined,
+    approve: undefined,
+    pay: undefined,
+    export: undefined,
+});
+
 const todosReportCountsSelector = (todos: OnyxEntry<TodosDerivedValue>) => {
     if (!todos) {
         return CONST.EMPTY_TODOS_REPORT_COUNTS;
@@ -23,11 +30,11 @@ type SingleReportIDs = {
     [CONST.SEARCH.SEARCH_KEYS.EXPORT]: string | undefined;
 };
 
-let previousSingleReportIDs: SingleReportIDs = CONST.EMPTY_TODOS_SINGLE_REPORT_IDS as SingleReportIDs;
+let previousSingleReportIDs: SingleReportIDs = EMPTY_TODOS_SINGLE_REPORT_IDS as SingleReportIDs;
 
 const todosSingleReportIDsSelector = (todos: OnyxEntry<TodosDerivedValue>) => {
     if (!todos) {
-        return CONST.EMPTY_TODOS_SINGLE_REPORT_IDS;
+        return EMPTY_TODOS_SINGLE_REPORT_IDS;
     }
 
     const submitReportID = todos.reportsToSubmit.length === 1 ? todos.reportsToSubmit.at(0)?.reportID : undefined;
@@ -36,8 +43,8 @@ const todosSingleReportIDsSelector = (todos: OnyxEntry<TodosDerivedValue>) => {
     const exportReportID = todos.reportsToExport.length === 1 ? todos.reportsToExport.at(0)?.reportID : undefined;
 
     if (!submitReportID && !approveReportID && !payReportID && !exportReportID) {
-        previousSingleReportIDs = CONST.EMPTY_TODOS_SINGLE_REPORT_IDS;
-        return CONST.EMPTY_TODOS_SINGLE_REPORT_IDS;
+        previousSingleReportIDs = EMPTY_TODOS_SINGLE_REPORT_IDS;
+        return EMPTY_TODOS_SINGLE_REPORT_IDS;
     }
 
     const newValue = {
@@ -56,4 +63,4 @@ const todosSingleReportIDsSelector = (todos: OnyxEntry<TodosDerivedValue>) => {
 };
 
 export default todosReportCountsSelector;
-export {todosSingleReportIDsSelector};
+export {todosSingleReportIDsSelector, EMPTY_TODOS_SINGLE_REPORT_IDS};

@@ -28,12 +28,6 @@ const EMPTY_TODOS_REPORT_COUNTS = Object.freeze({
     pay: 0,
     export: 0,
 });
-const EMPTY_TODOS_SINGLE_REPORT_IDS = Object.freeze({
-    submit: undefined,
-    approve: undefined,
-    pay: undefined,
-    export: undefined,
-});
 
 // Using 28 days to align with OldDot and because all months are guaranteed to be at least 28 days.
 const MONTH_DAYS = Object.freeze([...Array(28).keys()].map((i) => i + 1));
@@ -1024,7 +1018,6 @@ const CONST = {
     EMPTY_OBJECT,
     EMPTY_SET,
     EMPTY_TODOS_REPORT_COUNTS,
-    EMPTY_TODOS_SINGLE_REPORT_IDS,
     DEFAULT_NUMBER_ID,
     DEFAULT_MISSING_ID,
     DEFAULT_COUNTRY_CODE,
