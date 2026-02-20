@@ -85,10 +85,8 @@ If you’re the new Workspace Admin, make sure reimbursements continue without i
 2. Under **Payments**, confirm the correct payment account is selected. 
 3. Under **Payer**, select a current Workspace Admin. 
 
-![Payments section showing account and member selection]({{site.url}}/assets/images/ExpensifyHelp-AdminOffboardingChecklist_03.png){:width="100%"}
-
 ---
-1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Workspaces > [workspace name] > Workflows**. 
+   
 ## How to revoke the former Workspace Admin's access to a verified bank account
 
 Once the shared bank account is verified by the new Workspace Admin, they can [revoke the previous admin’s access](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Unshare-a-Business-Bank-Account) to maintain secure control.
@@ -97,7 +95,7 @@ Once the shared bank account is verified by the new Workspace Admin, they can [r
 
 ---
 
-## How to reconnect accounting integrations and update the Technical Contact
+## How to update Workspace accounting integration credentials
 
 As the new Workspace Admin, check that all integrations are reconnected under your integration system login.
 
@@ -133,7 +131,7 @@ No. If you're only taking over billing and payment responsibilities, follow [the
 
 ## Who can verify a shared business bank account?
 
-Only the person who sees the test transactions in their external bank account can complete verification. Once the account is shared, the new admin must wait for the transactions and verify them under **Account > Settings > Wallet**.
+Only the person who sees the test transactions in their external bank account can complete verification. Once the account is shared, the new admin must wait for the transactions and verify them under **Account > Wallet**.
 
 ## Can I remove the previous admin before verifying the bank account?
 
