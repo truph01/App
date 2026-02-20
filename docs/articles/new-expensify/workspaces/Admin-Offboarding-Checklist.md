@@ -154,7 +154,7 @@ To recover access, another Domain Admin must step in or contact Concierge for he
 Yes. A verified business bank account can be shared with multiple Workspace Admins. This ensures more than one person can reimburse, pay bills, or act as reimburser.
 ## What's the difference between a Workspace Admin and a Domain Admin?
 ## What’s the Difference Between a Workspace Admin and a Domain Admin?
-
+- **Domain Admins** manage company-wide permissions like SAML. 
 - **Workspace Admins** manage billing, reimbursements, integrations, and member roles for a single workspace.  
 - **Domain Admins** manage company-wide permissions like SAML. 
 
