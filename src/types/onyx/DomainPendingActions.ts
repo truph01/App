@@ -16,19 +16,14 @@ type GeneralDomainMemberPendingAction = {
  */
 type DomainMemberPendingActions = GeneralDomainMemberPendingAction & {
     /**
-     * Pending action for the list of emails exempt from the 2FA requirement
-     */
-    twoFactorAuthExemptEmails?: OnyxCommon.PendingAction;
-};
-
-/**
- * Pending actions structure for domain members
- */
-type DomainMemberPendingActions = GeneralDomainMemberPendingAction & {
-    /**
      * Pending action related to a specific domain vacation delegate
      */
     vacationDelegate?: OnyxCommon.PendingAction;
+
+    /**
+     * Pending action for the list of emails exempt from the 2FA requirement
+     */
+    twoFactorAuthExemptEmails?: OnyxCommon.PendingAction;
 };
 
 /**
