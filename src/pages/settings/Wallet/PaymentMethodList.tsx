@@ -478,7 +478,7 @@ function PaymentMethodList({
                 title={translate('bankAccount.addBankAccount')}
                 icon={Expensicons.Plus}
                 wrapperStyle={[styles.paymentMethod, listItemStyle]}
-                sentryLabel={CONST.SENTRY_LABEL.WALLET.ADD_BANK_ACCOUNT}
+                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.ADD_BANK_ACCOUNT}
             />
         ),
 

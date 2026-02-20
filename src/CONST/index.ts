@@ -8762,9 +8762,6 @@ const CONST = {
         INTERACTIVE_STEP_SUB_HEADER: {
             STEP_BUTTON: 'InteractiveStepSubHeader-StepButton',
         },
-        WALLET: {
-            ADD_BANK_ACCOUNT: 'Wallet-AddBankAccount',
-        },
         SOCIALS: {
             LINK: 'Socials',
         },
@@ -8820,9 +8817,17 @@ const CONST = {
             DELEGATE_REMOVE: 'SettingsSecurity-DelegateRemove',
         },
         SETTINGS_WALLET: {
+            ADD_BANK_ACCOUNT: 'SettingsWallet-AddBankAccount',
             IMPORT_TRANSACTIONS: 'SettingsWallet-ImportTransactions',
             TRANSFER_BALANCE: 'SettingsWallet-TransferBalance',
             ENABLE_WALLET: 'SettingsWallet-EnableWallet',
+        },
+        SETTINGS_RULES: {
+            NEW_RULE: 'SettingsRules-NewRule',
+        },
+        SETTINGS_TEACHERS_UNITE: {
+            I_KNOW_A_TEACHER: 'SettingsTeachersUnite-IKnowATeacher',
+            I_AM_A_TEACHER: 'SettingsTeachersUnite-IAmATeacher',
         },
         SETTINGS_SUBSCRIPTION: {
             EXPLORE_PLANS: 'SettingsSubscription-ExplorePlans',
