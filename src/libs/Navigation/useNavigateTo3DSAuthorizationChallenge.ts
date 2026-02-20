@@ -1,15 +1,15 @@
-import useOnyx from '@hooks/useOnyx';
-import {isTransactionStillPending3DSReview} from '@libs/actions/MultifactorAuthentication';
-import ONYXKEYS from '@src/ONYXKEYS';
-import CONST from '@src/CONST';
-import type {TransactionPending3DSReview} from '@src/types/onyx';
-import {useEffect, useMemo} from 'react';
-import ROUTES from '@src/ROUTES';
-import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
-import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
-import Log from '@libs/Log';
-import useRootNavigationState from '@hooks/useRootNavigationState';
 import {findFocusedRoute} from '@react-navigation/native';
+import {useEffect, useMemo} from 'react';
+import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
+import useOnyx from '@hooks/useOnyx';
+import useRootNavigationState from '@hooks/useRootNavigationState';
+import {isTransactionStillPending3DSReview} from '@libs/actions/MultifactorAuthentication';
+import Log from '@libs/Log';
+import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
+import type {TransactionPending3DSReview} from '@src/types/onyx';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import Navigation, {isMFAFlowScreen} from './Navigation';
 
 // We want predictable, stable ordering for transaction challenges to ensurewe don't

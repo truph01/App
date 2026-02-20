@@ -3,7 +3,6 @@ import AccountManagerLinkRenderer from './AccountManagerLinkRenderer';
 import AnchorRenderer from './AnchorRenderer';
 import CodeRenderer from './CodeRenderer';
 import ConciergeLinkRenderer from './ConciergeLinkRenderer';
-import TransactionHistoryLinkRenderer from './TransactionHistoryLinkRenderer';
 import CopyTextRenderer from './CopyTextRenderer';
 import DeletedActionRenderer from './DeletedActionRenderer';
 import EditedRenderer from './EditedRenderer';
@@ -17,6 +16,7 @@ import PreRenderer from './PreRenderer';
 import RBRRenderer from './RBRRenderer';
 import ShortMentionRenderer from './ShortMentionRenderer';
 import TaskTitleRenderer from './TaskTitleRenderer';
+import TransactionHistoryLinkRenderer from './TransactionHistoryLinkRenderer';
 import UserDetailsRenderer from './UserDetailsRenderer';
 import VideoRenderer from './VideoRenderer';
 

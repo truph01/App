@@ -1,4 +1,5 @@
 import React from 'react';
+import {AuthorizeTransactionCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 import createScreenWithDefaults from '@components/MultifactorAuthentication/components/OutcomeScreen/createScreenWithDefaults';
 import {
     DefaultClientFailureScreen,
@@ -17,7 +18,6 @@ import variables from '@styles/variables';
 import {authorizeTransaction, fireAndForgetDenyTransaction} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';
 import SCREENS from '@src/SCREENS';
-import {AuthorizeTransactionCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 
 type Payload = {
     transactionID: string;

@@ -1,4 +1,5 @@
 import React from 'react';
+import {DefaultCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 import {
     DefaultClientFailureScreen,
     DefaultServerFailureScreen,
@@ -9,7 +10,6 @@ import {
 import type {MultifactorAuthenticationDefaultUIConfig, MultifactorAuthenticationScenarioCustomConfig} from '@components/MultifactorAuthentication/config/types';
 import type {MultifactorAuthenticationCallbackResponse} from '@libs/MultifactorAuthentication/Biometrics/types';
 import CONST from '@src/CONST';
-import {DefaultCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 
 const DEFAULT_CONFIG = {
     successScreen: <DefaultSuccessScreen />,

@@ -1,10 +1,10 @@
 import React from 'react';
+import {View} from 'react-native';
 import Button from '@components/Button';
 import FixedFooter from '@components/FixedFooter';
+import LoadingIndicator from '@components/LoadingIndicator';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import LoadingIndicator from '@components/LoadingIndicator';
-import {View} from 'react-native';
 
 type MultifactorAuthenticationAuthorizeTransactionActionsProps = {
     onAuthorize: () => void;
