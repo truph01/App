@@ -66,4 +66,26 @@ describe('useMappedPersonalDetails', () => {
             });
         });
     });
+
+    it('should update mapped details when Onyx data changes', async () => {
+        await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+            [ACCOUNT_ID_ALICE]: {accountID: ACCOUNT_ID_ALICE, displayName: 'Alice', login: 'alice@test.com'},
+        });
+
+        const mapper = (pd: OnyxEntry<PersonalDetails>) => pd && {displayName: pd.displayName};
+        const {result} = renderHook(() => useMappedPersonalDetails(mapper));
+
+        await waitFor(() => {
+            expect(Object.keys(result.current[0])).toHaveLength(1);
+        });
+
+        await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+            [ACCOUNT_ID_BOB]: {accountID: ACCOUNT_ID_BOB, displayName: 'Bob', login: 'bob@test.com'},
+        });
+
+        await waitFor(() => {
+            expect(Object.keys(result.current[0])).toHaveLength(2);
+            expect(result.current[0][ACCOUNT_ID_BOB]).toEqual({displayName: 'Bob'});
+        });
+    });
 });

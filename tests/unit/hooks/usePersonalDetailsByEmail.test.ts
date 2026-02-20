@@ -52,4 +52,26 @@ describe('usePersonalDetailsByEmail', () => {
 
         expect(result.current).toBeUndefined();
     });
+
+    it('should update when personal details change in Onyx', async () => {
+        await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+            [ACCOUNT_ID_ALICE]: {accountID: ACCOUNT_ID_ALICE, displayName: 'Alice', login: 'alice@test.com'},
+        });
+
+        const {result} = renderHook(() => usePersonalDetailsByEmail());
+
+        await waitFor(() => {
+            expect(result.current?.['alice@test.com']).toBeDefined();
+            expect(result.current?.['bob@test.com']).toBeUndefined();
+        });
+
+        await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+            [ACCOUNT_ID_BOB]: {accountID: ACCOUNT_ID_BOB, displayName: 'Bob', login: 'bob@test.com'},
+        });
+
+        await waitFor(() => {
+            expect(result.current?.['bob@test.com']).toBeDefined();
+            expect(result.current?.['bob@test.com']?.accountID).toBe(ACCOUNT_ID_BOB);
+        });
+    });
 });
