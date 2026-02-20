@@ -314,8 +314,8 @@ function IOURequestStepOdometerImage({
                                         onPress={() => setFlash((prevFlash) => !prevFlash)}
                                     >
                                         <Icon
-                                            height={16}
-                                            width={16}
+                                            height={variables.iconSizeSmall}
+                                            width={variables.iconSizeSmall}
                                             src={lazyIcons.Bolt}
                                             fill={flash ? theme.white : theme.icon}
                                         />
@@ -368,8 +368,8 @@ function IOURequestStepOdometerImage({
                                 }}
                             >
                                 <Icon
-                                    height={32}
-                                    width={32}
+                                    height={variables.iconSizeMenuItem}
+                                    width={variables.iconSizeMenuItem}
                                     src={lazyIcons.Gallery}
                                     fill={theme.textSupporting}
                                 />
