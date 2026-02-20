@@ -69,6 +69,7 @@ function getParentReportActionDeletionStatus({
 }
 
 export {
+    decodeDeleteNavigateBackUrl,
     doesDeleteNavigateBackUrlIncludeDuplicatesReview,
     doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview,
     getParentReportActionDeletionStatus,
