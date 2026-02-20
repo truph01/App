@@ -1,4 +1,4 @@
-import todosReportCountsSelector from '@selectors/Todos';
+import todosReportCountsSelector, {todosSingleReportIDsSelector} from '@selectors/Todos';
 import CONST from '@src/CONST';
 import type {TodosDerivedValue} from '@src/types/onyx';
 
@@ -90,6 +90,46 @@ describe('todosReportCountsSelector', () => {
             [CONST.SEARCH.SEARCH_KEYS.APPROVE]: 50,
             [CONST.SEARCH.SEARCH_KEYS.PAY]: 25,
             [CONST.SEARCH.SEARCH_KEYS.EXPORT]: 75,
+        });
+    });
+});
+
+describe('todosSingleReportIDsSelector', () => {
+    it('returns report ID when exactly one report exists in each array', () => {
+        const todos: TodosDerivedValue = {
+            reportsToSubmit: [{reportID: '1'}] as TodosDerivedValue['reportsToSubmit'],
+            reportsToApprove: [{reportID: '2'}] as TodosDerivedValue['reportsToApprove'],
+            reportsToPay: [{reportID: '3'}] as TodosDerivedValue['reportsToPay'],
+            reportsToExport: [{reportID: '4'}] as TodosDerivedValue['reportsToExport'],
+            transactionsByReportID: {},
+        };
+
+        const result = todosSingleReportIDsSelector(todos);
+
+        expect(result).toEqual({
+            [CONST.SEARCH.SEARCH_KEYS.SUBMIT]: '1',
+            [CONST.SEARCH.SEARCH_KEYS.APPROVE]: '2',
+            [CONST.SEARCH.SEARCH_KEYS.PAY]: '3',
+            [CONST.SEARCH.SEARCH_KEYS.EXPORT]: '4',
+        });
+    });
+
+    it('returns undefined for arrays with more than one report', () => {
+        const todos: TodosDerivedValue = {
+            reportsToSubmit: [{reportID: '1'}, {reportID: '2'}] as TodosDerivedValue['reportsToSubmit'],
+            reportsToApprove: [{reportID: '3'}, {reportID: '4'}, {reportID: '5'}] as TodosDerivedValue['reportsToApprove'],
+            reportsToPay: [{reportID: '6'}] as TodosDerivedValue['reportsToPay'],
+            reportsToExport: [{reportID: '7'}, {reportID: '8'}] as TodosDerivedValue['reportsToExport'],
+            transactionsByReportID: {},
+        };
+
+        const result = todosSingleReportIDsSelector(todos);
+
+        expect(result).toEqual({
+            [CONST.SEARCH.SEARCH_KEYS.SUBMIT]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.APPROVE]: undefined,
+            [CONST.SEARCH.SEARCH_KEYS.PAY]: '6',
+            [CONST.SEARCH.SEARCH_KEYS.EXPORT]: undefined,
         });
     });
 });
