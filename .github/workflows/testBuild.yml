@@ -146,16 +146,192 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
 
-  buildApps:
+  postGitHubCommentBuildStarted:
+    name: Post build started comment
+    if: ${{ needs.prep.outputs.APP_PR_NUMBER != '' || needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR != '' }}
+    needs: [prep, getMobileExpensifyPR]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Add build start comment to Expensify/App PR
+        if: ${{ needs.prep.outputs.APP_PR_NUMBER != '' }}
+        # v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const workflowURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ needs.prep.outputs.APP_PR_NUMBER }},
+              body: `🚧 @${{ github.actor }} has triggered a test Expensify/App build. You can view the [workflow run here](${workflowURL}).`
+            });
+
+      - name: Add build start comment to Expensify/Mobile-Expensify PR
+        if: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR != '' }}
+        # v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          github-token: ${{ secrets.OS_BOTIFY_TOKEN }}
+          script: |
+            const workflowURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: 'Mobile-Expensify',
+              issue_number: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR }},
+              body: `🚧 @${{ github.actor }} has triggered a test Expensify/Mobile-Expensify build. You can view the [workflow run here](${workflowURL}).`
+            });
+
+  buildAndroid:
+    name: Build Android
     needs: [prep, getMobileExpensifyPR, getMobileExpensifyRef]
-    uses: ./.github/workflows/buildAdHoc.yml
+    if: ${{ inputs.ANDROID }}
+    uses: ./.github/workflows/buildAndroid.yml
     with:
-      APP_REF: ${{ needs.prep.outputs.APP_REF }}
-      APP_PR_NUMBER: ${{ needs.prep.outputs.APP_PR_NUMBER }}
-      MOBILE_EXPENSIFY_REF: ${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}
-      MOBILE_EXPENSIFY_PR: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR }}
-      BUILD_WEB: ${{ inputs.WEB && 'true' || 'false' }}
-      BUILD_IOS: ${{ inputs.IOS && 'true' || 'false' }}
-      BUILD_ANDROID: ${{ inputs.ANDROID && 'true' || 'false' }}
-      TRIGGER_ACTOR: ${{ github.actor }}
+      ref: ${{ needs.prep.outputs.APP_REF }}
+      variant: Adhoc
+      mobile-expensify-ref: ${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}
+      pull-request-number: ${{ needs.prep.outputs.APP_PR_NUMBER }}
     secrets: inherit
+
+  buildIOS:
+    name: Build iOS
+    needs: [prep, getMobileExpensifyPR, getMobileExpensifyRef]
+    if: ${{ inputs.IOS }}
+    uses: ./.github/workflows/buildIOS.yml
+    with:
+      ref: ${{ needs.prep.outputs.APP_REF }}
+      variant: Adhoc
+      mobile-expensify-ref: ${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}
+      pull-request-number: ${{ needs.prep.outputs.APP_PR_NUMBER }}
+    secrets: inherit
+
+  buildWeb:
+    name: Build Web
+    needs: [prep, getMobileExpensifyPR, getMobileExpensifyRef]
+    if: ${{ inputs.WEB && needs.prep.outputs.APP_PR_NUMBER != '' }}
+    uses: ./.github/workflows/buildWeb.yml
+    with:
+      ref: ${{ needs.prep.outputs.APP_REF }}
+      environment: adhoc
+      pull-request-number: ${{ needs.prep.outputs.APP_PR_NUMBER }}
+      upload-artifacts: false
+      deploy-to-s3: true
+      build-storybook: false
+    secrets: inherit
+
+  postGithubComment:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    if: ${{ always() && (needs.prep.outputs.APP_PR_NUMBER != '' || needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR != '') }}
+    name: Post a GitHub comment with app download links for testing
+    needs: [prep, getMobileExpensifyPR, getMobileExpensifyRef, buildWeb, buildAndroid, buildIOS]
+    steps:
+      - name: Checkout
+        # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ needs.prep.outputs.APP_REF }}
+
+      - name: Download Artifact
+        # v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+
+      - name: Publish links to apps for download on Expensify/App PR
+        if: ${{ needs.prep.outputs.APP_PR_NUMBER != '' }}
+        uses: ./.github/actions/javascript/postTestBuildComment
+        with:
+          REPO: App
+          APP_PR_NUMBER: ${{ needs.prep.outputs.APP_PR_NUMBER }}
+          MOBILE_EXPENSIFY_PR_NUMBER: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR }}
+          GITHUB_TOKEN: ${{ github.token }}
+          ANDROID: ${{ needs.buildAndroid.result }}
+          IOS: ${{ needs.buildIOS.result }}
+          WEB: ${{ needs.buildWeb.result }}
+          ANDROID_LINK: ${{ needs.buildAndroid.outputs.ROCK_ARTIFACT_URL }}
+          IOS_LINK: ${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}
+          WEB_LINK: https://${{ needs.prep.outputs.APP_PR_NUMBER }}.pr-testing.expensify.com
+
+      - name: Publish links to apps for download on Expensify/Mobile-Expensify PR
+        if: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR != '' }}
+        uses: ./.github/actions/javascript/postTestBuildComment
+        with:
+          REPO: Mobile-Expensify
+          MOBILE_EXPENSIFY_PR_NUMBER: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR }}
+          GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
+          ANDROID: ${{ needs.buildAndroid.result }}
+          IOS: ${{ needs.buildIOS.result }}
+          ANDROID_LINK: ${{ needs.buildAndroid.outputs.ROCK_ARTIFACT_URL }}
+          IOS_LINK: ${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}
+
+  buildSummary:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    if: ${{ always() && (needs.prep.outputs.APP_PR_NUMBER != '' || needs.buildAndroid.outputs.ROCK_ARTIFACT_URL != '' || needs.buildIOS.outputs.ROCK_ARTIFACT_URL != '') }}
+    name: Build Summary
+    needs: [prep, getMobileExpensifyPR, getMobileExpensifyRef, buildWeb, buildAndroid, buildIOS]
+    steps:
+      - name: Checkout
+        # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ needs.prep.outputs.APP_REF }}
+
+      - name: Get Mobile-Expensify ref
+        id: getMobileExpensifySHA
+        run: |
+          if [ -n "${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}" ]; then
+            echo "SHA=${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}" >> "$GITHUB_OUTPUT"
+          elif [ -d "Mobile-Expensify" ]; then
+            SUBMODULE_SHA=$(git ls-tree HEAD Mobile-Expensify | awk '{print $3}')
+            echo "SHA=$SUBMODULE_SHA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create build summary
+        # v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const prNumber = '${{ needs.prep.outputs.APP_PR_NUMBER }}';
+            const webLink = prNumber && '${{ needs.buildWeb.result }}' === 'success' ? `https://${prNumber}.pr-testing.expensify.com` : '';
+            const androidLink = '${{ needs.buildAndroid.outputs.ROCK_ARTIFACT_URL }}' || '';
+            const iosLink = '${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}' || '';
+            const mobileExpensifySHA = '${{ steps.getMobileExpensifySHA.outputs.SHA }}' || '';
+
+            const webStatus = webLink ? '✅ Success' : '${{ needs.buildWeb.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
+            const androidStatus = androidLink ? '✅ Success' : '${{ needs.buildAndroid.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
+            const iosStatus = iosLink ? '✅ Success' : '${{ needs.buildIOS.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
+
+            const summary = core.summary
+              .addTable([
+                [{data: 'Platform', header: true}, {data: 'Status', header: true}, {data: 'Download', header: true}],
+                [
+                  'Web',
+                  webStatus,
+                  webLink ? `<a href="${webLink}">${webLink}</a>` : '-'
+                ],
+                [
+                  'Android',
+                  androidStatus,
+                  androidLink ? `<a href="${androidLink}">${androidLink}</a>` : '-'
+                ],
+                [
+                  'iOS',
+                  iosStatus,
+                  iosLink ? `<a href="${iosLink}">${iosLink}</a>` : '-'
+                ],
+              ]);
+
+            if (mobileExpensifySHA) {
+              const mobileExpensifyUrl = `https://github.com/Expensify/Mobile-Expensify/commit/${mobileExpensifySHA}`;
+              const label = '${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}' ? 'Mobile-Expensify SHA (Custom)' : 'Mobile-Expensify Submodule SHA';
+              summary.addRaw(`\n**${label}:** [${mobileExpensifySHA}](${mobileExpensifyUrl})`);
+            }
+
+            if (prNumber) {
+              const prUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/pull/${prNumber}`;
+              summary.addRaw(`\n**PR Link:** ${prUrl}`);
+            } else {
+              summary.addRaw(`\n**PR Link:** No PR associated with this commit.`);
+            }
+
+            summary.write();
