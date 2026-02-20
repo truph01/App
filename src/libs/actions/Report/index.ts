@@ -1201,6 +1201,7 @@ function openReport(
         parentReportActionID,
         transactionID: transaction?.transactionID,
         includePartiallySetupBankAccounts: true,
+        useLastUnreadReportAction: true,
     };
 
     if (optimisticSelfDMReport) {
