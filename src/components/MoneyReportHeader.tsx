@@ -1010,6 +1010,10 @@ function MoneyReportHeader({
     ]);
 
     const onApprove = (isFullApproval: boolean) => {
+        if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
+            showDWEModal();
+            return;
+        }
         startApprovedAnimation();
         approveMoneyRequest(moneyRequestReport, policy, accountID, email ?? '', hasViolations, isASAPSubmitBetaEnabled, nextStep, betas, isFullApproval);
         if (currentSearchQueryJSON) {

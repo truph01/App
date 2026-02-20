@@ -644,6 +644,10 @@ function MoneyRequestReportPreviewContent({
                 nonHeldAmount={nonHeldAmount}
                 fullAmount={fullAmount}
                 onApprove={(isFullApproval) => {
+                    if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
+                        showDEWModal();
+                        return;
+                    }
                     startApprovedAnimation();
                     approveMoneyRequest(
                         iouReport,
@@ -958,6 +962,7 @@ function MoneyRequestReportPreviewContent({
                     moneyRequestReport={iouReport}
                     transactionCount={numberOfRequests}
                     startAnimation={startAnimation}
+                    hasNonHeldExpenses={!hasOnlyHeldExpenses}
                 />
             )}
         </View>
