@@ -19,14 +19,13 @@ import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import {getPolicyEmployeeAccountIDs} from '@libs/PolicyUtils';
 import {canReportBeMentionedWithinPolicy, doesReportBelongToWorkspace, isGroupChat, isReportParticipant} from '@libs/ReportUtils';
 import StringUtils from '@libs/StringUtils';
-import {getSortedPersonalDetails} from '@libs/SuggestionUtils';
+import {getSortedPersonalDetails, trimLeadingSpace} from '@libs/SuggestionUtils';
 import {isValidRoomName} from '@libs/ValidationUtils';
 import {searchInServer} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetails, PersonalDetailsList, Report} from '@src/types/onyx';
 import type {SuggestionProps} from './Suggestions';
-import {getNormalizedMentionPrefix, getUpdatedCommentWithInsertedMention} from './SuggestionMentionUtils';
 
 type SuggestionValues = {
     suggestedMentions: Mention[];
@@ -175,27 +174,51 @@ function SuggestionMention({
         [formatLoginPrivateDomain],
     );
 
+    function getOriginalMentionText(inputValue: string, atSignIndex: number, whiteSpacesLength = 0) {
+        const rest = inputValue.slice(atSignIndex);
+
+        // If the search string contains spaces, it's not a simple login/email mention.
+        // In that case, we need to replace all the words the user typed that are part of the mention.
+        // For example, if `rest` is "@Adam Chr and" and "@Adam Chris" is a valid mention,
+        // then `whiteSpacesLength` will be 1, and we should return "@Adam Chr".
+        // The length of this substring will then be used to replace the user's input with the full mention.
+        if (whiteSpacesLength) {
+            const str = rest.split(' ', whiteSpacesLength + 1).join(' ');
+            return rest.slice(0, str.length);
+        }
+
+        const breakerIndex = rest.search(CONST.REGEX.MENTION_BREAKER);
+        return breakerIndex === -1 ? rest : rest.slice(0, breakerIndex);
+    }
+
     /**
      * Replace the code of mention and update selection
      */
     const insertSelectedMention = useCallback(
         (highlightedMentionIndexInner: number) => {
+            const commentBeforeAtSign = value.slice(0, suggestionValues.atSignIndex);
             const mentionObject = suggestionValues.suggestedMentions.at(highlightedMentionIndexInner);
             if (!mentionObject || highlightedMentionIndexInner === -1) {
                 return;
             }
 
             const mentionCode = getMentionCode(mentionObject, suggestionValues.prefixType);
-            const updatedComment = getUpdatedCommentWithInsertedMention({
-                value,
-                atSignIndex: suggestionValues.atSignIndex,
-                mentionPrefix: suggestionValues.mentionPrefix,
-                prefixType: suggestionValues.prefixType,
-                mentionCode,
-                whiteSpacesLength: StringUtils.countWhiteSpaces(suggestionValues.mentionPrefix),
-            });
+            const originalMention = getOriginalMentionText(value, suggestionValues.atSignIndex, StringUtils.countWhiteSpaces(suggestionValues.mentionPrefix));
 
-            updateComment(updatedComment, true);
+            // We split trailing dot from the mention token so selecting `@a.` can become `@adam.`
+            // (preserve sentence punctuation) instead of consuming the `.` into the replacement.
+            let trailingDot = '';
+            let mentionToReplace = originalMention;
+            if (suggestionValues.prefixType === '@' && suggestionValues.mentionPrefix.endsWith('.')) {
+                trailingDot = originalMention.match(CONST.REGEX.TRAILING_DOTS)?.[0] ?? '';
+                mentionToReplace = originalMention.slice(0, originalMention.length - trailingDot.length);
+            }
+
+            const commentAfterMention = value.slice(
+                suggestionValues.atSignIndex + Math.max(mentionToReplace.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length),
+            );
+
+            updateComment(`${commentBeforeAtSign}${mentionCode}${trailingDot}${trimLeadingSpace(commentAfterMention)}`, true);
             const selectionPosition = suggestionValues.atSignIndex + mentionCode.length + CONST.SPACE_LENGTH;
             setSelection({
                 start: selectionPosition,
@@ -378,7 +401,11 @@ function SuggestionMention({
                 prefix = lastWord.substring(1);
             }
 
-            const {mentionPrefix, normalizedPrefix} = getNormalizedMentionPrefix(prefixType, prefix);
+            // Treat a trailing dot as punctuation so short mentions like "@a." still match "@a".
+            const hasTrailingDot = prefixType === '@' && prefix.length > 1 && prefix.endsWith('.');
+            const normalizedPrefix = hasTrailingDot ? prefix.slice(0, -1) : prefix;
+            // Keep the raw prefix for highlight so dots are preserved in the UI.
+            const mentionPrefix = prefix;
 
             const nextState: Partial<SuggestionValues> = {
                 suggestedMentions: [],
