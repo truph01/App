@@ -124,6 +124,8 @@ function OptionRowLHNData({
         movedToReport,
         currentUserAccountID,
         reportAttributesDerived,
+        policyTags,
+        login,
     ]);
 
     return (
