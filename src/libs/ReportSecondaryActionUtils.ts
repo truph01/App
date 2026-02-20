@@ -73,6 +73,7 @@ import {
     isDuplicate,
     isManagedCardTransaction as isManagedCardTransactionTransactionUtils,
     isOnHold as isOnHoldTransactionUtils,
+    isOdometerDistanceRequest,
     isPending,
     isPerDiemRequest as isPerDiemRequestTransactionUtils,
     isReceiptBeingScanned,
@@ -104,6 +105,10 @@ function isSplitAction(
 
     const reportTransaction = reportTransactions.at(0);
     const {amount} = getTransactionDetails(reportTransaction) ?? {};
+
+    if (isOdometerDistanceRequest(reportTransaction)) {
+        return false;
+    }
 
     if (isPending(reportTransaction) || !!reportTransaction?.errors) {
         return false;
