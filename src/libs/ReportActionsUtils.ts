@@ -1427,13 +1427,7 @@ function isNewerReportAction(a: ReportAction, b: ReportAction): boolean {
  * - lastVisibleAction: newest visible action
  * - lastActionForDisplay: newest displayable action (not CREATED)
  */
-function findLastReportActions(
-    reportActions: OnyxEntry<ReportActions>,
-    canUserPerformWriteAction?: boolean,
-): {
-    lastVisibleAction?: ReportAction;
-    lastActionForDisplay?: ReportAction;
-} {
+function findLastReportActions(reportActions: OnyxEntry<ReportActions>, canUserPerformWriteAction?: boolean) {
     if (!reportActions) {
         return {lastVisibleAction: undefined, lastActionForDisplay: undefined};
     }

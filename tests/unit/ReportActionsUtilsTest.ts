@@ -3600,12 +3600,11 @@ describe('ReportActionsUtils', () => {
 
         it('respects canUserPerformWriteAction when determining visibility', () => {
             const normalAction = makeAction({reportActionID: '1', created: '2024-01-01 00:00:00.000'});
-            // An actionable join request whisper is hidden when canUserPerformWriteAction is false
+            // An actionable mention whisper is hidden when canUserPerformWriteAction is false
             const joinRequestAction = makeAction({
                 reportActionID: '2',
                 created: '2024-01-02 00:00:00.000',
-                actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_JOIN_REQUEST,
-                originalMessage: {choice: '', inviterEmail: ''},
+                actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_MENTION_WHISPER,
             });
 
             const withWrite = findLastReportActions({[normalAction.reportActionID]: normalAction, [joinRequestAction.reportActionID]: joinRequestAction}, true);
