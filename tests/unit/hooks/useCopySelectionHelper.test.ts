@@ -66,13 +66,7 @@ describe('useCopySelectionHelper', () => {
     it('subscribes to copy shortcut and unsubscribes on unmount', () => {
         const {unmount} = renderHook(() => useCopySelectionHelper());
 
-        expect(mockSubscribe).toHaveBeenCalledWith(
-            copyShortcutConfig.shortcutKey,
-            expect.any(Function),
-            copyShortcutConfig.descriptionKey,
-            [...copyShortcutConfig.modifiers],
-            false,
-        );
+        expect(mockSubscribe).toHaveBeenCalledWith(copyShortcutConfig.shortcutKey, expect.any(Function), copyShortcutConfig.descriptionKey, [...copyShortcutConfig.modifiers], false);
 
         unmount();
 
