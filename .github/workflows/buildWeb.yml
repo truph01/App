@@ -1,0 +1,160 @@
+name: Build and deploy Web
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to checkout and build
+        type: string
+        required: true
+      environment:
+        description: "'production', 'staging', or 'adhoc'"
+        type: string
+        required: true
+      pull-request-number:
+        description: Pull request number (used for adhoc builds)
+        type: string
+        default: ''
+      upload-artifacts:
+        description: Whether to upload compressed build artifacts (.tar.gz, .zip)
+        type: boolean
+        default: true
+      deploy-to-s3:
+        description: Whether to deploy to S3
+        type: boolean
+        default: false
+      build-storybook:
+        description: Whether to build storybook docs
+        type: boolean
+        default: false
+
+    outputs:
+      S3_URL:
+        description: The S3 URL of the deployed web app (adhoc only)
+        value: ${{ jobs.build.outputs.S3_URL }}
+
+jobs:
+  build:
+    name: Build and deploy Web
+    runs-on: blacksmith-32vcpu-ubuntu-2404
+    env:
+      PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
+    outputs:
+      S3_URL: ${{ steps.set-s3-url.outputs.S3_URL }}
+    steps:
+      - name: Checkout
+        # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Create .env.adhoc file based on staging
+        if: ${{ inputs.environment == 'adhoc' }}
+        run: |
+          cp .env.staging .env.adhoc
+          sed -i 's/ENVIRONMENT=staging/ENVIRONMENT=adhoc/' .env.adhoc
+
+      - name: Inject CI data into JS bundle
+        if: ${{ inputs.environment == 'adhoc' && inputs.pull-request-number != '' }}
+        run: ./.github/scripts/inject-ci-data.sh PULL_REQUEST_NUMBER="$PULL_REQUEST_NUMBER"
+
+      - name: Setup Node
+        uses: ./.github/actions/composite/setupNode
+
+      - name: Setup Cloudflare CLI
+        if: ${{ inputs.environment != 'adhoc' }}
+        run: pip3 install cloudflare==2.19.0
+
+      - name: Configure AWS Credentials
+        if: ${{ inputs.deploy-to-s3 }}
+        # v6
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build web
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            npm run build
+          elif [ "${{ inputs.environment }}" == "staging" ]; then
+            npm run build-staging
+          else
+            npm run build-adhoc
+          fi
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+      - name: Build storybook docs
+        if: ${{ inputs.build-storybook }}
+        continue-on-error: true
+        run: |
+          if [ "${{ inputs.environment }}" == "production" ]; then
+            npm run storybook-build
+          else
+            npm run storybook-build-staging
+          fi
+
+      - name: Deploy to S3 (production/staging)
+        if: ${{ inputs.deploy-to-s3 && inputs.environment != 'adhoc' }}
+        run: |
+          aws s3 cp --recursive --acl public-read "$GITHUB_WORKSPACE"/dist ${{ env.S3_BUCKET }}/
+          aws s3 cp --acl public-read --content-type 'application/json' --metadata-directive REPLACE ${{ env.S3_BUCKET }}/.well-known/apple-app-site-association ${{ env.S3_BUCKET }}/.well-known/apple-app-site-association
+          aws s3 cp --acl public-read --content-type 'application/json' --metadata-directive REPLACE ${{ env.S3_BUCKET }}/.well-known/apple-app-site-association ${{ env.S3_BUCKET }}/apple-app-site-association
+        env:
+          S3_BUCKET: s3://${{ inputs.environment == 'staging' && 'staging-' || '' }}${{ vars.PRODUCTION_S3_BUCKET }}
+
+      - name: Deploy to S3 (adhoc)
+        if: ${{ inputs.deploy-to-s3 && inputs.environment == 'adhoc' && inputs.pull-request-number != '' }}
+        run: aws s3 cp --recursive --acl public-read "$GITHUB_WORKSPACE"/dist s3://ad-hoc-expensify-cash/web/"$PULL_REQUEST_NUMBER"
+
+      - name: Set S3 URL output
+        id: set-s3-url
+        if: ${{ inputs.environment == 'adhoc' && inputs.pull-request-number != '' }}
+        run: echo "S3_URL=https://${{ inputs.pull-request-number }}.pr-testing.expensify.com" >> "$GITHUB_OUTPUT"
+
+      - name: Purge Cloudflare cache
+        if: ${{ inputs.environment != 'adhoc' }}
+        run: |
+          /home/runner/.local/bin/cli4 --verbose --delete hosts=["$HOST"] /zones/:9ee042e6cfc7fd45e74aa7d2f78d617b/purge_cache
+        env:
+          CF_API_KEY: ${{ secrets.CLOUDFLARE_TOKEN }}
+          HOST: ${{ inputs.environment == 'production' && vars.WEB_PRODUCTION_HOST || vars.WEB_STAGING_HOST }}
+
+      - name: Verify deploy
+        if: ${{ inputs.environment != 'adhoc' }}
+        run: |
+          APP_VERSION=$(jq -r .version < package.json)
+          ./.github/scripts/verifyDeploy.sh "$HOST" "$APP_VERSION"
+        env:
+          HOST: ${{ inputs.environment == 'production' && vars.WEB_PRODUCTION_HOST || vars.WEB_STAGING_HOST }}
+
+      - name: Upload web sourcemaps artifact
+        # v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: web-sourcemaps-artifact
+          path: ./dist/merged-source-map.js.map
+
+      - name: Compress web build .tar.gz and .zip
+        if: ${{ inputs.upload-artifacts }}
+        run: |
+          tar -czvf webBuild.tar.gz dist
+          zip -r webBuild.zip dist
+
+      - name: Upload .tar.gz web build artifact
+        if: ${{ inputs.upload-artifacts }}
+        # v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: web-build-tar-gz-artifact
+          path: ./webBuild.tar.gz
+
+      - name: Upload .zip web build artifact
+        if: ${{ inputs.upload-artifacts }}
+        # v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: web-build-zip-artifact
+          path: ./webBuild.zip
