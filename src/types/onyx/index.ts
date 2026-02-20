@@ -21,8 +21,10 @@ import type CardContinuousReconciliation from './CardContinuousReconciliation';
 import type CardFeeds from './CardFeeds';
 import type {
     AddNewCompanyCardFeed,
+    CardFeed,
     CardFeedsStatus,
     CardFeedsStatusByDomainID,
+    CardFeedWithDomainID,
     CombinedCardFeed,
     CombinedCardFeeds,
     CompanyCardFeed,
@@ -33,7 +35,6 @@ import type {
 } from './CardFeeds';
 import type CardOnWaitlist from './CardOnWaitlist';
 import type CodingRuleMatchingTransaction from './CodingRuleMatchingTransaction';
-import type {CapturedLogs, Log} from './Console';
 import type {CorpayFields, CorpayFormField} from './CorpayFields';
 import type {CorpayOnboardingFields} from './CorpayOnboardingFields';
 import type Credentials from './Credentials';
@@ -44,11 +45,13 @@ import type {
     CardFeedErrorsDerivedValue,
     NonPersonalAndWorkspaceCardListDerivedValue,
     OutstandingReportsByPolicyIDDerivedValue,
+    PersonalAndWorkspaceCardListDerivedValue,
     ReportAttributesDerivedValue,
     ReportTransactionsAndViolationsDerivedValue,
     TodoMetadata,
     TodosDerivedValue,
 } from './DerivedValues';
+import type DeviceBiometrics from './DeviceBiometrics';
 import type DismissedProductTraining from './DismissedProductTraining';
 import type DismissedReferralBanners from './DismissedReferralBanners';
 import type Domain from './Domain';
@@ -75,6 +78,8 @@ import type LastExportMethod from './LastExportMethod';
 import type {LastPaymentMethod, LastPaymentMethodType} from './LastPaymentMethod';
 import type LastSelectedDistanceRates from './LastSelectedDistanceRates';
 import type Locale from './Locale';
+import type LocalPasskeyCredentialsEntry from './LocalPasskeyCredentialsEntry';
+import type {PasskeyCredential, PasskeyTransport} from './LocalPasskeyCredentialsEntry';
 import type LockAccountDetails from './LockAccountDetails';
 import type {LoginList} from './Login';
 import type Login from './Login';
@@ -86,7 +91,7 @@ import type NewGroupChatDraft from './NewGroupChatDraft';
 import type Onboarding from './Onboarding';
 import type OnboardingRHPVariant from './OnboardingRHPVariant';
 import type OnyxInputOrEntry from './OnyxInputOrEntry';
-import type {OnyxUpdateEvent, OnyxUpdatesFromServer} from './OnyxUpdatesFromServer';
+import type {AnyOnyxUpdatesFromServer, OnyxUpdateEvent, OnyxUpdatesFromServer} from './OnyxUpdatesFromServer';
 import type {DecisionName, OriginalMessageIOU} from './OriginalMessage';
 import type Pages from './Pages';
 import type {PendingContactAction} from './PendingContactAction';
@@ -148,7 +153,7 @@ import type Transaction from './Transaction';
 import type {TransactionViolation, ViolationName} from './TransactionViolation';
 import type TransactionViolations from './TransactionViolation';
 import type TravelProvisioning from './TravelProvisioning';
-import type {TravelSettings} from './TravelSettings';
+import type {TravelSettings, WorkspaceTravelSettings} from './TravelSettings';
 import type TryNewDot from './TryNewDot';
 import type UnshareBankAccount from './UnshareBankAccount';
 import type UserLocation from './UserLocation';
@@ -207,11 +212,16 @@ export type {
     CombinedCardFeeds,
     CardContinuousReconciliation,
     CompanyCardFeedWithDomainID,
+    CardFeed,
+    CardFeedWithDomainID,
     LastExportMethod,
     Locale,
+    LocalPasskeyCredentialsEntry,
     LockAccountDetails,
     Login,
     LoginList,
+    PasskeyCredential,
+    PasskeyTransport,
     PendingContactAction,
     MapboxAccessToken,
     Modal,
@@ -219,6 +229,7 @@ export type {
     OnyxInputOrEntry,
     OnyxUpdateEvent,
     OnyxUpdatesFromServer,
+    AnyOnyxUpdatesFromServer,
     Pages,
     PersonalBankAccount,
     PersonalDetails,
@@ -273,6 +284,7 @@ export type {
     TransactionViolation,
     TransactionViolations,
     TravelSettings,
+    WorkspaceTravelSettings,
     UserLocation,
     UserMetadata,
     UserWallet,
@@ -294,9 +306,7 @@ export type {
     LastSelectedDistanceRates,
     InvitedEmailsToAccountIDs,
     NewGroupChatDraft,
-    Log,
     PolicyJoinMember,
-    CapturedLogs,
     SearchResults,
     ReviewDuplicates,
     PrivateSubscription,
@@ -333,6 +343,7 @@ export type {
     ReportTransactionsAndViolationsDerivedValue,
     OutstandingReportsByPolicyIDDerivedValue,
     NonPersonalAndWorkspaceCardListDerivedValue,
+    PersonalAndWorkspaceCardListDerivedValue,
     CardFeedErrorsDerivedValue,
     TodosDerivedValue,
     TodoMetadata,
@@ -349,4 +360,5 @@ export type {
     DomainSecurityGroup,
     CodingRuleMatchingTransaction,
     UserSecurityGroupData,
+    DeviceBiometrics,
 };
