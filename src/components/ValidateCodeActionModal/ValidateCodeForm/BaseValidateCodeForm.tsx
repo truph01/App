@@ -370,6 +370,7 @@ function BaseValidateCodeForm({
                         style={[styles.mt4]}
                         success={false}
                         large
+                        sentryLabel={CONST.SENTRY_LABEL.VALIDATE_CODE.SKIP}
                     />
                 )}
                 {!hideSubmitButton && (
@@ -382,6 +383,7 @@ function BaseValidateCodeForm({
                         large
                         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                         isLoading={account?.isLoading || isLoading}
+                        sentryLabel={CONST.SENTRY_LABEL.VALIDATE_CODE.VERIFY}
                     />
                 )}
             </OfflineWithFeedback>
