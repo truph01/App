@@ -136,7 +136,7 @@ No. If you're only taking over billing and payment responsibilities, follow [the
 
 ## Who can verify a shared business bank account?
 
-Only the person who sees the test transactions in their external bank account can complete verification. Once the account is shared, the new admin must wait for the transactions and verify them under **Account > Settings > Wallet**.
+Only the person who sees the test transactions in their external bank account can complete verification. Once the account is shared, the new admin must wait for the transactions and verify them under **Settings > Account > Wallet**.
 
 ## Can I remove the previous admin before verifying the bank account?
 
