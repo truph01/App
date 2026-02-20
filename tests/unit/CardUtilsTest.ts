@@ -1733,11 +1733,22 @@ describe('CardUtils', () => {
             expect(filteredCards).toStrictEqual([{cardName: unassignedCard, cardID: unassignedCard}]);
         });
 
-        it('Should filter parent cards for Amex Direct (FDX) feeds', () => {
+        it('Should filter parent cards only when a child card has matching digits for Amex Direct (FDX) feeds', () => {
+            const amexDirectFeedName = `${CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT}11111#domain123` as CompanyCardFeedWithDomainID;
+            const accountList = ['Platinum Card - 11111', 'Platinum Card - JANE DOE - 11111', 'Platinum Card - JOHN SMITH - 33333'];
+            const cardsList = getFilteredCardList(undefined, accountList, undefined, amexDirectFeedName);
+            expect(cardsList).toStrictEqual([
+                {cardName: 'Platinum Card - JANE DOE - 11111', cardID: 'Platinum Card - JANE DOE - 11111'},
+                {cardName: 'Platinum Card - JOHN SMITH - 33333', cardID: 'Platinum Card - JOHN SMITH - 33333'},
+            ]);
+        });
+
+        it('Should not filter parent cards when no child card has matching digits for Amex Direct feeds', () => {
             const amexDirectFeedName = `${CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT}11111#domain123` as CompanyCardFeedWithDomainID;
             const accountList = ['Platinum Card - 11111', 'Platinum Card - JANE DOE - 22222', 'Platinum Card - JOHN SMITH - 33333'];
             const cardsList = getFilteredCardList(undefined, accountList, undefined, amexDirectFeedName);
             expect(cardsList).toStrictEqual([
+                {cardName: 'Platinum Card - 11111', cardID: 'Platinum Card - 11111'},
                 {cardName: 'Platinum Card - JANE DOE - 22222', cardID: 'Platinum Card - JANE DOE - 22222'},
                 {cardName: 'Platinum Card - JOHN SMITH - 33333', cardID: 'Platinum Card - JOHN SMITH - 33333'},
             ]);
@@ -1745,11 +1756,11 @@ describe('CardUtils', () => {
 
         it('Should filter multiple parent cards across card programs for Amex Direct feeds', () => {
             const amexDirectFeedName = `${CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_DIRECT}11111#domain123` as CompanyCardFeedWithDomainID;
-            const accountList = ['Platinum Card - 11111', 'Platinum Card - JANE DOE - 22222', 'Gold Card - 44444', 'Gold Card - JOHN SMITH - 55555'];
+            const accountList = ['Platinum Card - 11111', 'Platinum Card - JANE DOE - 11111', 'Gold Card - 44444', 'Gold Card - JOHN SMITH - 44444'];
             const cardsList = getFilteredCardList(undefined, accountList, undefined, amexDirectFeedName);
             expect(cardsList).toStrictEqual([
-                {cardName: 'Platinum Card - JANE DOE - 22222', cardID: 'Platinum Card - JANE DOE - 22222'},
-                {cardName: 'Gold Card - JOHN SMITH - 55555', cardID: 'Gold Card - JOHN SMITH - 55555'},
+                {cardName: 'Platinum Card - JANE DOE - 11111', cardID: 'Platinum Card - JANE DOE - 11111'},
+                {cardName: 'Gold Card - JOHN SMITH - 44444', cardID: 'Gold Card - JOHN SMITH - 44444'},
             ]);
         });
 

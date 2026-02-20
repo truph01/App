@@ -786,7 +786,7 @@ function isSelectedFeedExpired(cardFeed: CombinedCardFeed | undefined): boolean 
  * For Amex Direct (FDX) feeds, parent cards aggregate child accounts and should not be assignable.
  * Parent cards follow the format "CardType - Digits" (2 segments separated by " - "),
  * while child cards include a cardholder name: "CardType - NAME - Digits" (3 segments).
- * A parent card is removed only when at least one child card with the same card type exists.
+ * A parent card is removed only when a child card with the same card type AND digits exists.
  *
  * Returns the set of parent card names that should be filtered out.
  */
@@ -796,22 +796,24 @@ function getAmexDirectParentCardNames(accountList: string[], feedName?: CompanyC
         return new Set();
     }
 
-    // Collect card type prefixes that have at least one child card (3+ segments)
-    const cardTypesWithChildren = new Set<string>();
+    // Collect (cardType, digits) pairs from child cards (3+ segments)
+    const childKeys = new Set<string>();
     for (const name of accountList) {
         const segments = name.split(' - ');
         const cardType = segments.at(0);
-        if (segments.length >= 3 && cardType) {
-            cardTypesWithChildren.add(cardType);
+        const digits = segments.at(-1);
+        if (segments.length >= 3 && cardType && digits) {
+            childKeys.add(`${cardType}\0${digits}`);
         }
     }
 
-    // Identify parent cards (2 segments) whose card type has children
+    // Identify parent cards (2 segments) that have a matching child with same card type AND digits
     const parentCards = new Set<string>();
     for (const name of accountList) {
         const segments = name.split(' - ');
         const cardType = segments.at(0);
-        if (segments.length === 2 && cardType && cardTypesWithChildren.has(cardType)) {
+        const digits = segments.at(1);
+        if (segments.length === 2 && cardType && digits && childKeys.has(`${cardType}\0${digits}`)) {
             parentCards.add(name);
         }
     }
