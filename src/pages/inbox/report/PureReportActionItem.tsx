@@ -1829,7 +1829,7 @@ function PureReportActionItem({
                                             shouldUseLocalization={!isPhrasalConciergeOptions}
                                             primaryTextNumberOfLines={actionableButtonsNoLines}
                                             styles={{
-                                                text: [isPhrasalConciergeOptions ? styles.textAlignLeft : undefined],
+                                                text: [isPhrasalConciergeOptions ? [styles.textAlignLeft, styles.breakWord] : undefined],
                                                 button: isPhrasalConciergeOptions ? [styles.actionableItemButton, hovered && styles.actionableItemButtonBackgroundHovered] : undefined,
                                                 container: [
                                                     isPhrasalConciergeOptions && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
