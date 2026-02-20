@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import type {ViewStyle} from 'react-native';
 import BlockingView from '@components/BlockingViews/BlockingView';
+import Text from '@components/Text';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {loadIllustration} from '@components/Icon/IllustrationLoader';
@@ -12,6 +13,7 @@ import {useMemoizedLazyAsset} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
+import Parser from '@libs/Parser';
 
 type OutcomeScreenBaseProps = {
     headerTitle: string;
@@ -24,22 +26,38 @@ type OutcomeScreenBaseProps = {
     padding?: ViewStyle;
 };
 
+function HTMLSubtitle({htmlString = '', style}: {htmlString?: string; style?: ViewStyle}) {
+    const styles = useThemeStyles();
+    return (
+        <View>
+            {/* We create an invisible Text component to ensure proper layout */}
+            <View style={[styles.opacity0, style]}>
+                <Text style={[styles.textAlignCenter]}>{Parser.htmlToText(htmlString)}</Text>
+            </View>
+
+            {/* But the actual text is rendered using RenderHTML */}
+            <View style={[styles.pAbsolute, style]}>
+                <RenderHTML html={`<centered-text><muted-text>${htmlString}</muted-text></centered-text>`} />
+            </View>
+        </View>
+    );
+}
+
 function OutcomeScreenBase({headerTitle, illustration, iconWidth, iconHeight, title, subtitle, customSubtitle, padding}: OutcomeScreenBaseProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {asset: icon} = useMemoizedLazyAsset(() => loadIllustration(illustration));
 
-    const renderedSubtitle =
-        customSubtitle ??
-        (subtitle ? (
-            <View style={[styles.renderHTML, styles.flexRow, styles.w100, styles.ph5]}>
-                <RenderHTML html={`<centered-text><muted-text>${subtitle}</muted-text></centered-text>`} />
-            </View>
-        ) : undefined);
-
     const onClose = () => {
         Navigation.closeRHPFlow();
     };
+
+    const CustomSubtitle = customSubtitle ?? (
+        <HTMLSubtitle
+            htmlString={subtitle}
+            style={styles.ph5}
+        />
+    );
 
     return (
         <ScreenWrapper testID={OutcomeScreenBase.displayName}>
@@ -56,8 +74,7 @@ function OutcomeScreenBase({headerTitle, illustration, iconWidth, iconHeight, ti
                     iconHeight={iconHeight}
                     title={title}
                     titleStyles={styles.mb2}
-                    CustomSubtitle={renderedSubtitle}
-                    subtitleStyle={[styles.textSupporting, styles.ph5]}
+                    CustomSubtitle={CustomSubtitle}
                     containerStyle={[styles.ph5, padding]}
                     testID={OutcomeScreenBase.displayName}
                 />
