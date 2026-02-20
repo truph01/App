@@ -307,9 +307,9 @@ function Search({
 
     const clearTransactionsAndSetHashAndKey = useCallback(() => {
         clearSelectedTransactions(hash);
-        setCurrentSearchHashAndKey(hash, searchKey);
+        setCurrentSearchHashAndKey(hash, similarSearchHash, searchKey);
         setCurrentSearchQueryJSON(queryJSON);
-    }, [hash, searchKey, clearSelectedTransactions, setCurrentSearchHashAndKey, setCurrentSearchQueryJSON, queryJSON]);
+    }, [hash, similarSearchHash, searchKey, clearSelectedTransactions, setCurrentSearchHashAndKey, setCurrentSearchQueryJSON, queryJSON]);
 
     useFocusEffect(clearTransactionsAndSetHashAndKey);
 
