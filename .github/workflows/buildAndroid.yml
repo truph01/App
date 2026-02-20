@@ -1,4 +1,4 @@
-name: Build Android HybridApp
+name: Build Android app
 
 on:
   workflow_call:
@@ -20,7 +20,7 @@ on:
         type: string
         default: ''
       artifact-prefix:
-        description: Prefix for build artifact names
+        description: 'The prefix for build artifact names. This is useful if you need to call multiple builds from the same workflow'
         type: string
         default: ''
       upload-sourcemaps:
@@ -42,7 +42,7 @@ on:
 
 jobs:
   build:
-    name: Build Android HybridApp
+    name: Build Android app
     runs-on: blacksmith-32vcpu-ubuntu-2404
     env:
       PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}

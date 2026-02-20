@@ -1,34 +1,34 @@
-name: Build and deploy ad-hoc apps for testing
+name: Build and deploy ad-hoc apps
 
 on:
   workflow_call:
     inputs:
       APP_REF:
-        description: Git ref to checkout and build
+        description: Git ref to checkout for building
         type: string
         required: true
       APP_PR_NUMBER:
-        description: App PR number (empty if none)
-        type: string
-        default: ''
-      MOBILE_EXPENSIFY_PR:
-        description: Mobile-Expensify PR number (empty if none)
+        description: Expensify/App pull request number (empty to skip comments and web deploy)
         type: string
         default: ''
       MOBILE_EXPENSIFY_REF:
         description: Mobile-Expensify ref to checkout (empty to use submodule at HEAD)
         type: string
         default: ''
-      BUILD_ANDROID:
-        description: Whether to build Android ('true' or 'false')
+      MOBILE_EXPENSIFY_PR:
+        description: Mobile-Expensify pull request number (empty to skip ME PR comments)
+        type: string
+        default: ''
+      BUILD_WEB:
+        description: Whether to build the web app
         type: string
         default: 'true'
       BUILD_IOS:
-        description: Whether to build iOS ('true' or 'false')
+        description: Whether to build the iOS app
         type: string
         default: 'true'
-      BUILD_WEB:
-        description: Whether to build web ('true' or 'false')
+      BUILD_ANDROID:
+        description: Whether to build the Android app
         type: string
         default: 'true'
       FORCE_NATIVE_BUILD:
@@ -49,13 +49,13 @@ jobs:
         with:
           github-token: ${{ github.token }}
           script: |
-            const workflowURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            github.rest.issues.createComment({
+              const workflowURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+              github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ${{ inputs.APP_PR_NUMBER || 0 }},
               body: `🚧 @${{ github.actor }} has triggered a test Expensify/App build. You can view the [workflow run here](${workflowURL}).`
-            });
+              });
 
       - name: Add build start comment to Expensify/Mobile-Expensify PR
         if: ${{ inputs.MOBILE_EXPENSIFY_PR != '' }}
@@ -64,13 +64,13 @@ jobs:
         with:
           github-token: ${{ secrets.OS_BOTIFY_TOKEN }}
           script: |
-            const workflowURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            github.rest.issues.createComment({
+              const workflowURL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+              github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: 'Mobile-Expensify',
               issue_number: ${{ inputs.MOBILE_EXPENSIFY_PR || 0 }},
               body: `🚧 @${{ github.actor }} has triggered a test Expensify/Mobile-Expensify build. You can view the [workflow run here](${workflowURL}).`
-            });
+              });
 
   buildAndroid:
     name: Build Android

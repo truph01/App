@@ -86,7 +86,7 @@ jobs:
     with:
       APP_REF: ${{ needs.prep.outputs.APP_REF }}
       APP_PR_NUMBER: ${{ needs.prep.outputs.APP_PR_NUMBER }}
-      BUILD_ANDROID: ${{ needs.prep.outputs.BUILD_MOBILE }}
-      BUILD_IOS: ${{ needs.prep.outputs.BUILD_MOBILE }}
       BUILD_WEB: ${{ needs.prep.outputs.BUILD_WEB }}
+      BUILD_IOS: ${{ needs.prep.outputs.BUILD_MOBILE }}
+      BUILD_ANDROID: ${{ needs.prep.outputs.BUILD_MOBILE }}
     secrets: inherit

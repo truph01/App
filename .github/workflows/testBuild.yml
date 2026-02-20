@@ -156,10 +156,10 @@ jobs:
     with:
       APP_REF: ${{ needs.prep.outputs.APP_REF }}
       APP_PR_NUMBER: ${{ needs.prep.outputs.APP_PR_NUMBER }}
-      MOBILE_EXPENSIFY_PR: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR }}
       MOBILE_EXPENSIFY_REF: ${{ needs.getMobileExpensifyRef.outputs.MOBILE_EXPENSIFY_REF }}
-      BUILD_ANDROID: ${{ inputs.ANDROID && 'true' || 'false' }}
-      BUILD_IOS: ${{ inputs.IOS && 'true' || 'false' }}
+      MOBILE_EXPENSIFY_PR: ${{ needs.getMobileExpensifyPR.outputs.MOBILE_EXPENSIFY_PR }}
       BUILD_WEB: ${{ inputs.WEB && 'true' || 'false' }}
+      BUILD_IOS: ${{ inputs.IOS && 'true' || 'false' }}
+      BUILD_ANDROID: ${{ inputs.ANDROID && 'true' || 'false' }}
       FORCE_NATIVE_BUILD: ${{ inputs.FORCE_NATIVE_BUILD && 'true' || 'false' }}
     secrets: inherit
