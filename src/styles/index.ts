@@ -932,6 +932,7 @@ const staticStyles = (theme: ThemeColors) =>
             paddingTop: 8,
             paddingBottom: 8,
             alignItems: 'flex-start',
+            borderRadius: 20,
         },
 
         actionableItemButtonText: {
