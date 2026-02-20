@@ -8,7 +8,9 @@ import ROUTES from '@src/ROUTES';
 import useNativeBiometrics from '@components/MultifactorAuthentication/Context/useNativeBiometrics';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import Log from '@libs/Log';
-import Navigation from './Navigation';
+import useRootNavigationState from '@hooks/useRootNavigationState';
+import {findFocusedRoute} from '@react-navigation/native';
+import Navigation, {isMFAFlowScreen} from './Navigation';
 
 // We want predictable, stable ordering for transaction challenges to ensurewe don't
 // accidentally navigate the user while they're in the middle of acting on a challenge.
@@ -37,6 +39,21 @@ function useNavigateTo3DSAuthorizationChallenge() {
     const [locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult] = useOnyx(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS, {canBeMissing: true});
     const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
 
+    // It's important not to whisk the user away from a challenge they're still working on. We add the challenge
+    // to locallyProcessed3DSTransactionReviews and clear it from the queue as soon as the Authorize call completes,
+    // which is also when we navigate to the outcome page. Thus, we need to make sure not to act on the next
+    // queue item until the user has completely exited the flow
+    const isCurrentlyActingOn3DSChallenge = useRootNavigationState((state) => {
+        if (!state) {
+            return false;
+        }
+        const focusedScreen = findFocusedRoute(state)?.name;
+        if (!focusedScreen) {
+            return false;
+        }
+        return isMFAFlowScreen(focusedScreen);
+    });
+
     const {doesDeviceSupportBiometrics} = useNativeBiometrics();
 
     const transactionPending3DSReview = useMemo(() => {
@@ -51,6 +68,13 @@ function useNavigateTo3DSAuthorizationChallenge() {
 
     useEffect(() => {
         if (!transactionPending3DSReview?.transactionID) {
+            return;
+        }
+
+        Log.info('[useNavigateTo3DSAuthorizationChallenge] Effect triggered for transaction', undefined, {transactionID: transactionPending3DSReview?.transactionID});
+
+        if (isCurrentlyActingOn3DSChallenge) {
+            Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - user is still acting on a challenge');
             return;
         }
 
@@ -81,6 +105,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
             // the old value and react will run a second effect with the new value. Typescript doesn't know that Onyx treats the object as
             // immutable, so we must guard against transactionID becoming undefined again, even though we know it won't be.
             if (!transactionPending3DSReview?.transactionID) {
+                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - typeguard bail-out (should be impossible to reach)');
                 return;
             }
 
@@ -98,16 +123,18 @@ function useNavigateTo3DSAuthorizationChallenge() {
                 return;
             }
 
+            Log.info('[useNavigateTo3DSAuthorizationChallenge] Navigating!', undefined, {transactionID: transactionPending3DSReview.transactionID});
+
             // If the challenge is still valid, navigate the user to the AuthorizePage
             Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION.getRoute(transactionPending3DSReview.transactionID));
         }
 
-        maybeNavigateTo3DSChallenge();
+        Navigation.isNavigationReady().then(() => maybeNavigateTo3DSChallenge());
 
         return () => {
             cancel = true;
         };
-    }, [transactionPending3DSReview?.transactionID, doesDeviceSupportBiometrics]);
+    }, [transactionPending3DSReview?.transactionID, doesDeviceSupportBiometrics, isCurrentlyActingOn3DSChallenge]);
 }
 
 export default useNavigateTo3DSAuthorizationChallenge;
