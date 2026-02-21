@@ -104,15 +104,40 @@ jobs:
       ref: ${{ inputs.APP_REF }}
       environment: adhoc
       pull-request-number: ${{ inputs.APP_PR_NUMBER }}
-      upload-artifacts: false
-      deploy-to-s3: true
     secrets: inherit
+
+  deployWebAdHoc:
+    name: Deploy Web to S3 (adhoc)
+    needs: [buildWeb]
+    if: ${{ fromJSON(inputs.BUILD_WEB) && inputs.APP_PR_NUMBER != '' }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Download web build artifact
+        # v7
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: web-build-tar-gz-artifact
+          path: ./
+
+      - name: Extract web build
+        run: tar -xzvf webBuild.tar.gz
+
+      - name: Configure AWS Credentials
+        # v6
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        run: aws s3 cp --recursive --acl public-read dist s3://ad-hoc-expensify-cash/web/${{ inputs.APP_PR_NUMBER }}
 
   postGithubComment:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ always() && (inputs.APP_PR_NUMBER != '' || inputs.MOBILE_EXPENSIFY_PR != '') }}
     name: Post a GitHub comment with app download links for testing
-    needs: [buildWeb, buildAndroid, buildIOS]
+    needs: [deployWebAdHoc, buildAndroid, buildIOS]
     steps:
       - name: Checkout
         # v6
@@ -134,7 +159,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           ANDROID: ${{ needs.buildAndroid.result }}
           IOS: ${{ needs.buildIOS.result }}
-          WEB: ${{ needs.buildWeb.result }}
+          WEB: ${{ needs.deployWebAdHoc.result }}
           ANDROID_LINK: ${{ needs.buildAndroid.outputs.ROCK_ARTIFACT_URL }}
           IOS_LINK: ${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}
           WEB_LINK: https://${{ inputs.APP_PR_NUMBER }}.pr-testing.expensify.com
@@ -155,7 +180,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ always() && (inputs.APP_PR_NUMBER != '' || needs.buildAndroid.outputs.ROCK_ARTIFACT_URL != '' || needs.buildIOS.outputs.ROCK_ARTIFACT_URL != '') }}
     name: Build Summary
-    needs: [buildWeb, buildAndroid, buildIOS]
+    needs: [deployWebAdHoc, buildAndroid, buildIOS]
     steps:
       - name: Checkout
         # v6
@@ -180,12 +205,12 @@ jobs:
           github-token: ${{ github.token }}
           script: |
             const prNumber = '${{ inputs.APP_PR_NUMBER }}';
-            const webLink = prNumber && '${{ needs.buildWeb.result }}' === 'success' ? `https://${prNumber}.pr-testing.expensify.com` : '';
+            const webLink = prNumber && '${{ needs.deployWebAdHoc.result }}' === 'success' ? `https://${prNumber}.pr-testing.expensify.com` : '';
             const androidLink = '${{ needs.buildAndroid.outputs.ROCK_ARTIFACT_URL }}' || '';
             const iosLink = '${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}' || '';
             const mobileExpensifySHA = '${{ steps.getMobileExpensifySHA.outputs.SHA }}' || '';
 
-            const webStatus = webLink ? '✅ Success' : '${{ needs.buildWeb.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
+            const webStatus = webLink ? '✅ Success' : '${{ needs.deployWebAdHoc.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
             const androidStatus = androidLink ? '✅ Success' : '${{ needs.buildAndroid.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
             const iosStatus = iosLink ? '✅ Success' : '${{ needs.buildIOS.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
 
