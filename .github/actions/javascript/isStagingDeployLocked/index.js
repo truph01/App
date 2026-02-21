@@ -12097,9 +12097,9 @@ const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
 const isEmptyObject_1 = __nccwpck_require__(6497);
 /**
  * Generic checklist section parser. Extracts a section from the issue body,
- * parses checkbox items within it, and returns typed objects sorted by number.
+ * parses checkbox items within it, and returns ChecklistItems sorted by number.
  */
-function parseChecklistSection(issueBody, sectionRegex, itemRegex, checkedKey, urlTransform) {
+function parseChecklistSection(issueBody, sectionRegex, itemRegex, urlTransform) {
     const sectionMatch = issueBody?.match(sectionRegex) ?? null;
     if (sectionMatch?.length !== 2) {
         return [];
@@ -12109,26 +12109,26 @@ function parseChecklistSection(issueBody, sectionRegex, itemRegex, checkedKey, u
         return {
             url: urlTransform ? urlTransform(rawUrl) : rawUrl,
             number: Number.parseInt(match[3], 10),
-            [checkedKey]: match[1] === 'x',
+            isChecked: match[1] === 'x',
         };
     });
     return items.sort((a, b) => a.number - b.number);
 }
 function getStagingDeployCashPRList(issue) {
-    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), 'isVerified');
+    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'));
     if (result.length === 0) {
         console.log('Hmmm...The open StagingDeployCash does not list any pull requests, continuing...');
     }
     return result;
 }
 function getStagingDeployCashPRListMobileExpensify(issue) {
-    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'), 'isVerified');
+    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
 }
 function getStagingDeployCashDeployBlockers(issue) {
-    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'), 'isResolved');
+    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
 }
 function getStagingDeployCashInternalQA(issue) {
-    return parseChecklistSection(issue.body, /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), 'isResolved', (url) => url.split('-').at(0)?.trim() ?? '');
+    return parseChecklistSection(issue.body, /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), (url) => url.split('-').at(0)?.trim() ?? '');
 }
 async function getStagingDeployCash() {
     const { data } = await GithubUtils_1.default.octokit.issues.listForRepo({
