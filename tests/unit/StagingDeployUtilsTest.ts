@@ -307,7 +307,7 @@ describe('StagingDeployUtils', () => {
         const PRListMobileExpensify = [1, 2, 3];
         const internalQAPRList = [6, 7];
 
-        const baseDeployBlockerList = [`https://github.com/${process.env.GITHUB_REPOSITORY}/pull/3`, `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/4`];
+        const baseDeployBlockerList = [3, 4];
 
         const baseExpectedOutput = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n\n**This release contains changes from the following pull requests:**\n`;
         const openCheckbox = '- [ ] ';
@@ -324,6 +324,7 @@ describe('StagingDeployUtils', () => {
         const ghVerification = 'I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.';
 
         const prURL = (n: number) => `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/${n}`;
+        const issueURL = (n: number) => `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${n}`;
         const mobileURL = (n: number) => `https://github.com/Expensify/Mobile-Expensify/pull/${n}`;
 
         const allVerifiedExpectedOutput =
@@ -406,8 +407,8 @@ describe('StagingDeployUtils', () => {
             expect(issue.issueBody).toBe(
                 `${allVerifiedExpectedOutput}` +
                     `${deployBlockerHeader}` +
-                    `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(0)}` +
-                    `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(1)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(3)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(4)}` +
                     `${lineBreak}${deployerVerificationsHeader}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
@@ -423,13 +424,13 @@ describe('StagingDeployUtils', () => {
                 PRList: basePRList,
                 verifiedPRList: basePRList,
                 deployBlockers: baseDeployBlockerList,
-                resolvedDeployBlockers: [baseDeployBlockerList.at(0) ?? ''],
+                resolvedDeployBlockers: [baseDeployBlockerList.at(0) ?? 0],
             });
             expect(issue.issueBody).toBe(
                 `${allVerifiedExpectedOutput}` +
                     `${deployBlockerHeader}` +
-                    `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
-                    `${lineBreak}${openCheckbox}${baseDeployBlockerList.at(1)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(3)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(4)}` +
                     `${lineBreak}${deployerVerificationsHeader}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +
@@ -455,8 +456,8 @@ describe('StagingDeployUtils', () => {
                     `${lineBreak}${closedCheckbox}${prURL(4)}` +
                     `${lineBreak}${closedCheckbox}${prURL(5)}` +
                     `${lineBreak}${deployBlockerHeader}` +
-                    `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(0)}` +
-                    `${lineBreak}${closedCheckbox}${baseDeployBlockerList.at(1)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(3)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(4)}` +
                     `${lineBreak}${deployerVerificationsHeader}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease}` +

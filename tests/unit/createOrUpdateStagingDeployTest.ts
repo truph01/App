@@ -139,7 +139,7 @@ const baseMobileExpensifyPRList = [
     `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/22`,
 ];
 
-const baseIssueList = [`https://github.com/${process.env.GITHUB_REPOSITORY}/issues/11`, `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/12`];
+const issueURL = (n: number) => `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${n}`;
 // eslint-disable-next-line max-len
 const baseExpectedOutput = (version = '1.0.2-1', includeMobileExpensifyCompare = true) =>
     // cspell:disable
@@ -448,11 +448,11 @@ describe('createOrUpdateStagingDeployCash', () => {
                     `${lineBreak}${openCheckbox}https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/23` +
                     `${lineBreak}${openCheckbox}https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/24` +
                     `${lineBreakDouble}${deployBlockerHeader}` +
-                    `${lineBreak}${openCheckbox}${basePRList.at(5)}` +
-                    `${lineBreak}${openCheckbox}${basePRList.at(8)}` +
-                    `${lineBreak}${closedCheckbox}${basePRList.at(9)}` +
-                    `${lineBreak}${openCheckbox}${baseIssueList.at(0)}` +
-                    `${lineBreak}${openCheckbox}${baseIssueList.at(1)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(6)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(9)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(10)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(11)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(12)}` +
                     `${lineBreakDouble}${buildChronologicalSection([...baseNewPullRequests, ...newPullRequests], [20, 21, 22, 23, 24])}` +
                     `${lineBreak}${deployerVerificationsHeader}` +
                     `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease('1.0.2-2')}` +
@@ -524,11 +524,11 @@ describe('createOrUpdateStagingDeployCash', () => {
                     `${lineBreak}${openCheckbox}${baseMobileExpensifyPRList.at(1)}` +
                     `${lineBreak}${openCheckbox}${baseMobileExpensifyPRList.at(2)}` +
                     `${lineBreakDouble}${deployBlockerHeader}` +
-                    `${lineBreak}${closedCheckbox}${basePRList.at(5)}` +
-                    `${lineBreak}${openCheckbox}${basePRList.at(8)}` +
-                    `${lineBreak}${closedCheckbox}${basePRList.at(9)}` +
-                    `${lineBreak}${openCheckbox}${baseIssueList.at(0)}` +
-                    `${lineBreak}${openCheckbox}${baseIssueList.at(1)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(6)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(9)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(10)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(11)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(12)}` +
                     `${lineBreakDouble}${buildChronologicalSection(baseNewPullRequests, [20, 21, 22])}` +
                     `${lineBreak}${deployerVerificationsHeader}` +
                     `${lineBreak}${closedCheckbox}${sentryVerificationCurrentRelease('1.0.2-1')}` +
@@ -581,9 +581,9 @@ describe('createOrUpdateStagingDeployCash', () => {
                     `${lineBreak}${openCheckbox}${basePRList.at(7)}` +
                     // Note: No Mobile-Expensify PRs section since there are none
                     `${lineBreakDouble}${deployBlockerHeader}` +
-                    `${lineBreak}${openCheckbox}${basePRList.at(5)}` +
-                    `${lineBreak}${openCheckbox}${basePRList.at(8)}` +
-                    `${lineBreak}${closedCheckbox}${basePRList.at(9)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(6)}` +
+                    `${lineBreak}${openCheckbox}${issueURL(9)}` +
+                    `${lineBreak}${closedCheckbox}${issueURL(10)}` +
                     `${lineBreakDouble}${buildChronologicalSection(baseNewPullRequests)}` +
                     `${lineBreak}${deployerVerificationsHeader}` +
                     `${lineBreak}${closedCheckbox}${sentryVerificationCurrentRelease('1.0.2-1')}` +

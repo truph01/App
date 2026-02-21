@@ -12091,10 +12091,8 @@ exports.getStagingDeployCashData = getStagingDeployCashData;
 exports.generateStagingDeployCashBodyAndAssignees = generateStagingDeployCashBodyAndAssignees;
 exports.parseChecklistSection = parseChecklistSection;
 const dedent_1 = __importDefault(__nccwpck_require__(6762));
-const arrayDifference_1 = __importDefault(__nccwpck_require__(7532));
 const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
-const isEmptyObject_1 = __nccwpck_require__(6497);
 /**
  * Generic checklist section parser. Extracts a section from the issue body,
  * parses checkbox items within it, and returns ChecklistItems sorted by number.
@@ -12178,7 +12176,7 @@ function getStagingDeployCashData(issue) {
  */
 async function generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '', chronologicalSection = '', }) {
     const data = await GithubUtils_1.default.fetchAllPullRequests(PRList);
-    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
+    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => pr.labels.some((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA)) : [];
     const mergerResults = await Promise.all(internalQAPRs.map((pr) => GithubUtils_1.default.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ number: pr.number, mergerLogin }))));
     const internalQAPRMap = new Map();
     for (const { number, mergerLogin } of mergerResults) {
@@ -12192,9 +12190,9 @@ async function generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMo
     const resolvedInternalQAPRSet = new Set(resolvedInternalQAPRs);
     const resolvedDeployBlockerSet = new Set(resolvedDeployBlockers);
     const internalQAPRNumbers = new Set(internalQAPRMap.keys());
-    const sortedPRList = [...new Set((0, arrayDifference_1.default)(PRList, [...internalQAPRNumbers]))].sort((a, b) => a - b);
+    const sortedPRList = [...new Set(PRList.filter((n) => !internalQAPRNumbers.has(n)))].sort((a, b) => a - b);
     const sortedPRListMobileExpensify = [...new Set(PRListMobileExpensify)].sort((a, b) => a - b);
-    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(a) - GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(b));
+    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => a - b);
     const sections = [];
     // Header
     let header = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n`;
@@ -12234,8 +12232,13 @@ async function generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMo
         sections.push(`**Internal QA:**\n${items}\n`);
     }
     // Deploy blockers
-    if (deployBlockers.length > 0) {
-        const items = sortedDeployBlockers.map((url) => `${resolvedDeployBlockerSet.has(url) ? '- [x] ' : '- [ ] '}${url}`).join('\n');
+    if (sortedDeployBlockers.length > 0) {
+        const items = sortedDeployBlockers
+            .map((number) => {
+            const url = `${CONST_1.default.APP_REPO_URL}/issues/${number}`;
+            return `${resolvedDeployBlockerSet.has(number) ? '- [x] ' : '- [ ] '}${url}`;
+        })
+            .join('\n');
         sections.push(`**Deploy Blockers:**\n${items}\n`);
     }
     // Chronological section
@@ -12255,38 +12258,6 @@ async function generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMo
     const issueBody = sections.join('\n');
     const issueAssignees = [...new Set(internalQAPRMap.values())].filter((login) => login !== undefined);
     return { issueBody, issueAssignees };
-}
-
-
-/***/ }),
-
-/***/ 7532:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-/**
- * This function is an equivalent of _.difference, it takes two arrays and returns the difference between them.
- * It returns an array of items that are in the first array but not in the second array.
- */
-function arrayDifference(array1, array2) {
-    return [array1, array2].reduce((a, b) => a.filter((c) => !b.includes(c)));
-}
-exports["default"] = arrayDifference;
-
-
-/***/ }),
-
-/***/ 6497:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isEmptyObject = isEmptyObject;
-function isEmptyObject(obj) {
-    return Object.keys(obj ?? {}).length === 0;
 }
 
 

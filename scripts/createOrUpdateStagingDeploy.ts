@@ -12,10 +12,6 @@ import type {ChecklistItem, StagingDeployCashData} from '@github/libs/StagingDep
 
 type IssuesCreateResponse = Awaited<ReturnType<typeof GithubUtils.octokit.issues.create>>['data'];
 
-type PackageJson = {
-    version: string;
-};
-
 type TimelineEntry = {type: 'pr'; prNumber: number; date: string} | {type: 'submodule'; version: string; date: string; commit: string};
 
 /**
@@ -113,31 +109,6 @@ async function buildChronologicalSection({
 }
 
 /**
- * Build params for creating a brand-new deploy checklist.
- */
-function buildNewChecklistParams({
-    newVersion,
-    newPRNumbers,
-    mergedMobileExpensifyPREntries,
-    previousChecklistData,
-    chronologicalSection,
-}: {
-    newVersion: string;
-    newPRNumbers: number[];
-    mergedMobileExpensifyPREntries: MergedPR[];
-    previousChecklistData: StagingDeployCashData;
-    chronologicalSection: string;
-}) {
-    return {
-        tag: newVersion,
-        PRList: newPRNumbers,
-        PRListMobileExpensify: mergedMobileExpensifyPREntries.map((pr) => pr.prNumber),
-        previousTag: previousChecklistData.version,
-        chronologicalSection,
-    };
-}
-
-/**
  * Build params for updating an existing open deploy checklist, preserving checked state.
  */
 async function buildUpdateChecklistParams({
@@ -185,16 +156,18 @@ async function buildUpdateChecklistParams({
         labels: CONST.LABELS.DEPLOY_BLOCKER,
     });
 
-    const deployBlockers = preserveCheckboxState(
-        openDeployBlockers.map((db) => ({number: db.number, url: db.html_url})),
-        currentChecklistData.deployBlockers,
-    );
-
-    // Add demoted/closed blockers from current checklist and auto-check them
-    for (const deployBlocker of currentChecklistData.deployBlockers) {
-        const isChecked = !deployBlockers.some((openBlocker) => openBlocker.number === deployBlocker.number);
-        deployBlockers.push({...deployBlocker, isChecked});
-    }
+    // Merge open blockers (from the API) with previously-tracked blockers (from the current checklist).
+    // Open blockers preserve their checked state; closed/demoted blockers are auto-checked.
+    const openBlockerNumbers = new Set(openDeployBlockers.map((db) => db.number));
+    const allBlockerNumbers = new Set([...openBlockerNumbers, ...currentChecklistData.deployBlockers.map((db) => db.number)]);
+    const deployBlockers: ChecklistItem[] = [...allBlockerNumbers].map((number) => {
+        const existing = currentChecklistData.deployBlockers.find((db) => db.number === number);
+        if (!openBlockerNumbers.has(number)) {
+            return {number, url: existing?.url ?? '', isChecked: true};
+        }
+        const url = existing?.url ?? openDeployBlockers.find((db) => db.number === number)?.html_url ?? '';
+        return {number, url, isChecked: existing?.isChecked ?? false};
+    });
 
     const didVersionChange = newVersion !== currentChecklistData.version;
 
@@ -204,8 +177,8 @@ async function buildUpdateChecklistParams({
         PRListMobileExpensify: PRListMobileExpensify.map((pr) => pr.number),
         verifiedPRList: PRList.filter((pr) => pr.isChecked).map((pr) => pr.number),
         verifiedPRListMobileExpensify: PRListMobileExpensify.filter((pr) => pr.isChecked).map((pr) => pr.number),
-        deployBlockers: deployBlockers.map((blocker) => blocker.url),
-        resolvedDeployBlockers: deployBlockers.filter((blocker) => blocker.isChecked).map((blocker) => blocker.url),
+        deployBlockers: deployBlockers.map((blocker) => blocker.number),
+        resolvedDeployBlockers: deployBlockers.filter((blocker) => blocker.isChecked).map((blocker) => blocker.number),
         resolvedInternalQAPRs: currentChecklistData.internalQAPRList.filter((pr) => pr.isChecked).map((pr) => pr.number),
         isSentryChecked: didVersionChange ? false : currentChecklistData.isSentryChecked,
         isGHStatusChecked: didVersionChange ? false : currentChecklistData.isGHStatusChecked,
@@ -215,12 +188,10 @@ async function buildUpdateChecklistParams({
 }
 
 async function run(): Promise<IssuesCreateResponse | void> {
-    // Note: require('package.json').version does not work because ncc will resolve that to a plain string at compile time
-    const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as PackageJson;
-    // e.g. '1.2.3-4'
-    const newVersion = packageJson.version;
+    // Read version at runtime (not via static import) so tests can mock different versions per test case
+    const {version: newVersion} = JSON.parse(fs.readFileSync('package.json', 'utf8')) as {version: string};
     // e.g. '1.2.3-4-staging'
-    const newStagingTag = `${packageJson.version}-staging`;
+    const newStagingTag = `${newVersion}-staging`;
 
     try {
         const {data: recentDeployChecklists} = await GithubUtils.octokit.issues.listForRepo({
@@ -310,13 +281,13 @@ async function run(): Promise<IssuesCreateResponse | void> {
 
         let checklistParams;
         if (shouldCreateNewDeployChecklist) {
-            checklistParams = buildNewChecklistParams({
-                newVersion,
-                newPRNumbers,
-                mergedMobileExpensifyPREntries,
-                previousChecklistData,
+            checklistParams = {
+                tag: newVersion,
+                PRList: newPRNumbers,
+                PRListMobileExpensify: mergedMobileExpensifyPREntries.map((pr) => pr.prNumber),
+                previousTag: previousChecklistData.version,
                 chronologicalSection,
-            });
+            };
         } else if (currentChecklistData) {
             checklistParams = await buildUpdateChecklistParams({
                 newVersion,
@@ -367,4 +338,4 @@ if (require.main === module) {
 }
 
 export default run;
-export {buildChronologicalSection, buildNewChecklistParams, buildUpdateChecklistParams, preserveCheckboxState};
+export {buildChronologicalSection, buildUpdateChecklistParams, preserveCheckboxState};

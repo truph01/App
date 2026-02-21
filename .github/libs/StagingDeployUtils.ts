@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type {components as OctokitComponents} from '@octokit/openapi-types/types';
 import dedent from '@libs/StringUtils/dedent';
-import arrayDifference from './arrayDifference';
 import CONST from './CONST';
 import GithubUtils from './GithubUtils';
-import {isEmptyObject} from './isEmptyObject';
 
 type OctokitIssueItem = OctokitComponents['schemas']['issue'];
 
@@ -25,8 +23,8 @@ type StagingDeployCashParams = {
     PRListMobileExpensify?: number[];
     verifiedPRList?: number[];
     verifiedPRListMobileExpensify?: number[];
-    deployBlockers?: string[];
-    resolvedDeployBlockers?: string[];
+    deployBlockers?: number[];
+    resolvedDeployBlockers?: number[];
     resolvedInternalQAPRs?: number[];
     isSentryChecked?: boolean;
     isGHStatusChecked?: boolean;
@@ -162,7 +160,7 @@ async function generateStagingDeployCashBodyAndAssignees({
 }: StagingDeployCashParams): Promise<StagingDeployCashBody> {
     const data = await GithubUtils.fetchAllPullRequests(PRList);
 
-    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !isEmptyObject(pr.labels.find((item) => item.name === CONST.LABELS.INTERNAL_QA))) : [];
+    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => pr.labels.some((item) => item.name === CONST.LABELS.INTERNAL_QA)) : [];
     const mergerResults = await Promise.all(internalQAPRs.map((pr) => GithubUtils.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({number: pr.number, mergerLogin}))));
 
     const internalQAPRMap = new Map<number, string | undefined>();
@@ -180,9 +178,9 @@ async function generateStagingDeployCashBodyAndAssignees({
     const resolvedDeployBlockerSet = new Set(resolvedDeployBlockers);
 
     const internalQAPRNumbers = new Set(internalQAPRMap.keys());
-    const sortedPRList = [...new Set(arrayDifference(PRList, [...internalQAPRNumbers]))].sort((a, b) => a - b);
+    const sortedPRList = [...new Set(PRList.filter((n) => !internalQAPRNumbers.has(n)))].sort((a, b) => a - b);
     const sortedPRListMobileExpensify = [...new Set(PRListMobileExpensify)].sort((a, b) => a - b);
-    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => GithubUtils.getIssueOrPullRequestNumberFromURL(a) - GithubUtils.getIssueOrPullRequestNumberFromURL(b));
+    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => a - b);
 
     const sections: string[] = [];
 
@@ -228,8 +226,13 @@ async function generateStagingDeployCashBodyAndAssignees({
     }
 
     // Deploy blockers
-    if (deployBlockers.length > 0) {
-        const items = sortedDeployBlockers.map((url) => `${resolvedDeployBlockerSet.has(url) ? '- [x] ' : '- [ ] '}${url}`).join('\n');
+    if (sortedDeployBlockers.length > 0) {
+        const items = sortedDeployBlockers
+            .map((number) => {
+                const url = `${CONST.APP_REPO_URL}/issues/${number}`;
+                return `${resolvedDeployBlockerSet.has(number) ? '- [x] ' : '- [ ] '}${url}`;
+            })
+            .join('\n');
         sections.push(`**Deploy Blockers:**\n${items}\n`);
     }
 
