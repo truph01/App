@@ -3700,8 +3700,6 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         personalDetails,
     });
 
-    console.log(optimisticData, '---1');
-
     return {
         payerAccountID,
         payerEmail,
