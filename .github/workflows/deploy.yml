@@ -99,7 +99,7 @@ jobs:
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     uses: ./.github/workflows/buildAndroid.yml
     with:
-      ref: ${{ github.ref }}
+      ref: ${{ github.sha }}
       variant: Release
     secrets: inherit
 
@@ -290,7 +290,7 @@ jobs:
     if: ${{ fromJSON(needs.prep.outputs.SHOULD_BUILD_NATIVE) }}
     uses: ./.github/workflows/buildIOS.yml
     with:
-      ref: ${{ github.ref }}
+      ref: ${{ github.sha }}
       variant: Release
     secrets: inherit
 
@@ -355,31 +355,6 @@ jobs:
         run: |
           op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
           op read "op://${{ vars.OP_VAULT }}/ios-fastlane-json-key.json/ios-fastlane-json-key.json" --force --out-file ./ios-fastlane-json-key.json
-
-      - name: Setup Node
-        id: setup-node
-        uses: ./.github/actions/composite/setupNode
-        with:
-          IS_HYBRID_BUILD: 'true'
-
-      - name: Configure MapBox SDK
-        run: ./scripts/setup-mapbox-sdk.sh ${{ secrets.MAPBOX_SDK_DOWNLOAD_TOKEN }}
-
-      - name: Cache Pod dependencies
-        # v5.0.1
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb
-        id: pods-cache
-        with:
-          path: Mobile-Expensify/iOS/Pods
-          key: ${{ runner.os }}-pods-cache-${{ hashFiles('Mobile-Expensify/iOS/Podfile.lock') }}
-
-      - name: Install cocoapods
-        if: ${{ steps.pods-cache.outputs.cache-hit != 'true' }}
-        uses: nick-fields/retry@3f757583fb1b1f940bc8ef4bf4734c8dc02a5847
-        with:
-          timeout_minutes: 10
-          max_attempts: 5
-          command: npm run pod-install
 
       - name: Upload release build to TestFlight
         run: bundle exec fastlane ios upload_testflight_hybrid
@@ -523,7 +498,7 @@ jobs:
     needs: [prep]
     uses: ./.github/workflows/buildWeb.yml
     with:
-      ref: ${{ github.ref }}
+      ref: ${{ github.sha }}
       environment: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
     secrets: inherit
 
