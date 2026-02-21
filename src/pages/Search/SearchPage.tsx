@@ -132,7 +132,6 @@ function SearchPage({route}: SearchPageProps) {
     const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
     const {accountID} = useCurrentUserPersonalDetails();
-    const [allReportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {canBeMissing: true});
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);
@@ -397,6 +396,8 @@ function SearchPage({route}: SearchPageProps) {
         selectAllMatchingItems,
         clearSelectedTransactions,
         setIsDownloadErrorModalVisible,
+        selectedReportIDs,
+        selectedTransactionReportIDs,
     ]);
 
     const handleApproveWithDEWCheck = useCallback(async () => {
@@ -769,7 +770,7 @@ function SearchPage({route}: SearchPageProps) {
                 }
 
                 const reportPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
-                const completeReport = getReportOrDraftReport(report.reportID) ?? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`];
+                const completeReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`];
 
                 if (!completeReport) {
                     return false;
@@ -802,7 +803,7 @@ function SearchPage({route}: SearchPageProps) {
                     let areAnyReportsExported = false;
 
                     for (const reportID of selectedReportIDs) {
-                        const unfilteredReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
+                        const unfilteredReportActions = currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
 
                         if (!unfilteredReportActions) {
                             continue;
@@ -815,7 +816,7 @@ function SearchPage({route}: SearchPageProps) {
                         if (isExported) {
                             areAnyReportsExported = true;
 
-                            const reportName = getReportOrDraftReport(reportID)?.reportName ?? '';
+                            const reportName = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]?.reportName ?? '';
                             if (reportName) {
                                 exportedReportNames.push(reportName);
                             }
@@ -1206,7 +1207,6 @@ function SearchPage({route}: SearchPageProps) {
         currentUserPersonalDetails.accountID,
         currentUserPersonalDetails?.login,
         bankAccountList,
-        allReportActions,
         handleBasicExport,
         beginExportWithTemplate,
         handleApproveWithDEWCheck,
@@ -1226,29 +1226,8 @@ function SearchPage({route}: SearchPageProps) {
         styles.colorMuted,
         styles.fontWeightNormal,
         styles.textWrap,
+        styles.integrationIcon,
         showConfirmModal,
-        expensifyIcons.ArrowCollapse,
-        expensifyIcons.ArrowRight,
-        expensifyIcons.ArrowSplit,
-        expensifyIcons.DocumentMerge,
-        expensifyIcons.Exclamation,
-        expensifyIcons.Export,
-        expensifyIcons.MoneyBag,
-        expensifyIcons.Send,
-        expensifyIcons.Stopwatch,
-        expensifyIcons.Table,
-        expensifyIcons.ThumbsDown,
-        expensifyIcons.ThumbsUp,
-        expensifyIcons.Trashcan,
-        dismissedHoldUseExplanation,
-        dismissedRejectUseExplanation,
-        areAllTransactionsFromSubmitter,
-        allTransactionViolations,
-        currentSearchResults?.data,
-        isDelegateAccessRestricted,
-        showDelegateNoAccessModal,
-        currentUserPersonalDetails.accountID,
-        personalPolicyID,
     ]);
 
     const {initScanRequest, PDFValidationComponent, ErrorModal} = useReceiptScanDrop();
