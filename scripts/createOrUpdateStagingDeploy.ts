@@ -41,6 +41,7 @@ async function buildChronologicalSection({
         return '';
     }
 
+    // Look up workflow run URLs for each submodule update commit
     const submoduleRunURLs = new Map<string, string | undefined>();
     const results = await Promise.allSettled(
         submoduleUpdates.map(async (update) => {
@@ -54,6 +55,9 @@ async function buildChronologicalSection({
         }
     }
 
+    // Group Mobile-Expensify PRs by the submodule update that introduced them.
+    // A Mobile-Expensify PR is assigned to the first submodule bump whose date >= PR merge date,
+    // because merging to Mobile-Expensify doesn't matter until the submodule is actually bumped in App.
     const sortedSubmoduleUpdates = [...submoduleUpdates].sort((a, b) => a.date.localeCompare(b.date));
     const mobileExpensifyPRsBySubmodule = new Map<string, MergedPR[]>();
     const mobileExpensifyPRsPendingSubmoduleUpdate: MergedPR[] = [];
@@ -68,6 +72,7 @@ async function buildChronologicalSection({
         }
     }
 
+    // Merge PRs and submodule updates into a single chronological timeline
     const timeline: TimelineEntry[] = [
         ...chronologicalPREntries.map((pr): TimelineEntry => ({type: 'pr', prNumber: pr.prNumber, date: pr.date})),
         ...submoduleUpdates.map((update): TimelineEntry => ({type: 'submodule', version: update.version, date: update.date, commit: update.commit})),
@@ -133,7 +138,7 @@ function buildNewChecklistParams({
 }
 
 /**
- * Build params for updating an existing open deploy checklist, preserving verified/resolved state.
+ * Build params for updating an existing open deploy checklist, preserving checked state.
  */
 async function buildUpdateChecklistParams({
     newVersion,
@@ -212,7 +217,9 @@ async function buildUpdateChecklistParams({
 async function run(): Promise<IssuesCreateResponse | void> {
     // Note: require('package.json').version does not work because ncc will resolve that to a plain string at compile time
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as PackageJson;
+    // e.g. '1.2.3-4'
     const newVersion = packageJson.version;
+    // e.g. '1.2.3-4-staging'
     const newStagingTag = `${packageJson.version}-staging`;
 
     try {
@@ -224,6 +231,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
             state: 'all',
         });
 
+        // If the most recent checklist is open we'll update it; otherwise we create a new one
         const mostRecentChecklist = recentDeployChecklists.at(0);
         if (!mostRecentChecklist) {
             throw new Error('Could not find the most recent checklist');
@@ -241,9 +249,11 @@ async function run(): Promise<IssuesCreateResponse | void> {
             throw new Error('Could not find the previous checklist');
         }
 
+        // Parse checklist data from the previous (and optionally current) deploy checklists
         const previousChecklistData = getStagingDeployCashData(previousChecklist);
         const currentChecklistData: StagingDeployCashData | undefined = shouldCreateNewDeployChecklist ? undefined : getStagingDeployCashData(mostRecentChecklist);
 
+        // Find PRs merged between the previous checklist's tag and the new staging tag
         const {mergedPRs: mergedPREntries, submoduleUpdates} = await GitUtils.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST.APP_REPO);
         const mergedPRs = mergedPREntries.map((pr) => pr.prNumber).sort((a, b) => a - b);
 
@@ -264,6 +274,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
         core.endGroup();
         console.info(`[api] Checklist PRs: ${newPRNumbers.join(', ')}`);
 
+        // Fetch Mobile-Expensify PRs (with dates for chronological grouping by submodule update)
         let mergedMobileExpensifyPREntries: MergedPR[] = [];
         try {
             const {mergedPRs: allMobileExpensifyPREntries} = await GitUtils.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST.MOBILE_EXPENSIFY_REPO);
@@ -321,6 +332,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
 
         const {issueBody: checklistBody, issueAssignees: checklistAssignees} = await generateStagingDeployCashBodyAndAssignees(checklistParams);
 
+        // Finally, create or update the checklist
         const defaultPayload = {
             owner: CONST.GITHUB_OWNER,
             repo: CONST.APP_REPO,
