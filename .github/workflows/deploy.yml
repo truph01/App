@@ -599,7 +599,7 @@ jobs:
     name: Post a Slack message when any platform fails to build or deploy
     runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ failure() }}
-    needs: [androidBuild, androidUploadGooglePlay, androidUploadBrowserStack, androidUploadApplause, androidSubmit, iosBuild, iosUploadTestflight, iosUploadBrowserStack, iosUploadApplause, iosSubmit, webDeploy]
+    needs: [androidBuild, androidUploadGooglePlay, androidUploadBrowserStack, androidUploadApplause, androidSubmit, iosBuild, iosUploadTestflight, iosUploadBrowserStack, iosUploadApplause, iosSubmit, webBuild, webDeploy]
     steps:
       - name: Checkout
         # v4
@@ -618,7 +618,7 @@ jobs:
       ANDROID_RESULT: ${{ steps.platformResults.outputs.ANDROID_RESULT }}
       IOS_RESULT: ${{ steps.platformResults.outputs.IOS_RESULT }}
       WEB_RESULT: ${{ steps.platformResults.outputs.WEB_RESULT }}
-    needs: [androidBuild, androidUploadGooglePlay, androidSubmit, iosBuild, iosUploadTestflight, iosSubmit, webDeploy]
+    needs: [androidBuild, androidUploadGooglePlay, androidSubmit, iosBuild, iosUploadTestflight, iosSubmit, webBuild, webDeploy]
     if: ${{ always() }}
     steps:
       # Determine effective result for each platform
@@ -653,7 +653,12 @@ jobs:
             echo "IOS_RESULT=${{ needs.iosUploadTestflight.result }}" >> "$GITHUB_OUTPUT"
           fi
 
-          echo "WEB_RESULT=${{ needs.webDeploy.result }}" >> "$GITHUB_OUTPUT"
+          # Web: propagate build failure even when deploy is skipped
+          if [ "${{ needs.webBuild.result }}" == "failure" ]; then
+            echo "WEB_RESULT=failure" >> "$GITHUB_OUTPUT"
+          else
+            echo "WEB_RESULT=${{ needs.webDeploy.result }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Check deployment success on at least one platform
         id: checkDeploymentSuccessOnAtLeastOnePlatform
