@@ -27,12 +27,12 @@ import useFilesValidation from '@hooks/useFilesValidation';
 import useIOUUtils from '@hooks/useIOUUtils';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useReportAttributes from '@hooks/useReportAttributes';
 import useOnyx from '@hooks/useOnyx';
 import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
 import usePermissions from '@hooks/usePermissions';
 import usePersonalPolicy from '@hooks/usePersonalPolicy';
 import usePolicy from '@hooks/usePolicy';
+import useReportAttributes from '@hooks/useReportAttributes';
 import useSelfDMReport from '@hooks/useSelfDMReport';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -655,30 +655,30 @@ function IOURequestStepScan({
                                         forceInactive={isAttachmentPickerActive}
                                     />
                                     <Animated.View style={[styles.cameraFocusIndicator, cameraFocusIndicatorAnimatedStyle]} />
-                                    {canUseMultiScan ? (
-                                        <View style={[styles.flashButtonContainer, styles.primaryMediumIcon, flash && styles.bgGreenSuccess, !hasFlash && styles.opacity0]}>
-                                            <PressableWithFeedback
-                                                role={CONST.ROLE.BUTTON}
-                                                accessibilityLabel={translate('receipt.flash')}
-                                                sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.FLASH}
-                                                disabled={cameraPermissionStatus !== RESULTS.GRANTED || !hasFlash}
-                                                onPress={() => setFlash((prevFlash) => !prevFlash)}
-                                            >
-                                                <Icon
-                                                    height={16}
-                                                    width={16}
-                                                    src={lazyIcons.Bolt}
-                                                    fill={flash ? theme.white : theme.icon}
-                                                />
-                                            </PressableWithFeedback>
-                                        </View>
-                                    ) : null}
                                     <Animated.View
                                         pointerEvents="none"
                                         style={[StyleSheet.absoluteFillObject, styles.backgroundWhite, blinkStyle, styles.zIndex10]}
                                     />
                                 </View>
                             </GestureDetector>
+                            {canUseMultiScan ? (
+                                <View style={[styles.flashButtonContainer, styles.primaryMediumIcon, flash && styles.bgGreenSuccess, !hasFlash && styles.opacity0]}>
+                                    <PressableWithFeedback
+                                        role={CONST.ROLE.BUTTON}
+                                        accessibilityLabel={translate('receipt.flash')}
+                                        sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.FLASH}
+                                        disabled={cameraPermissionStatus !== RESULTS.GRANTED || !hasFlash}
+                                        onPress={() => setFlash((prevFlash) => !prevFlash)}
+                                    >
+                                        <Icon
+                                            height={16}
+                                            width={16}
+                                            src={lazyIcons.Bolt}
+                                            fill={flash ? theme.white : theme.icon}
+                                        />
+                                    </PressableWithFeedback>
+                                </View>
+                            ) : null}
                         </View>
                     )}
                 </View>
@@ -787,6 +787,7 @@ function IOURequestStepScan({
                     <ReceiptPreviews
                         isMultiScanEnabled={isMultiScanEnabled}
                         submit={submitMultiScanReceipts}
+                        isCapturingPhoto={didCapturePhoto}
                     />
                 )}
 
