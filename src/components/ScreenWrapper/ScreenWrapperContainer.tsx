@@ -246,5 +246,7 @@ function ScreenWrapperContainer({
     );
 }
 
+ScreenWrapperContainer.displayName = 'ScreenWrapperContainer';
+
 export default React.memo(ScreenWrapperContainer);
 export type {ScreenWrapperContainerProps};

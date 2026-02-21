@@ -16,7 +16,6 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
 import useThemeStyles from '@hooks/useThemeStyles';
-import Accessibility from '@libs/Accessibility';
 import {isMobile} from '@libs/Browser';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
 import getPlatform from '@libs/getPlatform';
@@ -263,8 +262,6 @@ function ScreenWrapper({
                 return;
             }
         }
-
-        Accessibility.moveAccessibilityFocus(screenWrapperRef as unknown as Parameters<typeof Accessibility.moveAccessibilityFocus>[0]);
     }, [didScreenTransitionEnd, isFocused, shouldMoveAccessibilityFocus]);
 
     useFocusEffect(
