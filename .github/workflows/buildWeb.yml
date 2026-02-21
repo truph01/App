@@ -23,10 +23,6 @@ on:
         description: Whether to deploy to S3
         type: boolean
         default: false
-      build-storybook:
-        description: Whether to build storybook docs
-        type: boolean
-        default: false
 
     outputs:
       S3_URL:
@@ -85,16 +81,6 @@ jobs:
           fi
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
-      - name: Build storybook docs
-        if: ${{ inputs.build-storybook }}
-        continue-on-error: true
-        run: |
-          if [ "${{ inputs.environment }}" == "production" ]; then
-            npm run storybook-build
-          else
-            npm run storybook-build-staging
-          fi
 
       - name: Deploy to S3 (production/staging)
         if: ${{ inputs.deploy-to-s3 && inputs.environment != 'adhoc' }}

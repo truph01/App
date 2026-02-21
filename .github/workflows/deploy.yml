@@ -526,9 +526,31 @@ jobs:
       ref: ${{ github.ref }}
       environment: ${{ github.ref == 'refs/heads/production' && 'production' || 'staging' }}
       deploy-to-s3: true
-      build-storybook: true
       upload-artifacts: true
     secrets: inherit
+
+  buildStorybook:
+    name: Build storybook docs
+    needs: [prep]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        # v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup Node
+        uses: ./.github/actions/composite/setupNode
+
+      - name: Build storybook docs
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/production" ]; then
+            npm run storybook-build
+          else
+            npm run storybook-build-staging
+          fi
 
   postSlackMessageOnFailure:
     name: Post a Slack message when any platform fails to build or deploy
