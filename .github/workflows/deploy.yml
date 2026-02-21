@@ -512,7 +512,7 @@ jobs:
         # v6
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.sha }}
 
       - name: Download web build artifact
         # v7
@@ -575,7 +575,7 @@ jobs:
         # v6
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.sha }}
 
       - name: Setup Node
         uses: ./.github/actions/composite/setupNode
