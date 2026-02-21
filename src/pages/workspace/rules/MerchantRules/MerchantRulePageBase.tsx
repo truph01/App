@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Button from '@components/Button';
@@ -13,10 +13,13 @@ import Switch from '@components/Switch';
 import Text from '@components/Text';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import {deletePolicyCodingRule, setPolicyCodingRule} from '@libs/actions/Policy/Rules';
+import {openPolicyTagsPage} from '@libs/actions/Policy/Tag';
 import {clearDraftMerchantRule, setDraftMerchantRule} from '@libs/actions/User';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -132,6 +135,22 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
 
     // Clear the form on unmount
     useEffect(() => () => clearDraftMerchantRule(), []);
+
+    // Fetch categories and tags if they're not loaded (e.g. after cache clear)
+    const fetchPolicyData = useCallback(() => {
+        if (policy?.areCategoriesEnabled && !policyCategories) {
+            openPolicyCategoriesPage(policyID);
+        }
+        if (policy?.areTagsEnabled && policyTags.length === 0) {
+            openPolicyTagsPage(policyID);
+        }
+    }, [policyID, policy?.areCategoriesEnabled, policy?.areTagsEnabled, policyCategories, policyTags.length]);
+
+    useNetwork({onReconnect: fetchPolicyData});
+
+    useEffect(() => {
+        fetchPolicyData();
+    }, [fetchPolicyData]);
 
     const hasCategories = () => {
         if (!policy?.areCategoriesEnabled) {
