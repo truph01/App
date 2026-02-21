@@ -669,6 +669,38 @@ describe('useCompanyCards', () => {
             expect(entries).toHaveLength(3);
         });
 
+        it('should return the card unchanged when nothing in cardList matches', async () => {
+            const cdfCardsList = {
+                cardList: {
+                    '999888XXXX77777': 'v1:COMPLETELY_DIFFERENT',
+                },
+                '6000': {
+                    cardID: 6000,
+                    accountID: 11,
+                    bank: 'gl1025',
+                    cardName: 'XXXXXXXXXXX5555',
+                    encryptedCardNumber: 'v1:UNRELATED_ENCRYPTED',
+                    lastFourPAN: '5555',
+                    domainName: 'expensify-policy://123456',
+                    state: 3,
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${mockPolicyID}`, mockCustomFeed);
+            (useCardFeeds as jest.Mock).mockReturnValue([mockCustomFeedData, {status: 'loaded'}, undefined]);
+            (useCardsList as jest.Mock).mockReturnValue([cdfCardsList, {status: 'loaded'}]);
+
+            const {result} = renderHook(() => useCompanyCards({policyID: mockPolicyID}));
+
+            const entries = result.current.companyCardEntries ?? [];
+
+            // The assigned card keeps its original cardName and encryptedCardNumber
+            expect(entries).toEqual(
+                expect.arrayContaining([entry('XXXXXXXXXXX5555', 'v1:UNRELATED_ENCRYPTED', true), entry('999888XXXX77777', 'v1:COMPLETELY_DIFFERENT')]),
+            );
+            expect(entries).toHaveLength(2);
+        });
+
         it('should cascade to lastFourPAN even when card has a non-matching encryptedCardNumber', async () => {
             const cdfCardsList = {
                 cardList: {

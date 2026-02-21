@@ -77,7 +77,7 @@ function resolveCardListEntry(card: Card, cardListEntries: Array<[string, string
         return card;
     }
 
-    const [name = cardName, encrypted = encryptedCardNumber] = matchedCard;
+    const [name = cardName, encrypted = encryptedCardNumber] = matchedCard ?? [];
     return {...card, cardName: name, encryptedCardNumber: encrypted};
 }
 
