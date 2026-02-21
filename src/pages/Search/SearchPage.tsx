@@ -698,6 +698,12 @@ function SearchPage({route}: SearchPageProps) {
         ],
     );
 
+    const onBulkPaySelectedRef = useRef(onBulkPaySelected);
+    onBulkPaySelectedRef.current = onBulkPaySelected;
+    const stableOnBulkPaySelected = useCallback((paymentMethod?: PaymentMethodType, additionalData?: Record<string, unknown>) => {
+        onBulkPaySelectedRef.current?.(paymentMethod, additionalData);
+    }, []);
+
     const [isSorting, setIsSorting] = useState(false);
     let searchResults: SearchResults | undefined;
     if (currentSearchResults?.data) {
@@ -1087,7 +1093,7 @@ function SearchPage({route}: SearchPageProps) {
                         text: translate('common.merge'),
                         icon: expensifyIcons.ArrowCollapse,
                         value: CONST.SEARCH.BULK_ACTION_TYPES.MERGE,
-                        onSelected: () => setupMergeTransactionDataAndNavigate(transactionID, searchedTransactions, localeCompare, reports, false, true),
+                        onSelected: () => setupMergeTransactionDataAndNavigate(transactionID, searchedTransactions, localeCompare, reports, false, true, transactionPolicies),
                     });
                 }
             }
@@ -1374,7 +1380,7 @@ function SearchPage({route}: SearchPageProps) {
                             footerData={footerData}
                             currentSelectedPolicyID={selectedPolicyIDs?.at(0)}
                             currentSelectedReportID={selectedTransactionReportIDs?.at(0) ?? selectedReportIDs?.at(0)}
-                            confirmPayment={onBulkPaySelected}
+                            confirmPayment={stableOnBulkPaySelected}
                             latestBankItems={latestBankItems}
                             shouldShowFooter={shouldShowFooter}
                         />
@@ -1402,7 +1408,7 @@ function SearchPage({route}: SearchPageProps) {
                         selectedTransactionReportIDs={selectedTransactionReportIDs}
                         selectedReportIDs={selectedReportIDs}
                         latestBankItems={latestBankItems}
-                        onBulkPaySelected={onBulkPaySelected}
+                        onBulkPaySelected={stableOnBulkPaySelected}
                         handleSearchAction={handleSearchAction}
                         onSortPressedCallback={onSortPressedCallback}
                         scrollHandler={scrollHandler}
