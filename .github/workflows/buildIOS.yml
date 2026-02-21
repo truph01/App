@@ -123,31 +123,26 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SHOULD_LOAD_SSL_CERTIFICATES: 'false'
 
-      - name: Load Release provisioning profiles from 1Password
-        if: ${{ inputs.variant == 'Release' }}
+      - name: Load provisioning profiles from 1Password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
-          op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore/${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Share_Extension/${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Notification_Service/${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}
+          if [ "${{ inputs.variant }}" == "Release" ]; then
+            op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
+            op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore/${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}
+            op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Share_Extension/${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}
+            op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Notification_Service/${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}
+          else
+            op read "op://${{ vars.OP_VAULT }}/OldApp_AdHoc/OldApp_AdHoc.mobileprovision" --force --out-file ./OldApp_AdHoc.mobileprovision
+            op read "op://${{ vars.OP_VAULT }}/OldApp_AdHoc_Share_Extension/OldApp_AdHoc_Share_Extension.mobileprovision" --force --out-file ./OldApp_AdHoc_Share_Extension.mobileprovision
+            op read "op://${{ vars.OP_VAULT }}/OldApp_AdHoc_Notification_Service/OldApp_AdHoc_Notification_Service.mobileprovision" --force --out-file ./OldApp_AdHoc_Notification_Service.mobileprovision
+          fi
           op read "op://${{ vars.OP_VAULT }}/New Expensify Distribution Certificate/Certificates.p12" --force --out-file ./Certificates.p12
 
-      - name: Load AdHoc provisioning profiles from 1Password
-        if: ${{ inputs.variant == 'Adhoc' }}
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      - name: Create ExportOptions.plist
         run: |
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AdHoc/OldApp_AdHoc.mobileprovision" --force --out-file ./OldApp_AdHoc.mobileprovision
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AdHoc_Share_Extension/OldApp_AdHoc_Share_Extension.mobileprovision" --force --out-file ./OldApp_AdHoc_Share_Extension.mobileprovision
-          op read "op://${{ vars.OP_VAULT }}/OldApp_AdHoc_Notification_Service/OldApp_AdHoc_Notification_Service.mobileprovision" --force --out-file ./OldApp_AdHoc_Notification_Service.mobileprovision
-          op read "op://${{ vars.OP_VAULT }}/New Expensify Distribution Certificate/Certificates.p12" --force --out-file ./Certificates.p12
-
-      - name: Create ExportOptions.plist for Release
-        if: ${{ inputs.variant == 'Release' }}
-        run: |
-          cat > Mobile-Expensify/iOS/ExportOptions.plist << EOF
+          if [ "${{ inputs.variant }}" == "Release" ]; then
+            cat > Mobile-Expensify/iOS/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -166,11 +161,8 @@ jobs:
           </dict>
           </plist>
           EOF
-
-      - name: Create ExportOptions.plist for AdHoc
-        if: ${{ inputs.variant == 'Adhoc' }}
-        run: |
-          cat > Mobile-Expensify/iOS/ExportOptions.plist << 'EOF'
+          else
+            cat > Mobile-Expensify/iOS/ExportOptions.plist << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -189,6 +181,7 @@ jobs:
           </dict>
           </plist>
           EOF
+          fi
 
       - name: Get iOS native version
         id: getIOSVersion
