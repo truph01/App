@@ -52,7 +52,7 @@ For **which pattern to use** (A / B / C / D) and UX behavior for each, see https
 
 3. **failureData** (Applied when API fails)
    - Reverts optimisticData changes
-   - Clears `pendingAction`. (e.g. sets `isLoading: false`)
+   - Clears `pendingAction`.
    - Adds `errors` field for the user to see
    - Always include this to handle unexpected failures
 
