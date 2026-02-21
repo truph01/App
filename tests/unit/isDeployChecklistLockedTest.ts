@@ -2,10 +2,10 @@
  * @jest-environment node
  */
 import * as core from '@actions/core';
-import run from '../../.github/actions/javascript/isStagingDeployLocked/isStagingDeployLocked';
-import * as StagingDeployUtils from '../../.github/libs/StagingDeployUtils';
+import run from '../../.github/actions/javascript/isDeployChecklistLocked/isDeployChecklistLocked';
+import * as DeployChecklistUtils from '../../.github/libs/DeployChecklistUtils';
 
-jest.mock('../../.github/libs/StagingDeployUtils');
+jest.mock('../../.github/libs/DeployChecklistUtils');
 
 beforeAll(() => {
     process.env.INPUT_GITHUB_TOKEN = 'fake_token';
@@ -19,13 +19,13 @@ afterAll(() => {
     delete process.env.INPUT_GITHUB_TOKEN;
 });
 
-describe('isStagingDeployLockedTest', () => {
+describe('isDeployChecklistLockedTest', () => {
     describe('GitHub action run function', () => {
         test('Test returning empty result', () => {
-            (StagingDeployUtils.getStagingDeployCash as jest.Mock).mockResolvedValue({});
+            (DeployChecklistUtils.getDeployChecklist as jest.Mock).mockResolvedValue({});
             const setOutputMock = jest.spyOn(core, 'setOutput');
-            const isStagingDeployLocked = run();
-            return isStagingDeployLocked.then(() => {
+            const isDeployChecklistLocked = run();
+            return isDeployChecklistLocked.then(() => {
                 expect(setOutputMock).toHaveBeenCalledWith('IS_LOCKED', false);
             });
         });
@@ -35,10 +35,10 @@ describe('isStagingDeployLockedTest', () => {
                 labels: [{name: '🔐 LockCashDeploys 🔐'}],
             };
 
-            (StagingDeployUtils.getStagingDeployCash as jest.Mock).mockResolvedValue(mockData);
+            (DeployChecklistUtils.getDeployChecklist as jest.Mock).mockResolvedValue(mockData);
             const setOutputMock = jest.spyOn(core, 'setOutput');
-            const isStagingDeployLocked = run();
-            return isStagingDeployLocked.then(() => {
+            const isDeployChecklistLocked = run();
+            return isDeployChecklistLocked.then(() => {
                 expect(setOutputMock).toHaveBeenCalledWith('IS_LOCKED', true);
             });
         });

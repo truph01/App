@@ -12,12 +12,12 @@ type ChecklistItem = {
     isChecked: boolean;
 };
 
-type StagingDeployCashBody = {
+type DeployChecklistBody = {
     issueBody: string;
     issueAssignees: string[];
 };
 
-type StagingDeployCashParams = {
+type DeployChecklistParams = {
     tag: string;
     PRList: number[];
     PRListMobileExpensify?: number[];
@@ -32,7 +32,7 @@ type StagingDeployCashParams = {
     chronologicalSection?: string;
 };
 
-type StagingDeployCashData = {
+type DeployChecklistData = {
     title: string;
     url: string;
     number: number;
@@ -67,23 +67,23 @@ function parseChecklistSection(issueBody: string | null | undefined, sectionRege
     return items.sort((a, b) => a.number - b.number);
 }
 
-function getStagingDeployCashPRList(issue: OctokitIssueItem): ChecklistItem[] {
+function getDeployChecklistPRList(issue: OctokitIssueItem): ChecklistItem[] {
     const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST.PULL_REQUEST_REGEX.source})`, 'g'));
     if (result.length === 0) {
-        console.log('Hmmm...The open StagingDeployCash does not list any pull requests, continuing...');
+        console.log('Hmmm...The open deploy checklist does not list any pull requests, continuing...');
     }
     return result;
 }
 
-function getStagingDeployCashPRListMobileExpensify(issue: OctokitIssueItem): ChecklistItem[] {
+function getDeployChecklistPRListMobileExpensify(issue: OctokitIssueItem): ChecklistItem[] {
     return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
 }
 
-function getStagingDeployCashDeployBlockers(issue: OctokitIssueItem): ChecklistItem[] {
+function getDeployChecklistDeployBlockers(issue: OctokitIssueItem): ChecklistItem[] {
     return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
 }
 
-function getStagingDeployCashInternalQA(issue: OctokitIssueItem): ChecklistItem[] {
+function getDeployChecklistInternalQA(issue: OctokitIssueItem): ChecklistItem[] {
     return parseChecklistSection(
         issue.body,
         /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/,
@@ -92,7 +92,7 @@ function getStagingDeployCashInternalQA(issue: OctokitIssueItem): ChecklistItem[
     );
 }
 
-async function getStagingDeployCash(): Promise<StagingDeployCashData> {
+async function getDeployChecklist(): Promise<DeployChecklistData> {
     const {data} = await GithubUtils.octokit.issues.listForRepo({
         owner: CONST.GITHUB_OWNER,
         repo: CONST.APP_REPO,
@@ -113,10 +113,10 @@ async function getStagingDeployCash(): Promise<StagingDeployCashData> {
         throw new Error(`Found an undefined ${CONST.LABELS.STAGING_DEPLOY} issue.`);
     }
 
-    return getStagingDeployCashData(issue);
+    return getDeployChecklistData(issue);
 }
 
-function getStagingDeployCashData(issue: OctokitIssueItem): StagingDeployCashData {
+function getDeployChecklistData(issue: OctokitIssueItem): DeployChecklistData {
     try {
         const versionRegex = new RegExp('([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9]+))?', 'g');
         const version = (issue.body?.match(versionRegex)?.[0] ?? '').replaceAll('`', '');
@@ -126,10 +126,10 @@ function getStagingDeployCashData(issue: OctokitIssueItem): StagingDeployCashDat
             url: issue.url,
             number: GithubUtils.getIssueOrPullRequestNumberFromURL(issue.url),
             labels: issue.labels,
-            PRList: getStagingDeployCashPRList(issue),
-            PRListMobileExpensify: getStagingDeployCashPRListMobileExpensify(issue),
-            deployBlockers: getStagingDeployCashDeployBlockers(issue),
-            internalQAPRList: getStagingDeployCashInternalQA(issue),
+            PRList: getDeployChecklistPRList(issue),
+            PRListMobileExpensify: getDeployChecklistPRListMobileExpensify(issue),
+            deployBlockers: getDeployChecklistDeployBlockers(issue),
+            internalQAPRList: getDeployChecklistInternalQA(issue),
             isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
             isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
             version,
@@ -141,10 +141,10 @@ function getStagingDeployCashData(issue: OctokitIssueItem): StagingDeployCashDat
 }
 
 /**
- * Generate the issue body and assignees for a StagingDeployCash checklist.
+ * Generate the issue body and assignees for a deploy checklist.
  * Accepts PR numbers directly (not URLs) to avoid unnecessary roundtripping.
  */
-async function generateStagingDeployCashBodyAndAssignees({
+async function generateDeployChecklistBodyAndAssignees({
     tag,
     PRList,
     PRListMobileExpensify = [],
@@ -157,7 +157,7 @@ async function generateStagingDeployCashBodyAndAssignees({
     isGHStatusChecked = false,
     previousTag = '',
     chronologicalSection = '',
-}: StagingDeployCashParams): Promise<StagingDeployCashBody> {
+}: DeployChecklistParams): Promise<DeployChecklistBody> {
     const data = await GithubUtils.fetchAllPullRequests(PRList);
 
     const internalQAPRs = Array.isArray(data) ? data.filter((pr) => pr.labels.some((item) => item.name === CONST.LABELS.INTERNAL_QA)) : [];
@@ -260,5 +260,5 @@ async function generateStagingDeployCashBodyAndAssignees({
     return {issueBody, issueAssignees};
 }
 
-export {getStagingDeployCash, getStagingDeployCashData, generateStagingDeployCashBodyAndAssignees, parseChecklistSection};
-export type {ChecklistItem, StagingDeployCashBody, StagingDeployCashParams, StagingDeployCashData};
+export {getDeployChecklist, getDeployChecklistData, generateDeployChecklistBodyAndAssignees, parseChecklistSection};
+export type {ChecklistItem, DeployChecklistBody, DeployChecklistParams, DeployChecklistData};

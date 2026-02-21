@@ -11494,7 +11494,7 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 2137:
+/***/ 6971:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -11534,9 +11534,9 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const StagingDeployUtils_1 = __nccwpck_require__(3318);
+const DeployChecklistUtils_1 = __nccwpck_require__(2141);
 const run = function () {
-    return (0, StagingDeployUtils_1.getStagingDeployCash)()
+    return (0, DeployChecklistUtils_1.getDeployChecklist)()
         .then(({ labels, number }) => {
         const labelsNames = labels.map((label) => {
             if (typeof label === 'string') {
@@ -11544,12 +11544,12 @@ const run = function () {
             }
             return label.name;
         });
-        console.log(`Found StagingDeployCash with labels: ${JSON.stringify(labelsNames)}`);
+        console.log(`Found deploy checklist with labels: ${JSON.stringify(labelsNames)}`);
         core.setOutput('IS_LOCKED', labelsNames.includes('🔐 LockCashDeploys 🔐'));
         core.setOutput('NUMBER', number);
     })
         .catch((err) => {
-        console.warn('No open StagingDeployCash found, continuing...', err);
+        console.warn('No open deploy checklist found, continuing...', err);
         core.setOutput('IS_LOCKED', false);
         core.setOutput('NUMBER', 0);
     });
@@ -11636,6 +11636,192 @@ const CONST = {
     ACTION_HIDE_DUPLICATE: 'ACTION_HIDE_DUPLICATE',
 };
 exports["default"] = CONST;
+
+
+/***/ }),
+
+/***/ 2141:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getDeployChecklist = getDeployChecklist;
+exports.getDeployChecklistData = getDeployChecklistData;
+exports.generateDeployChecklistBodyAndAssignees = generateDeployChecklistBodyAndAssignees;
+exports.parseChecklistSection = parseChecklistSection;
+const dedent_1 = __importDefault(__nccwpck_require__(6762));
+const CONST_1 = __importDefault(__nccwpck_require__(9873));
+const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
+/**
+ * Generic checklist section parser. Extracts a section from the issue body,
+ * parses checkbox items within it, and returns ChecklistItems sorted by number.
+ */
+function parseChecklistSection(issueBody, sectionRegex, itemRegex, urlTransform) {
+    const sectionMatch = issueBody?.match(sectionRegex) ?? null;
+    if (sectionMatch?.length !== 2) {
+        return [];
+    }
+    const items = [...sectionMatch[1].matchAll(itemRegex)].map((match) => {
+        const rawUrl = match[2];
+        return {
+            url: urlTransform ? urlTransform(rawUrl) : rawUrl,
+            number: Number.parseInt(match[3], 10),
+            isChecked: match[1] === 'x',
+        };
+    });
+    return items.sort((a, b) => a.number - b.number);
+}
+function getDeployChecklistPRList(issue) {
+    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'));
+    if (result.length === 0) {
+        console.log('Hmmm...The open deploy checklist does not list any pull requests, continuing...');
+    }
+    return result;
+}
+function getDeployChecklistPRListMobileExpensify(issue) {
+    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
+}
+function getDeployChecklistDeployBlockers(issue) {
+    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
+}
+function getDeployChecklistInternalQA(issue) {
+    return parseChecklistSection(issue.body, /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), (url) => url.split('-').at(0)?.trim() ?? '');
+}
+async function getDeployChecklist() {
+    const { data } = await GithubUtils_1.default.octokit.issues.listForRepo({
+        owner: CONST_1.default.GITHUB_OWNER,
+        repo: CONST_1.default.APP_REPO,
+        labels: CONST_1.default.LABELS.STAGING_DEPLOY,
+        state: 'open',
+    });
+    if (!data.length) {
+        throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
+    }
+    if (data.length > 1) {
+        throw new Error(`Found more than one ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
+    }
+    const issue = data.at(0);
+    if (!issue) {
+        throw new Error(`Found an undefined ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
+    }
+    return getDeployChecklistData(issue);
+}
+function getDeployChecklistData(issue) {
+    try {
+        const versionRegex = new RegExp('([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9]+))?', 'g');
+        const version = (issue.body?.match(versionRegex)?.[0] ?? '').replaceAll('`', '');
+        return {
+            title: issue.title,
+            url: issue.url,
+            number: GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(issue.url),
+            labels: issue.labels,
+            PRList: getDeployChecklistPRList(issue),
+            PRListMobileExpensify: getDeployChecklistPRListMobileExpensify(issue),
+            deployBlockers: getDeployChecklistDeployBlockers(issue),
+            internalQAPRList: getDeployChecklistInternalQA(issue),
+            isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
+            isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
+            version,
+            tag: `${version}-staging`,
+        };
+    }
+    catch (exception) {
+        throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue with correct data.`);
+    }
+}
+/**
+ * Generate the issue body and assignees for a deploy checklist.
+ * Accepts PR numbers directly (not URLs) to avoid unnecessary roundtripping.
+ */
+async function generateDeployChecklistBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '', chronologicalSection = '', }) {
+    const data = await GithubUtils_1.default.fetchAllPullRequests(PRList);
+    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => pr.labels.some((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA)) : [];
+    const mergerResults = await Promise.all(internalQAPRs.map((pr) => GithubUtils_1.default.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ number: pr.number, mergerLogin }))));
+    const internalQAPRMap = new Map();
+    for (const { number, mergerLogin } of mergerResults) {
+        internalQAPRMap.set(number, mergerLogin);
+    }
+    console.log('Found the following Internal QA PRs:', Object.fromEntries(internalQAPRMap));
+    const noQAPRNumbers = Array.isArray(data) ? data.filter((PR) => /\[No\s?QA]/i.test(PR.title)).map((item) => item.number) : [];
+    console.log('Found the following NO QA PRs:', noQAPRNumbers);
+    const verifiedAppPRs = new Set([...verifiedPRList, ...noQAPRNumbers]);
+    const verifiedMobileExpensifyPRs = new Set(verifiedPRListMobileExpensify);
+    const resolvedInternalQAPRSet = new Set(resolvedInternalQAPRs);
+    const resolvedDeployBlockerSet = new Set(resolvedDeployBlockers);
+    const internalQAPRNumbers = new Set(internalQAPRMap.keys());
+    const sortedPRList = [...new Set(PRList.filter((n) => !internalQAPRNumbers.has(n)))].sort((a, b) => a - b);
+    const sortedPRListMobileExpensify = [...new Set(PRListMobileExpensify)].sort((a, b) => a - b);
+    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => a - b);
+    const sections = [];
+    // Header
+    let header = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n`;
+    if (sortedPRListMobileExpensify.length > 0) {
+        header += `**Mobile-Expensify Changes:** https://github.com/${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.MOBILE_EXPENSIFY_REPO}/compare/production...staging\n`;
+    }
+    sections.push(header);
+    // PR list
+    if (sortedPRList.length > 0) {
+        const items = sortedPRList
+            .map((prNumber) => {
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.APP_REPO_URL);
+            return `${verifiedAppPRs.has(prNumber) ? '- [x]' : '- [ ]'} ${url}`;
+        })
+            .join('\n');
+        sections.push(`**This release contains changes from the following pull requests:**\n${items}\n`);
+    }
+    // Mobile-Expensify PR list
+    if (sortedPRListMobileExpensify.length > 0) {
+        const items = sortedPRListMobileExpensify
+            .map((prNumber) => {
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
+            return `${verifiedMobileExpensifyPRs.has(prNumber) ? '- [x]' : '- [ ]'} ${url}`;
+        })
+            .join('\n');
+        sections.push(`**Mobile-Expensify PRs:**\n${items}\n`);
+    }
+    // Internal QA PR list
+    if (internalQAPRMap.size > 0) {
+        console.log('Found the following verified Internal QA PRs:', resolvedInternalQAPRs);
+        const items = [...internalQAPRMap.entries()]
+            .map(([prNumber, merger]) => {
+            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.APP_REPO_URL);
+            return `${resolvedInternalQAPRSet.has(prNumber) ? '- [x]' : '- [ ]'} ${url} - @${merger}`;
+        })
+            .join('\n');
+        sections.push(`**Internal QA:**\n${items}\n`);
+    }
+    // Deploy blockers
+    if (sortedDeployBlockers.length > 0) {
+        const items = sortedDeployBlockers
+            .map((number) => {
+            const url = `${CONST_1.default.APP_REPO_URL}/issues/${number}`;
+            return `${resolvedDeployBlockerSet.has(number) ? '- [x] ' : '- [ ] '}${url}`;
+        })
+            .join('\n');
+        sections.push(`**Deploy Blockers:**\n${items}\n`);
+    }
+    // Chronological section
+    if (chronologicalSection) {
+        sections.push(chronologicalSection);
+    }
+    // Deployer verifications
+    const check = (checked) => (checked ? 'x' : ' ');
+    sections.push((0, dedent_1.default)(`
+            **Deployer verifications:**
+            - [${check(isSentryChecked)}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).
+            - [${check(isSentryChecked)}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${previousTag}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).
+            - [${check(isGHStatusChecked)}] I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.
+        `).trimEnd());
+    // Footer
+    sections.push('cc @Expensify/applauseleads\n');
+    const issueBody = sections.join('\n');
+    const issueAssignees = [...new Set(internalQAPRMap.values())].filter((login) => login !== undefined);
+    return { issueBody, issueAssignees };
+}
 
 
 /***/ }),
@@ -12077,192 +12263,6 @@ exports["default"] = GithubUtils;
 
 /***/ }),
 
-/***/ 3318:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getStagingDeployCash = getStagingDeployCash;
-exports.getStagingDeployCashData = getStagingDeployCashData;
-exports.generateStagingDeployCashBodyAndAssignees = generateStagingDeployCashBodyAndAssignees;
-exports.parseChecklistSection = parseChecklistSection;
-const dedent_1 = __importDefault(__nccwpck_require__(6762));
-const CONST_1 = __importDefault(__nccwpck_require__(9873));
-const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
-/**
- * Generic checklist section parser. Extracts a section from the issue body,
- * parses checkbox items within it, and returns ChecklistItems sorted by number.
- */
-function parseChecklistSection(issueBody, sectionRegex, itemRegex, urlTransform) {
-    const sectionMatch = issueBody?.match(sectionRegex) ?? null;
-    if (sectionMatch?.length !== 2) {
-        return [];
-    }
-    const items = [...sectionMatch[1].matchAll(itemRegex)].map((match) => {
-        const rawUrl = match[2];
-        return {
-            url: urlTransform ? urlTransform(rawUrl) : rawUrl,
-            number: Number.parseInt(match[3], 10),
-            isChecked: match[1] === 'x',
-        };
-    });
-    return items.sort((a, b) => a.number - b.number);
-}
-function getStagingDeployCashPRList(issue) {
-    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'));
-    if (result.length === 0) {
-        console.log('Hmmm...The open StagingDeployCash does not list any pull requests, continuing...');
-    }
-    return result;
-}
-function getStagingDeployCashPRListMobileExpensify(issue) {
-    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
-}
-function getStagingDeployCashDeployBlockers(issue) {
-    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
-}
-function getStagingDeployCashInternalQA(issue) {
-    return parseChecklistSection(issue.body, /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST_1.default.PULL_REQUEST_REGEX.source})`, 'g'), (url) => url.split('-').at(0)?.trim() ?? '');
-}
-async function getStagingDeployCash() {
-    const { data } = await GithubUtils_1.default.octokit.issues.listForRepo({
-        owner: CONST_1.default.GITHUB_OWNER,
-        repo: CONST_1.default.APP_REPO,
-        labels: CONST_1.default.LABELS.STAGING_DEPLOY,
-        state: 'open',
-    });
-    if (!data.length) {
-        throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
-    }
-    if (data.length > 1) {
-        throw new Error(`Found more than one ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
-    }
-    const issue = data.at(0);
-    if (!issue) {
-        throw new Error(`Found an undefined ${CONST_1.default.LABELS.STAGING_DEPLOY} issue.`);
-    }
-    return getStagingDeployCashData(issue);
-}
-function getStagingDeployCashData(issue) {
-    try {
-        const versionRegex = new RegExp('([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9]+))?', 'g');
-        const version = (issue.body?.match(versionRegex)?.[0] ?? '').replaceAll('`', '');
-        return {
-            title: issue.title,
-            url: issue.url,
-            number: GithubUtils_1.default.getIssueOrPullRequestNumberFromURL(issue.url),
-            labels: issue.labels,
-            PRList: getStagingDeployCashPRList(issue),
-            PRListMobileExpensify: getStagingDeployCashPRListMobileExpensify(issue),
-            deployBlockers: getStagingDeployCashDeployBlockers(issue),
-            internalQAPRList: getStagingDeployCashInternalQA(issue),
-            isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
-            isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
-            version,
-            tag: `${version}-staging`,
-        };
-    }
-    catch (exception) {
-        throw new Error(`Unable to find ${CONST_1.default.LABELS.STAGING_DEPLOY} issue with correct data.`);
-    }
-}
-/**
- * Generate the issue body and assignees for a StagingDeployCash checklist.
- * Accepts PR numbers directly (not URLs) to avoid unnecessary roundtripping.
- */
-async function generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '', chronologicalSection = '', }) {
-    const data = await GithubUtils_1.default.fetchAllPullRequests(PRList);
-    const internalQAPRs = Array.isArray(data) ? data.filter((pr) => pr.labels.some((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA)) : [];
-    const mergerResults = await Promise.all(internalQAPRs.map((pr) => GithubUtils_1.default.getPullRequestMergerLogin(pr.number).then((mergerLogin) => ({ number: pr.number, mergerLogin }))));
-    const internalQAPRMap = new Map();
-    for (const { number, mergerLogin } of mergerResults) {
-        internalQAPRMap.set(number, mergerLogin);
-    }
-    console.log('Found the following Internal QA PRs:', Object.fromEntries(internalQAPRMap));
-    const noQAPRNumbers = Array.isArray(data) ? data.filter((PR) => /\[No\s?QA]/i.test(PR.title)).map((item) => item.number) : [];
-    console.log('Found the following NO QA PRs:', noQAPRNumbers);
-    const verifiedAppPRs = new Set([...verifiedPRList, ...noQAPRNumbers]);
-    const verifiedMobileExpensifyPRs = new Set(verifiedPRListMobileExpensify);
-    const resolvedInternalQAPRSet = new Set(resolvedInternalQAPRs);
-    const resolvedDeployBlockerSet = new Set(resolvedDeployBlockers);
-    const internalQAPRNumbers = new Set(internalQAPRMap.keys());
-    const sortedPRList = [...new Set(PRList.filter((n) => !internalQAPRNumbers.has(n)))].sort((a, b) => a - b);
-    const sortedPRListMobileExpensify = [...new Set(PRListMobileExpensify)].sort((a, b) => a - b);
-    const sortedDeployBlockers = [...new Set(deployBlockers)].sort((a, b) => a - b);
-    const sections = [];
-    // Header
-    let header = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n`;
-    if (sortedPRListMobileExpensify.length > 0) {
-        header += `**Mobile-Expensify Changes:** https://github.com/${CONST_1.default.GITHUB_OWNER}/${CONST_1.default.MOBILE_EXPENSIFY_REPO}/compare/production...staging\n`;
-    }
-    sections.push(header);
-    // PR list
-    if (sortedPRList.length > 0) {
-        const items = sortedPRList
-            .map((prNumber) => {
-            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.APP_REPO_URL);
-            return `${verifiedAppPRs.has(prNumber) ? '- [x]' : '- [ ]'} ${url}`;
-        })
-            .join('\n');
-        sections.push(`**This release contains changes from the following pull requests:**\n${items}\n`);
-    }
-    // Mobile-Expensify PR list
-    if (sortedPRListMobileExpensify.length > 0) {
-        const items = sortedPRListMobileExpensify
-            .map((prNumber) => {
-            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.MOBILE_EXPENSIFY_URL);
-            return `${verifiedMobileExpensifyPRs.has(prNumber) ? '- [x]' : '- [ ]'} ${url}`;
-        })
-            .join('\n');
-        sections.push(`**Mobile-Expensify PRs:**\n${items}\n`);
-    }
-    // Internal QA PR list
-    if (internalQAPRMap.size > 0) {
-        console.log('Found the following verified Internal QA PRs:', resolvedInternalQAPRs);
-        const items = [...internalQAPRMap.entries()]
-            .map(([prNumber, merger]) => {
-            const url = GithubUtils_1.default.getPullRequestURLFromNumber(prNumber, CONST_1.default.APP_REPO_URL);
-            return `${resolvedInternalQAPRSet.has(prNumber) ? '- [x]' : '- [ ]'} ${url} - @${merger}`;
-        })
-            .join('\n');
-        sections.push(`**Internal QA:**\n${items}\n`);
-    }
-    // Deploy blockers
-    if (sortedDeployBlockers.length > 0) {
-        const items = sortedDeployBlockers
-            .map((number) => {
-            const url = `${CONST_1.default.APP_REPO_URL}/issues/${number}`;
-            return `${resolvedDeployBlockerSet.has(number) ? '- [x] ' : '- [ ] '}${url}`;
-        })
-            .join('\n');
-        sections.push(`**Deploy Blockers:**\n${items}\n`);
-    }
-    // Chronological section
-    if (chronologicalSection) {
-        sections.push(chronologicalSection);
-    }
-    // Deployer verifications
-    const check = (checked) => (checked ? 'x' : ' ');
-    sections.push((0, dedent_1.default)(`
-            **Deployer verifications:**
-            - [${check(isSentryChecked)}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).
-            - [${check(isSentryChecked)}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${previousTag}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).
-            - [${check(isGHStatusChecked)}] I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.
-        `).trimEnd());
-    // Footer
-    sections.push('cc @Expensify/applauseleads\n');
-    const issueBody = sections.join('\n');
-    const issueAssignees = [...new Set(internalQAPRMap.values())].filter((login) => login !== undefined);
-    return { issueBody, issueAssignees };
-}
-
-
-/***/ }),
-
 /***/ 6762:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -12506,7 +12506,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(2137);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6971);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

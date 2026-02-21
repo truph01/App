@@ -4,11 +4,11 @@ import * as core from '@actions/core';
 import {format} from 'date-fns/format';
 import fs from 'fs';
 import CONST from '@github/libs/CONST';
+import {generateDeployChecklistBodyAndAssignees, getDeployChecklistData} from '@github/libs/DeployChecklistUtils';
+import type {ChecklistItem, DeployChecklistData} from '@github/libs/DeployChecklistUtils';
 import GithubUtils from '@github/libs/GithubUtils';
 import GitUtils from '@github/libs/GitUtils';
 import type {MergedPR, SubmoduleUpdate} from '@github/libs/GitUtils';
-import {generateStagingDeployCashBodyAndAssignees, getStagingDeployCashData} from '@github/libs/StagingDeployUtils';
-import type {ChecklistItem, StagingDeployCashData} from '@github/libs/StagingDeployUtils';
 
 type IssuesCreateResponse = Awaited<ReturnType<typeof GithubUtils.octokit.issues.create>>['data'];
 
@@ -122,8 +122,8 @@ async function buildUpdateChecklistParams({
     newVersion: string;
     newPRNumbers: number[];
     mergedMobileExpensifyPREntries: MergedPR[];
-    previousChecklistData: StagingDeployCashData;
-    currentChecklistData: StagingDeployCashData;
+    previousChecklistData: DeployChecklistData;
+    currentChecklistData: DeployChecklistData;
     chronologicalSection: string;
 }) {
     const PRList = preserveCheckboxState(
@@ -211,9 +211,9 @@ async function run(): Promise<IssuesCreateResponse | void> {
         const shouldCreateNewDeployChecklist = mostRecentChecklist.state !== 'open';
         const previousChecklist = shouldCreateNewDeployChecklist ? mostRecentChecklist : recentDeployChecklists.at(1);
         if (shouldCreateNewDeployChecklist) {
-            console.log('Latest StagingDeployCash is closed, creating a new one.', mostRecentChecklist);
+            console.log('Latest deploy checklist is closed, creating a new one.', mostRecentChecklist);
         } else {
-            console.log('Latest StagingDeployCash is open, updating it instead of creating a new one.', 'Current:', mostRecentChecklist, 'Previous:', previousChecklist);
+            console.log('Latest deploy checklist is open, updating it instead of creating a new one.', 'Current:', mostRecentChecklist, 'Previous:', previousChecklist);
         }
 
         if (!previousChecklist) {
@@ -221,8 +221,8 @@ async function run(): Promise<IssuesCreateResponse | void> {
         }
 
         // Parse checklist data from the previous (and optionally current) deploy checklists
-        const previousChecklistData = getStagingDeployCashData(previousChecklist);
-        const currentChecklistData: StagingDeployCashData | undefined = shouldCreateNewDeployChecklist ? undefined : getStagingDeployCashData(mostRecentChecklist);
+        const previousChecklistData = getDeployChecklistData(previousChecklist);
+        const currentChecklistData: DeployChecklistData | undefined = shouldCreateNewDeployChecklist ? undefined : getDeployChecklistData(mostRecentChecklist);
 
         // Find PRs merged between the previous checklist's tag and the new staging tag
         const {mergedPRs: mergedPREntries, submoduleUpdates} = await GitUtils.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST.APP_REPO);
@@ -301,7 +301,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
             throw new Error('Expected current checklist data for update but it was undefined');
         }
 
-        const {issueBody: checklistBody, issueAssignees: checklistAssignees} = await generateStagingDeployCashBodyAndAssignees(checklistParams);
+        const {issueBody: checklistBody, issueAssignees: checklistAssignees} = await generateDeployChecklistBodyAndAssignees(checklistParams);
 
         // Finally, create or update the checklist
         const defaultPayload = {
@@ -317,7 +317,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
                 labels: [CONST.LABELS.STAGING_DEPLOY, CONST.LABELS.LOCK_DEPLOY],
                 assignees: [CONST.APPLAUSE_BOT as string].concat(checklistAssignees),
             });
-            console.log(`Successfully created new StagingDeployCash! 🎉 ${newChecklist.html_url}`);
+            console.log(`Successfully created new deploy checklist! 🎉 ${newChecklist.html_url}`);
             return newChecklist;
         }
 
@@ -325,7 +325,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
             ...defaultPayload,
             issue_number: currentChecklistData?.number ?? 0,
         });
-        console.log(`Successfully updated StagingDeployCash! 🎉 ${updatedChecklist.html_url}`);
+        console.log(`Successfully updated deploy checklist! 🎉 ${updatedChecklist.html_url}`);
         return updatedChecklist;
     } catch (err: unknown) {
         console.error('An unknown error occurred!', err);

@@ -3,11 +3,11 @@ import * as fns from 'date-fns';
 import {vol} from 'memfs';
 import path from 'path';
 import CONST from '@github/libs/CONST';
+import * as DeployChecklistUtils from '@github/libs/DeployChecklistUtils';
 import type {InternalOctokit} from '@github/libs/GithubUtils';
 import GithubUtils from '@github/libs/GithubUtils';
 import GitUtils from '@github/libs/GitUtils';
-import * as StagingDeployUtils from '@github/libs/StagingDeployUtils';
-import run from '@scripts/createOrUpdateStagingDeploy';
+import run from '@scripts/createOrUpdateDeployChecklist';
 
 /**
  * @jest-environment node
@@ -65,7 +65,7 @@ beforeAll(() => {
             },
             pulls: {
                 // Static mock for pulls.list (only used to filter out automated PRs, and that functionality is covered
-                // in the test for GithubUtils.generateStagingDeployCashBody
+                // in the test for GithubUtils.generateDeployChecklistBody
                 list: jest.fn().mockResolvedValue([]),
             },
         },
@@ -161,10 +161,10 @@ const deployBlockerHeader = '**Deploy Blockers:**';
 const lineBreak = '\n';
 const lineBreakDouble = '\n\n';
 
-describe('createOrUpdateStagingDeployCash', () => {
-    const closedStagingDeployCash = {
+describe('createOrUpdateDeployChecklist', () => {
+    const closedDeployChecklist = {
         url: `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/issues/28`,
-        title: 'Test StagingDeployCash',
+        title: 'Test Deploy Checklist',
         number: 28,
         labels: [LABELS.STAGING_DEPLOY_CASH],
         html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/29`,
@@ -255,7 +255,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
         mockListIssues.mockImplementation((args: Arguments) => {
             if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                return Promise.resolve({data: [closedStagingDeployCash]});
+                return Promise.resolve({data: [closedDeployChecklist]});
             }
 
             return Promise.resolve({data: []});
@@ -306,7 +306,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
         mockListIssues.mockImplementation((args: Arguments) => {
             if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                return Promise.resolve({data: [closedStagingDeployCash]});
+                return Promise.resolve({data: [closedDeployChecklist]});
             }
 
             return Promise.resolve({data: []});
@@ -336,9 +336,9 @@ describe('createOrUpdateStagingDeployCash', () => {
     });
 
     describe('updates existing issue when there is one open', () => {
-        const openStagingDeployCashBefore = {
+        const openDeployChecklistBefore = {
             url: `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/issues/29`,
-            title: 'Test StagingDeployCash',
+            title: 'Test Deploy Checklist',
             number: 29,
             labels: [LABELS.STAGING_DEPLOY_CASH],
             // eslint-disable-next-line max-len
@@ -386,7 +386,7 @@ describe('createOrUpdateStagingDeployCash', () => {
                 [PATH_TO_PACKAGE_JSON]: JSON.stringify({version: '1.0.2-2'}),
             });
 
-            // New pull requests to add to open StagingDeployCash
+            // New pull requests to add to the open deploy checklist
             const newPullRequests = [9, 10];
             mockGetMergedPRsDeployedBetween.mockImplementation(async (fromRef, toRef, repositoryName) => {
                 if (fromRef === '1.0.1-0-staging' && toRef === '1.0.2-2-staging') {
@@ -400,7 +400,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashBefore, closedStagingDeployCash]});
+                    return Promise.resolve({data: [openDeployChecklistBefore, closedDeployChecklist]});
                 }
 
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
@@ -430,9 +430,9 @@ describe('createOrUpdateStagingDeployCash', () => {
             expect(result).toStrictEqual({
                 owner: CONST.GITHUB_OWNER,
                 repo: CONST.APP_REPO,
-                issue_number: openStagingDeployCashBefore.number,
+                issue_number: openDeployChecklistBefore.number,
                 // eslint-disable-next-line max-len, @typescript-eslint/naming-convention
-                html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${openStagingDeployCashBefore.number}`,
+                html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${openDeployChecklistBefore.number}`,
                 // eslint-disable-next-line max-len
                 body:
                     `${baseExpectedOutput('1.0.2-2')}` +
@@ -479,7 +479,7 @@ describe('createOrUpdateStagingDeployCash', () => {
             });
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashBefore, closedStagingDeployCash]});
+                    return Promise.resolve({data: [openDeployChecklistBefore, closedDeployChecklist]});
                 }
 
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
@@ -510,9 +510,9 @@ describe('createOrUpdateStagingDeployCash', () => {
             expect(result).toStrictEqual({
                 owner: CONST.GITHUB_OWNER,
                 repo: CONST.APP_REPO,
-                issue_number: openStagingDeployCashBefore.number,
+                issue_number: openDeployChecklistBefore.number,
                 // eslint-disable-next-line max-len, @typescript-eslint/naming-convention
-                html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${openStagingDeployCashBefore.number}`,
+                html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${openDeployChecklistBefore.number}`,
                 // eslint-disable-next-line max-len
                 body:
                     `${baseExpectedOutput('1.0.2-1')}` +
@@ -556,7 +556,7 @@ describe('createOrUpdateStagingDeployCash', () => {
             });
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashBefore, closedStagingDeployCash]});
+                    return Promise.resolve({data: [openDeployChecklistBefore, closedDeployChecklist]});
                 }
 
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
@@ -570,9 +570,9 @@ describe('createOrUpdateStagingDeployCash', () => {
             expect(result).toStrictEqual({
                 owner: CONST.GITHUB_OWNER,
                 repo: CONST.APP_REPO,
-                issue_number: openStagingDeployCashBefore.number,
+                issue_number: openDeployChecklistBefore.number,
                 // eslint-disable-next-line max-len, @typescript-eslint/naming-convention
-                html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${openStagingDeployCashBefore.number}`,
+                html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/${openDeployChecklistBefore.number}`,
                 // eslint-disable-next-line max-len
                 body:
                     `${baseExpectedOutput('1.0.2-1', false)}` +
@@ -614,8 +614,8 @@ describe('createOrUpdateStagingDeployCash', () => {
             });
 
             // Mock previous checklist containing PRs 6,8
-            const mockGetStagingDeployCashData = jest.spyOn(StagingDeployUtils, 'getStagingDeployCashData');
-            mockGetStagingDeployCashData.mockImplementation(() => ({
+            const mockGetDeployChecklistData = jest.spyOn(DeployChecklistUtils, 'getDeployChecklistData');
+            mockGetDeployChecklistData.mockImplementation(() => ({
                 title: 'Previous Checklist',
                 url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/29`,
                 number: 29,
@@ -661,7 +661,7 @@ describe('createOrUpdateStagingDeployCash', () => {
             expect(result?.body).not.toContain('https://github.com/Expensify/App/pull/6');
             expect(result?.body).not.toContain('https://github.com/Expensify/App/pull/8');
 
-            mockGetStagingDeployCashData.mockRestore();
+            mockGetDeployChecklistData.mockRestore();
         });
 
         test('filters out PRs when no Mobile-Expensify PRs exist', async () => {
@@ -683,8 +683,8 @@ describe('createOrUpdateStagingDeployCash', () => {
             });
 
             // Mock previous checklist containing PRs 6,8 but no Mobile-Expensify PRs
-            const mockGetStagingDeployCashData = jest.spyOn(StagingDeployUtils, 'getStagingDeployCashData');
-            mockGetStagingDeployCashData.mockImplementation(() => ({
+            const mockGetDeployChecklistData = jest.spyOn(DeployChecklistUtils, 'getDeployChecklistData');
+            mockGetDeployChecklistData.mockImplementation(() => ({
                 title: 'Previous Checklist',
                 url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/29`,
                 number: 29,
@@ -730,7 +730,7 @@ describe('createOrUpdateStagingDeployCash', () => {
             expect(result?.body).not.toContain('**Mobile-Expensify PRs:**');
             expect(result?.body).not.toContain('Mobile-Expensify/pull/');
 
-            mockGetStagingDeployCashData.mockRestore();
+            mockGetDeployChecklistData.mockRestore();
         });
     });
 
@@ -779,7 +779,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [closedStagingDeployCash]});
+                    return Promise.resolve({data: [closedDeployChecklist]});
                 }
                 return Promise.resolve({data: []});
             });
@@ -825,7 +825,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [closedStagingDeployCash]});
+                    return Promise.resolve({data: [closedDeployChecklist]});
                 }
                 return Promise.resolve({data: []});
             });
@@ -876,9 +876,9 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockGetWorkflowRunURLForCommit.mockImplementation(async () => workflowRunURL);
 
-            const openStagingDeployCashWithSubmodule = {
+            const openDeployChecklistWithSubmodule = {
                 url: `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/issues/29`,
-                title: 'Test StagingDeployCash',
+                title: 'Test Deploy Checklist',
                 number: 29,
                 labels: [LABELS.STAGING_DEPLOY_CASH],
                 body:
@@ -896,7 +896,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [openStagingDeployCashWithSubmodule, closedStagingDeployCash]});
+                    return Promise.resolve({data: [openDeployChecklistWithSubmodule, closedDeployChecklist]});
                 }
                 if (args.labels === CONST.LABELS.DEPLOY_BLOCKER) {
                     return Promise.resolve({data: []});
@@ -972,7 +972,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [closedStagingDeployCash]});
+                    return Promise.resolve({data: [closedDeployChecklist]});
                 }
                 return Promise.resolve({data: []});
             });
@@ -1027,7 +1027,7 @@ describe('createOrUpdateStagingDeployCash', () => {
 
             mockListIssues.mockImplementation((args: Arguments) => {
                 if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
-                    return Promise.resolve({data: [closedStagingDeployCash]});
+                    return Promise.resolve({data: [closedDeployChecklist]});
                 }
                 return Promise.resolve({data: []});
             });

@@ -4,9 +4,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as core from '@actions/core';
 import type {Writable} from 'type-fest';
+import {generateDeployChecklistBodyAndAssignees, getDeployChecklist} from '@github/libs/DeployChecklistUtils';
 import type {InternalOctokit, ListForRepoMethod} from '@github/libs/GithubUtils';
 import GithubUtils from '@github/libs/GithubUtils';
-import {generateStagingDeployCashBodyAndAssignees, getStagingDeployCash} from '@github/libs/StagingDeployUtils';
 
 const mockGetInput = jest.fn();
 const mockListIssues = jest.fn();
@@ -66,8 +66,8 @@ afterEach(() => {
     mockListIssues.mockClear();
 });
 
-describe('StagingDeployUtils', () => {
-    describe('getStagingDeployCash', () => {
+describe('DeployChecklistUtils', () => {
+    describe('getDeployChecklist', () => {
         const baseIssue: Issue = {
             url: 'https://api.github.com/repos/Andrew-Test-Org/Public-Test-Repo/issues/29',
             title: 'Andrew Test Issue',
@@ -90,7 +90,7 @@ describe('StagingDeployUtils', () => {
         // eslint-disable-next-line max-len
         issueWithDeployBlockers.body += `\r\n**Deploy Blockers:**\r\n- [ ] https://github.com/${process.env.GITHUB_REPOSITORY}/issues/1\r\n- [x] https://github.com/${process.env.GITHUB_REPOSITORY}/issues/2\r\n- [ ] https://github.com/${process.env.GITHUB_REPOSITORY}/pull/1234\r\n`;
 
-        const baseExpectedResponse: Partial<Awaited<ReturnType<typeof getStagingDeployCash>>> = {
+        const baseExpectedResponse: Partial<Awaited<ReturnType<typeof getDeployChecklist>>> = {
             PRList: [
                 {
                     url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/21`,
@@ -157,24 +157,24 @@ describe('StagingDeployUtils', () => {
                 body: `**Release Version:** \`1.0.1-47\`\r\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\r\n\r\ncc @Expensify/applauseleads\n`,
             };
 
-            const bareExpectedResponse: Partial<Awaited<ReturnType<typeof getStagingDeployCash>>> = {
+            const bareExpectedResponse: Partial<Awaited<ReturnType<typeof getDeployChecklist>>> = {
                 ...baseExpectedResponse,
                 PRList: [],
                 PRListMobileExpensify: [],
             };
 
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({data: [bareIssue]}) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().then((data) => expect(data).toStrictEqual(bareExpectedResponse));
+            return getDeployChecklist().then((data) => expect(data).toStrictEqual(bareExpectedResponse));
         });
 
         test('Test finding an open issue successfully', () => {
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({data: [baseIssue]}) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().then((data) => expect(data).toStrictEqual(baseExpectedResponse));
+            return getDeployChecklist().then((data) => expect(data).toStrictEqual(baseExpectedResponse));
         });
 
         test('Test finding an open issue successfully and parsing with deploy blockers', () => {
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({data: [issueWithDeployBlockers]}) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().then((data) => expect(data).toStrictEqual(expectedResponseWithDeployBlockers));
+            return getDeployChecklist().then((data) => expect(data).toStrictEqual(expectedResponseWithDeployBlockers));
         });
 
         test('Test finding an open issue successfully and parsing with blockers w/o carriage returns', () => {
@@ -184,7 +184,7 @@ describe('StagingDeployUtils', () => {
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({
                 data: [modifiedIssueWithDeployBlockers],
             }) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().then((data) => expect(data).toStrictEqual(expectedResponseWithDeployBlockers));
+            return getDeployChecklist().then((data) => expect(data).toStrictEqual(expectedResponseWithDeployBlockers));
         });
 
         test('Test finding an open issue without a body', () => {
@@ -192,21 +192,21 @@ describe('StagingDeployUtils', () => {
             noBodyIssue.body = '';
 
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({data: [noBodyIssue]}) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().catch((e) => expect(e).toEqual(new Error('Unable to find StagingDeployCash issue with correct data.')));
+            return getDeployChecklist().catch((e) => expect(e).toEqual(new Error('Unable to find StagingDeployCash issue with correct data.')));
         });
 
         test('Test finding more than one issue', () => {
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({data: [{a: 1}, {b: 2}]}) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().catch((e) => expect(e).toEqual(new Error('Found more than one StagingDeployCash issue.')));
+            return getDeployChecklist().catch((e) => expect(e).toEqual(new Error('Found more than one StagingDeployCash issue.')));
         });
 
         test('Test finding no issues', () => {
             GithubUtils.octokit.issues.listForRepo = jest.fn().mockResolvedValue({data: []}) as unknown as ListForRepoMethod;
-            return getStagingDeployCash().catch((e) => expect(e).toEqual(new Error('Unable to find StagingDeployCash issue.')));
+            return getDeployChecklist().catch((e) => expect(e).toEqual(new Error('Unable to find StagingDeployCash issue.')));
         });
     });
 
-    describe('generateStagingDeployCashBody', () => {
+    describe('generateDeployChecklistBody', () => {
         const mockPRs = [
             {
                 number: 1,
@@ -337,7 +337,7 @@ describe('StagingDeployUtils', () => {
             `${lineBreak}`;
 
         test('Test no verified PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify});
             const expectedOutputWithMobileExpensify = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n**Mobile-Expensify Changes:** https://github.com/Expensify/Mobile-Expensify/compare/production...staging\n\n**This release contains changes from the following pull requests:**\n`;
             expect(issue.issueBody).toBe(
                 `${expectedOutputWithMobileExpensify}` +
@@ -360,19 +360,19 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test Mobile-Expensify compare link with Mobile-Expensify PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify});
             expect(issue.issueBody).toContain('**Mobile-Expensify Changes:** https://github.com/Expensify/Mobile-Expensify/compare/production...staging');
             expect(issue.issueBody).toContain('**Mobile-Expensify PRs:**');
         });
 
         test('Test no Mobile-Expensify compare link without Mobile-Expensify PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify: []});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: basePRList, PRListMobileExpensify: []});
             expect(issue.issueBody).not.toContain('**Mobile-Expensify Changes:**');
             expect(issue.issueBody).not.toContain('**Mobile-Expensify PRs:**');
         });
 
         test('Test some verified PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: [2]});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: [2]});
             expect(issue.issueBody).toBe(
                 `${baseExpectedOutput}` +
                     `${openCheckbox}${prURL(1)}` +
@@ -390,7 +390,7 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test all verified PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: basePRList});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: basePRList});
             expect(issue.issueBody).toBe(
                 `${allVerifiedExpectedOutput}` +
                     `${deployerVerificationsHeader}` +
@@ -403,7 +403,7 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test no resolved deploy blockers', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: basePRList, deployBlockers: baseDeployBlockerList});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: basePRList, verifiedPRList: basePRList, deployBlockers: baseDeployBlockerList});
             expect(issue.issueBody).toBe(
                 `${allVerifiedExpectedOutput}` +
                     `${deployBlockerHeader}` +
@@ -419,7 +419,7 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test some resolved deploy blockers', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({
+            const issue = await generateDeployChecklistBodyAndAssignees({
                 tag,
                 PRList: basePRList,
                 verifiedPRList: basePRList,
@@ -441,7 +441,7 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test all resolved deploy blockers', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({
+            const issue = await generateDeployChecklistBodyAndAssignees({
                 tag,
                 PRList: basePRList,
                 verifiedPRList: basePRList,
@@ -468,7 +468,7 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test internalQA PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: [...basePRList, ...internalQAPRList], PRListMobileExpensify});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: [...basePRList, ...internalQAPRList], PRListMobileExpensify});
             const expectedOutputWithMobileExpensify = `**Release Version:** \`${tag}\`\n**Compare Changes:** https://github.com/${process.env.GITHUB_REPOSITORY}/compare/production...staging\n**Mobile-Expensify Changes:** https://github.com/Expensify/Mobile-Expensify/compare/production...staging\n\n**This release contains changes from the following pull requests:**\n`;
             expect(issue.issueBody).toBe(
                 `${expectedOutputWithMobileExpensify}` +
@@ -494,7 +494,7 @@ describe('StagingDeployUtils', () => {
         });
 
         test('Test some verified internalQA PRs', async () => {
-            const issue = await generateStagingDeployCashBodyAndAssignees({tag, PRList: [...basePRList, ...internalQAPRList], resolvedInternalQAPRs: [6]});
+            const issue = await generateDeployChecklistBodyAndAssignees({tag, PRList: [...basePRList, ...internalQAPRList], resolvedInternalQAPRs: [6]});
             expect(issue.issueBody).toBe(
                 `${baseExpectedOutput}` +
                     `${openCheckbox}${prURL(1)}` +
