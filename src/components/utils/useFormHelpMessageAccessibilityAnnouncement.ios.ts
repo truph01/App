@@ -9,6 +9,7 @@ function useFormHelpMessageAccessibilityAnnouncement(message: string | ReactNode
 
     useEffect(() => {
         if (!shouldAnnounceError || typeof message !== 'string' || !message.trim()) {
+            previousAnnouncedMessageRef.current = '';
             return;
         }
 

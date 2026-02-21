@@ -98,7 +98,7 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
                             // TalkBack on some Android versions skips role-only alert announcements,
                             // so keep native accessibilityRole/live-region as a platform fallback.
                             accessibilityRole={!isWeb && shouldAnnounceError ? CONST.ROLE.ALERT : undefined}
-                            accessibilityLiveRegion={!isWeb && shouldAnnounceError ? 'assertive' : undefined}
+                            accessibilityLiveRegion={shouldAnnounceError ? 'assertive' : undefined}
                         >
                             {message}
                         </Text>
