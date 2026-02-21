@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import {act, renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
+import useReceiptScan from '@pages/iou/request/step/IOURequestStepScan/useReceiptScan';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, Transaction} from '@src/types/onyx';
-import useReceiptScan from '@pages/iou/request/step/IOURequestStepScan/useReceiptScan';
 import waitForBatchedUpdatesWithAct from '../../utils/waitForBatchedUpdatesWithAct';
 
 const mockHandleMoneyRequestStepScanParticipants = jest.fn();

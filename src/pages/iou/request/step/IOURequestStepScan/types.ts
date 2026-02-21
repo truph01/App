@@ -1,14 +1,14 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import type {WithWritableReportOrNotFoundProps} from '@pages/iou/request/step/withWritableReportOrNotFound';
-import type SCREENS from '@src/SCREENS';
-import type {ReceiptSource} from '@src/types/onyx/Transaction';
-import type {FileObject} from '@src/types/utils/Attachment';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type {Route} from '@src/ROUTES';
+import type SCREENS from '@src/SCREENS';
 import type {Report} from '@src/types/onyx';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
+import type {ReceiptSource} from '@src/types/onyx/Transaction';
 import type Transaction from '@src/types/onyx/Transaction';
+import type {FileObject} from '@src/types/utils/Attachment';
 
 type UseReceiptScanParams = {
     /** The report associated with money request */
