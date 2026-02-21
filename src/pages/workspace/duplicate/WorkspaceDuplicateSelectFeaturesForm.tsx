@@ -372,7 +372,6 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
                             accessibilityState={{checked: isSelectAllChecked}}
                             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.DUPLICATE_SELECT_FEATURES_SELECT_ALL}
                             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
-                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_DUPLICATE_SELECT_FEATURES.SELECT_ALL}
                         >
                             <Text style={[styles.textLabelSupporting, styles.ph3]}>{translate('workspace.common.selectAll')}</Text>
                         </PressableWithFeedback>
