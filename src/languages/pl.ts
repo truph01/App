@@ -7056,8 +7056,6 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
         monthlyAccrual: 'Miesięczne rozliczenie',
         unapprovedCash: 'Niezaakceptowana gotówka',
         unapprovedCard: 'Niezaakceptowana karta',
-        expensifyCard: 'Karta Expensify',
-        reimbursements: 'Zwroty',
         reconciliation: 'Uzgodnienie',
         topSpenders: 'Najwięksi wydający',
         saveSearch: 'Zapisz wyszukiwanie',

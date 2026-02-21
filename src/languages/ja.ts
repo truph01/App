@@ -7016,8 +7016,6 @@ ${reportName}
         monthlyAccrual: '月次発生',
         unapprovedCash: '未承認の現金',
         unapprovedCard: '未承認のカード',
-        expensifyCard: 'Expensifyカード',
-        reimbursements: '払い戻し',
         reconciliation: '照合',
         topSpenders: '上位支出者',
         saveSearch: '検索を保存',

@@ -745,7 +745,7 @@ function getSuggestedSearches(
         },
         [CONST.SEARCH.SEARCH_KEYS.EXPENSIFY_CARD]: {
             key: CONST.SEARCH.SEARCH_KEYS.EXPENSIFY_CARD,
-            translationPath: 'search.expensifyCard',
+            translationPath: 'workspace.common.expensifyCard',
             type: CONST.SEARCH.DATA_TYPES.EXPENSE,
             icon: 'CreditCard',
             searchQuery: buildQueryStringFromFilterFormValues(
@@ -773,7 +773,7 @@ function getSuggestedSearches(
         },
         [CONST.SEARCH.SEARCH_KEYS.RECONCILIATION]: {
             key: CONST.SEARCH.SEARCH_KEYS.RECONCILIATION,
-            translationPath: 'search.reimbursements',
+            translationPath: 'workspace.common.reimburse',
             type: CONST.SEARCH.DATA_TYPES.EXPENSE,
             icon: 'Bank',
             searchQuery: buildQueryStringFromFilterFormValues(

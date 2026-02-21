@@ -7054,8 +7054,6 @@ const translations = {
         monthlyAccrual: 'Monthly accrual',
         unapprovedCash: 'Unapproved cash',
         unapprovedCard: 'Unapproved card',
-        expensifyCard: 'Expensify Card',
-        reimbursements: 'Reimbursements',
         reconciliation: 'Reconciliation',
         topSpenders: 'Top spenders',
         saveSearch: 'Save search',

@@ -7068,8 +7068,6 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         monthlyAccrual: 'Maandelijkse opbouw',
         unapprovedCash: 'Niet-goedgekeurde contante uitgaven',
         unapprovedCard: 'Niet-goedgekeurde kaart',
-        expensifyCard: 'Expensify Card',
-        reimbursements: 'Terugbetalingen',
         reconciliation: 'Afstemming',
         topSpenders: 'Grootste uitgaven doeners',
         saveSearch: 'Zoekopdracht opslaan',

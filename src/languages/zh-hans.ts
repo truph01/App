@@ -6904,8 +6904,6 @@ ${reportName}
         monthlyAccrual: '月度计提',
         unapprovedCash: '未批准现金',
         unapprovedCard: '未批准的卡片',
-        expensifyCard: 'Expensify 卡',
-        reimbursements: '报销',
         reconciliation: '对账',
         topSpenders: '最高支出者',
         saveSearch: '保存搜索',

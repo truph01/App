@@ -7060,8 +7060,6 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
         monthlyAccrual: 'Acréscimo mensal',
         unapprovedCash: 'Dinheiro não aprovado',
         unapprovedCard: 'Cartão não aprovado',
-        expensifyCard: 'Cartão Expensify',
-        reimbursements: 'Reembolsos',
         reconciliation: 'Conciliação',
         topSpenders: 'Maiores gastadores',
         saveSearch: 'Salvar pesquisa',

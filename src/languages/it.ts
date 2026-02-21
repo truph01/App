@@ -7089,8 +7089,6 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
         monthlyAccrual: 'Rateo mensile',
         unapprovedCash: 'Contanti non approvati',
         unapprovedCard: 'Carta non approvata',
-        expensifyCard: 'Carta Expensify',
-        reimbursements: 'Rimborsi',
         reconciliation: 'Riconciliazione',
         topSpenders: 'Maggiori spendaccioni',
         saveSearch: 'Salva ricerca',

@@ -7103,8 +7103,6 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
         monthlyAccrual: 'Monatliche Abgrenzung',
         unapprovedCash: 'Nicht genehmigtes Bargeld',
         unapprovedCard: 'Nicht genehmigte Karte',
-        expensifyCard: 'Expensify Card',
-        reimbursements: 'Rückerstattungen',
         reconciliation: 'Abstimmung',
         topSpenders: 'Top-Ausgaben',
         saveSearch: 'Suche speichern',

@@ -7124,8 +7124,6 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
         monthlyAccrual: 'Régularisation mensuelle',
         unapprovedCash: 'Espèces non approuvées',
         unapprovedCard: 'Carte non approuvée',
-        expensifyCard: 'Carte Expensify',
-        reimbursements: 'Remboursements',
         reconciliation: 'Rapprochement',
         topSpenders: 'Plus gros dépensiers',
         saveSearch: 'Enregistrer la recherche',
