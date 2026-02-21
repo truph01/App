@@ -137,7 +137,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ always() && (inputs.APP_PR_NUMBER != '' || inputs.MOBILE_EXPENSIFY_PR != '') }}
     name: Post a GitHub comment with app download links for testing
-    needs: [deployWebAdHoc, buildAndroid, buildIOS]
+    needs: [buildWeb, deployWebAdHoc, buildAndroid, buildIOS]
     steps:
       - name: Checkout
         # v6
@@ -159,7 +159,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           ANDROID: ${{ needs.buildAndroid.result }}
           IOS: ${{ needs.buildIOS.result }}
-          WEB: ${{ needs.deployWebAdHoc.result }}
+          WEB: ${{ needs.buildWeb.result == 'failure' && 'failure' || needs.deployWebAdHoc.result }}
           ANDROID_LINK: ${{ needs.buildAndroid.outputs.ROCK_ARTIFACT_URL }}
           IOS_LINK: ${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}
           WEB_LINK: https://${{ inputs.APP_PR_NUMBER }}.pr-testing.expensify.com
@@ -180,7 +180,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     if: ${{ always() && (inputs.APP_PR_NUMBER != '' || needs.buildAndroid.outputs.ROCK_ARTIFACT_URL != '' || needs.buildIOS.outputs.ROCK_ARTIFACT_URL != '') }}
     name: Build Summary
-    needs: [deployWebAdHoc, buildAndroid, buildIOS]
+    needs: [buildWeb, deployWebAdHoc, buildAndroid, buildIOS]
     steps:
       - name: Checkout
         # v6
@@ -210,7 +210,8 @@ jobs:
             const iosLink = '${{ needs.buildIOS.outputs.ROCK_ARTIFACT_URL }}' || '';
             const mobileExpensifySHA = '${{ steps.getMobileExpensifySHA.outputs.SHA }}' || '';
 
-            const webStatus = webLink ? '✅ Success' : '${{ needs.deployWebAdHoc.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
+            const webFailed = '${{ needs.buildWeb.result }}' === 'failure' || '${{ needs.deployWebAdHoc.result }}' === 'failure';
+            const webStatus = webLink ? '✅ Success' : webFailed ? '❌ Failed' : '⏭️ Skipped';
             const androidStatus = androidLink ? '✅ Success' : '${{ needs.buildAndroid.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
             const iosStatus = iosLink ? '✅ Success' : '${{ needs.buildIOS.result }}' === 'failure' ? '❌ Failed' : '⏭️ Skipped';
 
