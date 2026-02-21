@@ -99,6 +99,7 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
 
     const [form] = useOnyx(ONYXKEYS.FORMS.MERCHANT_RULE_FORM, {canBeMissing: true});
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`, {canBeMissing: true});
+    const [policyTagsRaw] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {canBeMissing: true});
     const [policyTags = getEmptyArray<ValueOf<PolicyTagLists>>()] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {
         canBeMissing: true,
         selector: getTagLists,
@@ -141,16 +142,15 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
         if (policy?.areCategoriesEnabled && !policyCategories) {
             openPolicyCategoriesPage(policyID);
         }
-        if (policy?.areTagsEnabled && policyTags.length === 0) {
+        if (policy?.areTagsEnabled && !policyTagsRaw) {
             openPolicyTagsPage(policyID);
         }
-    }, [policyID, policy?.areCategoriesEnabled, policy?.areTagsEnabled, policyCategories, policyTags.length]);
+    }, [policyID, policy?.areCategoriesEnabled, policy?.areTagsEnabled, policyCategories, policyTagsRaw]);
 
     useNetwork({onReconnect: fetchPolicyData});
 
-    useEffect(() => {
-        fetchPolicyData();
-    }, [fetchPolicyData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(fetchPolicyData, [policyID]);
 
     const hasCategories = () => {
         if (!policy?.areCategoriesEnabled) {
