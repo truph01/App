@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, View} from 'react-native';
+import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Icon from '@components/Icon';
@@ -18,6 +18,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {getSubscriptionPlanInfo, isSubscriptionTypeOfInvoicing} from '@libs/SubscriptionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import getSubscriptionPlanBenefitA11yProps from './getSubscriptionPlanBenefitA11yProps';
 import SubscriptionPlanCardActionButton from './SubscriptionPlanCardActionButton';
 
 type PersonalPolicyTypeExcludedProps = Exclude<ValueOf<typeof CONST.POLICY.TYPE>, 'personal'>;
@@ -56,35 +57,36 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
     const benefitsColumns = shouldUseNarrowLayout || isFromComparisonModal ? 1 : 2;
 
     const renderBenefits = () => {
-        const isWeb = Platform.OS === 'web';
-
         return (
             <View
                 role={CONST.ROLE.LIST}
                 style={[styles.flexRow, styles.flexWrap]}
             >
-                {benefits.map((item, index) => (
-                    <View
-                        key={item}
-                        style={[styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4, {width: `${100 / benefitsColumns}%`}]}
-                        role={CONST.ROLE.LISTITEM}
-                        accessible={!isWeb}
-                        accessibilityLabel={!isWeb ? `${item}, ${index + 1} ${translate('common.of')} ${benefits.length}` : undefined}
-                    >
+                {benefits.map((item, index) => {
+                    const {accessible, accessibilityLabel} = getSubscriptionPlanBenefitA11yProps({benefitText: item, index, totalBenefits: benefits.length, ofLabel: translate('common.of')});
+                    return (
                         <View
-                            aria-hidden
-                            importantForAccessibility="no-hide-descendants"
+                            key={item}
+                            style={[styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4, {width: `${100 / benefitsColumns}%`}]}
+                            role={CONST.ROLE.LISTITEM}
+                            accessible={accessible}
+                            accessibilityLabel={accessibilityLabel}
                         >
-                            <Icon
-                                src={Expensicons.Checkmark}
-                                fill={theme.iconSuccessFill}
-                                width={variables.iconSizeSmall}
-                                height={variables.iconSizeSmall}
-                            />
+                            <View
+                                aria-hidden
+                                importantForAccessibility="no-hide-descendants"
+                            >
+                                <Icon
+                                    src={Expensicons.Checkmark}
+                                    fill={theme.iconSuccessFill}
+                                    width={variables.iconSizeSmall}
+                                    height={variables.iconSizeSmall}
+                                />
+                            </View>
+                            <Text style={[styles.textLabelSupporting, styles.ml2]}>{item}</Text>
                         </View>
-                        <Text style={[styles.textLabelSupporting, styles.ml2]}>{item}</Text>
-                    </View>
-                ))}
+                    );
+                })}
             </View>
         );
     };
