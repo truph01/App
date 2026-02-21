@@ -1,27 +1,13 @@
 ---
 name: onyx
 description: Onyx state management patterns — useOnyx hook, action files, optimistic updates, collections, and offline-first architecture. Use when working with Onyx connections, writing action files, debugging state, or implementing API calls with optimistic data.
-alwaysApply: false
 ---
-
-# Onyx State Management Skill
-
-Use this skill when working with Onyx for state management, data persistence, or optimistic updates.
-
-## When to Use This Skill
-
-- When implementing or modifying Onyx connections (useOnyx, Onyx.connect)
-- When writing action files that update Onyx state
-- When debugging state management issues
-- When optimizing component re-renders related to Onyx
-- When working with collection keys
-- When implementing or investigating optimistic updates or API calls
 
 ## Core Concepts
 
 Onyx is a **persistent storage solution wrapped in a Pub/Sub library** that enables reactive, offline-first data management — key-value storage with automatic AsyncStorage persistence, reactive subscriptions, and collection management.
 
-For the full API reference (initialization, storage providers, cache eviction, benchmarks, Redux DevTools), see `@../react-native-onyx/README.md`.
+For the full API reference (initialization, storage providers, cache eviction, benchmarks, Redux DevTools), see https://github.com/Expensify/react-native-onyx/blob/main/README.md.
 
 ## Common Patterns
 
@@ -47,7 +33,7 @@ export {setIsOffline};
 
 Optimistic updates allow users to see changes immediately while the API request is queued. This is fundamental to Expensify's offline-first architecture.
 
-For **which pattern to use** (A / B / C / D) and UX behavior for each, see `@contributingGuides/philosophies/OFFLINE.md`.
+For **which pattern to use** (A / B / C / D) and UX behavior for each, see https://github.com/Expensify/App/blob/main/contributingGuides/philosophies/OFFLINE.md.
 
 #### Understanding the Three Data Sets
 
@@ -208,7 +194,22 @@ const accountIDSelector = (account: Account) => account?.accountID;
 const [accountID] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountIDSelector});
 ```
 
-For `skipCacheCheck` (large objects) and batch collection update patterns, see `@../react-native-onyx/README.md`.
+`useOnyx` caches by selector reference — a new function reference on every render bypasses the cache and causes unnecessary re-renders. Prefer pure selectors defined in `src/selectors/` over inline functions. If a selector must be defined inside a component, ensure referential stability: React Compiler handles this automatically, but in components that are not compiled, wrap the selector in `useMemo`.
+
+```typescript
+// BAD: new function reference on every render defeats caching
+const [accountID] = useOnyx(ONYXKEYS.ACCOUNT, {selector: (account) => account?.accountID});
+
+// GOOD: stable reference defined outside the component
+// src/selectors/accountSelectors.ts
+const selectAccountID = (account: Account) => account?.accountID;
+
+// GOOD: stable reference via useMemo (for non-React-Compiler components)
+const selector = useMemo(() => (account: Account) => account?.accountID, []);
+const [accountID] = useOnyx(ONYXKEYS.ACCOUNT, {selector});
+```
+
+For `skipCacheCheck` (large objects) and batch collection update patterns, see https://github.com/Expensify/react-native-onyx/blob/main/README.md.
 
 ## Common Pitfalls
 
@@ -252,9 +253,9 @@ API.write('SomeCommand', params, {optimisticData, successData, failureData});
 
 ## Related Files
 
-- `@../react-native-onyx/README.md` - Full Onyx API reference (initialization, merge/set/connect, collections, loading state, cache eviction, Redux DevTools, benchmarks)
-- `@contributingGuides/philosophies/OFFLINE.md` - Full offline UX patterns, decision flowchart, and when to use each pattern (A/B/C/D)
-- `@./src/ONYXKEYS.ts` - All Onyx key definitions
-- `@./src/libs/actions/` - Action files that update Onyx
-- `@./src/hooks/useOnyx.ts` - useOnyx hook implementation
-- `@./src/types/onyx/` - TypeScript types for Onyx data
+- https://github.com/Expensify/react-native-onyx/blob/main/README.md - Full Onyx API reference (initialization, merge/set/connect, collections, loading state, cache eviction, Redux DevTools, benchmarks)
+- https://github.com/Expensify/App/blob/main/contributingGuides/philosophies/OFFLINE.md - Full offline UX patterns, decision flowchart, and when to use each pattern (A/B/C/D)
+- https://github.com/Expensify/App/blob/main/src/ONYXKEYS.ts - All Onyx key definitions
+- https://github.com/Expensify/App/tree/main/src/libs/actions - Action files that update Onyx
+- https://github.com/Expensify/App/blob/main/src/hooks/useOnyx.ts - useOnyx hook implementation
+- https://github.com/Expensify/App/tree/main/src/types/onyx - TypeScript types for Onyx data
