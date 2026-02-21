@@ -149,8 +149,9 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
 
     useNetwork({onReconnect: fetchPolicyData});
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(fetchPolicyData, [policyID]);
+    useEffect(() => {
+        fetchPolicyData();
+    }, [fetchPolicyData]);
 
     const hasCategories = () => {
         if (!policy?.areCategoriesEnabled) {
