@@ -122,7 +122,9 @@ function InviteReceiptPartnerPolicyPage({route}: InviteReceiptPartnerPolicyPageP
         }
     }
 
-    if (selectedOptions.length === 0 && workspaceMembers.length > 0) {
+    const [hasPreselected, setHasPreselected] = useState(false);
+    if (!hasPreselected && workspaceMembers.length > 0) {
+        setHasPreselected(true);
         setSelectedOptions(workspaceMembers.map((member) => ({...member, isSelected: true})));
     }
 
