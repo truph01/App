@@ -1632,7 +1632,7 @@ const ROUTES = {
         route: 'workspaces/:policyID/accounting/quickbooks-online/travel-invoicing',
 
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/quickbooks-online/travel-invoicing` as const,
+        getRoute: (policyID: string, backTo?: string) => getUrlWithBackToParam(`workspaces/${policyID}/accounting/quickbooks-online/travel-invoicing` as const, backTo),
     },
     POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_TRAVEL_INVOICING_VENDOR_SELECT: {
         route: 'workspaces/:policyID/accounting/quickbooks-online/travel-invoicing/vendor',

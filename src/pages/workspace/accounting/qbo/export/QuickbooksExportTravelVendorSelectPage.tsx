@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
 import type {ListItem} from '@components/SelectionList/types';
@@ -37,40 +37,33 @@ function QuickbooksExportTravelVendorSelectPage({policy}: WithPolicyConnectionsP
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const data: CardListItem[] = useMemo(
-        () =>
-            vendors?.map((vendor) => ({
-                value: vendor.id,
-                text: vendor.name,
-                keyForList: vendor.name,
-                isSelected: vendor.id === qboConfig?.travelInvoicingVendorID,
-            })) ?? [],
-        [qboConfig?.travelInvoicingVendorID, vendors],
+    const data: CardListItem[] =
+        vendors?.map((vendor) => ({
+            value: vendor.id,
+            text: vendor.name,
+            keyForList: vendor.name,
+            isSelected: vendor.id === qboConfig?.travelInvoicingVendorID,
+        })) ?? [];
+
+    const selectVendor = (row: CardListItem) => {
+        if (row.value !== qboConfig?.travelInvoicingVendorID) {
+            updateConnectionConfig(policyID, CONST.POLICY.CONNECTIONS.NAME.QBO, {travelInvoicingVendorID: row.value}, {travelInvoicingVendorID: qboConfig?.travelInvoicingVendorID});
+        }
+        Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID));
+    };
+
+    const getListEmptyContent = () => (
+        <BlockingView
+            icon={illustrations.Telescope}
+            iconWidth={variables.emptyListIconWidth}
+            iconHeight={variables.emptyListIconHeight}
+            title={translate('workspace.qbo.noAccountsFound')}
+            subtitle={translate('workspace.qbo.noAccountsFoundDescription')}
+            containerStyle={styles.pb10}
+        />
     );
 
-    const selectVendor = useCallback(
-        (row: CardListItem) => {
-            if (row.value !== qboConfig?.travelInvoicingVendorID) {
-                updateConnectionConfig(policyID, CONST.POLICY.CONNECTIONS.NAME.QBO, {travelInvoicingVendorID: row.value}, {travelInvoicingVendorID: qboConfig?.travelInvoicingVendorID});
-            }
-            Navigation.goBack();
-        },
-        [qboConfig?.travelInvoicingVendorID, policyID],
-    );
-
-    const listEmptyContent = useMemo(
-        () => (
-            <BlockingView
-                icon={illustrations.Telescope}
-                iconWidth={variables.emptyListIconWidth}
-                iconHeight={variables.emptyListIconHeight}
-                title={translate('workspace.qbo.noAccountsFound')}
-                subtitle={translate('workspace.qbo.noAccountsFoundDescription')}
-                containerStyle={styles.pb10}
-            />
-        ),
-        [illustrations.Telescope, translate, styles.pb10],
-    );
+    const listEmptyContent = getListEmptyContent();
 
     return (
         <SelectionScreen

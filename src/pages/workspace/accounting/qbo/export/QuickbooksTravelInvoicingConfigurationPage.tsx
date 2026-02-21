@@ -87,11 +87,10 @@ function QuickbooksTravelInvoicingConfigurationPage({policy}: WithPolicyConnecti
             connectionName={CONST.POLICY.CONNECTIONS.NAME.QBO}
             onBackButtonPress={() => Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_EXPORT.getRoute(policyID))}
         >
-            {sections.map((section, index) => (
+            {sections.map((section) => (
                 <OfflineWithFeedback
                     pendingAction={section.pendingAction}
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
+                    key={section.subscribedSettings.at(0)}
                     errors={section.errors}
                     errorRowStyles={[styles.ph5]}
                 >
