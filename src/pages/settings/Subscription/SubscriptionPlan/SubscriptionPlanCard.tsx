@@ -56,40 +56,29 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
     const benefitsColumns = shouldUseNarrowLayout || isFromComparisonModal ? 1 : 2;
 
     const renderBenefits = () => {
-        const amountOfRows = Math.ceil(benefits.length / benefitsColumns);
-
         return (
-            <View role={CONST.ROLE.LIST}>
-                {Array.from({length: amountOfRows}).map((_, rowIndex) => (
+            <View
+                role={CONST.ROLE.LIST}
+                style={[styles.flexRow, styles.flexWrap]}
+            >
+                {benefits.map((item) => (
                     <View
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={`row-${rowIndex}`}
-                        style={styles.flexRow}
-                        role={CONST.ROLE.PRESENTATION}
+                        key={item}
+                        style={[styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4, {width: `${100 / benefitsColumns}%`}]}
+                        role={CONST.ROLE.LISTITEM}
                     >
-                        {benefits.slice(rowIndex * benefitsColumns, (rowIndex + 1) * benefitsColumns).map((item) => (
-                            <View
-                                key={item}
-                                style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4]}
-                                role={CONST.ROLE.LISTITEM}
-                                accessible
-                                accessibilityLabel={item}
-                            >
-                                <View
-                                    style={[styles.flexRow, styles.alignItemsCenter]}
-                                    importantForAccessibility="no-hide-descendants"
-                                    aria-hidden
-                                >
-                                    <Icon
-                                        src={Expensicons.Checkmark}
-                                        fill={theme.iconSuccessFill}
-                                        width={variables.iconSizeSmall}
-                                        height={variables.iconSizeSmall}
-                                    />
-                                    <Text style={[styles.textLabelSupporting, styles.ml2]}>{item}</Text>
-                                </View>
-                            </View>
-                        ))}
+                        <View
+                            aria-hidden
+                            importantForAccessibility="no-hide-descendants"
+                        >
+                            <Icon
+                                src={Expensicons.Checkmark}
+                                fill={theme.iconSuccessFill}
+                                width={variables.iconSizeSmall}
+                                height={variables.iconSizeSmall}
+                            />
+                        </View>
+                        <Text style={[styles.textLabelSupporting, styles.ml2]}>{item}</Text>
                     </View>
                 ))}
             </View>
