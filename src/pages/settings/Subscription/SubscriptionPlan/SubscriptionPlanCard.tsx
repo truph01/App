@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Icon from '@components/Icon';
@@ -56,16 +56,20 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
     const benefitsColumns = shouldUseNarrowLayout || isFromComparisonModal ? 1 : 2;
 
     const renderBenefits = () => {
+        const isWeb = Platform.OS === 'web';
+
         return (
             <View
                 role={CONST.ROLE.LIST}
                 style={[styles.flexRow, styles.flexWrap]}
             >
-                {benefits.map((item) => (
+                {benefits.map((item, index) => (
                     <View
                         key={item}
                         style={[styles.flexRow, styles.alignItemsCenter, shouldUseNarrowLayout ? styles.mt3 : styles.mt4, {width: `${100 / benefitsColumns}%`}]}
                         role={CONST.ROLE.LISTITEM}
+                        accessible={!isWeb}
+                        accessibilityLabel={!isWeb ? `${item}, ${index + 1} ${translate('common.of')} ${benefits.length}` : undefined}
                     >
                         <View
                             aria-hidden
