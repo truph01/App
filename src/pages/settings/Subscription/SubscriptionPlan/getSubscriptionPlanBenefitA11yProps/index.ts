@@ -1,7 +1,5 @@
-import type {SubscriptionPlanBenefitA11yProps} from './types';
+import type {GetSubscriptionPlanBenefitA11yProps} from './types';
 
-function getSubscriptionPlanBenefitA11yProps(): SubscriptionPlanBenefitA11yProps {
-    return {};
-}
+const getSubscriptionPlanBenefitA11yProps: GetSubscriptionPlanBenefitA11yProps = () => ({});
 
 export default getSubscriptionPlanBenefitA11yProps;

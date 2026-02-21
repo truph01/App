@@ -10,4 +10,6 @@ type SubscriptionPlanBenefitA11yProps = {
     accessibilityLabel?: string;
 };
 
-export type {GetSubscriptionPlanBenefitA11yPropsParams, SubscriptionPlanBenefitA11yProps};
+type GetSubscriptionPlanBenefitA11yProps = (params?: GetSubscriptionPlanBenefitA11yPropsParams) => SubscriptionPlanBenefitA11yProps;
+
+export type {GetSubscriptionPlanBenefitA11yPropsParams, SubscriptionPlanBenefitA11yProps, GetSubscriptionPlanBenefitA11yProps};

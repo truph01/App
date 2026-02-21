@@ -1,10 +1,8 @@
-import type {GetSubscriptionPlanBenefitA11yPropsParams, SubscriptionPlanBenefitA11yProps} from './types';
+import type {GetSubscriptionPlanBenefitA11yProps} from './types';
 
-function getSubscriptionPlanBenefitA11yProps({benefitText, index, totalBenefits, ofLabel}: GetSubscriptionPlanBenefitA11yPropsParams): SubscriptionPlanBenefitA11yProps {
-    return {
-        accessible: true,
-        accessibilityLabel: `${benefitText}, ${index + 1} ${ofLabel} ${totalBenefits}`,
-    };
-}
+const getSubscriptionPlanBenefitA11yProps: GetSubscriptionPlanBenefitA11yProps = (params) => ({
+    accessible: true,
+    accessibilityLabel: `${params?.benefitText}, ${(params?.index ?? 0) + 1} ${params?.ofLabel} ${params?.totalBenefits}`,
+});
 
 export default getSubscriptionPlanBenefitA11yProps;
