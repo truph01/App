@@ -1,7 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useMemo} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
-import {AccessibilityInfo, View} from 'react-native';
+import {View} from 'react-native';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -11,6 +11,7 @@ import CONST from '@src/CONST';
 import Icon from './Icon';
 import RenderHTML from './RenderHTML';
 import Text from './Text';
+import useFormHelpMessageAccessibilityAnnouncement from './utils/useFormHelpMessageAccessibilityAnnouncement';
 
 type FormHelpMessageProps = {
     /** Error or hint text. Ignored when children is not empty */
@@ -39,8 +40,6 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
     const theme = useTheme();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Exclamation']);
-    const previousAnnouncedMessageRef = useRef('');
-    const isIOS = getPlatform() === CONST.PLATFORM.IOS;
     const isWeb = getPlatform() === CONST.PLATFORM.WEB;
     const shouldAnnounceError = isError && typeof message === 'string' && !!message && !shouldRenderMessageAsHTML && children == null;
 
@@ -58,18 +57,7 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
         return `<muted-text-label>${replacedText}</muted-text-label>`;
     }, [isError, message, shouldRenderMessageAsHTML]);
 
-    useEffect(() => {
-        if (!isIOS || !shouldAnnounceError || typeof message !== 'string' || !message.trim()) {
-            return;
-        }
-
-        if (previousAnnouncedMessageRef.current === message) {
-            return;
-        }
-
-        previousAnnouncedMessageRef.current = message;
-        AccessibilityInfo.announceForAccessibility(message);
-    }, [isIOS, message, shouldAnnounceError]);
+    useFormHelpMessageAccessibilityAnnouncement(message, shouldAnnounceError);
 
     const errorIconLabel = isError && shouldShowRedDotIndicator ? CONST.ACCESSIBILITY_LABELS.ERROR : undefined;
 
