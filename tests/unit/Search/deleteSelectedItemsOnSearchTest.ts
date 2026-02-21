@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import Onyx from 'react-native-onyx';
 import type {SelectedTransactionInfo} from '@components/Search/types';
-import * as API from '@libs/API';
+import {write} from '@libs/API';
 import {bulkDeleteReports} from '@libs/actions/Search';
 import {deleteAppReport} from '@userActions/Report';
 import CONST from '@src/CONST';
@@ -370,7 +370,7 @@ describe('bulkDeleteReports', () => {
             expect(deleteAppReport).toHaveBeenCalledWith(reports.report_123, undefined, currentUserEmail, 1, transactions, transactionsViolations, {});
 
             // Should call API.write with DELETE_MONEY_REQUEST_ON_SEARCH only for transaction_456 (not transaction_789 since its report is being deleted)
-            expect(API.write).toHaveBeenCalledWith(
+            expect(write).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH,
                 expect.objectContaining({
                     hash,
@@ -424,7 +424,7 @@ describe('bulkDeleteReports', () => {
 
             // Should call API.write with DELETE_MONEY_REQUEST_ON_SEARCH with all transaction IDs
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
-            expect(API.write).toHaveBeenCalledWith(
+            expect(write).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH,
                 expect.objectContaining({
                     hash,
@@ -487,7 +487,7 @@ describe('bulkDeleteReports', () => {
 
             // Should NOT call API.write with DELETE_MONEY_REQUEST_ON_SEARCH since all transactions belong to the report being deleted
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
-            expect(API.write).not.toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH, expect.anything(), expect.anything());
+            expect(write).not.toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH, expect.anything(), expect.anything());
         });
 
         it('should handle transactions with no reportID', () => {
@@ -515,7 +515,7 @@ describe('bulkDeleteReports', () => {
 
             // Should call API.write with DELETE_MONEY_REQUEST_ON_SEARCH for transaction with no reportID
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
-            expect(API.write).toHaveBeenCalledWith(
+            expect(write).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH,
                 expect.objectContaining({
                     hash,
