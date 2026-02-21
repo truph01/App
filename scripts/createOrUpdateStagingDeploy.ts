@@ -8,7 +8,7 @@ import GithubUtils from '@github/libs/GithubUtils';
 import GitUtils from '@github/libs/GitUtils';
 import type {MergedPR, SubmoduleUpdate} from '@github/libs/GitUtils';
 import {generateStagingDeployCashBodyAndAssignees, getStagingDeployCashData} from '@github/libs/StagingDeployUtils';
-import type {StagingDeployCashBlocker, StagingDeployCashData, StagingDeployCashPR} from '@github/libs/StagingDeployUtils';
+import type {ChecklistItem, StagingDeployCashData} from '@github/libs/StagingDeployUtils';
 
 type IssuesCreateResponse = Awaited<ReturnType<typeof GithubUtils.octokit.issues.create>>['data'];
 
@@ -19,16 +19,12 @@ type PackageJson = {
 type TimelineEntry = {type: 'pr'; prNumber: number; date: string} | {type: 'submodule'; version: string; date: string; commit: string};
 
 /**
- * Preserve the checked state (isVerified/isResolved) from a previous checklist when building a new one.
+ * Preserve the checked state from a previous checklist when building a new one.
  */
-function preserveCheckboxState<T extends StagingDeployCashPR | StagingDeployCashBlocker>(
-    items: Array<{number: number; url: string}>,
-    currentList: T[] | undefined,
-    checkedKey: 'isVerified' | 'isResolved',
-): T[] {
+function preserveCheckboxState(items: Array<{number: number; url: string}>, currentList: ChecklistItem[] | undefined): ChecklistItem[] {
     return items.map((item) => {
         const existing = currentList?.find((c) => c.number === item.number);
-        return {...item, [checkedKey]: existing ? (existing as Record<string, unknown>)[checkedKey] : false} as T;
+        return {...item, isChecked: existing?.isChecked ?? false};
     });
 }
 
@@ -154,22 +150,20 @@ async function buildUpdateChecklistParams({
     currentChecklistData: StagingDeployCashData;
     chronologicalSection: string;
 }) {
-    const PRList = preserveCheckboxState<StagingDeployCashPR>(
+    const PRList = preserveCheckboxState(
         newPRNumbers.map((prNum) => ({
             number: prNum,
             url: GithubUtils.getPullRequestURLFromNumber(prNum, CONST.APP_REPO_URL),
         })),
         currentChecklistData.PRList,
-        'isVerified',
     );
 
-    const PRListMobileExpensify = preserveCheckboxState<StagingDeployCashPR>(
+    const PRListMobileExpensify = preserveCheckboxState(
         mergedMobileExpensifyPREntries.map((entry) => ({
             number: entry.prNumber,
             url: GithubUtils.getPullRequestURLFromNumber(entry.prNumber, CONST.MOBILE_EXPENSIFY_URL),
         })),
         currentChecklistData.PRListMobileExpensify,
-        'isVerified',
     );
 
     // Include existing Mobile-Expensify PRs from the current checklist that aren't in the new merged list
@@ -186,16 +180,15 @@ async function buildUpdateChecklistParams({
         labels: CONST.LABELS.DEPLOY_BLOCKER,
     });
 
-    const deployBlockers = preserveCheckboxState<StagingDeployCashBlocker>(
+    const deployBlockers = preserveCheckboxState(
         openDeployBlockers.map((db) => ({number: db.number, url: db.html_url})),
         currentChecklistData.deployBlockers,
-        'isResolved',
     );
 
     // Add demoted/closed blockers from current checklist and auto-check them
     for (const deployBlocker of currentChecklistData.deployBlockers) {
-        const isResolved = !deployBlockers.some((openBlocker) => openBlocker.number === deployBlocker.number);
-        deployBlockers.push({...deployBlocker, isResolved});
+        const isChecked = !deployBlockers.some((openBlocker) => openBlocker.number === deployBlocker.number);
+        deployBlockers.push({...deployBlocker, isChecked});
     }
 
     const didVersionChange = newVersion !== currentChecklistData.version;
@@ -204,11 +197,11 @@ async function buildUpdateChecklistParams({
         tag: newVersion,
         PRList: PRList.map((pr) => pr.number),
         PRListMobileExpensify: PRListMobileExpensify.map((pr) => pr.number),
-        verifiedPRList: PRList.filter((pr) => pr.isVerified).map((pr) => pr.number),
-        verifiedPRListMobileExpensify: PRListMobileExpensify.filter((pr) => pr.isVerified).map((pr) => pr.number),
+        verifiedPRList: PRList.filter((pr) => pr.isChecked).map((pr) => pr.number),
+        verifiedPRListMobileExpensify: PRListMobileExpensify.filter((pr) => pr.isChecked).map((pr) => pr.number),
         deployBlockers: deployBlockers.map((blocker) => blocker.url),
-        resolvedDeployBlockers: deployBlockers.filter((blocker) => blocker.isResolved).map((blocker) => blocker.url),
-        resolvedInternalQAPRs: currentChecklistData.internalQAPRList.filter((pr) => pr.isResolved).map((pr) => pr.number),
+        resolvedDeployBlockers: deployBlockers.filter((blocker) => blocker.isChecked).map((blocker) => blocker.url),
+        resolvedInternalQAPRs: currentChecklistData.internalQAPRList.filter((pr) => pr.isChecked).map((pr) => pr.number),
         isSentryChecked: didVersionChange ? false : currentChecklistData.isSentryChecked,
         isGHStatusChecked: didVersionChange ? false : currentChecklistData.isGHStatusChecked,
         previousTag: previousChecklistData.version,

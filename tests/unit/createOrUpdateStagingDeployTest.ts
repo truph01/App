@@ -621,12 +621,12 @@ describe('createOrUpdateStagingDeployCash', () => {
                 number: 29,
                 labels: [LABELS.STAGING_DEPLOY_CASH],
                 PRList: [
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`, number: 6, isVerified: true},
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`, number: 8, isVerified: true},
+                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`, number: 6, isChecked: true},
+                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`, number: 8, isChecked: true},
                 ],
                 PRListMobileExpensify: [
-                    {url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/20`, number: 20, isVerified: true},
-                    {url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/22`, number: 22, isVerified: true},
+                    {url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/20`, number: 20, isChecked: true},
+                    {url: `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/22`, number: 22, isChecked: true},
                 ],
                 deployBlockers: [],
                 internalQAPRList: [],
@@ -690,8 +690,8 @@ describe('createOrUpdateStagingDeployCash', () => {
                 number: 29,
                 labels: [LABELS.STAGING_DEPLOY_CASH],
                 PRList: [
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`, number: 6, isVerified: true},
-                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`, number: 8, isVerified: true},
+                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/6`, number: 6, isChecked: true},
+                    {url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/8`, number: 8, isChecked: true},
                 ],
                 PRListMobileExpensify: [], // No Mobile-Expensify PRs in previous checklist
                 deployBlockers: [],

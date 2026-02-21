@@ -8,16 +8,10 @@ import {isEmptyObject} from './isEmptyObject';
 
 type OctokitIssueItem = OctokitComponents['schemas']['issue'];
 
-type StagingDeployCashPR = {
+type ChecklistItem = {
     url: string;
     number: number;
-    isVerified: boolean;
-};
-
-type StagingDeployCashBlocker = {
-    url: string;
-    number: number;
-    isResolved: boolean;
+    isChecked: boolean;
 };
 
 type StagingDeployCashBody = {
@@ -45,10 +39,10 @@ type StagingDeployCashData = {
     url: string;
     number: number;
     labels: OctokitIssueItem['labels'];
-    PRList: StagingDeployCashPR[];
-    PRListMobileExpensify: StagingDeployCashPR[];
-    deployBlockers: StagingDeployCashBlocker[];
-    internalQAPRList: StagingDeployCashBlocker[];
+    PRList: ChecklistItem[];
+    PRListMobileExpensify: ChecklistItem[];
+    deployBlockers: ChecklistItem[];
+    internalQAPRList: ChecklistItem[];
     isSentryChecked: boolean;
     isGHStatusChecked: boolean;
     version: string;
@@ -57,15 +51,9 @@ type StagingDeployCashData = {
 
 /**
  * Generic checklist section parser. Extracts a section from the issue body,
- * parses checkbox items within it, and returns typed objects sorted by number.
+ * parses checkbox items within it, and returns ChecklistItems sorted by number.
  */
-function parseChecklistSection<K extends string>(
-    issueBody: string | null | undefined,
-    sectionRegex: RegExp,
-    itemRegex: RegExp,
-    checkedKey: K,
-    urlTransform?: (url: string) => string,
-): Array<{url: string; number: number} & Record<K, boolean>> {
+function parseChecklistSection(issueBody: string | null | undefined, sectionRegex: RegExp, itemRegex: RegExp, urlTransform?: (url: string) => string): ChecklistItem[] {
     const sectionMatch = issueBody?.match(sectionRegex) ?? null;
     if (sectionMatch?.length !== 2) {
         return [];
@@ -75,34 +63,33 @@ function parseChecklistSection<K extends string>(
         return {
             url: urlTransform ? urlTransform(rawUrl) : rawUrl,
             number: Number.parseInt(match[3], 10),
-            [checkedKey]: match[1] === 'x',
-        } as {url: string; number: number} & Record<K, boolean>;
+            isChecked: match[1] === 'x',
+        };
     });
     return items.sort((a, b) => a.number - b.number);
 }
 
-function getStagingDeployCashPRList(issue: OctokitIssueItem): StagingDeployCashPR[] {
-    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST.PULL_REQUEST_REGEX.source})`, 'g'), 'isVerified');
+function getStagingDeployCashPRList(issue: OctokitIssueItem): ChecklistItem[] {
+    const result = parseChecklistSection(issue.body, /pull requests:\*\*\r?\n((?:-.*\r?\n)+)\r?\n\r?\n?/, new RegExp(`- \\[([ x])] (${CONST.PULL_REQUEST_REGEX.source})`, 'g'));
     if (result.length === 0) {
         console.log('Hmmm...The open StagingDeployCash does not list any pull requests, continuing...');
     }
     return result;
 }
 
-function getStagingDeployCashPRListMobileExpensify(issue: OctokitIssueItem): StagingDeployCashPR[] {
-    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'), 'isVerified');
+function getStagingDeployCashPRListMobileExpensify(issue: OctokitIssueItem): ChecklistItem[] {
+    return parseChecklistSection(issue.body, /Mobile-Expensify PRs:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
 }
 
-function getStagingDeployCashDeployBlockers(issue: OctokitIssueItem): StagingDeployCashBlocker[] {
-    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'), 'isResolved');
+function getStagingDeployCashDeployBlockers(issue: OctokitIssueItem): ChecklistItem[] {
+    return parseChecklistSection(issue.body, /Deploy Blockers:\*\*\r?\n((?:-.*\r?\n)+)/, new RegExp(`- \\[([ x])]\\s(${CONST.ISSUE_OR_PULL_REQUEST_REGEX.source})`, 'g'));
 }
 
-function getStagingDeployCashInternalQA(issue: OctokitIssueItem): StagingDeployCashBlocker[] {
+function getStagingDeployCashInternalQA(issue: OctokitIssueItem): ChecklistItem[] {
     return parseChecklistSection(
         issue.body,
         /Internal QA:\*\*\r?\n((?:- \[[ x]].*\r?\n)+)/,
         new RegExp(`- \\[([ x])]\\s(${CONST.PULL_REQUEST_REGEX.source})`, 'g'),
-        'isResolved',
         (url) => url.split('-').at(0)?.trim() ?? '',
     );
 }
@@ -271,4 +258,4 @@ async function generateStagingDeployCashBodyAndAssignees({
 }
 
 export {getStagingDeployCash, getStagingDeployCashData, generateStagingDeployCashBodyAndAssignees, parseChecklistSection};
-export type {StagingDeployCashPR, StagingDeployCashBlocker, StagingDeployCashBody, StagingDeployCashParams, StagingDeployCashData};
+export type {ChecklistItem, StagingDeployCashBody, StagingDeployCashParams, StagingDeployCashData};

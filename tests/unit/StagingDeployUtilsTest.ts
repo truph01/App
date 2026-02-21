@@ -14,7 +14,7 @@ const mockListIssues = jest.fn();
 type Label = {
     id: number;
     number?: number;
-    isVerified?: boolean;
+    isChecked?: boolean;
     node_id: string;
     url: string;
     name: string;
@@ -95,17 +95,17 @@ describe('StagingDeployUtils', () => {
                 {
                     url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/21`,
                     number: 21,
-                    isVerified: false,
+                    isChecked: false,
                 },
                 {
                     url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/22`,
                     number: 22,
-                    isVerified: true,
+                    isChecked: true,
                 },
                 {
                     url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/23`,
                     number: 23,
-                    isVerified: false,
+                    isChecked: false,
                 },
             ],
             PRListMobileExpensify: [],
@@ -136,17 +136,17 @@ describe('StagingDeployUtils', () => {
             {
                 url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/1`,
                 number: 1,
-                isResolved: false,
+                isChecked: false,
             },
             {
                 url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/2`,
                 number: 2,
-                isResolved: true,
+                isChecked: true,
             },
             {
                 url: `https://github.com/${process.env.GITHUB_REPOSITORY}/pull/1234`,
                 number: 1234,
-                isResolved: false,
+                isChecked: false,
             },
         ];
 
