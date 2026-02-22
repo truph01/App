@@ -13,10 +13,10 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {setImportTransactionCardName} from '@libs/actions/ImportSpreadsheet';
 import {addErrorMessage} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
+import {isValidInputLength} from '@libs/ValidationUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/ImportTransactionsForm';
-import { isValidInputLength } from '@libs/ValidationUtils';
 
 function ImportTransactionsCardNamePage() {
     const styles = useThemeStyles();

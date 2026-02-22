@@ -254,23 +254,21 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID, isLoading}: W
                     {isBankAccountVerified && getHeaderButtons()}
                 </View>
             )}
-            {isEmptyObject(cardsList) ? (
-                isLoading ? (
-                    <FullScreenLoadingIndicator />
-                ) : (
-                    <EmptyCardView
-                        isBankAccountVerified={isBankAccountVerified}
-                        policyID={policyID}
-                        buttons={[
-                            {
-                                buttonText: translate('workspace.expensifyCard.issueCard'),
-                                buttonAction: handleIssueCardPress,
-                                success: true,
-                            },
-                        ]}
-                    />
-                )
-            ) : (
+            {isEmptyObject(cardsList) && isLoading && <FullScreenLoadingIndicator />}
+            {isEmptyObject(cardsList) && !isLoading && (
+                <EmptyCardView
+                    isBankAccountVerified={isBankAccountVerified}
+                    policyID={policyID}
+                    buttons={[
+                        {
+                            buttonText: translate('workspace.expensifyCard.issueCard'),
+                            buttonAction: handleIssueCardPress,
+                            success: true,
+                        },
+                    ]}
+                />
+            )}
+            {!isEmptyObject(cardsList) && (
                 <ScrollView
                     addBottomSafeAreaPadding
                     showsVerticalScrollIndicator={false}
