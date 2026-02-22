@@ -87,14 +87,6 @@ Onyx.connect({
 });
 
 /**
- * @returns The date when the grace period ends.
- * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
- */
-function getOverdueGracePeriodDate(gracePeriodEnd?: OnyxEntry<number>): OnyxEntry<number> {
-    return gracePeriodEnd;
-}
-
-/**
  * @returns Whether the workspace owner has an overdue grace period.
  * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
  */
@@ -635,7 +627,6 @@ export {
     getAmountOwed,
     getCardForSubscriptionBilling,
     getFreeTrialText,
-    getOverdueGracePeriodDate,
     getSubscriptionStatus,
     hasCardAuthenticatedError,
     hasGracePeriodOverdue,
