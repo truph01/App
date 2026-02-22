@@ -22,12 +22,12 @@ import useNetwork from '@hooks/useNetwork';
 import useOnboardingTaskInformation from '@hooks/useOnboardingTaskInformation';
 import useOnyx from '@hooks/useOnyx';
 import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
-import useReportAttributes from '@hooks/useReportAttributes';
 import useParentReportAction from '@hooks/useParentReportAction';
 import useParticipantsInvoiceReport from '@hooks/useParticipantsInvoiceReport';
 import usePermissions from '@hooks/usePermissions';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
+import useReportAttributes from '@hooks/useReportAttributes';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {completeTestDriveTask} from '@libs/actions/Task';
@@ -61,7 +61,9 @@ import {
     isReportOutstanding,
     isSelectedManagerMcTest,
 } from '@libs/ReportUtils';
-import {endSpan} from '@libs/telemetry/activeSpans';
+import {endSpan, startSpan} from '@libs/telemetry/activeSpans';
+import getSubmitExpenseScenario from '@libs/telemetry/getSubmitExpenseScenario';
+import markSubmitExpenseEnd from '@libs/telemetry/markSubmitExpenseEnd';
 import {
     getAttendees,
     getDefaultTaxCode,
@@ -980,8 +982,40 @@ function IOURequestStepConfirmation({
 
             formHasBeenSubmitted.current = true;
 
+            const hasReceiptFiles = Object.values(receiptFiles).some((receipt) => !!receipt);
+            const isFromGlobalCreate = transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton ?? false;
+
+            const scenario = getSubmitExpenseScenario({
+                iouType,
+                isDistanceRequest,
+                isMovingTransactionFromTrackExpense,
+                isUnreported,
+                isCategorizingTrackExpense,
+                isSharingTrackExpense,
+                isPerDiemRequest,
+                isFromGlobalCreate,
+                hasReceiptFiles,
+            });
+
+            Performance.markStart(CONST.TIMING.SUBMIT_EXPENSE);
+            startSpan(CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE, {
+                name: 'submit-expense',
+                op: CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE,
+                attributes: {
+                    [CONST.TELEMETRY.ATTRIBUTE_SCENARIO]: scenario,
+                    [CONST.TELEMETRY.ATTRIBUTE_HAS_RECEIPT]: hasReceiptFiles,
+                    [CONST.TELEMETRY.ATTRIBUTE_IS_FROM_GLOBAL_CREATE]: isFromGlobalCreate,
+                    [CONST.TELEMETRY.ATTRIBUTE_IOU_TYPE]: iouType,
+                    [CONST.TELEMETRY.ATTRIBUTE_IOU_REQUEST_TYPE]: requestType ?? 'unknown',
+                },
+            });
+
+            // IMPORTANT: Every branch below must call markSubmitExpenseEnd() after dispatching the expense action.
+            // This ensures the telemetry span started above is always closed, including inside async getCurrentPosition callbacks.
+            // If missed, the impact is benign (an orphaned Sentry span), but it pollutes telemetry data.
             if (iouType !== CONST.IOU.TYPE.TRACK && isDistanceRequest && !isMovingTransactionFromTrackExpense && !isUnreported) {
                 createDistanceRequest(iouType === CONST.IOU.TYPE.SPLIT ? splitParticipants : selectedParticipants, trimmedComment);
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1020,6 +1054,7 @@ function IOURequestStepConfirmation({
                         });
                     }
                 }
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1054,6 +1089,7 @@ function IOURequestStepConfirmation({
                         betas,
                     });
                 }
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1086,6 +1122,7 @@ function IOURequestStepConfirmation({
                         betas,
                     });
                 }
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1108,6 +1145,7 @@ function IOURequestStepConfirmation({
                     isFromGlobalCreate: transaction?.isFromFloatingActionButton ?? transaction?.isFromGlobalCreate,
                     policyRecentlyUsedTags,
                 });
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1120,6 +1158,7 @@ function IOURequestStepConfirmation({
                                 lat: userLocation.latitude,
                                 long: userLocation.longitude,
                             });
+                            markSubmitExpenseEnd();
                             return;
                         }
 
@@ -1129,11 +1168,13 @@ function IOURequestStepConfirmation({
                                     lat: successData.coords.latitude,
                                     long: successData.coords.longitude,
                                 });
+                                markSubmitExpenseEnd();
                             },
                             (errorData) => {
                                 Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, errorData);
                                 // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                                 trackExpense(selectedParticipants);
+                                markSubmitExpenseEnd();
                             },
                         );
                         return;
@@ -1141,14 +1182,17 @@ function IOURequestStepConfirmation({
 
                     // Otherwise, the money is being requested through the "Manual" flow with an attached image and the GPS coordinates are not needed.
                     trackExpense(selectedParticipants);
+                    markSubmitExpenseEnd();
                     return;
                 }
                 trackExpense(selectedParticipants);
+                markSubmitExpenseEnd();
                 return;
             }
 
             if (isPerDiemRequest) {
                 submitPerDiemExpense(selectedParticipants, trimmedComment, policyRecentlyUsedCategories);
+                markSubmitExpenseEnd();
                 return;
             }
 
@@ -1166,6 +1210,7 @@ function IOURequestStepConfirmation({
                             lat: userLocation.latitude,
                             long: userLocation.longitude,
                         });
+                        markSubmitExpenseEnd();
                         return;
                     }
 
@@ -1175,11 +1220,13 @@ function IOURequestStepConfirmation({
                                 lat: successData.coords.latitude,
                                 long: successData.coords.longitude,
                             });
+                            markSubmitExpenseEnd();
                         },
                         (errorData) => {
                             Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, errorData);
                             // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                             requestMoney(selectedParticipants);
+                            markSubmitExpenseEnd();
                         },
                     );
                     return;
@@ -1187,10 +1234,12 @@ function IOURequestStepConfirmation({
 
                 // Otherwise, the money is being requested through the "Manual" flow with an attached image and the GPS coordinates are not needed.
                 requestMoney(selectedParticipants);
+                markSubmitExpenseEnd();
                 return;
             }
 
             requestMoney(selectedParticipants);
+            markSubmitExpenseEnd();
         },
         [
             iouType,
@@ -1225,6 +1274,7 @@ function IOURequestStepConfirmation({
             submitPerDiemExpense,
             policyRecentlyUsedCurrencies,
             reportID,
+            requestType,
             betas,
         ],
     );
