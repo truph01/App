@@ -303,6 +303,7 @@ function MoneyRequestReportPreviewContent({
             activePolicy,
             policy,
             betas,
+            ownerBillingGraceEndPeriod,
         ],
     );
 
@@ -625,7 +626,7 @@ function MoneyRequestReportPreviewContent({
                 lastDistanceExpenseType,
                 ownerBillingGraceEndPeriod,
             ),
-        [translate, expensifyIcons, iouReport?.reportID, iouReport?.parentReportID, policy, userBillingGraceEndPeriodCollection, chatReportID, lastDistanceExpenseType],
+        [translate, expensifyIcons, iouReport?.reportID, iouReport?.parentReportID, policy, userBillingGraceEndPeriodCollection, chatReportID, lastDistanceExpenseType, ownerBillingGraceEndPeriod],
     );
 
     const isReportDeleted = action?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;

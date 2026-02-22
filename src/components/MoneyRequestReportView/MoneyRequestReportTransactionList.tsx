@@ -212,7 +212,7 @@ function MoneyRequestReportTransactionList({
                 lastDistanceExpenseType,
                 ownerBillingGraceEndPeriod,
             ),
-        [translate, expensifyIcons, report?.reportID, policy, userBillingGraceEndPeriodCollection, lastDistanceExpenseType],
+        [translate, expensifyIcons, report?.reportID, policy, userBillingGraceEndPeriodCollection, lastDistanceExpenseType, ownerBillingGraceEndPeriod],
     );
 
     const hasPendingAction = useMemo(() => {
