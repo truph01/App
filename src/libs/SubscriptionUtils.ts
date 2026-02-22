@@ -86,7 +86,6 @@ Onyx.connect({
     waitForCollectionCallback: true,
 });
 
-
 /**
  * @returns Whether the workspace owner's grace period is overdue.
  * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
@@ -270,7 +269,7 @@ function getSubscriptionStatus(
     amountOwed: number,
     ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): SubscriptionStatus | undefined {
-    if (!!ownerBillingGraceEndPeriod) {
+    if (ownerBillingGraceEndPeriod) {
         if (hasAmountOwed()) {
             // 1. Policy owner with amount owed, within grace period
             if (!hasGracePeriodOverdue(ownerBillingGraceEndPeriod)) {
