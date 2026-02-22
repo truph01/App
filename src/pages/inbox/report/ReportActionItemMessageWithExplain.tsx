@@ -6,10 +6,12 @@ import RenderHTML from '@components/RenderHTML';
 import TextBlock from '@components/TextBlock';
 import TextLinkBlock from '@components/TextLinkBlock';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {openLink} from '@libs/actions/Link';
 import {explain} from '@libs/actions/Report';
 import {hasReasoning} from '@libs/ReportActionsUtils';
 import variables from '@styles/variables';
@@ -40,6 +42,7 @@ function ReportActionItemMessageWithExplain({message, action, childReport, origi
     const {translate} = useLocalize();
     const personalDetail = useCurrentUserPersonalDetails();
     const icons = useMemoizedLazyExpensifyIcons(['Sparkles']);
+    const {environmentURL} = useEnvironment();
 
     const actionHasReasoning = hasReasoning(action);
 
@@ -50,7 +53,12 @@ function ReportActionItemMessageWithExplain({message, action, childReport, origi
     if (!actionHasReasoning) {
         return (
             <ReportActionItemBasicMessage>
-                <RenderHTML html={`<comment><muted-text>${message}</muted-text></comment>`} />
+                <RenderHTML
+                    html={`<comment><muted-text>${message}</muted-text></comment>`}
+                    onLinkPress={(event, href) => {
+                        openLink(href, environmentURL);
+                    }}
+                />
             </ReportActionItemBasicMessage>
         );
     }
