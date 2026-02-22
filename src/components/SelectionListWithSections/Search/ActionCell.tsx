@@ -80,8 +80,10 @@ function ActionCell({
     const policy = usePolicy(policyID);
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.chatReportID}`, {canBeMissing: true});
-    const canBePaid = canIOUBePaid(iouReport, chatReport, policy, bankAccountList, transactions, false);
-    const shouldOnlyShowElsewhere = !canBePaid && canIOUBePaid(iouReport, chatReport, policy, bankAccountList, transactions, true);
+    const invoiceReceiverPolicyID = chatReport?.invoiceReceiver && 'policyID' in chatReport.invoiceReceiver ? chatReport.invoiceReceiver.policyID : undefined;
+    const invoiceReceiverPolicy = usePolicy(invoiceReceiverPolicyID);
+    const canBePaid = canIOUBePaid(iouReport, chatReport, policy, bankAccountList, transactions, false, undefined, invoiceReceiverPolicy);
+    const shouldOnlyShowElsewhere = !canBePaid && canIOUBePaid(iouReport, chatReport, policy, bankAccountList, transactions, true, undefined, invoiceReceiverPolicy);
     const text = isChildListItem ? translate(actionTranslationsMap[CONST.SEARCH.ACTION_TYPES.VIEW]) : translate(actionTranslationsMap[action]);
     const shouldUseViewAction = action === CONST.SEARCH.ACTION_TYPES.VIEW || (parentAction === CONST.SEARCH.ACTION_TYPES.PAID && action === CONST.SEARCH.ACTION_TYPES.PAID);
 
