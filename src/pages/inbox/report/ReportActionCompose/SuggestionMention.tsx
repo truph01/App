@@ -214,11 +214,17 @@ function SuggestionMention({
                 mentionToReplace = originalMention.slice(0, originalMention.length - trailingDot.length);
             }
 
+            // Append a preserved trailing dot only when it is sentence punctuation, not part of the selected mention match.
+            const dotToAppend =
+                trailingDot && ![mentionObject.text, mentionObject.alternateText].some((mentionText) => mentionText.toLowerCase().includes(suggestionValues.mentionPrefix.toLowerCase()))
+                    ? trailingDot
+                    : '';
+
             const commentAfterMention = value.slice(
                 suggestionValues.atSignIndex + Math.max(mentionToReplace.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length),
             );
 
-            updateComment(`${commentBeforeAtSign}${mentionCode}${trailingDot}${trimLeadingSpace(commentAfterMention)}`, true);
+            updateComment(`${commentBeforeAtSign}${mentionCode}${dotToAppend}${trimLeadingSpace(commentAfterMention)}`, true);
             const selectionPosition = suggestionValues.atSignIndex + mentionCode.length + CONST.SPACE_LENGTH;
             setSelection({
                 start: selectionPosition,
