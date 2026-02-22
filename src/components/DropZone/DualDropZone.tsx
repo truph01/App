@@ -2,12 +2,12 @@ import React from 'react';
 import {View} from 'react-native';
 import type {ViewStyle} from 'react-native';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
+import {useWideRHPState} from '@components/WideRHPContextProvider';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {useWideRHPState} from '@components/WideRHPContextProvider';
 import DropZoneUI from './DropZoneUI';
 import DropZoneWrapper from './DropZoneWrapper';
 
