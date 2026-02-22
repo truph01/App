@@ -1151,6 +1151,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints: [],
             });
 
             await waitForBatchedUpdates();
@@ -1201,6 +1202,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints: [],
             });
 
             await waitForBatchedUpdates();
@@ -1260,6 +1262,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints: [],
             });
 
             await waitForBatchedUpdates();
@@ -1305,6 +1308,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints: [],
             });
 
             await waitForBatchedUpdates();
@@ -1343,6 +1347,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints: [],
             });
 
             await waitForBatchedUpdates();
@@ -1433,6 +1438,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
+                recentWaypoints: [],
             });
 
             await waitForBatchedUpdates();
@@ -1539,6 +1545,8 @@ describe('actions/Duplicate', () => {
                 targetPolicy: undefined,
                 targetPolicyCategories: undefined,
                 targetReport: undefined,
+                existingTransactionDraft: undefined,
+                draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
                 recentWaypoints,
@@ -1596,6 +1604,8 @@ describe('actions/Duplicate', () => {
                 targetPolicy: mockPolicy,
                 targetPolicyCategories: fakePolicyCategories,
                 targetReport: policyExpenseChat,
+                existingTransactionDraft: undefined,
+                draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {},
                 recentWaypoints,

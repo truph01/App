@@ -1657,6 +1657,8 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             policyRecentlyUsedCurrencies: [],
             quickAction: undefined,
             isSelfTourViewed: false,
+            existingTransactionDraft: undefined,
+            draftTransactionIDs: [],
             personalDetails: {},
         });
         await waitForBatchedUpdates();
