@@ -123,18 +123,16 @@ describe('SuggestionMention', () => {
         });
         mockUseMemoizedLazyExpensifyIcons.mockImplementation((() => mockIcons) as unknown as typeof useMemoizedLazyExpensifyIcons);
         mockUseLocalize.mockImplementation(() => mockLocalize as ReturnType<typeof useLocalize>);
-        mockUseOnyx.mockImplementation(
-            ((...args: Parameters<typeof useOnyx>) => {
-                const key = args[0];
-                if (key === ONYXKEYS.COLLECTION.REPORT) {
-                    return createOnyxResult<typeof mockReports>(mockReports);
-                }
-                if (key === ONYXKEYS.CONCIERGE_REPORT_ID) {
-                    return createOnyxResult<string>('');
-                }
-                return createOnyxResult<unknown>(undefined);
-            }) as typeof useOnyx,
-        );
+        mockUseOnyx.mockImplementation(((...args: Parameters<typeof useOnyx>) => {
+            const key = args[0];
+            if (key === ONYXKEYS.COLLECTION.REPORT) {
+                return createOnyxResult<typeof mockReports>(mockReports);
+            }
+            if (key === ONYXKEYS.CONCIERGE_REPORT_ID) {
+                return createOnyxResult<string>('');
+            }
+            return createOnyxResult<unknown>(undefined);
+        }) as typeof useOnyx);
         mockUsePolicy.mockReturnValue(undefined);
     });
 
