@@ -537,6 +537,7 @@ const translations: TranslationDeepObject<typeof en> = {
         quarter: '四半期',
         vacationDelegate: '休暇代理人',
         expensifyLogo: 'Expensifyロゴ',
+        explain: '説明',
     },
     socials: {
         podcast: 'ポッドキャストでフォロー',
@@ -1482,7 +1483,6 @@ const translations: TranslationDeepObject<typeof en> = {
             amountTooLargeError: '合計金額が大きすぎます。時間を減らすか、レートを下げてください。',
         },
         correctRateError: 'レートのエラーを修正して、もう一度お試しください。',
-        AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>説明</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? '経費を「精算対象」としてマークしました' : '経費を「非精算」としてマークしました'),
             billable: (value: boolean) => (value ? '経費を「請求可能」に設定しました' : '経費を「請求不可」としてマークしました'),

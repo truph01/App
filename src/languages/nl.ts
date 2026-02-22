@@ -537,6 +537,7 @@ const translations: TranslationDeepObject<typeof en> = {
         quarter: 'Kwartaal',
         vacationDelegate: 'Vertegenwoordiger tijdens vakantie',
         expensifyLogo: 'Expensify-logo',
+        explain: 'Uitleggen',
     },
     socials: {
         podcast: 'Volg ons op Podcast',
@@ -1487,7 +1488,6 @@ const translations: TranslationDeepObject<typeof en> = {
             amountTooLargeError: 'Het totale bedrag is te hoog. Verlaag het aantal uren of verlaag het tarief.',
         },
         correctRateError: 'Herstel de koersfout en probeer het opnieuw.',
-        AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Uitleggen</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'heeft de uitgave gemarkeerd als „vergoedbaar”' : 'markeerde de uitgave als ‘niet-terugbetaalbaar’'),
             billable: (value: boolean) => (value ? 'heeft de uitgave gemarkeerd als ‘door te belasten’' : 'heeft de uitgave gemarkeerd als ‘niet factureerbaar’'),

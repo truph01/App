@@ -533,6 +533,7 @@ const translations: TranslationDeepObject<typeof en> = {
         quarter: '季度',
         vacationDelegate: '休假代理',
         expensifyLogo: 'Expensify徽标',
+        explain: '说明',
     },
     socials: {
         podcast: '在播客上关注我们',
@@ -1458,7 +1459,6 @@ const translations: TranslationDeepObject<typeof en> = {
             amountTooLargeError: '总金额过大。请减少工时或降低费率。',
         },
         correctRateError: '修复费率错误后重试。',
-        AskToExplain: `。<a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>说明</strong></a> ✨`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? '已将该报销单标记为“可报销”' : '将该报销单标记为“不可报销”'),
             billable: (value: boolean) => (value ? '将该报销标记为“可计费”' : '将该报销标记为“不可计费”'),

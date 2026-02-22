@@ -537,6 +537,7 @@ const translations: TranslationDeepObject<typeof en> = {
         quarter: 'Kwartał',
         vacationDelegate: 'Zastępca urlopowy',
         expensifyLogo: 'Logo Expensify',
+        explain: 'Wyjaśnij',
     },
     socials: {
         podcast: 'Śledź nas na Podcast',
@@ -1486,7 +1487,6 @@ const translations: TranslationDeepObject<typeof en> = {
             amountTooLargeError: 'Łączna kwota jest zbyt wysoka. Zmniejsz liczbę godzin lub obniż stawkę.',
         },
         correctRateError: 'Napraw błąd stawki i spróbuj ponownie.',
-        AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Wyjaśnij</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'oznaczył(a) wydatek jako „podlegający zwrotowi”' : 'oznaczył(a) wydatek jako „niepodlegający zwrotowi”'),
             billable: (value: boolean) => (value ? 'oznaczył(-a) wydatek jako „fakturowany”' : 'oznaczono wydatek jako „niefakturowalny”'),

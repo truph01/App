@@ -538,6 +538,7 @@ const translations: TranslationDeepObject<typeof en> = {
         quarter: 'Trimestre',
         vacationDelegate: 'Delega ferie',
         expensifyLogo: 'Logo Expensify',
+        explain: 'Spiega',
     },
     socials: {
         podcast: 'Seguici su Podcast',
@@ -1489,7 +1490,6 @@ const translations: TranslationDeepObject<typeof en> = {
             amountTooLargeError: 'L’importo totale è troppo alto. Riduci le ore o abbassa la tariffa.',
         },
         correctRateError: 'Correggi l’errore di tariffa e riprova.',
-        AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Spiega</strong></a> &#x2728;`,
         policyRulesModifiedFields: {
             reimbursable: (value: boolean) => (value ? 'ha contrassegnato la spesa come "rimborsabile"' : 'ha contrassegnato la spesa come "non rimborsabile"'),
             billable: (value: boolean) => (value ? 'ha contrassegnato la spesa come "fatturabile"' : 'ha contrassegnato la spesa come "non fatturabile"'),
