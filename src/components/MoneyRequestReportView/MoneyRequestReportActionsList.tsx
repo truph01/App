@@ -4,22 +4,24 @@ import {useIsFocused, useRoute} from '@react-navigation/native';
 import {isUserValidatedSelector} from '@selectors/Account';
 import {tierNameSelector} from '@selectors/UserWallet';
 import isEmpty from 'lodash/isEmpty';
-import type {ValueOf} from 'type-fest';
-import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import {DeviceEventEmitter, InteractionManager, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import Checkbox from '@components/Checkbox';
-import ConfirmModal from '@components/ConfirmModal';
 import DecisionModal from '@components/DecisionModal';
 import FlatListWithScrollKey from '@components/FlatList/FlatListWithScrollKey';
+import HoldOrRejectEducationalModal from '@components/HoldOrRejectEducationalModal';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {PressableWithFeedback} from '@components/Pressable';
 import ScrollView from '@components/ScrollView';
 import {useSearchContext} from '@components/Search/SearchContext';
 import Text from '@components/Text';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useFilterSelectedTransactions from '@hooks/useFilterSelectedTransactions';
 import {AUTOSCROLL_TO_TOP_THRESHOLD} from '@hooks/useFlatListScrollKey';
@@ -36,6 +38,7 @@ import useResponsiveLayoutOnWideRHP from '@hooks/useResponsiveLayoutOnWideRHP';
 import useSelectedTransactionsActions from '@hooks/useSelectedTransactionsActions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
+import {dismissRejectUseExplanation} from '@libs/actions/IOU';
 import {queueExportSearchWithTemplate} from '@libs/actions/Search';
 import DateUtils from '@libs/DateUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -65,16 +68,16 @@ import getInitialNumToRender from '@pages/inbox/report/getInitialNumReportAction
 import ReportActionsListItemRenderer from '@pages/inbox/report/ReportActionsListItemRenderer';
 import shouldDisplayNewMarkerOnReportAction from '@pages/inbox/report/shouldDisplayNewMarkerOnReportAction';
 import useReportUnreadMessageScrollTracking from '@pages/inbox/report/useReportUnreadMessageScrollTracking';
+import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import variables from '@styles/variables';
-import {dismissRejectUseExplanation} from '@userActions/IOU';
 import {openReport, readNewestAction, subscribeToNewActionEvent} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import type {Route} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
-import HoldOrRejectEducationalModal from '@components/HoldOrRejectEducationalModal';
 import MoneyRequestReportTransactionList from './MoneyRequestReportTransactionList';
 import MoneyRequestViewReportFields from './MoneyRequestViewReportFields';
 import ReportActionsListLoadingSkeleton from './ReportActionsListLoadingSkeleton';
@@ -201,7 +204,7 @@ function MoneyRequestReportActionsList({
     useFilterSelectedTransactions(transactions);
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
-    const [isExportWithTemplateModalVisible, setIsExportWithTemplateModalVisible] = useState(false);
+    const {showConfirmModal} = useConfirmModal();
     const beginExportWithTemplate = useCallback(
         (templateName: string, templateType: string, transactionIDList: string[]) => {
             if (isOffline) {
@@ -213,7 +216,6 @@ function MoneyRequestReportActionsList({
                 return;
             }
 
-            setIsExportWithTemplateModalVisible(true);
             queueExportSearchWithTemplate({
                 templateName,
                 templateType,
@@ -222,17 +224,47 @@ function MoneyRequestReportActionsList({
                 transactionIDList,
                 policyID: policy?.id,
             });
+
+            showConfirmModal({
+                title: translate('export.exportInProgress'),
+                prompt: translate('export.conciergeWillSend'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            }).then((result) => {
+                if (result.action === ModalActions.CONFIRM) {
+                    clearSelectedTransactions(undefined, true);
+                }
+            });
         },
-        [isOffline, report, policy?.id],
+        [isOffline, report, policy?.id, showConfirmModal, translate, clearSelectedTransactions],
     );
 
-    const {
-        options: originalSelectedTransactionsOptions,
-        handleDeleteTransactions,
-        handleDeleteTransactionsWithNavigation,
-        isDeleteModalVisible,
-        hideDeleteModal,
-    } = useSelectedTransactionsActions({
+    const onDeleteSelected = useCallback(
+        (handleDeleteTransactions: () => void, handleDeleteTransactionsWithNavigation: (backToRoute?: Route) => void) => {
+            showConfirmModal({
+                title: translate('iou.deleteExpense', {count: selectedTransactionIDs.length}),
+                prompt: translate('iou.deleteConfirmation', {count: selectedTransactionIDs.length}),
+                confirmText: translate('common.delete'),
+                cancelText: translate('common.cancel'),
+                danger: true,
+                shouldEnableNewFocusManagement: true,
+            }).then((result) => {
+                if (result.action !== ModalActions.CONFIRM) {
+                    return;
+                }
+                const shouldNavigateBack = transactions.filter((trans) => trans.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length === selectedTransactionIDs.length;
+                if (shouldNavigateBack) {
+                    const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
+                    handleDeleteTransactionsWithNavigation(backToRoute);
+                    return;
+                }
+                handleDeleteTransactions();
+            });
+        },
+        [showConfirmModal, translate, selectedTransactionIDs.length, transactions, route.params?.backTo, chatReport?.reportID],
+    );
+
+    const {options: originalSelectedTransactionsOptions} = useSelectedTransactionsActions({
         report,
         reportActions,
         allTransactionsLength: transactions.length,
@@ -241,6 +273,7 @@ function MoneyRequestReportActionsList({
         onExportOffline: () => setOfflineModalVisible(true),
         policy,
         beginExportWithTemplate: (templateName, templateType, transactionIDList) => beginExportWithTemplate(templateName, templateType, transactionIDList),
+        onDeleteSelected,
     });
 
     const [dismissedRejectUseExplanation] = useOnyx(ONYXKEYS.NVP_DISMISSED_REJECT_USE_EXPLANATION, {canBeMissing: true});
@@ -296,6 +329,7 @@ function MoneyRequestReportActionsList({
     const lastActionIndex = lastAction?.reportActionID;
     const previousLastIndex = useRef(lastActionIndex);
 
+    const {scrollOffsetRef} = useContext(ActionListContext);
     const scrollingVerticalBottomOffset = useRef(0);
     const scrollingVerticalTopOffset = useRef(0);
     const wrapperViewRef = useRef<View>(null);
@@ -484,6 +518,7 @@ function MoneyRequestReportActionsList({
              * Diff == (height of all items in the list) - (height of the layout with the list) - (how far user scrolled)
              */
             scrollingVerticalBottomOffset.current = fullContentHeight - layoutMeasurement.height - contentOffset.y;
+            scrollOffsetRef.current = scrollingVerticalBottomOffset.current;
 
             // We additionally track the top offset to be able to scroll to the new transaction when it's added
             scrollingVerticalTopOffset.current = contentOffset.y;
@@ -727,69 +762,47 @@ function MoneyRequestReportActionsList({
             ref={wrapperViewRef}
         >
             {shouldUseNarrowLayout && isMobileSelectionModeEnabled && (
-                <>
-                    <OfflineWithFeedback pendingAction={reportPendingAction}>
-                        <ButtonWithDropdownMenu
-                            onPress={() => null}
-                            options={selectedTransactionsOptions}
-                            customText={translate('workspace.common.selected', {count: selectedTransactionIDs.length})}
-                            isSplitButton={false}
-                            shouldAlwaysShowDropdownMenu
-                            wrapperStyle={[styles.w100, styles.ph5]}
-                        />
-                        <View style={[styles.alignItemsCenter, styles.userSelectNone, styles.flexRow, styles.pt6, styles.ph8, styles.pb3]}>
-                            <Checkbox
-                                accessibilityLabel={translate('workspace.people.selectAll')}
-                                isChecked={isSelectAllChecked}
-                                isIndeterminate={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length !== transactionsWithoutPendingDelete.length}
-                                onPress={() => {
-                                    if (selectedTransactionIDs.length !== 0) {
-                                        clearSelectedTransactions(true);
-                                    } else {
-                                        setSelectedTransactions(transactionsWithoutPendingDelete.map((t) => t.transactionID));
-                                    }
-                                }}
-                            />
-                            <PressableWithFeedback
-                                style={[styles.userSelectNone, styles.alignItemsCenter]}
-                                onPress={() => {
-                                    if (isSelectAllChecked) {
-                                        clearSelectedTransactions(true);
-                                    } else {
-                                        setSelectedTransactions(transactionsWithoutPendingDelete.map((t) => t.transactionID));
-                                    }
-                                }}
-                                accessibilityLabel={translate('workspace.people.selectAll')}
-                                role="button"
-                                accessibilityState={{checked: isSelectAllChecked}}
-                                dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
-                                sentryLabel={CONST.SENTRY_LABEL.REPORT.MONEY_REQUEST_REPORT_ACTIONS_LIST_SELECT_ALL}
-                            >
-                                <Text style={[styles.textStrong, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>
-                            </PressableWithFeedback>
-                        </View>
-                    </OfflineWithFeedback>
-                    <ConfirmModal
-                        title={translate('iou.deleteExpense', {count: selectedTransactionIDs.length})}
-                        isVisible={isDeleteModalVisible}
-                        onConfirm={() => {
-                            const shouldNavigateBack =
-                                transactions.filter((trans) => trans.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length === selectedTransactionIDs.length;
-                            if (shouldNavigateBack) {
-                                const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
-                                handleDeleteTransactionsWithNavigation(backToRoute);
-                            } else {
-                                handleDeleteTransactions();
-                            }
-                        }}
-                        onCancel={hideDeleteModal}
-                        prompt={translate('iou.deleteConfirmation', {count: selectedTransactionIDs.length})}
-                        confirmText={translate('common.delete')}
-                        cancelText={translate('common.cancel')}
-                        danger
-                        shouldEnableNewFocusManagement
+                <OfflineWithFeedback pendingAction={reportPendingAction}>
+                    <ButtonWithDropdownMenu
+                        onPress={() => null}
+                        options={selectedTransactionsOptions}
+                        customText={translate('workspace.common.selected', {count: selectedTransactionIDs.length})}
+                        isSplitButton={false}
+                        shouldAlwaysShowDropdownMenu
+                        wrapperStyle={[styles.w100, styles.ph5]}
                     />
-                </>
+                    <View style={[styles.alignItemsCenter, styles.userSelectNone, styles.flexRow, styles.pt6, styles.ph8, styles.pb3]}>
+                        <Checkbox
+                            accessibilityLabel={translate('workspace.people.selectAll')}
+                            isChecked={isSelectAllChecked}
+                            isIndeterminate={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length !== transactionsWithoutPendingDelete.length}
+                            onPress={() => {
+                                if (selectedTransactionIDs.length !== 0) {
+                                    clearSelectedTransactions(true);
+                                } else {
+                                    setSelectedTransactions(transactionsWithoutPendingDelete.map((t) => t.transactionID));
+                                }
+                            }}
+                        />
+                        <PressableWithFeedback
+                            style={[styles.userSelectNone, styles.alignItemsCenter]}
+                            onPress={() => {
+                                if (isSelectAllChecked) {
+                                    clearSelectedTransactions(true);
+                                } else {
+                                    setSelectedTransactions(transactionsWithoutPendingDelete.map((t) => t.transactionID));
+                                }
+                            }}
+                            accessibilityLabel={translate('workspace.people.selectAll')}
+                            role="button"
+                            accessibilityState={{checked: isSelectAllChecked}}
+                            dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
+                            sentryLabel={CONST.SENTRY_LABEL.REPORT.MONEY_REQUEST_REPORT_ACTIONS_LIST_SELECT_ALL}
+                        >
+                            <Text style={[styles.textStrong, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>
+                        </PressableWithFeedback>
+                    </View>
+                </OfflineWithFeedback>
             )}
             <View style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}>
                 <FloatingMessageCounter
@@ -870,18 +883,6 @@ function MoneyRequestReportActionsList({
                 secondOptionText={translate('common.buttonConfirm')}
                 isVisible={offlineModalVisible}
                 onClose={() => setOfflineModalVisible(false)}
-            />
-            <ConfirmModal
-                onConfirm={() => {
-                    setIsExportWithTemplateModalVisible(false);
-                    clearSelectedTransactions(undefined, true);
-                }}
-                onCancel={() => setIsExportWithTemplateModalVisible(false)}
-                isVisible={isExportWithTemplateModalVisible}
-                title={translate('export.exportInProgress')}
-                prompt={translate('export.conciergeWillSend')}
-                confirmText={translate('common.buttonConfirm')}
-                shouldShowCancelButton={false}
             />
             {!!rejectModalAction && (
                 <HoldOrRejectEducationalModal
