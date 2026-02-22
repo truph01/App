@@ -672,7 +672,7 @@ describe('SubscriptionUtils', () => {
         it('should return undefined by default', () => {
             const stripeCustomerIdForDefault: Partial<OnyxEntry<StripeCustomerID>> = {};
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0)).toBeUndefined();
+            expect(getSubscriptionStatus(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0, 0)).toBeUndefined();
         });
 
         it('should return POLICY_OWNER_WITH_AMOUNT_OWED status', async () => {
@@ -724,7 +724,7 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.NVP_PRIVATE_BILLING_DISPUTE_PENDING]: 1,
             });
 
-            expect(getSubscriptionStatus(stripeCustomerId, false, 1, undefined, undefined, undefined, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerId, false, 1, undefined, undefined, undefined, 0, 0)).toEqual({
                 status: PAYMENT_STATUS.BILLING_DISPUTE_PENDING,
                 isError: true,
             });
@@ -737,7 +737,7 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.NVP_PRIVATE_STRIPE_CUSTOMER_ID]: STRIPE_CUSTOMER_ID,
             });
 
-            expect(getSubscriptionStatus(stripeCustomerId, false, 0, undefined, undefined, undefined, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerId, false, 0, undefined, undefined, undefined, 0, 0)).toEqual({
                 status: PAYMENT_STATUS.CARD_AUTHENTICATION_REQUIRED,
                 isError: true,
             });
@@ -750,7 +750,7 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.NVP_PRIVATE_BILLING_STATUS]: BILLING_STATUS_INSUFFICIENT_FUNDS,
             });
 
-            expect(getSubscriptionStatus(stripeCustomerId, false, undefined, undefined, undefined, BILLING_STATUS_INSUFFICIENT_FUNDS, AMOUNT_OWED)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerId, false, undefined, undefined, undefined, BILLING_STATUS_INSUFFICIENT_FUNDS, AMOUNT_OWED, 0)).toEqual({
                 status: PAYMENT_STATUS.INSUFFICIENT_FUNDS,
                 isError: true,
             });
@@ -881,11 +881,10 @@ describe('SubscriptionUtils', () => {
 
         it('should return true when there is a subscription status with isError true', async () => {
             await Onyx.multiSet({
-                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: GRACE_PERIOD_DATE,
                 [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: AMOUNT_OWED,
             });
 
-            expect(hasSubscriptionRedDotError(stripeCustomerId, false, undefined, undefined, undefined, undefined, AMOUNT_OWED)).toBeTruthy();
+            expect(hasSubscriptionRedDotError(stripeCustomerId, false, undefined, undefined, undefined, undefined, AMOUNT_OWED, GRACE_PERIOD_DATE)).toBeTruthy();
         });
 
         it('should return false when there is no subscription status error', () => {
