@@ -4,6 +4,7 @@ import type {ForwardedRef, RefObject} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {useOptionsList} from '@components/OptionListContextProvider';
+import OptionsListSkeletonView from '@components/OptionsListSkeletonView';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
 import type {ListItem as NewListItem, UserListItemProps} from '@components/SelectionList/ListItem/types';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
@@ -105,9 +106,6 @@ type SearchAutocompleteListProps = {
 
     /** Reference to the outer element */
     ref?: ForwardedRef<SelectionListWithSectionsHandle>;
-
-    /** Optional skeleton view to render while loadings */
-    skeletonView?: React.ReactNode;
 };
 
 const defaultListOptions = {
@@ -169,7 +167,6 @@ function SearchAutocompleteList({
     allFeeds,
     allCards = CONST.EMPTY_OBJECT,
     ref,
-    skeletonView,
 }: SearchAutocompleteListProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
@@ -909,8 +906,14 @@ function SearchAutocompleteList({
     const isRecentSearchesDataLoaded = !isLoadingOnyxValue(recentSearchesMetadata);
     const isLoading = !isRecentSearchesDataLoaded || !areOptionsInitialized;
 
-    if (isLoading && skeletonView) {
-        return skeletonView;
+    if (isLoading) {
+        return (
+            <OptionsListSkeletonView
+                fixedNumItems={4}
+                shouldStyleAsTable
+                speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
+            />
+        );
     }
 
     return (

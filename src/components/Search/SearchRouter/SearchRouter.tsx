@@ -5,7 +5,6 @@ import {InteractionManager, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
-import OptionsListSkeletonView from '@components/OptionsListSkeletonView';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
 import type {GetAdditionalSectionsCallback} from '@components/Search/SearchAutocompleteList';
 import SearchAutocompleteList from '@components/Search/SearchAutocompleteList';
@@ -468,13 +467,6 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                 allFeeds={allFeeds}
                 allCards={personalAndWorkspaceCards}
                 textInputRef={textInputRef}
-                skeletonView={
-                    <OptionsListSkeletonView
-                        fixedNumItems={4}
-                        shouldStyleAsTable
-                        speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
-                    />
-                }
             />
         </View>
     );
