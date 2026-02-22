@@ -905,7 +905,8 @@ class TranslationGenerator {
                     };
 
                     if (this.verbose) {
-                        console.log(`📄 GitHub API diff: ${parsedDiff.files.length} files total, ${diffResult.hasChanges ? '1' : '0'} matching en.ts`);
+                        const enTsMatchCount = diffResult.hasChanges ? 1 : 0;
+                        console.log(`📄 GitHub API diff: ${parsedDiff.files.length} files total, ${enTsMatchCount} matching en.ts`);
                     }
                 } catch (apiError: unknown) {
                     // Fallback to git diff if GitHub API fails (e.g., 406 for large diffs >20K lines)
