@@ -7,6 +7,7 @@ import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import CardFeedIcon from '@components/CardFeedIcon';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import FeedSelector from '@components/FeedSelector';
+import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 // eslint-disable-next-line no-restricted-imports
 import {Plus} from '@components/Icon/Expensicons';
@@ -42,6 +43,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import {Loading} from '@src/stories/Button.stories';
 import type {Card, WorkspaceCardsList} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import EmptyCardView from './EmptyCardView';
@@ -58,9 +60,12 @@ type WorkspaceExpensifyCardListPageProps = {
 
     /** Fund ID */
     fundID: number;
+
+    /** Whether the page is in loading state or not */
+    isLoading?: boolean;
 };
 
-function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExpensifyCardListPageProps) {
+function WorkspaceExpensifyCardListPage({route, cardsList, fundID, isLoading}: WorkspaceExpensifyCardListPageProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Gear']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const {translate, localeCompare} = useLocalize();
@@ -251,17 +256,21 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                 </View>
             )}
             {isEmptyObject(cardsList) ? (
-                <EmptyCardView
-                    isBankAccountVerified={isBankAccountVerified}
-                    policyID={policyID}
-                    buttons={[
-                        {
-                            buttonText: translate('workspace.expensifyCard.issueCard'),
-                            buttonAction: handleIssueCardPress,
-                            success: true,
-                        },
-                    ]}
-                />
+                isLoading ? (
+                    <FullScreenLoadingIndicator />
+                ) : (
+                    <EmptyCardView
+                        isBankAccountVerified={isBankAccountVerified}
+                        policyID={policyID}
+                        buttons={[
+                            {
+                                buttonText: translate('workspace.expensifyCard.issueCard'),
+                                buttonAction: handleIssueCardPress,
+                                success: true,
+                            },
+                        ]}
+                    />
+                )
             ) : (
                 <ScrollView
                     addBottomSafeAreaPadding
