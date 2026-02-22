@@ -1,19 +1,18 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import {hasViolations as hasViolationsReportUtils} from '@libs/ReportUtils';
-import {approveMoneyRequest, payMoneyRequest} from '@userActions/IOU';
-import CONST from '@src/CONST';
+import {payMoneyRequest} from '@userActions/IOU';
+import type CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 import type DeepValueOf from '@src/types/utils/DeepValueOf';
 import DecisionModal from './DecisionModal';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from './DelegateNoAccessModalProvider';
 
 type ActionHandledType = DeepValueOf<typeof CONST.IOU.REPORT_ACTION_TYPE.PAY | typeof CONST.IOU.REPORT_ACTION_TYPE.APPROVE>;
 
@@ -39,19 +38,18 @@ type ProcessMoneyReportHoldMenuProps = {
     /** Type of payment */
     paymentType?: PaymentMethodType;
 
-    /** Type of action handled */
-    requestType?: ActionHandledType;
-
     /** Number of transaction of a money request */
     transactionCount: number;
 
     /** Callback for displaying payment animation on IOU preview component */
     startAnimation?: () => void;
+
+    /** Whether the report has non held expenses */
+    hasNonHeldExpenses?: boolean;
 };
 
 function ProcessMoneyReportHoldMenu({
-    requestType,
-    nonHeldAmount,
+    nonHeldAmount = '0',
     fullAmount,
     onClose,
     isVisible,
@@ -60,59 +58,63 @@ function ProcessMoneyReportHoldMenu({
     moneyRequestReport,
     transactionCount,
     startAnimation,
+    hasNonHeldExpenses,
 }: ProcessMoneyReportHoldMenuProps) {
     const {translate} = useLocalize();
-    const isApprove = requestType === CONST.IOU.REPORT_ACTION_TYPE.APPROVE;
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to apply the correct modal type
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
     const activePolicy = usePolicy(activePolicyID);
+    const policy = usePolicy(moneyRequestReport?.policyID);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
-    const {isBetaEnabled} = usePermissions();
-    const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
-    const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const [moneyRequestReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${moneyRequestReport?.reportID}`, {canBeMissing: true});
     const currentUserDetails = useCurrentUserPersonalDetails();
-    const hasViolations = hasViolationsReportUtils(moneyRequestReport?.reportID, transactionViolations, currentUserDetails.accountID, currentUserDetails.email ?? '');
 
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const onSubmit = (full: boolean) => {
-        if (isApprove) {
+        if (isDelegateAccessRestricted) {
+            showDelegateNoAccessModal();
+            return;
+        }
+        if (chatReport && paymentType) {
             if (startAnimation) {
                 startAnimation();
             }
-            approveMoneyRequest(moneyRequestReport, activePolicy, currentUserDetails.accountID, currentUserDetails.email ?? '', hasViolations, isASAPSubmitBetaEnabled, full);
-        } else if (chatReport && paymentType) {
-            if (startAnimation) {
-                startAnimation();
-            }
-            payMoneyRequest(paymentType, chatReport, moneyRequestReport, introSelected, undefined, full, activePolicy);
+            payMoneyRequest({
+                paymentType,
+                chatReport,
+                iouReport: moneyRequestReport,
+                introSelected,
+                iouReportCurrentNextStepDeprecated: moneyRequestReportNextStep,
+                currentUserAccountID: currentUserDetails.accountID,
+                full,
+                activePolicy,
+                policy,
+                betas,
+            });
         }
         onClose();
     };
 
-    const promptText = useMemo(() => {
-        if (nonHeldAmount) {
-            return translate(isApprove ? 'iou.confirmApprovalAmount' : 'iou.confirmPayAmount');
-        }
-        return translate(isApprove ? 'iou.confirmApprovalAllHoldAmount' : 'iou.confirmPayAllHoldAmount', {count: transactionCount});
-    }, [nonHeldAmount, transactionCount, translate, isApprove]);
+    const promptText = hasNonHeldExpenses ? translate('iou.confirmPayAmount') : translate('iou.confirmPayAllHoldAmount', {count: transactionCount});
 
     return (
         <DecisionModal
-            title={translate(isApprove ? 'iou.confirmApprove' : 'iou.confirmPay')}
+            title={translate('iou.confirmPay')}
             onClose={onClose}
             isVisible={isVisible}
             prompt={promptText}
-            firstOptionText={nonHeldAmount ? `${translate(isApprove ? 'iou.approveOnly' : 'iou.payOnly')} ${nonHeldAmount}` : undefined}
-            secondOptionText={`${translate(isApprove ? 'iou.approve' : 'iou.pay')} ${fullAmount}`}
+            firstOptionText={hasNonHeldExpenses ? `${translate('iou.payOnly')} ${nonHeldAmount}` : undefined}
+            secondOptionText={`${translate('iou.pay')} ${fullAmount}`}
             onFirstOptionSubmit={() => onSubmit(false)}
             onSecondOptionSubmit={() => onSubmit(true)}
             isSmallScreenWidth={isSmallScreenWidth}
         />
     );
 }
-
-ProcessMoneyReportHoldMenu.displayName = 'ProcessMoneyReportHoldMenu';
 
 export default ProcessMoneyReportHoldMenu;
 export type {ActionHandledType};

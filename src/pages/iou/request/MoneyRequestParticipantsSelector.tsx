@@ -1,6 +1,3 @@
-import reportsSelector from '@selectors/Attributes';
-import {emailSelector} from '@selectors/Session';
-import {transactionDraftValuesSelector} from '@selectors/TransactionDraft';
 import {deepEqual} from 'fast-equals';
 import lodashPick from 'lodash/pick';
 import React, {memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
@@ -15,19 +12,23 @@ import FormHelpMessage from '@components/FormHelpMessage';
 import MenuItem from '@components/MenuItem';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import ReferralProgramCTA from '@components/ReferralProgramCTA';
+// eslint-disable-next-line no-restricted-imports
 import SelectionList from '@components/SelectionListWithSections';
 import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
 import type {SelectionListHandle} from '@components/SelectionListWithSections/types';
 import useContactImport from '@hooks/useContactImport';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDismissedReferralBanners from '@hooks/useDismissedReferralBanners';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
+import useReportAttributes from '@hooks/useReportAttributes';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useTransactionDraftValues from '@hooks/useTransactionDraftValues';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getPlatform from '@libs/getPlatform';
 import goToSettings from '@libs/goToSettings';
@@ -51,7 +52,7 @@ import ImportContactButton from './ImportContactButton';
 
 type MoneyRequestParticipantsSelectorProps = {
     /** Callback to request parent modal to go to next step, which should be split */
-    onFinish?: (value?: string) => void;
+    onFinish?: (value?: string, participants?: Participant[]) => void;
 
     /** Callback to add participants in MoneyRequestModal */
     onParticipantsAdded: (value: Participant[]) => void;
@@ -91,7 +92,7 @@ const sanitizedSelectedParticipant = (option: Option | OptionData, iouType: IOUT
 function MoneyRequestParticipantsSelector({
     participants = CONST.EMPTY_ARRAY,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onFinish = (_value?: string) => {},
+    onFinish = (_value?: string, _participants?: Participant[]) => {},
     onParticipantsAdded,
     iouType,
     action,
@@ -100,7 +101,7 @@ function MoneyRequestParticipantsSelector({
     isCorporateCardTransaction = false,
     ref,
 }: MoneyRequestParticipantsSelectorProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['UserPlus'] as const);
+    const icons = useMemoizedLazyExpensifyIcons(['UserPlus']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {contactPermissionState, contacts, setContactPermissionState, importAndSaveContacts} = useContactImport();
@@ -116,9 +117,13 @@ function MoneyRequestParticipantsSelector({
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const policy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`];
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {canBeMissing: true, initWithStoredValues: false});
-    const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: true, selector: emailSelector});
-    const [reportAttributesDerived] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportsSelector});
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const currentUserLogin = currentUserPersonalDetails.login;
+    const currentUserEmail = currentUserPersonalDetails.email ?? '';
+    const currentUserAccountID = currentUserPersonalDetails.accountID;
+    const reportAttributesDerived = useReportAttributes();
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE, {canBeMissing: false});
+    const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST, {canBeMissing: true});
 
     const [textInputAutoFocus, setTextInputAutoFocus] = useState<boolean>(!isNative);
     const selectionListRef = useRef<SelectionListHandle | null>(null);
@@ -130,13 +135,10 @@ function MoneyRequestParticipantsSelector({
     const isCategorizeOrShareAction = [CONST.IOU.ACTION.CATEGORIZE, CONST.IOU.ACTION.SHARE].some((option) => option === action);
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {canBeMissing: true});
     const hasBeenAddedToNudgeMigration = !!tryNewDot?.nudgeMigration?.timestamp;
-    const [optimisticTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {
-        selector: transactionDraftValuesSelector,
-        canBeMissing: true,
-    });
+    const optimisticTransactions = useTransactionDraftValues();
 
     // This is necessary to prevent showing the Manager McTest when there are multiple transactions being created
-    const hasMultipleTransactions = (optimisticTransactions ?? []).length > 1;
+    const hasMultipleTransactions = optimisticTransactions.length > 1;
     const canShowManagerMcTest = useMemo(() => !hasBeenAddedToNudgeMigration && action !== CONST.IOU.ACTION.SUBMIT, [hasBeenAddedToNudgeMigration, action]) && !hasMultipleTransactions;
 
     /**
@@ -161,10 +163,10 @@ function MoneyRequestParticipantsSelector({
             onParticipantsAdded(newParticipants);
 
             if (!option.isSelfDM) {
-                onFinish();
+                onFinish(undefined, newParticipants);
             }
         },
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps -- we don't want to trigger this callback when iouType changes
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't want to trigger this callback when iouType changes
         [onFinish, onParticipantsAdded, policy, activeAdminWorkspaces],
     );
 
@@ -213,7 +215,7 @@ function MoneyRequestParticipantsSelector({
         [isIOUSplit, iouType, onParticipantsAdded],
     );
 
-    const {searchTerm, setSearchTerm, availableOptions, selectedOptions, toggleSelection, areOptionsInitialized, onListEndReached, contactState} = useSearchSelector({
+    const {searchTerm, debouncedSearchTerm, setSearchTerm, availableOptions, selectedOptions, toggleSelection, areOptionsInitialized, onListEndReached, contactState} = useSearchSelector({
         selectionMode: isIOUSplit ? CONST.SEARCH_SELECTOR.SELECTION_MODE_MULTI : CONST.SEARCH_SELECTOR.SELECTION_MODE_SINGLE,
         searchContext: CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_GENERAL,
         includeUserToInvite: !isCategorizeOrShareAction && !isPerDiemRequest,
@@ -234,11 +236,11 @@ function MoneyRequestParticipantsSelector({
         },
     });
 
-    const cleanSearchTerm = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm]);
+    const cleanSearchTerm = useMemo(() => debouncedSearchTerm.trim().toLowerCase(), [debouncedSearchTerm]);
 
     useEffect(() => {
-        searchInServer(searchTerm.trim());
-    }, [searchTerm]);
+        searchInServer(debouncedSearchTerm.trim());
+    }, [debouncedSearchTerm]);
 
     const inputHelperText = useMemo(
         () =>
@@ -246,11 +248,10 @@ function MoneyRequestParticipantsSelector({
                 (availableOptions.personalDetails ?? []).length + (availableOptions.recentReports ?? []).length + (availableOptions.workspaceChats ?? []).length !== 0 ||
                     !isEmptyObject(availableOptions.selfDMChat),
                 !!availableOptions?.userToInvite,
-                searchTerm.trim(),
+                debouncedSearchTerm.trim(),
                 countryCode,
-                participants.some((participant) => getPersonalDetailSearchTerms(participant).join(' ').toLowerCase().includes(cleanSearchTerm)),
+                participants.some((participant) => getPersonalDetailSearchTerms(participant, currentUserAccountID).join(' ').toLowerCase().includes(cleanSearchTerm)),
             ),
-        // eslint-disable-next-line react-compiler/react-compiler
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [
             availableOptions.personalDetails?.length,
@@ -259,9 +260,10 @@ function MoneyRequestParticipantsSelector({
             availableOptions?.userToInvite,
             availableOptions.workspaceChats,
             cleanSearchTerm,
-            searchTerm,
+            debouncedSearchTerm,
             participants,
             countryCode,
+            currentUserAccountID,
         ],
     );
 
@@ -286,13 +288,15 @@ function MoneyRequestParticipantsSelector({
             participants.map((participant) => ({...participant, reportID: participant.reportID})) as OptionData[],
             [],
             [],
+            currentUserAccountID,
             personalDetails,
             true,
             undefined,
             reportAttributesDerived,
         );
-
-        newSections.push(formatResults.section);
+        // Just a temporary fix to satisfy the type checker
+        // Will be fixed when migrating to use new SelectionListWithSections
+        newSections.push({...formatResults.section, title: undefined, shouldShow: true});
 
         newSections.push({
             title: translate('workspace.common.workspace'),
@@ -323,18 +327,24 @@ function MoneyRequestParticipantsSelector({
         if (
             !isWorkspacesOnly &&
             availableOptions.userToInvite &&
-            !isCurrentUser({
-                ...availableOptions.userToInvite,
-                accountID: availableOptions.userToInvite?.accountID ?? CONST.DEFAULT_NUMBER_ID,
-                status: availableOptions.userToInvite?.status ?? undefined,
-            }) &&
+            !isCurrentUser(
+                {
+                    ...availableOptions.userToInvite,
+                    accountID: availableOptions.userToInvite?.accountID ?? CONST.DEFAULT_NUMBER_ID,
+                    status: availableOptions.userToInvite?.status ?? undefined,
+                },
+                loginList,
+                currentUserEmail,
+            ) &&
             !isPerDiemRequest
         ) {
             newSections.push({
                 title: undefined,
                 data: [availableOptions.userToInvite].map((participant) => {
                     const isPolicyExpenseChat = participant?.isPolicyExpenseChat ?? false;
-                    return isPolicyExpenseChat ? getPolicyExpenseReportOption(participant, reportAttributesDerived) : getParticipantsOption(participant, personalDetails);
+                    return isPolicyExpenseChat
+                        ? getPolicyExpenseReportOption(participant, currentUserAccountID, personalDetails, reportAttributesDerived)
+                        : getParticipantsOption(participant, personalDetails);
                 }),
                 shouldShow: true,
             });
@@ -360,9 +370,12 @@ function MoneyRequestParticipantsSelector({
         availableOptions.recentReports,
         availableOptions.personalDetails,
         isWorkspacesOnly,
+        loginList,
         isPerDiemRequest,
         showImportContacts,
         inputHelperText,
+        currentUserAccountID,
+        currentUserEmail,
     ]);
 
     /**
@@ -456,6 +469,7 @@ function MoneyRequestParticipantsSelector({
                         pressOnEnter
                         large
                         isDisabled={shouldShowSplitBillErrorMessage}
+                        sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.PARTICIPANTS_NEXT_BUTTON}
                     />
                 )}
                 {isCategorizeOrShareAction && (
@@ -465,6 +479,7 @@ function MoneyRequestParticipantsSelector({
                         onPress={() => onFinish()}
                         pressOnEnter
                         large
+                        sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.PARTICIPANTS_NEW_WORKSPACE_BUTTON}
                     />
                 )}
             </>
@@ -499,7 +514,7 @@ function MoneyRequestParticipantsSelector({
         [isIOUSplit, addParticipantToSelection, addSingleParticipant],
     );
 
-    const footerContentAbovePaginationComponent = useMemo(() => {
+    const importContactsButtonComponent = useMemo(() => {
         const shouldShowImportContactsButton = contactState?.showImportUI ?? showImportContacts;
         if (!shouldShowImportContactsButton) {
             return null;
@@ -510,10 +525,10 @@ function MoneyRequestParticipantsSelector({
                 icon={icons.UserPlus}
                 onPress={goToSettings}
                 shouldShowRightIcon
-                style={styles.mb3}
+                sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.PARTICIPANTS_IMPORT_CONTACTS_ITEM}
             />
         );
-    }, [icons.UserPlus, contactState?.showImportUI, showImportContacts, styles.mb3, translate]);
+    }, [icons.UserPlus, contactState?.showImportUI, showImportContacts, translate]);
 
     const ClickableImportContactTextComponent = useMemo(() => {
         if (searchTerm.length || isSearchingForReports) {
@@ -575,7 +590,8 @@ function MoneyRequestParticipantsSelector({
                 }
                 footerContent={footerContent}
                 listEmptyContent={EmptySelectionListContentWithPermission}
-                footerContentAbovePagination={footerContentAbovePaginationComponent}
+                listHeaderContent={importContactsButtonComponent}
+                showSectionTitleWithListHeaderContent
                 headerMessage={header}
                 showLoadingPlaceholder={showLoadingPlaceholder}
                 canSelectMultiple={isIOUSplit && isAllowedToSplit}
@@ -589,11 +605,10 @@ function MoneyRequestParticipantsSelector({
     );
 }
 
-MoneyRequestParticipantsSelector.displayName = 'MoneyRequestParticipantsSelector';
-
 export default memo(
     MoneyRequestParticipantsSelector,
     (prevProps, nextProps) =>
+        // eslint-disable-next-line rulesdir/no-deep-equal-in-memo
         deepEqual(prevProps.participants, nextProps.participants) &&
         prevProps.iouType === nextProps.iouType &&
         prevProps.isWorkspacesOnly === nextProps.isWorkspacesOnly &&

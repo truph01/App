@@ -1,6 +1,8 @@
 import {useCallback} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import {deleteMoneyRequest, getIOUActionForTransactions, getIOURequestPolicyID, initSplitExpenseItemData, updateSplitTransactions} from '@libs/actions/IOU';
+import {deleteMoneyRequest, getIOURequestPolicyID} from '@libs/actions/IOU';
+import {getIOUActionForTransactions} from '@libs/actions/IOU/Duplicate';
+import {initSplitExpenseItemData, updateSplitTransactions} from '@libs/actions/IOU/Split';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {getChildTransactions, getOriginalTransactionWithSplitInfo} from '@libs/TransactionUtils';
@@ -33,7 +35,10 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
     const [allReportNameValuePairs] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {canBeMissing: true});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
-
+    const [policyRecentlyUsedCurrencies] = useOnyx(ONYXKEYS.RECENTLY_USED_CURRENCIES, {canBeMissing: true});
+    const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE, {canBeMissing: true});
+    const [iouReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.reportID)}`, {canBeMissing: true});
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
     const {isBetaEnabled} = usePermissions();
     const archivedReportsIdSet = useArchivedReportsIdSet();
 
@@ -111,6 +116,22 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
                     allPolicyRecentlyUsedCategories?.[
                         `${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES}${getNonEmptyStringOnyxID(getIOURequestPolicyID(originalTransaction, report))}`
                     ] ?? [];
+
+                const hasEditableSplitExpensesLeft = childTransactions.some((childTransaction) => {
+                    const currentReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${childTransaction?.reportID}`];
+                    return (currentReport?.statusNum ?? 0) < CONST.REPORT.STATUS_NUM.SUBMITTED;
+                });
+
+                if (!hasEditableSplitExpensesLeft) {
+                    nonSplitTransactions.push(...splitTransactionsByOriginalTransactionID[transactionID]);
+                    continue;
+                }
+
+                const remainingSplitExpenses = childTransactions.map((childTransaction) => {
+                    const transactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${childTransaction?.reportID}`];
+                    return initSplitExpenseItemData(childTransaction, transactionReport);
+                });
+
                 updateSplitTransactions({
                     allTransactionsList: allTransactions,
                     allReportsList: allReports,
@@ -118,9 +139,11 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
                     transactionData: {
                         reportID: report?.reportID ?? String(CONST.DEFAULT_NUMBER_ID),
                         originalTransactionID: transactionID,
-                        splitExpenses: childTransactions.map((childTransaction) => initSplitExpenseItemData(childTransaction)),
+                        splitExpenses: remainingSplitExpenses,
                     },
-                    hash: currentSearchHash ?? 0,
+                    searchContext: {
+                        currentSearchHash: currentSearchHash ?? 0,
+                    },
                     policyCategories,
                     policy,
                     policyRecentlyUsedCategories,
@@ -129,6 +152,10 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
                     isASAPSubmitBetaEnabled: isBetaEnabled(CONST.BETAS.ASAP_SUBMIT),
                     currentUserPersonalDetails,
                     transactionViolations,
+                    policyRecentlyUsedCurrencies: policyRecentlyUsedCurrencies ?? [],
+                    quickAction,
+                    iouReportNextStep,
+                    betas,
                 });
             }
 
@@ -141,18 +168,20 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
                 const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.chatReportID}`];
                 const chatIOUReportID = chatReport?.reportID;
                 const isChatIOUReportArchived = archivedReportsIdSet.has(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${chatIOUReportID}`);
-                deleteMoneyRequest(
+                deleteMoneyRequest({
                     transactionID,
-                    action,
-                    duplicateTransactions,
-                    duplicateTransactionViolations,
+                    reportAction: action,
+                    transactions: duplicateTransactions,
+                    violations: duplicateTransactionViolations,
                     iouReport,
                     chatReport,
                     isChatIOUReportArchived,
                     isSingleTransactionView,
-                    deletedTransactionIDs,
-                    transactionIDs,
-                );
+                    transactionIDsPendingDeletion: deletedTransactionIDs,
+                    selectedTransactionIDs: transactionIDs,
+                    allTransactionViolationsParam: transactionViolations,
+                    currentUserAccountID: currentUserPersonalDetails.accountID,
+                });
                 deletedTransactionIDs.push(transactionID);
                 if (action.childReportID) {
                     deletedTransactionThreadReportIDs.add(action.childReportID);
@@ -162,18 +191,22 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
             return Array.from(deletedTransactionThreadReportIDs);
         },
         [
-            reportActions,
-            allTransactions,
-            allReports,
-            report,
-            allReportNameValuePairs,
             allPolicyRecentlyUsedCategories,
-            policyCategories,
-            policy,
+            allReportNameValuePairs,
+            allReports,
+            allTransactions,
             archivedReportsIdSet,
-            isBetaEnabled,
             currentUserPersonalDetails,
+            iouReportNextStep,
+            isBetaEnabled,
+            policy,
+            policyCategories,
+            policyRecentlyUsedCurrencies,
+            quickAction,
+            report,
+            reportActions,
             transactionViolations,
+            betas,
         ],
     );
 

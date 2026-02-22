@@ -3,10 +3,11 @@ import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Badge from '@components/Badge';
 import Button from '@components/Button';
-import * as Expensicons from '@components/Icon/Expensicons';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import type {PaymentMethod} from '@components/KYCWall/types';
 import {SearchScopeProvider} from '@components/Search/SearchScopeProvider';
 import SettlementButton from '@components/SettlementButton';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -28,7 +29,6 @@ import type {SearchTransactionAction} from '@src/types/onyx/SearchResults';
 
 const actionTranslationsMap: Record<SearchTransactionAction, TranslationPaths> = {
     view: 'common.view',
-    review: 'common.review',
     submit: 'common.submit',
     approve: 'iou.approve',
     pay: 'iou.pay',
@@ -73,11 +73,15 @@ function ActionCell({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {isOffline} = useNetwork();
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Checkbox']);
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const [iouReport, transactions] = useReportWithTransactionsAndViolations(reportID);
     const policy = usePolicy(policyID);
+    const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.chatReportID}`, {canBeMissing: true});
-    const canBePaid = canIOUBePaid(iouReport, chatReport, policy, transactions, false, undefined, undefined, true);
-    const shouldOnlyShowElsewhere = !canBePaid && canIOUBePaid(iouReport, chatReport, policy, transactions, true, undefined, undefined, true);
+    const canBePaid = canIOUBePaid(iouReport, chatReport, policy, bankAccountList, transactions, false);
+    const shouldOnlyShowElsewhere = !canBePaid && canIOUBePaid(iouReport, chatReport, policy, bankAccountList, transactions, true);
     const text = isChildListItem ? translate(actionTranslationsMap[CONST.SEARCH.ACTION_TYPES.VIEW]) : translate(actionTranslationsMap[action]);
     const shouldUseViewAction = action === CONST.SEARCH.ACTION_TYPES.VIEW || (parentAction === CONST.SEARCH.ACTION_TYPES.PAID && action === CONST.SEARCH.ACTION_TYPES.PAID);
 
@@ -88,10 +92,16 @@ function ActionCell({
             if (!type || !reportID || !hash || !amount) {
                 return;
             }
+
+            if (isDelegateAccessRestricted) {
+                showDelegateNoAccessModal();
+                return;
+            }
+
             const invoiceParams = getPayMoneyOnSearchInvoiceParams(policyID, payAsBusiness, methodID, paymentMethod);
             payMoneyRequestOnSearch(hash, [{amount, paymentType: type, reportID, ...(isInvoiceReport(iouReport) ? invoiceParams : {})}]);
         },
-        [reportID, hash, amount, policyID, iouReport],
+        [reportID, hash, amount, policyID, iouReport, isDelegateAccessRestricted, showDelegateNoAccessModal],
     );
 
     if (!isChildListItem && ((parentAction !== CONST.SEARCH.ACTION_TYPES.PAID && action === CONST.SEARCH.ACTION_TYPES.PAID) || action === CONST.SEARCH.ACTION_TYPES.DONE)) {
@@ -103,7 +113,7 @@ function ActionCell({
             >
                 <Badge
                     text={text}
-                    icon={action === CONST.SEARCH.ACTION_TYPES.DONE ? Expensicons.Checkbox : Expensicons.Checkmark}
+                    icon={action === CONST.SEARCH.ACTION_TYPES.DONE ? expensifyIcons.Checkbox : expensifyIcons.Checkmark}
                     badgeStyles={[
                         styles.ml0,
                         styles.ph2,
@@ -122,12 +132,12 @@ function ActionCell({
         );
     }
 
-    if (action === CONST.SEARCH.ACTION_TYPES.VIEW || action === CONST.SEARCH.ACTION_TYPES.REVIEW || shouldUseViewAction || isChildListItem) {
+    if (action === CONST.SEARCH.ACTION_TYPES.VIEW || shouldUseViewAction || isChildListItem) {
         const buttonInnerStyles = isSelected ? styles.buttonDefaultSelected : {};
 
         return isLargeScreenWidth ? (
             <Button
-                testID={ActionCell.displayName}
+                testID="ActionCell"
                 text={text}
                 onPress={goToItem}
                 small={!extraSmall}
@@ -138,10 +148,8 @@ function ActionCell({
                 innerStyles={buttonInnerStyles}
                 link={isChildListItem}
                 shouldUseDefaultHover={!isChildListItem}
-                icon={!isChildListItem && action === CONST.SEARCH.ACTION_TYPES.REVIEW ? Expensicons.DotIndicator : undefined}
-                iconFill={theme.danger}
-                iconHoverFill={theme.dangerHover}
                 isNested
+                sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_VIEW}
             />
         ) : null;
     }
@@ -167,6 +175,7 @@ function ActionCell({
                     shouldStayNormalOnDisable={shouldDisablePointerEvents}
                     isLoading={isLoading}
                     onlyShowPayElsewhere={shouldOnlyShowElsewhere}
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_PAY}
                 />
             </SearchScopeProvider>
         );
@@ -184,10 +193,9 @@ function ActionCell({
             isDisabled={isOffline || shouldDisablePointerEvents}
             shouldStayNormalOnDisable={shouldDisablePointerEvents}
             isNested
+            sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_ACTION}
         />
     );
 }
-
-ActionCell.displayName = 'ActionCell';
 
 export default ActionCell;

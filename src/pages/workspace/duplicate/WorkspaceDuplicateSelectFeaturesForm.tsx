@@ -8,6 +8,7 @@ import SelectionList from '@components/SelectionList';
 import MultiSelectListItem from '@components/SelectionList/ListItem/MultiSelectListItem';
 import type {ConfirmButtonOptions, ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
@@ -42,12 +43,14 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
     const taxesLength = Object.keys(policy?.taxRates?.taxes ?? {}).length ?? 0;
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`, {canBeMissing: true});
     const categoriesCount = Object.keys(policyCategories ?? {}).length;
+    const codingRulesCount = Object.keys(policy?.rules?.codingRules ?? {}).length;
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const reportFields = Object.keys(getReportFieldsByPolicyID(policyID)).length ?? 0;
     const customUnits = getPerDiemCustomUnit(policy);
     const customUnitRates: Record<string, Rate> = customUnits?.rates ?? {};
     const allRates = Object.values(customUnitRates)?.length;
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
     const accountingIntegrations = Object.values(CONST.POLICY.CONNECTIONS.NAME);
     const connectedIntegration = getAllValidConnectedIntegration(policy, accountingIntegrations);
@@ -140,6 +143,13 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
                           : undefined,
                   }
                 : undefined,
+            codingRulesCount > 0 && !isCollect
+                ? {
+                      translation: translate('workspace.duplicateWorkspace.merchantRules'),
+                      value: 'codingRules',
+                      alternateText: translate('workspace.duplicateWorkspace.merchantRulesCount', {count: codingRulesCount}),
+                  }
+                : undefined,
             ratesCount > 0 && policy?.areDistanceRatesEnabled
                 ? {
                       translation: translate('workspace.common.distanceRates'),
@@ -162,6 +172,12 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
                       alternateText: bankAccountList ? `${Object.keys(bankAccountList).length} ${translate('common.bankAccounts').toLowerCase()}, ${invoiceCompany}` : invoiceCompany,
                   }
                 : undefined,
+            policy?.isTravelEnabled
+                ? {
+                      translation: translate('workspace.common.travel'),
+                      value: 'travel',
+                  }
+                : undefined,
         ];
 
         return result.filter((item): item is NonNullable<typeof item> => !!item);
@@ -180,6 +196,7 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
         allRates,
         bankAccountList,
         invoiceCompany,
+        codingRulesCount,
     ]);
 
     const featuresToCopy: ListItem[] = useMemo(() => {
@@ -222,14 +239,27 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
                 perDiem: selectedItems.includes('perDiem'),
                 reimbursements: selectedItems.includes('invoices'),
                 expenses: selectedItems.includes('rules'),
-                customUnits: selectedItems.includes('distanceRates'),
+                distance: selectedItems.includes('distanceRates'),
                 invoices: selectedItems.includes('invoices'),
                 exportLayouts: selectedItems.includes('workflows'),
+                overview: selectedItems.includes('overview'),
+                travel: selectedItems.includes('travel'),
+                codingRules: selectedItems.includes('codingRules'),
             },
             file: duplicatedWorkspaceAvatar,
+            localCurrency: currentUserPersonalDetails?.localCurrencyCode ?? '',
         });
         Navigation.closeRHPFlow();
-    }, [duplicateWorkspace?.name, duplicateWorkspace?.policyID, policy, policyCategories, selectedItems, translate, duplicatedWorkspaceAvatar]);
+    }, [
+        duplicateWorkspace?.name,
+        duplicateWorkspace?.policyID,
+        policy,
+        policyCategories,
+        selectedItems,
+        translate,
+        duplicatedWorkspaceAvatar,
+        currentUserPersonalDetails?.localCurrencyCode,
+    ]);
 
     const confirmDuplicateAndHideModal = useCallback(() => {
         setIsDuplicateModalOpen(false);
@@ -295,13 +325,11 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
             return;
         }
         setSelectedItems(items.map((i) => i.value));
-        // eslint-disable-next-line react-compiler/react-compiler
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [items.length]);
 
     useEffect(() => {
         fetchWorkspaceRelatedData();
-        // eslint-disable-next-line react-compiler/react-compiler
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -342,6 +370,7 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
                             accessibilityLabel={translate('workspace.common.selectAll')}
                             role="button"
                             accessibilityState={{checked: isSelectAllChecked}}
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.DUPLICATE_SELECT_FEATURES_SELECT_ALL}
                             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                         >
                             <Text style={[styles.textLabelSupporting, styles.ph3]}>{translate('workspace.common.selectAll')}</Text>
@@ -381,7 +410,5 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
         </>
     );
 }
-
-WorkspaceDuplicateSelectFeaturesForm.displayName = 'WorkspaceDuplicateSelectFeaturesForm';
 
 export default WorkspaceDuplicateSelectFeaturesForm;

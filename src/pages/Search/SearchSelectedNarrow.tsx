@@ -3,6 +3,7 @@ import React, {useContext, useRef} from 'react';
 import {View} from 'react-native';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import KYCWall from '@components/KYCWall';
 import {KYCWallContext} from '@components/KYCWall/KYCWallContext';
 import type {PaymentMethodType} from '@components/KYCWall/types';
@@ -45,6 +46,8 @@ function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, cu
     const selectedOptionRef = useRef<DropdownOption<SearchHeaderOptionValue> | null>(null);
     const {accountID} = useCurrentUserPersonalDetails();
     const activeAdminPolicies = getActiveAdminWorkspaces(allPolicies, accountID.toString()).sort((a, b) => localeCompare(a.name || '', b.name || ''));
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
     const handleOnMenuItemPress = (option: DropdownOption<SearchHeaderOptionValue>) => {
         if (option?.shouldCloseModalOnSelect) {
@@ -60,7 +63,14 @@ function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, cu
             chatReportID={currentSelectedReportID}
             iouReport={selectedIouReport}
             enablePaymentsRoute={ROUTES.ENABLE_PAYMENTS}
-            addBankAccountRoute={isCurrentSelectedExpenseReport ? ROUTES.BANK_ACCOUNT_WITH_STEP_TO_OPEN.getRoute(currentSelectedPolicyID, undefined, Navigation.getActiveRoute()) : undefined}
+            addBankAccountRoute={
+                isCurrentSelectedExpenseReport
+                    ? ROUTES.BANK_ACCOUNT_WITH_STEP_TO_OPEN.getRoute({
+                          policyID: currentSelectedPolicyID,
+                          backTo: Navigation.getActiveRoute(),
+                      })
+                    : undefined
+            }
             onSuccessfulKYC={(paymentType) => confirmPayment?.(paymentType)}
         >
             {(triggerKYCFlow, buttonRef) => (
@@ -72,19 +82,22 @@ function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, cu
                         shouldAlwaysShowDropdownMenu
                         isDisabled={options.length === 0}
                         onPress={() => null}
+                        shouldPopoverUseScrollView={options.length >= CONST.DROPDOWN_SCROLL_THRESHOLD}
                         onOptionSelected={(item) => handleOnMenuItemPress(item)}
                         onSubItemSelected={(subItem) =>
-                            handleBulkPayItemSelected(
-                                subItem,
+                            handleBulkPayItemSelected({
+                                item: subItem,
                                 triggerKYCFlow,
                                 isAccountLocked,
                                 showLockedAccountModal,
-                                currentPolicy,
+                                policy: currentPolicy,
                                 latestBankItems,
                                 activeAdminPolicies,
                                 isUserValidated,
+                                isDelegateAccessRestricted,
+                                showDelegateNoAccessModal,
                                 confirmPayment,
-                            )
+                            })
                         }
                         success
                         isSplitButton={false}
@@ -94,13 +107,12 @@ function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, cu
                             vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
                         }}
                         shouldUseModalPaddingStyle
+                        sentryLabel={CONST.SENTRY_LABEL.SEARCH.NARROW_BULK_ACTIONS_DROPDOWN}
                     />
                 </View>
             )}
         </KYCWall>
     );
 }
-
-SearchSelectedNarrow.displayName = 'SearchSelectedNarrow';
 
 export default SearchSelectedNarrow;

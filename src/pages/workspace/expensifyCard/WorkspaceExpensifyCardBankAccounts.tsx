@@ -45,7 +45,7 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
     const policyID = route?.params?.policyID;
     const policy = usePolicy(policyID);
 
-    const illustrations = useMemoizedLazyIllustrations(['Puzzle'] as const);
+    const illustrations = useMemoizedLazyIllustrations(['Puzzle']);
 
     const isUkEuCurrencySupported = useExpensifyCardUkEuSupported(policyID);
 
@@ -70,11 +70,17 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
     };
 
     const handleAddBankAccount = () => {
-        Navigation.navigate(ROUTES.BANK_ACCOUNT_WITH_STEP_TO_OPEN.getRoute(policyID, REIMBURSEMENT_ACCOUNT_ROUTE_NAMES.NEW, ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID)));
+        Navigation.navigate(
+            ROUTES.BANK_ACCOUNT_WITH_STEP_TO_OPEN.getRoute({
+                policyID,
+                stepToOpen: REIMBURSEMENT_ACCOUNT_ROUTE_NAMES.NEW,
+                backTo: ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID),
+            }),
+        );
     };
 
     const handleSelectBankAccount = (value?: number) => {
-        configureExpensifyCardsForPolicy(policyID, value);
+        configureExpensifyCardsForPolicy(policyID, policy?.workspaceAccountID ?? CONST.DEFAULT_NUMBER_ID, value);
     };
 
     const renderBankOptions = () => {
@@ -200,7 +206,7 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
             featureName={CONST.POLICY.MORE_FEATURES.ARE_EXPENSIFY_CARDS_ENABLED}
         >
             <ScreenWrapper
-                testID={WorkspaceExpensifyCardBankAccounts.displayName}
+                testID="WorkspaceExpensifyCardBankAccounts"
                 enableEdgeToEdgeBottomSafeAreaPadding
                 shouldEnablePickerAvoiding={false}
                 shouldShowOfflineIndicator={false}
@@ -230,7 +236,5 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
         </AccessOrNotFoundWrapper>
     );
 }
-
-WorkspaceExpensifyCardBankAccounts.displayName = 'WorkspaceExpensifyCardBankAccounts';
 
 export default WorkspaceExpensifyCardBankAccounts;

@@ -8,10 +8,11 @@ import Icon from '@components/Icon';
 import * as Expensicons from '@components/Icon/Expensicons';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import RenderHTML from '@components/RenderHTML';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useSidePanel from '@hooks/useSidePanel';
+import useSidePanelState from '@hooks/useSidePanelState';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getActiveAdminWorkspaces, getActiveEmployeeWorkspaces, getGroupPaidPoliciesWithExpenseChatEnabled} from '@libs/PolicyUtils';
@@ -152,6 +153,7 @@ function ProductTrainingContextProvider({children}: ChildrenProps) {
                 tooltipName !== CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_TOOLTIP_MANAGER &&
                 tooltipName !== CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_CONFIRMATION &&
                 tooltipName !== CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_DRIVE_CONFIRMATION &&
+                tooltipName !== CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.GPS_TOOLTIP &&
                 isModalVisible
             ) {
                 return false;
@@ -229,8 +231,9 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
     const context = useContext(ProductTrainingContext);
     const styles = useThemeStyles();
     const theme = useTheme();
-    const {shouldHideToolTip} = useSidePanel();
+    const {shouldHideToolTip} = useSidePanelState();
     const {translate} = useLocalize();
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
 
     if (!context) {
         throw new Error('useProductTourContext must be used within a ProductTourProvider');
@@ -280,7 +283,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
                     ]}
                 >
                     <Icon
-                        src={Expensicons.Lightbulb}
+                        src={expensifyIcons.Lightbulb}
                         fill={theme.tooltipHighlightText}
                         medium
                     />
@@ -289,6 +292,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
                     </View>
                     {!tooltip?.shouldRenderActionButtons && (
                         <PressableWithoutFeedback
+                            sentryLabel={CONST.SENTRY_LABEL.PRODUCT_TRAINING.TOOLTIP}
                             shouldUseAutoHitSlop
                             accessibilityLabel={translate('common.noThanks')}
                             role={CONST.ROLE.BUTTON}
@@ -345,6 +349,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
         config.onConfirm,
         config.onDismiss,
         hideTooltip,
+        expensifyIcons.Lightbulb,
     ]);
 
     const hideProductTrainingTooltip = useCallback(() => {

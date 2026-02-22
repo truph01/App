@@ -8,7 +8,7 @@ import type {MagicCodeInputHandle} from '@components/MagicCodeInput';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
-import useOnyx from '@hooks/useOnyx';
+import useNonPersonalCardList from '@hooks/useNonPersonalCardList';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -17,7 +17,6 @@ import {getLatestErrorMessage} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
@@ -37,7 +36,7 @@ function ActivatePhysicalCardPageBase({cardID = '', navigateBackTo}: ActivatePhy
     const {isExtraSmallScreenHeight} = useResponsiveLayout();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const [cardList = getEmptyObject<CardList>()] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
+    const cardList = useNonPersonalCardList() ?? getEmptyObject<CardList>();
 
     const [formError, setFormError] = useState('');
     const [lastFourDigits, setLastFourDigits] = useState('');
@@ -106,7 +105,7 @@ function ActivatePhysicalCardPageBase({cardID = '', navigateBackTo}: ActivatePhy
             illustration={LottieAnimations.Magician}
             scrollViewContainerStyles={[styles.mnh100]}
             childrenContainerStyles={[styles.flex1]}
-            testID={ActivatePhysicalCardPageBase.displayName}
+            testID="ActivatePhysicalCardPageBase"
             shouldShowOfflineIndicatorInWideScreen
         >
             <Text style={[styles.mh5, styles.textHeadline]}>{translate('activateCardPage.pleaseEnterLastFour')}</Text>
@@ -136,7 +135,5 @@ function ActivatePhysicalCardPageBase({cardID = '', navigateBackTo}: ActivatePhy
         </IllustratedHeaderPageLayout>
     );
 }
-
-ActivatePhysicalCardPageBase.displayName = 'ActivatePhysicalCardPageBase';
 
 export default ActivatePhysicalCardPageBase;

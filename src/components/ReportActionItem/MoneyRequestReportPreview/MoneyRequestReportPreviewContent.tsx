@@ -1,6 +1,8 @@
-import React, {useCallback, useContext, useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
-import type {ListRenderItemInfo, ViewToken} from 'react-native';
+import {FlashList} from '@shopify/flash-list';
+import type {FlashListRef, ListRenderItemInfo} from '@shopify/flash-list';
+import React, {useCallback, useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
+import {View} from 'react-native';
+import type {ViewToken} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming} from 'react-native-reanimated';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -8,22 +10,23 @@ import AnimatedSubmitButton from '@components/AnimatedSubmitButton';
 import Button from '@components/Button';
 import {getButtonRole} from '@components/Button/utils';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
-import ConfirmModal from '@components/ConfirmModal';
-import {DelegateNoAccessContext} from '@components/DelegateNoAccessModalProvider';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
+import ExpenseHeaderApprovalButton from '@components/ExpenseHeaderApprovalButton';
 import Icon from '@components/Icon';
-import * as Expensicons from '@components/Icon/Expensicons';
 import type {PaymentMethod} from '@components/KYCWall/types';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import MoneyReportHeaderStatusBarSkeleton from '@components/MoneyReportHeaderStatusBarSkeleton';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {PressableWithFeedback} from '@components/Pressable';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import ProcessMoneyReportHoldMenu from '@components/ProcessMoneyReportHoldMenu';
-import type {ActionHandledType} from '@components/ProcessMoneyReportHoldMenu';
 import ExportWithDropdownMenu from '@components/ReportActionItem/ExportWithDropdownMenu';
 import AnimatedSettlementButton from '@components/SettlementButton/AnimatedSettlementButton';
 import {showContextMenuForReport} from '@components/ShowContextMenuContext';
 import Text from '@components/Text';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -33,7 +36,6 @@ import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useStrictPolicyRules from '@hooks/useStrictPolicyRules';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -44,16 +46,17 @@ import {getTotalAmountForIOUReportPreviewButton} from '@libs/MoneyRequestReportU
 import Navigation from '@libs/Navigation/Navigation';
 import Performance from '@libs/Performance';
 import {getConnectedIntegration, hasDynamicExternalWorkflow} from '@libs/PolicyUtils';
-import {getReportPreviewAction} from '@libs/ReportPreviewActionUtils';
+import {hasPendingDEWSubmit} from '@libs/ReportActionsUtils';
+import {getInvoicePayerName} from '@libs/ReportNameUtils';
+import getReportPreviewAction from '@libs/ReportPreviewActionUtils';
 import {
     areAllRequestsBeingSmartScanned as areAllRequestsBeingSmartScannedReportUtils,
     getAddExpenseDropdownOptions,
     getDisplayNameForParticipant,
-    getInvoicePayerName,
-    getMoneyReportPreviewName,
     getMoneyRequestSpendBreakdown,
     getNonHeldAndFullAmount,
     getPolicyName,
+    getReportName,
     getReportStatusColorStyle,
     getReportStatusTranslation,
     getTransactionsWithReceipts,
@@ -81,15 +84,22 @@ import colors from '@styles/theme/colors';
 import variables from '@styles/variables';
 import {approveMoneyRequest, canIOUBePaid as canIOUBePaidIOUActions, payInvoice, payMoneyRequest, submitReport} from '@userActions/IOU';
 import {openOldDotLink} from '@userActions/Link';
-import Timing from '@userActions/Timing';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {ReportAttributesDerivedValue, Transaction} from '@src/types/onyx';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
+import AccessMoneyRequestReportPreviewPlaceHolder from './AccessMoneyRequestReportPreviewPlaceHolder';
 import EmptyMoneyRequestReportPreview from './EmptyMoneyRequestReportPreview';
 import type {MoneyRequestReportPreviewContentProps} from './types';
+
+const MAX_PREVIEWS_NUMBER = 10;
+
+const ITEM_LAYOUT_TYPE = {
+    PREVIEW: 'preview',
+    SHOW_MORE: 'showMore',
+};
 
 const reportAttributesSelector = (c: OnyxEntry<ReportAttributesDerivedValue>) => c?.reports;
 
@@ -108,7 +118,6 @@ function MoneyRequestReportPreviewContent({
     invoiceReceiverPolicy,
     iouReport,
     transactions,
-    violations,
     policy,
     invoiceReceiverPersonalDetail,
     lastTransactionViolations,
@@ -118,13 +127,15 @@ function MoneyRequestReportPreviewContent({
     currentWidth,
     reportPreviewStyles,
     shouldDisplayContextMenu = true,
-    isInvoice,
     shouldShowBorder = false,
     onPress,
     forwardedFSClass,
 }: MoneyRequestReportPreviewContentProps) {
+    const [userBillingGraceEndPeriodCollection] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
     const [chatReportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${chatReportID}`, {canBeMissing: true, allowStaleData: true});
+    const [iouReportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${iouReportID}`, {canBeMissing: true});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
+    const [iouReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${iouReportID}`, {canBeMissing: true});
     const activePolicy = usePolicy(activePolicyID);
     const [lastDistanceExpenseType] = useOnyx(ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE, {canBeMissing: true});
     const shouldShowLoading = !chatReportMetadata?.hasOnceLoadedReportActions && transactions.length === 0 && !chatReportMetadata?.isOptimisticReport;
@@ -133,6 +144,7 @@ function MoneyRequestReportPreviewContent({
     const shouldShowLoadingDeferred = useDeferredValue(shouldShowLoading);
     const lastTransaction = transactions?.at(0);
     const shouldShowSkeleton = shouldShowLoading && transactions.length === 0;
+    const shouldShowAccessPlaceHolder = !iouReport && !shouldShowLoading;
     const shouldShowEmptyPlaceholder = transactions.length === 0 && !shouldShowLoading;
     const showStatusAndSkeleton = !shouldShowEmptyPlaceholder;
     const theme = useTheme();
@@ -140,9 +152,12 @@ function MoneyRequestReportPreviewContent({
     const StyleUtils = useStyleUtils();
     const {translate, formatPhoneNumber} = useLocalize();
     const {isOffline} = useNetwork();
-    const {areStrictPolicyRulesEnabled} = useStrictPolicyRules();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const currentUserDetails = useCurrentUserPersonalDetails();
+    const currentUserAccountID = currentUserDetails.accountID;
+    const currentUserEmail = currentUserDetails.email ?? '';
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow', 'Location', 'ReceiptPlus']);
 
     const {areAllRequestsBeingSmartScanned, hasNonReimbursableTransactions} = useMemo(
         () => ({
@@ -151,28 +166,29 @@ function MoneyRequestReportPreviewContent({
             hasNonReimbursableTransactions: hasNonReimbursableTransactionsReportUtils(iouReportID),
         }),
         // When transactions get updated these values may have changed, so that is a case where we also want to recompute them
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [transactions, iouReportID, action],
     );
 
     const {isPaidAnimationRunning, isApprovedAnimationRunning, isSubmittingAnimationRunning, stopAnimation, startAnimation, startApprovedAnimation, startSubmittingAnimation} =
         usePaymentAnimations();
+    const {showConfirmModal} = useConfirmModal();
     const [isHoldMenuVisible, setIsHoldMenuVisible] = useState(false);
-    const [requestType, setRequestType] = useState<ActionHandledType>();
     const [paymentType, setPaymentType] = useState<PaymentMethodType>();
-    const [isDEWModalVisible, setIsDEWModalVisible] = useState(false);
     const isIouReportArchived = useReportIsArchived(iouReportID);
     const isChatReportArchived = useReportIsArchived(chatReport?.reportID);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
     const {isBetaEnabled} = usePermissions();
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS, {canBeMissing: true});
+    const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
-    const hasViolations = hasViolationsReportUtils(iouReport?.reportID, transactionViolations, currentUserDetails.accountID, currentUserDetails.email ?? '');
+    const [betas] = useOnyx(ONYXKEYS.BETAS, {canBeMissing: true});
+    const isDEWBetaEnabled = isBetaEnabled(CONST.BETAS.NEW_DOT_DEW);
+    const hasViolations = hasViolationsReportUtils(iouReport?.reportID, transactionViolations, currentUserAccountID, currentUserEmail);
 
     const getCanIOUBePaid = useCallback(
-        (shouldShowOnlyPayElsewhere = false, shouldCheckApprovedState = true) =>
-            canIOUBePaidIOUActions(iouReport, chatReport, policy, transactions, shouldShowOnlyPayElsewhere, undefined, undefined, shouldCheckApprovedState),
-        [iouReport, chatReport, policy, transactions],
+        (shouldShowOnlyPayElsewhere = false) => canIOUBePaidIOUActions(iouReport, chatReport, policy, bankAccountList, transactions, shouldShowOnlyPayElsewhere),
+        [iouReport, chatReport, policy, bankAccountList, transactions],
     );
 
     const canIOUBePaid = useMemo(() => getCanIOUBePaid(), [getCanIOUBePaid]);
@@ -180,7 +196,7 @@ function MoneyRequestReportPreviewContent({
     const shouldShowPayButton = isPaidAnimationRunning || canIOUBePaid || onlyShowPayElsewhere;
 
     const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(iouReport, shouldShowPayButton);
-    const canIOUBePaidAndApproved = useMemo(() => getCanIOUBePaid(false, false), [getCanIOUBePaid]);
+    const canIOUBePaidAndApproved = useMemo(() => getCanIOUBePaid(false), [getCanIOUBePaid]);
     const connectedIntegration = getConnectedIntegration(policy);
     const hasOnlyHeldExpenses = hasOnlyHeldExpensesReportUtils(iouReport?.reportID);
 
@@ -211,18 +227,12 @@ function MoneyRequestReportPreviewContent({
 
     const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true, selector: reportAttributesSelector});
 
-    const currentReportName = iouReport?.reportID ? reportAttributes?.[iouReport.reportID]?.reportName : undefined;
-    const reportPreviewName = useMemo(() => {
-        return getMoneyReportPreviewName(action, iouReport, isInvoice, reportAttributes);
-        // eslint-disable-next-line react-compiler/react-compiler
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [action, iouReport, isInvoice, currentReportName]);
-
     const hasReceipts = transactionsWithReceipts.length > 0;
     const isScanning = hasReceipts && areAllRequestsBeingSmartScanned;
     const existingB2BInvoiceReport = useParticipantsInvoiceReport(activePolicyID, CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS, chatReport?.policyID);
 
-    const {isDelegateAccessRestricted, showDelegateNoAccessModal} = useContext(DelegateNoAccessContext);
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReportID}`, {canBeMissing: true});
 
     const hasReportBeenRetracted = hasReportBeenReopenedUtils(iouReport, reportActions) || hasReportBeenRetractedUtils(iouReport, reportActions);
@@ -240,7 +250,6 @@ function MoneyRequestReportPreviewContent({
                 return;
             }
             setPaymentType(type);
-            setRequestType(CONST.IOU.REPORT_ACTION_TYPE.PAY);
             if (isDelegateAccessRestricted) {
                 showDelegateNoAccessModal();
             } else if (hasHeldExpensesReportUtils(iouReport?.reportID)) {
@@ -248,28 +257,77 @@ function MoneyRequestReportPreviewContent({
             } else if (chatReport && iouReport) {
                 startAnimation();
                 if (isInvoiceReportUtils(iouReport)) {
-                    payInvoice(type, chatReport, iouReport, introSelected, payAsBusiness, existingB2BInvoiceReport, methodID, paymentMethod, activePolicy);
+                    payInvoice({
+                        paymentMethodType: type,
+                        chatReport,
+                        invoiceReport: iouReport,
+                        invoiceReportCurrentNextStepDeprecated: iouReportNextStep,
+                        introSelected,
+                        currentUserAccountIDParam: currentUserAccountID,
+                        currentUserEmailParam: currentUserEmail,
+                        payAsBusiness,
+                        existingB2BInvoiceReport,
+                        methodID,
+                        paymentMethod,
+                        activePolicy,
+                        betas,
+                    });
                 } else {
-                    payMoneyRequest(type, chatReport, iouReport, introSelected, undefined, true, activePolicy);
+                    payMoneyRequest({
+                        paymentType: type,
+                        chatReport,
+                        iouReport,
+                        introSelected,
+                        iouReportCurrentNextStepDeprecated: iouReportNextStep,
+                        currentUserAccountID,
+                        activePolicy,
+                        policy,
+                        betas,
+                    });
                 }
             }
         },
-        [isDelegateAccessRestricted, iouReport, chatReport, showDelegateNoAccessModal, startAnimation, introSelected, existingB2BInvoiceReport, activePolicy],
+        [
+            isDelegateAccessRestricted,
+            iouReport,
+            chatReport,
+            showDelegateNoAccessModal,
+            startAnimation,
+            iouReportNextStep,
+            introSelected,
+            currentUserAccountID,
+            currentUserEmail,
+            existingB2BInvoiceReport,
+            activePolicy,
+            policy,
+            betas,
+        ],
     );
 
+    const showDEWModal = useCallback(() => {
+        showConfirmModal({
+            title: translate('customApprovalWorkflow.title'),
+            prompt: translate('customApprovalWorkflow.description'),
+            confirmText: translate('customApprovalWorkflow.goToExpensifyClassic'),
+            shouldShowCancelButton: false,
+        }).then((result) => {
+            if (result.action !== ModalActions.CONFIRM) {
+                return;
+            }
+            openOldDotLink(CONST.OLDDOT_URLS.INBOX);
+        });
+    }, [showConfirmModal, translate]);
+
     const confirmApproval = () => {
-        if (hasDynamicExternalWorkflow(policy)) {
-            setIsDEWModalVisible(true);
+        if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
+            showDEWModal();
             return;
         }
-        setRequestType(CONST.IOU.REPORT_ACTION_TYPE.APPROVE);
         if (isDelegateAccessRestricted) {
             showDelegateNoAccessModal();
-        } else if (hasHeldExpensesReportUtils(iouReport?.reportID)) {
-            setIsHoldMenuVisible(true);
-        } else {
+        } else if (!hasHeldExpensesReportUtils(iouReport?.reportID)) {
             startApprovedAnimation();
-            approveMoneyRequest(iouReport, activePolicy, currentUserDetails.accountID, currentUserDetails.email ?? '', hasViolations, isASAPSubmitBetaEnabled, true);
+            approveMoneyRequest(iouReport, activePolicy, currentUserAccountID, currentUserEmail, hasViolations, isASAPSubmitBetaEnabled, iouReportNextStep, betas, true);
         }
     };
 
@@ -294,7 +352,7 @@ function MoneyRequestReportPreviewContent({
         }
 
         if (isApproved) {
-            return translate('iou.managerApproved', {manager: payerOrApproverName});
+            return translate('iou.managerApproved', payerOrApproverName);
         }
         let paymentVerb: TranslationPaths = 'iou.payerOwes';
         if (iouSettled || iouReport?.isWaitingOnBankAccount) {
@@ -303,7 +361,7 @@ function MoneyRequestReportPreviewContent({
             paymentVerb = 'iou.payerSpent';
             payerOrApproverName = getDisplayNameForParticipant({accountID: chatReport?.ownerAccountID, shouldUseShortForm: true, formatPhoneNumber});
         }
-        return translate(paymentVerb, {payer: payerOrApproverName});
+        return translate(paymentVerb, payerOrApproverName);
     }, [
         isScanning,
         numberOfPendingRequests,
@@ -352,6 +410,8 @@ function MoneyRequestReportPreviewContent({
         [action?.childStateNum, action?.childStatusNum, iouReport?.stateNum, iouReport?.statusNum, translate],
     );
 
+    const shouldShowReportStatus = !!reportStatus && !!expenseCount;
+
     const reportStatusColorStyle = useMemo(
         () => getReportStatusColorStyle(theme, iouReport?.stateNum ?? action?.childStateNum, iouReport?.statusNum ?? action?.childStatusNum),
         [action?.childStateNum, action?.childStatusNum, iouReport?.stateNum, iouReport?.statusNum, theme],
@@ -370,7 +430,7 @@ function MoneyRequestReportPreviewContent({
             }),
         );
         // We only want to animate the text when the text changes
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [previewMessage, previewMessageOpacity]);
 
     useEffect(() => {
@@ -389,7 +449,7 @@ function MoneyRequestReportPreviewContent({
         thumbsUpScale.set(isApprovedAnimationRunning ? withDelay(CONST.ANIMATION_THUMBS_UP_DELAY, withSpring(1, {duration: CONST.ANIMATION_THUMBS_UP_DURATION})) : 1);
     }, [isApproved, isApprovedAnimationRunning, thumbsUpScale]);
 
-    const carouselTransactions = transactions.slice(0, 11);
+    const carouselTransactions = shouldShowAccessPlaceHolder ? [] : transactions.slice(0, 11);
     const prevCarouselTransactionLength = useRef(0);
 
     useEffect(() => {
@@ -405,9 +465,9 @@ function MoneyRequestReportPreviewContent({
     // value ensures that disabled state is applied instantly and not overridden by onViewableItemsChanged when scrolling
     // undefined makes arrow buttons react on currentIndex changes when scrolling manually
     const [optimisticIndex, setOptimisticIndex] = useState<number | undefined>(undefined);
-    const carouselRef = useRef<FlatList<Transaction> | null>(null);
+    const carouselRef = useRef<FlashListRef<Transaction> | null>(null);
     const visibleItemsOnEndCount = useMemo(() => {
-        const lastItemWidth = transactions.length > 10 ? footerWidth : reportPreviewStyles.transactionPreviewCarouselStyle.width;
+        const lastItemWidth = transactions.length > MAX_PREVIEWS_NUMBER ? footerWidth : reportPreviewStyles.transactionPreviewCarouselStyle.width;
         const lastItemWithGap = lastItemWidth + styles.gap2.gap;
         const itemWithGap = reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.gap2.gap;
         return Math.floor((currentWidth - 2 * styles.pl2.paddingLeft - lastItemWithGap) / itemWithGap) + 1;
@@ -416,7 +476,6 @@ function MoneyRequestReportPreviewContent({
         return {itemVisiblePercentThreshold: 100};
     }, []);
 
-    // eslint-disable-next-line react-compiler/react-compiler
     const onViewableItemsChanged = useRef(({viewableItems}: {viewableItems: ViewToken[]; changed: ViewToken[]}) => {
         const newIndex = viewableItems.at(0)?.index;
         if (typeof newIndex === 'number') {
@@ -426,30 +485,38 @@ function MoneyRequestReportPreviewContent({
         setCurrentVisibleItems(viewableItemsIndexes);
     }).current;
 
+    const snapOffsets = carouselTransactions.map((_, index) => index * (reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.transactionsCarouselGap.width));
+
     const handleChange = (index: number) => {
         if (index > carouselTransactions.length - visibleItemsOnEndCount) {
-            setOptimisticIndex(carouselTransactions.length - visibleItemsOnEndCount);
-            carouselRef.current?.scrollToIndex({index: carouselTransactions.length - visibleItemsOnEndCount, animated: true, viewOffset: 2 * styles.gap2.gap});
+            const lastScrollableIndex = carouselTransactions.length - visibleItemsOnEndCount;
+            setOptimisticIndex(lastScrollableIndex);
+            carouselRef.current?.scrollToOffset({offset: snapOffsets.at(lastScrollableIndex) ?? 0, animated: true});
             return;
         }
         if (index < 0) {
             setOptimisticIndex(0);
-            carouselRef.current?.scrollToIndex({index: 0, animated: true, viewOffset: 2 * styles.gap2.gap});
+            carouselRef.current?.scrollToTop({animated: true});
+            return;
+        }
+        if (index === carouselTransactions.length - visibleItemsOnEndCount) {
+            setOptimisticIndex(index);
+            carouselRef.current?.scrollToEnd({animated: true});
             return;
         }
         setOptimisticIndex(index);
-        carouselRef.current?.scrollToIndex({index, animated: true, viewOffset: 2 * styles.gap2.gap});
+        carouselRef.current?.scrollToOffset({offset: snapOffsets.at(index) ?? 0, animated: true});
     };
 
-    const renderFlatlistItem = (itemInfo: ListRenderItemInfo<Transaction>) => {
-        if (itemInfo.index > 9) {
+    const renderItem = (itemInfo: ListRenderItemInfo<Transaction>) => {
+        if (itemInfo.index > MAX_PREVIEWS_NUMBER - 1) {
             return (
                 <View
-                    style={[styles.flex1, styles.p5, styles.justifyContentCenter]}
+                    style={[styles.p5, styles.justifyContentCenter]}
                     onLayout={(e) => setFooterWidth(e.nativeEvent.layout.width)}
                 >
                     <Text style={{color: colors.blue600}}>
-                        +{transactions.length - 10} {translate('common.more').toLowerCase()}
+                        +{transactions.length - MAX_PREVIEWS_NUMBER} {translate('common.more').toLowerCase()}
                     </Text>
                 </View>
             );
@@ -482,48 +549,69 @@ function MoneyRequestReportPreviewContent({
             return;
         }
         Performance.markStart(CONST.TIMING.OPEN_REPORT_FROM_PREVIEW);
-        Timing.start(CONST.TIMING.OPEN_REPORT_FROM_PREVIEW);
         startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${iouReportID}`, {
             name: 'MoneyRequestReportPreviewContent',
             op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
         });
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(iouReportID, undefined, undefined, Navigation.getActiveRoute()));
-    }, [iouReportID]);
+        // Small screens navigate to full report view since super wide RHP
+        // is not available on narrow layouts and would break the navigation logic.
+        if (isSmallScreenWidth) {
+            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(iouReportID, undefined, undefined, Navigation.getActiveRoute()));
+        } else {
+            Navigation.navigate(ROUTES.EXPENSE_REPORT_RHP.getRoute({reportID: iouReportID, backTo: Navigation.getActiveRoute()}));
+        }
+    }, [iouReportID, isSmallScreenWidth]);
 
+    const isDEWPolicy = hasDynamicExternalWorkflow(policy);
+    const isDEWSubmitPending = hasPendingDEWSubmit(iouReportMetadata, isDEWPolicy);
     const reportPreviewAction = useMemo(() => {
-        return getReportPreviewAction(
-            violations,
-            isIouReportArchived || isChatReportArchived,
-            currentUserDetails.email ?? '',
-            currentUserDetails.accountID,
-            iouReport,
+        return getReportPreviewAction({
+            isReportArchived: isIouReportArchived || isChatReportArchived,
+            currentUserAccountID: currentUserDetails.accountID,
+            currentUserLogin: currentUserDetails.login ?? '',
+            report: iouReport,
             policy,
             transactions,
+            bankAccountList,
             invoiceReceiverPolicy,
             isPaidAnimationRunning,
             isApprovedAnimationRunning,
             isSubmittingAnimationRunning,
-            areStrictPolicyRulesEnabled,
-        );
+            isDEWSubmitPending,
+            violationsData: transactionViolations,
+            reportMetadata: iouReportMetadata,
+        });
     }, [
-        isPaidAnimationRunning,
-        isApprovedAnimationRunning,
-        isSubmittingAnimationRunning,
-        violations,
+        bankAccountList,
+        isIouReportArchived,
+        isChatReportArchived,
+        currentUserDetails.accountID,
+        currentUserDetails.login,
         iouReport,
         policy,
         transactions,
-        isIouReportArchived,
         invoiceReceiverPolicy,
-        isChatReportArchived,
-        areStrictPolicyRulesEnabled,
-        currentUserDetails.email,
-        currentUserDetails.accountID,
+        isPaidAnimationRunning,
+        isApprovedAnimationRunning,
+        isSubmittingAnimationRunning,
+        transactionViolations,
+        isDEWSubmitPending,
+        iouReportMetadata,
     ]);
 
     const addExpenseDropdownOptions = useMemo(
-        () => getAddExpenseDropdownOptions(iouReport?.reportID, policy, chatReportID, iouReport?.parentReportID, lastDistanceExpenseType),
-        [chatReportID, iouReport?.parentReportID, iouReport?.reportID, policy, lastDistanceExpenseType],
+        () =>
+            getAddExpenseDropdownOptions(
+                translate,
+                expensifyIcons,
+                iouReport?.reportID,
+                policy,
+                userBillingGraceEndPeriodCollection,
+                chatReportID,
+                iouReport?.parentReportID,
+                lastDistanceExpenseType,
+            ),
+        [translate, expensifyIcons, iouReport?.reportID, iouReport?.parentReportID, policy, userBillingGraceEndPeriodCollection, chatReportID, lastDistanceExpenseType],
     );
 
     const isReportDeleted = action?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
@@ -535,22 +623,44 @@ function MoneyRequestReportPreviewContent({
                 success={isWaitingForSubmissionFromCurrentUser}
                 text={translate('common.submit')}
                 onPress={() => {
-                    if (hasDynamicExternalWorkflow(policy)) {
-                        setIsDEWModalVisible(true);
+                    if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
+                        showDEWModal();
                         return;
                     }
                     startSubmittingAnimation();
-                    submitReport(iouReport, policy, currentUserDetails.accountID, currentUserDetails.email ?? '', hasViolations, isASAPSubmitBetaEnabled);
+                    submitReport(iouReport, policy, currentUserAccountID, currentUserEmail, hasViolations, isASAPSubmitBetaEnabled, iouReportNextStep);
                 }}
                 isSubmittingAnimationRunning={isSubmittingAnimationRunning}
                 onAnimationFinish={stopAnimation}
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.SUBMIT_BUTTON}
             />
         ),
         [CONST.REPORT.REPORT_PREVIEW_ACTIONS.APPROVE]: (
-            <Button
-                text={translate('iou.approve')}
-                success
-                onPress={() => confirmApproval()}
+            <ExpenseHeaderApprovalButton
+                isAnyTransactionOnHold={hasHeldExpensesReportUtils(iouReport?.reportID)}
+                isDelegateAccessRestricted={isDelegateAccessRestricted}
+                hasOnlyHeldExpenses={hasOnlyHeldExpenses}
+                hasValidNonHeldAmount={hasValidNonHeldAmount}
+                nonHeldAmount={nonHeldAmount}
+                fullAmount={fullAmount}
+                onApprove={(isFullApproval) => {
+                    if (hasDynamicExternalWorkflow(policy) && !isDEWBetaEnabled) {
+                        showDEWModal();
+                        return;
+                    }
+                    startApprovedAnimation();
+                    approveMoneyRequest(
+                        iouReport,
+                        activePolicy,
+                        currentUserDetails.accountID,
+                        currentUserDetails.email ?? '',
+                        hasViolations,
+                        isASAPSubmitBetaEnabled,
+                        iouReportNextStep,
+                        betas,
+                        isFullApproval,
+                    );
+                }}
             />
         ),
         [CONST.REPORT.REPORT_PREVIEW_ACTIONS.PAY]: (
@@ -582,6 +692,7 @@ function MoneyRequestReportPreviewContent({
                 }}
                 isDisabled={isOffline && !canAllowSettlement}
                 isLoading={!isOffline && !canAllowSettlement}
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.PAY_BUTTON}
             />
         ),
         [CONST.REPORT.REPORT_PREVIEW_ACTIONS.EXPORT_TO_ACCOUNTING]: connectedIntegration ? (
@@ -594,23 +705,16 @@ function MoneyRequestReportPreviewContent({
                     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
                 }}
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.EXPORT_BUTTON}
             />
         ) : null,
-        [CONST.REPORT.REPORT_PREVIEW_ACTIONS.REVIEW]: (
-            <Button
-                icon={Expensicons.DotIndicator}
-                iconFill={theme.danger}
-                iconHoverFill={theme.danger}
-                text={translate('common.review')}
-                onPress={() => openReportFromPreview()}
-            />
-        ),
         [CONST.REPORT.REPORT_PREVIEW_ACTIONS.VIEW]: (
             <Button
                 text={translate('common.view')}
                 onPress={() => {
                     openReportFromPreview();
                 }}
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.VIEW_BUTTON}
             />
         ),
         [CONST.REPORT.REPORT_PREVIEW_ACTIONS.ADD_EXPENSE]: (
@@ -624,6 +728,7 @@ function MoneyRequestReportPreviewContent({
                     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
                 }}
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.ADD_EXPENSE_BUTTON}
             />
         ),
     };
@@ -639,6 +744,12 @@ function MoneyRequestReportPreviewContent({
         prevCarouselTransactionLength.current = carouselTransactions.length;
         carouselRef.current?.scrollToEnd();
     }, [carouselTransactions.length]);
+
+    const renderSeparator = () => <View style={styles.transactionsCarouselGap} />;
+
+    const getItemType = (_item: Transaction, index: number) => {
+        return index === MAX_PREVIEWS_NUMBER ? ITEM_LAYOUT_TYPE.SHOW_MORE : ITEM_LAYOUT_TYPE.PREVIEW;
+    };
 
     return (
         <View
@@ -678,6 +789,7 @@ function MoneyRequestReportPreviewContent({
                         role={getButtonRole(true)}
                         isNested
                         accessibilityLabel={translate('iou.viewDetails')}
+                        sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.CARD}
                     >
                         <View
                             style={[
@@ -698,16 +810,19 @@ function MoneyRequestReportPreviewContent({
                                                             style={[styles.headerText]}
                                                             testID="MoneyRequestReportPreview-reportName"
                                                         >
-                                                            {reportPreviewName}
+                                                            {/* This will be fixed as follow up https://github.com/Expensify/App/pull/75357 */}
+                                                            {/* eslint-disable-next-line @typescript-eslint/no-deprecated */}
+                                                            {getReportName(iouReport, undefined, undefined, undefined, undefined, reportAttributes) || action.childReportName}
                                                         </Text>
                                                     </Animated.View>
                                                 </View>
                                                 {showStatusAndSkeleton && shouldShowSkeleton ? (
                                                     <MoneyReportHeaderStatusBarSkeleton />
                                                 ) : (
-                                                    !shouldShowEmptyPlaceholder && (
+                                                    (!shouldShowEmptyPlaceholder || shouldShowAccessPlaceHolder) &&
+                                                    (shouldShowReportStatus || !shouldShowAccessPlaceHolder) && (
                                                         <View style={[styles.flexRow, styles.justifyContentStart, styles.alignItemsCenter]}>
-                                                            {!!reportStatus && (
+                                                            {shouldShowReportStatus && (
                                                                 <View
                                                                     style={[
                                                                         styles.reportStatusContainer,
@@ -720,24 +835,25 @@ function MoneyRequestReportPreviewContent({
                                                                     <Text style={[styles.reportStatusText, {color: reportStatusColorStyle?.textColor}]}>{reportStatus}</Text>
                                                                 </View>
                                                             )}
-                                                            <Text style={[styles.textLabelSupporting, styles.lh16]}>{expenseCount}</Text>
+                                                            {!shouldShowAccessPlaceHolder && <Text style={[styles.textLabelSupporting, styles.lh16]}>{expenseCount}</Text>}
                                                         </View>
                                                     )
                                                 )}
                                             </View>
-                                            {!shouldUseNarrowLayout && transactions.length > 2 && reportPreviewStyles.expenseCountVisible && (
+                                            {!shouldUseNarrowLayout && !shouldShowAccessPlaceHolder && transactions.length > 2 && reportPreviewStyles.expenseCountVisible && (
                                                 <View style={[styles.flexRow, styles.alignItemsCenter]}>
                                                     <PressableWithFeedback
                                                         accessibilityRole="button"
                                                         accessible
-                                                        accessibilityLabel="button"
+                                                        accessibilityLabel={translate('common.previous')}
                                                         style={[styles.reportPreviewArrowButton, {backgroundColor: theme.buttonDefaultBG}]}
                                                         onPress={() => handleChange(currentIndex - 1)}
                                                         disabled={optimisticIndex !== undefined ? optimisticIndex === 0 : currentIndex === 0 && currentVisibleItems.at(0) === 0}
                                                         disabledStyle={[styles.cursorDefault, styles.buttonOpacityDisabled]}
+                                                        sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.CAROUSEL_PREVIOUS}
                                                     >
                                                         <Icon
-                                                            src={Expensicons.BackArrow}
+                                                            src={expensifyIcons.BackArrow}
                                                             small
                                                             fill={theme.icon}
                                                             isButtonIcon
@@ -746,7 +862,7 @@ function MoneyRequestReportPreviewContent({
                                                     <PressableWithFeedback
                                                         accessibilityRole="button"
                                                         accessible
-                                                        accessibilityLabel="button"
+                                                        accessibilityLabel={translate('common.next')}
                                                         style={[styles.reportPreviewArrowButton, {backgroundColor: theme.buttonDefaultBG}]}
                                                         onPress={() => handleChange(currentIndex + 1)}
                                                         disabled={
@@ -755,9 +871,10 @@ function MoneyRequestReportPreviewContent({
                                                                 : currentVisibleItems.at(-1) === carouselTransactions.length - 1
                                                         }
                                                         disabledStyle={[styles.cursorDefault, styles.buttonOpacityDisabled]}
+                                                        sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.CAROUSEL_NEXT}
                                                     >
                                                         <Icon
-                                                            src={Expensicons.ArrowRight}
+                                                            src={expensifyIcons.ArrowRight}
                                                             small
                                                             fill={theme.icon}
                                                             isButtonIcon
@@ -783,35 +900,39 @@ function MoneyRequestReportPreviewContent({
                                             <ActivityIndicator size={40} />
                                         </View>
                                     ) : (
-                                        <View style={[styles.flex1, styles.flexColumn, styles.overflowVisible]}>
-                                            <FlatList
+                                        <View style={[styles.flex1, styles.flexColumn, styles.overflowVisible, styles.minHeight42]}>
+                                            <FlashList
                                                 snapToAlignment="start"
                                                 decelerationRate="fast"
-                                                snapToInterval={reportPreviewStyles.transactionPreviewCarouselStyle.width + styles.gap2.gap}
+                                                snapToOffsets={snapOffsets}
                                                 horizontal
+                                                ItemSeparatorComponent={renderSeparator}
                                                 data={carouselTransactions}
                                                 ref={carouselRef}
                                                 nestedScrollEnabled
                                                 bounces={false}
                                                 keyExtractor={(item) => `${item.transactionID}_${reportPreviewStyles.transactionPreviewCarouselStyle.width}`}
-                                                contentContainerStyle={[styles.gap2]}
+                                                contentContainerStyle={styles.ph2}
                                                 style={reportPreviewStyles.flatListStyle}
                                                 showsHorizontalScrollIndicator={false}
-                                                renderItem={renderFlatlistItem}
+                                                renderItem={renderItem}
+                                                getItemType={getItemType}
                                                 onViewableItemsChanged={onViewableItemsChanged}
                                                 onEndReached={adjustScroll}
                                                 viewabilityConfig={viewabilityConfig}
                                                 ListFooterComponent={<View style={styles.pl2} />}
                                                 ListHeaderComponent={<View style={styles.pr2} />}
+                                                drawDistance={1000}
                                             />
-                                            {shouldShowEmptyPlaceholder && <EmptyMoneyRequestReportPreview />}
+                                            {shouldShowAccessPlaceHolder && <AccessMoneyRequestReportPreviewPlaceHolder />}
+                                            {shouldShowEmptyPlaceholder && !shouldShowAccessPlaceHolder && <EmptyMoneyRequestReportPreview />}
                                         </View>
                                     )}
                                     <View style={[styles.expenseAndReportPreviewTextContainer]}>
                                         <View style={[totalAmountStyle, styles.justifyContentBetween, styles.gap4, StyleUtils.getMinimumHeight(variables.h28)]}>
                                             {/* height is needed to avoid flickering on animation */}
                                             <View style={[buttonMaxWidth, styles.flex1, {height: variables.h40}]}>{reportPreviewActions[reportPreviewAction]}</View>
-                                            {transactions.length > 1 && (
+                                            {transactions.length > 1 && !shouldShowAccessPlaceHolder && (
                                                 <View style={[styles.flexRow, shouldUseNarrowLayout ? styles.justifyContentBetween : styles.gap2, styles.alignItemsCenter]}>
                                                     <Text
                                                         style={[styles.textLabelSupporting]}
@@ -829,43 +950,23 @@ function MoneyRequestReportPreviewContent({
                         </View>
                     </PressableWithoutFeedback>
                 </View>
-                {isHoldMenuVisible && !!iouReport && !!requestType && (
-                    <ProcessMoneyReportHoldMenu
-                        nonHeldAmount={!hasOnlyHeldExpenses && hasValidNonHeldAmount ? nonHeldAmount : undefined}
-                        requestType={requestType}
-                        fullAmount={fullAmount}
-                        onClose={() => setIsHoldMenuVisible(false)}
-                        isVisible={isHoldMenuVisible}
-                        paymentType={paymentType}
-                        chatReport={chatReport}
-                        moneyRequestReport={iouReport}
-                        transactionCount={numberOfRequests}
-                        startAnimation={() => {
-                            if (requestType === CONST.IOU.REPORT_ACTION_TYPE.APPROVE) {
-                                startApprovedAnimation();
-                            } else {
-                                startAnimation();
-                            }
-                        }}
-                    />
-                )}
             </OfflineWithFeedback>
-            <ConfirmModal
-                title={translate('customApprovalWorkflow.title')}
-                isVisible={isDEWModalVisible}
-                onConfirm={() => {
-                    setIsDEWModalVisible(false);
-                    openOldDotLink(CONST.OLDDOT_URLS.INBOX);
-                }}
-                onCancel={() => setIsDEWModalVisible(false)}
-                prompt={translate('customApprovalWorkflow.description')}
-                confirmText={translate('customApprovalWorkflow.goToExpensifyClassic')}
-                shouldShowCancelButton={false}
-            />
+            {isHoldMenuVisible && !!iouReport && (
+                <ProcessMoneyReportHoldMenu
+                    nonHeldAmount={!hasOnlyHeldExpenses && hasValidNonHeldAmount ? nonHeldAmount : undefined}
+                    fullAmount={fullAmount}
+                    onClose={() => setIsHoldMenuVisible(false)}
+                    isVisible={isHoldMenuVisible}
+                    paymentType={paymentType}
+                    chatReport={chatReport}
+                    moneyRequestReport={iouReport}
+                    transactionCount={numberOfRequests}
+                    startAnimation={startAnimation}
+                    hasNonHeldExpenses={!hasOnlyHeldExpenses}
+                />
+            )}
         </View>
     );
 }
-
-MoneyRequestReportPreviewContent.displayName = 'MoneyRequestReportPreviewContent';
 
 export default MoneyRequestReportPreviewContent;

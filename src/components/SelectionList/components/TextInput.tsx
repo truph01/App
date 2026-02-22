@@ -65,10 +65,10 @@ function TextInput({
 }: TextInputProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const {label, value, onChangeText, errorText, headerMessage, hint, disableAutoFocus, placeholder, maxLength, inputMode, ref: optionsRef} = options ?? {};
+    const {label, value, onChangeText, errorText, headerMessage, hint, disableAutoFocus, placeholder, maxLength, inputMode, ref: optionsRef, style, disableAutoCorrect} = options ?? {};
     const resultsFound = headerMessage !== translate('common.noResultsFound');
     const noData = dataLength === 0 && !showLoadingPlaceholder;
-    const shouldShowHeaderMessage = !!headerMessage && (!isLoadingNewOptions || resultsFound || !noData);
+    const shouldShowHeaderMessage = !!headerMessage && (!isLoadingNewOptions || resultsFound || noData);
 
     const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const mergedRef = mergeRefs<BaseTextInputRef>(ref, optionsRef);
@@ -112,7 +112,7 @@ function TextInput({
 
     return (
         <>
-            <View style={[styles.ph5, styles.pb3]}>
+            <View style={[styles.ph5, styles.pb3, style?.containerStyle]}>
                 <BaseTextInput
                     ref={mergedRef}
                     onKeyPress={onKeyPress}
@@ -135,17 +135,16 @@ function TextInput({
                     testID="selection-list-text-input"
                     errorText={errorText}
                     shouldInterceptSwipe={false}
+                    autoCorrect={!disableAutoCorrect}
                 />
             </View>
             {shouldShowHeaderMessage && (
-                <View style={[styles.ph5, styles.pb5]}>
+                <View style={[styles.ph5, styles.pb5, style?.headerMessageStyle]}>
                     <Text style={[styles.textLabel, styles.colorMuted, styles.minHeight5]}>{headerMessage}</Text>
                 </View>
             )}
         </>
     );
 }
-
-TextInput.displayName = 'TextInput';
 
 export default TextInput;

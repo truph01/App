@@ -16,7 +16,7 @@ import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolations from '@hooks/useTransactionViolations';
 import {openReport} from '@libs/actions/Report';
-import {dismissDuplicateTransactionViolation} from '@libs/actions/Transaction';
+import {dismissDuplicateTransactionViolation, getDuplicateTransactionDetails} from '@libs/actions/Transaction';
 import {setActiveTransactionIDs} from '@libs/actions/TransactionThreadNavigation';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -59,18 +59,14 @@ function TransactionDuplicateReview() {
         [transactionIDs],
     );
 
-    const [transactions] = useOnyx(
-        ONYXKEYS.COLLECTION.TRANSACTION,
-        {
-            selector: transactionsSelector,
-            canBeMissing: true,
-        },
-        [transactionIDs],
-    );
+    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {canBeMissing: true});
+    const transactions = useMemo(() => transactionsSelector(allTransactions ?? {}), [allTransactions, transactionsSelector]);
+
     const originalTransactionIDsListRef = useRef<string[] | null>(null);
     const [transactionIDsList = getEmptyArray<string>()] = useOnyx(ONYXKEYS.TRANSACTION_THREAD_NAVIGATION_TRANSACTION_IDS, {
         canBeMissing: true,
     });
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
 
     const onPreviewPressed = useCallback(
         (reportID: string) => {
@@ -97,7 +93,14 @@ function TransactionDuplicateReview() {
     );
 
     const keepAll = () => {
-        dismissDuplicateTransactionViolation(transactionIDs, currentPersonalDetails, expenseReport, policy, isASAPSubmitBetaEnabled);
+        dismissDuplicateTransactionViolation({
+            transactionIDs,
+            dismissedPersonalDetails: currentPersonalDetails,
+            expenseReport,
+            policy,
+            isASAPSubmitBetaEnabled,
+            allTransactions,
+        });
         Navigation.goBack();
     };
 
@@ -107,8 +110,15 @@ function TransactionDuplicateReview() {
         if (!route.params.threadReportID || report?.reportID) {
             return;
         }
-        openReport(route.params.threadReportID);
-    }, [report?.reportID, route.params.threadReportID]);
+        openReport(route.params.threadReportID, introSelected);
+    }, [report?.reportID, route.params.threadReportID, introSelected]);
+
+    useEffect(() => {
+        if (!transactionID) {
+            return;
+        }
+        getDuplicateTransactionDetails(transactionID);
+    }, [transactionID]);
 
     const isLoadingPage = (!report?.reportID && reportMetadata?.isLoadingInitialReportActions !== false) || !reportAction?.reportActionID;
 
@@ -117,7 +127,7 @@ function TransactionDuplicateReview() {
 
     if (isLoadingPage) {
         return (
-            <ScreenWrapper testID={TransactionDuplicateReview.displayName}>
+            <ScreenWrapper testID="TransactionDuplicateReview">
                 <View style={[styles.flex1]}>
                     <View style={[styles.appContentHeader, styles.borderBottom]}>
                         <ReportHeaderSkeletonView onBackButtonPress={() => {}} />
@@ -129,7 +139,7 @@ function TransactionDuplicateReview() {
     }
 
     return (
-        <ScreenWrapper testID={TransactionDuplicateReview.displayName}>
+        <ScreenWrapper testID="TransactionDuplicateReview">
             <FullPageNotFoundView shouldShow={shouldShowNotFound}>
                 <HeaderWithBackButton
                     title={translate('iou.reviewDuplicates')}
@@ -151,5 +161,4 @@ function TransactionDuplicateReview() {
     );
 }
 
-TransactionDuplicateReview.displayName = 'TransactionDuplicateReview';
 export default TransactionDuplicateReview;

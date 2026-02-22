@@ -23,6 +23,7 @@ import {importPlaidAccounts, openPlaidCompanyCardLogin} from '@userActions/Plaid
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
+import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWithDomainID; policyID?: string; onExit?: () => void}) {
@@ -84,7 +85,7 @@ function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWi
         }
 
         // disabling this rule, as we want this to run only on the first render
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -116,8 +117,8 @@ function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWi
                         // on success we need to move to bank connection screen with token, bank name = plaid
                         Log.info('[PlaidLink] Success!');
 
-                        const plaidConnectedFeed =
-                            (metadata?.institution as PlaidLinkOnSuccessMetadata['institution'])?.institution_id ?? (metadata?.institution as LinkSuccessMetadata['institution'])?.id;
+                        const plaidConnectedFeed = ((metadata?.institution as PlaidLinkOnSuccessMetadata['institution'])?.institution_id ??
+                            (metadata?.institution as LinkSuccessMetadata['institution'])?.id) as CardFeedWithNumber;
                         const plaidConnectedFeedName =
                             (metadata?.institution as PlaidLinkOnSuccessMetadata['institution'])?.name ?? (metadata?.institution as LinkSuccessMetadata['institution'])?.name;
 
@@ -137,7 +138,7 @@ function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWi
                                 // eslint-disable-next-line @typescript-eslint/no-deprecated
                                 InteractionManager.runAfterInteractions(() => {
                                     setAssignCardStepAndData({
-                                        data: {
+                                        cardToAssign: {
                                             plaidAccessToken: publicToken,
                                             institutionId: plaidConnectedFeed,
                                             plaidConnectedFeedName,
@@ -149,7 +150,7 @@ function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWi
                                 return;
                             }
                             setAssignCardStepAndData({
-                                data: {
+                                cardToAssign: {
                                     plaidAccessToken: publicToken,
                                     institutionId: plaidConnectedFeed,
                                     plaidConnectedFeedName,
@@ -203,7 +204,7 @@ function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWi
 
     return (
         <ScreenWrapper
-            testID={PlaidConnectionStep.displayName}
+            testID="PlaidConnectionStep"
             enableEdgeToEdgeBottomSafeAreaPadding
             shouldEnablePickerAvoiding={false}
             shouldEnableMaxHeight
@@ -220,7 +221,5 @@ function PlaidConnectionStep({feed, policyID, onExit}: {feed?: CompanyCardFeedWi
         </ScreenWrapper>
     );
 }
-
-PlaidConnectionStep.displayName = 'PlaidConnectionStep';
 
 export default PlaidConnectionStep;

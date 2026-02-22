@@ -7,4 +7,10 @@ const isUserValidatedSelector = (account: OnyxEntry<Account>) => account?.valida
 
 const primaryLoginSelector = (account: OnyxEntry<Account>) => account?.primaryLogin;
 
-export {isActingAsDelegateSelector, isUserValidatedSelector, primaryLoginSelector};
+const delegatesSelector = (account: OnyxEntry<Account>) => account?.delegatedAccess?.delegates;
+
+const hasBiometricsRegisteredSelector = (data: OnyxEntry<Account>) => data?.multifactorAuthenticationPublicKeyIDs && data.multifactorAuthenticationPublicKeyIDs.length > 0;
+
+const isAccountLoadingSelector = (data: OnyxEntry<Account>) => !!data?.isLoading;
+
+export {isActingAsDelegateSelector, isUserValidatedSelector, primaryLoginSelector, delegatesSelector, hasBiometricsRegisteredSelector, isAccountLoadingSelector};

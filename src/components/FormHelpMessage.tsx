@@ -2,11 +2,12 @@ import isEmpty from 'lodash/isEmpty';
 import React, {useMemo} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Parser from '@libs/Parser';
+import CONST from '@src/CONST';
 import Icon from './Icon';
-import * as Expensicons from './Icon/Expensicons';
 import RenderHTML from './RenderHTML';
 import Text from './Text';
 
@@ -36,6 +37,7 @@ type FormHelpMessageProps = {
 function FormHelpMessage({message = '', children, isError = true, style, shouldShowRedDotIndicator = true, shouldRenderMessageAsHTML = false, isInfo = false}: FormHelpMessageProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
+    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Exclamation']);
 
     const HTMLMessage = useMemo(() => {
         if (typeof message !== 'string' || !shouldRenderMessageAsHTML) {
@@ -51,6 +53,8 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
         return `<muted-text-label>${replacedText}</muted-text-label>`;
     }, [isError, message, shouldRenderMessageAsHTML]);
 
+    const errorIconLabel = isError && shouldShowRedDotIndicator ? CONST.ACCESSIBILITY_LABELS.ERROR : undefined;
+
     if (isEmpty(message) && isEmpty(children)) {
         return null;
     }
@@ -58,14 +62,20 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt2, styles.mb1, style]}>
             {isError && shouldShowRedDotIndicator && (
-                <Icon
-                    src={Expensicons.DotIndicator}
-                    fill={theme.danger}
-                />
+                <View
+                    accessible
+                    role={CONST.ROLE.IMG}
+                    accessibilityLabel={errorIconLabel}
+                >
+                    <Icon
+                        src={icons.DotIndicator}
+                        fill={theme.danger}
+                    />
+                </View>
             )}
             {isInfo && (
                 <Icon
-                    src={Expensicons.Exclamation}
+                    src={icons.Exclamation}
                     fill={theme.icon}
                     small
                     additionalStyles={[styles.mr1]}
@@ -77,7 +87,5 @@ function FormHelpMessage({message = '', children, isError = true, style, shouldS
         </View>
     );
 }
-
-FormHelpMessage.displayName = 'FormHelpMessage';
 
 export default FormHelpMessage;

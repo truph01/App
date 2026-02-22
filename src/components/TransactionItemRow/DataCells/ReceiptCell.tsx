@@ -2,10 +2,10 @@ import {Str} from 'expensify-common';
 import React from 'react';
 import {View} from 'react-native';
 import type {ViewStyle} from 'react-native';
-import {Receipt} from '@components/Icon/Expensicons';
 import ReceiptImage from '@components/ReceiptImage';
 import ReceiptPreview from '@components/TransactionItemRow/ReceiptPreview';
 import useHover from '@hooks/useHover';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -20,6 +20,7 @@ function ReceiptCell({transactionItem, isSelected, style}: {transactionItem: Tra
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
+    const icons = useMemoizedLazyExpensifyIcons(['Receipt']);
     const backgroundStyles = isSelected ? StyleUtils.getBackgroundColorStyle(theme.buttonHoveredBG) : StyleUtils.getBackgroundColorStyle(theme.border);
     const {hovered, bind} = useHover();
     const isMissingReceiptSource = !hasReceiptSource(transactionItem);
@@ -31,7 +32,11 @@ function ReceiptCell({transactionItem, isSelected, style}: {transactionItem: Tra
     if (source && typeof source === 'string') {
         const filename = getFileName(source);
         const receiptURIs = getThumbnailAndImageURIs(transactionItem, null, filename);
-        source = tryResolveUrlFromApiRoot(receiptURIs.thumbnail ?? receiptURIs.image ?? '');
+
+        // Use 320px thumbnail for the receipt cell image
+        source = tryResolveUrlFromApiRoot(receiptURIs.thumbnail320 ?? receiptURIs.thumbnail ?? receiptURIs.image ?? '');
+
+        // Use full size receipt image for the hovered preview
         const previewImageURI = Str.isImage(filename) ? receiptURIs.image : receiptURIs.thumbnail;
         previewSource = tryResolveUrlFromApiRoot(previewImageURI ?? '');
     }
@@ -55,7 +60,7 @@ function ReceiptCell({transactionItem, isSelected, style}: {transactionItem: Tra
                 shouldUseThumbnailImage
                 thumbnailContainerStyles={styles.bgTransparent}
                 isAuthTokenRequired
-                fallbackIcon={Receipt}
+                fallbackIcon={icons.Receipt}
                 fallbackIconSize={20}
                 fallbackIconColor={theme.icon}
                 fallbackIconBackground={isSelected ? theme.buttonHoveredBG : undefined}
@@ -76,5 +81,4 @@ function ReceiptCell({transactionItem, isSelected, style}: {transactionItem: Tra
     );
 }
 
-ReceiptCell.displayName = 'ReceiptCell';
 export default ReceiptCell;

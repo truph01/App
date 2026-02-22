@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   prep:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       APP_VERSION: ${{ steps.getAppVersion.outputs.VERSION }}
       TAG: ${{ steps.getTagName.outputs.TAG }}
@@ -84,7 +84,7 @@ jobs:
   android:
     name: Build and deploy Android HybridApp
     needs: prep
-    runs-on: ubuntu-latest-xl
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     env:
       SHOULD_BUILD_APP: ${{ github.ref == 'refs/heads/staging' || fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     steps:
@@ -109,12 +109,16 @@ jobs:
             cd Mobile-Expensify
             npm run grunt:build:shared
 
+      - name: Get Java version
+        id: get-java-version
+        uses: ./.github/actions/composite/getJavaVersion
+
       - name: Setup Java
         # v4
         uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12
         with:
-          distribution: 'oracle'
-          java-version: '17'
+          distribution: oracle
+          java-version: ${{ steps.get-java-version.outputs.version }}
 
       - name: Setup Ruby
         # v1.229.0
@@ -125,15 +129,16 @@ jobs:
       - name: Install New Expensify Gems
         run: bundle install
 
-      - name: Install 1Password CLI
-        # v1
-        uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
+      - name: Setup 1Password CLI and certificates
+        uses: Expensify/GitHub-Actions/setup-certificate-1p@main
+        with:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          SHOULD_LOAD_SSL_CERTIFICATES: 'false'
 
       - name: Load files from 1Password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
-          op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
           op read "op://${{ vars.OP_VAULT }}/upload-key.keystore/upload-key.keystore" --force --out-file ./upload-key.keystore
           op read "op://${{ vars.OP_VAULT }}/android-fastlane-json-key.json/android-fastlane-json-key.json" --force --out-file ./android-fastlane-json-key.json
 
@@ -167,6 +172,7 @@ jobs:
           ANDROID_BUILD_TYPE: ${{ vars.ANDROID_BUILD_TYPE }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ github.token }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Upload Android app to Google Play
         if: ${{ fromJSON(env.SHOULD_BUILD_APP) }}
@@ -291,7 +297,7 @@ jobs:
     needs: prep
     runs-on: macos-15-xlarge
     env:
-      DEVELOPER_DIR: /Applications/Xcode_26.0.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
       SHOULD_BUILD_APP: ${{ github.ref == 'refs/heads/staging' || fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     steps:
       - name: Checkout
@@ -320,12 +326,12 @@ jobs:
         run: bundle install
 
       - name: Cache Pod dependencies
-        # v4
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57
+        # v5.0.1
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb
         id: pods-cache
         with:
           path: Mobile-Expensify/iOS/Pods
-          key: ${{ runner.os }}-pods-cache-${{ hashFiles('Mobile-Expensify/iOS/Podfile.lock', 'firebase.json') }}
+          key: ${{ runner.os }}-pods-cache-${{ hashFiles('Mobile-Expensify/iOS/Podfile.lock') }}
 
       - name: Compare Podfile.lock and Manifest.lock
         id: compare-podfile-and-manifest
@@ -339,15 +345,16 @@ jobs:
           max_attempts: 5
           command: npm run pod-install
 
-      - name: Install 1Password CLI
-        # v1
-        uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
+      - name: Setup 1Password CLI and certificates
+        uses: Expensify/GitHub-Actions/setup-certificate-1p@main
+        with:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          SHOULD_LOAD_SSL_CERTIFICATES: 'false'
 
       - name: Load files from 1Password
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
         run: |
-          op read "op://${{ vars.OP_VAULT }}/firebase.json/firebase.json" --force --out-file ./firebase.json
           op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore/${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_STORE_PROVISIONING_PROFILE_FILE }}
           op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Share_Extension/${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_FILE }}
           op read "op://${{ vars.OP_VAULT }}/OldApp_AppStore_Notification_Service/${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}" --force --out-file ./${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}
@@ -382,6 +389,7 @@ jobs:
           APPLE_SHARE_PROVISIONING_PROFILE_NAME: ${{ vars.APPLE_SHARE_PROVISIONING_PROFILE_NAME }}
           APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE: ${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_FILE }}
           APPLE_NOTIFICATION_PROVISIONING_PROFILE_NAME: ${{ vars.APPLE_NOTIFICATION_PROVISIONING_PROFILE_NAME }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Upload release build to TestFlight
         if: ${{ fromJSON(env.SHOULD_BUILD_APP) }}
@@ -392,10 +400,6 @@ jobs:
           APPLE_DEMO_EMAIL: ${{ secrets.APPLE_DEMO_EMAIL }}
           APPLE_DEMO_PASSWORD: ${{ secrets.APPLE_DEMO_PASSWORD }}
           APPLE_ID: ${{ vars.APPLE_ID }}
-
-      - name: Upload DSYMs to Firebase for HybridApp
-        if: ${{ fromJSON(env.IS_APP_REPO) && fromJSON(env.SHOULD_BUILD_APP) }}
-        run: bundle exec fastlane ios upload_dsyms_hybrid
 
       - name: Submit previous production build to 100%
         if: ${{ github.ref == 'refs/heads/production' }}
@@ -461,7 +465,7 @@ jobs:
   web:
     name: Build and deploy Web
     needs: prep
-    runs-on: ubuntu-latest-xl
+    runs-on: blacksmith-16vcpu-ubuntu-2404
     steps:
       - name: Checkout
         # v4
@@ -488,6 +492,8 @@ jobs:
           else
             npm run build-staging
           fi
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Build storybook docs
         continue-on-error: true
@@ -547,7 +553,7 @@ jobs:
 
   postSlackMessageOnFailure:
     name: Post a Slack message when any platform fails to build or deploy
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ failure() }}
     needs: [android, ios, web]
     steps:
@@ -561,7 +567,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
   checkDeploymentSuccess:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       IS_AT_LEAST_ONE_PLATFORM_DEPLOYED: ${{ steps.checkDeploymentSuccessOnAtLeastOnePlatform.outputs.IS_AT_LEAST_ONE_PLATFORM_DEPLOYED }}
       IS_ALL_PLATFORMS_DEPLOYED: ${{ steps.checkDeploymentSuccessOnAllPlatforms.outputs.IS_ALL_PLATFORMS_DEPLOYED }}
@@ -594,7 +600,7 @@ jobs:
           echo "IS_ALL_PLATFORMS_DEPLOYED is $isAllPlatformsDeployed"
 
   createRelease:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ always() && fromJSON(needs.checkDeploymentSuccess.outputs.IS_AT_LEAST_ONE_PLATFORM_DEPLOYED) }}
     needs: [prep, checkDeploymentSuccess]
     steps:
@@ -615,19 +621,38 @@ jobs:
             echo "Release ${{ needs.prep.outputs.TAG }} already exists, skipping creating it again."
           else
             echo "Release ${{ needs.prep.outputs.TAG }} does not exist, creating it now."
-            gh release create "${{ needs.prep.outputs.TAG }}" ${{ github.ref == 'refs/heads/staging' && '--prerelease' || '' }} \
-              --repo "${{ github.repository }}" \
-              --title "${{ needs.prep.outputs.TAG }}" \
-              ${{ github.ref == 'refs/heads/production' && format('--notes-start-tag {0}', steps.get_last_prod_version.outputs.LAST_PROD_VERSION) || '' }} \
-              --generate-notes \
-              --verify-tag \
-              --target "${{ github.ref }}"
+            readonly CREATE_MAX_RETRIES=5
+            for ((i = 0; i <= CREATE_MAX_RETRIES; i++)); do
+              if gh release create "${{ needs.prep.outputs.TAG }}" ${{ github.ref == 'refs/heads/staging' && '--prerelease' || '' }} \
+                --repo "${{ github.repository }}" \
+                --title "${{ needs.prep.outputs.TAG }}" \
+                ${{ github.ref == 'refs/heads/production' && format('--notes-start-tag {0}', steps.get_last_prod_version.outputs.LAST_PROD_VERSION) || '' }} \
+                --generate-notes \
+                --verify-tag \
+                --target "${{ github.ref }}"; then
+                break
+              fi
+              if [[ $i -lt $CREATE_MAX_RETRIES ]]; then
+                echo "Failed to create release. Retrying in 3 seconds... ($((CREATE_MAX_RETRIES - i)) attempts left)"
+                sleep 3
+              else
+                echo "Failed to create release after $((CREATE_MAX_RETRIES + 1)) attempts"
+                exit 1
+              fi
+            done
 
-            RETRIES=0
-            readonly MAX_RETRIES=10
-            until [[ $(gh release view "${{ needs.prep.outputs.TAG }}" --repo "${{ github.repository }}") || $RETRIES -ge $MAX_RETRIES ]]; do
-              echo "Release ${{ needs.prep.outputs.TAG }} not yet visible after creation. Retrying... ($((MAX_RETRIES - RETRIES++)) attempts left)"
-              sleep 1
+            readonly VIEW_MAX_RETRIES=10
+            for ((i = 0; i <= VIEW_MAX_RETRIES; i++)); do
+              if gh release view "${{ needs.prep.outputs.TAG }}" --repo "${{ github.repository }}" &> /dev/null; then
+                break
+              fi
+              if [[ $i -lt $VIEW_MAX_RETRIES ]]; then
+                echo "Release ${{ needs.prep.outputs.TAG }} not yet visible after creation. Retrying... ($((VIEW_MAX_RETRIES - i)) attempts left)"
+                sleep 1
+              else
+                echo "Release ${{ needs.prep.outputs.TAG }} never became visible after $((VIEW_MAX_RETRIES + 1)) checks"
+                exit 1
+              fi
             done
           fi
         env:
@@ -703,7 +728,7 @@ jobs:
 
   postSlackMessageOnSuccess:
     name: Post a Slack message when all platforms deploy successfully
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     if: ${{ always() && fromJSON(needs.checkDeploymentSuccess.outputs.IS_ALL_PLATFORMS_DEPLOYED) }}
     needs: [prep, android, ios, web, checkDeploymentSuccess, createRelease]
     steps:

@@ -1,10 +1,9 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Keyboard, LogBox, View} from 'react-native';
+import {Keyboard, LogBox, StyleSheet, View} from 'react-native';
 import type {LayoutChangeEvent} from 'react-native';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import type {GooglePlaceData, GooglePlaceDetail} from 'react-native-google-places-autocomplete';
 import ActivityIndicator from '@components/ActivityIndicator';
-import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import LocationErrorMessage from '@components/LocationErrorMessage';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
@@ -73,11 +72,13 @@ function AddressSearch({
         lat: 'addressLat',
         lng: 'addressLng',
     },
+    autoComplete = 'off',
     resultTypes = 'address',
     shouldSaveDraft = false,
     value,
     locationBias,
     caretHidden,
+    forwardedFSClass,
     ref,
 }: AddressSearchProps) {
     const theme = useTheme();
@@ -286,10 +287,6 @@ function AddressSearch({
                 setIsFetchingCurrentLocation(false);
                 setLocationErrorCode(errorData?.code ?? null);
             },
-            {
-                maximumAge: 0, // No cache, always get fresh location info
-                timeout: 30000,
-            },
         );
     };
 
@@ -363,6 +360,7 @@ function AddressSearch({
                 <View
                     style={styles.w100}
                     ref={containerRef}
+                    fsClass={forwardedFSClass}
                 >
                     <GooglePlacesAutocomplete
                         disableScroll
@@ -422,7 +420,7 @@ function AddressSearch({
                                 }
                                 onBlur?.();
                             },
-                            autoComplete: 'off',
+                            autoComplete,
                             onInputChange: (text: string) => {
                                 setSearchValue(text);
                                 setIsTyping(true);
@@ -480,12 +478,14 @@ function AddressSearch({
                     </GooglePlacesAutocomplete>
                 </View>
             </ScrollView>
-            {isFetchingCurrentLocation && <FullScreenLoadingIndicator />}
+            {isFetchingCurrentLocation && (
+                <View style={[StyleSheet.absoluteFillObject, styles.fullScreenLoading, styles.w100]}>
+                    <ActivityIndicator size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE} />
+                </View>
+            )}
         </>
     );
 }
-
-AddressSearch.displayName = 'AddressSearchWithRef';
 
 export default AddressSearch;
 

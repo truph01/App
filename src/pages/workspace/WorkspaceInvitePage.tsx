@@ -1,11 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import type {SectionListData} from 'react-native';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
-import SelectionList from '@components/SelectionListWithSections';
-import InviteMemberListItem from '@components/SelectionListWithSections/InviteMemberListItem';
-import type {Section} from '@components/SelectionListWithSections/types';
+import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
+import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
+import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
 import withNavigationTransitionEnd from '@components/withNavigationTransitionEnd';
 import type {WithNavigationTransitionEndProps} from '@components/withNavigationTransitionEnd';
 import useLocalize from '@hooks/useLocalize';
@@ -22,9 +21,9 @@ import HttpUtils from '@libs/HttpUtils';
 import {appendCountryCode} from '@libs/LoginUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
-import {getHeaderMessage} from '@libs/OptionsListUtils';
+import {getHeaderMessage, getParticipantsOption} from '@libs/OptionsListUtils';
 import {addSMSDomainIfPhoneNumber, parsePhoneNumber} from '@libs/PhoneNumber';
-import {getIneligibleInvitees, getMemberAccountIDsForWorkspace, goBackFromInvalidPolicy} from '@libs/PolicyUtils';
+import {getIneligibleInvitees, getMemberAccountIDsForWorkspace, getSoftExclusionsForGuideAndAccountManager, goBackFromInvalidPolicy} from '@libs/PolicyUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import CONST from '@src/CONST';
@@ -38,8 +37,6 @@ import AccessOrNotFoundWrapper from './AccessOrNotFoundWrapper';
 import withPolicyAndFullscreenLoading from './withPolicyAndFullscreenLoading';
 import type {WithPolicyAndFullscreenLoadingProps} from './withPolicyAndFullscreenLoading';
 
-type Sections = SectionListData<OptionData, Section<OptionData>>;
-
 type WorkspaceInvitePageProps = WithPolicyAndFullscreenLoadingProps &
     WithNavigationTransitionEndProps &
     PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.INVITE>;
@@ -50,6 +47,9 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
     const [didScreenTransitionEnd, setDidScreenTransitionEnd] = useState(false);
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {initWithStoredValues: false, canBeMissing: true});
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE, {canBeMissing: false});
+    const [invitedEmailsToAccountIDsDraft] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_INVITE_MEMBERS_DRAFT}${route.params.policyID}`, {canBeMissing: true});
+    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: false});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
     const openWorkspaceInvitePage = () => {
         const policyMemberEmailsToAccountIDs = getMemberAccountIDsForWorkspace(policy?.employeeList);
         policyOpenWorkspaceInvitePage(route.params.policyID, Object.keys(policyMemberEmailsToAccountIDs));
@@ -58,7 +58,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
     useEffect(() => {
         clearErrors(route.params.policyID);
         openWorkspaceInvitePage();
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps -- policyID changes remount the component
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- policyID changes remount the component
     }, []);
 
     useNetwork({onReconnect: openWorkspaceInvitePage});
@@ -74,18 +74,53 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         );
     }, [policy?.employeeList]);
 
-    const {searchTerm, setSearchTerm, availableOptions, selectedOptions, selectedOptionsForDisplay, toggleSelection, areOptionsInitialized, onListEndReached, searchOptions} =
-        useSearchSelector({
-            selectionMode: CONST.SEARCH_SELECTOR.SELECTION_MODE_MULTI,
-            searchContext: CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_MEMBER_INVITE,
-            includeUserToInvite: true,
-            excludeLogins: excludedUsers,
-            includeRecentReports: false,
-            shouldInitialize: didScreenTransitionEnd,
-        });
+    const softExclusions = useMemo(
+        () => getSoftExclusionsForGuideAndAccountManager(policy, account?.accountManagerAccountID, personalDetails),
+        [policy, account?.accountManagerAccountID, personalDetails],
+    );
 
-    const sections: Sections[] = useMemo(() => {
-        const sectionsArr: Sections[] = [];
+    const initiallySelectedOptions = useMemo(() => {
+        if (!invitedEmailsToAccountIDsDraft || !personalDetails) {
+            return [];
+        }
+
+        // Convert InvitedEmailsToAccountIDs to OptionData[]
+        // The draft stores login -> accountID mappings
+        // Use getParticipantsOption to enrich with full user details
+        return Object.entries(invitedEmailsToAccountIDsDraft).map(([login, accountID]) => {
+            const participant = {
+                login,
+                accountID,
+                selected: true,
+            };
+            return getParticipantsOption(participant, personalDetails) as OptionData;
+        });
+    }, [invitedEmailsToAccountIDsDraft, personalDetails]);
+
+    const {
+        searchTerm,
+        debouncedSearchTerm,
+        setSearchTerm,
+        availableOptions,
+        selectedOptions,
+        selectedOptionsForDisplay,
+        toggleSelection,
+        areOptionsInitialized,
+        onListEndReached,
+        searchOptions,
+    } = useSearchSelector({
+        selectionMode: CONST.SEARCH_SELECTOR.SELECTION_MODE_MULTI,
+        searchContext: CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_MEMBER_INVITE,
+        includeUserToInvite: true,
+        excludeLogins: excludedUsers,
+        excludeFromSuggestionsOnly: softExclusions,
+        includeRecentReports: false,
+        shouldInitialize: didScreenTransitionEnd,
+        initialSelected: initiallySelectedOptions,
+    });
+
+    const sections: Array<Section<OptionData>> = useMemo(() => {
+        const sectionsArr = [];
 
         if (!areOptionsInitialized) {
             return [];
@@ -96,6 +131,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             sectionsArr.push({
                 title: undefined,
                 data: selectedOptionsForDisplay,
+                sectionIndex: 0,
             });
         }
 
@@ -104,6 +140,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             sectionsArr.push({
                 title: translate('common.contacts'),
                 data: availableOptions.personalDetails,
+                sectionIndex: 1,
             });
         }
 
@@ -112,11 +149,12 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             sectionsArr.push({
                 title: undefined,
                 data: [availableOptions.userToInvite],
+                sectionIndex: 2,
             });
         }
 
         return sectionsArr;
-    }, [areOptionsInitialized, selectedOptionsForDisplay, availableOptions.personalDetails.length, availableOptions.userToInvite, translate]);
+    }, [areOptionsInitialized, selectedOptionsForDisplay, availableOptions.personalDetails, availableOptions.userToInvite, translate]);
 
     const handleToggleSelection = useCallback(
         (option: OptionData) => {
@@ -158,7 +196,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
     );
 
     const headerMessage = useMemo(() => {
-        const searchValue = searchTerm.trim().toLowerCase();
+        const searchValue = debouncedSearchTerm.trim().toLowerCase();
         if (!availableOptions.userToInvite && CONST.EXPENSIFY_EMAILS_OBJECT[searchValue]) {
             return translate('messages.errorMessageInvalidEmail');
         }
@@ -170,7 +208,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         }
         return getHeaderMessage(searchOptions.personalDetails.length + selectedOptions.length !== 0, !!searchOptions.userToInvite, searchValue, countryCode, false);
     }, [
-        searchTerm,
+        debouncedSearchTerm,
         availableOptions.userToInvite,
         excludedUsers,
         countryCode,
@@ -197,8 +235,18 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
     );
 
     useEffect(() => {
-        searchInServer(searchTerm);
-    }, [searchTerm]);
+        searchInServer(debouncedSearchTerm);
+    }, [debouncedSearchTerm]);
+
+    const textInputOptions = useMemo(
+        () => ({
+            label: translate('selectionList.nameEmailOrPhoneNumber'),
+            value: searchTerm,
+            onChangeText: setSearchTerm,
+            headerMessage,
+        }),
+        [searchTerm, setSearchTerm, headerMessage, translate],
+    );
 
     return (
         <AccessOrNotFoundWrapper
@@ -209,7 +257,7 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             <ScreenWrapper
                 shouldEnableMaxHeight
                 shouldUseCachedViewportHeight
-                testID={WorkspaceInvitePage.displayName}
+                testID="WorkspaceInvitePage"
                 enableEdgeToEdgeBottomSafeAreaPadding
                 onEntryTransitionEnd={() => setDidScreenTransitionEnd(true)}
             >
@@ -221,19 +269,16 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
                         Navigation.goBack(route.params.backTo);
                     }}
                 />
-                <SelectionList
+                <SelectionListWithSections
                     canSelectMultiple
                     sections={sections}
                     ListItem={InviteMemberListItem}
-                    textInputLabel={translate('selectionList.nameEmailOrPhoneNumber')}
-                    textInputValue={searchTerm}
-                    onChangeText={(value) => {
-                        setSearchTerm(value);
-                    }}
-                    headerMessage={headerMessage}
                     onSelectRow={handleToggleSelection}
-                    onConfirm={inviteUser}
-                    showScrollIndicator
+                    shouldShowTextInput
+                    textInputOptions={textInputOptions}
+                    confirmButtonOptions={{
+                        onConfirm: inviteUser,
+                    }}
                     showLoadingPlaceholder={!areOptionsInitialized || !didScreenTransitionEnd}
                     shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                     footerContent={footerContent}
@@ -245,7 +290,5 @@ function WorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
         </AccessOrNotFoundWrapper>
     );
 }
-
-WorkspaceInvitePage.displayName = 'WorkspaceInvitePage';
 
 export default withNavigationTransitionEnd(withPolicyAndFullscreenLoading(WorkspaceInvitePage));

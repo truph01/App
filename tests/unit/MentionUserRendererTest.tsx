@@ -2,13 +2,19 @@
 import {fireEvent, render, screen} from '@testing-library/react-native';
 import React from 'react';
 import type {ComponentType, ReactNode} from 'react';
+import Onyx from 'react-native-onyx';
 import type {TText} from 'react-native-render-html';
 import MentionUserRenderer from '@components/HTMLEngineProvider/HTMLRenderers/MentionUserRenderer';
+import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import {ShowContextMenuContext} from '@components/ShowContextMenuContext';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import Navigation from '@libs/Navigation/Navigation';
+import CONST from '@src/CONST';
+import IntlStore from '@src/languages/IntlStore';
+import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {PersonalDetails} from '@src/types/onyx';
+import {translateLocal} from '../utils/TestHelper';
 
 // Mock Navigation to avoid actual navigation calls
 jest.mock('@libs/Navigation/Navigation', () => ({
@@ -88,20 +94,22 @@ jest.mock('@libs/Log', () => ({
 
 function withProvider(children: ReactNode) {
     return (
-        <ShowContextMenuContext.Provider
-            value={{
-                onShowContextMenu: (fn: () => void) => fn(),
-                anchor: null,
-                report: undefined,
-                isReportArchived: false,
-                action: undefined,
-                checkIfContextMenuActive: () => false,
-                isDisabled: true,
-                shouldDisplayContextMenu: false,
-            }}
-        >
-            {children}
-        </ShowContextMenuContext.Provider>
+        <OnyxListItemProvider>
+            <ShowContextMenuContext.Provider
+                value={{
+                    onShowContextMenu: (fn: () => void) => fn(),
+                    anchor: null,
+                    report: undefined,
+                    isReportArchived: false,
+                    action: undefined,
+                    checkIfContextMenuActive: () => false,
+                    isDisabled: true,
+                    shouldDisplayContextMenu: false,
+                }}
+            >
+                {children}
+            </ShowContextMenuContext.Provider>
+        </OnyxListItemProvider>
     );
 }
 
@@ -129,8 +137,15 @@ function buildTNode({accountID, data}: {accountID?: string; data?: string}): TTe
 }
 
 describe('MentionUserRenderer', () => {
+    beforeAll(() => {
+        Onyx.init({
+            keys: ONYXKEYS,
+        });
+    });
+
     beforeEach(() => {
         mockPersonalDetails = {};
+        IntlStore.load(CONST.LOCALES.DEFAULT);
         jest.clearAllMocks();
     });
 
@@ -183,6 +198,13 @@ describe('MentionUserRenderer', () => {
         const tnode = buildTNode({});
         const {toJSON} = renderMention({tnode});
         expect(toJSON()).toBeNull();
+    });
+
+    test('renders @Hidden when accountID not found in personal details and mention data not provided', () => {
+        mockPersonalDetails = {};
+        const tnode = buildTNode({accountID: '203'});
+        renderMention({tnode});
+        expect(screen.getByText(`@${translateLocal('common.hidden')}`)).toBeVisible();
     });
 
     test('navigates to user profile when pressed with accountID', () => {

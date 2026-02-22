@@ -1,21 +1,18 @@
 import {differenceInDays} from 'date-fns';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import ConfirmModal from '@components/ConfirmModal';
 import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-// eslint-disable-next-line no-restricted-imports
-import * as Expensicons from '@components/Icon/Expensicons';
 import ImportOnyxState from '@components/ImportOnyxState';
-import LottieAnimations from '@components/LottieAnimations';
 import MenuItemList from '@components/MenuItemList';
 import {useOptionsList} from '@components/OptionListContextProvider';
-import RecordTroubleshootDataToolMenu from '@components/RecordTroubleshootDataToolMenu';
 import RenderHTML from '@components/RenderHTML';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import {useSearchContext} from '@components/Search/SearchContext';
 import Section from '@components/Section';
+import SentryDebugToolMenu from '@components/SentryDebugToolMenu';
 import Switch from '@components/Switch';
 import TestToolMenu from '@components/TestToolMenu';
 import TestToolRow from '@components/TestToolRow';
@@ -25,38 +22,42 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import {resetExitSurveyForm} from '@libs/actions/ExitSurvey';
 import {closeReactNativeApp} from '@libs/actions/HybridApp';
 import {openOldDotLink} from '@libs/actions/Link';
 import {setShouldMaskOnyxState} from '@libs/actions/MaskOnyx';
+import {openTroubleshootSettingsPage} from '@libs/actions/User';
 import ExportOnyxState from '@libs/ExportOnyxState';
 import Navigation from '@libs/Navigation/Navigation';
+import colors from '@styles/theme/colors';
 import {clearOnyxAndResetApp} from '@userActions/App';
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import {isTrackingSelector} from '@src/selectors/GPSDraftDetails';
 import type IconAsset from '@src/types/utils/IconAsset';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
+import useTroubleshootSectionIllustration from './useTroubleshootSectionIllustration';
 
-type BaseMenuItem = {
+type BaseMenuItem = WithSentryLabel & {
     translationKey: TranslationPaths;
     icon: IconAsset;
     action: () => void | Promise<void>;
 };
 
 function TroubleshootPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'ExpensifyLogoNew'] as const);
-    const illustrations = useMemoizedLazyIllustrations(['Lightbulb'] as const);
+    const icons = useMemoizedLazyExpensifyIcons(['Download', 'ExpensifyLogoNew', 'RotateLeft']);
+    const illustrations = useMemoizedLazyIllustrations(['Lightbulb']);
+    const troubleshootIllustration = useTroubleshootSectionIllustration();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const {isProduction} = useEnvironment();
+    const {isProduction, isDevelopment} = useEnvironment();
     const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
-    const waitForNavigate = useWaitForNavigation();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [isLoading, setIsLoading] = useState(false);
-    const [shouldStoreLogs] = useOnyx(ONYXKEYS.SHOULD_STORE_LOGS, {canBeMissing: true});
+    const [isTrackingGPS = false] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {canBeMissing: true, selector: isTrackingSelector});
     const [shouldMaskOnyxState = true] = useOnyx(ONYXKEYS.SHOULD_MASK_ONYX_STATE, {canBeMissing: true});
     const {resetOptions} = useOptionsList({shouldInitialize: false});
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {canBeMissing: true});
@@ -71,12 +72,28 @@ function TroubleshootPage() {
 
     const surveyCompletedWithinLastMonth = useMemo(() => {
         const surveyThresholdInDays = 30;
-        if (!tryNewDot?.classicRedirect?.timestamp || !tryNewDot?.classicRedirect?.dismissed) {
+        const {dismissedReasons} = tryNewDot?.classicRedirect ?? {};
+        if (dismissedReasons?.length === 0) {
             return false;
         }
-        const daysSinceLastSurvey = differenceInDays(new Date(), new Date(tryNewDot.classicRedirect.timestamp));
+
+        let timestampToCheck;
+        if (dismissedReasons && dismissedReasons.length > 0) {
+            const latestReason = dismissedReasons.reduce((latest, current) => {
+                const currentDate = current.timestamp;
+                const latestDate = latest.timestamp;
+                return currentDate > latestDate ? current : latest;
+            });
+            timestampToCheck = latestReason.timestamp;
+        }
+
+        if (!timestampToCheck) {
+            return false;
+        }
+
+        const daysSinceLastSurvey = differenceInDays(new Date(), timestampToCheck);
         return daysSinceLastSurvey < surveyThresholdInDays;
-    }, [tryNewDot?.classicRedirect?.timestamp, tryNewDot?.classicRedirect?.dismissed]);
+    }, [tryNewDot?.classicRedirect]);
 
     const classicRedirectMenuItem: BaseMenuItem | null = useMemo(() => {
         if (tryNewDot?.classicRedirect?.isLockedToNewDot) {
@@ -86,9 +103,10 @@ function TroubleshootPage() {
         return {
             translationKey: 'exitSurvey.goToExpensifyClassic',
             icon: icons.ExpensifyLogoNew,
+            sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TROUBLESHOOT.GO_TO_CLASSIC,
             ...(CONFIG.IS_HYBRID_APP
                 ? {
-                      action: () => closeReactNativeApp({shouldSetNVP: true}),
+                      action: () => closeReactNativeApp({shouldSetNVP: true, isTrackingGPS}),
                   }
                 : {
                       action() {
@@ -107,31 +125,23 @@ function TroubleshootPage() {
                       },
                   }),
         };
-    }, [tryNewDot?.classicRedirect?.isLockedToNewDot, icons.ExpensifyLogoNew, surveyCompletedWithinLastMonth, shouldOpenSurveyReasonPage]);
+    }, [tryNewDot?.classicRedirect?.isLockedToNewDot, icons.ExpensifyLogoNew, surveyCompletedWithinLastMonth, shouldOpenSurveyReasonPage, isTrackingGPS]);
 
     const menuItems = useMemo(() => {
-        const debugConsoleItem: BaseMenuItem = {
-            translationKey: 'initialSettingsPage.troubleshoot.viewConsole',
-            icon: Expensicons.Bug,
-            action: waitForNavigate(() => Navigation.navigate(ROUTES.SETTINGS_CONSOLE.getRoute(ROUTES.SETTINGS_TROUBLESHOOT))),
-        };
-
         const baseMenuItems: BaseMenuItem[] = [
             {
                 translationKey: 'initialSettingsPage.troubleshoot.clearCacheAndRestart',
-                icon: Expensicons.RotateLeft,
+                icon: icons.RotateLeft,
+                sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TROUBLESHOOT.CLEAR_CACHE,
                 action: () => setIsConfirmationModalVisible(true),
             },
             {
                 translationKey: 'initialSettingsPage.troubleshoot.exportOnyxState',
                 icon: icons.Download,
+                sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TROUBLESHOOT.EXPORT_ONYX,
                 action: exportOnyxState,
             },
         ];
-
-        if (shouldStoreLogs) {
-            baseMenuItems.push(debugConsoleItem);
-        }
 
         const finalMenuItems = classicRedirectMenuItem ? [classicRedirectMenuItem, ...baseMenuItems] : baseMenuItems;
 
@@ -142,21 +152,26 @@ function TroubleshootPage() {
                 icon: item.icon,
                 onPress: item.action,
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
+                sentryLabel: item.sentryLabel,
             }))
             .reverse();
-    }, [icons.Download, waitForNavigate, exportOnyxState, shouldStoreLogs, translate, styles.sectionMenuItemTopDescription, classicRedirectMenuItem]);
+    }, [icons.RotateLeft, icons.Download, exportOnyxState, classicRedirectMenuItem, translate, styles.sectionMenuItemTopDescription]);
+
+    useEffect(() => {
+        openTroubleshootSettingsPage();
+    }, []);
 
     return (
         <ScreenWrapper
             shouldEnablePickerAvoiding={false}
             shouldShowOfflineIndicatorInWideScreen
-            testID={TroubleshootPage.displayName}
+            testID="TroubleshootPage"
         >
             <HeaderWithBackButton
                 title={translate('initialSettingsPage.aboutPage.troubleshoot')}
                 shouldShowBackButton={shouldUseNarrowLayout}
                 shouldDisplaySearchRouter
-                onBackButtonPress={Navigation.popToSidebar}
+                onBackButtonPress={Navigation.goBack}
                 icon={illustrations.Lightbulb}
                 shouldUseHeadlineHeader
             />
@@ -168,17 +183,19 @@ function TroubleshootPage() {
                         subtitle={translate('initialSettingsPage.troubleshoot.description')}
                         isCentralPane
                         subtitleMuted
-                        illustration={LottieAnimations.Desk}
+                        illustrationContainerStyle={styles.cardSectionIllustrationContainer}
+                        illustrationBackgroundColor={colors.blue700}
                         titleStyles={styles.accountSettingsSectionTitle}
                         renderSubtitle={() => (
                             <View style={[styles.renderHTML, styles.flexRow, styles.alignItemsCenter, styles.w100, styles.mt2]}>
                                 <RenderHTML html={translate('initialSettingsPage.troubleshoot.description')} />
                             </View>
                         )}
+                        // eslint-disable-next-line react/jsx-props-no-spreading
+                        {...troubleshootIllustration}
                     >
                         <View style={[styles.flex1, styles.mt5]}>
                             <View>
-                                <RecordTroubleshootDataToolMenu />
                                 <TestToolRow title={translate('initialSettingsPage.troubleshoot.maskExportOnyxStateData')}>
                                     <Switch
                                         accessibilityLabel={translate('initialSettingsPage.troubleshoot.maskExportOnyxStateData')}
@@ -197,6 +214,12 @@ function TroubleshootPage() {
                                     <TestToolMenu />
                                 </View>
                             )}
+                            {isDevelopment && (
+                                <View style={[styles.mt6]}>
+                                    <SentryDebugToolMenu />
+                                </View>
+                            )}
+
                             <ConfirmModal
                                 title={translate('common.areYouSure')}
                                 isVisible={isConfirmationModalVisible}
@@ -218,7 +241,5 @@ function TroubleshootPage() {
         </ScreenWrapper>
     );
 }
-
-TroubleshootPage.displayName = 'TroubleshootPage';
 
 export default TroubleshootPage;

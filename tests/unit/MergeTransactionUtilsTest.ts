@@ -1,5 +1,7 @@
 import Onyx from 'react-native-onyx';
+import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import {
+    areTransactionsEligibleForMerge,
     buildMergedTransactionData,
     getDisplayValue,
     getMergeableDataAndConflictFields,
@@ -8,13 +10,12 @@ import {
     getMergeFieldUpdatedValues,
     getMergeFieldValue,
     getRateFromMerchant,
-    getReceiptFileName,
-    getSourceTransactionFromMergeTransaction,
     isEmptyMergeValue,
     selectTargetAndSourceTransactionsForMerge,
     shouldNavigateToReceiptReview,
 } from '@libs/MergeTransactionUtils';
 import {getTransactionDetails} from '@libs/ReportUtils';
+import {calculateTaxAmount} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import createRandomMergeTransaction from '../utils/collections/mergeTransaction';
@@ -32,63 +33,17 @@ describe('MergeTransactionUtils', () => {
         return waitForBatchedUpdates();
     });
 
-    describe('getSourceTransactionFromMergeTransaction', () => {
-        it('should return undefined when mergeTransaction is undefined', () => {
-            // Given a null merge transaction
-            const mergeTransaction = undefined;
-
-            // When we try to get the source transaction
-            const result = getSourceTransactionFromMergeTransaction(mergeTransaction);
-
-            // Then it should return undefined because the merge transaction is undefined
-            expect(result).toBeUndefined();
-        });
-
-        it('should return undefined when sourceTransactionID is not found in eligibleTransactions', () => {
-            // Given a merge transaction with a sourceTransactionID that doesn't match any eligible transactions
-            const transaction1 = createRandomTransaction(0);
-            const transaction2 = createRandomTransaction(1);
-            const mergeTransaction = {
-                ...createRandomMergeTransaction(0),
-                sourceTransactionID: 'nonexistent',
-                eligibleTransactions: [transaction1, transaction2],
-            };
-
-            // When we try to get the source transaction
-            const result = getSourceTransactionFromMergeTransaction(mergeTransaction);
-
-            // Then it should return undefined because the source transaction ID doesn't match any eligible transaction
-            expect(result).toBeUndefined();
-        });
-
-        it('should return the correct transaction when sourceTransactionID matches an eligible transaction', () => {
-            // Given a merge transaction with a sourceTransactionID that matches one of the eligible transactions
-            const sourceTransaction = {...createRandomTransaction(0), receipt: undefined};
-            const otherTransaction = createRandomTransaction(1);
-            sourceTransaction.transactionID = 'source123';
-
-            const mergeTransaction = {
-                ...createRandomMergeTransaction(0),
-                sourceTransactionID: 'source123',
-                eligibleTransactions: [sourceTransaction, otherTransaction],
-            };
-
-            // When we try to get the source transaction
-            const result = getSourceTransactionFromMergeTransaction(mergeTransaction);
-
-            // Then it should return the matching transaction from the eligible transactions
-            expect(result).toBe(sourceTransaction);
-            expect(result?.transactionID).toBe('source123');
-        });
-    });
-
     describe('shouldNavigateToReceiptReview', () => {
         it('should return false when any transaction has no receipt', () => {
             // Given transactions where one has no receipt
-            const transaction1 = createRandomTransaction(0);
-            const transaction2 = createRandomTransaction(1);
-            transaction1.receipt = {receiptID: 123};
-            transaction2.receipt = undefined;
+            const transaction1 = {
+                ...createRandomTransaction(0),
+                receipt: {receiptID: 123},
+            };
+            const transaction2 = {
+                ...createRandomTransaction(1),
+                receipt: undefined,
+            };
             const transactions = [transaction1, transaction2];
 
             // When we check if should navigate to receipt review
@@ -100,10 +55,14 @@ describe('MergeTransactionUtils', () => {
 
         it('should return true when all transactions have receipts with receiptIDs', () => {
             // Given transactions where all have receipts with receiptIDs
-            const transaction1 = createRandomTransaction(0);
-            const transaction2 = createRandomTransaction(1);
-            transaction1.receipt = {receiptID: 123};
-            transaction2.receipt = {receiptID: 456};
+            const transaction1 = {
+                ...createRandomTransaction(0),
+                receipt: {receiptID: 123},
+            };
+            const transaction2 = {
+                ...createRandomTransaction(1),
+                receipt: {receiptID: 456},
+            };
             const transactions = [transaction1, transaction2];
 
             // When we check if should navigate to receipt review
@@ -115,11 +74,14 @@ describe('MergeTransactionUtils', () => {
 
         it('should return false when both transactions are distance requests', () => {
             // Given two distance request transactions (with or without receipts)
-            const distanceTransaction1 = createRandomDistanceRequestTransaction(0);
-            const distanceTransaction2 = createRandomDistanceRequestTransaction(1);
-
-            distanceTransaction1.receipt = {receiptID: 333};
-            distanceTransaction2.receipt = {receiptID: 444};
+            const distanceTransaction1 = {
+                ...createRandomDistanceRequestTransaction(0),
+                receipt: {receiptID: 333},
+            };
+            const distanceTransaction2 = {
+                ...createRandomDistanceRequestTransaction(1),
+                receipt: {receiptID: 444},
+            };
 
             const transactions = [distanceTransaction1, distanceTransaction2];
 
@@ -146,9 +108,11 @@ describe('MergeTransactionUtils', () => {
 
         it('should return merchant value from transaction', () => {
             // Given a transaction with a merchant value
-            const transaction = createRandomTransaction(0);
-            transaction.merchant = 'Test Merchant';
-            transaction.modifiedMerchant = 'Test Merchant';
+            const transaction = {
+                ...createRandomTransaction(0),
+                merchant: 'Test Merchant',
+                modifiedMerchant: 'Test Merchant',
+            };
 
             // When we get the merchant field value
             const result = getMergeFieldValue(getTransactionDetails(transaction), transaction, 'merchant');
@@ -159,8 +123,10 @@ describe('MergeTransactionUtils', () => {
 
         it('should return category value from transaction', () => {
             // Given a transaction with a category value
-            const transaction = createRandomTransaction(0);
-            transaction.category = 'Food';
+            const transaction = {
+                ...createRandomTransaction(0),
+                category: 'Food',
+            };
 
             // When we get the category field value
             const result = getMergeFieldValue(getTransactionDetails(transaction), transaction, 'category');
@@ -171,9 +137,11 @@ describe('MergeTransactionUtils', () => {
 
         it('should handle amount field for unreported expense correctly', () => {
             // Given a transaction that is an unreported expense (no reportID or unreported reportID)
-            const transaction = createRandomTransaction(0);
-            transaction.amount = -1000; // Stored as negative
-            transaction.reportID = CONST.REPORT.UNREPORTED_REPORT_ID;
+            const transaction = {
+                ...createRandomTransaction(0),
+                amount: -1000, // Stored as negative
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
 
             // When we get the amount field value
             const result = getMergeFieldValue(getTransactionDetails(transaction), transaction, 'amount');
@@ -349,6 +317,7 @@ describe('MergeTransactionUtils', () => {
                 reimbursable: true,
                 billable: false,
                 managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
                 created: '2025-01-01T00:00:00.000Z',
             };
             const sourceTransaction = {
@@ -363,10 +332,11 @@ describe('MergeTransactionUtils', () => {
                 reimbursable: false, // Different
                 billable: undefined, // Undefined value
                 managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
                 created: '2025-01-02T00:00:00.000Z',
             };
 
-            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
             // Only the different values are in the conflict fields
             expect(result.conflictFields).toEqual(['amount', 'created', 'description', 'reimbursable', 'reportID']);
@@ -393,7 +363,7 @@ describe('MergeTransactionUtils', () => {
                 currency: CONST.CURRENCY.USD,
             };
 
-            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
             expect(result.conflictFields).not.toContain('amount');
             expect(result.mergeableData).toMatchObject({
@@ -413,9 +383,10 @@ describe('MergeTransactionUtils', () => {
                 amount: 1000,
                 currency: CONST.CURRENCY.AUD,
                 managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
             };
 
-            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
             expect(result.conflictFields).not.toContain('amount');
             expect(result.mergeableData).toMatchObject({
@@ -442,7 +413,7 @@ describe('MergeTransactionUtils', () => {
                 },
             };
 
-            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
             expect(result.conflictFields).not.toContain('amount');
             expect(result.mergeableData).toMatchObject({
@@ -456,6 +427,7 @@ describe('MergeTransactionUtils', () => {
                 ...createRandomTransaction(1),
                 amount: 1000,
                 currency: CONST.CURRENCY.USD,
+                reportID: CONST.REPORT.SPLIT_REPORT_ID,
                 comment: {
                     ...createRandomTransaction(1).comment,
                     originalTransactionID: 'original-split-transaction-123',
@@ -468,7 +440,7 @@ describe('MergeTransactionUtils', () => {
                 currency: CONST.CURRENCY.AUD,
             };
 
-            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
             expect(result.conflictFields).not.toContain('amount');
             expect(result.mergeableData).toMatchObject({
@@ -480,20 +452,28 @@ describe('MergeTransactionUtils', () => {
 
         describe('merge attendees', () => {
             it('should automatically merge attendees when they are the same', () => {
-                const targetTransaction = createRandomTransaction(0);
-                targetTransaction.comment = targetTransaction.comment ?? {};
-                targetTransaction.comment.attendees = [
-                    {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-                    {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
-                ];
-                const sourceTransaction = createRandomTransaction(1);
-                sourceTransaction.comment = sourceTransaction.comment ?? {};
-                sourceTransaction.comment.attendees = [
-                    {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-                    {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
-                ];
+                const targetTransaction = {
+                    ...createRandomTransaction(0),
+                    comment: {
+                        ...createRandomTransaction(0).comment,
+                        attendees: [
+                            {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                            {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
+                        ],
+                    },
+                };
+                const sourceTransaction = {
+                    ...createRandomTransaction(1),
+                    comment: {
+                        ...createRandomTransaction(1).comment,
+                        attendees: [
+                            {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                            {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
+                        ],
+                    },
+                };
 
-                const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+                const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
                 expect(result.conflictFields).not.toContain('attendees');
                 expect(result.mergeableData).toMatchObject({
@@ -505,20 +485,28 @@ describe('MergeTransactionUtils', () => {
             });
 
             it('should automatically merge attendees when they are same but just order is different', () => {
-                const targetTransaction = createRandomTransaction(0);
-                targetTransaction.comment = targetTransaction.comment ?? {};
-                targetTransaction.comment.attendees = [
-                    {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-                    {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
-                ];
-                const sourceTransaction = createRandomTransaction(1);
-                sourceTransaction.comment = sourceTransaction.comment ?? {};
-                sourceTransaction.comment.attendees = [
-                    {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
-                    {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-                ];
+                const targetTransaction = {
+                    ...createRandomTransaction(0),
+                    comment: {
+                        ...createRandomTransaction(0).comment,
+                        attendees: [
+                            {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                            {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
+                        ],
+                    },
+                };
+                const sourceTransaction = {
+                    ...createRandomTransaction(1),
+                    comment: {
+                        ...createRandomTransaction(1).comment,
+                        attendees: [
+                            {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
+                            {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                        ],
+                    },
+                };
 
-                const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+                const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
                 expect(result.conflictFields).not.toContain('attendees');
                 expect(result.mergeableData).toMatchObject({
@@ -530,20 +518,28 @@ describe('MergeTransactionUtils', () => {
             });
 
             it('should conflict when attendees are different', () => {
-                const targetTransaction = createRandomTransaction(0);
-                targetTransaction.comment = targetTransaction.comment ?? {};
-                targetTransaction.comment.attendees = [
-                    {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-                    {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
-                ];
-                const sourceTransaction = createRandomTransaction(1);
-                sourceTransaction.comment = sourceTransaction.comment ?? {};
-                sourceTransaction.comment.attendees = [
-                    {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-                    {email: 'test3@example.com', displayName: 'Test User 3', avatarUrl: '', login: 'test3'},
-                ];
+                const targetTransaction = {
+                    ...createRandomTransaction(0),
+                    comment: {
+                        ...createRandomTransaction(0).comment,
+                        attendees: [
+                            {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                            {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
+                        ],
+                    },
+                };
+                const sourceTransaction = {
+                    ...createRandomTransaction(1),
+                    comment: {
+                        ...createRandomTransaction(1).comment,
+                        attendees: [
+                            {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                            {email: 'test3@example.com', displayName: 'Test User 3', avatarUrl: '', login: 'test3'},
+                        ],
+                    },
+                };
 
-                const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+                const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
                 expect(result.conflictFields).toContain('attendees');
             });
@@ -561,7 +557,7 @@ describe('MergeTransactionUtils', () => {
                 reportID: sharedReportID,
             };
 
-            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, undefined, mockLocaleCompare);
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare);
 
             expect(result.conflictFields).not.toContain('reportID');
             expect(result.mergeableData).toMatchObject({
@@ -603,6 +599,10 @@ describe('MergeTransactionUtils', () => {
                 reportName: 'Test Report',
                 waypoints: {waypoint0: {name: 'Selected waypoint'}},
                 customUnit: {name: CONST.CUSTOM_UNITS.NAME_DISTANCE, customUnitID: 'distance1', quantity: 100},
+                taxValue: '9%',
+                taxAmount: convertToBackendAmount(calculateTaxAmount('9%', 2000, getCurrencyDecimals(CONST.CURRENCY.USD))),
+                taxCode: 'id_TAX_RATE_1',
+                taxName: 'Tax Rate 1 (9%)',
             };
 
             const result = buildMergedTransactionData(targetTransaction, mergeTransaction);
@@ -625,12 +625,15 @@ describe('MergeTransactionUtils', () => {
                 },
                 reimbursable: false,
                 billable: true,
-                filename: 'merged.jpg',
                 receipt: {receiptID: 1235, source: 'merged.jpg', filename: 'merged.jpg'},
                 created: '2025-01-02T00:00:00.000Z',
                 modifiedCreated: '2025-01-02T00:00:00.000Z',
                 reportID: '1',
                 reportName: 'Test Report',
+                taxValue: '9%',
+                taxAmount: convertToBackendAmount(calculateTaxAmount('9%', 2000, getCurrencyDecimals(CONST.CURRENCY.USD))),
+                taxCode: 'id_TAX_RATE_1',
+                taxName: 'Tax Rate 1 (9%)',
             });
         });
     });
@@ -649,7 +652,8 @@ describe('MergeTransactionUtils', () => {
             const cashTransaction = {
                 ...createRandomTransaction(0),
                 transactionID: 'cash1',
-                managedCard: undefined,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
             };
             const cardTransaction = {
                 ...createRandomTransaction(1),
@@ -674,7 +678,8 @@ describe('MergeTransactionUtils', () => {
             const cashTransaction = {
                 ...createRandomTransaction(1),
                 transactionID: 'cash1',
-                managedCard: undefined,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
             };
 
             const result = selectTargetAndSourceTransactionsForMerge(cardTransaction, cashTransaction);
@@ -689,12 +694,14 @@ describe('MergeTransactionUtils', () => {
             const cashTransaction1 = {
                 ...createRandomTransaction(0),
                 transactionID: 'cash1',
-                managedCard: undefined,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
             };
             const cashTransaction2 = {
                 ...createRandomTransaction(1),
                 transactionID: 'cash2',
-                managedCard: undefined,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
             };
 
             const result = selectTargetAndSourceTransactionsForMerge(cashTransaction1, cashTransaction2);
@@ -709,7 +716,8 @@ describe('MergeTransactionUtils', () => {
             const cashTransaction = {
                 ...createRandomTransaction(1),
                 transactionID: 'cash1',
-                managedCard: undefined,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
             };
             const splitExpenseTransaction = {
                 ...createRandomTransaction(0),
@@ -754,30 +762,6 @@ describe('MergeTransactionUtils', () => {
         });
     });
 
-    describe('getReceiptFileName', () => {
-        it('should return filename from source when source is a string', () => {
-            const receipt = {
-                source: 'https://example.com/receipts/receipt123.jpg',
-                filename: 'backup-filename.jpg',
-            };
-
-            const result = getReceiptFileName(receipt);
-
-            expect(result).toBe('receipt123.jpg');
-        });
-
-        it('should return filename when source is not a string', () => {
-            const receipt = {
-                source: 12345,
-                filename: 'receipt-from-filename.jpg',
-            };
-
-            const result = getReceiptFileName(receipt);
-
-            expect(result).toBe('receipt-from-filename.jpg');
-        });
-    });
-
     describe('getDisplayValue', () => {
         it('should return empty string for empty values', () => {
             // Given a transaction with empty merchant
@@ -788,7 +772,7 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for merchant
-            const result = getDisplayValue('merchant', transaction, translateLocal);
+            const result = getDisplayValue('merchant', transaction, undefined, translateLocal);
 
             // Then it should return empty string
             expect(result).toBe('');
@@ -803,8 +787,8 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display values for boolean fields
-            const reimbursableResult = getDisplayValue('reimbursable', transaction, translateLocal);
-            const billableResult = getDisplayValue('billable', transaction, translateLocal);
+            const reimbursableResult = getDisplayValue('reimbursable', transaction, undefined, translateLocal);
+            const billableResult = getDisplayValue('billable', transaction, undefined, translateLocal);
 
             // Then it should return translated Yes/No values
             expect(reimbursableResult).toBe('common.yes');
@@ -820,7 +804,7 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for amount
-            const result = getDisplayValue('amount', transaction, translateLocal);
+            const result = getDisplayValue('amount', transaction, undefined, translateLocal);
 
             // Then it should return formatted currency string
             expect(result).toBe('$10.00');
@@ -836,7 +820,7 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for description
-            const result = getDisplayValue('description', transaction, translateLocal);
+            const result = getDisplayValue('description', transaction, undefined, translateLocal);
 
             // Then it should return cleaned text without HTML and with spaces instead of line breaks
             expect(result).toBe('This is a test description with line breaks and more text');
@@ -850,20 +834,24 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for tag
-            const result = getDisplayValue('tag', transaction, translateLocal);
+            const result = getDisplayValue('tag', transaction, undefined, translateLocal);
 
             // Then it should return sanitized tag names separated by commas
             expect(result).toBe('Department, Engineering, Frontend');
         });
 
         it('should return correct value for attendees field', () => {
-            const transaction = createRandomTransaction(0);
-            transaction.comment = transaction.comment ?? {};
-            transaction.comment.attendees = [
-                {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
-                {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
-            ];
-            const result = getDisplayValue('attendees', transaction, translateLocal);
+            const transaction = {
+                ...createRandomTransaction(0),
+                comment: {
+                    ...createRandomTransaction(0).comment,
+                    attendees: [
+                        {email: 'test2@example.com', displayName: 'Test User 2', avatarUrl: '', login: 'test2'},
+                        {email: 'test1@example.com', displayName: 'Test User 1', avatarUrl: '', login: 'test1'},
+                    ],
+                },
+            };
+            const result = getDisplayValue('attendees', transaction, undefined, translateLocal);
 
             expect(result).toBe('Test User 2, Test User 1');
         });
@@ -878,8 +866,8 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display values for string fields
-            const merchantResult = getDisplayValue('merchant', transaction, translateLocal);
-            const categoryResult = getDisplayValue('category', transaction, translateLocal);
+            const merchantResult = getDisplayValue('merchant', transaction, undefined, translateLocal);
+            const categoryResult = getDisplayValue('category', transaction, undefined, translateLocal);
 
             // Then it should return the string values
             expect(merchantResult).toBe('Starbucks Coffee');
@@ -894,7 +882,7 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for reportID
-            const result = getDisplayValue('reportID', transaction, translateLocal);
+            const result = getDisplayValue('reportID', transaction, undefined, translateLocal);
 
             // Then it should return translated "None"
             expect(result).toBe('common.none');
@@ -909,7 +897,7 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for reportID
-            const result = getDisplayValue('reportID', transaction, translateLocal);
+            const result = getDisplayValue('reportID', transaction, undefined, translateLocal);
 
             // Then it should return the reportName
             expect(result).toBe('Test Report Name');
@@ -935,7 +923,7 @@ describe('MergeTransactionUtils', () => {
             };
 
             // When we get display value for reportID
-            const result = getDisplayValue('reportID', transaction, translateLocal);
+            const result = getDisplayValue('reportID', transaction, undefined, translateLocal);
 
             // Then it should return the report's name from Onyx
             expect(result).toBe(report.reportName);
@@ -945,11 +933,13 @@ describe('MergeTransactionUtils', () => {
     describe('getMergeFieldUpdatedValues', () => {
         it('should return updated values with the field value for non-special fields', () => {
             // Given a transaction and a basic field like merchant
-            const transaction = createRandomTransaction(0);
+            const transaction = {
+                ...createRandomTransaction(0),
+            };
             const fieldValue = 'New Merchant Name';
 
             // When we get updated values for merchant field
-            const result = getMergeFieldUpdatedValues(transaction, 'merchant', fieldValue);
+            const result = getMergeFieldUpdatedValues({transaction, field: 'merchant', fieldValue, mergeTransaction: undefined});
 
             // Then it should return an object with the field value
             expect(result).toEqual({
@@ -966,7 +956,7 @@ describe('MergeTransactionUtils', () => {
             const fieldValue = 2500;
 
             // When we get updated values for amount field
-            const result = getMergeFieldUpdatedValues(transaction, 'amount', fieldValue);
+            const result = getMergeFieldUpdatedValues({transaction, field: 'amount', fieldValue, mergeTransaction: undefined});
 
             // Then it should include both amount and currency
             expect(result).toEqual({
@@ -985,7 +975,7 @@ describe('MergeTransactionUtils', () => {
             const fieldValue = '456';
 
             // When we get updated values for reportID field
-            const result = getMergeFieldUpdatedValues(transaction, 'reportID', fieldValue);
+            const result = getMergeFieldUpdatedValues({transaction, field: 'reportID', fieldValue});
 
             // Then it should include both reportID and reportName
             expect(result).toEqual({
@@ -1016,7 +1006,7 @@ describe('MergeTransactionUtils', () => {
             const fieldValue = 'New Distance Merchant';
 
             // When we get updated values for merchant field
-            const result = getMergeFieldUpdatedValues(transaction, 'merchant', fieldValue);
+            const result = getMergeFieldUpdatedValues({transaction, field: 'merchant', fieldValue, mergeTransaction: undefined});
 
             // Then it should include merchant plus all distance-specific fields
             expect(result).toEqual({
@@ -1068,6 +1058,186 @@ describe('MergeTransactionUtils', () => {
 
             // Then it should return the generic error message with lowercase field name
             expect(result).toBe(translateLocal('transactionMerge.detailsPage.pleaseSelectError', {field: 'merchant'}));
+        });
+    });
+
+    describe('areTransactionsEligibleForMerge', () => {
+        it('should return false when either transaction is undefined', () => {
+            // Given one transaction is undefined
+            const transaction = createRandomTransaction(0);
+
+            // When we check if they are eligible for merge
+            const result1 = areTransactionsEligibleForMerge(undefined, transaction);
+            const result2 = areTransactionsEligibleForMerge(transaction, undefined);
+            const result3 = areTransactionsEligibleForMerge(undefined, undefined);
+
+            // Then it should return false because both transactions are required
+            expect(result1).toBe(false);
+            expect(result2).toBe(false);
+            expect(result3).toBe(false);
+        });
+
+        it('should return false when source transaction is pending delete', () => {
+            // Given transactions where source is pending delete
+            const targetTransaction = {
+                ...createRandomTransaction(0),
+            };
+            const sourceTransaction = {
+                ...createRandomTransaction(1),
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+            };
+
+            // When we check if they are eligible for merge
+            const result = areTransactionsEligibleForMerge(targetTransaction, sourceTransaction);
+
+            // Then it should return false because source transaction is pending delete
+            expect(result).toBe(false);
+        });
+
+        it('should return true if both transactions are cash', () => {
+            // Given both transactions are cash transactions
+            const transaction1 = {
+                ...createRandomTransaction(0),
+                merchant: 'Starbucks Coffee',
+                modifiedMerchant: '',
+                category: 'Food & Dining',
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+            const transaction2 = {
+                ...createRandomTransaction(1),
+                merchant: 'Caribou Coffee',
+                modifiedMerchant: '',
+                category: 'Food & Dining',
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+
+            // When we check if they are eligible for merge
+            const result = areTransactionsEligibleForMerge(transaction1, transaction2);
+
+            // Then it should return true because both are cash transactions
+            expect(result).toBe(true);
+        });
+
+        it('should return true if one transaction is cash and one is card', () => {
+            // Given one cash and one card transaction
+            const cashTransaction = {
+                ...createRandomTransaction(0),
+                merchant: 'Starbucks Coffee',
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
+            };
+            const cardTransaction = {
+                ...createRandomTransaction(1),
+                merchant: 'Caribou Coffee',
+                managedCard: true,
+            };
+
+            // When we check if they are eligible for merge
+            const result1 = areTransactionsEligibleForMerge(cashTransaction, cardTransaction);
+            const result2 = areTransactionsEligibleForMerge(cardTransaction, cashTransaction);
+
+            // Then it should return true for both orders
+            expect(result1).toBe(true);
+            expect(result2).toBe(true);
+        });
+
+        it('should return false if both transactions are from a card', () => {
+            // Given both transactions are card transactions
+            const transaction1 = {
+                ...createRandomTransaction(0),
+                merchant: 'Starbucks Coffee',
+                modifiedMerchant: '',
+                category: 'Food & Dining',
+                managedCard: true,
+                comment: {},
+            };
+            const transaction2 = {
+                ...createRandomTransaction(1),
+                merchant: 'Caribou Coffee',
+                modifiedMerchant: '',
+                category: 'Food & Dining',
+                managedCard: true,
+                comment: {},
+            };
+
+            // When we check if they are eligible for merge
+            const result = areTransactionsEligibleForMerge(transaction1, transaction2);
+
+            // Then it should return false because both are card transactions
+            expect(result).toBe(false);
+        });
+
+        it('should return false if both transactions have $0 amount', () => {
+            // Given both transactions have $0 amount
+            const transaction1 = {
+                ...createRandomTransaction(0),
+                amount: 0,
+            };
+            const transaction2 = {
+                ...createRandomTransaction(1),
+                amount: 0,
+            };
+
+            // When we check if they are eligible for merge
+            const result = areTransactionsEligibleForMerge(transaction1, transaction2);
+
+            // Then it should return false because both have $0 amount
+            expect(result).toBe(false);
+        });
+
+        it('should return true if only one transaction has $0 amount', () => {
+            // Given one transaction has $0 amount and the other has a non-zero amount
+            const zeroTransaction = {
+                ...createRandomTransaction(0),
+                amount: 0,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+            const nonZeroTransaction = {
+                ...createRandomTransaction(1),
+                amount: 1000,
+                managedCard: false,
+                cardName: CONST.EXPENSE.TYPE.CASH_CARD_NAME,
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+
+            // When we check if they are eligible for merge
+            const result1 = areTransactionsEligibleForMerge(zeroTransaction, nonZeroTransaction);
+            const result2 = areTransactionsEligibleForMerge(nonZeroTransaction, zeroTransaction);
+
+            // Then it should return true for both orders
+            expect(result1).toBe(true);
+            expect(result2).toBe(true);
+        });
+
+        it('should return false if per diem transaction is merged with card transaction', () => {
+            // Given a per diem transaction and a card transaction
+            const perDiemTransaction = {
+                ...createRandomTransaction(0),
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL,
+                    },
+                },
+            };
+            const cardTransaction = {
+                ...createRandomTransaction(1),
+                managedCard: true,
+            };
+
+            // When we check if they are eligible for merge
+            const result1 = areTransactionsEligibleForMerge(perDiemTransaction, cardTransaction);
+            const result2 = areTransactionsEligibleForMerge(cardTransaction, perDiemTransaction);
+
+            // Then it should return false for both orders
+            expect(result1).toBe(false);
+            expect(result2).toBe(false);
         });
     });
 

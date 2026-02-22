@@ -11826,6 +11826,9 @@ const CONST = {
     },
     COMMENT: {
         TYPE_BOT: 'Bot',
+        NAME_MELVIN_BOT: 'melvin-bot',
+        NAME_MELVIN_USER: 'MelvinBot',
+        NAME_CODEX: 'chatgpt-codex-connector',
         NAME_GITHUB_ACTIONS: 'github-actions',
     },
     ACTIONS: {
@@ -11851,6 +11854,8 @@ const CONST = {
     TEST_WORKFLOW_NAME: 'Jest Unit Tests',
     TEST_WORKFLOW_PATH: '.github/workflows/test.yml',
     PROPOSAL_KEYWORD: 'Proposal',
+    PROPOSAL_HEADER_A: 'what is the root cause of that problem?',
+    PROPOSAL_HEADER_B: 'what changes do you think we should make in order to solve the problem?',
     DATE_FORMAT_STRING: 'yyyy-MM-dd',
     PULL_REQUEST_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/pull/([0-9]+).*`),
     ISSUE_REGEX: new RegExp(`${GITHUB_BASE_URL_REGEX.source}/.*/.*/issues/([0-9]+).*`),
@@ -12039,7 +12044,7 @@ class GithubUtils {
                 PRListMobileExpensify: this.getStagingDeployCashPRListMobileExpensify(issue),
                 deployBlockers: this.getStagingDeployCashDeployBlockers(issue),
                 internalQAPRList: this.getStagingDeployCashInternalQA(issue),
-                isFirebaseChecked: issue.body ? /-\s\[x]\sI checked \[Firebase Crashlytics]/.test(issue.body) : false,
+                isSentryChecked: issue.body ? /-\s\[x]\sI checked \[Sentry]/.test(issue.body) : false,
                 isGHStatusChecked: issue.body ? /-\s\[x]\sI checked \[GitHub Status]/.test(issue.body) : false,
                 version,
                 tag: `${version}-staging`,
@@ -12121,7 +12126,7 @@ class GithubUtils {
     /**
      * Generate the issue body and assignees for a StagingDeployCash.
      */
-    static generateStagingDeployCashBodyAndAssignees(tag, PRList, PRListMobileExpensify, verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isFirebaseChecked = false, isGHStatusChecked = false) {
+    static generateStagingDeployCashBodyAndAssignees({ tag, PRList, PRListMobileExpensify = [], verifiedPRList = [], verifiedPRListMobileExpensify = [], deployBlockers = [], resolvedDeployBlockers = [], resolvedInternalQAPRs = [], isSentryChecked = false, isGHStatusChecked = false, previousTag = '', chronologicalSection = '', }) {
         return this.fetchAllPullRequests(PRList.map((pr) => this.getPullRequestNumberFromURL(pr)))
             .then((data) => {
             const internalQAPRs = Array.isArray(data) ? data.filter((pr) => !(0, isEmptyObject_1.isEmptyObject)(pr.labels.find((item) => item.name === CONST_1.default.LABELS.INTERNAL_QA))) : [];
@@ -12192,11 +12197,15 @@ class GithubUtils {
                     }
                     issueBody += '\r\n\r\n';
                 }
+                if (chronologicalSection) {
+                    issueBody += chronologicalSection;
+                    issueBody += '\r\n\r\n';
+                }
                 issueBody += '**Deployer verifications:**';
                 // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isFirebaseChecked ? 'x' : ' '}] I checked [Firebase Crashlytics](https://console.firebase.google.com/u/0/project/expensify-mobile-app/crashlytics/app/ios:com.expensify.expensifylite/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
+                issueBody += `\r\n- [${isSentryChecked ? 'x' : ' '}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${tag}/?project=app&environment=staging) for **this release version** and verified that this release does not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
                 // eslint-disable-next-line max-len
-                issueBody += `\r\n- [${isFirebaseChecked ? 'x' : ' '}] I checked [Firebase Crashlytics](https://console.firebase.google.com/u/0/project/expensify-mobile-app/crashlytics/app/android:org.me.mobiexpensifyg/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount) for **the previous release version** and verified that the release did not introduce any new crashes. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
+                issueBody += `\r\n- [${isSentryChecked ? 'x' : ' '}] I checked [Sentry](https://expensify.sentry.io/releases/new.expensify%40${previousTag}/?project=app&environment=production) for **the previous release version** and verified that the release did not introduce any new crashes. Because mobile deploys use a phased rollout, completing this checklist will deploy the previous release version to 100% of users. More detailed instructions on this verification can be found [here](https://stackoverflowteams.com/c/expensify/questions/15095/15096).`;
                 // eslint-disable-next-line max-len
                 issueBody += `\r\n- [${isGHStatusChecked ? 'x' : ' '}] I checked [GitHub Status](https://www.githubstatus.com/) and verified there is no reported incident with Actions.`;
                 issueBody += '\r\n\r\ncc @Expensify/applauseleads\r\n';
@@ -12306,6 +12315,26 @@ class GithubUtils {
             per_page: options.per_page ?? 50,
             ...(options.status && { status: options.status }),
         });
+    }
+    /**
+     * Get the workflow run URL for a specific commit SHA and workflow file.
+     * Returns the HTML URL of the matching run, or undefined if not found.
+     */
+    static async getWorkflowRunURLForCommit(commitSha, workflowFile) {
+        try {
+            const response = await this.octokit.actions.listWorkflowRuns({
+                owner: CONST_1.default.GITHUB_OWNER,
+                repo: CONST_1.default.APP_REPO,
+                workflow_id: workflowFile,
+                head_sha: commitSha,
+                per_page: 1,
+            });
+            return response.data.workflow_runs.at(0)?.html_url;
+        }
+        catch (error) {
+            console.warn(`Failed to find workflow run for commit ${commitSha}:`, error);
+            return undefined;
+        }
     }
     /**
      * Generate the URL of an New Expensify pull request given the PR number.
@@ -12464,6 +12493,7 @@ class GithubUtils {
                 commit: commit.sha,
                 subject: commit.commit.message,
                 authorName: commit.commit.author?.name ?? 'Unknown',
+                date: commit.commit.committer?.date ?? '',
             }));
         }
         catch (error) {
@@ -12539,6 +12569,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const github_1 = __nccwpck_require__(5438);
 const child_process_1 = __nccwpck_require__(2081);
+const fs_1 = __importDefault(__nccwpck_require__(7147));
+const path_1 = __importDefault(__nccwpck_require__(1017));
 const util_1 = __nccwpck_require__(3837);
 const CONST_1 = __importDefault(__nccwpck_require__(9873));
 const GithubUtils_1 = __importDefault(__nccwpck_require__(9296));
@@ -12591,7 +12623,7 @@ class Git {
      * @returns Structured diff result with line numbers and change information
      * @throws Error when git command fails (invalid refs, not a git repo, file not found, etc.)
      */
-    static diff(fromRef, toRef, filePaths) {
+    static diff(fromRef, toRef, filePaths, shouldIncludeUntrackedFiles = false) {
         // Build git diff command (with 0 context lines for easier parsing)
         let command = `git diff -U0 ${fromRef}`;
         if (toRef) {
@@ -12599,12 +12631,23 @@ class Git {
         }
         if (filePaths) {
             const pathsArray = Array.isArray(filePaths) ? filePaths : [filePaths];
-            const quotedPaths = pathsArray.map((path) => `"${path}"`).join(' ');
+            const quotedPaths = pathsArray.map((filePath) => `"${filePath}"`).join(' ');
             command += ` -- ${quotedPaths}`;
         }
         // Execute git diff with unified format - let errors bubble up
         const diffOutput = execSync(command);
-        return Git.parseDiff(diffOutput);
+        const diffResult = Git.parseDiff(diffOutput);
+        // Include untracked files when diffing against working directory
+        if (!toRef && shouldIncludeUntrackedFiles) {
+            const untrackedFiles = Git.getUntrackedFiles(filePaths);
+            const untrackedFileDiffs = Git.createFileDiffsForUntrackedFiles(untrackedFiles);
+            // Merge untracked files into the diff result
+            if (untrackedFileDiffs.length > 0) {
+                diffResult.files.push(...untrackedFileDiffs);
+                diffResult.hasChanges = true;
+            }
+        }
+        return diffResult;
     }
     /**
      * Parse git diff output into structured format.
@@ -12624,6 +12667,7 @@ class Git {
         const files = [];
         let currentFile = null;
         let currentHunk = null;
+        let oldFilePath = null; // Track old file path to determine fileDiffType
         for (const line of lines) {
             // File header: diff --git a/file b/file
             if (line.startsWith('diff --git')) {
@@ -12636,13 +12680,41 @@ class Git {
                 }
                 currentFile = null;
                 currentHunk = null;
+                oldFilePath = null; // Reset for next file
                 continue;
             }
-            // File path: +++ b/file
-            if (line.startsWith('+++ b/')) {
-                const diffFilePath = line.slice(6); // Remove '+++ b/'
+            // Old file path: --- a/file or --- /dev/null (for new files)
+            // This comes before +++ in git diff output
+            if (line.startsWith('--- ')) {
+                oldFilePath = line.slice(4); // Store the old file path (remove '--- ')
+                continue;
+            }
+            // New file path: +++ b/file or +++ /dev/null (for removed files)
+            if (line.startsWith('+++ ')) {
+                const newFilePath = line.slice(4); // Remove '+++ '
+                // Determine fileDiffType based on old and new file paths
+                // Note: oldFilePath should always be set by the time we see +++, but handle null for type safety
+                let fileDiffType = 'modified';
+                let diffFilePath;
+                const oldPath = oldFilePath ?? '';
+                if (oldPath === '/dev/null') {
+                    // New file: use the new file path
+                    fileDiffType = 'added';
+                    diffFilePath = newFilePath.startsWith('b/') ? newFilePath.slice(2) : newFilePath;
+                }
+                else if (newFilePath === '/dev/null') {
+                    // Removed file: use the old file path
+                    fileDiffType = 'removed';
+                    diffFilePath = oldPath.startsWith('a/') ? oldPath.slice(2) : oldPath;
+                }
+                else {
+                    // Modified file: use the new file path
+                    fileDiffType = 'modified';
+                    diffFilePath = newFilePath.startsWith('b/') ? newFilePath.slice(2) : newFilePath;
+                }
                 currentFile = {
                     filePath: diffFilePath,
+                    diffType: fileDiffType,
                     hunks: [],
                     addedLines: new Set(),
                     removedLines: new Set(),
@@ -12695,6 +12767,10 @@ class Git {
                 }
                 else if (firstChar === ' ') {
                     // Context line - skip it (we only care about added/removed lines)
+                    continue;
+                }
+                else if (firstChar === '\\') {
+                    // "No newline at end of file" marker - skip it (metadata, not content)
                     continue;
                 }
                 else {
@@ -12859,7 +12935,7 @@ class Git {
             return false;
         }
     }
-    static async getChangedFileNames(fromRef, toRef) {
+    static async getChangedFileNames(fromRef, toRef, shouldIncludeUntrackedFiles = false) {
         if (IS_CI) {
             const { data: changedFiles } = await GithubUtils_1.default.octokit.pulls.listFiles({
                 owner: CONST_1.default.GITHUB_OWNER,
@@ -12870,9 +12946,100 @@ class Git {
             return changedFiles.map((file) => file.filename);
         }
         // Get the diff output and check status
-        const diffResult = this.diff(fromRef, toRef);
+        const diffResult = this.diff(fromRef, toRef, undefined, shouldIncludeUntrackedFiles);
         const files = diffResult.files.map((file) => file.filePath);
         return files;
+    }
+    /**
+     * Get list of untracked files from git.
+     *
+     * @param filePaths - Optional specific file path(s) to filter by (relative to git repo root)
+     * @returns Array of untracked file paths
+     */
+    static getUntrackedFiles(filePaths) {
+        try {
+            // Get all untracked files
+            const untrackedOutput = execSync('git ls-files --others --exclude-standard', {
+                stdio: 'pipe',
+            });
+            if (!untrackedOutput.trim()) {
+                return [];
+            }
+            let untrackedFiles = untrackedOutput
+                .trim()
+                .split('\n')
+                .filter((file) => file.length > 0);
+            // Filter by filePaths if provided
+            if (filePaths) {
+                const pathsArray = Array.isArray(filePaths) ? filePaths : [filePaths];
+                const normalizedPaths = pathsArray.map((p) => path_1.default.normalize(p));
+                untrackedFiles = untrackedFiles.filter((file) => {
+                    const normalizedFile = path_1.default.normalize(file);
+                    return normalizedPaths.some((p) => normalizedFile === p || normalizedFile.startsWith(p + path_1.default.sep));
+                });
+            }
+            return untrackedFiles;
+        }
+        catch (error) {
+            // If command fails, return empty array (e.g., not a git repo)
+            return [];
+        }
+    }
+    /**
+     * Create FileDiff entries for untracked files by reading their content and treating all lines as added.
+     *
+     * @param untrackedFiles - Array of untracked file paths (relative to git repo root)
+     * @returns Array of FileDiff entries for untracked files
+     */
+    static createFileDiffsForUntrackedFiles(untrackedFiles) {
+        const fileDiffs = [];
+        for (const filePath of untrackedFiles) {
+            const absolutePath = path_1.default.join(process.cwd(), filePath);
+            // Check if file exists and is readable
+            if (!fs_1.default.existsSync(absolutePath) || !fs_1.default.statSync(absolutePath).isFile()) {
+                continue;
+            }
+            let fileContent;
+            try {
+                fileContent = fs_1.default.readFileSync(absolutePath, 'utf8');
+            }
+            catch (error) {
+                // Skip files that can't be read
+                continue;
+            }
+            // Split content into lines
+            const lines = fileContent.split('\n');
+            const addedLines = new Set();
+            // Create a single hunk with all lines as added
+            const diffLines = [];
+            for (let i = 0; i < lines.length; i++) {
+                const lineNumber = i + 1;
+                addedLines.add(lineNumber);
+                diffLines.push({
+                    number: lineNumber,
+                    type: 'added',
+                    content: lines.at(i) ?? '',
+                });
+            }
+            // Create a single hunk for the entire file
+            const hunk = {
+                oldStart: 0,
+                oldCount: 0,
+                newStart: 1,
+                newCount: lines.length,
+                lines: diffLines,
+            };
+            const fileDiff = {
+                filePath,
+                diffType: 'added',
+                hunks: [hunk],
+                addedLines,
+                removedLines: new Set(),
+                modifiedLines: new Set(),
+            };
+            fileDiffs.push(fileDiff);
+        }
+        return fileDiffs;
     }
 }
 exports["default"] = Git;
