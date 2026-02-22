@@ -108,7 +108,6 @@ export default {
     receiptPreviewMaxHeight: 440,
     homePageLeftColumnMaxWidth: 680,
     homePageRightColumnMaxWidth: 488,
-    superWideRHPMaxWidth: 1260,
     minScanTooltipWidth: 320,
     uploadViewMargin: 20,
     chooseFilesViewMargin: 8,
