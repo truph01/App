@@ -1,4 +1,4 @@
-# Optimistic Update Code Examples
+# Optimistic Patterns Code Examples
 
 ## Pattern A: Optimistic Without Feedback
 
