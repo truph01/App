@@ -4,9 +4,10 @@
 # config file to be parsed for the suffix (relative to current project root)
 CONFIG_FILE="../Web-Expensify/_config.local.php"
 
-if [ -f '.env' ]; then
+if [[ -f '.env' ]]; then
     while read -r line; do
-        if [[ "$line" == \#* ]]; then
+        # Skip comments and blank lines
+        if [[ "$line" == \#* || "$line" =~ ^\s*$ ]]; then
             continue
         fi
         export "${line?}"
