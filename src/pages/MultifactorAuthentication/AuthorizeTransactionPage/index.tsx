@@ -7,6 +7,7 @@ import {AlreadyReviewedFailureScreen, DeniedTransactionSuccessScreen} from '@com
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
+import useNetworkWithOfflineStatus from '@hooks/useNetworkWithOfflineStatus';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {denyTransaction, fireAndForgetDenyTransaction} from '@libs/actions/MultifactorAuthentication';
@@ -29,6 +30,8 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
+    const {isOffline} = useNetworkWithOfflineStatus();
+
     const [transactionDenialState, setTransactionDenial] = useState<TransactionDenialState>(false);
 
     const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
@@ -39,6 +42,9 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const [isConfirmModalVisible, setConfirmModalVisibility] = useState(false);
 
     const showConfirmModal = () => {
+        if (isOffline) {
+            Navigation.closeRHPFlow();
+        }
         setConfirmModalVisibility(true);
     };
 
