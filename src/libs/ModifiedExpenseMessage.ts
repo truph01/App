@@ -260,7 +260,7 @@ function getForReportAction({
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     policyForMovingExpensesID?: string;
-    currentUserLogin: string;
+    currentUserLogin?: string;
 }): string {
     // Temporary fallback to storedCurrentUserLogin since currentUserLogin can be empty string.
     // Remove once all callers pass currentUserLogin explicitly and the migration to getForReportActionTemp is complete.
