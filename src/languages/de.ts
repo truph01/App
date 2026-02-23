@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -535,6 +534,7 @@ const translations: TranslationDeepObject<typeof en> = {
         year: 'Jahr',
         quarter: 'Quartal',
         expensifyLogo: 'Expensify-Logo',
+        duplicateReport: 'Duplizierten Bericht',
     },
     socials: {
         podcast: 'Folgen Sie uns auf Podcast',
@@ -5207,7 +5207,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 updateCard: 'Karte aktualisieren',
                 unassignCard: 'Karte zuweisen aufheben',
                 unassign: 'Zuweisung aufheben',
-                unassignCardDescription: 'Das Aufheben der Zuweisung dieser Karte entfernt alle Transaktionen in Entwurfsberichten aus dem Konto der Karteninhaber*in.',
+                unassignCardDescription: 'Die Zuordnung dieser Karte aufzuheben, entfernt alle Transaktionen in Entwürfen von Berichten aus dem Konto der Karteninhaber*in.',
                 assignCard: 'Karte zuweisen',
                 cardFeedName: 'Name des Kartenfeeds',
                 cardFeedNameDescription: 'Gib dem Kartenfeed einen eindeutigen Namen, damit du ihn von den anderen unterscheiden kannst.',
@@ -6388,7 +6388,7 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
                 matchTypeContains: 'Enthält',
                 matchTypeExact: 'Exakte Übereinstimmung',
                 duplicateRuleTitle: 'Ähnliche Händlerregel existiert bereits',
-                duplicateRulePrompt: (merchantName: string) => `Möchtest du eine neue Regel für „${merchantName}“ speichern, obwohl bereits eine existierende Regel vorhanden ist?`,
+                duplicateRulePrompt: (merchantName: string) => `Möchtest du eine neue Regel für „${merchantName}“ speichern, obwohl bereits eine existiert?`,
                 saveAnyway: 'Trotzdem speichern',
                 applyToExistingUnsubmittedExpenses: 'Auf bestehende nicht eingereichte Ausgaben anwenden',
             },
@@ -7742,15 +7742,15 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
         reviewRequired: 'Überprüfung erforderlich',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Beleg kann wegen unterbrochener Bankverbindung nicht automatisch zugeordnet werden';
+                return 'Beleg kann aufgrund einer unterbrochenen Bankverbindung nicht automatisch zugeordnet werden';
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
                     ? `Bankverbindung unterbrochen. <a href="${companyCardPageURL}">Erneut verbinden, um Beleg abzugleichen</a>`
-                    : 'Bankverbindung unterbrochen. Bitte eine:n Admin darum bitten, sie neu zu verbinden, um den Beleg abzugleichen.';
+                    : 'Bankverbindung unterbrochen. Bitte eine*n Admin bitten, sie zur Belegzuordnung erneut zu verbinden.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Bitte ${member} darum, als Barzahlung zu markieren, oder warte 7 Tage und versuche es dann erneut` : 'Warten auf Abgleich mit Kartentransaktion.';
+                return isAdmin ? `Bitte ${member} darum, es als Barzahlung zu markieren, oder warte 7 Tage und versuche es erneut` : 'Wartet auf Zusammenführung mit Kartenumsatz.';
             }
             return '';
         },

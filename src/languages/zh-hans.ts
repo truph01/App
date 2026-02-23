@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -530,6 +529,7 @@ const translations: TranslationDeepObject<typeof en> = {
         year: '年份',
         quarter: '季度',
         expensifyLogo: 'Expensify徽标',
+        duplicateReport: '重复报销单',
     },
     socials: {
         podcast: '在播客上关注我们',
@@ -5069,7 +5069,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 updateCard: '更新卡片',
                 unassignCard: '取消分配卡片',
                 unassign: '取消分配',
-                unassignCardDescription: '取消分配此卡将从持卡人的账户中移除所有处于草稿报表中的交易。',
+                unassignCardDescription: '取消分配此卡将从持卡人账户中移除所有处于草稿报表中的交易记录。',
                 assignCard: '分配卡片',
                 cardFeedName: '卡片交易源名称',
                 cardFeedNameDescription: '为该卡片流水命名一个唯一名称，以便与其他区分。',
@@ -6217,7 +6217,7 @@ ${reportName}
                 matchTypeContains: '包含',
                 matchTypeExact: '完全匹配',
                 duplicateRuleTitle: '已存在类似的商家规则',
-                duplicateRulePrompt: (merchantName: string) => `即使已经有一条适用于“${merchantName}”的规则，是否仍要保存新规则？`,
+                duplicateRulePrompt: (merchantName: string) => `尽管你已经有一个现有规则，仍要为“${merchantName}”保存一个新规则吗？`,
                 saveAnyway: '仍然保存',
                 applyToExistingUnsubmittedExpenses: '应用到现有未提交的报销费用',
             },

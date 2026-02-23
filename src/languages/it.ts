@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -535,6 +534,7 @@ const translations: TranslationDeepObject<typeof en> = {
         year: 'Anno',
         quarter: 'Trimestre',
         expensifyLogo: 'Logo Expensify',
+        duplicateReport: 'Report duplicato',
     },
     socials: {
         podcast: 'Seguici su Podcast',
@@ -3053,7 +3053,7 @@ ${
         time: 'Ora',
         clearAfter: 'Cancella dopo',
         whenClearStatus: 'Quando dovremmo cancellare il tuo stato?',
-        vacationDelegate: 'Delegato ferie',
+        vacationDelegate: 'Delegato per le ferie',
         setVacationDelegate: `Imposta un delegato per le ferie per approvare i report per tuo conto mentre sei fuori ufficio.`,
         cannotSetVacationDelegate: `Non puoi impostare un delegato per le ferie perché al momento sei il delegato per i seguenti membri:`,
         vacationDelegateError: 'Si è verificato un errore durante l’aggiornamento del tuo delegato per le ferie.',
@@ -5195,7 +5195,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 updateCard: 'Aggiorna carta',
                 unassignCard: 'Rimuovi carta',
                 unassign: 'Rimuovi assegnazione',
-                unassignCardDescription: 'La rimozione dell’assegnazione di questa carta eliminerà tutte le transazioni nei report in bozza dall’account del titolare della carta.',
+                unassignCardDescription: 'La dissociazione di questa carta rimuoverà tutte le transazioni nei report in bozza dall’account del titolare della carta.',
                 assignCard: 'Assegna carta',
                 cardFeedName: 'Nome feed carta',
                 cardFeedNameDescription: 'Dai al feed della carta un nome univoco, così puoi distinguerlo dagli altri.',
@@ -6371,7 +6371,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 matchTypeContains: 'Contiene',
                 matchTypeExact: 'Corrisponde esattamente',
                 duplicateRuleTitle: "Una regola simile per l'esercente esiste già",
-                duplicateRulePrompt: (merchantName: string) => `Vuoi salvare una nuova regola per «${merchantName}» anche se ne hai già una esistente?`,
+                duplicateRulePrompt: (merchantName: string) => `Vuoi salvare una nuova regola per "${merchantName}" anche se ne esiste già una?`,
                 saveAnyway: 'Salva comunque',
                 applyToExistingUnsubmittedExpenses: 'Applica alle spese esistenti non inviate',
             },
@@ -7732,10 +7732,10 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
                     ? `Connessione bancaria interrotta. <a href="${companyCardPageURL}">Riconnetti per abbinare la ricevuta</a>`
-                    : 'Collegamento bancario interrotto. Chiedi a un amministratore di ricollegarlo per abbinare la ricevuta.';
+                    : 'Connessione bancaria interrotta. Chiedi a un amministratore di ricollegarla per abbinarla alla ricevuta.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Chiedi a ${member} di contrassegnarla come contante oppure attendi 7 giorni e riprova` : 'In attesa di unione con la transazione della carta.';
+                return isAdmin ? `Chiedi a ${member} di contrassegnarlo come contante oppure attendi 7 giorni e riprova` : 'In attesa di unione con la transazione della carta.';
             }
             return '';
         },

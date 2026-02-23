@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -533,6 +532,7 @@ const translations: TranslationDeepObject<typeof en> = {
         year: 'Ano',
         quarter: 'Trimestre',
         expensifyLogo: 'Logo da Expensify',
+        duplicateReport: 'Relatório duplicado',
     },
     socials: {
         podcast: 'Siga-nos no Podcast',
@@ -5178,7 +5178,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 updateCard: 'Atualizar cartão',
                 unassignCard: 'Remover cartão',
                 unassign: 'Desatribuir',
-                unassignCardDescription: 'Desatribuir este cartão removerá todas as transações em relatórios em rascunho da conta do titular do cartão.',
+                unassignCardDescription: 'Remover a atribuição deste cartão excluirá todas as transações em relatórios de rascunho da conta do titular do cartão.',
                 assignCard: 'Atribuir cartão',
                 cardFeedName: 'Nome do feed do cartão',
                 cardFeedNameDescription: 'Dê um nome exclusivo ao feed do cartão para diferenciá-lo dos outros.',
@@ -7698,15 +7698,15 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
         reviewRequired: 'Revisão necessária',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return 'Não é possível associar automaticamente o recibo devido à conexão bancária interrompida';
+                return 'Não é possível fazer a correspondência automática do recibo devido a conexão bancária interrompida';
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
-                    ? `Conexão bancária interrompida. <a href="${companyCardPageURL}">Reconectar para corresponder ao recibo</a>`
-                    : 'Conexão bancária quebrada. Peça para um administrador reconectar para coincidir com o recibo.';
+                    ? `Conexão bancária interrompida. <a href="${companyCardPageURL}">Reconecte para conciliar o recibo</a>`
+                    : 'Conexão bancária interrompida. Peça para um administrador reconectar para corresponder ao recibo.';
             }
             if (!isTransactionOlderThan7Days) {
-                return isAdmin ? `Peça para ${member} marcar como pagamento em dinheiro ou aguarde 7 dias e tente novamente` : 'Aguardando mesclagem com a transação do cartão.';
+                return isAdmin ? `Peça para ${member} marcar como dinheiro em espécie ou aguarde 7 dias e tente novamente` : 'Aguardando combinação com a transação do cartão.';
             }
             return '';
         },

@@ -130,7 +130,6 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
-
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -534,6 +533,7 @@ const translations: TranslationDeepObject<typeof en> = {
         year: '年',
         quarter: '四半期',
         expensifyLogo: 'Expensifyロゴ',
+        duplicateReport: 'レポートを複製',
     },
     socials: {
         podcast: 'ポッドキャストでフォロー',
@@ -5142,7 +5142,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 updateCard: 'カードを更新',
                 unassignCard: 'カードの割り当てを解除',
                 unassign: '割り当てを解除',
-                unassignCardDescription: 'このカードの割り当てを解除すると、ドラフトレポート上のすべての取引がカード所有者のアカウントから削除されます。',
+                unassignCardDescription: 'このカードの割り当てを解除すると、ドラフトレポート上のすべての取引がカード保有者のアカウントから削除されます。',
                 assignCard: 'カードを割り当てる',
                 cardFeedName: 'カードフィード名',
                 cardFeedNameDescription: '他のカードフィードと区別できるように、一意の名前を付けてください。',
@@ -6312,7 +6312,7 @@ ${reportName}
                 matchTypeContains: '含む',
                 matchTypeExact: '完全一致',
                 duplicateRuleTitle: '同様のマーチャントルールが既に存在します',
-                duplicateRulePrompt: (merchantName: string) => `既にルールが存在しますが、「${merchantName}」用に新しいルールを保存しますか？`,
+                duplicateRulePrompt: (merchantName: string) => `既存のルールがある「${merchantName}」に対して、新しいルールを保存しますか？`,
                 saveAnyway: 'とにかく保存',
                 applyToExistingUnsubmittedExpenses: '既存の未提出経費に適用',
             },
@@ -7652,12 +7652,12 @@ ${reportName}
         reviewRequired: '要レビュー',
         rter: ({brokenBankConnection, isAdmin, isTransactionOlderThan7Days, member, rterType, companyCardPageURL}: ViolationsRterParams) => {
             if (rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION_530) {
-                return '銀行連携の不具合によりレシートを自動照合できません';
+                return '銀行連携の不具合により領収書を自動照合できません';
             }
             if (brokenBankConnection || rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION) {
                 return isAdmin
-                    ? `銀行接続が切断されました。<a href="${companyCardPageURL}">再接続してレシートと照合</a>`
-                    : '銀行連携が切断されています。管理者に依頼して再接続し、レシートとの照合を行ってください。';
+                    ? `銀行連携が切断されました。<a href="${companyCardPageURL}">領収書と照合するために再接続</a>`
+                    : '銀行連携が切断されています。管理者に依頼して再接続し、レシートと照合してください。';
             }
             if (!isTransactionOlderThan7Days) {
                 return isAdmin ? `${member} に現金としてマークするよう依頼するか、7日待ってからもう一度お試しください` : 'カード取引との統合待ちです。';
