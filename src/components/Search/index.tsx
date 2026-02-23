@@ -1143,34 +1143,17 @@ function Search({
     ]);
 
     const onLayout = useCallback(() => {
+        getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER)?.setAttributes({
+            inputQuery: queryJSON?.inputQuery,
+        });
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
         markNavigateAfterExpenseCreateEnd();
         handleSelectionListScroll(sortedData, searchListRef.current);
-    }, [handleSelectionListScroll, sortedData]);
-
-    useEffect(() => {
-        if (shouldShowLoadingState) {
-            return;
-        }
-
-        const renderSpanParent = getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
-
-        if (renderSpanParent) {
-            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER, {
-                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
-                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
-                parentSpan: renderSpanParent,
-            }).setAttributes({
-                inputQuery: queryJSON?.inputQuery,
-            });
-        }
-
-        // Exclude `queryJSON?.inputQuery` since it’s only telemetry metadata and would cause the span to start multiple times.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [shouldShowLoadingState]);
+    }, [handleSelectionListScroll, sortedData, queryJSON?.inputQuery]);
 
     const onLayoutSkeleton = useCallback(() => {
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
         endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
     }, []);
 

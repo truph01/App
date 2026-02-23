@@ -62,6 +62,12 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
                 parentSpan,
             });
 
+            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER, {
+                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
+                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
+                parentSpan,
+            });
+
             const lastSearchRoute = getLastRoute(navigationRef.getRootState(), NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, SCREENS.SEARCH.ROOT);
 
             if (lastSearchRoute) {
