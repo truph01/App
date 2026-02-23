@@ -19,7 +19,7 @@ type DeepLinkHandlerProps = {
 };
 
 /**
- * Renderless component that isolates the COLLECTION.REPORT Onyx subscription
+ * Component that does not render anything but isolates the COLLECTION.REPORT Onyx subscription
  * from the root Expensify component to prevent cascading re-renders of the
  * entire navigation tree on every report change.
  */
