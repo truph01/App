@@ -975,6 +975,11 @@ const translations = {
                 subtitle: 'Provide an address to receive your Expensify Card.',
                 cta: 'Add address',
             },
+            addPaymentCard: {
+                title: 'Add a payment card to keep using Expensify',
+                subtitle: 'Account > Subscription',
+                cta: 'Add',
+            },
             activateCard: {
                 title: 'Activate your Expensify Card',
                 subtitle: 'Validate your card and start spending.',
