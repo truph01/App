@@ -2374,7 +2374,8 @@ describe('actions/Policy', () => {
             // FormData serializes all values to strings
             const calls = TestHelper.getFetchMockCalls(WRITE_COMMANDS.SET_WORKSPACE_REIMBURSEMENT);
             expect(calls).toHaveLength(1);
-            const body = (calls[0]?.[1] as RequestInit)?.body;
+            const call = calls.at(0);
+            const body = (call?.at(1) as RequestInit)?.body;
             const params = body instanceof FormData ? Object.fromEntries(body as unknown as Iterable<[string, string]>) : {};
             expect(params).toEqual(
                 expect.objectContaining({
