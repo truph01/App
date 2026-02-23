@@ -35,6 +35,7 @@ function SelectBankStep() {
     const {isOffline} = useNetwork();
 
     const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD);
+    const [shouldUseStagingServer = false] = useOnyx(ONYXKEYS.SHOULD_USE_STAGING_SERVER);
     const [localBankSelected, setLocalBankSelected] = useState<ValueOf<typeof CONST.COMPANY_CARDS.BANKS> | null>();
     const bankSelected = localBankSelected ?? addNewCard?.data.selectedBank;
     const [hasError, setHasError] = useState(false);
@@ -66,9 +67,9 @@ function SelectBankStep() {
 
     const data = Object.values(CONST.COMPANY_CARDS.BANKS)
         .filter((bank) => {
-            // Only show Mock Bank when the frontend environment is not production
+            // Only show Mock Bank when the frontend environment is not production or when using the staging server
             if (bank === CONST.COMPANY_CARDS.BANKS.MOCK_BANK) {
-                return CONFIG.ENVIRONMENT !== CONST.ENVIRONMENT.PRODUCTION;
+                return CONFIG.ENVIRONMENT !== CONST.ENVIRONMENT.PRODUCTION || shouldUseStagingServer;
             }
             return true;
         })
