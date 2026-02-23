@@ -34,7 +34,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
 
     const [transactionDenialState, setTransactionDenial] = useState<TransactionDenialState>(false);
 
-    const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
+    const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW);
     const transaction = transactionQueue?.[transactionID];
 
     const {executeScenario} = useMultifactorAuthentication();

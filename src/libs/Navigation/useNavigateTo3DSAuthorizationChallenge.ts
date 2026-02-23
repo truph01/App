@@ -36,8 +36,8 @@ function sortTransactionsPending3DSReview(transactions: TransactionPending3DSRev
 
 /** Listens to changes to ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS and navigates to ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION if necessary */
 function useNavigateTo3DSAuthorizationChallenge() {
-    const [locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult] = useOnyx(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS, {canBeMissing: true});
-    const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
+    const [locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult] = useOnyx(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS);
+    const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW);
 
     // It's important not to whisk the user away from a challenge they're still working on. We add the challenge
     // to locallyProcessed3DSTransactionReviews and clear it from the queue as soon as the Authorize call completes,
