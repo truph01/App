@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/core';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Alert, AppState, StyleSheet, View} from 'react-native';
 import type {LayoutRectangle} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -86,7 +86,6 @@ function IOURequestStepOdometerImage({
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
     const hasFlash = !!device?.hasFlash;
     const [flash, setFlash] = useState(false);
-    const [focusPoint, setFocusPoint] = useState<Point | null>(null);
     const [didCapturePhoto, setDidCapturePhoto] = useState(false);
     const camera = useRef<Camera>(null);
     const viewfinderLayout = useRef<LayoutRectangle>(null);
@@ -129,13 +128,6 @@ function IOURequestStepOdometerImage({
         transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
     }));
 
-    useEffect(() => {
-        if (!focusPoint) {
-            return;
-        }
-        focusCamera(camera, focusPoint);
-    }, [focusPoint]);
-
     const tapGesture = Gesture.Tap()
         .enabled(device?.supportsFocus ?? false)
         .runOnJS(true)
@@ -147,7 +139,7 @@ function IOURequestStepOdometerImage({
             focusIndicatorScale.set(withSpring(1, {damping: 10, stiffness: 200}));
             focusIndicatorPosition.set(point);
 
-            setFocusPoint(point);
+            focusCamera(camera, point);
         });
 
     useFocusEffect(() => {
