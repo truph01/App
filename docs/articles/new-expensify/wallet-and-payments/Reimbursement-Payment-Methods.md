@@ -105,7 +105,7 @@ Global reimbursement timelines vary by country. However, most reimbursements are
 Workspace business bank accounts can be connected in:
 
 - [USD](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Global-Reimbursement-United-States) (United States)
-- [CAD](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Global-Reimbursement-Canada) (Canada)
+- [SGD](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Global-Reimbursement-Singapore) (Singapore)
 - [GBP](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Global-Reimbursement-United-Kingdom) (United Kingdom)
 - [EUR](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Global-Reimbursement-Europe) (European Union)
 - [AUD](https://help.expensify.com/articles/new-expensify/wallet-and-payments/Global-Reimbursement-Australia) (Australia)
