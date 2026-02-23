@@ -43,7 +43,6 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children,
 
     const personalDetailsSelector = useCallback((personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsList?.[accountID], [accountID]);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: personalDetailsSelector,
     });
 

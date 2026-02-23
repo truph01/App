@@ -194,7 +194,6 @@ function PaymentMethodList({
     const policiesForDomainCardsSelectorFactory = useMemo(() => createPoliciesForDomainCardsSelector(cardDomains), [cardDomains]);
     const policiesForDomainCardsSelector = useCallback((policies: OnyxCollection<Policy>) => policiesForDomainCardsSelectorFactory(policies), [policiesForDomainCardsSelectorFactory]);
     const [policiesForAssignedCards] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
-        canBeMissing: true,
         selector: policiesForDomainCardsSelector,
     });
     // Temporarily disabled because P2P debit cards are disabled.

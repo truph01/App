@@ -202,7 +202,6 @@ function MoneyRequestView({
         `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportID}`,
         {
             canEvict: false,
-            canBeMissing: true,
             selector: parentReportActionSelector,
         },
         [parentReportActionID],

@@ -54,7 +54,6 @@ function DomainAddPrimaryContactPage({route}: DomainAddPrimaryContactPageProps) 
         [adminAccountIDs],
     );
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: adminsPersonalDetailsSelector,
     });
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');

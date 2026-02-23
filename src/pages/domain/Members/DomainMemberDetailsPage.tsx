@@ -40,13 +40,11 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
 
     const securityGroupSelector = useCallback((domain: OnyxEntry<Domain>) => selectSecurityGroupForAccount(accountID)(domain), [accountID]);
     const [userSecurityGroup] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
-        canBeMissing: true,
         selector: securityGroupSelector,
     });
 
     const memberPersonalDetailsSelector = useCallback((personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsSelector(accountID)(personalDetailsList), [accountID]);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: memberPersonalDetailsSelector,
     });
 

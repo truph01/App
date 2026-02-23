@@ -36,7 +36,6 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
 
     const adminPersonalDetailsSelector = useCallback((personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsList?.[accountID], [accountID]);
     const [adminPersonalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: adminPersonalDetailsSelector,
     });
 
