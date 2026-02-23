@@ -49,7 +49,6 @@ import navigateAfterInteraction from '@libs/Navigation/navigateAfterInteraction'
 import Navigation from '@libs/Navigation/Navigation';
 import {rand64, roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
-import Performance from '@libs/Performance';
 import {isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {
     doesReportReceiverMatchParticipant,
@@ -324,7 +323,6 @@ function IOURequestStepConfirmation({
 
     useEffect(() => {
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
-        Performance.markEnd(CONST.TIMING.OPEN_CREATE_EXPENSE_APPROVE);
     }, []);
 
     useEffect(() => {
@@ -995,7 +993,6 @@ function IOURequestStepConfirmation({
                 hasReceiptFiles,
             });
 
-            Performance.markStart(CONST.TIMING.SUBMIT_EXPENSE);
             startSpan(CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE, {
                 name: 'submit-expense',
                 op: CONST.TELEMETRY.SPAN_SUBMIT_EXPENSE,
