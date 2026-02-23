@@ -3,6 +3,7 @@ import Onyx from 'react-native-onyx';
 import OnboardingGuard from '@libs/Navigation/guards/OnboardingGuard';
 import type {GuardContext} from '@libs/Navigation/guards/types';
 import CONST from '@src/CONST';
+import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import waitForBatchedUpdates from '../../../utils/waitForBatchedUpdates';
@@ -159,6 +160,83 @@ describe('OnboardingGuard', () => {
 
             const result = OnboardingGuard.evaluate(mockState, mockAction, authenticatedContext);
 
+            expect(result.type).toBe('ALLOW');
+        });
+    });
+
+    describe('redirect completed users away from onboarding routes', () => {
+        it('should redirect to HOME when completed user navigates to onboarding via deep link (RESET with onboarding screen)', async () => {
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+                hasCompletedGuidedSetupFlow: true,
+            });
+            await waitForBatchedUpdates();
+
+            const resetToOnboardingAction: NavigationAction = {
+                type: CONST.NAVIGATION_ACTIONS.RESET,
+                payload: {
+                    key: 'root',
+                    index: 1,
+                    routeNames: [SCREENS.HOME, NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR],
+                    routes: [
+                        {key: 'home', name: SCREENS.HOME},
+                        {
+                            key: 'onboarding',
+                            name: NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR,
+                            state: {
+                                key: 'onboarding-nav',
+                                index: 0,
+                                routeNames: [SCREENS.ONBOARDING.PURPOSE],
+                                routes: [{key: 'purpose', name: SCREENS.ONBOARDING.PURPOSE}],
+                                stale: false,
+                                type: 'stack',
+                            },
+                        },
+                    ],
+                    stale: false,
+                    type: 'root',
+                },
+            };
+
+            const result = OnboardingGuard.evaluate(mockState, resetToOnboardingAction, authenticatedContext) as {type: 'REDIRECT'; route: string};
+
+            expect(result.type).toBe('REDIRECT');
+            expect(result.route).toBe('home');
+        });
+
+        it('should ALLOW when completed user navigates to a non-onboarding route', async () => {
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+                hasCompletedGuidedSetupFlow: true,
+            });
+            await waitForBatchedUpdates();
+
+            const resetToHomeAction: NavigationAction = {
+                type: CONST.NAVIGATION_ACTIONS.RESET,
+                payload: {
+                    key: 'root',
+                    index: 0,
+                    routeNames: [SCREENS.HOME],
+                    routes: [{key: 'home', name: SCREENS.HOME}],
+                    stale: false,
+                    type: 'root',
+                },
+            };
+
+            const result = OnboardingGuard.evaluate(mockState, resetToHomeAction, authenticatedContext);
+            expect(result.type).toBe('ALLOW');
+        });
+
+        it('should ALLOW non-RESET actions for completed users (e.g. NAVIGATE)', async () => {
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+                hasCompletedGuidedSetupFlow: true,
+            });
+            await waitForBatchedUpdates();
+
+            const navigateAction: NavigationAction = {
+                type: 'NAVIGATE',
+                payload: {name: SCREENS.HOME},
+            };
+
+            const result = OnboardingGuard.evaluate(mockState, navigateAction, authenticatedContext);
             expect(result.type).toBe('ALLOW');
         });
     });
