@@ -135,7 +135,6 @@ function shouldPreventReset(state: NavigationState, action: NavigationAction) {
  * This handles NAVIGATE/PUSH actions that target the OnboardingModalNavigator directly.
  */
 function isNavigatingToOnboardingFlow(action: NavigationAction): boolean {
-    // For NAVIGATE/PUSH actions, check if the action targets the OnboardingModalNavigator directly
     if (
         (action.type === CONST.NAVIGATION.ACTION_TYPE.NAVIGATE || action.type === CONST.NAVIGATION.ACTION_TYPE.PUSH) &&
         (action.payload as {name?: string} | undefined)?.name === NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR
