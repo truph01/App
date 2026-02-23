@@ -738,22 +738,22 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
  * For detailed information about dismissing modals,
  * see the NAVIGATION.md documentation.
  */
-async function dismissModal({
+function dismissModal({
     ref = navigationRef,
     afterTransition,
     waitForTransition,
 }: {ref?: NavigationRef; callback?: () => void; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedText();
-    await isNavigationReady();
-
     const runImmediately = !waitForTransition;
-    TransitionTracker.runAfterTransitions(() => {
-        ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
+    isNavigationReady().then(() => {
+        TransitionTracker.runAfterTransitions(() => {
+            ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
 
-        if (afterTransition) {
-            TransitionTracker.runAfterTransitions(afterTransition);
-        }
-    }, runImmediately);
+            if (afterTransition) {
+                TransitionTracker.runAfterTransitions(afterTransition);
+            }
+        }, runImmediately);
+    });
 }
 
 /**
@@ -761,32 +761,35 @@ async function dismissModal({
  * For detailed information about dismissing modals,
  * see the NAVIGATION.md documentation.
  */
-async function dismissModalWithReport({reportID, reportActionID, referrer, backTo}: ReportsSplitNavigatorParamList[typeof SCREENS.REPORT], ref = navigationRef) {
-    await isNavigationReady();
-    const topmostSuperWideRHPReportID = getTopmostSuperWideRHPReportID();
-    let areReportsIDsDefined = !!topmostSuperWideRHPReportID && !!reportID;
+function dismissModalWithReport({reportID, reportActionID, referrer, backTo}: ReportsSplitNavigatorParamList[typeof SCREENS.REPORT], ref = navigationRef) {
+    isNavigationReady().then(() => {
+        const topmostSuperWideRHPReportID = getTopmostSuperWideRHPReportID();
+        let areReportsIDsDefined = !!topmostSuperWideRHPReportID && !!reportID;
 
-    if (topmostSuperWideRHPReportID === reportID && areReportsIDsDefined) {
-        dismissToSuperWideRHP();
-        return;
-    }
+        if (topmostSuperWideRHPReportID === reportID && areReportsIDsDefined) {
+            dismissToSuperWideRHP();
+            return;
+        }
 
-    const topmostReportID = getTopmostReportId();
-    areReportsIDsDefined = !!topmostReportID && !!reportID;
-    const isReportsSplitTopmostFullScreen = ref.getRootState().routes.findLast((route) => isFullScreenName(route.name))?.name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR;
-    if (topmostReportID === reportID && areReportsIDsDefined && isReportsSplitTopmostFullScreen) {
-        dismissModal();
-        return;
-    }
-    const reportRoute = ROUTES.REPORT_WITH_ID.getRoute(reportID, reportActionID, referrer, backTo);
-    if (getIsNarrowLayout()) {
-        navigate(reportRoute, {forceReplace: true});
-        return;
-    }
-    dismissModal({
-        afterTransition: () => {
-            navigate(reportRoute);
-        },
+        const topmostReportID = getTopmostReportId();
+        areReportsIDsDefined = !!topmostReportID && !!reportID;
+        const isReportsSplitTopmostFullScreen = ref.getRootState().routes.findLast((route) => isFullScreenName(route.name))?.name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR;
+        if (topmostReportID === reportID && areReportsIDsDefined && isReportsSplitTopmostFullScreen) {
+            dismissModal();
+            return;
+        }
+
+        const reportRoute = ROUTES.REPORT_WITH_ID.getRoute(reportID, reportActionID, referrer, backTo);
+        if (getIsNarrowLayout()) {
+            navigate(reportRoute, {forceReplace: true});
+            return;
+        }
+
+        dismissModal({
+            afterTransition: () => {
+                navigate(reportRoute);
+            },
+        });
     });
 }
 
