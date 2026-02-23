@@ -1,6 +1,7 @@
 import {useEffect, useRef} from 'react';
 import type {NativeEventSubscription} from 'react-native';
 import {Linking} from 'react-native';
+import CONST from './CONST';
 import useIsAuthenticated from './hooks/useIsAuthenticated';
 import useOnyx from './hooks/useOnyx';
 import {openReportFromDeepLink} from './libs/actions/Link';
@@ -8,7 +9,6 @@ import * as Report from './libs/actions/Report';
 import {hasAuthToken} from './libs/actions/Session';
 import Log from './libs/Log';
 import {endSpan} from './libs/telemetry/activeSpans';
-import CONST from './CONST';
 import ONYXKEYS from './ONYXKEYS';
 import type {Route} from './ROUTES';
 import isLoadingOnyxValue from './types/utils/isLoadingOnyxValue';
