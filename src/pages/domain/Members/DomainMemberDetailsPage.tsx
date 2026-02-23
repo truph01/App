@@ -1,10 +1,11 @@
-import {domainNameSelector, selectSecurityGroupForAccount} from '@selectors/Domain';
+import {domainNameSelector, selectSecurityGroupForAccount, vacationDelegateSelector} from '@selectors/Domain';
 import {personalDetailsSelector} from '@selectors/PersonalDetails';
 import React, {useCallback, useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -12,11 +13,14 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {closeUserAccount} from '@libs/actions/Domain';
+import {getLatestError} from '@libs/ErrorUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import BaseDomainMemberDetailsComponent from '@pages/domain/BaseDomainMemberDetailsComponent';
+import {clearVacationDelegateError} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Domain, PersonalDetailsList} from '@src/types/onyx';
 
@@ -46,7 +50,14 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
         selector: memberPersonalDetailsSelector,
     });
 
-    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
+    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
+
+    const [vacationDelegate] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
+        selector: vacationDelegateSelector(accountID),
+    });
+
+    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
+    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
 
     const memberLogin = personalDetails?.login ?? '';
 
@@ -99,7 +110,15 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 domainAccountID={domainAccountID}
                 accountID={accountID}
                 avatarButton={avatarButton}
-            />
+            >
+                <VacationDelegateMenuItem
+                    vacationDelegate={vacationDelegate}
+                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_VACATION_DELEGATE.getRoute(domainAccountID, accountID))}
+                    pendingAction={domainPendingActions?.member?.[memberLogin]?.vacationDelegate}
+                    errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.vacationDelegateErrors)}
+                    onCloseError={() => clearVacationDelegateError(domainAccountID, accountID, memberLogin, vacationDelegate?.previousDelegate)}
+                />
+            </BaseDomainMemberDetailsComponent>
             <DecisionModal
                 title={translate('domain.members.closeAccount', {count: 1})}
                 prompt={translate('domain.members.closeAccountInfo', {count: 1})}
