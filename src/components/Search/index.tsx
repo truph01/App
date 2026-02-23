@@ -753,6 +753,7 @@ function Search({
     }, [isSearchResultsEmpty, prevIsSearchResultEmpty]);
 
     const isUnmounted = useRef(false);
+    const hasHadFirstLayout = useRef(false);
 
     useEffect(
         () => () => {
@@ -1141,6 +1142,7 @@ function Search({
     ]);
 
     const onLayout = useCallback(() => {
+        hasHadFirstLayout.current = true;
         getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER)?.setAttributes({
             inputQuery: queryJSON?.inputQuery,
         });
@@ -1151,9 +1153,24 @@ function Search({
     }, [handleSelectionListScroll, sortedData, queryJSON?.inputQuery]);
 
     const onLayoutSkeleton = useCallback(() => {
+        hasHadFirstLayout.current = true;
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
         endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
     }, []);
+
+    // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
+    // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
+    useFocusEffect(
+        useCallback(() => {
+            if (!hasHadFirstLayout.current) {
+                return;
+            }
+            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
+            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
+            endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+            markNavigateAfterExpenseCreateEnd();
+        }, []),
+    );
 
     if (shouldShowLoadingState) {
         return (
