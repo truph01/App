@@ -30,8 +30,9 @@ if [ -f "$CONFIG_FILE" ]; then
         echo "Found suffix: $PUSHER_DEV_SUFFIX"
         echo "Updating .env"
 
-        # delete any old suffix value and append the new one
-        sed -i '' '/^PUSHER_DEV_SUFFIX/d' '.env' || true
+        # Delete any old suffix value and append the new one. Use full path to default macOS sed in case user
+        # has gnu sed installed (i.e. through homebrew)
+        /usr/bin/sed -i '' '/^PUSHER_DEV_SUFFIX/d' '.env' || true
         # a dash '-' is prepended to separate the suffix from trailing channel IDs (accountID, reportID, etc).
         echo "PUSHER_DEV_SUFFIX=-${PUSHER_DEV_SUFFIX}" >> .env
       fi
