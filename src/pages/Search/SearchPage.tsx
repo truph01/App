@@ -60,6 +60,7 @@ import {
     unholdMoneyRequestOnSearch,
     updateAdvancedFilters,
 } from '@libs/actions/Search';
+import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setNameValuePair} from '@libs/actions/User';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -80,7 +81,6 @@ import {navigateToSearchRHP, shouldShowDeleteOption} from '@libs/SearchUIUtils';
 import {hasTransactionBeenRejected} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import {canIOUBePaid, dismissRejectUseExplanation} from '@userActions/IOU';
-import initSplitExpense from '@libs/actions/SplitExpenses';
 import {openOldDotLink} from '@userActions/Link';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';

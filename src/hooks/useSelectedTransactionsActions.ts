@@ -5,10 +5,10 @@ import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchContext} from '@components/Search/SearchContext';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
-import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {exportReportToCSV} from '@libs/actions/Report';
 import {getExportTemplates, handlePreventSearchAPI} from '@libs/actions/Search';
+import initSplitExpense from '@libs/actions/SplitExpenses';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import {getIOUActionForTransactionID, getReportAction, isDeletedAction} from '@libs/ReportActionsUtils';
 import {isMergeActionForSelectedTransactions, isSplitAction} from '@libs/ReportSecondaryActionUtils';

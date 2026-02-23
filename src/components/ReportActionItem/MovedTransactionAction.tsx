@@ -1,14 +1,14 @@
 import React from 'react';
-import useLocalize from '@hooks/useLocalize';
-import Parser from '@libs/Parser';
 import RenderHTML from '@components/RenderHTML';
+import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
+import Parser from '@libs/Parser';
 import {getOriginalMessage} from '@libs/ReportActionsUtils';
 import {getMovedTransactionMessage} from '@libs/ReportUtils';
 import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBasicMessage';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction} from '@src/types/onyx';
-import useOnyx from '@hooks/useOnyx';
 
 type MovedTransactionActionProps = {
     /** The moved transaction action data */
@@ -24,8 +24,8 @@ function MovedTransactionAction({action, emptyHTML}: MovedTransactionActionProps
     const toReportID = movedTransactionOriginalMessage?.toReportID;
     const fromReportID = movedTransactionOriginalMessage?.fromReportID;
 
-    const [toReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${toReportID}`, {canBeMissing: true});
-    const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`, {canBeMissing: true});
+    const [toReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${toReportID}`);
+    const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`);
 
     const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
     // When the transaction is moved from personal space (unreported), fromReportID will be "0" which doesn't exist in allReports

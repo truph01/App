@@ -1,12 +1,12 @@
 import React from 'react';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
+import useOnyx from '@hooks/useOnyx';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import FS from '@libs/Fullstory';
 import ReportActionItem from '@pages/inbox/report/ReportActionItem';
 import variables from '@styles/variables';
 import ONYXKEYS from '@src/ONYXKEYS';
-import useOnyx from '@hooks/useOnyx';
 import BaseListItem from './BaseListItem';
 import type {ChatListItemProps, ListItem, ReportActionListItemType} from './types';
 
@@ -28,7 +28,7 @@ function ChatListItem<TItem extends ListItem>({
     userBillingFundID,
 }: ChatListItemProps<TItem>) {
     const reportActionItem = item as unknown as ReportActionListItemType;
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportActionItem?.reportID}`, {canBeMissing: true});
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportActionItem?.reportID}`);
     const styles = useThemeStyles();
     const theme = useTheme();
     const animatedHighlightStyle = useAnimatedHighlightStyle({

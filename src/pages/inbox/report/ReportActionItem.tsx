@@ -8,6 +8,7 @@ import useOriginalReportID from '@hooks/useOriginalReportID';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactions from '@hooks/useReportTransactions';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getForReportActionTemp, getMovedReportID} from '@libs/ModifiedExpenseMessage';
 import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
@@ -33,7 +34,6 @@ import {clearError} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Policy, ReportAction, ReportActionReactions, Transaction} from '@src/types/onyx';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
 

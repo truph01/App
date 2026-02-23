@@ -1,13 +1,13 @@
 import React from 'react';
-import useOnyx from '@hooks/useOnyx';
-import {getReportName} from '@libs/ReportNameUtils';
-import ONYXKEYS from '@src/ONYXKEYS';
-import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBasicMessage';
 import RenderHTML from '@components/RenderHTML';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import {getCreatedReportForUnapprovedTransactionsMessage, getOriginalMessage} from '@libs/ReportActionsUtils';
-import type {ReportAction} from '@src/types/onyx';
+import {getReportName} from '@libs/ReportNameUtils';
+import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBasicMessage';
 import type CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
+import type {ReportAction} from '@src/types/onyx';
 
 type CreatedReportForUnapprovedTransactionsActionProps = {
     /** The report action when a report was created for unapproved transactions  */
@@ -17,7 +17,7 @@ type CreatedReportForUnapprovedTransactionsActionProps = {
 function CreatedReportForUnapprovedTransactionsAction({action}: CreatedReportForUnapprovedTransactionsActionProps) {
     const {originalID} = getOriginalMessage(action) ?? {};
     const {translate} = useLocalize();
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalID}`, {canBeMissing: true});
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalID}`);
     const reportName = getReportName(report);
     const htmlContent = `<comment><muted-text>${getCreatedReportForUnapprovedTransactionsMessage(originalID, reportName, translate)}</muted-text></comment>`;
 
