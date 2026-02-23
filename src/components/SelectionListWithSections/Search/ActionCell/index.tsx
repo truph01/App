@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '@components/Button';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import type {SearchTransactionAction} from '@src/types/onyx/SearchResults';
@@ -41,6 +42,7 @@ function ActionCell({
 }: ActionCellProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {isOffline} = useNetwork();
 
     const shouldUseViewAction = action === CONST.SEARCH.ACTION_TYPES.VIEW || (parentAction === CONST.SEARCH.ACTION_TYPES.PAID && action === CONST.SEARCH.ACTION_TYPES.PAID);
     const isBadgeAction = !isChildListItem && ((parentAction !== CONST.SEARCH.ACTION_TYPES.PAID && action === CONST.SEARCH.ACTION_TYPES.PAID) || action === CONST.SEARCH.ACTION_TYPES.DONE);
@@ -105,7 +107,7 @@ function ActionCell({
             style={[styles.w100, shouldDisablePointerEvents && styles.pointerEventsNone]}
             isLoading={isLoading}
             success
-            isDisabled={shouldDisablePointerEvents}
+            isDisabled={isOffline || shouldDisablePointerEvents}
             shouldStayNormalOnDisable={shouldDisablePointerEvents}
             isNested
             sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_ACTION}
