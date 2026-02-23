@@ -1,0 +1,24 @@
+diff --git a/node_modules/react-native/scripts/react-native-xcode.sh b/node_modules/react-native/scripts/react-native-xcode.sh
+--- a/node_modules/react-native/scripts/react-native-xcode.sh
++++ b/node_modules/react-native/scripts/react-native-xcode.sh
+@@ -171,17 +171,16 @@
+   if [[ $DEV == true ]]; then
+     EXTRA_COMPILER_ARGS=-Og
+   else
+-    EXTRA_COMPILER_ARGS=-O
++    EXTRA_COMPILER_ARGS="-O -output-source-map"
+   fi
+-  if [[ $EMIT_SOURCEMAP == true ]]; then
+-    EXTRA_COMPILER_ARGS="$EXTRA_COMPILER_ARGS -output-source-map"
+-  fi
+   "$HERMES_CLI_PATH" -emit-binary -max-diagnostic-width=80 $EXTRA_COMPILER_ARGS -out "$DEST/$BUNDLE_NAME.jsbundle" "$BUNDLE_FILE"
+   if [[ $EMIT_SOURCEMAP == true ]]; then
+     HBC_SOURCEMAP_FILE="$DEST/$BUNDLE_NAME.jsbundle.map"
+     "$NODE_BINARY" "$COMPOSE_SOURCEMAP_PATH" "$PACKAGER_SOURCEMAP_FILE" "$HBC_SOURCEMAP_FILE" -o "$SOURCEMAP_FILE"
+     rm "$HBC_SOURCEMAP_FILE"
+     rm "$PACKAGER_SOURCEMAP_FILE"
++  elif [[ $DEV != true ]]; then
++    rm -f "$DEST/$BUNDLE_NAME.jsbundle.map"
+   fi
+   BUNDLE_FILE="$DEST/$BUNDLE_NAME.jsbundle"
+ fi
