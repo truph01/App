@@ -43,8 +43,8 @@ import {setMoneyRequestOdometerImage} from '@userActions/IOU';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
-import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import type {FileObject} from '@src/types/utils/Attachment';
+import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 type IOURequestStepOdometerImageProps = WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.ODOMETER_IMAGE>;
 
@@ -63,7 +63,7 @@ function focusCamera(cameraRef: React.RefObject<Camera | null>, point: Point) {
 
 function IOURequestStepOdometerImage({
     route: {
-        params: {transactionID, imageType},
+        params: {action, iouType, transactionID, imageType},
     },
 }: IOURequestStepOdometerImageProps) {
     const {translate} = useLocalize();
@@ -90,7 +90,7 @@ function IOURequestStepOdometerImage({
     const [didCapturePhoto, setDidCapturePhoto] = useState(false);
     const camera = useRef<Camera>(null);
     const viewfinderLayout = useRef<LayoutRectangle>(null);
-    const isTransactionDraft = shouldUseTransactionDraft(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.REQUEST);
+    const isTransactionDraft = shouldUseTransactionDraft(action ?? CONST.IOU.ACTION.CREATE, iouType ?? CONST.IOU.TYPE.REQUEST);
 
     const title = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
     const snapPhotoText = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.snapPhotoStart') : translate('distance.odometer.snapPhotoEnd');
