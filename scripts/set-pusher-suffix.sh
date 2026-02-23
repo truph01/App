@@ -15,9 +15,9 @@ if [[ -f '.env' ]]; then
 fi
 
 # use the suffix only when the config file can be found
-if [ -f "$CONFIG_FILE" ]; then
+if [[ -f "$CONFIG_FILE" ]]; then
     # If we are pointing to the staging or production api don't add the suffix
-    if [[ $EXPENSIFY_URL == "https://www.expensify.com/" ]]; then
+    if [[ "$EXPENSIFY_URL" == "https://www.expensify.com/" ]]; then
         echo "Ignoring the PUSHER_DEV_SUFFIX since we are not pointing to the dev API"
         exit 0
     fi
@@ -26,8 +26,8 @@ if [ -f "$CONFIG_FILE" ]; then
 
     PATTERN="PUSHER_DEV_SUFFIX.*'(.+)'"
     while read -r line; do
-      if [[ $line =~ $PATTERN ]]; then
-        PUSHER_DEV_SUFFIX=${BASH_REMATCH[1]}
+      if [[ "$line" =~ $PATTERN ]]; then
+        PUSHER_DEV_SUFFIX="${BASH_REMATCH[1]}"
         echo "Found suffix: $PUSHER_DEV_SUFFIX"
         echo "Updating .env"
 
