@@ -16,4 +16,12 @@ const hasBiometricsRegisteredSelector = (data: OnyxEntry<Account>) => data?.mult
 
 const isAccountLoadingSelector = (data: OnyxEntry<Account>) => !!data?.isLoading;
 
-export {isActingAsDelegateSelector, isDelegateAccessRestrictedSelector, isUserValidatedSelector, primaryLoginSelector, delegatesSelector, hasBiometricsRegisteredSelector, isAccountLoadingSelector};
+export {
+    isActingAsDelegateSelector,
+    isDelegateAccessRestrictedSelector,
+    isUserValidatedSelector,
+    primaryLoginSelector,
+    delegatesSelector,
+    hasBiometricsRegisteredSelector,
+    isAccountLoadingSelector,
+};
