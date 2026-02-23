@@ -2,7 +2,7 @@ import React from 'react';
 // We use Animated for all functionality related to wide RHP to make it easier
 // to interact with react-navigation components (e.g., CardContainer, interpolator), which also use Animated.
 // eslint-disable-next-line no-restricted-imports
-import {View, Animated} from 'react-native';
+import {Animated, View} from 'react-native';
 import type {ViewStyle} from 'react-native';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
 import {useWideRHPState} from '@components/WideRHPContextProvider';
@@ -65,7 +65,7 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
                         />
                     )}
                 </DropZoneWrapper>
-                <Animated.View style={(isWideRHPFocused || isSuperWideRHPFocused) ? styles.wideRHPDropZoneContainer : [styles.flex1, styles.h100]}>
+                <Animated.View style={isWideRHPFocused || isSuperWideRHPFocused ? styles.wideRHPDropZoneContainer : [styles.flex1, styles.h100]}>
                     <DropZoneWrapper onDrop={onReceiptDrop}>
                         {({isDraggingOver}) => (
                             <DropZoneUI
