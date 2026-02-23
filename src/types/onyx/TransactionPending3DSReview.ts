@@ -27,9 +27,6 @@ type TransactionPending3DSReview = {
 
     /** Optional transactionID if the backend provides it */
     transactionID?: string;
-
-    /** Added by client to mark that an approval/denial request is in-flight for this transaction */
-    isLoading?: boolean;
 };
 
 export default TransactionPending3DSReview;

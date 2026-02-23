@@ -230,15 +230,6 @@ async function denyTransaction({transactionID}: DenyTransactionParams) {
             {
                 optimisticData: [
                     {
-                        key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
-                        onyxMethod: Onyx.METHOD.MERGE,
-                        value: {
-                            [transactionID]: {
-                                isLoading: true,
-                            },
-                        },
-                    },
-                    {
                         key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
                         onyxMethod: Onyx.METHOD.MERGE,
                         value: {
@@ -275,7 +266,7 @@ function clearLocalMFAPublicKeyList() {
     });
 }
 
-function cleanUpLocalChallengeBlocklist(entriesToDelete: string[]) {
+function cleanUpLocallyProcessed3DSTransactionReviews(entriesToDelete: string[]) {
     const value: Record<string, null> = {};
     for (const entry of entriesToDelete) {
         value[entry] = null;
@@ -302,7 +293,7 @@ Onyx.connectWithoutView({
         const queuedTransactionIDs = Object.keys(queue);
         const blocklistEntriesToCleanup = Object.keys(locallyProcessed3DSTransactionReviews).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
         if (blocklistEntriesToCleanup.length > 0) {
-            cleanUpLocalChallengeBlocklist(blocklistEntriesToCleanup);
+            cleanUpLocallyProcessed3DSTransactionReviews(blocklistEntriesToCleanup);
         }
     },
 });

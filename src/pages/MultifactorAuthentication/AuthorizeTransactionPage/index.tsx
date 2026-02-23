@@ -21,13 +21,15 @@ import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTra
 
 type MultifactorAuthenticationAuthorizeTransactionPageProps = PlatformStackScreenProps<MultifactorAuthenticationParamList, typeof SCREENS.MULTIFACTOR_AUTHENTICATION.AUTHORIZE_TRANSACTION>;
 
+type TransactionDenialState = false | 'loading' | 'complete';
+
 function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: MultifactorAuthenticationAuthorizeTransactionPageProps) {
     const transactionID = route.params.transactionID;
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    const [transactionDenied, setTransactionDenied] = useState(false);
+    const [transactionDenialState, setTransactionDenial] = useState<TransactionDenialState>(false);
 
     const [transactionQueue] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW, {canBeMissing: true});
     const transaction = transactionQueue?.[transactionID];
@@ -51,7 +53,8 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     };
 
     const onDenyTransaction = () => {
-        denyTransaction({transactionID}).then(() => setTransactionDenied(true));
+        setTransactionDenial('loading');
+        denyTransaction({transactionID}).then(() => setTransactionDenial('complete'));
     };
 
     const onSilentlyDenyTransaction = () => {
@@ -59,7 +62,9 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         Navigation.closeRHPFlow();
     };
 
-    if (transactionDenied) {
+    // When the transaction denial succeeds, the transaction gets removed from the queue slightly sooner than denyTransaction resolves.
+    // We handle this case specially here so that the user does not see a momentary flash of the AlreadyReviewedFailureScreen
+    if (transactionDenialState === 'complete' || (transactionDenialState === 'loading' && !transaction)) {
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
                 <DeniedTransactionSuccessScreen />
@@ -86,7 +91,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                 <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
                     <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
                     <MultifactorAuthenticationAuthorizeTransactionActions
-                        isLoading={transaction.isLoading}
+                        isLoading={transactionDenialState !== false}
                         onAuthorize={approveTransaction}
                         onDeny={onDenyTransaction}
                     />
