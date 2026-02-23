@@ -2,9 +2,7 @@ import {renderHook} from '@testing-library/react-native';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 
-jest.mock('@react-navigation/native', () => ({
-    useNavigationState: jest.fn(),
-}));
+jest.mock('@hooks/useRootNavigationState', () => jest.fn());
 jest.mock('@libs/Navigation/helpers/getPathFromState', () => jest.fn());
 jest.mock('@src/ROUTES', () => ({
     default: {
@@ -16,13 +14,14 @@ jest.mock('@src/ROUTES', () => ({
     },
 }));
 
-const {useNavigationState} = jest.requireMock<{useNavigationState: jest.Mock}>('@react-navigation/native');
+
+const useRootNavigationStateMock = jest.requireMock<jest.Mock>('@hooks/useRootNavigationState');
 const getPathFromStateMock: jest.Mock = jest.requireMock('@libs/Navigation/helpers/getPathFromState');
 
 describe('useDynamicBackPath', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        useNavigationState.mockImplementation((selector: (state: unknown) => unknown) => selector({}));
+        useRootNavigationStateMock.mockImplementation((selector: (state: unknown) => unknown) => selector({}));
     });
 
     it('should return HOME when path is null or undefined', () => {

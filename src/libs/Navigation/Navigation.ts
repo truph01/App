@@ -25,7 +25,6 @@ import SCREENS, {PROTECTED_SCREENS} from '@src/SCREENS';
 import type {Account, SidePanel} from '@src/types/onyx';
 import getInitialSplitNavigatorState from './AppNavigator/createSplitNavigator/getInitialSplitNavigatorState';
 import originalCloseRHPFlow from './helpers/closeRHPFlow';
-import getPathFromState from './helpers/getPathFromState';
 import getStateFromPath from './helpers/getStateFromPath';
 import getTopmostReportParams from './helpers/getTopmostReportParams';
 import {isFullScreenName, isOnboardingFlowName, isSplitNavigatorName} from './helpers/isNavigatorName';
