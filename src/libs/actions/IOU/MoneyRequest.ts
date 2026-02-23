@@ -4,8 +4,9 @@ import getCurrentPosition from '@libs/getCurrentPosition';
 import {calculateDefaultReimbursable, navigateToConfirmationPage, navigateToParticipantPage} from '@libs/IOUUtils';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
+import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {getManagerMcTestParticipant, getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
-import {findSelfDMReportID, generateReportID, getPolicyExpenseChat} from '@libs/ReportUtils';
+import {generateReportID, getPolicyExpenseChat, isSelfDM} from '@libs/ReportUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import shouldUseDefaultExpensePolicy from '@libs/shouldUseDefaultExpensePolicy';
 import {getValidWaypoints} from '@libs/TransactionUtils';
@@ -19,6 +20,7 @@ import ROUTES from '@src/ROUTES';
 import type {Beta, IntroSelected, LastSelectedDistanceRates, PersonalDetailsList, Policy, QuickAction, Report, Transaction, TransactionViolation} from '@src/types/onyx';
 import type {ReportAttributes, ReportAttributesDerivedValue} from '@src/types/onyx/DerivedValues';
 import type {Participant} from '@src/types/onyx/IOU';
+import type {Unit} from '@src/types/onyx/Policy';
 import type {Receipt, WaypointCollection} from '@src/types/onyx/Transaction';
 import type {GpsPoint} from './index';
 import {
@@ -26,8 +28,8 @@ import {
     getMoneyRequestParticipantsFromReport,
     getRecentWaypoints,
     requestMoney,
-    resetSplitShares,
     setCustomUnitRateID,
+    setMoneyRequestDistance,
     setMoneyRequestMerchant,
     setMoneyRequestParticipants,
     setMoneyRequestParticipantsFromReport,
@@ -35,7 +37,7 @@ import {
     setMultipleMoneyRequestParticipantsFromReport,
     trackExpense,
 } from './index';
-import {startSplitBill} from './Split';
+import {resetSplitShares, startSplitBill} from './Split';
 
 type CreateTransactionParams = {
     transactions: Transaction[];
@@ -101,6 +103,7 @@ type MoneyRequestStepScanParticipantsFlowParams = {
     isTestTransaction?: boolean;
     locationPermissionGranted?: boolean;
     shouldGenerateTransactionThreadReport: boolean;
+    selfDMReport: OnyxEntry<Report>;
     isSelfTourViewed: boolean;
     betas: OnyxEntry<Beta[]>;
 };
@@ -136,9 +139,15 @@ type MoneyRequestStepDistanceNavigationParams = {
     introSelected?: IntroSelected;
     activePolicyID?: string;
     privateIsArchived?: string;
+    selfDMReport: OnyxEntry<Report>;
     gpsCoordinates?: string;
     gpsDistance?: number;
+    odometerStart?: number;
+    odometerEnd?: number;
+    odometerDistance?: number;
     betas: OnyxEntry<Beta[]>;
+    unit?: Unit;
+    personalOutputCurrency?: string;
 };
 
 function createTransaction({
@@ -284,6 +293,7 @@ function handleMoneyRequestStepScanParticipants({
     files,
     isTestTransaction = false,
     locationPermissionGranted = false,
+    selfDMReport,
     isSelfTourViewed,
     betas,
 }: MoneyRequestStepScanParticipantsFlowParams) {
@@ -452,19 +462,21 @@ function handleMoneyRequestStepScanParticipants({
     // If there was no reportID, then that means the user started this flow from the global + menu
     // and an optimistic reportID was generated. In that case, the next step is to select the participants for this expense.
     if (shouldUseDefaultExpensePolicy(iouType, defaultExpensePolicy)) {
-        const activePolicyExpenseChat = getPolicyExpenseChat(currentUserAccountID, defaultExpensePolicy?.id);
         const shouldAutoReport = !!defaultExpensePolicy?.autoReporting || isAutoReporting;
-        const transactionReportID = shouldAutoReport ? activePolicyExpenseChat?.reportID : CONST.REPORT.UNREPORTED_REPORT_ID;
+        const targetReport = shouldAutoReport ? getPolicyExpenseChat(currentUserAccountID, defaultExpensePolicy?.id) : selfDMReport;
+        const transactionReportID = isSelfDM(targetReport) ? CONST.REPORT.UNREPORTED_REPORT_ID : targetReport?.reportID;
+        const iouTypeTrackOrSubmit = transactionReportID === CONST.REPORT.UNREPORTED_REPORT_ID ? CONST.IOU.TYPE.TRACK : CONST.IOU.TYPE.SUBMIT;
 
         // If the initial transaction has different participants selected that means that the user has changed the participant in the confirmation step
-        if (initialTransaction?.participants && initialTransaction?.participants?.at(0)?.reportID !== activePolicyExpenseChat?.reportID) {
-            const selfDMReportID = findSelfDMReportID();
-            const isTrackExpense = initialTransaction?.participants?.at(0)?.reportID === selfDMReportID;
+        if (initialTransaction?.participants && initialTransaction?.participants?.at(0)?.reportID !== targetReport?.reportID) {
+            const isTrackExpense = initialTransaction?.participants?.at(0)?.reportID === selfDMReport?.reportID;
 
             const setParticipantsPromises = files.map((receiptFile) => setMoneyRequestParticipants(receiptFile.transactionID, initialTransaction?.participants));
             Promise.all(setParticipantsPromises).then(() => {
                 if (isTrackExpense) {
-                    Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.TRACK, initialTransaction.transactionID, selfDMReportID));
+                    Navigation.navigate(
+                        ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.TRACK, initialTransaction.transactionID, selfDMReport?.reportID),
+                    );
                 } else {
                     navigateToConfirmationPage(iouType, initialTransaction.transactionID, reportID, backToReport, iouType === CONST.IOU.TYPE.CREATE, initialTransaction?.reportID);
                 }
@@ -474,17 +486,10 @@ function handleMoneyRequestStepScanParticipants({
 
         const setParticipantsPromises = files.map((receiptFile) => {
             setTransactionReport(receiptFile.transactionID, {reportID: transactionReportID}, true);
-            return setMoneyRequestParticipantsFromReport(receiptFile.transactionID, activePolicyExpenseChat, currentUserAccountID);
+            return setMoneyRequestParticipantsFromReport(receiptFile.transactionID, targetReport, currentUserAccountID);
         });
         Promise.all(setParticipantsPromises).then(() =>
-            Navigation.navigate(
-                ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(
-                    CONST.IOU.ACTION.CREATE,
-                    iouType === CONST.IOU.TYPE.CREATE ? CONST.IOU.TYPE.SUBMIT : iouType,
-                    initialTransaction.transactionID,
-                    activePolicyExpenseChat?.reportID,
-                ),
-            ),
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(CONST.IOU.ACTION.CREATE, iouTypeTrackOrSubmit, initialTransaction.transactionID, targetReport?.reportID)),
         );
     } else {
         navigateToParticipantPage(iouType, initialTransaction.transactionID, reportID);
@@ -521,22 +526,31 @@ function handleMoneyRequestStepDistanceNavigation({
     introSelected,
     activePolicyID,
     privateIsArchived,
+    selfDMReport,
     gpsCoordinates,
     gpsDistance,
     policyForMovingExpenses,
+    odometerStart,
+    odometerEnd,
+    odometerDistance,
     betas,
+    unit,
+    personalOutputCurrency,
 }: MoneyRequestStepDistanceNavigationParams) {
     const isManualDistance = manualDistance !== undefined;
+    const isOdometerDistance = odometerDistance !== undefined;
     const isGPSDistance = gpsDistance !== undefined && gpsCoordinates !== undefined;
     const recentWaypoints = getRecentWaypoints();
 
-    if (transaction?.splitShares && !isManualDistance) {
+    if (transaction?.splitShares && !isManualDistance && !isOdometerDistance) {
         resetSplitShares(transaction);
     }
     if (backTo) {
         Navigation.goBack(backTo);
         return;
     }
+
+    const distance = manualDistance ?? gpsDistance ?? odometerDistance;
 
     // If a reportID exists in the report object, it's because either:
     // - The user started this flow from using the + button in the composer inside a report.
@@ -546,15 +560,6 @@ function handleMoneyRequestStepDistanceNavigation({
     // If the user started this flow using the Create expense option (combined submit/track flow), they should be redirected to the participants page.
     if (report?.reportID && !isArchivedExpenseReport && iouType !== CONST.IOU.TYPE.CREATE) {
         const participants = getMoneyRequestParticipantOptions(currentUserAccountID, report, policy, personalDetails, privateIsArchived, reportAttributesDerived);
-
-        let validWaypoints: WaypointCollection | undefined;
-        if (!isManualDistance) {
-            if (isGPSDistance) {
-                validWaypoints = waypoints;
-            } else {
-                validWaypoints = getValidWaypoints(waypoints, true);
-            }
-        }
 
         setDistanceRequestData?.(participants);
         if (shouldSkipConfirmation) {
@@ -571,6 +576,8 @@ function handleMoneyRequestStepDistanceNavigation({
                 transactionReportID: transaction?.reportID,
             });
 
+            const validWaypoints = !isManualDistance && !isOdometerDistance ? getValidWaypoints(waypoints, true, isGPSDistance) : undefined;
+
             if (isCreatingTrackExpense && participant) {
                 trackExpense({
                     report,
@@ -585,7 +592,7 @@ function handleMoneyRequestStepDistanceNavigation({
                     },
                     transactionParams: {
                         amount: 0,
-                        distance: manualDistance ?? gpsDistance,
+                        distance,
                         currency: transaction?.currency ?? 'USD',
                         created: transaction?.created ?? '',
                         merchant: translate('iou.fieldPending'),
@@ -596,6 +603,8 @@ function handleMoneyRequestStepDistanceNavigation({
                         customUnitRateID,
                         attendees: transaction?.comment?.attendees,
                         gpsCoordinates,
+                        odometerStart,
+                        odometerEnd,
                     },
                     isASAPSubmitBetaEnabled,
                     currentUserAccountIDParam: currentUserAccountID,
@@ -618,7 +627,7 @@ function handleMoneyRequestStepDistanceNavigation({
                 existingTransaction: transaction,
                 transactionParams: {
                     amount: 0,
-                    distance: manualDistance ?? gpsDistance,
+                    distance,
                     comment: '',
                     created: transaction?.created ?? '',
                     currency: transaction?.currency ?? 'USD',
@@ -630,6 +639,8 @@ function handleMoneyRequestStepDistanceNavigation({
                     splitShares: transaction?.splitShares,
                     attendees: transaction?.comment?.attendees,
                     gpsCoordinates,
+                    odometerStart,
+                    odometerEnd,
                 },
                 backToReport,
                 isASAPSubmitBetaEnabled,
@@ -650,9 +661,12 @@ function handleMoneyRequestStepDistanceNavigation({
     // If there was no reportID, then that means the user started this flow from the global menu
     // and an optimistic reportID was generated. In that case, the next step is to select the participants for this expense.
     if (defaultExpensePolicy && shouldUseDefaultExpensePolicy(iouType, defaultExpensePolicy)) {
-        const activePolicyExpenseChat = getPolicyExpenseChat(currentUserAccountID, defaultExpensePolicy?.id);
         const shouldAutoReport = !!defaultExpensePolicy?.autoReporting || isAutoReporting;
-        const transactionReportID = shouldAutoReport ? activePolicyExpenseChat?.reportID : CONST.REPORT.UNREPORTED_REPORT_ID;
+        const targetReport = shouldAutoReport ? getPolicyExpenseChat(currentUserAccountID, defaultExpensePolicy?.id) : selfDMReport;
+        const isSelfDMReport = isSelfDM(targetReport);
+        const transactionReportID = isSelfDMReport ? CONST.REPORT.UNREPORTED_REPORT_ID : targetReport?.reportID;
+        const iouTypeTrackOrSubmit = transactionReportID === CONST.REPORT.UNREPORTED_REPORT_ID ? CONST.IOU.TYPE.TRACK : CONST.IOU.TYPE.SUBMIT;
+
         const rateID = DistanceRequestUtils.getCustomUnitRateID({
             reportID: transactionReportID,
             isPolicyExpenseChat: true,
@@ -660,16 +674,24 @@ function handleMoneyRequestStepDistanceNavigation({
             lastSelectedDistanceRates,
         });
         setTransactionReport(transactionID, {reportID: transactionReportID}, true);
-        setCustomUnitRateID(transactionID, rateID);
-        setMoneyRequestParticipantsFromReport(transactionID, activePolicyExpenseChat, currentUserAccountID).then(() => {
-            Navigation.navigate(
-                ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(
-                    CONST.IOU.ACTION.CREATE,
-                    iouType === CONST.IOU.TYPE.CREATE ? CONST.IOU.TYPE.SUBMIT : iouType,
-                    transactionID,
-                    activePolicyExpenseChat?.reportID,
-                ),
-            );
+        // Do not pass transaction and policy so it only updates customUnitRateID without changing distance and distance unit
+        // as it is set for Manual requests before this function is called and transaction may have
+        // obsolete customUnit values
+        setCustomUnitRateID(transactionID, rateID, undefined, undefined);
+
+        // Update distance and distance unit in transaction object as it is usually set before this function is called using
+        // defaultExpensePolicy data which is not accurate in this case as defaultExpensePolicy has autoReporting set to false
+        // and because of this this report is converted to selfDM here
+        if (isSelfDMReport && distance !== undefined && unit) {
+            const personalCurrency = personalOutputCurrency ?? CONST.CURRENCY.USD;
+            const personalDistanceUnit = DistanceRequestUtils.getRateForP2P(personalCurrency, transaction).unit;
+            const distanceInMeters = DistanceRequestUtils.convertToDistanceInMeters(distance, unit);
+            const distanceUsingPersonalDistanceUnit = roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(distanceInMeters, personalDistanceUnit));
+            setMoneyRequestDistance(transactionID, distanceUsingPersonalDistanceUnit, true, personalDistanceUnit);
+        }
+
+        setMoneyRequestParticipantsFromReport(transactionID, targetReport, currentUserAccountID).then(() => {
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(CONST.IOU.ACTION.CREATE, iouTypeTrackOrSubmit, transactionID, targetReport?.reportID));
         });
     } else {
         navigateToParticipantPage(iouType, transactionID, reportID);
