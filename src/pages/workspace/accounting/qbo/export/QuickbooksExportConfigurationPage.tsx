@@ -37,7 +37,7 @@ function QuickbooksExportConfigurationPage({policy}: WithPolicyConnectionsProps)
     const travelPayableAccount = accountPayable?.find((account) => account.id === qboConfig?.travelInvoicingPayableAccountID);
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);
-    const [cardSettings] = useOnyx(getTravelInvoicingCardSettingsKey(workspaceAccountID), {canBeMissing: true});
+    const [cardSettings] = useOnyx(getTravelInvoicingCardSettingsKey(workspaceAccountID));
     const isTravelInvoicingEnabled = isBetaEnabled(CONST.BETAS.TRAVEL_INVOICING) && getIsTravelInvoicingEnabled(cardSettings);
 
     const shouldShowVendorMenuItems = useMemo(

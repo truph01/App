@@ -1,3 +1,4 @@
+import {useRoute} from '@react-navigation/native';
 import React from 'react';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
@@ -8,6 +9,8 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {updateConnectionConfig} from '@libs/actions/PolicyConnections';
 import {getLatestErrorField} from '@libs/ErrorUtils';
+import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
@@ -15,12 +18,9 @@ import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import variables from '@styles/variables';
 import {clearQBOErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
-import type {Account} from '@src/types/onyx/Policy';
-import {useRoute} from '@react-navigation/native';
-import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
-import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
-import type SCREENS from '@src/SCREENS';
 import ROUTES from '@src/ROUTES';
+import type SCREENS from '@src/SCREENS';
+import type {Account} from '@src/types/onyx/Policy';
 
 type CardListItem = ListItem & {
     value: Account;
