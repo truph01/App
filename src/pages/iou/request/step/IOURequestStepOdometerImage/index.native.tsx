@@ -80,7 +80,7 @@ function IOURequestStepOdometerImage({
         physicalDevices: ['wide-angle-camera', 'ultra-wide-angle-camera'],
     });
     const platform = getPlatform(true);
-    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS, {canBeMissing: true});
+    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS);
     const isPlatformMuted = mutedPlatforms[platform];
 
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
