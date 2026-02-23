@@ -11,118 +11,44 @@ import type {TranslationPaths} from '@src/languages/types';
 const ILLUSTRATION_WIDTH = 100;
 const ILLUSTRATION_DEFAULT_HEIGHT = 100;
 
+const MSG = 'homePage.forYouSection.emptyStateMessages' as const;
+const TITLE_KEY = `${MSG}.youreDone` as TranslationPaths;
+
+// ── Edit this table to update copy ──────────────────────────────────
+// [Illustration,        subtitle,              description       ]
+const ENTRY_DATA: Array<[IllustrationName, string, string]> = [
+    ['ThumbsUpStars', 'thumbsUpStar', 'keepAnEyeOut'],
+    ['SmallRocket', 'launchSomethingNew', 'upcomingTodos'],
+    ['CowboyHat', 'wrangledEveryTask', 'keepAnEyeOut'],
+    ['Trophy1', 'thankTheAcademy', 'upcomingTodos'],
+    ['PalmTree', 'hitTheBeach', 'keepAnEyeOut'],
+    ['FishbowlBlue', 'cuteFish', 'upcomingTodos'],
+    ['Target', 'rightOnTarget', 'keepAnEyeOut'],
+    ['Chair', 'takeASeat', 'upcomingTodos'],
+    ['Broom', 'niceAndTidy', 'keepAnEyeOut'],
+    ['House', 'welcomeHome', 'upcomingTodos'],
+    ['ConciergeBot', 'beepBoop', 'keepAnEyeOut'],
+    ['CheckboxText', 'checkedEveryBox', 'upcomingTodos'],
+    ['Trophy', 'shinyTrophy', 'keepAnEyeOut'],
+    ['Flash', 'fastAsLightning', 'upcomingTodos'],
+    ['Sunglasses', 'tooCool', 'keepAnEyeOut'],
+    ['F1Flags', 'crossedFinishLine', 'upcomingTodos'],
+];
+// ────────────────────────────────────────────────────────────────────
+
 type EmptyStateConfig = {
     titleKey: TranslationPaths;
     subtitleKey: TranslationPaths;
+    descriptionKey: TranslationPaths;
     illustrationName: IllustrationName;
-    illustrationHeight: number;
 };
 
-const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = [
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpTitle',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.keepAnEyeOut',
-        illustrationName: 'ThumbsUpStars',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.niceWork',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.keepAnEyeOut',
-        illustrationName: 'SmallRocket',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.yeehaw',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpSubtitle',
-        illustrationName: 'CowboyHat',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.youWin',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpSubtitle',
-        illustrationName: 'Trophy1',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpExclaim',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.timeForABreak',
-        illustrationName: 'PalmTree',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpExclaim',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.timeForABreak',
-        illustrationName: 'FishbowlBlue',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.bullseye',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpSubtitle',
-        illustrationName: 'Target',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allDone',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.timeToRelax',
-        illustrationName: 'Chair',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allClean',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.timeToRelax',
-        illustrationName: 'Broom',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.takeItEasy',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.everythingsTidiedUp',
-        illustrationName: 'House',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.nothingToShow',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.caughtUpOnTasks',
-        illustrationName: 'ConciergeBot',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.tasksCompleted',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpSubtitle',
-        illustrationName: 'CheckboxText',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.youreNumber1',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.caughtUpOnTasks',
-        illustrationName: 'Trophy',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.kaZap',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.caughtUpOnTasks',
-        illustrationName: 'Flash',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allDone',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.caughtUpOnTasks',
-        illustrationName: 'F1Flags',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.finished',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.caughtUpOnTasks',
-        illustrationName: 'Sunglasses',
-        illustrationHeight: ILLUSTRATION_DEFAULT_HEIGHT,
-    },
-    {
-        titleKey: 'homePage.forYouSection.emptyStateMessages.allCaughtUpSubtitle',
-        subtitleKey: 'homePage.forYouSection.emptyStateMessages.upcomingTodos',
-        illustrationName: 'Fireworks',
-        // Fireworks viewBox is 164x148, so height = 100 * (148/164) ≈ 90
-        illustrationHeight: 90,
-    },
-];
+const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ENTRY_DATA.map(([illustrationName, subtitle, description]) => ({
+    titleKey: TITLE_KEY,
+    subtitleKey: `${MSG}.${subtitle}` as TranslationPaths,
+    descriptionKey: `${MSG}.${description}` as TranslationPaths,
+    illustrationName,
+}));
 
 const ILLUSTRATION_NAMES = EMPTY_STATE_CONFIGS.map((c) => c.illustrationName);
 
@@ -142,10 +68,11 @@ function EmptyState() {
             <ImageSVG
                 src={illustrations[config.illustrationName]}
                 width={ILLUSTRATION_WIDTH}
-                height={config.illustrationHeight}
+                height={ILLUSTRATION_DEFAULT_HEIGHT}
             />
             <Text style={styles.forYouEmptyStateTitle}>{translate(config.titleKey)}</Text>
             <Text style={styles.forYouEmptyStateSubtitle}>{translate(config.subtitleKey)}</Text>
+            <Text style={styles.forYouEmptyStateDescription}>{translate(config.descriptionKey)}</Text>
         </View>
     );
 }

@@ -3713,6 +3713,15 @@ const staticStyles = (theme: ThemeColors) =>
             color: theme.textSupporting,
         },
 
+        forYouEmptyStateDescription: {
+            ...FontUtils.fontFamily.platform.EXP_NEUE,
+            fontSize: variables.fontSizeLabel,
+            lineHeight: 16,
+            marginTop: 2,
+            textAlign: 'center' as const,
+            color: theme.textSupporting,
+        },
+
         homePageContentContainer: {
             flexGrow: 1,
             paddingTop: 0,
