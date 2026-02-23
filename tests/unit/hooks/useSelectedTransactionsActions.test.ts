@@ -620,6 +620,8 @@ describe('useSelectedTransactionsActions', () => {
             originalTransaction: transaction,
         });
 
+        jest.spyOn(require('@libs/ReportSecondaryActionUtils'), 'isSplitAction').mockReturnValue(true);
+
         const {result} = renderHook(() =>
             useSelectedTransactionsActions({
                 report,

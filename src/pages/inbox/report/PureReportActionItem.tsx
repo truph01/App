@@ -5,6 +5,7 @@ import React, {memo, use, useCallback, useContext, useEffect, useMemo, useRef, u
 import type {GestureResponderEvent, TextInput} from 'react-native';
 import {InteractionManager, Keyboard, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {Emoji} from '@assets/emojis/types';
 import * as ActionSheetAwareScrollView from '@components/ActionSheetAwareScrollView';
 import {AttachmentContext} from '@components/AttachmentContext';
@@ -53,6 +54,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {cleanUpMoneyRequest} from '@libs/actions/IOU';
 import {resolveSuggestedFollowup} from '@libs/actions/Report/SuggestedFollowup';
+import {isPersonalCardBrokenConnection} from '@libs/CardUtils';
 import ControlSelection from '@libs/ControlSelection';
 import {convertToDisplayString} from '@libs/CurrencyUtils';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
@@ -78,11 +80,14 @@ import {
     getChangedApproverActionMessage,
     getCompanyAddressUpdateMessage,
     getCompanyCardConnectionBrokenMessage,
+    getCurrencyDefaultTaxUpdateMessage,
+    getCustomTaxNameUpdateMessage,
     getDefaultApproverUpdateMessage,
     getDeletedApprovalRuleMessage,
     getDeletedBudgetMessage,
     getDemotedFromWorkspaceMessage,
     getDismissedViolationMessageText,
+    getForeignCurrencyDefaultTaxUpdateMessage,
     getForwardsToUpdateMessage,
     getIntegrationSyncFailedMessage,
     getInvoiceCompanyNameUpdateMessage,
@@ -236,13 +241,11 @@ import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {JoinWorkspaceResolution} from '@src/types/onyx/OriginalMessage';
 import {isEmptyObject, isEmptyValueObject} from '@src/types/utils/EmptyObject';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
-import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
-import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
-import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
-import CreatedReportForUnapprovedTransactionsAction from '@components/ReportActionItem/CreatedReportForUnapprovedTransactionsAction';
-import type {OnyxEntry, OnyxCollection} from 'react-native-onyx';
 import useOnyx from '@hooks/useOnyx';
-import {isPersonalCardBrokenConnection} from '@libs/CardUtils';
+import MovedTransactionAction from '@components/ReportActionItem/MovedTransactionAction';
+import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
+import CreatedReportForUnapprovedTransactionsAction from '@components/ReportActionItem/CreatedReportForUnapprovedTransactionsAction';
+import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
 import {RestrictedReadOnlyContextMenuActions} from './ContextMenu/ContextMenuActions';
 import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMenu';
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
@@ -439,7 +442,13 @@ type PureReportActionItemProps = {
     clearError?: (transactionID: string) => void;
 
     /** Function to clear all errors from a report action */
-    clearAllRelatedReportActionErrors?: (reportID: string | undefined, reportAction: OnyxTypes.ReportAction | null | undefined, ignore?: IgnoreDirection, keys?: string[]) => void;
+    clearAllRelatedReportActionErrors?: (
+        reportID: string | undefined,
+        reportAction: OnyxTypes.ReportAction | null | undefined,
+        originalReportID: string | undefined,
+        ignore?: IgnoreDirection,
+        keys?: string[],
+    ) => void;
 
     /** Function to dismiss the actionable whisper for tracking expenses */
     dismissTrackExpenseActionableWhisper?: (reportID: string | undefined, reportAction: OnyxEntry<OnyxTypes.ReportAction>) => void;
@@ -613,13 +622,13 @@ function PureReportActionItem({
     const dismissError = useCallback(() => {
         const transactionID = isMoneyRequestAction(action) ? getOriginalMessage(action)?.IOUTransactionID : undefined;
         if (isSendingMoney && transactionID && reportID) {
-            cleanUpMoneyRequest(transactionID, action, reportID, report, chatReport, undefined, true);
+            cleanUpMoneyRequest(transactionID, action, reportID, report, chatReport, undefined, originalReportID, true);
             return;
         }
         if (transactionID) {
             clearError(transactionID);
         }
-        clearAllRelatedReportActionErrors(reportID, action);
+        clearAllRelatedReportActionErrors(reportID, action, originalReportID);
     }, [action, isSendingMoney, reportID, clearAllRelatedReportActionErrors, report, chatReport, clearError]);
 
     const showDismissReceiptErrorModal = useCallback(async () => {
@@ -1490,6 +1499,12 @@ function PureReportActionItem({
             action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_TAX
         ) {
             children = <ReportActionItemBasicMessage message={getWorkspaceTaxUpdateMessage(translate, action)} />;
+        } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_CUSTOM_TAX_NAME) {
+            children = <ReportActionItemBasicMessage message={getCustomTaxNameUpdateMessage(translate, action)} />;
+        } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_CURRENCY_DEFAULT_TAX) {
+            children = <ReportActionItemBasicMessage message={getCurrencyDefaultTaxUpdateMessage(translate, action)} />;
+        } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_FOREIGN_CURRENCY_DEFAULT_TAX) {
+            children = <ReportActionItemBasicMessage message={getForeignCurrencyDefaultTaxUpdateMessage(translate, action)} />;
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_TAG_LIST_NAME) {
             children = <ReportActionItemBasicMessage message={getCleanedTagName(getTagListNameUpdatedMessage(translate, action))} />;
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_TAG_LIST) {
@@ -1616,12 +1631,14 @@ function PureReportActionItem({
                 />
             );
         } else if (isCardBrokenConnectionAction(action)) {
-            const cardID = getOriginalMessage(action)?.cardID;
+            const message = getOriginalMessage(action);
+            const cardID = message?.cardID;
+            const cardName = message?.cardName;
             const card = cardID ? cardList?.[cardID] : undefined;
             const connectionLink = cardID && isPersonalCardBrokenConnection(card) ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : undefined;
             children = (
                 <ReportActionItemBasicMessage message="">
-                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, translate, connectionLink)}</comment>`} />
+                    <RenderHTML html={`<comment>${getCardConnectionBrokenMessage(card, cardName, translate, connectionLink)}</comment>`} />
                 </ReportActionItemBasicMessage>
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {

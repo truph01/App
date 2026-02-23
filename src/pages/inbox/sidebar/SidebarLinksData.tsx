@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import React, {useCallback, useRef} from 'react';
 import {View} from 'react-native';
@@ -30,9 +30,23 @@ function SidebarLinksData({insets}: SidebarLinksDataProps) {
     currentReportIDRef.current = currentReportID;
     const isActiveReport = useCallback((reportID: string): boolean => currentReportIDRef.current === reportID, []);
 
+    // Guards against ending the span before the first layout has completed.
+    const hasHadFirstLayout = useRef(false);
     const onLayout = useCallback(() => {
+        hasHadFirstLayout.current = true;
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
     }, []);
+
+    // On re-visits, react-freeze serves the cached layout — onLayout never fires.
+    // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
+    useFocusEffect(
+        useCallback(() => {
+            if (!hasHadFirstLayout.current) {
+                return;
+            }
+            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
+        }, []),
+    );
 
     return (
         <View

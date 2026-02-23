@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {useBlockedFromConcierge} from '@components/OnyxListItemProvider';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -7,8 +7,9 @@ import useOnyx from '@hooks/useOnyx';
 import useOriginalReportID from '@hooks/useOriginalReportID';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useReportIsArchived from '@hooks/useReportIsArchived';
+import useReportTransactions from '@hooks/useReportTransactions';
 import {getForReportActionTemp, getMovedReportID} from '@libs/ModifiedExpenseMessage';
-import {getIOUReportIDFromReportActionPreview, getOriginalMessage} from '@libs/ReportActionsUtils';
+import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     chatIncludesChronosWithID,
     createDraftTransactionAndNavigateToParticipantSelector,
@@ -32,7 +33,6 @@ import {clearError} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Policy, ReportAction, ReportActionReactions, Transaction} from '@src/types/onyx';
-import type {Errors} from '@src/types/onyx/OnyxCommon';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
@@ -47,9 +47,6 @@ type ReportActionItemProps = Omit<
     /** Whether to show the draft message or not */
     shouldShowDraftMessage?: boolean;
 
-    /** All the data of the transaction collection */
-    transactions?: Array<OnyxEntry<Transaction>>;
-
     /** Draft message for the report action */
     draftMessage?: string;
 
@@ -58,9 +55,6 @@ type ReportActionItemProps = Omit<
 
     /** User wallet tierName */
     userWalletTierName: string | undefined;
-
-    /** Linked transaction route error */
-    linkedTransactionRouteError?: OnyxEntry<Errors>;
 
     /** Whether the user is validated */
     isUserValidated: boolean | undefined;
@@ -79,14 +73,13 @@ function ReportActionItem({
     policies,
     action,
     report,
-    transactions,
     draftMessage,
     emojiReactions,
     userWalletTierName,
     isUserValidated,
     personalDetails,
-    linkedTransactionRouteError,
     userBillingFundID,
+    linkedTransactionRouteError: linkedTransactionRouteErrorProp,
     isTryNewDotNVPDismissed,
     ...props
 }: ReportActionItemProps) {
@@ -123,6 +116,18 @@ function ReportActionItem({
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: true});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
+    const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
+    const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
+
+    const getLinkedTransactionRouteError = useCallback(
+        (transaction: OnyxEntry<Transaction>) => {
+            return linkedTransactionRouteErrorProp ?? transaction?.errorFields?.route;
+        },
+        [linkedTransactionRouteErrorProp],
+    );
+
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {canBeMissing: true, selector: getLinkedTransactionRouteError});
+
     const blockedFromConcierge = useBlockedFromConcierge();
     const targetReport = isChatThread(report) ? parentReport : report;
     const missingPaymentMethod = getIndicatedMissingPaymentMethod(userWalletTierName, targetReport?.reportID, action, bankAccountList);
@@ -160,7 +165,7 @@ function ReportActionItem({
             createDraftTransactionAndNavigateToParticipantSelector={createDraftTransactionAndNavigateToParticipantSelector}
             resolveActionableReportMentionWhisper={resolveActionableReportMentionWhisper}
             resolveActionableMentionWhisper={resolveActionableMentionWhisper}
-            isClosedExpenseReportWithNoExpenses={isClosedExpenseReportWithNoExpenses(iouReport, transactions)}
+            isClosedExpenseReportWithNoExpenses={isClosedExpenseReportWithNoExpenses(iouReport, transactionsOnIOUReport)}
             isCurrentUserTheOnlyParticipant={isCurrentUserTheOnlyParticipant}
             missingPaymentMethod={missingPaymentMethod}
             reimbursementDeQueuedOrCanceledActionMessage={getReimbursementDeQueuedOrCanceledActionMessage(

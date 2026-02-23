@@ -2,23 +2,26 @@ import mapValues from 'lodash/mapValues';
 import React, {useMemo, useState} from 'react';
 import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
-import type {OnyxEntry} from 'react-native-onyx';
-import {ModalActions} from '@components/Modal/Global/ModalContext';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ReceiptAudit, {ReceiptAuditMessages} from '@components/ReceiptAudit';
 import ReceiptEmptyState from '@components/ReceiptEmptyState';
 import useActiveRoute from '@hooks/useActiveRoute';
+import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useEnvironment from '@hooks/useEnvironment';
 import useGetIOUReportFromReportAction from '@hooks/useGetIOUReportFromReportAction';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useOriginalReportID from '@hooks/useOriginalReportID';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolations from '@hooks/useTransactionViolations';
+import {getBrokenConnectionUrlToFixPersonalCard} from '@libs/CardUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey, isReceiptError} from '@libs/ErrorUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getThumbnailAndImageURIs} from '@libs/ReceiptUtils';
@@ -53,8 +56,6 @@ import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {TransactionPendingFieldsKey} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import useCardFeedErrors from '@hooks/useCardFeedErrors';
-import {getBrokenConnectionUrlToFixPersonalCard} from '@libs/CardUtils';
 import ReportActionItemImage from './ReportActionItemImage';
 
 type MoneyRequestReceiptViewProps = {
@@ -107,6 +108,7 @@ function MoneyRequestReceiptView({report, readonly = false, updatedTransaction, 
 
     const [isLoading, setIsLoading] = useState(true);
     const parentReportAction = report?.parentReportActionID ? parentReportActions?.[report.parentReportActionID] : undefined;
+    const originalReportID = useOriginalReportID(report?.reportID, parentReportAction);
     const {iouReport, chatReport: chatIOUReport, isChatIOUReportArchived} = useGetIOUReportFromReportAction(parentReportAction);
     const isTrackExpense = !mergeTransactionID && isTrackExpenseReportNew(report, parentReport, parentReportAction);
     const moneyRequestReport = parentReport;
@@ -269,16 +271,26 @@ function MoneyRequestReceiptView({report, readonly = false, updatedTransaction, 
                 return;
             }
             if (parentReportAction) {
-                cleanUpMoneyRequest(transaction?.transactionID ?? linkedTransactionID, parentReportAction, report.reportID, iouReport, chatIOUReport, isChatIOUReportArchived, true);
+                cleanUpMoneyRequest(
+                    transaction?.transactionID ?? linkedTransactionID,
+                    parentReportAction,
+                    report.reportID,
+                    iouReport,
+                    chatIOUReport,
+                    isChatIOUReportArchived,
+                    originalReportID,
+                    true,
+                );
                 return;
             }
         }
+
         if (!transaction?.transactionID) {
             if (!linkedTransactionID) {
                 return;
             }
             clearError(linkedTransactionID);
-            clearAllRelatedReportActionErrors(report.reportID, parentReportAction);
+            clearAllRelatedReportActionErrors(report.reportID, parentReportAction, originalReportID);
             return;
         }
         if (!isEmptyObject(transactionAndReportActionErrors)) {
@@ -286,7 +298,7 @@ function MoneyRequestReceiptView({report, readonly = false, updatedTransaction, 
         }
         if (!isEmptyObject(errorsWithoutReportCreation)) {
             clearError(transaction.transactionID);
-            clearAllRelatedReportActionErrors(report.reportID, parentReportAction);
+            clearAllRelatedReportActionErrors(report.reportID, parentReportAction, originalReportID);
         }
         if (!isEmptyObject(reportCreationError)) {
             if (isInNarrowPaneModal) {
