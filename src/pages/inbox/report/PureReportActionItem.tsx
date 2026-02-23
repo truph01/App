@@ -1799,14 +1799,9 @@ function PureReportActionItem({
 
             const isConciergeOptions = isConciergeCategoryOptions(action) || isConciergeDescriptionOptions(action);
             const actionContainsFollowUps = containsActionableFollowUps(action);
-            let actionableButtonsNoLines = 1;
-            if (isConciergeOptions) {
-                actionableButtonsNoLines = 2;
-            }
-            if (actionContainsFollowUps) {
-                actionableButtonsNoLines = 0;
-            }
             const isPhrasalConciergeOptions = isConciergeOptions || actionContainsFollowUps;
+            const actionableButtonsNoLines = isPhrasalConciergeOptions ? 3 : 1;
+
             children = (
                 <MentionReportContext.Provider value={mentionReportContextValue}>
                     <ShowContextMenuContext.Provider value={contextValue}>
