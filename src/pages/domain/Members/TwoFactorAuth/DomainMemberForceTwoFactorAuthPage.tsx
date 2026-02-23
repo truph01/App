@@ -17,17 +17,13 @@ function DomainMemberForceTwoFactorAuthPage({route}: DomainMemberForceTwoFactorA
     const {domainAccountID, accountID} = route.params;
 
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: personalDetailsSelector(accountID),
     });
     const memberLogin = personalDetails?.login ?? '';
     const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
-        canBeMissing: false,
         selector: domainMemberSettingsSelector,
     });
-    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
+    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
 
     useEffect(() => {
         if (!domainSettings?.twoFactorAuthExemptEmails?.includes(memberLogin)) {

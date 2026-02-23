@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
 import FixedFooter from '@components/FixedFooter';
@@ -28,11 +28,25 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    const [validateDomainTwoFactorCodeErrors] = useOnyx(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, {
-        canBeMissing: true,
-    });
+    const [validateDomainTwoFactorCodeErrors] = useOnyx(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE);
 
     const baseTwoFactorAuthRef = useRef<BaseTwoFactorAuthFormRef>(null);
+    const isUnmounted = useRef(false);
+
+    useEffect(() => {
+        return () => {
+            isUnmounted.current = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            if (!isUnmounted.current) {
+                return;
+            }
+            clearValidateDomainTwoFactorCodeError();
+        };
+    }, []);
 
     return (
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>

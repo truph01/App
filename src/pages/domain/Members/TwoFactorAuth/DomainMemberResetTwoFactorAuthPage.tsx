@@ -16,7 +16,6 @@ function DomainMemberResetTwoFactorAuthPage({route}: DomainMemberTwoFactorAuthPa
     const {domainAccountID, accountID} = route.params;
 
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: personalDetailsSelector(accountID),
     });
 

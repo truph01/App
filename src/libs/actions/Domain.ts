@@ -1650,10 +1650,6 @@ function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID
     API.write(WRITE_COMMANDS.RESET_DOMAIN_MEMBER_TWO_FACTOR_AUTH, params, {optimisticData, failureData, successData});
 }
 
-function clearValidateDomainTwoFactorCodeError() {
-    Onyx.set(ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE, null);
-}
-
 export {
     getDomainValidationCode,
     validateDomain,
@@ -1689,5 +1685,4 @@ export {
     setTwoFactorAuthExemptEmailForDomain,
     clearTwoFactorAuthExemptEmailsErrors,
     resetDomainMemberTwoFactorAuth,
-    clearValidateDomainTwoFactorCodeError,
 };
