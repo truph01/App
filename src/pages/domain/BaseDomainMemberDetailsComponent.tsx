@@ -43,7 +43,6 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children,
 
     // The selector depends on the dynamic `accountID`, so it cannot be extracted
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: true,
         selector: (personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsList?.[accountID],
     });
 

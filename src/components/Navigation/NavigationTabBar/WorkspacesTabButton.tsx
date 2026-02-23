@@ -48,7 +48,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
         }
         return policies?.[`${ONYXKEYS.COLLECTION.POLICY}${paramsPolicyID}`];
     };
-    const [lastViewedPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true, selector: lastViewedPolicySelector}, [navigationState]);
+    const [lastViewedPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: lastViewedPolicySelector}, [navigationState]);
 
     const lastViewedDomainSelector = (domains: OnyxCollection<Domain>) => {
         if (!lastWorkspacesTabNavigatorRoute || lastWorkspacesTabNavigatorRoute.name !== NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR || !paramsDomainAccountID) {
@@ -56,7 +56,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
         }
         return domains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${paramsDomainAccountID}`];
     };
-    const [lastViewedDomain] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN, {canBeMissing: true, selector: lastViewedDomainSelector}, [navigationState]);
+    const [lastViewedDomain] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN, {selector: lastViewedDomainSelector}, [navigationState]);
 
     const navigateToWorkspaces = () => {
         navigateToWorkspacesPage({shouldUseNarrowLayout, currentUserLogin, policy: lastViewedPolicy, domain: lastViewedDomain});
