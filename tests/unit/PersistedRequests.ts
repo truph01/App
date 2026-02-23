@@ -1,4 +1,5 @@
 import Onyx from 'react-native-onyx';
+import type {OnyxKey} from 'react-native-onyx';
 import * as PersistedRequests from '../../src/libs/actions/PersistedRequests';
 import ONYXKEYS from '../../src/ONYXKEYS';
 import type Request from '../../src/types/onyx/Request';
@@ -102,7 +103,7 @@ describe('PersistedRequests persistence guarantees', () => {
     // but no production code ever sets this flag. Every write request in the
     // app uses the default (false), so ALL ongoing requests are unprotected.
     // If the app dies while a request is in-flight, the ongoing request is
-    // lost from memory and has no disk backup. On restart, the dedup check
+    // lost from memory and has no disk backup. On restart, the deduplicate check
     // in the connect callback (PersistedRequests.ts:53-67) cannot detect
     // that this request was already being processed.
     it('Issue 3a: ongoing request should be persisted to disk (persistWhenOngoing is never set in production)', () =>
@@ -211,7 +212,7 @@ describe('PersistedRequests persistence guarantees', () => {
                 return new Promise<void>((resolvePromise) => {
                     capturedSets.push({
                         value,
-                        triggerRealSet: () => originalSet(key, value).then(resolvePromise),
+                        triggerRealSet: () => originalSet(key, value as Array<Request<OnyxKey>>).then(resolvePromise),
                     });
                 });
             }
