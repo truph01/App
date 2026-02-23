@@ -34,12 +34,12 @@ type SearchSelectedNarrowProps = {
 
 function SearchSelectedNarrow({options, itemsLength, currentSelectedPolicyID, currentSelectedReportID, confirmPayment, latestBankItems}: SearchSelectedNarrowProps) {
     const styles = useThemeStyles();
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
-    const [selectedIouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${currentSelectedReportID}`, {canBeMissing: true});
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [selectedIouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${currentSelectedReportID}`);
     const {translate, localeCompare} = useLocalize();
     const kycWallRef = useContext(KYCWallContext);
     const currentPolicy = usePolicy(currentSelectedPolicyID);
-    const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector, canBeMissing: true});
+    const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector});
     const isCurrentSelectedExpenseReport = isExpenseReport(currentSelectedReportID);
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
