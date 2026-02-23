@@ -1427,6 +1427,9 @@ const CONST = {
                     UPDATE_DEFAULT_APPROVER: 'POLICYCHANGELOG_UPDATE_DEFAULT_APPROVER',
                     UPDATE_SUBMITS_TO: 'POLICYCHANGELOG_UPDATE_SUBMITS_TO',
                     UPDATE_FORWARDS_TO: 'POLICYCHANGELOG_UPDATE_FORWARDS_TO',
+                    UPDATE_CUSTOM_TAX_NAME: 'POLICYCHANGELOG_UPDATE_CUSTOM_TAX_NAME',
+                    UPDATE_CURRENCY_DEFAULT_TAX: 'POLICYCHANGELOG_UPDATE_CURRENCY_DEFAULT_TAX',
+                    UPDATE_FOREIGN_CURRENCY_DEFAULT_TAX: 'POLICYCHANGELOG_UPDATE_FOREIGN_CURRENCY_DEFAULT_TAX',
                     UPDATE_INVOICE_COMPANY_NAME: 'POLICYCHANGELOG_UPDATE_INVOICE_COMPANY_NAME',
                     UPDATE_INVOICE_COMPANY_WEBSITE: 'POLICYCHANGELOG_UPDATE_INVOICE_COMPANY_WEBSITE',
                     UPDATE_MANUAL_APPROVAL_THRESHOLD: 'POLICYCHANGELOG_UPDATE_MANUAL_APPROVAL_THRESHOLD',
@@ -2617,13 +2620,23 @@ const CONST = {
         AUTO_CREATE_ENTITIES: 'autoCreateEntities',
         APPROVAL_ACCOUNT: 'approvalAccount',
         CUSTOM_FORM_ID_OPTIONS: 'customFormIDOptions',
-        TOKEN_INPUT_STEP_NAMES: ['1', '2', '3', '4', '5'],
-        TOKEN_INPUT_STEP_KEYS: {
-            0: 'installBundle',
-            1: 'enableTokenAuthentication',
-            2: 'enableSoapServices',
-            3: 'createAccessToken',
-            4: 'enterCredentials',
+        TOKEN_INPUT: {
+            STEP_INDEX_LIST: ['1', '2', '3', '4'],
+            PAGE_NAME: {
+                INSTALL: 'install',
+                AUTHENTICATION: 'authentication',
+                SOAP: 'soap',
+                ACCESS_TOKEN: 'access-token',
+                CREDENTIALS: 'credentials',
+            },
+            CREDENTIALS_PAGE_INDEX: 4,
+            STEP_KEYS: {
+                install: 'installBundle',
+                authentication: 'enableTokenAuthentication',
+                soap: 'enableSoapServices',
+                'access-token': 'createAccessToken',
+                credentials: 'enterCredentials',
+            },
         },
         IMPORT_CUSTOM_FIELDS: {
             CUSTOM_SEGMENTS: 'customSegments',
@@ -3193,6 +3206,11 @@ const CONST = {
             TRACK_EXPENSE: 'trackExpense',
             MONEY_REQUEST: 'moneyRequest',
             REPLACE_RECEIPT: 'replaceReceipt',
+        },
+        COMPACT_RECEIPT: {
+            MAX_WIDTH: variables.receiptPreviewMaxWidth,
+            DEFAULT_ASPECT_RATIO: 16 / 9,
+            MAX_HEIGHT_PIXEL_ADJUSTMENT: 5,
         },
     },
 
@@ -4080,6 +4098,7 @@ const CONST = {
         SPECIAL_CHAR_MENTION_BREAKER: /[,/?"{}[\]()&^%;`$=<>!*]/g,
         SPECIAL_CHAR: /[,/?"{}[\]()&^%;`$=#<>!*]/g,
         FIRST_SPACE: /.+?(?=\s)/,
+        TRAILING_DOTS: /\.$/,
 
         get SPECIAL_CHAR_OR_EMOJI() {
             return new RegExp(`[~\\n\\s]|(_\\b(?!$))|${this.SPECIAL_CHAR.source}|${this.EMOJI.source}`, 'gu');
@@ -8419,12 +8438,18 @@ const CONST = {
         },
         SELECTION_LIST: {
             BASE_LIST_ITEM: 'SelectionList-BaseListItem',
+            SELECT_ALL: 'ListHeader-SelectAll',
             SPLIT_LIST_ITEM_EDIT_BUTTON: 'SplitListItem-EditButton',
             LIST_HEADER_SELECT_ALL: 'SelectionList-ListHeader-SelectAll',
         },
         SELECTION_LIST_WITH_SECTIONS: {
             BASE_LIST_ITEM: 'SelectionListWithSections-BaseListItem',
-            SELECT_ALL: 'SelectionList-SelectAll',
+            SELECT_ALL: 'BaseSelectionListWithSections-SelectAll',
+        },
+        WORKSPACE_DUPLICATE_SELECT_FEATURES: {
+            SELECT_ALL: 'WorkspaceDuplicateSelectFeatures-SelectAll',
+            SPLIT_LIST_ITEM_EDIT_BUTTON: 'SplitListItem-EditButton',
+            LIST_HEADER_SELECT_ALL: 'SelectionList-ListHeader-SelectAll',
         },
         CONTEXT_MENU: {
             REPLY_IN_THREAD: 'ContextMenu-ReplyInThread',
@@ -8939,22 +8964,22 @@ const CONST = {
     HOME: {
         ANNOUNCEMENTS: [
             {
-                title: 'Start the year with smarter spending, admin controls, and more.',
-                subtitle: 'Product update',
-                url: 'https://use.expensify.com/blog/expensify-january-2026-product-update',
-                publishedDate: '2026-01-28',
+                title: 'Expensify and Xero partner to support SMBs',
+                subtitle: 'Press Release',
+                url: 'https://www.businesswire.com/news/home/20260212641796/en/Expensify-and-Xero-Enhance-Partnership-to-Support-Small-Businesses',
+                publishedDate: '2026-02-12',
             },
             {
-                title: 'Our favorite features + final upgrades of the year',
+                title: 'New Home page & upgraded Insights analytics',
                 subtitle: 'Product update',
-                url: 'https://use.expensify.com/blog/expensify-2025-year-end-product-update',
-                publishedDate: '2025-12-22',
+                url: 'https://use.expensify.com/blog/expensify-home-and-insights-update',
+                publishedDate: '2026-02-18',
             },
             {
-                title: 'Uber for business + Expensify automates ride and meal receipts',
+                title: 'Smarter spend controls & Concierge anywhere',
                 subtitle: 'Product update',
-                url: 'https://use.expensify.com/blog/uber-for-business-and-expensify-integration-update',
-                publishedDate: '2025-12-01',
+                url: 'https://use.expensify.com/blog/expensify-february-2026-product-update',
+                publishedDate: '2026-02-19',
             },
         ],
     },
