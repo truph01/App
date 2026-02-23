@@ -44,6 +44,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const showConfirmModal = () => {
         if (isOffline) {
             Navigation.closeRHPFlow();
+            return;
         }
         setConfirmModalVisibility(true);
     };
