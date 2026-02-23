@@ -3711,22 +3711,7 @@ const staticStyles = (theme: ThemeColors) =>
             width: '100%',
         },
 
-        forYouEmptyStateNarrowTitle: {
-            ...FontUtils.fontFamily.platform.EXP_NEW_KANSAS_MEDIUM,
-            fontSize: variables.fontSizeLarge,
-            textAlign: 'center',
-            color: theme.text,
-        },
-
-        forYouEmptyStateNarrowDescription: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeLabel,
-            lineHeight: 16,
-            textAlign: 'center',
-            color: theme.textSupporting,
-        },
-
-        forYouEmptyStateWideTitle: {
+        forYouEmptyStateTitle: {
             ...FontUtils.fontFamily.platform.EXP_NEW_KANSAS_MEDIUM,
             fontSize: variables.fontSizeXLarge,
             lineHeight: 28,
@@ -3734,7 +3719,7 @@ const staticStyles = (theme: ThemeColors) =>
             color: theme.text,
         },
 
-        forYouEmptyStateWideDescription: {
+        forYouEmptyStateDescription: {
             ...FontUtils.fontFamily.platform.EXP_NEUE,
             fontSize: variables.fontSizeNormal,
             lineHeight: variables.fontSizeNormalHeight,
