@@ -53,7 +53,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     footerContent,
     listFooterContent,
     style,
-    isScrollEnabled: isScrollEnabledOverride,
     addBottomSafeAreaPadding,
     isLoadingNewOptions,
     canSelectMultiple = false,
@@ -73,7 +72,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     const styles = useThemeStyles();
     const isScreenFocused = useIsFocused();
     const scrollEnabled = useScrollEnabled();
-    const isScrollEnabled = isScrollEnabledOverride ?? scrollEnabled;
     const {singleExecution} = useSingleExecution();
     const listRef = useRef<FlashListRef<FlattenedItem<TItem>> | null>(null);
     const innerTextInputRef = useRef<BaseTextInputRef | null>(null);
@@ -356,7 +354,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                         onEndReached={onEndReached}
                         onEndReachedThreshold={onEndReachedThreshold}
                         onScrollBeginDrag={onScrollBeginDrag}
-                        scrollEnabled={isScrollEnabled}
                         indicatorStyle="white"
                         showsVerticalScrollIndicator
                         keyboardShouldPersistTaps="always"
