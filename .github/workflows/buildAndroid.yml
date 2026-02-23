@@ -214,19 +214,25 @@ jobs:
         if: ${{ inputs.variant == 'Adhoc' }}
         run: echo "ARTIFACT_URL=$ARTIFACT_URL" >> "$GITHUB_OUTPUT"
 
+      - name: Collect build artifacts
+        run: |
+          mkdir -p /tmp/android-artifacts
+          find Mobile-Expensify/Android/app/build/outputs/bundle -name '*.aab' -exec cp {} /tmp/android-artifacts/ \;
+          find Mobile-Expensify/Android/build/generated/sourcemaps/react -name 'index.android.bundle.map' -exec cp {} /tmp/android-artifacts/ \;
+
       - name: Find and upload AAB artifact
         # v6
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: ${{ inputs.artifact-prefix }}androidBuild-artifact
-          path: Mobile-Expensify/Android/app/build/outputs/bundle/*/*.aab
+          path: /tmp/android-artifacts/*.aab
 
       - name: Upload Android sourcemap artifact
         # v6
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: ${{ inputs.artifact-prefix }}android-sourcemap-artifact
-          path: Mobile-Expensify/Android/build/generated/sourcemaps/react/*/index.android.bundle.map
+          path: /tmp/android-artifacts/index.android.bundle.map
 
       - name: Install bundletool
         run: |
