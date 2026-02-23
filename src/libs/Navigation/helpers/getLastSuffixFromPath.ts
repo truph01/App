@@ -10,8 +10,8 @@ function getLastSuffixFromPath(path: string | undefined): string {
     const pathWithoutParams = path?.split('?').at(0);
 
     if (!pathWithoutParams) {
-        Log.warn("[getLastSuffixFromPath.ts] Failed to parse the path, path is empty");
-        return "";
+        Log.warn('[getLastSuffixFromPath.ts] Failed to parse the path, path is empty');
+        return '';
     }
 
     const pathWithoutTrailingSlash = pathWithoutParams.endsWith('/') ? pathWithoutParams.slice(0, -1) : pathWithoutParams;
