@@ -444,6 +444,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 icon={expensifyIcons.Plus}
                                 iconHeight={20}
                                 iconWidth={20}
+                                shouldShowRightIcon
                                 disabled={isOffline || !isPolicyAdmin}
                                 shouldGreyOutWhenDisabled={!policy?.pendingFields?.reimbursementChoice}
                                 sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.ADD_BANK_ACCOUNT}
