@@ -475,6 +475,7 @@ type PureReportActionItemProps = {
     /** Report metadata for the report */
     reportMetadata?: OnyxEntry<OnyxTypes.ReportMetadata>;
 
+    /** The billing grace end period's shared NVP collection */
     userBillingGraceEndPeriodCollection: OnyxCollection<OnyxTypes.BillingGraceEndPeriod>;
 };
 
