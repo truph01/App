@@ -853,6 +853,7 @@ function getOptionData({
             movedToReport,
             policy,
             isReportArchived,
+            reportMetadata,
             reportAttributesDerived,
             lastAction,
         });
