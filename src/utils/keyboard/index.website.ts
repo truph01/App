@@ -38,11 +38,11 @@ window.visualViewport?.addEventListener('resize', handleResize);
 
 const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
     return new Promise((resolve) => {
-        if (options?.shouldSkipSafari && isMobileSafari()) {
-            resolve();
-            return;
-        }
-        if (!isVisible || !isMobile()) {
+        const shouldSkipSafari = options?.shouldSkipSafari && isMobileSafari();
+        const shouldDismiss = !isVisible || !isMobile();
+
+        if (shouldDismiss || shouldSkipSafari) {
+            options?.afterTransition?.();
             resolve();
             return;
         }
