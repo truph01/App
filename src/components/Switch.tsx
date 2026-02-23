@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useMemo} from 'react';
+import React, {useLayoutEffect, useMemo, useRef} from 'react';
 import Animated, {cancelAnimation, interpolateColor, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
