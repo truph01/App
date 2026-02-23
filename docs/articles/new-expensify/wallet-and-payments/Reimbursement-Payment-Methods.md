@@ -140,4 +140,4 @@ Common scenarios for using Pay elsewhere include:
 - Sending a bank wire  
 - Using another internal payment system  
 
-Workspace business bank accounts can be connected in USD, CAD, GBP, EUR, or AUD. Global reimbursement supports member bank accounts in 190+ countries.
+Workspace business bank accounts can be connected in USD, CAD, GBP, EUR, AUD, or SGD. Global reimbursement supports member bank accounts in 190+ countries.
