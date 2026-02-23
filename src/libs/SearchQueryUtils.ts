@@ -89,15 +89,6 @@ const createKeyToUserFriendlyMap = () => {
 // Create the maps once at module initialization for performance
 const keyToUserFriendlyMap = createKeyToUserFriendlyMap();
 
-// Precompute Sets of allowed filters per type for O(1) isFilterSupported lookups
-const ALLOWED_TYPE_FILTERS_SET: Partial<Record<SearchDataTypes, Set<string>>> = (() => {
-    const map: Partial<Record<SearchDataTypes, Set<string>>> = {};
-    for (const [dataType, filters] of Object.entries(ALLOWED_TYPE_FILTERS)) {
-        map[dataType as SearchDataTypes] = new Set(filters as string[]);
-    }
-    return map;
-})();
-
 const REPORT_FIELD_FILTER_KEY = CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_FIELD;
 const REPORT_FIELD_GLOBAL_PREFIX = CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX;
 
@@ -415,7 +406,7 @@ function isSearchDatePreset(date: string | undefined): date is SearchDatePreset 
  * Returns whether a given search filter is supported in a given search data type
  */
 function isFilterSupported(filter: SearchAdvancedFiltersKey, type: SearchDataTypes) {
-    const allowed = ALLOWED_TYPE_FILTERS_SET[type];
+    const allowed = ALLOWED_TYPE_FILTERS[type];
     if (!allowed) {
         return false;
     }
