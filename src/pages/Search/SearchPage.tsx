@@ -803,23 +803,16 @@ function SearchPage({route}: SearchPageProps) {
                     let areAnyReportsExported = false;
 
                     for (const reportID of selectedReportIDs) {
-                        const unfilteredReportActions = currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
+                        const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
 
-                        if (!unfilteredReportActions) {
+                        if (!report?.isExportedToIntegration) {
                             continue;
                         }
 
-                        const reportActions = getFilteredReportActionsForReportView(Object.values(unfilteredReportActions));
+                        areAnyReportsExported = true;
 
-                        const isExported = isExportedUtils(reportActions);
-
-                        if (isExported) {
-                            areAnyReportsExported = true;
-
-                            const reportName = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]?.reportName ?? '';
-                            if (reportName) {
-                                exportedReportNames.push(reportName);
-                            }
+                        if (report.reportName) {
+                            exportedReportNames.push(report.reportName);
                         }
                     }
 
