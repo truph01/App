@@ -19,9 +19,9 @@ import type {Address} from '@src/types/onyx/PrivatePersonalDetails';
 function AddressStep({onNext, isEditing}: SubStepProps) {
     const styles = useThemeStyles();
 
-    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {});
-    const [defaultCountry] = useOnyx(ONYXKEYS.COUNTRY, {});
-    const [bankAccountPersonalDetails] = useOnyx(ONYXKEYS.FORMS.PERSONAL_BANK_ACCOUNT_FORM_DRAFT, {});
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
+    const [defaultCountry] = useOnyx(ONYXKEYS.COUNTRY);
+    const [bankAccountPersonalDetails] = useOnyx(ONYXKEYS.FORMS.PERSONAL_BANK_ACCOUNT_FORM_DRAFT);
 
     const address = useMemo(() => {
         const normalizedAddress = normalizeCountryCode(getCurrentAddress(privatePersonalDetails)) as Address;

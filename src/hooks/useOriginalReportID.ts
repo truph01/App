@@ -22,8 +22,8 @@ import useTransactionsAndViolationsForReport from './useTransactionsAndViolation
  */
 function useOriginalReportID(reportID: string | undefined, reportAction: OnyxInputOrEntry<Pick<ReportAction, 'reportActionID' | 'childReportID'>>): string | undefined {
     const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {selector: withDEWRoutedActionsObject});
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {});
-    const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`, {});
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
+    const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`);
     const {isOffline} = useNetwork();
     const {transactions: allReportTransactions} = useTransactionsAndViolationsForReport(reportID);
 
@@ -46,7 +46,7 @@ function useOriginalReportID(reportID: string | undefined, reportAction: OnyxInp
         return getOneTransactionThreadReportID({type: report?.type}, chatReport, reportActions ?? ([] as ReportAction[]), isOffline, visibleTransactionsIDs);
     }, [reportID, reportActionBelongsCurrentReport, isThreadReportParentAction, reportActionID, allReportTransactions, reportActions, report?.type, chatReport, isOffline]);
 
-    const [uniqueTransactionThreadReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${uniqueTransactionThreadReportID}`, {});
+    const [uniqueTransactionThreadReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${uniqueTransactionThreadReportID}`);
 
     if (!reportID) {
         return undefined;

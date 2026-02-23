@@ -8,12 +8,12 @@ import type {WalletStatementMessage, WalletStatementProps} from './types';
 import handleWalletStatementNavigation from './walletNavigationUtils';
 
 function WalletStatementModal({statementPageURL}: WalletStatementProps) {
-    const [session] = useOnyx(ONYXKEYS.SESSION, {});
+    const [session] = useOnyx(ONYXKEYS.SESSION);
     const styles = useThemeStyles();
     const [isLoading, setIsLoading] = useState(true);
     const authToken = session?.authToken ?? null;
 
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {});
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     /**
      * Handles in-app navigation for iframe links
      */

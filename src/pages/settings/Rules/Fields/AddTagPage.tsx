@@ -20,8 +20,8 @@ type AddTagPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, type
 function AddTagPage({route}: AddTagPageProps) {
     const {hash, index: orderWeight} = route.params ?? {};
 
-    const [form] = useOnyx(ONYXKEYS.FORMS.EXPENSE_RULE_FORM, {});
-    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {});
+    const [form] = useOnyx(ONYXKEYS.FORMS.EXPENSE_RULE_FORM);
+    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [policyTags = getEmptyArray<ValueOf<PolicyTagLists>>()] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${activePolicyID}`, {selector: getTagLists});
     const hasDependentTags = policyTags.some((tagList) => Object.values(tagList.tags).some((tag) => !!tag.rules?.parentTagsFilter || !!tag.parentTagsFilter));
     const tagList = policyTags.find((item) => item.orderWeight === orderWeight);

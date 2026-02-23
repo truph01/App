@@ -18,8 +18,8 @@ function SignUpWelcomeForm() {
     const network = useNetwork();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE);
     const serverErrorText = useMemo(() => (account ? getLatestErrorMessage(account) : ''), [account]);
 
     return (

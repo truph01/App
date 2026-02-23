@@ -33,8 +33,8 @@ const updateLegalName = (
 };
 
 function LegalNamePage() {
-    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {});
-    const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP, {});
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
+    const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
     const styles = useThemeStyles();

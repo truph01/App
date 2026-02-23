@@ -20,7 +20,7 @@ function DebitCardPage() {
     return <NotFoundPage />;
 
     const {translate} = useLocalize();
-    const [formData] = useOnyx(ONYXKEYS.FORMS.ADD_PAYMENT_CARD_FORM, {});
+    const [formData] = useOnyx(ONYXKEYS.FORMS.ADD_PAYMENT_CARD_FORM);
     const prevFormDataSetupComplete = usePrevious(!!formData?.setupComplete);
     const nameOnCardRef = useRef<AnimatedTextInputRef>(null);
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});

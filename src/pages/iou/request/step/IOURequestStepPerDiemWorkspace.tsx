@@ -21,7 +21,7 @@ function IOURequestStepPerDiemWorkspace({route, navigation}: IOURequestStepPerDi
         params: {action, iouType, transactionID},
     } = route;
     const {accountID} = useCurrentUserPersonalDetails();
-    const [selfDMReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${findSelfDMReportID()}`, {});
+    const [selfDMReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${findSelfDMReportID()}`);
 
     return (
         <BaseRequestStepWorkspace

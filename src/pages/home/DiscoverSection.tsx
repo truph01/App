@@ -25,7 +25,7 @@ function DiscoverSection() {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const isCurrentUserPolicyAdmin = useIsPaidPolicyAdmin();
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {});
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const styles = useThemeStyles();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {

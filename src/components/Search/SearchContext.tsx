@@ -77,7 +77,7 @@ function SearchContextProvider({children}: ChildrenProps) {
     const searchContextDataRef = useRef(searchContextData);
     searchContextDataRef.current = searchContextData;
 
-    const [snapshotSearchResults] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContextData.currentSearchHash}`, {});
+    const [snapshotSearchResults] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContextData.currentSearchHash}`);
     const todoSearchResultsData = useTodos();
 
     const currentSearchKey = searchContextData.currentSearchKey;

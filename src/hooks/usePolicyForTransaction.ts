@@ -33,13 +33,13 @@ type UsePolicyForTransactionResult = {
 function usePolicyForTransaction({transaction, reportPolicyID, action, iouType, isPerDiemRequest}: UsePolicyForTransactionParams): UsePolicyForTransactionResult {
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
 
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
     const customUnitPolicy = useMemo(() => {
         return getPolicyByCustomUnitID(transaction, allPolicies);
     }, [transaction, allPolicies]);
 
-    const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${reportPolicyID}`, {});
+    const [reportPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${reportPolicyID}`);
 
     const isUnreportedExpense = isExpenseUnreported(transaction);
     const isCreatingTrackExpense = action === CONST.IOU.ACTION.CREATE && iouType === CONST.IOU.TYPE.TRACK;

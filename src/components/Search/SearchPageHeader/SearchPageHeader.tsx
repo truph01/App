@@ -49,7 +49,7 @@ function SearchPageHeader({
 
     const selectedTransactionsKeys = Object.keys(selectedTransactions ?? {});
 
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [email] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const {type: unsafeType} = queryJSON;
     const [type] = useMemo(() => {

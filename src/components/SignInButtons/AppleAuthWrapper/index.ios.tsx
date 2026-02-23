@@ -9,8 +9,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
  * revokes the session if the credential is revoked.
  */
 function AppleAuthWrapper() {
-    const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS, {});
-    const [session] = useOnyx(ONYXKEYS.SESSION, {});
+    const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS);
+    const [session] = useOnyx(ONYXKEYS.SESSION);
 
     useEffect(() => {
         if (!appleAuth.isSupported) {

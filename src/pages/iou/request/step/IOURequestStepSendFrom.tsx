@@ -31,7 +31,7 @@ function IOURequestStepSendFrom({route, transaction}: IOURequestStepSendFromProp
     const {translate, localeCompare} = useLocalize();
     const {transactionID, backTo} = route.params;
     const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
     const selectedWorkspace = useMemo(() => transaction?.participants?.find((participant) => participant.isSender), [transaction]);
 

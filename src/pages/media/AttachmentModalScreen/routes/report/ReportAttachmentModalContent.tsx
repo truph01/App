@@ -27,18 +27,18 @@ function ReportAttachmentModalContent({route, navigation}: AttachmentModalScreen
     const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
         canEvict: false,
     });
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {});
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
 
     const reportActionID = useMemo(() => attachmentID?.split('_')?.[0], [attachmentID]);
     const originalReportID = useOriginalReportID(reportID, reportActionID ? (reportActions?.[reportActionID ?? CONST.DEFAULT_NUMBER_ID] ?? {reportActionID}) : undefined);
     const reportActionReportID = originalReportID ?? reportID;
 
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportActionReportID}`, {});
-    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportActionReportID}`, {});
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportActionReportID}`);
+    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportActionReportID}`);
 
     useNavigateToReportOnRefresh({source: sourceParam, reportID});
 
-    const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP, {});
+    const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const {isOffline} = useNetwork();
 
     const submitRef = useRef<View | HTMLElement>(null);

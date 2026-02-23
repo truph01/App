@@ -32,7 +32,7 @@ function DebugTagPicker({policyID, tagName = '', onSubmit}: DebugTagPickerProps)
     const {translate} = useLocalize();
     const [newTagName, setNewTagName] = useState(tagName);
     const selectedTags = useMemo(() => getTagArrayFromName(newTagName), [newTagName]);
-    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {});
+    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
     const policyTagLists = useMemo(() => getTagLists(policyTags), [policyTags]);
 
     const [hasMultipleTagLists] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {selector: policyHasMultipleTagListsSelector});

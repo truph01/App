@@ -28,9 +28,9 @@ function TestDriveDemo() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [isVisible, setIsVisible] = useState(false);
     const styles = useThemeStyles();
-    const [onboarding] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {});
-    const [onboardingReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${onboarding?.chatReportID}`, {});
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {});
+    const [onboarding] = useOnyx(ONYXKEYS.NVP_ONBOARDING);
+    const [onboardingReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${onboarding?.chatReportID}`);
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const {
         taskReport: viewTourTaskReport,
         taskParentReport: viewTourTaskParentReport,

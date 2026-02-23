@@ -10,7 +10,7 @@ import useOnyx from './useOnyx';
  */
 function useAllTransactions() {
     const {currentSearchResults} = useSearchContext();
-    const [allTransactionsCollection] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {});
+    const [allTransactionsCollection] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
 
     const allTransactions = useMemo(() => {
         const data = currentSearchResults?.data;

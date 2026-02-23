@@ -8,7 +8,7 @@ import type {Report, TransactionViolations} from '@src/types/onyx';
 import useOnyx from './useOnyx';
 
 function useTransactionViolationOfWorkspace(policyID?: string) {
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {});
+    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const reportsToArchive = Object.values(allReports ?? {}).filter(
         (report): report is Report => report != null && isPolicyRelatedReport(report, policyID) && (isChatRoom(report) || isPolicyExpenseChat(report) || isTaskReport(report)),
     );

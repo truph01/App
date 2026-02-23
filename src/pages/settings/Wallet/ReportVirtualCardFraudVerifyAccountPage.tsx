@@ -26,9 +26,9 @@ function ReportVirtualCardFraudVerifyAccountPage({
     const cardList = useNonPersonalCardList();
     const virtualCard = cardList?.[cardID];
     const {translate} = useLocalize();
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [validateCodeAction] = useOnyx(ONYXKEYS.VALIDATE_ACTION_CODE, {});
-    const [formData] = useOnyx(ONYXKEYS.FORMS.REPORT_VIRTUAL_CARD_FRAUD, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [validateCodeAction] = useOnyx(ONYXKEYS.VALIDATE_ACTION_CODE);
+    const [formData] = useOnyx(ONYXKEYS.FORMS.REPORT_VIRTUAL_CARD_FRAUD);
     const latestIssuedVirtualCardID = Object.keys(cardList ?? {})?.pop();
 
     const primaryLogin = account?.primaryLogin ?? '';

@@ -30,10 +30,10 @@ const isInFocusModeSelector = (priorityMode: OnyxEntry<ValueOf<typeof CONST.PRIO
  */
 export default function PriorityModeController() {
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
-    const [isLoadingReportData] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA, {});
+    const [isLoadingReportData] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA);
     const [isInFocusMode, isInFocusModeMetadata] = useOnyx(ONYXKEYS.NVP_PRIORITY_MODE, {selector: isInFocusModeSelector});
-    const [hasTriedFocusMode, hasTriedFocusModeMetadata] = useOnyx(ONYXKEYS.NVP_TRY_FOCUS_MODE, {});
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {});
+    const [hasTriedFocusMode, hasTriedFocusModeMetadata] = useOnyx(ONYXKEYS.NVP_TRY_FOCUS_MODE);
+    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const currentRouteName = useCurrentRouteName();
     const [shouldShowModal, setShouldShowModal] = useState(false);
     const closeModal = useCallback(() => setShouldShowModal(false), []);

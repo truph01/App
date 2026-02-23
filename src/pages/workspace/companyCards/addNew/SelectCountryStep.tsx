@@ -36,8 +36,8 @@ function SelectCountryStep({policyID}: CountryStepProps) {
     const styles = useThemeStyles();
     const policy = usePolicy(policyID);
     const {currencyList} = useCurrencyListState();
-    const [countryByIp] = useOnyx(ONYXKEYS.COUNTRY, {});
-    const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD, {});
+    const [countryByIp] = useOnyx(ONYXKEYS.COUNTRY);
+    const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD);
 
     const [searchValue, debouncedSearchValue, setSearchValue] = useDebouncedState('');
 

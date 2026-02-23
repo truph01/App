@@ -18,8 +18,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
 function SAMLSignInPage() {
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS);
     const [showNavigation, shouldShowNavigation] = useState(true);
     const [SAMLUrl, setSAMLUrl] = useState('');
     const {translate} = useLocalize();

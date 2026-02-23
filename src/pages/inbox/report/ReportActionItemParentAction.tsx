@@ -160,7 +160,7 @@ function ReportActionItemParentAction({
         },
         [ancestors],
     );
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {});
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
     return (
         <View style={[styles.pRelative]}>

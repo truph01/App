@@ -37,8 +37,8 @@ function usePolicyData(policyID?: string): PolicyData {
         [policyID, allReportsTransactionsAndViolations],
     );
 
-    const [tags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {}, [policyID]);
-    const [categories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`, {}, [policyID]);
+    const [tags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, undefined, [policyID]);
+    const [categories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`, undefined, [policyID]);
     const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: reportsSelectorCallback}, [policyID, allReportsTransactionsAndViolations]);
     const transactionsAndViolations = useMemo(() => {
         if (!reports || !allReportsTransactionsAndViolations) {

@@ -48,8 +48,8 @@ function AccountHolderDetails({onNext, isEditing, corpayFields}: BankInfoSubStep
         {} as Record<keyof ReimbursementAccountForm, keyof ReimbursementAccountForm>,
     );
 
-    const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {});
-    const [reimbursementAccountDraft] = useOnyx(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM_DRAFT, {});
+    const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
+    const [reimbursementAccountDraft] = useOnyx(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM_DRAFT);
     const defaultValues = useMemo(
         () => getBankInfoStepValues(subStepKeys ?? {}, reimbursementAccountDraft, reimbursementAccount),
         [subStepKeys, reimbursementAccount, reimbursementAccountDraft],

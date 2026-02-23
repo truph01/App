@@ -20,8 +20,8 @@ function AddDelegatePage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {initWithStoredValues: false});
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const existingDelegates =
         account?.delegatedAccess?.delegates?.reduce(
             (prev, {email}) => {

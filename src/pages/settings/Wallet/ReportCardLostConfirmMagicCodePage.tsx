@@ -26,11 +26,11 @@ function ReportCardLostConfirmMagicCodePage({
     },
 }: ReportCardLostConfirmMagicCodePageProps) {
     const {translate} = useLocalize();
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [formData] = useOnyx(ONYXKEYS.FORMS.REPORT_PHYSICAL_CARD_FORM, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [formData] = useOnyx(ONYXKEYS.FORMS.REPORT_PHYSICAL_CARD_FORM);
 
     const primaryLogin = account?.primaryLogin ?? '';
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST, {});
+    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
     const physicalCard = cardList?.[cardID];
     const [newCardID, setNewCardID] = useState<string>('');
     const previousCardList = usePrevious(cardList);

@@ -50,10 +50,10 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [unknownUserDetails] = useOnyx(ONYXKEYS.SHARE_UNKNOWN_USER_DETAILS, {});
-    const [currentAttachment] = useOnyx(ONYXKEYS.SHARE_TEMP_FILE, {});
-    const [validatedFile] = useOnyx(ONYXKEYS.VALIDATED_FILE_OBJECT, {});
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {});
+    const [unknownUserDetails] = useOnyx(ONYXKEYS.SHARE_UNKNOWN_USER_DETAILS);
+    const [currentAttachment] = useOnyx(ONYXKEYS.SHARE_TEMP_FILE);
+    const [validatedFile] = useOnyx(ONYXKEYS.VALIDATED_FILE_OBJECT);
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
 
     const reportAttributesDerived = useReportAttributes();
     const personalDetails = usePersonalDetails();

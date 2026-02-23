@@ -26,7 +26,7 @@ type DomainNotFoundPageWrapperProps = {
 } & Pick<FullPageNotFoundViewProps, 'subtitleKey' | 'onLinkPress'>;
 
 function DomainNotFoundPageWrapper({domainAccountID, shouldBeBlocked, fullPageNotFoundViewProps, ...props}: DomainNotFoundPageWrapperProps) {
-    const [domain, domainMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {});
+    const [domain, domainMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`);
     const [adminAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: adminAccountIDsSelector,
     });

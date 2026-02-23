@@ -25,12 +25,12 @@ type InviteeNewMemberStepProps = PlatformStackScreenProps<SettingsNavigatorParam
 
 function InviteNewMemberStep({route, currentUserPersonalDetails}: InviteeNewMemberStepProps) {
     const {translate} = useLocalize();
-    const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD, {});
-    const [workspaceCardFeeds] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {});
+    const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD);
+    const [workspaceCardFeeds] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST);
     const policyID = route.params.policyID;
     const feed = route.params.feed;
     const cardID = route.params.cardID;
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {});
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const [list] = useCardsList(feed);
     const [cardFeeds] = useCardFeeds(policy?.id);
     const filteredCardList = getFilteredCardList(list, cardFeeds?.[feed]?.accountList, workspaceCardFeeds);

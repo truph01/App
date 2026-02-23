@@ -13,7 +13,7 @@ import type SCREENS from '@src/SCREENS';
 type AddTaxRatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.RULES.EDIT_TAX>;
 
 function AddTaxRatePage({route}: AddTaxRatePageProps) {
-    const [form] = useOnyx(ONYXKEYS.FORMS.EXPENSE_RULE_FORM, {});
+    const [form] = useOnyx(ONYXKEYS.FORMS.EXPENSE_RULE_FORM);
     const [allTaxRates] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: getAllTaxRatesNamesAndValues});
 
     const taxItems = Object.entries(allTaxRates ?? {}).map(([taxRateKey, taxRate]) => ({

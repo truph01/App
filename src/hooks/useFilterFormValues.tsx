@@ -15,12 +15,12 @@ const useFilterFormValues = (queryJSON?: SearchQueryJSON) => {
     const personalDetails = usePersonalDetails();
     const {currencyList} = useCurrencyListState();
 
-    const [userCardList] = useOnyx(ONYXKEYS.CARD_LIST, {});
-    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {});
-    const [policyTagsLists] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {});
-    const [policyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES, {});
-    const [workspaceCardFeeds] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {});
+    const [userCardList] = useOnyx(ONYXKEYS.CARD_LIST);
+    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
+    const [policyTagsLists] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
+    const [policyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES);
+    const [workspaceCardFeeds] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST);
 
     // Helps to avoid unnecessary recalculations when user open report details screen. React Compiler does not provide same result.
     const taxRates = useMemo(() => getAllTaxRates(policies), [policies]);

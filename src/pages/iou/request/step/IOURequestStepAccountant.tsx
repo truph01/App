@@ -33,7 +33,7 @@ function IOURequestStepAccountant({
         [login],
     );
     const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector});
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {});
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
 
     const setAccountant = useCallback(
         (accountant: Accountant) => {

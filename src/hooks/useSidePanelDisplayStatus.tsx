@@ -11,7 +11,7 @@ import useRootNavigationState from './useRootNavigationState';
  */
 function useSidePanelDisplayStatus() {
     const {isExtraLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
-    const [sidePanelNVP] = useOnyx(ONYXKEYS.NVP_SIDE_PANEL, {});
+    const [sidePanelNVP] = useOnyx(ONYXKEYS.NVP_SIDE_PANEL);
     const [isOnboardingCompleted = false] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {
         selector: hasCompletedGuidedSetupFlowSelector,
     });

@@ -35,7 +35,7 @@ function AddPaymentCard() {
     const {translate} = useLocalize();
     const privateSubscription = usePrivateSubscription();
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
-    const [fundList] = useOnyx(ONYXKEYS.FUND_LIST, {});
+    const [fundList] = useOnyx(ONYXKEYS.FUND_LIST);
 
     const subscriptionPlan = useSubscriptionPlan();
     const subscriptionPrice = useSubscriptionPrice();
@@ -77,7 +77,7 @@ function AddPaymentCard() {
         [accountID, fundList],
     );
 
-    const [formData] = useOnyx(ONYXKEYS.FORMS.ADD_PAYMENT_CARD_FORM, {});
+    const [formData] = useOnyx(ONYXKEYS.FORMS.ADD_PAYMENT_CARD_FORM);
     const prevFormDataSetupComplete = usePrevious(!!formData?.setupComplete);
 
     useEffect(() => {

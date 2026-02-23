@@ -26,8 +26,8 @@ function AddDomainPage() {
     const {translate} = useLocalize();
     const {inputCallbackRef} = useAutoFocusInput();
 
-    const [form] = useOnyx(ONYXKEYS.FORMS.CREATE_DOMAIN_FORM, {});
-    const [allDomains] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN, {});
+    const [form] = useOnyx(ONYXKEYS.FORMS.CREATE_DOMAIN_FORM);
+    const [allDomains] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN);
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector});
 
     const validate = useCallback(

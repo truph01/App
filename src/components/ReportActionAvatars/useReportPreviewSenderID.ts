@@ -60,7 +60,7 @@ function useReportPreviewSenderID({iouReport, action, chatReport}: {action: Onyx
         selector: getSplitsSelector,
     });
 
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(shouldFetchData ? iouReport?.policyID : undefined)}`, {});
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(shouldFetchData ? iouReport?.policyID : undefined)}`);
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
     if (isOptimisticReportPreview) {

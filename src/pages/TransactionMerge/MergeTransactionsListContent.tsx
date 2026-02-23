@@ -36,9 +36,9 @@ function MergeTransactionsListContent({transactionID, mergeTransaction}: MergeTr
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
 
-    const [session] = useOnyx(ONYXKEYS.SESSION, {});
+    const [session] = useOnyx(ONYXKEYS.SESSION);
     const currentUserLogin = session?.email;
-    const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {});
+    const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
     const {isOffline} = useNetwork();
 
     const eligibleTransactions = mergeTransaction?.eligibleTransactions;

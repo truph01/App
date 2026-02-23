@@ -5,8 +5,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import useOnyx from './useOnyx';
 
 export default function useImportPlaidAccounts(policyID?: string) {
-    const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD, {});
-    const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD, {});
+    const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD);
+    const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD);
 
     const plaidToken = addNewCard?.data?.publicToken ?? assignCard?.cardToAssign?.plaidAccessToken;
     const plaidFeed = addNewCard?.data?.plaidConnectedFeed ?? assignCard?.cardToAssign?.institutionId;

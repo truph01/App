@@ -14,7 +14,7 @@ import {isTrackingSelector} from '@src/selectors/GPSDraftDetails';
 
 function Waypoints() {
     const styles = useThemeStyles();
-    const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {});
+    const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
     const {translate} = useLocalize();
 
     const icons = useMemoizedLazyExpensifyIcons(['Location', 'DotIndicatorUnfilled']);

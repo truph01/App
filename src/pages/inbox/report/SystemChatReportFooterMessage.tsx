@@ -19,9 +19,9 @@ function SystemChatReportFooterMessage() {
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
     const {environmentURL} = useEnvironment();
     const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
-    const [choice] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED, {});
-    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
-    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {});
+    const [choice] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
+    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
 
     const adminChatReportID = useMemo(() => {
         const adminPolicy = activePolicyID
@@ -31,7 +31,7 @@ function SystemChatReportFooterMessage() {
         return String(adminPolicy?.chatReportIDAdmins ?? CONST.DEFAULT_NUMBER_ID);
     }, [activePolicyID, policies, currentUserLogin]);
 
-    const [adminChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${adminChatReportID}`, {});
+    const [adminChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${adminChatReportID}`);
 
     const content = useMemo(() => {
         switch (choice) {

@@ -48,7 +48,7 @@ function TwoFactorAuthWrapper({
     shouldEnableMaxHeight = true,
     children,
 }: TwoFactorAuthWrapperProps) {
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
 
     // eslint-disable-next-line rulesdir/no-negated-variables

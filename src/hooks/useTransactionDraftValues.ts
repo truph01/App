@@ -3,7 +3,7 @@ import type Transaction from '@src/types/onyx/Transaction';
 import useOnyx from './useOnyx';
 
 function useTransactionDraftValues(): Array<Transaction | null | undefined> {
-    const [drafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {});
+    const [drafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT);
 
     return Object.values(drafts ?? {});
 }

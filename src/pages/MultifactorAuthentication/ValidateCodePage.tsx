@@ -38,8 +38,8 @@ function MultifactorAuthenticationValidateCodePage() {
     const styles = useThemeStyles();
 
     // Onyx data
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [session] = useOnyx(ONYXKEYS.SESSION, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [session] = useOnyx(ONYXKEYS.SESSION);
 
     const contactMethod = account?.primaryLogin ?? '';
 

@@ -30,15 +30,15 @@ function PreferencesPage() {
     const {getCurrencySymbol} = useCurrencyListActions();
     const illustrations = useMemoizedLazyIllustrations(['Gears']);
     const preferencesIllustration = usePreferencesSectionIllustration();
-    const [priorityMode] = useOnyx(ONYXKEYS.NVP_PRIORITY_MODE, {});
+    const [priorityMode] = useOnyx(ONYXKEYS.NVP_PRIORITY_MODE);
 
     const platform = getPlatform(true);
-    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS, {});
+    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS);
     const isPlatformMuted = mutedPlatforms[platform];
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME, {});
-    const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE, {});
-    const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME);
+    const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE);
+    const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
 
     const personalPolicy = usePolicy(personalPolicyID);
 

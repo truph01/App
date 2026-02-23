@@ -31,8 +31,8 @@ function isPolicyValidForMovingExpenses(policy: OnyxEntry<Policy>, login: string
 }
 
 function usePolicyForMovingExpenses(isPerDiemRequest?: boolean, expensePolicyID?: string) {
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
-    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {});
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`, {
         selector: activePolicySelector,
     });

@@ -28,8 +28,8 @@ type ContactMethodsPageProps = PlatformStackScreenProps<SettingsNavigatorParamLi
 function ContactMethodsPage({route}: ContactMethodsPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST, {});
-    const [session] = useOnyx(ONYXKEYS.SESSION, {});
+    const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
+    const [session] = useOnyx(ONYXKEYS.SESSION);
     const navigateBackTo = route?.params?.backTo;
 
     const {isActingAsDelegate} = useDelegateNoAccessState();

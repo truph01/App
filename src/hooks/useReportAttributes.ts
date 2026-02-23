@@ -10,7 +10,7 @@ import useOnyx from './useOnyx';
  * O(n) and expensive.
  */
 function useReportAttributes() {
-    const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {});
+    const [reportAttributes] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES);
     return reportAttributes?.reports;
 }
 

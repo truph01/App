@@ -62,11 +62,11 @@ function SearchPageHeaderInput({queryJSON, searchRouterListVisible, hideSearchRo
     const {shouldUseNarrowLayout: displayNarrowHeader} = useResponsiveLayout();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
     const personalDetails = usePersonalDetails();
-    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {});
-    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {});
+    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
+    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const taxRates = useMemo(() => getAllTaxRates(policies), [policies]);
-    const [personalAndWorkspaceCards] = useOnyx(ONYXKEYS.DERIVED.PERSONAL_AND_WORKSPACE_CARD_LIST, {});
-    const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER, {});
+    const [personalAndWorkspaceCards] = useOnyx(ONYXKEYS.DERIVED.PERSONAL_AND_WORKSPACE_CARD_LIST);
+    const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER);
     const feedKeysWithCards = useFeedKeysWithAssignedCards();
     const {inputQuery: originalInputQuery} = queryJSON;
     const [currentUserAccountID = -1] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
@@ -84,7 +84,7 @@ function SearchPageHeaderInput({queryJSON, searchRouterListVisible, hideSearchRo
         feedKeysWithCards,
     });
 
-    const [searchContext] = useOnyx(ONYXKEYS.SEARCH_CONTEXT, {});
+    const [searchContext] = useOnyx(ONYXKEYS.SEARCH_CONTEXT);
     const shouldShowQuery = searchContext?.shouldShowSearchQuery ?? false;
 
     const [textInputValue, setTextInputValue] = useState('');

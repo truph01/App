@@ -137,8 +137,8 @@ function WorkspacePageWithSections({
     const policyID = route.params?.policyID;
     const {isOffline} = useNetwork({onReconnect: () => fetchData(policyID, shouldSkipVBBACall)});
 
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {});
-    const [reimbursementAccount = CONST.REIMBURSEMENT_ACCOUNT.DEFAULT_DATA] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [reimbursementAccount = CONST.REIMBURSEMENT_ACCOUNT.DEFAULT_DATA] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
     const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {
         selector: emailSelector,
     });
