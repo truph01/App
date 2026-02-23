@@ -92,7 +92,7 @@ Once confirmed, Expensify processes the transfers and the report statuses update
 
 Rapid Reimbursement is applied automatically when eligibility requirements are met.
 
----
+## Global Reimbursement timelines 
 
 # Global Reimbursement timelines 
 
