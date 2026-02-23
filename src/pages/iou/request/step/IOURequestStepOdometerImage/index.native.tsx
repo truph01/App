@@ -237,11 +237,16 @@ function IOURequestStepOdometerImage({
                     })
                     .then((photo: PhotoFile) => {
                         const imageObject: ImageObject = {file: photo, filename: photo.path, source: getPhotoSource(photo.path)};
-                        cropImageToAspectRatio(imageObject, viewfinderLayout.current?.width, viewfinderLayout.current?.height, undefined, photo.orientation).then(({source}) => {
-                            // Store odometer image - on native, save the URI string (source), not the File object
-                            setMoneyRequestOdometerImage(transactionID, imageType, source, isTransactionDraft);
-                            navigateBack();
-                        });
+                        cropImageToAspectRatio(imageObject, viewfinderLayout.current?.width, viewfinderLayout.current?.height, undefined, photo.orientation)
+                            .then(({source}) => {
+                                setMoneyRequestOdometerImage(transactionID, imageType, source, isTransactionDraft);
+                                navigateBack();
+                            })
+                            .catch((error: unknown) => {
+                                setDidCapturePhoto(false);
+                                showCameraAlert();
+                                Log.warn('Error cropping photo', error instanceof Error ? error.message : String(error));
+                            });
                     })
                     .catch((error: unknown) => {
                         setDidCapturePhoto(false);
