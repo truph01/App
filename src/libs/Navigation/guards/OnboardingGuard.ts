@@ -11,7 +11,6 @@ import {isOnboardingFlowName} from '@libs/Navigation/helpers/isNavigatorName';
 import {getOnboardingInitialPath} from '@userActions/Welcome/OnboardingFlow';
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
-import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
@@ -131,22 +130,23 @@ function shouldPreventReset(state: NavigationState, action: NavigationAction) {
 }
 
 /**
- * Check if the navigation action is targeting an onboarding screen.
- * This handles RESET actions (URL-based navigation / deep links).
+ * Check if the user is already on or navigating to an onboarding screen.
+ * This follows the same pattern as isNavigatingToTestDriveModal in TestDriveModalGuard.
  */
-function isNavigatingToOnboardingFlow(action: NavigationAction): boolean {
-    if (action.type !== CONST.NAVIGATION_ACTIONS.RESET || !action.payload) {
-        return false;
-    }
-
-    const targetFocusedRoute = findFocusedRoute(action.payload as NavigationState);
-    if (isOnboardingFlowName(targetFocusedRoute?.name)) {
+function isNavigatingToOnboardingFlow(state: NavigationState, action: NavigationAction): boolean {
+    const currentRoute = findFocusedRoute(state);
+    if (isOnboardingFlowName(currentRoute?.name)) {
         return true;
     }
 
-    // Also check if the target state contains the onboarding modal navigator directly
-    const routes = (action.payload as NavigationState).routes;
-    return routes?.some((route) => route.name === NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR) ?? false;
+    if (action.type === CONST.NAVIGATION_ACTIONS.RESET && action.payload) {
+        const targetRoute = findFocusedRoute(action.payload as NavigationState);
+        if (isOnboardingFlowName(targetRoute?.name)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -170,7 +170,7 @@ const OnboardingGuard: NavigationGuard = {
 
         // Redirect completed users who try to navigate to onboarding routes (e.g. via deep link)
         // The OnboardingModalNavigator is not mounted when onboarding is complete, so the route would silently fail
-        if (isOnboardingCompleted && isNavigatingToOnboardingFlow(action)) {
+        if (isOnboardingCompleted && isNavigatingToOnboardingFlow(state, action)) {
             Log.info('[OnboardingGuard] Redirecting completed user away from onboarding route to home');
             return {type: 'REDIRECT', route: ROUTES.HOME};
         }
