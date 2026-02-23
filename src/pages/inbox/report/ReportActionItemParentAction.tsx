@@ -116,7 +116,7 @@ function ReportActionItemParentAction({
         return transaction?.errorFields?.route;
     }, []);
 
-    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {canBeMissing: true, selector: getLinkedTransactionRouteError});
+    const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: getLinkedTransactionRouteError});
 
     const ancestorReportNameValuePairsSelector = useCallback(
         (allReportNameValuePairs: OnyxCollection<ReportNameValuePairs>) => {
@@ -136,7 +136,6 @@ function ReportActionItemParentAction({
     const [ancestorsReportNameValuePairs] = useOnyx(
         ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS,
         {
-            canBeMissing: true,
             selector: ancestorReportNameValuePairsSelector,
         },
         [ancestors],
@@ -153,12 +152,11 @@ function ReportActionItemParentAction({
     const [ancestorsReportActions] = useOnyx(
         ONYXKEYS.COLLECTION.REPORT_ACTIONS,
         {
-            canBeMissing: true,
             selector: ancestorReportActionsSelector,
         },
         [ancestors],
     );
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
     return (
         <View style={[styles.pRelative]}>
