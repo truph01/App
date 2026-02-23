@@ -275,6 +275,54 @@ describe('OnboardingGuard', () => {
             // Then navigation should be allowed because the redirect only triggers when the target is the OnboardingModalNavigator
             expect(result.type).toBe('ALLOW');
         });
+
+        it('should NOT redirect completed user for RESET actions containing onboarding routes', async () => {
+            // Given a user who has completed the guided setup flow
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+                hasCompletedGuidedSetupFlow: true,
+            });
+            await waitForBatchedUpdates();
+
+            // When a RESET action contains onboarding routes in its payload (not NAVIGATE/PUSH)
+            const resetWithOnboardingAction: NavigationAction = {
+                type: CONST.NAVIGATION_ACTIONS.RESET,
+                payload: {
+                    key: 'root',
+                    index: 1,
+                    routeNames: [SCREENS.HOME, NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR],
+                    routes: [
+                        {key: 'home', name: SCREENS.HOME},
+                        {key: 'onboarding', name: NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR},
+                    ],
+                    stale: false,
+                    type: 'root',
+                },
+            };
+
+            const result = OnboardingGuard.evaluate(mockState, resetWithOnboardingAction, authenticatedContext);
+
+            // Then navigation should be allowed because isNavigatingToOnboardingFlow only checks NAVIGATE/PUSH actions, not RESET — RESET with onboarding routes does not reach the completed-user redirect
+            expect(result.type).toBe('ALLOW');
+        });
+
+        it('should NOT redirect completed user for REPLACE actions targeting onboarding', async () => {
+            // Given a user who has completed the guided setup flow
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+                hasCompletedGuidedSetupFlow: true,
+            });
+            await waitForBatchedUpdates();
+
+            // When a REPLACE action targets the OnboardingModalNavigator
+            const replaceAction: NavigationAction = {
+                type: CONST.NAVIGATION.ACTION_TYPE.REPLACE,
+                payload: {name: NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR},
+            };
+
+            const result = OnboardingGuard.evaluate(mockState, replaceAction, authenticatedContext);
+
+            // Then navigation should be allowed because isNavigatingToOnboardingFlow only handles NAVIGATE and PUSH action types, not REPLACE
+            expect(result.type).toBe('ALLOW');
+        });
     });
 
     describe('redirect to onboarding', () => {
