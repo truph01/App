@@ -253,17 +253,21 @@ function getForReportAction({
     movedFromReport,
     movedToReport,
     policyForMovingExpensesID,
-    // Falls back to storedCurrentUserLogin until migration to getForReportActionTemp is complete.
-    // Once migrated, storedCurrentUserLogin can be removed and currentUserLogin made required.
-    currentUserLogin = storedCurrentUserLogin,
+    currentUserLogin: currentUserLoginParam,
 }: {
     reportAction: OnyxEntry<ReportAction>;
     policyID: string | undefined;
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     policyForMovingExpensesID?: string;
-    currentUserLogin?: string;
+    currentUserLogin: string;
 }): string {
+    // Temporary fallback to storedCurrentUserLogin since currentUserLogin can be empty string.
+    // Remove once all callers pass currentUserLogin explicitly and the migration to getForReportActionTemp is complete.
+    let currentUserLogin = currentUserLoginParam;
+    if (!currentUserLogin) {
+        currentUserLogin = storedCurrentUserLogin;
+    }
     if (!isModifiedExpenseAction(reportAction)) {
         return '';
     }
@@ -561,7 +565,7 @@ function getForReportActionTemp({
     movedFromReport,
     movedToReport,
     policyTags,
-    currentUserLogin = storedCurrentUserLogin,
+    currentUserLogin: currentUserLoginParam,
 }: {
     translate: LocalizedTranslate;
     reportAction: OnyxEntry<ReportAction>;
@@ -569,10 +573,14 @@ function getForReportActionTemp({
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     policyTags: OnyxEntry<PolicyTagLists>;
-    // Falls back to storedCurrentUserLogin until migration to getForReportActionTemp is complete.
-    // Once migrated, storedCurrentUserLogin can be removed and currentUserLogin made required.
-    currentUserLogin?: string;
+    currentUserLogin: string;
 }): string {
+    // Temporary fallback to storedCurrentUserLogin since currentUserLogin can be empty string.
+    // Remove once all callers pass currentUserLogin explicitly and the migration to getForReportActionTemp is complete.
+    let currentUserLogin = currentUserLoginParam;
+    if (!currentUserLogin) {
+        currentUserLogin = storedCurrentUserLogin;
+    }
     if (!isModifiedExpenseAction(reportAction)) {
         return '';
     }
