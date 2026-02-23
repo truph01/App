@@ -3,7 +3,6 @@ import Onyx from 'react-native-onyx';
 import OnboardingGuard from '@libs/Navigation/guards/OnboardingGuard';
 import type {GuardContext} from '@libs/Navigation/guards/types';
 import CONST from '@src/CONST';
-import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import waitForBatchedUpdates from '../../../utils/waitForBatchedUpdates';
@@ -198,30 +197,16 @@ describe('OnboardingGuard', () => {
             });
             await waitForBatchedUpdates();
 
-            // When a RESET action tries to navigate them to the onboarding modal (e.g. via a deep link like /onboarding/purpose from a Concierge message)
+            // When a RESET action tries to navigate them to the onboarding purpose screen (e.g. via a deep link like /onboarding/purpose from a Concierge message)
             const resetToOnboardingAction: NavigationAction = {
-                type: CONST.NAVIGATION_ACTIONS.RESET,
+                type: 'RESET',
                 payload: {
                     key: 'root',
-                    index: 1,
-                    routeNames: [SCREENS.HOME, NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR],
-                    routes: [
-                        {key: 'home', name: SCREENS.HOME},
-                        {
-                            key: 'onboarding',
-                            name: NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR,
-                            state: {
-                                key: 'onboarding-nav',
-                                index: 0,
-                                routeNames: [SCREENS.ONBOARDING.PURPOSE],
-                                routes: [{key: 'purpose', name: SCREENS.ONBOARDING.PURPOSE}],
-                                stale: false,
-                                type: 'stack',
-                            },
-                        },
-                    ],
+                    index: 0,
+                    routeNames: [SCREENS.ONBOARDING.PURPOSE],
+                    routes: [{key: 'purpose', name: SCREENS.ONBOARDING.PURPOSE}],
                     stale: false,
-                    type: 'root',
+                    type: 'stack',
                 },
             };
 
