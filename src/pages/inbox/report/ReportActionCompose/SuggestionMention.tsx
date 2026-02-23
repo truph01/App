@@ -92,11 +92,8 @@ function SuggestionMention({
         [policyID],
     );
 
-    const [conciergeReportID = ''] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
-    const [mentionableReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
-        canBeMissing: false,
-        selector: mentionableReportsSelector,
-    });
+    const [conciergeReportID = ''] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [mentionableReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: mentionableReportsSelector});
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isMentionSuggestionsMenuVisible = !!suggestionValues.suggestedMentions.length && suggestionValues.shouldShowSuggestionMenu;
