@@ -13,7 +13,7 @@ const LockedAccountActionsContext = createContext<LockedAccountActionsContextTyp
 
 function LockedAccountModalProvider({children}: React.PropsWithChildren) {
     const {translate} = useLocalize();
-    const [lockAccountDetails] = useOnyx(ONYXKEYS.NVP_PRIVATE_LOCK_ACCOUNT_DETAILS, {canBeMissing: true});
+    const [lockAccountDetails] = useOnyx(ONYXKEYS.NVP_PRIVATE_LOCK_ACCOUNT_DETAILS);
     const isAccountLocked = lockAccountDetails?.isLocked ?? false;
     const [isModalOpen, setIsModalOpen] = useState(false);
 
