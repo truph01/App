@@ -1831,10 +1831,6 @@ function PureReportActionItem({
                                             styles={{
                                                 text: isPhrasalConciergeOptions ? styles.actionableItemButtonText : undefined,
                                                 button: isPhrasalConciergeOptions ? styles.actionableItemButton : undefined,
-                                                container: [
-                                                    isPhrasalConciergeOptions && shouldUseNarrowLayout ? styles.alignItemsStretch : undefined,
-                                                    actionContainsFollowUps ? styles.mt5 : undefined,
-                                                ],
                                             }}
                                         />
                                     )}
