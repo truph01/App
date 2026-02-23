@@ -9,11 +9,11 @@ Workspace Admins can reimburse approved reports using ACH reimbursement, global 
 
 ---
 
-# Reimbursement payment methods 
+# How to choose a reimbursement method for approved reports
 
-Workspace Admins can reimburse approved reports in Expensify using one of three methods:
+Workspace Admins can choose between two reimbursement methods when paying an approved report in Expensify:
 
-- **Direct reimbursement** — Expensify sends payment from a connected Workspace business bank account to a member’s connected personal bank account.
+- **Direct reimbursement** — Expensify sends payment from a connected Workspace business bank account to a member’s connected personal bank account. This includes US ACH reimbursement and Global Reimbursement.
 - **Pay elsewhere** — The Workspace Admin marks the report as paid in Expensify and issues payment outside the platform. Expensify records the report as paid but does not process the transfer.
 
 The payment method is selected when the Workspace Admin clicks **Pay** on an approved report.
@@ -94,8 +94,6 @@ Rapid Reimbursement is applied automatically when eligibility requirements are m
 
 ## Global Reimbursement timelines 
 
-# Global Reimbursement timelines 
-
 Global reimbursement timelines vary by country. However, most reimbursements are processed in two to three business days. 
 
 ---
@@ -119,19 +117,19 @@ Members can receive funds in 190+ countries after adding a supported personal ba
 
 # FAQ
 
-## What is direct reimbursement
+## What is direct reimbursement?
 
 Direct reimbursement means Expensify sends payment from the Workspace’s connected business bank account to a member’s connected personal bank account after the Workspace Admin clicks **Pay**.
 
-## Can Workspace Admins send reimbursement by check
+## Can Workspace Admins send reimbursement by check?
 
 Expensify does not issue checks. Workspace Admins can select **Pay elsewhere** and issue a check outside Expensify.
 
-## What is the difference between ACH reimbursement and global reimbursement
+## What is the difference between ACH reimbursement and global reimbursement?
 
 ACH reimbursement applies to US-based USD payments. Global reimbursement supports international payments and multiple currencies.
 
-## When is Pay elsewhere used
+## When is Pay elsewhere used?
 
 Common scenarios for using Pay elsewhere include:
 
