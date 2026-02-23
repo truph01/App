@@ -89,9 +89,6 @@ const createKeyToUserFriendlyMap = () => {
 // Create the maps once at module initialization for performance
 const keyToUserFriendlyMap = createKeyToUserFriendlyMap();
 
-const REPORT_FIELD_FILTER_KEY = CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_FIELD;
-const REPORT_FIELD_GLOBAL_PREFIX = CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX;
-
 /**
  * Lookup a key in the keyToUserFriendlyMap and return the user-friendly key.
  *
@@ -413,8 +410,8 @@ function isFilterSupported(filter: SearchAdvancedFiltersKey, type: SearchDataTyp
     if (supportedTypeFilters.has(filter)) {
         return true;
     }
-    if (filter.startsWith(REPORT_FIELD_GLOBAL_PREFIX)) {
-        return supportedTypeFilters.has(REPORT_FIELD_FILTER_KEY);
+    if (filter.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX)) {
+        return supportedTypeFilters.has(CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_FIELD);
     }
     return false;
 }
