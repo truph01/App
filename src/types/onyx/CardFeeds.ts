@@ -33,6 +33,11 @@ type CardFeedWithDomainID = `${CardFeedWithNumber}${typeof CONST.COMPANY_CARD.FE
 type BankName = ValueOf<typeof CONST.COMPANY_CARDS.BANKS>;
 
 /**
+ * OldDot bank name
+ */
+type OldDotBankName = ValueOf<typeof CONST.COMPANY_CARDS.OLDDOT_BANKS>;
+
+/**
  *
  */
 type CardType = ValueOf<typeof CONST.COMPANY_CARDS.CARD_TYPE>;
@@ -318,6 +323,7 @@ export type {
     CardFeedWithNumber,
     CardFeedWithDomainID,
     BankName,
+    OldDotBankName,
     CardType,
     CardTypeName,
     CompanyCardFeed,
