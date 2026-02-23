@@ -19,9 +19,9 @@ type UseExportedToFilterDataResult = {
  */
 export default function useExportedToFilterOptions(): UseExportedToFilterDataResult {
     const {translate, localeCompare} = useLocalize();
-    const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES, {canBeMissing: true});
-    const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS, {canBeMissing: true});
-    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
+    const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES);
+    const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS);
+    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
     const policyLevelExportTemplates = Object.values(policies ?? {}).flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
     const accountLevelExportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
