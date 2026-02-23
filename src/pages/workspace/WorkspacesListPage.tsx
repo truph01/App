@@ -454,7 +454,7 @@ function WorkspacesListPage() {
                 shouldHideOnDelete={false}
             >
                 <PressableWithoutFeedback
-                    role={CONST.ROLE.BUTTON}
+                    role={isLessThanMediumScreen ? CONST.ROLE.BUTTON : CONST.ROLE.ROW}
                     accessibilityLabel={accessibilityLabel}
                     style={[styles.mh5]}
                     disabled={item.disabled}
