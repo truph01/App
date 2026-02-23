@@ -93,7 +93,7 @@ function SuggestionMention({
     );
 
     const [conciergeReportID = ''] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const [mentionableReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: mentionableReportsSelector});
+    const [mentionableReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: mentionableReportsSelector}, [policyID]);
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isMentionSuggestionsMenuVisible = !!suggestionValues.suggestedMentions.length && suggestionValues.shouldShowSuggestionMenu;
