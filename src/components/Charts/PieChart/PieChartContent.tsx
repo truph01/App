@@ -43,10 +43,10 @@ function PieChartContent({data, title, titleIcon, isLoading, valueUnit, valueUni
         setCanvasHeight(event.nativeEvent.layout.height);
     };
 
-    // Process data into slices with aggregation.
+    // Slices are sorted by absolute value (largest first) for color assignment,
+    // so slice indices don't match the original data array. We map back via
+    // originalIndex so the tooltip can display the original (possibly negative) value.
     const processedSlices = processDataIntoSlices(data, PIE_CHART_START_ANGLE);
-
-    // Map sorted slice index back to original data index for the tooltip hook
     const activeOriginalDataIndex = activeSliceIndex >= 0 ? (processedSlices.at(activeSliceIndex)?.originalIndex ?? -1) : -1;
 
     const {formatValue} = useChartLabelFormats({data, unit: valueUnit, unitPosition: valueUnitPosition});
