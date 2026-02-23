@@ -130,8 +130,8 @@ function shouldPreventReset(state: NavigationState, action: NavigationAction) {
 }
 
 /**
- * Check if the user is already on or navigating to an onboarding screen.
- * This follows the same pattern as isNavigatingToTestDriveModal in TestDriveModalGuard.
+ * Check if we're already on or navigating to an onboarding screen.
+ * This prevents redirect loops where our redirect creates new navigation actions.
  */
 function isNavigatingToOnboardingFlow(state: NavigationState, action: NavigationAction): boolean {
     const currentRoute = findFocusedRoute(state);
