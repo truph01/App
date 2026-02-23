@@ -1,3 +1,4 @@
+// This component is compiled by the React Compiler
 /* eslint-disable react/jsx-no-constructed-context-values */
 import React, {createContext, useContext} from 'react';
 import useTheme from '@hooks/useTheme';
