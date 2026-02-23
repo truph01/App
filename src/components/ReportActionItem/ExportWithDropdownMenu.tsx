@@ -20,8 +20,9 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportActions} from '@src/types/onyx';
 import type {ConnectionName} from '@src/types/onyx/Policy';
 import type AnchorAlignment from '@src/types/utils/AnchorAlignment';
+import type WithSentryLabel from '@src/types/utils/SentryLabel';
 
-type ExportWithDropdownMenuProps = {
+type ExportWithDropdownMenuProps = WithSentryLabel & {
     report: OnyxEntry<Report>;
 
     reportActions: OnyxEntry<ReportActions>;
@@ -31,9 +32,6 @@ type ExportWithDropdownMenuProps = {
     dropdownAnchorAlignment?: AnchorAlignment;
 
     wrapperStyle?: StyleProp<ViewStyle>;
-
-    /** Label for Sentry tracking */
-    sentryLabel?: string;
 };
 
 function ExportWithDropdownMenu({
@@ -52,12 +50,12 @@ function ExportWithDropdownMenu({
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [modalStatus, setModalStatus] = useState<ExportType | null>(null);
-    const [exportMethods] = useOnyx(ONYXKEYS.LAST_EXPORT_METHOD, {canBeMissing: true});
+    const [exportMethods] = useOnyx(ONYXKEYS.LAST_EXPORT_METHOD);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['XeroSquare', 'QBOSquare', 'NetSuiteSquare', 'IntacctSquare', 'QBDSquare']);
 
     const iconToDisplay = getIntegrationIcon(connectionName, expensifyIcons);
     const canBeExported = canBeExportedUtils(report);
-    const isExported = isExportedUtils(reportActions);
+    const isExported = isExportedUtils(reportActions, report);
     const flattenedWrapperStyle = StyleSheet.flatten([styles.flex1, wrapperStyle]);
 
     const dropdownOptions: Array<DropdownOption<ReportExportType>> = useMemo(() => {
