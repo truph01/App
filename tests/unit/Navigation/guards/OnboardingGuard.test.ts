@@ -3,6 +3,7 @@ import Onyx from 'react-native-onyx';
 import OnboardingGuard from '@libs/Navigation/guards/OnboardingGuard';
 import type {GuardContext} from '@libs/Navigation/guards/types';
 import CONST from '@src/CONST';
+import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import waitForBatchedUpdates from '../../../utils/waitForBatchedUpdates';
@@ -190,29 +191,42 @@ describe('OnboardingGuard', () => {
     });
 
     describe('redirect completed users away from onboarding routes', () => {
-        it('should redirect to HOME when completed user navigates to onboarding via deep link (RESET with onboarding screen)', async () => {
+        it('should redirect to HOME when completed user navigates to onboarding via NAVIGATE action', async () => {
             // Given a user who has already completed the guided setup flow
             await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
                 hasCompletedGuidedSetupFlow: true,
             });
             await waitForBatchedUpdates();
 
-            // When a RESET action tries to navigate them to the onboarding purpose screen (e.g. via a deep link like /onboarding/purpose from a Concierge message)
-            const resetToOnboardingAction: NavigationAction = {
-                type: 'RESET',
-                payload: {
-                    key: 'root',
-                    index: 0,
-                    routeNames: [SCREENS.ONBOARDING.PURPOSE],
-                    routes: [{key: 'purpose', name: SCREENS.ONBOARDING.PURPOSE}],
-                    stale: false,
-                    type: 'stack',
-                },
+            // When a NAVIGATE action targets the OnboardingModalNavigator (e.g. via a deep link like /onboarding/purpose)
+            const navigateToOnboardingAction: NavigationAction = {
+                type: CONST.NAVIGATION.ACTION_TYPE.NAVIGATE,
+                payload: {name: NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR},
             };
 
-            const result = OnboardingGuard.evaluate(mockState, resetToOnboardingAction, authenticatedContext) as {type: 'REDIRECT'; route: string};
+            const result = OnboardingGuard.evaluate(mockState, navigateToOnboardingAction, authenticatedContext) as {type: 'REDIRECT'; route: string};
 
-            // Then the user should be redirected to HOME because the onboarding modal is excluded from the navigation stack for completed users, and navigating there would silently fail
+            // Then the user should be redirected to HOME because the OnboardingModalNavigator is not mounted for completed users, and navigating there would silently fail
+            expect(result.type).toBe('REDIRECT');
+            expect(result.route).toBe('home');
+        });
+
+        it('should redirect to HOME when completed user navigates to onboarding via PUSH action', async () => {
+            // Given a user who has already completed the guided setup flow
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
+                hasCompletedGuidedSetupFlow: true,
+            });
+            await waitForBatchedUpdates();
+
+            // When a PUSH action targets the OnboardingModalNavigator
+            const pushToOnboardingAction: NavigationAction = {
+                type: CONST.NAVIGATION.ACTION_TYPE.PUSH,
+                payload: {name: NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR},
+            };
+
+            const result = OnboardingGuard.evaluate(mockState, pushToOnboardingAction, authenticatedContext) as {type: 'REDIRECT'; route: string};
+
+            // Then the user should be redirected to HOME because the OnboardingModalNavigator is not mounted for completed users
             expect(result.type).toBe('REDIRECT');
             expect(result.route).toBe('home');
         });
@@ -243,22 +257,22 @@ describe('OnboardingGuard', () => {
             expect(result.type).toBe('ALLOW');
         });
 
-        it('should ALLOW non-RESET actions for completed users (e.g. NAVIGATE)', async () => {
+        it('should ALLOW NAVIGATE actions for completed users when target is not onboarding', async () => {
             // Given a user who has completed the guided setup flow
             await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {
                 hasCompletedGuidedSetupFlow: true,
             });
             await waitForBatchedUpdates();
 
-            // When a standard NAVIGATE action (not a RESET) is evaluated
+            // When a NAVIGATE action targets a non-onboarding screen (HOME)
             const navigateAction: NavigationAction = {
-                type: 'NAVIGATE',
+                type: CONST.NAVIGATION.ACTION_TYPE.NAVIGATE,
                 payload: {name: SCREENS.HOME},
             };
 
             const result = OnboardingGuard.evaluate(mockState, navigateAction, authenticatedContext);
 
-            // Then navigation should be allowed because the deep link redirect only applies to RESET actions, which are how deep links resolve in the navigation stack
+            // Then navigation should be allowed because the redirect only triggers when the target is the OnboardingModalNavigator
             expect(result.type).toBe('ALLOW');
         });
     });
