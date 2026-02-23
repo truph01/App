@@ -4087,6 +4087,10 @@ describe('OptionsListUtils', () => {
     describe('getLastMessageTextForReport', () => {
         describe('getReportPreviewMessage', () => {
             it('should format report preview message correctly for non-policy expense chat with IOU action', async () => {
+                const report: Report = {
+                    ...createRandomReport(0, undefined),
+                    isOwnPolicyExpenseChat: false,
+                };
                 const iouReport: Report = {
                     ...createRandomReport(1, undefined),
                     isOwnPolicyExpenseChat: false,
