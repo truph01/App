@@ -111,6 +111,12 @@ type MenuItemBaseProps = ForwardedFSClassProps &
         /** Any additional styles to apply on the badge element */
         badgeStyle?: ViewStyle;
 
+        /** Any additional styles to apply on the badge text */
+        badgeTextStyle?: StyleProp<TextStyle>;
+
+        /** Custom fill color to apply to the badge icon */
+        badgeIconFill?: string;
+
         /** Any additional styles to apply to the label */
         labelStyle?: StyleProp<ViewStyle>;
 
@@ -461,6 +467,8 @@ function MenuItem({
     labelStyle,
     descriptionTextStyle,
     badgeStyle,
+    badgeTextStyle,
+    badgeIconFill,
     viewMode = CONST.OPTION_MODE.DEFAULT,
     numberOfLinesTitle = 1,
     numberOfLinesDescription = 2,
@@ -971,6 +979,8 @@ function MenuItem({
                                                                 text={badgeText}
                                                                 icon={badgeIcon}
                                                                 badgeStyles={[badgeStyle, styles.alignSelfStart, styles.ml3, styles.mt2]}
+                                                                textStyles={badgeTextStyle}
+                                                                iconFill={badgeIconFill}
                                                                 success={badgeSuccess}
                                                                 onPress={onBadgePress}
                                                                 pressable={!!onBadgePress}
@@ -987,6 +997,8 @@ function MenuItem({
                                                         text={badgeText}
                                                         icon={badgeIcon}
                                                         badgeStyles={badgeStyle}
+                                                        textStyles={badgeTextStyle}
+                                                        iconFill={badgeIconFill}
                                                         success={badgeSuccess}
                                                         onPress={onBadgePress}
                                                         pressable={!!onBadgePress}
@@ -1077,6 +1089,8 @@ function MenuItem({
                                                 text={badgeText}
                                                 icon={badgeIcon}
                                                 badgeStyles={[badgeStyle, styles.alignSelfStart, styles.ml13, styles.mt2]}
+                                                textStyles={badgeTextStyle}
+                                                iconFill={badgeIconFill}
                                                 success={badgeSuccess}
                                                 onPress={onBadgePress}
                                                 pressable={!!onBadgePress}
