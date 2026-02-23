@@ -21,6 +21,7 @@ import useDebounce from '@hooks/useDebounce';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import useKeyboardState from '@hooks/useKeyboardState';
 import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
+import useScrollEnabled from '@hooks/useScrollEnabled';
 import useSingleExecution from '@hooks/useSingleExecution';
 import {focusedItemRef} from '@hooks/useSyncFocus/useSyncFocusImplementation';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -70,6 +71,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
 }: SelectionListWithSectionsProps<TItem>) {
     const styles = useThemeStyles();
     const isScreenFocused = useIsFocused();
+    const scrollEnabled = useScrollEnabled();
     const {singleExecution} = useSingleExecution();
     const listRef = useRef<FlashListRef<FlattenedItem<TItem>> | null>(null);
     const innerTextInputRef = useRef<BaseTextInputRef | null>(null);
@@ -352,6 +354,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                         onEndReached={onEndReached}
                         onEndReachedThreshold={onEndReachedThreshold}
                         onScrollBeginDrag={onScrollBeginDrag}
+                        scrollEnabled={scrollEnabled}
                         indicatorStyle="white"
                         showsVerticalScrollIndicator
                         keyboardShouldPersistTaps="always"
