@@ -306,6 +306,7 @@ const translations: TranslationDeepObject<typeof en> = {
         reportID: 'ID del informe',
         longReportID: 'ID de informe largo',
         withdrawalID: 'ID de retiro',
+        withdrawalStatus: 'Estado de retiro',
         bankAccounts: 'Cuentas bancarias',
         chooseFile: 'Elegir archivo',
         chooseFiles: 'Elegir archivos',
@@ -402,6 +403,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Semana',
         year: 'Año',
         quarter: 'Trimestre',
+        vacationDelegate: 'Delegado de vacaciones',
         expensifyLogo: 'Logo de Expensify',
     },
     socials: {
@@ -814,6 +816,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 cta: 'Revisar',
             },
         },
+        assignedCards: 'Tarjetas asignadas',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} restantes`,
         announcements: 'Anuncios',
         discoverSection: {
             title: 'Descubrir',
@@ -1228,12 +1232,7 @@ const translations: TranslationDeepObject<typeof en> = {
         someDuplicatesArePaid: 'Algunos de estos duplicados ya han sido aprobados o pagados.',
         reviewDuplicates: 'Revisar duplicados',
         keepAll: 'Mantener todos',
-        confirmApprove: 'Confirmar importe a aprobar',
-        confirmApprovalAmount: 'Aprueba sólo los gastos conformes, o aprueba todo el informe.',
-        confirmApprovalAllHoldAmount: () => ({
-            one: 'Este gasto está retenido. ¿Quieres aprobarlo de todos modos?',
-            other: 'Estos gastos están retenidos. ¿Quieres aprobarlos de todos modos?',
-        }),
+        confirmApprovalWithHeldAmount: 'El informe contiene gastos retenidos. ¿Quieres aprobar sólo los gastos que cumplen con los requisitos o aprobar todo el informe?',
         confirmPay: 'Confirmar importe de pago',
         confirmPayAmount: 'Paga lo que no está retenido, o paga el informe completo.',
         confirmPayAllHoldAmount: () => ({
@@ -2927,7 +2926,6 @@ ${amount} para ${merchant} - ${date}`,
         time: 'Hora',
         clearAfter: 'Borrar después',
         whenClearStatus: '¿Cuándo deberíamos borrar tu estado?',
-        vacationDelegate: 'Delegado de vacaciones',
         setVacationDelegate: 'Configura un delegado de vacaciones para aprobar informes en tu nombre mientras estás fuera de la oficina.',
         cannotSetVacationDelegate: `No puedes establecer un delegado de vacaciones porque actualmente eres el delegado de los siguientes miembros:`,
         vacationDelegateError: 'Hubo un error al actualizar tu delegado de vacaciones.',
@@ -3676,6 +3674,12 @@ ${amount} para ${merchant} - ${date}`,
         carRental: ' de alquiler de coche',
         nightIn: 'noche en',
         nightsIn: 'noches en',
+    },
+    proactiveAppReview: {
+        title: '¿Te gusta New Expensify?',
+        description: 'Dínoslo para que podamos ayudarte a mejorar tu experiencia de gestión de gastos.',
+        positiveButton: '¡Sí!',
+        negativeButton: 'No mucho',
     },
     workspace: {
         common: {
@@ -6220,7 +6224,7 @@ ${amount} para ${merchant} - ${date}`,
                 matchTypeContains: 'Contiene',
                 matchTypeExact: 'Coincide exactamente',
                 duplicateRuleTitle: 'Ya existe una regla de comerciante similar',
-                duplicateRulePrompt: (merchantName: string) => `¿Quieres guardar una nueva regla para "${merchantName}" aunque ya tengas una existente?`,
+                duplicateRulePrompt: (merchantName: string) => `La regla existente para "${merchantName}" tendrá prioridad sobre esta. ¿Desea guardarla de todos modos?`,
                 saveAnyway: 'Guardar de todos modos',
                 applyToExistingUnsubmittedExpenses: 'Aplicar a gastos existentes no enviados',
             },
@@ -6755,6 +6759,9 @@ ${amount} para ${merchant} - ${date}`,
             previousForwardsTo
                 ? `cambió el flujo de aprobación para ${approver} para dejar de reenviar informes aprobados (anteriormente reenviados a ${previousForwardsTo})`
                 : `cambió el flujo de aprobación para ${approver} para dejar de reenviar informes aprobados`,
+        updateCustomTaxName: ({oldName, newName}) => `cambió el nombre del impuesto personalizado a "${newName}" (antes "${oldName}")`,
+        updateCurrencyDefaultTax: ({oldName, newName}) => `cambió la tasa impositiva predeterminada de la moneda del espacio de trabajo a "${newName}" (anteriormente "${oldName}")`,
+        updateForeignCurrencyDefaultTax: ({oldName, newName}) => `cambió la tasa impositiva predeterminada de la moneda extranjera a "${newName}" (anteriormente "${oldName}")`,
         changedInvoiceCompanyName: ({newValue, oldValue}: {newValue: string; oldValue?: string}) =>
             oldValue ? `cambió el nombre de la empresa de la factura a "${newValue}" (previamente "${oldValue}")` : `estableció el nombre de la empresa de la factura como "${newValue}"`,
         changedInvoiceCompanyWebsite: ({newValue, oldValue}: {newValue: string; oldValue?: string}) =>
@@ -8669,12 +8676,15 @@ ${amount} para ${merchant} - ${date}`,
             error: {
                 removeMember: 'No se pudo eliminar a este usuario. Por favor, inténtalo de nuevo.',
                 addMember: 'No se pudo añadir este miembro. Por favor, inténtalo de nuevo.',
+                vacationDelegate: 'No se pudo establecer a este usuario como delegado de vacaciones. Por favor, inténtalo de nuevo.',
             },
             forceTwoFactorAuth: 'Forzar la autenticación de dos factores',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Por favor, deshabilita <a href="${samlPageUrl}">SAML</a> para forzar la autenticación de dos factores.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Requiere la autenticación de dos factores para todos los miembros de este dominio. Se les pedirá a los miembros del dominio que configuren la autenticación de dos factores en su cuenta cuando inicien sesión.</muted-text>`,
             forceTwoFactorAuthError: 'No se pudo cambiar la autenticación de dos factores forzada. Por favor, inténtalo de nuevo más tarde.',
+            cannotSetVacationDelegateForMember: (email: string) =>
+                `No puedes establecer un delegado de vacaciones para ${email} porque actualmente es el delegado de los siguientes miembros:`,
         },
         common: {
             settings: 'Configuración',
