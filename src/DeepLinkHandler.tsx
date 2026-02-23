@@ -26,10 +26,10 @@ type DeepLinkHandlerProps = {
 function DeepLinkHandler({onInitialUrl}: DeepLinkHandlerProps) {
     const linkingChangeListener = useRef<NativeEventSubscription | null>(null);
 
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
-    const [, sessionMetadata] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: true});
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {canBeMissing: true});
+    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
+    const [, sessionMetadata] = useOnyx(ONYXKEYS.SESSION);
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const isAuthenticated = useIsAuthenticated();
 
     useEffect(() => {
