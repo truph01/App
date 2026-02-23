@@ -844,7 +844,7 @@ function getOptionData({
 
     const lastActorDisplayName = getLastActorDisplayName(lastActorDetails, currentUserAccountID);
     let lastMessageTextFromReport = lastMessageTextFromReportProp;
-    if (lastMessageTextFromReport == null) {
+    if (!lastMessageTextFromReport) {
         lastMessageTextFromReport = getLastMessageTextForReport({
             translate,
             report,
@@ -853,13 +853,10 @@ function getOptionData({
             movedToReport,
             policy,
             isReportArchived,
-            reportMetadata,
             reportAttributesDerived,
             lastAction,
         });
     }
-
-    lastMessageTextFromReport = Parser.htmlToText(lastMessageTextFromReport);
 
     // We need to remove sms domain in case the last message text has a phone number mention with sms domain.
     let lastMessageText = Str.removeSMSDomain(lastMessageTextFromReport);
