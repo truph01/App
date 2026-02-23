@@ -561,7 +561,7 @@ function getForReportActionTemp({
     movedFromReport,
     movedToReport,
     policyTags,
-    currentUserLogin,
+    currentUserLogin = storedCurrentUserLogin,
 }: {
     translate: LocalizedTranslate;
     reportAction: OnyxEntry<ReportAction>;
@@ -569,7 +569,9 @@ function getForReportActionTemp({
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     policyTags: OnyxEntry<PolicyTagLists>;
-    currentUserLogin: string;
+    // Falls back to storedCurrentUserLogin until migration to getForReportActionTemp is complete.
+    // Once migrated, storedCurrentUserLogin can be removed and currentUserLogin made required.
+    currentUserLogin?: string;
 }): string {
     if (!isModifiedExpenseAction(reportAction)) {
         return '';
