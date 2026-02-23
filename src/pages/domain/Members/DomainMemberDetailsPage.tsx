@@ -1,6 +1,7 @@
 import {domainNameSelector, selectSecurityGroupForAccount} from '@selectors/Domain';
 import {personalDetailsSelector} from '@selectors/PersonalDetails';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
+import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
@@ -17,6 +18,7 @@ import type {SettingsNavigatorParamList} from '@navigation/types';
 import BaseDomainMemberDetailsComponent from '@pages/domain/BaseDomainMemberDetailsComponent';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
+import type {Domain, PersonalDetailsList} from '@src/types/onyx';
 
 type DomainMemberDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_DETAILS>;
 
@@ -32,14 +34,16 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     const {isSmallScreenWidth} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
 
+    const securityGroupSelector = useCallback((domain: OnyxEntry<Domain>) => selectSecurityGroupForAccount(accountID)(domain), [accountID]);
     const [userSecurityGroup] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         canBeMissing: true,
-        selector: selectSecurityGroupForAccount(accountID),
+        selector: securityGroupSelector,
     });
 
+    const memberPersonalDetailsSelector = useCallback((personalDetailsList: OnyxEntry<PersonalDetailsList>) => personalDetailsSelector(accountID)(personalDetailsList), [accountID]);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         canBeMissing: true,
-        selector: personalDetailsSelector(accountID),
+        selector: memberPersonalDetailsSelector,
     });
 
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
