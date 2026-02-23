@@ -253,12 +253,16 @@ function getForReportAction({
     movedFromReport,
     movedToReport,
     policyForMovingExpensesID,
+    // Falls back to storedCurrentUserLogin until migration to getForReportActionTemp is complete.
+    // Once migrated, storedCurrentUserLogin can be removed and currentUserLogin made required.
+    currentUserLogin = storedCurrentUserLogin,
 }: {
     reportAction: OnyxEntry<ReportAction>;
     policyID: string | undefined;
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     policyForMovingExpensesID?: string;
+    currentUserLogin?: string;
 }): string {
     if (!isModifiedExpenseAction(reportAction)) {
         return '';
@@ -371,7 +375,7 @@ function getForReportAction({
         } else if (reportActionOriginalMessage?.source === CONST.CATEGORY_SOURCE.MCC) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             const policy = getPolicy(policyID);
-            const isAdmin = isPolicyAdmin(policy, storedCurrentUserLogin);
+            const isAdmin = isPolicyAdmin(policy, currentUserLogin);
 
             // For admins, create a hyperlink to the workspace rules page
             if (isAdmin && policy?.id) {
