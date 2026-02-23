@@ -124,10 +124,7 @@ function usePersonalDetailOptions(config: UseFilteredOptionsConfig = {}): UseFil
 
     const {accountID} = useCurrentUserPersonalDetails();
     const {formatPhoneNumber} = useLocalize();
-    const [reports, reportsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
-        canBeMissing: true,
-        selector: reportsSelector,
-    });
+    const [reports, reportsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: reportsSelector});
     const reportIDsSet = (() => {
         if (!reports) {
             return new Set<string>();
@@ -141,8 +138,8 @@ function usePersonalDetailOptions(config: UseFilteredOptionsConfig = {}): UseFil
         return validReportIDs;
     })();
 
-    const [reportAttributes, reportAttributesMetadata] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {canBeMissing: true});
-    const [reportNameValuePairs, reportNameValuePairsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {canBeMissing: true});
+    const [reportAttributes, reportAttributesMetadata] = useOnyx(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES);
+    const [reportNameValuePairs, reportNameValuePairsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS);
     const personalDetails = usePersonalDetails();
 
     const isLoading = !enabled || isLoadingOnyxValue(reportsMetadata, reportAttributesMetadata, reportNameValuePairsMetadata);
