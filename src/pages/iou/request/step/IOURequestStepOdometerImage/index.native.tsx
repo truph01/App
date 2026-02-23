@@ -203,6 +203,7 @@ function IOURequestStepOdometerImage({
 
         if (!camera.current) {
             showCameraAlert();
+            return;
         }
 
         if (didCapturePhoto) {
