@@ -1,3 +1,4 @@
+import {emailSelector} from '@selectors/Session';
 import {format, getMonth, getYear} from 'date-fns';
 import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -12,14 +13,13 @@ import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import useThemePreference from '@hooks/useThemePreference';
 import addEncryptedAuthTokenToURL from '@libs/addEncryptedAuthTokenToURL';
-import * as Browser from '@libs/Browser';
+import {isMobileSafari} from '@libs/Browser';
 import {getOldDotURLFromEnvironment} from '@libs/Environment/Environment';
 import fileDownload from '@libs/fileDownload';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import addTrailingForwardSlash from '@libs/UrlUtils';
 import type {WalletStatementNavigatorParamList} from '@navigation/types';
-import {emailSelector} from '@selectors/Session';
 import {generateStatementPDF} from '@userActions/User';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -62,7 +62,7 @@ function WalletStatementPage({route}: WalletStatementPageProps) {
             const pdfURL = `${baseURL}secure?secureType=pdfreport&filename=${encodeURIComponent(fileName)}&downloadName=${encodeURIComponent(downloadFileName)}&email=${encodeURIComponent(
                 currentUserLogin,
             )}`;
-            fileDownload(translate, addEncryptedAuthTokenToURL(pdfURL, true), downloadFileName, '', Browser.isMobileSafari()).finally(() => setIsDownloading(false));
+            fileDownload(translate, addEncryptedAuthTokenToURL(pdfURL, true), downloadFileName, '', isMobileSafari()).finally(() => setIsDownloading(false));
             return;
         }
 
