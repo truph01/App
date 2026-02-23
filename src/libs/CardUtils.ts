@@ -601,7 +601,6 @@ const getBankCardDetailsImage = (bank: BankName | OldDotBankName, illustrations:
         [CONST.COMPANY_CARDS.BANKS.BREX]: companyCardIllustrations.BrexCompanyCardDetail,
         [CONST.COMPANY_CARDS.BANKS.STRIPE]: companyCardIllustrations.StripeCompanyCardDetail,
         [CONST.COMPANY_CARDS.BANKS.MOCK_BANK]: illustrations.GenericCompanyCard,
-        [CONST.COMPANY_CARDS.BANKS.EXPENSIFY]: Illustrations.ExpensifyCardImage,
         [CONST.COMPANY_CARDS.BANKS.OTHER]: illustrations.GenericCompanyCard,
         [CONST.COMPANY_CARDS.OLDDOT_BANKS.PEX]: illustrations.GenericCompanyCard,
     };

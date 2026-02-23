@@ -3790,7 +3790,6 @@ const CONST = {
             STRIPE: 'Stripe',
             WELLS_FARGO: 'Wells Fargo',
             MOCK_BANK: 'Mock Bank',
-            EXPENSIFY: 'Expensify',
             OTHER: 'Other',
         },
         OLDDOT_BANKS: {
