@@ -893,7 +893,7 @@ describe('SubscriptionUtils', () => {
                 currency: 'USD',
                 status: 'succeeded',
             };
-            expect(hasSubscriptionRedDotError(stripeCustomerIdWithNoError, false, undefined, undefined, undefined, undefined, 0)).toBeFalsy();
+            expect(hasSubscriptionRedDotError(stripeCustomerIdWithNoError, false, undefined, undefined, undefined, undefined, 0, 0)).toBeFalsy();
         });
     });
 
@@ -922,7 +922,7 @@ describe('SubscriptionUtils', () => {
         });
 
         it('should return false when there is no subscription status or isError is true', () => {
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, undefined, undefined, undefined, undefined, 0)).toBeFalsy();
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, undefined, undefined, undefined, undefined, 0, 0)).toBeFalsy();
         });
     });
 
@@ -1012,7 +1012,7 @@ describe('SubscriptionUtils', () => {
 
         it('should return true when billing dispute is pending regardless of grace period', async () => {
             // Billing dispute pending should return error
-            expect(hasSubscriptionRedDotError(stripeCustomerId, false, 1, undefined, undefined, undefined, 0)).toBe(true);
+            expect(hasSubscriptionRedDotError(stripeCustomerId, false, 1, undefined, undefined, undefined, 0, 0)).toBe(true);
         });
     });
 
@@ -1054,7 +1054,7 @@ describe('SubscriptionUtils', () => {
 
         it('should return false when billing dispute is pending (error state)', async () => {
             // Billing dispute pending should return error, not green dot
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, 1, undefined, undefined, undefined, 0)).toBe(false);
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, 1, undefined, undefined, undefined, 0, 0)).toBe(false);
         });
     });
 

@@ -90,7 +90,7 @@ Onyx.connect({
  * @returns Whether the workspace owner's grace period is overdue.
  * @param gracePeriodEnd - Optional parameter to use instead of module-level value (for pure function usage).
  */
-function hasGracePeriodOverdue(gracePeriodEnd?: OnyxEntry<number>): boolean {
+function hasGracePeriodOverdue(gracePeriodEnd: OnyxEntry<number>): boolean {
     const value = gracePeriodEnd;
     return !!value && Date.now() > new Date(value).getTime();
 }
@@ -373,7 +373,7 @@ function hasSubscriptionRedDotError(
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
     amountOwed: number,
-    ownerBillingGraceEndPeriod?: OnyxEntry<number>,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     return (
         getSubscriptionStatus(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, amountOwed, ownerBillingGraceEndPeriod)
@@ -392,7 +392,7 @@ function hasSubscriptionGreenDotInfo(
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
     amountOwed: number,
-    ownerBillingGraceEndPeriod?: OnyxEntry<number>,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     return (
         getSubscriptionStatus(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, amountOwed, ownerBillingGraceEndPeriod)
