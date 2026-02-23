@@ -1,3 +1,4 @@
+import React from 'react';
 import useOnyx from '@hooks/useOnyx';
 import {getReportName} from '@libs/ReportNameUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
