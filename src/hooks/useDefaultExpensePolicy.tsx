@@ -5,12 +5,12 @@ import useOnyx from './useOnyx';
 import usePreferredPolicy from './usePreferredPolicy';
 
 export default function useDefaultExpensePolicy() {
+    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
+    const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const {isRestrictedToPreferredPolicy, preferredPolicyID} = usePreferredPolicy();
-    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID, {canBeMissing: true});
-    const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`, {canBeMissing: true});
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {canBeMissing: true});
     const {login = ''} = useCurrentUserPersonalDetails();
-    const [preferredPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${preferredPolicyID}`, {canBeMissing: true});
+    const [preferredPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${preferredPolicyID}`);
 
     if (isRestrictedToPreferredPolicy && isPaidGroupPolicy(preferredPolicy) && isPolicyAccessible(preferredPolicy, login)) {
         return preferredPolicy;
