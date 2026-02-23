@@ -6116,7 +6116,7 @@ describe('SearchUIUtils', () => {
 
             SearchUIUtils.createAndOpenSearchTransactionThread(transactionListItem, customIntroSelected, backTo, threadReportID, undefined, false);
 
-            expect((createTransactionThreadReport as jest.Mock).mock.calls[0][0]).toEqual(customIntroSelected);
+            expect(((createTransactionThreadReport as jest.Mock).mock.calls.at(0) as unknown[] | undefined)?.at(0)).toEqual(customIntroSelected);
         });
 
         test('Should pass undefined introSelected without bypassing with empty values', () => {
@@ -6124,7 +6124,7 @@ describe('SearchUIUtils', () => {
 
             SearchUIUtils.createAndOpenSearchTransactionThread(transactionListItem, undefined, backTo, threadReportID, undefined, false);
 
-            expect((createTransactionThreadReport as jest.Mock).mock.calls[0][0]).toBeUndefined();
+            expect(((createTransactionThreadReport as jest.Mock).mock.calls.at(0) as unknown[] | undefined)?.at(0)).toBeUndefined();
         });
     });
 
