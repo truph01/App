@@ -406,15 +406,15 @@ function isSearchDatePreset(date: string | undefined): date is SearchDatePreset 
  * Returns whether a given search filter is supported in a given search data type
  */
 function isFilterSupported(filter: SearchAdvancedFiltersKey, type: SearchDataTypes) {
-    const allowed = ALLOWED_TYPE_FILTERS[type];
-    if (!allowed) {
+    const supportedTypeFilters = ALLOWED_TYPE_FILTERS[type];
+    if (!supportedTypeFilters) {
         return false;
     }
-    if (allowed.has(filter)) {
+    if (supportedTypeFilters.has(filter)) {
         return true;
     }
     if (filter.startsWith(REPORT_FIELD_GLOBAL_PREFIX)) {
-        return allowed.has(REPORT_FIELD_FILTER_KEY);
+        return supportedTypeFilters.has(REPORT_FIELD_FILTER_KEY);
     }
     return false;
 }
