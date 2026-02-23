@@ -977,43 +977,77 @@ describe('API.write() persistence guarantees', () => {
             [ONYXKEYS.NETWORK]: {isOffline: true},
         });
 
-        // Add CommandA to the queue
-        API.write('CommandA' as WriteCommand, {param1: 'value1'} as ApiRequestCommandParameters[WriteCommand]);
-        await waitForBatchedUpdates();
+        // Intercept Onyx.set for PERSISTED_REQUESTS to control resolution order,
+        // reproducing the out-of-order race condition from Issue 4.
+        type CapturedSet = {value: unknown; triggerRealSet: () => Promise<void>};
+        const capturedSets: CapturedSet[] = [];
+        const originalSet = Onyx.set.bind(Onyx);
+        const setMock = jest.spyOn(Onyx, 'set').mockImplementation((key, value) => {
+            if (key === ONYXKEYS.PERSISTED_REQUESTS && Array.isArray(value) && value.length > 0) {
+                return new Promise<void>((resolvePromise) => {
+                    capturedSets.push({
+                        value,
+                        triggerRealSet: () => originalSet(key, value as Parameters<typeof Onyx.set<typeof ONYXKEYS.PERSISTED_REQUESTS>>[1]).then(resolvePromise),
+                    });
+                });
+            }
+            return originalSet(key, value);
+        });
 
-        // Verify CommandA is in the queue
-        expect(PersistedRequests.getAll()).toHaveLength(1);
-        expect(PersistedRequests.getAll().at(0)?.command).toBe('CommandA');
+        try {
+            // Rapidly write two commands while offline — each save() call updates
+            // in-memory state immediately then fires Onyx.set (captured, not resolved).
+            // save(CommandA): in-memory = [A], Onyx.set([A]) captured
+            API.write('CommandA' as WriteCommand, {param1: 'value1'} as ApiRequestCommandParameters[WriteCommand]);
+            // save(CommandB): in-memory = [A, B], Onyx.set([A, B]) captured
+            API.write('CommandB' as WriteCommand, {param2: 'value2'} as ApiRequestCommandParameters[WriteCommand]);
 
-        // Simulate the out-of-order Onyx.set() race condition from Issue 4:
-        // A stale write resolves and the connect callback overwrites in-memory
-        // state with an empty queue, even though CommandA was successfully saved.
-        await Onyx.set(ONYXKEYS.PERSISTED_REQUESTS, []);
-        await waitForBatchedUpdates();
+            expect(capturedSets).toHaveLength(2);
+            expect(PersistedRequests.getAll()).toHaveLength(2);
 
-        // In-memory queue is now empty due to the stale overwrite
-        expect(PersistedRequests.getAll()).toHaveLength(0);
+            // Resolve in REVERSE order to simulate out-of-order disk I/O (Issue 4):
+            // First, resolve the second set: Onyx.set([A, B])
+            await capturedSets.at(1)?.triggerRealSet();
+            await waitForBatchedUpdates();
+            expect(PersistedRequests.getAll()).toHaveLength(2);
 
-        // Now write CommandB with a conflict resolver that captures the queue state
-        let queueSeenByResolver: Array<{command: string}> = [];
-        API.write(
-            'CommandB' as WriteCommand,
-            {param2: 'value2'} as ApiRequestCommandParameters[WriteCommand],
-            {},
-            {
-                checkAndFixConflictingRequest: (requests) => {
-                    queueSeenByResolver = requests.map((r) => ({command: r.command}));
-                    return {conflictAction: {type: 'push'}};
+            // Now resolve the first (STALE) set: Onyx.set([A])
+            // The connect callback blindly overwrites in-memory with [A], losing CommandB.
+            await capturedSets.at(0)?.triggerRealSet();
+            await waitForBatchedUpdates();
+
+            // BUG (Issue 4): In-memory state is now [A] — CommandB was lost
+            // because the stale callback overwrote the correct [A, B] with [A].
+            expect(PersistedRequests.getAll()).toHaveLength(1);
+            expect(PersistedRequests.getAll().at(0)?.command).toBe('CommandA');
+
+            // Restore Onyx.set to normal before the next write
+            setMock.mockRestore();
+
+            // Now write CommandC with a conflict resolver that captures the queue state
+            let queueSeenByResolver: Array<{command: string}> = [];
+            API.write(
+                'CommandC' as WriteCommand,
+                {param3: 'value3'} as ApiRequestCommandParameters[WriteCommand],
+                {},
+                {
+                    checkAndFixConflictingRequest: (requests) => {
+                        queueSeenByResolver = requests.map((r) => ({command: r.command}));
+                        return {conflictAction: {type: 'push'}};
+                    },
                 },
-            },
-        );
+            );
 
-        // BUG: The conflict resolver could not see CommandA because the in-memory
-        // queue was stale (overwritten by the out-of-order connect callback).
-        // If the resolver needed to deduplicate or resolve conflicts with CommandA,
-        // it would fail to do so, potentially causing duplicate or conflicting requests.
-        // When fixed, the resolver should see a consistent view of the queue.
-        // Change to: expect(queueSeenByResolver).toContainEqual(expect.objectContaining({command: 'CommandA'}));
-        expect(queueSeenByResolver).not.toContainEqual(expect.objectContaining({command: 'CommandA'}));
+            // BUG (Issue 5): The conflict resolver cannot see CommandB because the
+            // in-memory queue was corrupted by the Issue 4 out-of-order race. The stale
+            // connect callback overwrote [A, B] with [A], making CommandB invisible
+            // to the resolver. If it needed to deduplicate or resolve conflicts with
+            // CommandB, it would fail, potentially causing duplicate or conflicting requests.
+            // When fixed, the resolver should see both CommandA and CommandB.
+            // Change to: expect(queueSeenByResolver).toContainEqual(expect.objectContaining({command: 'CommandB'}));
+            expect(queueSeenByResolver).not.toContainEqual(expect.objectContaining({command: 'CommandB'}));
+        } finally {
+            setMock.mockRestore();
+        }
     });
 });
