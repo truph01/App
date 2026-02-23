@@ -12,7 +12,7 @@ source "${TOP}/scripts/shellUtils.sh"
 declare -r PRETTIER_CACHE_DIR="${TOP}/node_modules/.cache/prettier"
 
 function run_prettier() {
-    npx prettier --experimental-cli --write .
+    npx prettier --experimental-cli --write . "$@"
 }
 
 function clear_cache() {
@@ -23,7 +23,7 @@ function clear_cache() {
 }
 
 function main() {
-    if run_prettier; then
+    if run_prettier "$@"; then
         success "Prettier finished successfully"
         return
     fi
@@ -31,7 +31,7 @@ function main() {
     error "Prettier failed — clearing cache and retrying"
     clear_cache
 
-    if run_prettier; then
+    if run_prettier "$@"; then
         success "Prettier finished successfully after clearing cache"
     else
         error "Prettier failed again after clearing cache"
