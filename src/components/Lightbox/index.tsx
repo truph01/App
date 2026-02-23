@@ -108,7 +108,7 @@ function Lightbox({attachmentID, isAuthTokenRequired = false, uri, onScaleChange
             ...actions,
             isUsedInCarousel: !!state.pagerRef,
             isSingleCarouselItem: state.pagerItems.length === 1,
-            page: foundPage,
+            page: foundPage === -1 ? 0 : foundPage,
         };
     }, [attachmentID, uri, state, actions, isPagerScrollingFallback, isScrollingEnabledFallback]);
 

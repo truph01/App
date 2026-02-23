@@ -134,6 +134,20 @@ describe('Lightbox', () => {
         });
     });
 
+    describe('page resolution when attachment is not found in pagerItems', () => {
+        it('should fall back to page 0 and still render when findIndex returns -1', async () => {
+            const stateValue = createStateValue(0, 5);
+            const actionsValue = createActionsValue();
+
+            // Use an attachmentID and uri that don't match any pagerItem — findIndex returns -1, should fallback to page 0
+            await renderLightboxInCarousel('non-existent-id', 'https://example.com/unknown.png', stateValue, actionsValue);
+
+            // Page 0 === activePage 0, so this should be active and render the lightbox
+            expect(screen.getByTestId('multi-gesture-canvas')).toBeTruthy();
+            expect(screen.getAllByTestId('image').length).toBeGreaterThan(0);
+        });
+    });
+
     describe('fallback rendering range', () => {
         it('should not render any image for distant pages outside FALLBACK_OFFSET range', async () => {
             const stateValue = createStateValue(15, 30);
