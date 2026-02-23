@@ -711,7 +711,7 @@ const translations: TranslationDeepObject<typeof en> = {
             auf dem er ursprünglich angefordert wurde
         `),
         doNotShare: dedent(`
-            Gib deinen Code an niemanden weiter.  
+            Gib deinen Code an niemanden weiter.
             Expensify wird niemals danach fragen!
         `),
         or: 'oder',
