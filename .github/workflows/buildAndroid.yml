@@ -219,14 +219,14 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: ${{ inputs.artifact-prefix }}androidBuild-artifact
-          path: Mobile-Expensify/Android/app/build/outputs/bundle/release/*.aab
+          path: Mobile-Expensify/Android/app/build/outputs/bundle/*/*.aab
 
       - name: Upload Android sourcemap artifact
         # v6
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: ${{ inputs.artifact-prefix }}android-sourcemap-artifact
-          path: Mobile-Expensify/Android/build/generated/sourcemaps/react/release/index.android.bundle.map
+          path: Mobile-Expensify/Android/build/generated/sourcemaps/react/*/index.android.bundle.map
 
       - name: Install bundletool
         run: |
