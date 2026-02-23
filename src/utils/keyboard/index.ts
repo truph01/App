@@ -1,5 +1,5 @@
-import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {Keyboard} from 'react-native';
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import type {DismissKeyboardOptions} from './types';
 
 type SimplifiedKeyboardEvent = {

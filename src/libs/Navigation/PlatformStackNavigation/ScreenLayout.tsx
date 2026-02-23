@@ -1,6 +1,6 @@
-import React, {useLayoutEffect} from 'react';
 import type {ParamListBase, ScreenLayoutArgs} from '@react-navigation/native';
 import type {StackNavigationOptions, StackNavigationProp} from '@react-navigation/stack';
+import React, {useLayoutEffect} from 'react';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import type {PlatformStackNavigationOptions, PlatformStackNavigationProp} from './types';
 

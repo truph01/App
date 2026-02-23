@@ -5,6 +5,7 @@ import {StackView} from '@react-navigation/stack';
 import React, {useMemo} from 'react';
 import {addCustomHistoryRouterExtension} from '@libs/Navigation/AppNavigator/customHistory';
 import convertToWebNavigationOptions from '@libs/Navigation/PlatformStackNavigation/navigationOptions/convertToWebNavigationOptions';
+import screenLayout from '@libs/Navigation/PlatformStackNavigation/ScreenLayout';
 import type {
     CreatePlatformStackNavigatorComponentOptions,
     CustomCodeProps,
@@ -13,7 +14,6 @@ import type {
     PlatformStackNavigatorProps,
     PlatformStackRouterOptions,
 } from '@libs/Navigation/PlatformStackNavigation/types';
-import screenLayout from '@libs/Navigation/PlatformStackNavigation/ScreenLayout';
 
 function createPlatformStackNavigatorComponent<RouterOptions extends PlatformStackRouterOptions = PlatformStackRouterOptions>(
     displayName: string,
