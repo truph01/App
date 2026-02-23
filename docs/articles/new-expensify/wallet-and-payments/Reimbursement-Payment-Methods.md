@@ -11,7 +11,7 @@ Workspace Admins can reimburse approved reports using ACH reimbursement, global 
 
 # Reimbursement payment methods 
 
-Workspace Admins can reimburse approved reports in Expensify using one of two methods:
+Workspace Admins can reimburse approved reports in Expensify using one of three methods:
 
 - **Direct reimbursement** — Expensify sends payment from a connected Workspace business bank account to a member’s connected personal bank account.
 - **Pay elsewhere** — The Workspace Admin marks the report as paid in Expensify and issues payment outside the platform. Expensify records the report as paid but does not process the transfer.
