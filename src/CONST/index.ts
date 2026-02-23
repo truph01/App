@@ -3207,6 +3207,11 @@ const CONST = {
             MONEY_REQUEST: 'moneyRequest',
             REPLACE_RECEIPT: 'replaceReceipt',
         },
+        COMPACT_RECEIPT: {
+            MAX_WIDTH: variables.receiptPreviewMaxWidth,
+            DEFAULT_ASPECT_RATIO: 16 / 9,
+            MAX_HEIGHT_PIXEL_ADJUSTMENT: 5,
+        },
     },
 
     CATEGORY_SOURCE: {
@@ -4093,6 +4098,7 @@ const CONST = {
         SPECIAL_CHAR_MENTION_BREAKER: /[,/?"{}[\]()&^%;`$=<>!*]/g,
         SPECIAL_CHAR: /[,/?"{}[\]()&^%;`$=#<>!*]/g,
         FIRST_SPACE: /.+?(?=\s)/,
+        TRAILING_DOTS: /\.$/,
 
         get SPECIAL_CHAR_OR_EMOJI() {
             return new RegExp(`[~\\n\\s]|(_\\b(?!$))|${this.SPECIAL_CHAR.source}|${this.EMOJI.source}`, 'gu');
