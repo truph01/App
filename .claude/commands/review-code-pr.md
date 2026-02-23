@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(addPrReaction.sh:*),Bash(createInlineComment.sh:*)
+allowed-tools: Bash(gh pr diff:*),Bash(gh pr view:*)
 description: Review a code contribution pull request
 ---
 
@@ -11,7 +11,7 @@ Use the code-inline-reviewer agent to:
 - Create inline comments for specific review rule violations
 - Focus on line-specific, actionable feedback
 
-Run the agent and ensure its feedback is posted to the PR.
+Run the agent. It will return structured JSON with any violations found.
 
 <important>
 Keep feedback concise.
