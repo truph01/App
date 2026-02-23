@@ -1,5 +1,8 @@
 import React from 'react';
-import {View} from 'react-native';
+// We use Animated for all functionality related to wide RHP to make it easier
+// to interact with react-navigation components (e.g., CardContainer, interpolator), which also use Animated.
+// eslint-disable-next-line no-restricted-imports
+import {View, Animated} from 'react-native';
 import type {ViewStyle} from 'react-native';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
 import {useWideRHPState} from '@components/WideRHPContextProvider';
@@ -62,17 +65,23 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
                         />
                     )}
                 </DropZoneWrapper>
-                <DropZoneWrapper onDrop={onReceiptDrop}>
-                    {({isDraggingOver}) => (
-                        <DropZoneUI
-                            icon={isEditing ? icons.ReplaceReceipt : icons.SmartScan}
-                            dropTitle={translate(isEditing ? 'dropzone.replaceReceipt' : scanReceiptsText)}
-                            dropStyles={styles.receiptDropOverlay(isDraggingOver)}
-                            dropTextStyles={styles.receiptDropText}
-                            dashedBorderStyles={[styles.dropzoneArea, styles.easeInOpacityTransition, styles.activeDropzoneDashedBorder(theme.receiptDropBorderColorActive, isDraggingOver)]}
-                        />
-                    )}
-                </DropZoneWrapper>
+                <Animated.View style={(isWideRHPFocused || isSuperWideRHPFocused) ? styles.wideRHPDropZoneContainer : [styles.flex1, styles.h100]}>
+                    <DropZoneWrapper onDrop={onReceiptDrop}>
+                        {({isDraggingOver}) => (
+                            <DropZoneUI
+                                icon={isEditing ? icons.ReplaceReceipt : icons.SmartScan}
+                                dropTitle={translate(isEditing ? 'dropzone.replaceReceipt' : scanReceiptsText)}
+                                dropStyles={styles.receiptDropOverlay(isDraggingOver)}
+                                dropTextStyles={styles.receiptDropText}
+                                dashedBorderStyles={[
+                                    styles.dropzoneArea,
+                                    styles.easeInOpacityTransition,
+                                    styles.activeDropzoneDashedBorder(theme.receiptDropBorderColorActive, isDraggingOver),
+                                ]}
+                            />
+                        )}
+                    </DropZoneWrapper>
+                </Animated.View>
             </View>
         </DragAndDropConsumer>
     );
