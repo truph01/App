@@ -189,16 +189,21 @@ function MoneyRequestView({
     parentReport = parentReport ?? currentSearchResults?.data[`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`];
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(parentReport?.reportID)}`, {canBeMissing: true});
 
-    const parentReportActionSelector = (reportActions: OnyxEntry<OnyxTypes.ReportActions>) =>
-        transactionThreadReport?.parentReportActionID ? reportActions?.[transactionThreadReport.parentReportActionID] : undefined;
+    const parentReportActionID = transactionThreadReport?.parentReportActionID;
+    const parentReportActionSelector = useCallback(
+        (reportActions: OnyxEntry<OnyxTypes.ReportActions>) => (parentReportActionID ? reportActions?.[parentReportActionID] : undefined),
+        [parentReportActionID],
+    );
 
-    // The parentReportActionSelector is memoized by React Compiler
-    // eslint-disable-next-line rulesdir/no-inline-useOnyx-selector
-    const [parentReportAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportID}`, {
-        canEvict: false,
-        canBeMissing: true,
-        selector: parentReportActionSelector,
-    });
+    const [parentReportAction] = useOnyx(
+        `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportID}`,
+        {
+            canEvict: false,
+            canBeMissing: true,
+            selector: parentReportActionSelector,
+        },
+        [parentReportActionID],
+    );
 
     const isFromMergeTransaction = !!mergeTransactionID;
     const linkedTransactionID = parentReportAction && isMoneyRequestAction(parentReportAction) ? getOriginalMessage(parentReportAction)?.IOUTransactionID : undefined;
