@@ -14,7 +14,6 @@ jest.mock('@src/ROUTES', () => ({
     },
 }));
 
-
 const useRootNavigationStateMock = jest.requireMock<jest.Mock>('@hooks/useRootNavigationState');
 const getPathFromStateMock: jest.Mock = jest.requireMock('@libs/Navigation/helpers/getPathFromState');
 
