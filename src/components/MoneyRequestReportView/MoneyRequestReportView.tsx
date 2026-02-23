@@ -131,7 +131,7 @@ function MoneyRequestReportView({report, policy, reportMetadata, shouldDisplayRe
 
         return transactions.filter((transaction) => transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
     }, [transactions, isOffline]);
-    const reportTransactionIDs = useMemo(() => visibleTransactions.map((transaction) => transaction.transactionID), [visibleTransactions]);
+    const reportTransactionIDs = visibleTransactions.map((transaction) => transaction.transactionID);
     const transactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, reportActions ?? [], isOffline, reportTransactionIDs);
     const isSentMoneyReport = useMemo(() => reportActions.some((action) => isSentMoneyReportAction(action)), [reportActions]);
 
