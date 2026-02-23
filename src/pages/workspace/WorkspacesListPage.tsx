@@ -461,7 +461,7 @@ function WorkspacesListPage() {
                     shouldHideOnDelete={false}
                 >
                     <PressableWithoutFeedback
-                        role={CONST.ROLE.BUTTON}
+                        role={isLessThanMediumScreen ? CONST.ROLE.BUTTON : CONST.ROLE.ROW}
                         accessibilityLabel={accessibilityLabel}
                         style={[styles.mh5]}
                         disabled={item.disabled}
@@ -691,8 +691,14 @@ function WorkspacesListPage() {
                 />
             )}
             {!isLessThanMediumScreen && filteredWorkspaces.length > 0 && (
-                <View style={[styles.flexRow, styles.gap5, styles.pt2, styles.pb3, styles.pr5, styles.pl10, styles.appBG]}>
-                    <View style={[styles.flexRow, styles.flex2]}>
+                <View
+                    role={CONST.ROLE.ROW}
+                    style={[styles.flexRow, styles.gap5, styles.pt2, styles.pb3, styles.pr5, styles.pl10, styles.appBG]}
+                >
+                    <View
+                        role={CONST.ROLE.COLUMNHEADER}
+                        style={[styles.flexRow, styles.flex2]}
+                    >
                         <Text
                             numberOfLines={1}
                             style={[styles.flexGrow1, styles.textLabelSupporting]}
@@ -700,7 +706,10 @@ function WorkspacesListPage() {
                             {translate('workspace.common.workspaceName')}
                         </Text>
                     </View>
-                    <View style={[styles.flexRow, styles.flex1, styles.workspaceOwnerSectionTitle, styles.workspaceOwnerSectionMinWidth]}>
+                    <View
+                        role={CONST.ROLE.COLUMNHEADER}
+                        style={[styles.flexRow, styles.flex1, styles.workspaceOwnerSectionTitle, styles.workspaceOwnerSectionMinWidth]}
+                    >
                         <Text
                             numberOfLines={1}
                             style={[styles.flexGrow1, styles.textLabelSupporting]}
@@ -708,7 +717,10 @@ function WorkspacesListPage() {
                             {translate('workspace.common.workspaceOwner')}
                         </Text>
                     </View>
-                    <View style={[styles.flexRow, styles.flex1, styles.workspaceTypeSectionTitle]}>
+                    <View
+                        role={CONST.ROLE.COLUMNHEADER}
+                        style={[styles.flexRow, styles.flex1, styles.workspaceTypeSectionTitle]}
+                    >
                         <Text
                             numberOfLines={1}
                             style={[styles.flexGrow1, styles.textLabelSupporting]}
@@ -716,7 +728,10 @@ function WorkspacesListPage() {
                             {translate('workspace.common.workspaceType')}
                         </Text>
                     </View>
-                    <View style={[styles.workspaceRightColumn, styles.mr7]} />
+                    <View
+                        role={CONST.ROLE.COLUMNHEADER}
+                        style={[styles.workspaceRightColumn, styles.mr7]}
+                    />
                 </View>
             )}
         </>
@@ -809,20 +824,26 @@ function WorkspacesListPage() {
                         <FullScreenLoadingIndicator style={[styles.flex1, styles.pRelative]} />
                     </View>
                 ) : (
-                    <FlatList
-                        ref={flatlistRef}
-                        data={data}
-                        onScrollToIndexFailed={(info) => {
-                            flatlistRef.current?.scrollToOffset({
-                                offset: info.averageItemLength * info.index,
-                                animated: true,
-                            });
-                        }}
-                        renderItem={renderItem}
-                        ListHeaderComponent={listHeaderComponent}
-                        keyboardShouldPersistTaps="handled"
-                        contentContainerStyle={styles.pb20}
-                    />
+                    <View
+                        style={styles.flex1}
+                        role={isLessThanMediumScreen ? undefined : CONST.ROLE.TABLE}
+                        aria-label={isLessThanMediumScreen ? undefined : translate('common.workspaces')}
+                    >
+                        <FlatList
+                            ref={flatlistRef}
+                            data={data}
+                            onScrollToIndexFailed={(info) => {
+                                flatlistRef.current?.scrollToOffset({
+                                    offset: info.averageItemLength * info.index,
+                                    animated: true,
+                                });
+                            }}
+                            renderItem={renderItem}
+                            ListHeaderComponent={listHeaderComponent}
+                            keyboardShouldPersistTaps="handled"
+                            contentContainerStyle={styles.pb20}
+                        />
+                    </View>
                 )}
             </View>
             <ConfirmModal
