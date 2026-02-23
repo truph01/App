@@ -340,16 +340,7 @@ function useSelectedTransactionsActions({
                     text: translate('common.merge'),
                     icon: expensifyIcons.ArrowCollapse,
                     value: MERGE,
-                    onSelected: () =>
-                        setupMergeTransactionDataAndNavigate(
-                            transactionID,
-                            selectedTransactionsList,
-                            localeCompare,
-                            [],
-                            false,
-                            isOnSearch,
-                            selectedTransactionsList.length > 1 ? [policy, policy] : undefined,
-                        ),
+                    onSelected: () => setupMergeTransactionDataAndNavigate(transactionID, selectedTransactionsList, localeCompare, [], false, isOnSearch),
                 });
             }
         }

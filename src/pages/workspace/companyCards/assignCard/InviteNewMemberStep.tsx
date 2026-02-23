@@ -7,7 +7,7 @@ import useCardsList from '@hooks/useCardsList';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {setDraftInviteAccountID} from '@libs/actions/Card';
-import {getDefaultCardName, getFilteredCardList, hasOnlyOneCardToAssign} from '@libs/CardUtils';
+import {getCardAssignmentStartDate, getDefaultCardName, getFilteredCardList, hasOnlyOneCardToAssign} from '@libs/CardUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import Navigation from '@navigation/Navigation';
@@ -63,7 +63,7 @@ function InviteNewMemberStep({route, currentUserPersonalDetails}: InviteeNewMemb
             cardToAssign.encryptedCardNumber = assignCard.cardToAssign.encryptedCardNumber;
             cardToAssign.cardName = assignCard.cardToAssign.cardName;
             cardToAssign.customCardName = assignCard.cardToAssign.customCardName ?? defaultCardName;
-            cardToAssign.startDate = assignCard?.cardToAssign?.startDate ?? new Date().toISOString().split('T').at(0);
+            cardToAssign.startDate = getCardAssignmentStartDate(true, assignCard?.cardToAssign?.startDate);
             cardToAssign.dateOption = assignCard?.cardToAssign?.dateOption ?? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM;
             setAssignCardStepAndData({
                 currentStep: CONST.COMPANY_CARD.STEP.CONFIRMATION,
@@ -75,7 +75,7 @@ function InviteNewMemberStep({route, currentUserPersonalDetails}: InviteeNewMemb
             const onlyCard = filteredCardList.at(0);
             cardToAssign.cardName = onlyCard?.cardName;
             cardToAssign.encryptedCardNumber = onlyCard?.cardID;
-            cardToAssign.startDate = assignCard?.cardToAssign?.startDate ?? new Date().toISOString().split('T').at(0);
+            cardToAssign.startDate = getCardAssignmentStartDate(true, assignCard?.cardToAssign?.startDate);
             cardToAssign.dateOption = assignCard?.cardToAssign?.dateOption ?? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM;
             setAssignCardStepAndData({
                 currentStep: CONST.COMPANY_CARD.STEP.CONFIRMATION,
