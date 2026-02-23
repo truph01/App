@@ -1,5 +1,4 @@
 import type {ParamListBase, StackNavigationState} from '@react-navigation/native';
-import {linkingConfig} from '@libs/Navigation/linkingConfig';
 import getPathFromState from '@libs/Navigation/helpers/getPathFromState';
 
 function syncBrowserHistory(state: StackNavigationState<ParamListBase>) {

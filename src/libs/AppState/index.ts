@@ -3,7 +3,6 @@ import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import Log from '@libs/Log';
 import getPathFromState from '@libs/Navigation/helpers/getPathFromState';
-import {linkingConfig} from '@libs/Navigation/linkingConfig';
 import {navigationRef} from '@libs/Navigation/Navigation';
 import {isAuthenticating as isAuthenticatingNetworkStore} from '@libs/Network/NetworkStore';
 import CONST from '@src/CONST';

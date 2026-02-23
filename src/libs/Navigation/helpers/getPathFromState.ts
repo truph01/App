@@ -7,11 +7,12 @@ import type {Screen} from '@src/SCREENS';
 
 type State = NavigationState | Omit<PartialState<NavigationState>, 'stale'>;
 
+const dynamicRouteEntries = Object.values(DYNAMIC_ROUTES);
+
 /**
  * Checks if a screen name is a dynamic route screen
  */
 function isDynamicRouteScreen(screenName: Screen): boolean {
-    const dynamicRouteEntries = Object.values(DYNAMIC_ROUTES);
     const screenPath = normalizedConfigs[screenName]?.path;
 
     if (!screenPath) {
