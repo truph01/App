@@ -1,16 +1,16 @@
-import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
-import {getTransactionDetails} from '@libs/ReportUtils';
-import {getOriginalTransactionWithSplitInfo, getChildTransactions, buildOptimisticTransaction} from '@libs/TransactionUtils';
-import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
-import type {Transaction, Report} from '@src/types/onyx';
-import type {Attendee} from '@src/types/onyx/IOU';
-import CONST from '@src/CONST';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
+import {calculateAmount} from '@libs/IOUUtils';
+import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import {rand64} from '@libs/NumberUtils';
-import {calculateAmount} from '@libs/IOUUtils';
+import {getTransactionDetails} from '@libs/ReportUtils';
+import {buildOptimisticTransaction, getChildTransactions, getOriginalTransactionWithSplitInfo} from '@libs/TransactionUtils';
+import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
+import type {Report, Transaction} from '@src/types/onyx';
+import type {Attendee} from '@src/types/onyx/IOU';
 import {initSplitExpenseItemData} from './IOU/Split';
 
 // We use connectWithoutView because `initSplitExpense` doesn't affect the UI rendering and
