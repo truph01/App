@@ -91,7 +91,7 @@ describe('findSliceAtPosition', () => {
         expect(findSliceAtPosition(50, 50, center, center, radius, 0, slices)).toBe(1);
     });
 
-    it('returns -1 when cursor is exactly at center with zero inner radius', () => {
+    it('returns matching slice when cursor is exactly at center with zero inner radius', () => {
         const slices = makeSlices();
         // distance = 0, which is not < 0 (innerRadius) and not > 100 (radius)
         // atan2(0, 0) = 0° → inside slice A

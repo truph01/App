@@ -47,3 +47,46 @@ describe('useChartLabelFormats', () => {
         expect(result.current.formatValue(1000)).toBe('1.000€');
     });
 });
+
+describe('formatLabel', () => {
+    it('returns the label at the given index', () => {
+        const {result} = renderHook(() => useChartLabelFormats({data: SAMPLE_DATA}));
+
+        expect(result.current.formatLabel(0)).toBe('Jan');
+        expect(result.current.formatLabel(1)).toBe('Feb');
+    });
+
+    it('rounds fractional indices to the nearest integer', () => {
+        const {result} = renderHook(() => useChartLabelFormats({data: SAMPLE_DATA}));
+
+        expect(result.current.formatLabel(0.4)).toBe('Jan');
+        expect(result.current.formatLabel(1.3)).toBe('Feb');
+    });
+
+    it('returns empty string for out-of-bounds index', () => {
+        const {result} = renderHook(() => useChartLabelFormats({data: SAMPLE_DATA}));
+
+        expect(result.current.formatLabel(5)).toBe('');
+    });
+
+    it('skips labels based on labelSkipInterval', () => {
+        const {result} = renderHook(() => useChartLabelFormats({data: SAMPLE_DATA, labelSkipInterval: 2}));
+
+        expect(result.current.formatLabel(0)).toBe('Jan');
+        expect(result.current.formatLabel(1)).toBe('');
+    });
+
+    it('uses truncatedLabels when provided and rotation is not vertical', () => {
+        const {result} = renderHook(() => useChartLabelFormats({data: SAMPLE_DATA, truncatedLabels: ['J', 'F']}));
+
+        expect(result.current.formatLabel(0)).toBe('J');
+        expect(result.current.formatLabel(1)).toBe('F');
+    });
+
+    it('ignores truncatedLabels when rotation is vertical', () => {
+        const {result} = renderHook(() => useChartLabelFormats({data: SAMPLE_DATA, truncatedLabels: ['J', 'F'], labelRotation: -90}));
+
+        expect(result.current.formatLabel(0)).toBe('Jan');
+        expect(result.current.formatLabel(1)).toBe('Feb');
+    });
+});
