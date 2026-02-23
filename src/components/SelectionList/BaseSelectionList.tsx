@@ -13,7 +13,6 @@ import useDebounce from '@hooks/useDebounce';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import useKeyboardState from '@hooks/useKeyboardState';
 import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
-import useScrollEnabled from '@hooks/useScrollEnabled';
 import useSingleExecution from '@hooks/useSingleExecution';
 import {focusedItemRef} from '@hooks/useSyncFocus/useSyncFocusImplementation';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -94,7 +93,6 @@ function BaseSelectionList<TItem extends ListItem>({
 }: SelectionListProps<TItem>) {
     const styles = useThemeStyles();
     const isFocused = useIsFocused();
-    const scrollEnabled = useScrollEnabled();
     const {singleExecution} = useSingleExecution();
     const activeElementRole = useActiveElementRole();
     const {isKeyboardShown} = useKeyboardState();
