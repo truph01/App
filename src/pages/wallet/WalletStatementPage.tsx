@@ -11,12 +11,15 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import useThemePreference from '@hooks/useThemePreference';
+import addEncryptedAuthTokenToURL from '@libs/addEncryptedAuthTokenToURL';
+import * as Browser from '@libs/Browser';
 import {getOldDotURLFromEnvironment} from '@libs/Environment/Environment';
 import fileDownload from '@libs/fileDownload';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import addTrailingForwardSlash from '@libs/UrlUtils';
 import type {WalletStatementNavigatorParamList} from '@navigation/types';
+import {emailSelector} from '@selectors/Session';
 import {generateStatementPDF} from '@userActions/User';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -26,6 +29,7 @@ type WalletStatementPageProps = PlatformStackScreenProps<WalletStatementNavigato
 
 function WalletStatementPage({route}: WalletStatementPageProps) {
     const [walletStatement] = useOnyx(ONYXKEYS.WALLET_STATEMENT);
+    const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const themePreference = useThemePreference();
     const yearMonth = route.params.yearMonth ?? null;
     const isWalletStatementGenerating = walletStatement?.isGenerating ?? false;
@@ -51,17 +55,19 @@ function WalletStatementPage({route}: WalletStatementPageProps) {
         }
 
         setIsDownloading(true);
-        if (walletStatement?.[yearMonth]) {
+        if (walletStatement?.[yearMonth] && currentUserLogin) {
             // We already have a file URL for this statement, so we can download it immediately
             const downloadFileName = `Expensify_Statement_${yearMonth}.pdf`;
             const fileName = walletStatement[yearMonth];
-            const pdfURL = `${baseURL}secure?secureType=pdfreport&filename=${fileName}&downloadName=${downloadFileName}`;
-            fileDownload(translate, pdfURL, downloadFileName).finally(() => setIsDownloading(false));
+            const pdfURL = `${baseURL}secure?secureType=pdfreport&filename=${encodeURIComponent(fileName)}&downloadName=${encodeURIComponent(downloadFileName)}&email=${encodeURIComponent(
+                currentUserLogin,
+            )}`;
+            fileDownload(translate, addEncryptedAuthTokenToURL(pdfURL, true), downloadFileName, '', Browser.isMobileSafari()).finally(() => setIsDownloading(false));
             return;
         }
 
         generateStatementPDF(yearMonth);
-    }, [baseURL, isWalletStatementGenerating, translate, walletStatement, yearMonth]);
+    }, [baseURL, currentUserLogin, isWalletStatementGenerating, translate, walletStatement, yearMonth]);
 
     // eslint-disable-next-line rulesdir/prefer-early-return
     useEffect(() => {
