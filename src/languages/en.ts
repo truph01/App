@@ -1019,10 +1019,10 @@ const translations = {
                 allCaughtUpSubtitle: "You're all caught up",
                 timeForABreak: 'Time for a break',
                 timeToRelax: "Now it's time to relax",
-                everythingsTidiedUp: "Everything's tidied up",
+                everythingsTidiedUp: "Everything's tidied up", // cspell:disable-line
                 caughtUpOnTasks: "You're all caught up on your tasks",
                 upcomingTodos: 'Upcoming to-dos will appear here.',
-                youreDone: "You're done!",
+                youreDone: "You're done!", // cspell:disable-line
                 thumbsUpStar: 'Thumbs up for being a total star.',
                 launchSomethingNew: 'Time to launch into something new.',
                 wrangledEveryTask: 'You wrangled every last task.',
