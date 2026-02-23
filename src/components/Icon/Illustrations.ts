@@ -57,6 +57,7 @@ import ThumbsUpStars from '@assets/images/simple-illustrations/simple-illustrati
 import Trophy1 from '@assets/images/simple-illustrations/simple-illustration__trophy-1.svg';
 import Trophy from '@assets/images/simple-illustrations/simple-illustration__trophy.svg';
 import ExpensifyApprovedLogo from '@assets/images/subscription-details__approvedlogo.svg';
+import TravelCVV from '@assets/images/travel-cvv.svg';
 import TurtleInShell from '@assets/images/turtle-in-shell.svg';
 
 export {
@@ -116,6 +117,7 @@ export {
     SmallRocket,
     Sunglasses,
     Target,
+    TravelCVV,
     ThumbsUpStars,
     Trophy,
     Trophy1,
