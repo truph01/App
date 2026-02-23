@@ -15,14 +15,11 @@ type DomainRequireTwoFactorAuthPageProps = PlatformStackScreenProps<SettingsNavi
 function DomainRequireTwoFactorAuthPage({route}: DomainRequireTwoFactorAuthPageProps) {
     const {domainAccountID} = route.params;
 
-    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
+    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
     const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
-        canBeMissing: false,
         selector: domainMemberSettingsSelector,
     });
-    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
+    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
 
     useEffect(() => {
         if (domainSettings?.twoFactorAuthRequired) {
