@@ -8390,5 +8390,11 @@ ${reportName}
         common: {settings: '設定'},
         groups: {title: 'グループ', memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`})},
     },
+    proactiveAppReview: {
+        title: '新しい Expensify をお楽しみいただけていますか？',
+        description: '経費精算の体験をさらに良くできるよう、お知らせください。',
+        positiveButton: 'やった！',
+        negativeButton: 'そうでもありません',
+    },
 };
 export default translations;

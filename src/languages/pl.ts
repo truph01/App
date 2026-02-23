@@ -8438,5 +8438,11 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
         common: {settings: 'Ustawienia'},
         groups: {title: 'Grupy', memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`})},
     },
+    proactiveAppReview: {
+        title: 'Podoba Ci się nowy Expensify?',
+        description: 'Daj nam znać, abyśmy mogli pomóc uczynić Twoje rozliczanie wydatków jeszcze lepszym.',
+        positiveButton: 'Tak!',
+        negativeButton: 'Niekoniecznie',
+    },
 };
 export default translations;

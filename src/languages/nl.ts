@@ -8454,5 +8454,11 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
         common: {settings: 'Instellingen'},
         groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
     },
+    proactiveAppReview: {
+        title: 'Geniet je van de nieuwe Expensify?',
+        description: 'Laat het ons weten, zodat we je uitgavenervaring nog beter kunnen maken.',
+        positiveButton: 'Ja!',
+        negativeButton: 'Niet echt',
+    },
 };
 export default translations;

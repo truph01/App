@@ -8490,5 +8490,11 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
         common: {settings: 'Einstellungen'},
         groups: {title: 'Gruppen', memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`})},
     },
+    proactiveAppReview: {
+        title: 'Gefällt dir das neue Expensify?',
+        description: 'Lass es uns wissen, damit wir dir helfen können, deine Abrechnungserfahrung noch besser zu machen.',
+        positiveButton: 'Ja!',
+        negativeButton: 'Nicht wirklich',
+    },
 };
 export default translations;

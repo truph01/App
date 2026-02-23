@@ -8512,5 +8512,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
         common: {settings: 'Paramètres'},
         groups: {title: 'Groupes', memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`})},
     },
+    proactiveAppReview: {
+        title: 'Vous appréciez le nouveau Expensify ?',
+        description: 'Faites-le-nous savoir afin que nous puissions rendre votre expérience de gestion de notes de frais encore meilleure.',
+        positiveButton: 'Oui !',
+        negativeButton: 'Pas vraiment',
+    },
 };
 export default translations;

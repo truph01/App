@@ -8444,5 +8444,11 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
         common: {settings: 'Configurações'},
         groups: {title: 'Grupos', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`})},
     },
+    proactiveAppReview: {
+        title: 'Curtindo o novo Expensify?',
+        description: 'Avise-nos para que possamos ajudar a tornar sua experiência com despesas ainda melhor.',
+        positiveButton: 'Sim!',
+        negativeButton: 'Na verdade, não',
+    },
 };
 export default translations;
