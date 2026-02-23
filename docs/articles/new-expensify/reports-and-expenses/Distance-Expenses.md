@@ -1,15 +1,33 @@
 ---
 title: Distance Expenses
-description: Learn how to create a distance expense and how the reimbursement rate is determined in New Expensify.
-keywords: [New Expensify, distance expense, mileage reimbursement, create expense, distance rate, workspace rate, personal policy, map route, reimbursement rate, manual mileage, manual distance, global create, track distance]
+description: Learn how to create a distance expense using GPS tracking, map-based routes, or manual entry, and how the reimbursement rate is determined in New Expensify.
+keywords: [New Expensify, distance expense, mileage reimbursement, create expense, distance rate, workspace rate, personal policy, map route, reimbursement rate, manual mileage, manual distance, global create, track distance, GPS, GPS tracking, GPS mileage, start GPS, track route]
 date: 2025-06-18T00:00:00Z
 ---
 
-Expensify makes it easy to submit mileage expenses using a built-in map, whether you're on the web, desktop, or mobile app. This guide explains how to create a distance expense and how the reimbursement rate is determined.
+Expensify offers three ways to create a distance expense: **GPS tracking** on mobile, **map-based routes** using start and end locations, or **manual entry** by typing in the distance. This guide explains each method and how the reimbursement rate is determined.
 
 ---
 
-# Create and Send a Distance Expense 
+# Create a GPS Distance Expense (Mobile Only)
+
+GPS tracking lets Expensify record your actual driving route in the background while you drive. When you stop, the app generates a receipt with a map of the route you took.
+
+1. Tap the green **+** button and select **Track distance**.
+2. Select the **GPS** tab.
+3. Tap **Start GPS** to begin tracking your route.
+4. Drive to your destination. Tracking runs in the background — you don't need to keep the app open.
+   - If you navigate away from the tracking screen, tap the green **+** button again to return to your active GPS session.
+5. When you arrive, tap **Stop** and confirm in the modal that appears.
+6. Review the route, distance, and calculated amount.
+7. Choose a workspace or recipient and add expense details like description, category, or tags.
+8. Tap **Create expense** to submit.
+
+**Note:** GPS tracking is available on iOS and Android only. On web or desktop, you'll see a prompt to download the mobile app when selecting the GPS option.
+
+---
+
+# Create a Map-Based Distance Expense
 
 To submit a distance-based expense using the Start and End locations of your trip:
 
@@ -25,6 +43,10 @@ To submit a distance-based expense using the Start and End locations of your tri
    - **Date**
    - (Optional) Add a **description**, **category**, or **tag**
 7. Click **Create expense** to submit the mileage expense for approval.
+
+---
+
+# Create a Manual Distance Expense
 
 To submit a distance-based expense by entering the distance manually:
 
@@ -100,6 +122,18 @@ Yes, you can do this before the expenses have been approved. However, be aware t
 
 ## What if I enter 0 miles or kilometers?
 
-You cannot create a distance expense for 0 miles or kilometers. If you do, you’ll see this error:  
-**“Please enter a valid distance before continuing.”**
+You cannot create a distance expense for 0 miles or kilometers. If you do, you'll see this error:
+**"Please enter a valid distance before continuing."**
+
+## Do I need to keep the app open during GPS tracking?
+
+No. GPS tracking runs in the background on your mobile device. A notification confirms that tracking is active, so you can use other apps or lock your phone while driving.
+
+## What does the GPS receipt look like?
+
+The GPS receipt shows a map of your actual route driven, along with the total distance and calculated reimbursement amount. It looks similar to a map-based distance receipt, but reflects the path you actually took rather than a suggested route.
+
+## Can I use GPS tracking on web or desktop?
+
+No. GPS tracking requires the iOS or Android mobile app because it uses your device's location services. On web or desktop, you'll see a prompt to download the mobile app when selecting GPS. You can still use map-based or manual distance entry on any platform.
 
