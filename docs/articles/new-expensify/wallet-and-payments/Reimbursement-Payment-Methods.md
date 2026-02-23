@@ -86,8 +86,8 @@ Once confirmed, Expensify processes the transfers and the report statuses update
 ---
 
 ## ACH reimbursement timelines 
-
- - **Rapid Reimbursement:** Eligible payments are typically received by the member in one business day. Applies to payments under $100 when total withdrawals are under $10,000 in the past 24 hours.
+- **Rapid Reimbursement:** Eligible payments are typically received by the member in one business day. Applies to payments under $100 when total withdrawals are under $10,000 in the past 24 hours.
+- **Standard ACH reimbursement:** All other ACH payments are typically received by the member in four to five business days.
  - **Standard ACH reimbursement:** All other ACH payments are typically received by the member in four to five business days.
 
 Rapid Reimbursement is applied automatically when eligibility requirements are met.
