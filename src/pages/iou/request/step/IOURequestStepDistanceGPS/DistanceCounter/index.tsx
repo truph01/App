@@ -25,8 +25,8 @@ type DistanceCounterProps = {
 function DistanceCounter({report, transaction, iouType}: DistanceCounterProps) {
     const styles = useThemeStyles();
     const policy = usePolicy(report?.policyID);
-    const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {canBeMissing: true});
-    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END, {canBeMissing: true});
+    const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
+    const [ownerBillingGraceEndPeriod] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
 
     const defaultExpensePolicy = useDefaultExpensePolicy();
 
