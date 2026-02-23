@@ -3691,34 +3691,45 @@ const staticStyles = (theme: ThemeColors) =>
         forYouEmptyStateContainer: {
             alignItems: 'center',
             justifyContent: 'center',
+            gap: 20,
             marginTop: 20,
             marginBottom: 52,
         },
 
-        forYouEmptyStateTitle: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,
-            fontSize: variables.fontSizeNormal,
-            lineHeight: variables.fontSizeNormalHeight,
-            marginTop: 20,
+        forYouEmptyStateTextContainer: {
+            alignItems: 'center',
+            gap: 8,
+            width: '100%',
+        },
+
+        forYouEmptyStateNarrowTitle: {
+            ...FontUtils.fontFamily.platform.EXP_NEW_KANSAS_MEDIUM,
+            fontSize: variables.fontSizeLarge,
             textAlign: 'center',
             color: theme.text,
         },
 
-        forYouEmptyStateSubtitle: {
+        forYouEmptyStateNarrowDescription: {
             ...FontUtils.fontFamily.platform.EXP_NEUE,
             fontSize: variables.fontSizeLabel,
             lineHeight: 16,
-            marginTop: 2,
             textAlign: 'center',
             color: theme.textSupporting,
         },
 
-        forYouEmptyStateDescription: {
+        forYouEmptyStateWideTitle: {
+            ...FontUtils.fontFamily.platform.EXP_NEW_KANSAS_MEDIUM,
+            fontSize: variables.fontSizeXLarge,
+            lineHeight: 28,
+            textAlign: 'center',
+            color: theme.text,
+        },
+
+        forYouEmptyStateWideDescription: {
             ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeLabel,
-            lineHeight: 16,
-            marginTop: 2,
-            textAlign: 'center' as const,
+            fontSize: variables.fontSizeNormal,
+            lineHeight: variables.fontSizeNormalHeight,
+            textAlign: 'center',
             color: theme.textSupporting,
         },
 

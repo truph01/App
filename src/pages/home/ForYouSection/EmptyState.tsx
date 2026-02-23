@@ -5,14 +5,13 @@ import ImageSVG from '@components/ImageSVG';
 import Text from '@components/Text';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {TranslationPaths} from '@src/languages/types';
 
-const ILLUSTRATION_WIDTH = 100;
-const ILLUSTRATION_DEFAULT_HEIGHT = 100;
+const ILLUSTRATION_SIZE = 100;
 
 const MSG = 'homePage.forYouSection.emptyStateMessages' as const;
-const TITLE_KEY = `${MSG}.youreDone` as TranslationPaths;
 
 // ── Edit this table to update copy ──────────────────────────────────
 // [Illustration,        subtitle,              description       ]
@@ -37,14 +36,12 @@ const ENTRY_DATA: Array<[IllustrationName, string, string]> = [
 // ────────────────────────────────────────────────────────────────────
 
 type EmptyStateConfig = {
-    titleKey: TranslationPaths;
     subtitleKey: TranslationPaths;
     descriptionKey: TranslationPaths;
     illustrationName: IllustrationName;
 };
 
 const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ENTRY_DATA.map(([illustrationName, subtitle, description]) => ({
-    titleKey: TITLE_KEY,
     subtitleKey: `${MSG}.${subtitle}` as TranslationPaths,
     descriptionKey: `${MSG}.${description}` as TranslationPaths,
     illustrationName,
@@ -55,6 +52,7 @@ const ILLUSTRATION_NAMES = EMPTY_STATE_CONFIGS.map((c) => c.illustrationName);
 function EmptyState() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(ILLUSTRATION_NAMES);
 
     // Select a random empty state message on mount (will change on refresh/remount)
@@ -67,12 +65,13 @@ function EmptyState() {
         <View style={styles.forYouEmptyStateContainer}>
             <ImageSVG
                 src={illustrations[config.illustrationName]}
-                width={ILLUSTRATION_WIDTH}
-                height={ILLUSTRATION_DEFAULT_HEIGHT}
+                width={ILLUSTRATION_SIZE}
+                height={ILLUSTRATION_SIZE}
             />
-            <Text style={styles.forYouEmptyStateTitle}>{translate(config.titleKey)}</Text>
-            <Text style={styles.forYouEmptyStateSubtitle}>{translate(config.subtitleKey)}</Text>
-            <Text style={styles.forYouEmptyStateDescription}>{translate(config.descriptionKey)}</Text>
+            <View style={styles.forYouEmptyStateTextContainer}>
+                <Text style={shouldUseNarrowLayout ? styles.forYouEmptyStateNarrowTitle : styles.forYouEmptyStateWideTitle}>{translate(config.subtitleKey)}</Text>
+                <Text style={shouldUseNarrowLayout ? styles.forYouEmptyStateNarrowDescription : styles.forYouEmptyStateWideDescription}>{translate(config.descriptionKey)}</Text>
+            </View>
         </View>
     );
 }
