@@ -12311,7 +12311,7 @@ describe('ReportUtils', () => {
                 await Onyx.set(ONYXKEYS.SESSION, {email: currentUserEmail, accountID: currentUserAccountID});
             });
 
-            it("should navigate to the restricted action page if the active policy's billable actions are restricted", async () => {
+            it("should navigate to the restricted action page if the policy owner's billable actions are restricted", async () => {
                 // Given a transaction and an active policy where billable actions are restricted
                 const transaction = createRandomTransaction(1);
                 const activePolicy: Policy = {
@@ -12327,6 +12327,40 @@ describe('ReportUtils', () => {
 
                 // When we call createDraftTransactionAndNavigateToParticipantSelector with the restricted policy
                 createDraftTransactionAndNavigateToParticipantSelector(transaction.transactionID, '1', CONST.IOU.ACTION.CATEGORIZE, '1', undefined, undefined, activePolicy, undefined);
+
+                // Then it should navigate to the restricted action page
+                expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.RESTRICTED_ACTION.getRoute(activePolicy.id));
+            });
+
+            it("should navigate to the restricted action page if the policy non-owner's billable actions are restricted", async () => {
+                // Given a transaction and an active policy where billable actions are restricted for non-owner
+                const transaction = createRandomTransaction(3);
+                const ownerAccountID = 123;
+                const activePolicy: Policy = {
+                    ...createRandomPolicy(102),
+                    ownerAccountID,
+                };
+
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${1}`, {});
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${activePolicy.id}`, activePolicy);
+                const userBillingGraceEndPeriodCollection = {
+                    [`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END}${ownerAccountID}`]: {
+                        value: 1,
+                    },
+                };
+
+                // When we call createDraftTransactionAndNavigateToParticipantSelector
+                createDraftTransactionAndNavigateToParticipantSelector(
+                    transaction.transactionID,
+                    '1',
+                    CONST.IOU.ACTION.CATEGORIZE,
+                    '1',
+                    undefined,
+                    undefined,
+                    activePolicy,
+                    userBillingGraceEndPeriodCollection,
+                );
 
                 // Then it should navigate to the restricted action page
                 expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.RESTRICTED_ACTION.getRoute(activePolicy.id));
