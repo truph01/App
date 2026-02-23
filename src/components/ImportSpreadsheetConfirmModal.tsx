@@ -22,7 +22,7 @@ type ImportSpreadsheetConfirmModalProps = {
 function ImportSpreadsheetConfirmModal({isVisible, closeImportPageAndModal, onModalHide, shouldHandleNavigationBack = true}: ImportSpreadsheetConfirmModalProps) {
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
-    const [spreadsheet] = useOnyx(ONYXKEYS.IMPORTED_SPREADSHEET, {canBeMissing: true});
+    const [spreadsheet] = useOnyx(ONYXKEYS.IMPORTED_SPREADSHEET);
 
     const titleText = spreadsheet?.importFinalModal?.titleKey ? translate(spreadsheet.importFinalModal.titleKey) : '';
     const promptText = spreadsheet?.importFinalModal?.promptKey
