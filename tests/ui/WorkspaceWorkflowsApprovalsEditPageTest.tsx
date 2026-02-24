@@ -121,9 +121,9 @@ describe('WorkspaceWorkflowsApprovalsEditPage', () => {
         await waitForBatchedUpdatesWithAct();
 
         expect(setApprovalWorkflow).toHaveBeenCalled();
-        const mockCalls = (setApprovalWorkflow as jest.Mock).mock.calls;
+        const mockCalls = (setApprovalWorkflow as jest.Mock<unknown[], [{availableMembers: Member[]}]>).mock.calls;
         const firstCall = mockCalls.at(0);
-        const callArg = firstCall?.at(0) as {availableMembers?: Member[]} | undefined;
+        const callArg = firstCall?.at(0);
         const availableMembers: Member[] = callArg?.availableMembers ?? [];
         const emails = availableMembers.map((m) => m.email);
         const uniqueEmails = [...new Set(emails)];
