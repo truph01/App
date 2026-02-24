@@ -1943,6 +1943,7 @@ const CONST = {
         STATE: {
             CURRENT: 'current',
             DRAFT: 'draft',
+            SPLIT_DRAFT: 'splitDraft',
             BACKUP: 'backup',
         },
         LIABILITY_TYPE: {
@@ -3072,6 +3073,8 @@ const CONST = {
         QUANTITY_MAX_LENGTH: 12,
         // This is the transactionID used when going through the create expense flow so that it mimics a real transaction (like the edit flow)
         OPTIMISTIC_TRANSACTION_ID: '1',
+        // This is the transactionID used when going through the distance split expense flow so that it mimics a draft transaction
+        OPTIMISTIC_DISTANCE_SPLIT_TRANSACTION_ID: '2',
         // Note: These payment types are used when building IOU reportAction message values in the server and should
         // not be changed.
         LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS: 7,
@@ -8526,6 +8529,12 @@ const CONST = {
         },
         TRANSACTION_ITEM_ROW: {
             ARROW_RIGHT: 'TransactionItemRow-ArrowRight',
+        },
+        PDF_VIEW: {
+            DOCUMENT: 'PDFView-Document',
+        },
+        AVATAR_CROP_MODAL: {
+            ZOOM_SLIDER: 'AvatarCropModal-ZoomSlider',
         },
         PAYMENT_METHOD_LIST_ITEM: {
             CHASE_ACCOUNT_HELP: 'PaymentMethodListItem-ChaseAccountHelp',
