@@ -243,13 +243,15 @@ jobs:
       - name: Set artifact filenames
         id: set-ipa-filename
         run: |
-          IPA_FILE=$(ls .rock/cache/ios/export/*.ipa 2>/dev/null | head -1)
+          IPA_FILE=$(find .rock/cache/ios/export/ -maxdepth 1 -name '*.ipa' -print -quit 2>/dev/null)
           if [ -z "$IPA_FILE" ]; then
             echo "::error::No .ipa found in .rock/cache/ios/export/"
             exit 1
           fi
-          echo "IPA_FILENAME=$(basename "$IPA_FILE")" >> "$GITHUB_OUTPUT"
-          echo "DSYM_FILENAME=Expensify.app.dSYM.zip" >> "$GITHUB_OUTPUT"
+          {
+            echo "IPA_FILENAME=$(basename "$IPA_FILE")"
+            echo "DSYM_FILENAME=Expensify.app.dSYM.zip"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Find and upload IPA artifact
         # v6
