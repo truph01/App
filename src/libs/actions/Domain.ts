@@ -1435,7 +1435,14 @@ function clearVacationDelegateError(domainAccountID: number, domainMemberAccount
 }
 
 function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, force2FA: boolean, twoFactorAuthCode?: string) {
-    const newExemptEmails = force2FA ? exemptEmails.filter((email) => email !== targetEmail) : exemptEmails;
+    let newExemptEmails;
+    if (force2FA) {
+        newExemptEmails = exemptEmails.filter((email) => email !== targetEmail);
+    } else if (twoFactorAuthCode === undefined) {
+        newExemptEmails = [...exemptEmails, targetEmail];
+    } else {
+        newExemptEmails = exemptEmails;
+    }
 
     const optimisticData: Array<
         OnyxUpdate<
