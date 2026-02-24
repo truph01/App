@@ -532,7 +532,7 @@ function MoneyReportHeader({
             }, {});
             const {errors} = getAllReportActionsErrorsAndReportActionThatRequiresAttention(moneyRequestReport, reportActionsObject);
 
-            if (errors?.dewSubmitFailed && isReportOwner(moneyRequestReport)) {
+            if (errors?.dewSubmitFailed) {
                 optimisticNextStep = buildOptimisticNextStepForDynamicExternalWorkflowSubmitError(theme.danger);
             } else if (isOffline && hasPendingDEWSubmit(reportMetadata, isDEWPolicy)) {
                 optimisticNextStep = buildOptimisticNextStepForDEWOffline();
