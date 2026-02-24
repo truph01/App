@@ -1,6 +1,7 @@
 import {domainMemberSettingsSelector, domainNameSelector, selectSecurityGroupForAccount, vacationDelegateSelector} from '@selectors/Domain';
 import {personalDetailsSelector} from '@selectors/PersonalDetails';
 import React, {useState} from 'react';
+import {View} from 'react-native';
 import Button from '@components/Button';
 import DecisionModal from '@components/DecisionModal';
 import MenuItem from '@components/MenuItem';
@@ -141,6 +142,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.twoFactorAuthExemptEmailsError)}
                     onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
                 />
+                <View style={styles.mt6} />
                 {!!account?.requiresTwoFactorAuth && (
                     <MenuItem
                         title={translate('domain.common.resetTwoFactorAuth')}
