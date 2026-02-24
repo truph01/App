@@ -15,13 +15,13 @@ import {cleanupTravelProvisioningSession, requestTravelAccess, setTravelProvisio
 import {isEmailPublicDomain} from '@libs/LoginUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {openTravelDotLink} from '@libs/openTravelDotLink';
+import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 import {getActivePolicies, getAdminsPrivateEmailDomains, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import colors from '@styles/theme/colors';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import Button from './Button';
 import ConfirmModal from './ConfirmModal';
