@@ -5836,10 +5836,6 @@ const staticStyles = (theme: ThemeColors) =>
             height: 250,
             position: 'relative',
         },
-        pieChartHoverOverlay: {
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor: 'transparent',
-        },
         pieChartLegendContainer: {
             display: 'flex',
             justifyContent: 'center',
@@ -5849,22 +5845,10 @@ const staticStyles = (theme: ThemeColors) =>
             flexDirection: 'row',
             flexWrap: 'wrap',
         },
-        pieChartLegendItem: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginRight: 16,
-            marginBottom: 8,
-        },
         pieChartLegendDot: {
             borderRadius: '50%',
             width: 12,
             height: 12,
-        },
-        pieChartLegendText: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,
-            fontSize: variables.fontSizeNormal,
-            lineHeight: variables.fontSizeNormalHeight,
-            color: theme.text,
         },
         discoverSectionImage: {
             width: '100%',
