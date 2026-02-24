@@ -24,8 +24,11 @@ function markOpenReportEnd(report: OnyxTypes.Report, options: MarkOpenReportEndO
         [CONST.TELEMETRY.ATTRIBUTE_REPORT_TYPE]: type,
         [CONST.TELEMETRY.ATTRIBUTE_CHAT_TYPE]: chatType,
     });
+    if (options.warm !== undefined) {
+        span?.setAttribute(CONST.TELEMETRY.ATTRIBUTE_IS_WARM, options.warm);
+    }
 
-    endSpan(spanId, {warm: options.warm});
+    endSpan(spanId);
 }
 
 export default markOpenReportEnd;
