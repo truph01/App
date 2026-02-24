@@ -30,14 +30,20 @@ type GroupColumnKey =
     | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_CATEGORY
     | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_MERCHANT
     | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_TAG
-    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH;
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_WEEK
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_YEAR
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_QUARTER;
 
 /** Supported column style keys for sizing */
 type ColumnStyleKey =
     | typeof CONST.SEARCH.TABLE_COLUMNS.CATEGORY
     | typeof CONST.SEARCH.TABLE_COLUMNS.MERCHANT
     | typeof CONST.SEARCH.TABLE_COLUMNS.TAG
-    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH;
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_MONTH
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_WEEK
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_YEAR
+    | typeof CONST.SEARCH.TABLE_COLUMNS.GROUP_QUARTER;
 
 type BaseListItemHeaderProps<TItem extends ListItem> = {
     /** The group item being rendered */
@@ -143,6 +149,7 @@ function BaseListItemHeader<TItem extends ListItem>({
                             disabled={!!isDisabled || item.isDisabledCheckbox}
                             accessibilityLabel={translate('common.select')}
                             style={isLargeScreenWidth && styles.mr1}
+                            sentryLabel={CONST.SENTRY_LABEL.SEARCH.GROUP_SELECT_ALL_CHECKBOX}
                         />
                     )}
                     {!isLargeScreenWidth && (
