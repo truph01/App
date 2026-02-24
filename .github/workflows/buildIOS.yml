@@ -243,7 +243,7 @@ jobs:
       - name: Set artifact filenames
         id: set-ipa-filename
         run: |
-          IPA_FILE=$(find .rock/cache/ios/export/ -maxdepth 1 -name '*.ipa' -print -quit 2>/dev/null)
+          IPA_FILE=$(find .rock/cache/ios/export/ -maxdepth 1 -name '*.ipa' -print -quit 2>/dev/null || true)
           if [ -z "$IPA_FILE" ]; then
             if [ "${{ inputs.variant }}" = "Adhoc" ]; then
               echo "::warning::No .ipa found locally (expected for remote-cache hits on Adhoc builds)"
