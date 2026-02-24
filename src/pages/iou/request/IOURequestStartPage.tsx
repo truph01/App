@@ -155,8 +155,12 @@ function IOURequestStartPage({
     const prevTransactionReportID = usePrevious(transaction?.reportID);
 
     useEffect(() => {
+        // Don't end span for scan flows - it will be ended when camera initializes
+        if (transactionRequestType === CONST.IOU.REQUEST_TYPE.SCAN) {
+            return;
+        }
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
-    }, []);
+    }, [transactionRequestType]);
 
     useEffect(() => {
         if (isLoadingSelectedTab || selectedTab) {

@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/core';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Alert, AppState, StyleSheet, View} from 'react-native';
 import type {LayoutRectangle} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -33,6 +33,7 @@ import type Platform from '@libs/getPlatform/types';
 import getReceiptsUploadFolderPath from '@libs/getReceiptsUploadFolderPath';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
+import {cancelSpan, endSpan, startSpan} from '@libs/telemetry/activeSpans';
 import navigationRef from '@libs/Navigation/navigationRef';
 import StepScreenWrapper from '@pages/iou/request/step/StepScreenWrapper';
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
@@ -91,6 +92,51 @@ function IOURequestStepScan({
     const policy = usePolicy(report?.policyID);
 
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
+
+    // Track camera init telemetry
+    const cameraInitSpanStarted = useRef(false);
+    const cameraInitialized = useRef(false);
+
+    // Start camera init span when permission is granted and camera is ready
+    useEffect(() => {
+        if (cameraInitSpanStarted.current || cameraPermissionStatus !== RESULTS.GRANTED || device == null) {
+            return;
+        }
+        startSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT, {
+            name: 'camera-init',
+            op: CONST.TELEMETRY.SPAN_CAMERA_INIT,
+        });
+        cameraInitSpanStarted.current = true;
+    }, [cameraPermissionStatus, device]);
+
+    // Cancel spans when permission is denied/blocked
+    useEffect(() => {
+        if (cameraPermissionStatus !== RESULTS.BLOCKED && cameraPermissionStatus !== RESULTS.UNAVAILABLE) {
+            return;
+        }
+        cancelSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+    }, [cameraPermissionStatus]);
+
+    // Cancel spans on unmount if camera never initialized
+    useEffect(() => {
+        return () => {
+            if (!cameraInitSpanStarted.current || cameraInitialized.current) {
+                return;
+            }
+            cancelSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
+            cancelSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+        };
+    }, []);
+
+    const handleCameraInitialized = useCallback(() => {
+        // Prevent duplicate span endings if callback fires multiple times
+        if (cameraInitialized.current) {
+            return;
+        }
+        cameraInitialized.current = true;
+        endSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
+        endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+    }, []);
 
     const askForPermissions = useCallback(() => {
         // There's no way we can check for the BLOCKED status without requesting the permission first
@@ -416,6 +462,7 @@ function IOURequestStepScan({
                                         cameraTabIndex={1}
                                         onLayout={(e) => (viewfinderLayout.current = e.nativeEvent.layout)}
                                         forceInactive={isAttachmentPickerActive}
+                                        onInitialized={handleCameraInitialized}
                                     />
                                     <Animated.View style={[styles.cameraFocusIndicator, cameraFocusIndicatorAnimatedStyle]} />
                                     <Animated.View
