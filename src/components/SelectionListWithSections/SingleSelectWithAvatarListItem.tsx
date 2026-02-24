@@ -32,12 +32,13 @@ function SingleSelectWithAvatarListItem<TItem extends ListItem>({
     const styles = useThemeStyles();
     const isSelected = item.isSelected;
     const icon = item.icons?.at(0);
+    const CIRCULAR_BORDER_RADIUS = 999;
 
     const radioCheckboxComponent = useCallback(() => {
         return (
             <Checkbox
                 shouldSelectOnPressEnter
-                containerBorderRadius={999}
+                containerBorderRadius={CIRCULAR_BORDER_RADIUS}
                 accessibilityLabel="SingleSelectListItem"
                 isChecked={isSelected}
                 onPress={() => onSelectRow(item)}
