@@ -166,7 +166,11 @@ function handleActionButtonPress({
                 return;
             }
 
-            exportToIntegrationOnSearch(hash, item?.reportID, connectedIntegration, currentSearchKey);
+            if (!item?.reportID) {
+                return;
+            }
+
+            exportToIntegrationOnSearch(hash, [item.reportID], connectedIntegration, currentSearchKey);
             return;
         }
         default:
@@ -644,12 +648,10 @@ function approveMoneyRequestOnSearch(hash: number, reportIDList: string[], curre
     API.write(WRITE_COMMANDS.APPROVE_MONEY_REQUEST_ON_SEARCH, {hash, reportIDList}, {optimisticData, failureData, successData});
 }
 
-function exportToIntegrationOnSearch(hash: number, reportIDOrIDs: string | string[] | undefined, connectionName: ConnectionName, currentSearchKey?: SearchKey) {
-    if (!reportIDOrIDs || (Array.isArray(reportIDOrIDs) && !reportIDOrIDs.length)) {
+function exportToIntegrationOnSearch(hash: number, reportIDs: string[], connectionName: ConnectionName, currentSearchKey?: SearchKey) {
+    if (!reportIDs.length) {
         return;
     }
-
-    const reportIDs = Array.isArray(reportIDOrIDs) ? reportIDOrIDs : [reportIDOrIDs];
     const optimisticReportActions: Record<string, string> = {};
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
@@ -710,6 +712,7 @@ function exportToIntegrationOnSearch(hash: number, reportIDOrIDs: string | strin
         });
     }
 
+    // If we are on the 'Export' suggested search, remove the report from the view once the action is taken, don't wait for the view to be re-fetched via Search
     if (currentSearchKey === CONST.SEARCH.SEARCH_KEYS.EXPORT) {
         successData.push({
             onyxMethod: Onyx.METHOD.MERGE,
