@@ -219,6 +219,7 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
             }
             const movedFromReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${getMovedReportID(lastReportAction, CONST.REPORT.MOVE_TYPE.FROM)}`];
             const movedToReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${getMovedReportID(lastReportAction, CONST.REPORT.MOVE_TYPE.TO)}`];
+            const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${item?.chatReportID}`];
             const itemReportMetadata = reportMetadataCollection?.[`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`];
             const lastMessageTextFromReport = getLastMessageTextForReport({
                 translate,

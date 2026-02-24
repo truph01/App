@@ -30,7 +30,6 @@ jest.mock('@components/OnyxListItemProvider', () => ({
 const mockCreateOptionList = createOptionList as jest.MockedFunction<typeof createOptionList>;
 const mockProcessReport = processReport as jest.MockedFunction<typeof processReport>;
 const mockCreateOptionFromReport = createOptionFromReport as jest.MockedFunction<typeof createOptionFromReport>;
-const mockProcessReport = processReport as jest.MockedFunction<typeof processReport>;
 const mockUseOnyx = useOnyx as jest.MockedFunction<typeof useOnyx>;
 const mockUsePersonalDetails = usePersonalDetails as jest.MockedFunction<typeof usePersonalDetails>;
 const mockUsePrivateIsArchivedMap = usePrivateIsArchivedMap as jest.MockedFunction<typeof usePrivateIsArchivedMap>;
@@ -263,7 +262,7 @@ describe('OptionListContextProvider', () => {
 
         rerender({shouldInitialize: false});
 
-        expect(mockProcessReport).toHaveBeenCalledWith(report, {}, expect.any(Number), chatReport, undefined);
+        expect(mockProcessReport).toHaveBeenCalledWith(report, {}, undefined, expect.any(Number), chatReport, undefined);
     });
 
     it('passes resolved chatReport to processReport when report actions change', () => {
@@ -316,7 +315,7 @@ describe('OptionListContextProvider', () => {
 
         rerender({shouldInitialize: false});
 
-        expect(mockProcessReport).toHaveBeenCalledWith(report, {}, expect.any(Number), chatReport, undefined);
+        expect(mockProcessReport).toHaveBeenCalledWith(report, {}, undefined, expect.any(Number), chatReport, undefined);
     });
 
     it('passes resolved chatReport to createOptionFromReport when personal details change and report has chatReportID', () => {

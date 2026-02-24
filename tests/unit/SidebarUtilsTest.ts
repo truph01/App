@@ -1452,6 +1452,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+                chatReport: undefined,
                 reportAttributesDerived: undefined,
             });
 
@@ -1491,6 +1492,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+                chatReport: undefined,
                 reportAttributesDerived: undefined,
             });
 
@@ -1530,6 +1532,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+                chatReport: undefined,
                 reportAttributesDerived: undefined,
             });
 
