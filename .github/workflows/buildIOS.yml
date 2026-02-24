@@ -41,6 +41,9 @@ on:
       DSYM_FILENAME:
         description: Filename of the app dSYM zip (Expensify.app.dSYM.zip)
         value: ${{ jobs.build.outputs.DSYM_FILENAME }}
+      SOURCEMAP_FILENAME:
+        description: Filename of the JS sourcemap artifact
+        value: ${{ jobs.build.outputs.SOURCEMAP_FILENAME }}
 
 jobs:
   build:
@@ -54,6 +57,7 @@ jobs:
       ROCK_ARTIFACT_URL: ${{ steps.set-artifact-url.outputs.ARTIFACT_URL }}
       IPA_FILENAME: ${{ steps.set-ipa-filename.outputs.IPA_FILENAME }}
       DSYM_FILENAME: ${{ steps.set-ipa-filename.outputs.DSYM_FILENAME }}
+      SOURCEMAP_FILENAME: main.jsbundle.map
     steps:
       - name: Checkout
         # v6
