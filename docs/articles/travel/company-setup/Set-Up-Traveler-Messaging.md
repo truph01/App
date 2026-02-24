@@ -1,5 +1,5 @@
 ---
-title: Traveler Messaging
+title: Set Up Traveler Messaging
 description: Learn how Travel Admins can create and manage Traveler messaging to display in-app banners or send emails in the Travel tool.
 keywords: Traveler messaging, Travel Admin, travel banner, in-app message, travel email notification, configure Traveler messaging, Spotnana message, travel site message
 internalScope: Audience is Travel Admins. Covers creating, publishing, and managing Traveler messaging in the Travel tool. Does not cover general Workspace messaging or non-travel notifications.
