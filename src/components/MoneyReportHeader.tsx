@@ -1774,6 +1774,10 @@ function MoneyReportHeader({
                 return {
                     ...option,
                     onSelected: () => {
+                        if (isDelegateAccessRestricted) {
+                            showDelegateNoAccessModal();
+                            return;
+                        }
                         if (dismissedRejectUseExplanation) {
                             option.onSelected?.();
                         } else {
