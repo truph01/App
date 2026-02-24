@@ -1,6 +1,6 @@
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import * as User from '@userActions/User';
+import {clearScreenShareRequest, joinScreenShare} from '@userActions/User';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ConfirmModal from './ConfirmModal';
 
@@ -19,8 +19,8 @@ function ScreenShareRequestModal() {
     return (
         <ConfirmModal
             title={translate('guides.screenShare')}
-            onConfirm={() => User.joinScreenShare(screenShareRequest.accessToken, screenShareRequest.roomName)}
-            onCancel={User.clearScreenShareRequest}
+            onConfirm={() => joinScreenShare(screenShareRequest.accessToken, screenShareRequest.roomName)}
+            onCancel={clearScreenShareRequest}
             prompt={translate('guides.screenShareRequest')}
             confirmText={translate('common.join')}
             cancelText={translate('common.decline')}
