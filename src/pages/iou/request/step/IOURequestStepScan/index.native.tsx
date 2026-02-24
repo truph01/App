@@ -109,9 +109,9 @@ function IOURequestStepScan({
         cameraInitSpanStarted.current = true;
     }, [cameraPermissionStatus, device]);
 
-    // Cancel spans when permission is denied/blocked
+    // Cancel spans when permission is denied/blocked/unavailable
     useEffect(() => {
-        if (cameraPermissionStatus !== RESULTS.BLOCKED && cameraPermissionStatus !== RESULTS.UNAVAILABLE) {
+        if (cameraPermissionStatus !== RESULTS.BLOCKED && cameraPermissionStatus !== RESULTS.UNAVAILABLE && cameraPermissionStatus !== RESULTS.DENIED) {
             return;
         }
         cancelSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
@@ -120,10 +120,15 @@ function IOURequestStepScan({
     // Cancel spans on unmount if camera never initialized
     useEffect(() => {
         return () => {
-            if (!cameraInitSpanStarted.current || cameraInitialized.current) {
+            // If camera initialized successfully, spans were already ended
+            if (cameraInitialized.current) {
                 return;
             }
-            cancelSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
+            // Cancel camera init span if it was started
+            if (cameraInitSpanStarted.current) {
+                cancelSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
+            }
+            // Always cancel the create expense span if camera never initialized
             cancelSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
         };
     }, []);
