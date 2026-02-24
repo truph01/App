@@ -278,7 +278,6 @@ class TranslationGenerator {
         this.verbose = this.cli.flags.verbose;
         this.isIncremental = this.pathsToModify.size > 0 || !!this.compareRef || !!this.prNumber;
 
-        // Validate GITHUB_TOKEN when using --pr-number
         if (this.prNumber && !process.env.GITHUB_TOKEN) {
             throw new Error('GITHUB_TOKEN environment variable is required when using --pr-number');
         }
@@ -305,7 +304,6 @@ class TranslationGenerator {
         const translations = new Map<TranslationTargetLocale, Map<number, string>>();
 
         if (this.isIncremental && this.pathsToModify.size === 0) {
-            // If compareRef or prNumber is provided (and no specific paths), use diff to find changed lines and build dot-notation paths
             await this.buildPathsFromGitDiff();
         }
 
@@ -910,9 +908,8 @@ class TranslationGenerator {
                         console.log(`🌐 Using GitHub API diff for PR #${this.prNumber}`);
                     }
 
-                    // Get the actual merge-base commit (common ancestor of base branch and PR head).
-                    // GitHub's PR diff is a three-dot diff (merge-base...head), so removed line numbers
-                    // correspond to the file at the merge-base, NOT at the tip of the base branch.
+                    // GitHub's PR diff is a three-dot diff (merge-base...head), so we need the
+                    // actual merge-base commit, not the tip of the base branch.
                     this.diffBase = await GitHubUtils.getPullRequestMergeBaseSHA(this.prNumber);
                     this.useGitHubAPI = true;
 
@@ -958,8 +955,6 @@ class TranslationGenerator {
                     throw new Error('--compare-ref is required when --pr-number is not provided for incremental translation');
                 }
 
-                // This finds the common ancestor between compare-ref and HEAD,
-                // ensuring we only see changes made in the current branch
                 this.diffBase = this.compareRef;
                 try {
                     const mergeBaseResult = execFileSync('git', ['merge-base', this.compareRef, 'HEAD'], {encoding: 'utf8'});
@@ -1209,10 +1204,8 @@ class TranslationGenerator {
         try {
             let oldEnContent: string;
             if (this.useGitHubAPI) {
-                // GitHub API was used for the diff — fetch old file via API too (may not be available locally in shallow clone)
                 oldEnContent = await GitHubUtils.getFileContents(relativePath, this.diffBase);
             } else {
-                // Git was used for the diff — use git show with the diff base ref
                 oldEnContent = Git.show(this.diffBase, relativePath);
             }
 
