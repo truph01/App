@@ -1,5 +1,6 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {calculateAmount} from '@libs/IOUUtils';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation from '@libs/Navigation/Navigation';
@@ -12,7 +13,6 @@ import ROUTES from '@src/ROUTES';
 import type {Policy, Report, Transaction} from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
 import type {TransactionCustomUnit} from '@src/types/onyx/Transaction';
-import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {initSplitExpenseItemData, updateSplitExpenseDistanceFromAmount} from './IOU/Split';
 
 // We use connectWithoutView because `initSplitExpense` doesn't affect the UI rendering and
