@@ -10,6 +10,12 @@ let lastSentIdentity: string | undefined;
 let cachedAccount: OnyxEntry<Account>;
 let cachedSession: OnyxEntry<Session>;
 
+function sendAccountAttributes() {
+    setAttribute('email', cachedAccount?.primaryLogin ?? '', false, true);
+    setAttribute('mfa', cachedAccount?.requiresTwoFactorAuth ? '2fa_enabled' : '2fa_disabled', false, true);
+    setAttribute('is_validated', cachedAccount?.validated ? 'true' : 'false', false, true);
+}
+
 function trySendToFraudProtection() {
     const isAuthenticated = !!(cachedSession?.authToken ?? null);
     const identity = isAuthenticated ? (cachedSession?.accountID?.toString() ?? '') : '';
@@ -19,17 +25,16 @@ function trySendToFraudProtection() {
         return;
     }
 
-    // Don't re-send if nothing changed.
+    // Always forward the latest account attributes, but only re-send identity when it changes.
     if (identity === lastSentIdentity) {
+        sendAccountAttributes();
         return;
     }
 
     lastSentIdentity = identity;
 
     setAuthenticationData(identity, sessionID);
-    setAttribute('email', cachedAccount.primaryLogin, false, true);
-    setAttribute('mfa', cachedAccount.requiresTwoFactorAuth ? '2fa_enabled' : '2fa_disabled', false, true);
-    setAttribute('is_validated', cachedAccount.validated ? 'true' : 'false', false, true);
+    sendAccountAttributes();
 }
 
 // Cache account data and attempt to send.
@@ -52,7 +57,9 @@ Onyx.connectWithoutView({
         if (wasAuthenticated && !isAuthenticated) {
             sessionID = Str.guid();
             lastSentIdentity = undefined;
+            cachedAccount = undefined;
             setAuthenticationData('', sessionID);
+            sendAccountAttributes();
             return;
         }
 

@@ -78,7 +78,7 @@ describe('FraudProtection', () => {
         expect(mockSetAuthenticationData).toHaveBeenCalledWith('12345', expect.any(String));
     });
 
-    it('should not re-send if session updates but identity has not changed', async () => {
+    it('should not re-send identity when session updates but identity has not changed, but should re-send attributes', async () => {
         await Onyx.merge(ONYXKEYS.ACCOUNT, {primaryLogin: 'user@expensify.com', requiresTwoFactorAuth: false, validated: false});
         await Onyx.merge(ONYXKEYS.SESSION, {authToken: 'token123', accountID: 12345});
         await waitForBatchedUpdates();
@@ -91,6 +91,21 @@ describe('FraudProtection', () => {
         await waitForBatchedUpdates();
 
         expect(mockSetAuthenticationData).not.toHaveBeenCalled();
+        expect(mockSetAttribute).toHaveBeenCalledWith('email', 'user@expensify.com', false, true);
+    });
+
+    it('should forward updated account attributes for the same identity', async () => {
+        await Onyx.merge(ONYXKEYS.ACCOUNT, {primaryLogin: 'user@expensify.com', requiresTwoFactorAuth: false, validated: false});
+        await Onyx.merge(ONYXKEYS.SESSION, {authToken: 'token123', accountID: 12345});
+        await waitForBatchedUpdates();
+        jest.clearAllMocks();
+
+        // User enables 2FA while already logged in
+        await Onyx.merge(ONYXKEYS.ACCOUNT, {requiresTwoFactorAuth: true});
+        await waitForBatchedUpdates();
+
+        expect(mockSetAuthenticationData).not.toHaveBeenCalled();
+        expect(mockSetAttribute).toHaveBeenCalledWith('mfa', '2fa_enabled', false, true);
     });
 
     it('should send new session with empty identity on logout', async () => {
@@ -112,6 +127,11 @@ describe('FraudProtection', () => {
         // The new sessionID should differ from the one used during auth
         const logoutSessionID = getSessionIDFromCall(0);
         expect(logoutSessionID).not.toBe(firstSessionID);
+
+        // Previous user's attributes should be cleared on logout
+        expect(mockSetAttribute).toHaveBeenCalledWith('email', '', false, true);
+        expect(mockSetAttribute).toHaveBeenCalledWith('mfa', '2fa_disabled', false, true);
+        expect(mockSetAttribute).toHaveBeenCalledWith('is_validated', 'false', false, true);
     });
 
     it('should use a new sessionID after logout and re-login', async () => {
