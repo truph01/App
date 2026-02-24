@@ -1,4 +1,3 @@
-import {emailSelector} from '@selectors/Session';
 import {format, getMonth, getYear} from 'date-fns';
 import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -6,6 +5,7 @@ import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOffli
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import WalletStatementModal from '@components/WalletStatementModal';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -29,7 +29,7 @@ type WalletStatementPageProps = PlatformStackScreenProps<WalletStatementNavigato
 
 function WalletStatementPage({route}: WalletStatementPageProps) {
     const [walletStatement] = useOnyx(ONYXKEYS.WALLET_STATEMENT);
-    const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
+    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const themePreference = useThemePreference();
     const yearMonth = route.params.yearMonth ?? null;
     const isWalletStatementGenerating = walletStatement?.isGenerating ?? false;
