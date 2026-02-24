@@ -122,14 +122,11 @@ jobs:
 
       - name: Set aabPath for Fastlane
         run: |
-          echo "All .aab files in working directory:"
-          ls -la *.aab 2>/dev/null || echo "(none)"
-          AAB_PATH="$(realpath *.aab 2>/dev/null | head -1)"
-          if [ -z "$AAB_PATH" ]; then
-            echo "::error::No .aab file found in working directory"
+          AAB_PATH="$(pwd)/${{ needs.androidBuild.outputs.AAB_FILENAME }}"
+          if [ ! -f "$AAB_PATH" ]; then
+            echo "::error::Expected AAB not found at $AAB_PATH"
             exit 1
           fi
-          echo "Selected: $AAB_PATH"
           echo "aabPath=$AAB_PATH" >> "$GITHUB_ENV"
 
       - name: Setup Ruby
@@ -244,9 +241,9 @@ jobs:
       - name: Find APK path
         id: find-apk
         run: |
-          APK_PATH="$(pwd)/Expensify.apk"
+          APK_PATH="$(pwd)/${{ needs.androidBuild.outputs.APK_FILENAME }}"
           if [ ! -f "$APK_PATH" ]; then
-            echo "::error::Expected Expensify.apk not found at $APK_PATH"
+            echo "::error::Expected APK not found at $APK_PATH"
             exit 1
           fi
           echo "APK_PATH=$APK_PATH" >> "$GITHUB_OUTPUT"
@@ -290,9 +287,9 @@ jobs:
       - name: Find APK path
         id: find-apk
         run: |
-          APK_PATH="$(pwd)/Expensify.apk"
+          APK_PATH="$(pwd)/${{ needs.androidBuild.outputs.APK_FILENAME }}"
           if [ ! -f "$APK_PATH" ]; then
-            echo "::error::Expected Expensify.apk not found at $APK_PATH"
+            echo "::error::Expected APK not found at $APK_PATH"
             exit 1
           fi
           echo "APK_PATH=$APK_PATH" >> "$GITHUB_OUTPUT"
@@ -352,24 +349,17 @@ jobs:
 
       - name: Set artifact paths for Fastlane
         run: |
-          echo "All .ipa files in working directory:"
-          ls -la *.ipa 2>/dev/null || echo "(none)"
-          IPA_PATH="$(realpath *.ipa 2>/dev/null | head -1)"
-          if [ -z "$IPA_PATH" ]; then
-            echo "::error::No .ipa file found in working directory"
+          IPA_PATH="$(pwd)/${{ needs.iosBuild.outputs.IPA_FILENAME }}"
+          if [ ! -f "$IPA_PATH" ]; then
+            echo "::error::Expected IPA not found at $IPA_PATH"
             exit 1
           fi
-          echo "Selected IPA: $IPA_PATH"
           echo "ipaPath=$IPA_PATH" >> "$GITHUB_ENV"
 
-          echo "All .dSYM.zip files in working directory:"
-          ls -la *.dSYM.zip 2>/dev/null || echo "(none)"
-          DSYM_PATH="$(pwd)/Expensify.app.dSYM.zip"
+          DSYM_PATH="$(pwd)/${{ needs.iosBuild.outputs.DSYM_FILENAME }}"
           if [ ! -f "$DSYM_PATH" ]; then
-            echo "::warning::Expensify.app.dSYM.zip not found, falling back to first .dSYM.zip"
-            DSYM_PATH="$(realpath *.dSYM.zip 2>/dev/null | head -1)"
+            echo "::warning::Expected dSYM not found at $DSYM_PATH"
           fi
-          echo "Selected dSYM: $DSYM_PATH"
           echo "dsymPath=$DSYM_PATH" >> "$GITHUB_ENV"
 
       - name: Setup Ruby
@@ -481,9 +471,9 @@ jobs:
       - name: Find IPA path
         id: find-ipa
         run: |
-          IPA_PATH="$(realpath *.ipa 2>/dev/null | head -1)"
-          if [ -z "$IPA_PATH" ]; then
-            echo "::error::No .ipa file found in working directory"
+          IPA_PATH="$(pwd)/${{ needs.iosBuild.outputs.IPA_FILENAME }}"
+          if [ ! -f "$IPA_PATH" ]; then
+            echo "::error::Expected IPA not found at $IPA_PATH"
             exit 1
           fi
           echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_OUTPUT"
@@ -527,9 +517,9 @@ jobs:
       - name: Find IPA path
         id: find-ipa
         run: |
-          IPA_PATH="$(realpath *.ipa 2>/dev/null | head -1)"
-          if [ -z "$IPA_PATH" ]; then
-            echo "::error::No .ipa file found in working directory"
+          IPA_PATH="$(pwd)/${{ needs.iosBuild.outputs.IPA_FILENAME }}"
+          if [ ! -f "$IPA_PATH" ]; then
+            echo "::error::Expected IPA not found at $IPA_PATH"
             exit 1
           fi
           echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_OUTPUT"
