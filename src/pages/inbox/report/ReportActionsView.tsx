@@ -304,15 +304,16 @@ function ReportActionsView({
 
     // Show skeleton while the app is loading and we're online
     const shouldShowSkeletonForAppLoad = isLoadingApp && !isOffline;
+    const shouldShowSkeleton = shouldShowSkeletonForInitialLoad ?? shouldShowSkeletonForAppLoad;
 
     useEffect(() => {
-        if (!shouldShowSkeletonForInitialLoad && !shouldShowSkeletonForAppLoad) {
+        if (!shouldShowSkeleton) {
             return;
         }
         markOpenReportEnd(report, {warm: false});
-    }, [report, shouldShowSkeletonForInitialLoad, shouldShowSkeletonForAppLoad]);
+    }, [report, shouldShowSkeleton]);
 
-    if (shouldShowSkeletonForInitialLoad ?? shouldShowSkeletonForAppLoad) {
+    if (shouldShowSkeleton) {
         return <ReportActionsSkeletonView />;
     }
 
