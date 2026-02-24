@@ -1170,7 +1170,7 @@ function toggleTwoFactorAuthRequiredForDomain(domainAccountID: number, domainNam
                       onyxMethod: Onyx.METHOD.MERGE,
                       key: ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE,
                       value: {
-                          errors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.forceTwoFactorAuthError'),
+                          errors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.forceTwoFactorAuthError'),
                       },
                   } as OnyxUpdate<typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE>,
               ]
@@ -1437,7 +1437,14 @@ function clearVacationDelegateError(domainAccountID: number, domainMemberAccount
 function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID: number, exemptEmails: string[], targetEmail: string, force2FA: boolean, twoFactorAuthCode?: string) {
     const newExemptEmails = force2FA ? exemptEmails.filter((email) => email !== targetEmail) : exemptEmails;
 
-    const optimisticData: OnyxUpdate[] = [
+    const optimisticData: Array<
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS
+            | typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE
+        >
+    > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
@@ -1475,7 +1482,7 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             value: null,
         },
     ];
-    const successData: OnyxUpdate[] = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -1504,7 +1511,14 @@ function setTwoFactorAuthExemptEmailForDomain(domainAccountID: number, accountID
             value: null,
         },
     ];
-    const failureData: OnyxUpdate[] = [
+    const failureData: Array<
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS
+            | typeof ONYXKEYS.VALIDATE_DOMAIN_TWO_FACTOR_CODE
+        >
+    > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
@@ -1568,7 +1582,7 @@ function clearTwoFactorAuthExemptEmailsErrors(domainAccountID: number, email: st
 }
 
 function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID: number, targetEmail: string, twoFactorAuthCode: string) {
-    const optimisticData: OnyxUpdate[] = [
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -1592,7 +1606,7 @@ function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID
             },
         },
     ];
-    const failureData: OnyxUpdate[] = [
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -1616,7 +1630,7 @@ function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID
             },
         },
     ];
-    const successData: OnyxUpdate[] = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
