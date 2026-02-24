@@ -15,7 +15,7 @@ import type {
     MultifactorAuthenticationScenarioCustomConfig,
 } from '@components/MultifactorAuthentication/config/types';
 import variables from '@styles/variables';
-import {authorizeTransaction, fireAndForgetDenyTransaction} from '@userActions/MultifactorAuthentication';
+import {authorizeTransaction, denyTransaction, fireAndForgetDenyTransaction} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';
 import SCREENS from '@src/SCREENS';
 
@@ -139,7 +139,15 @@ export default {
     successScreen: <ApprovedTransactionSuccessScreen />,
     defaultClientFailureScreen: <ApproveTransactionClientFailureScreen />,
     defaultServerFailureScreen: <ApproveTransactionServerFailureScreen />,
+    onCancel: async (payload) => {
+        if (!isAuthorizeTransactionPayload(payload)) {
+            return {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED};
+        }
+        const {reason} = await denyTransaction({transactionID: payload.transactionID});
+        return {reason};
+    },
     failureScreens: {
+        [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_DENIED]: <DeniedTransactionSuccessScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_EXPIRED]: <OutOfTimeFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_APPROVED_APPROVE_ATTEMPTED]: <ApprovedTransactionSuccessScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.ALREADY_DENIED_DENY_ATTEMPTED]: <DeniedTransactionSuccessScreen />,

@@ -106,6 +106,13 @@ type MultifactorAuthenticationScenarioBase<T extends Record<string, unknown> = E
      * (e.g., whether to show the outcome screen or let the callback handle navigation).
      */
     callback?: MultifactorAuthenticationScenarioCallback;
+
+    /**
+     * Called when the user cancels the MFA flow. When provided, cancel() awaits this function
+     * and uses the returned reason to navigate to the appropriate failure screen.
+     * When absent, cancel() falls back to the default behavior (SET_ERROR with EXPO.CANCELED).
+     */
+    onCancel?: (payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined) => Promise<{reason: MultifactorAuthenticationReason}>;
 };
 
 /**
