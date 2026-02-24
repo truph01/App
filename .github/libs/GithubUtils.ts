@@ -493,14 +493,19 @@ class GithubUtils {
             .then(({data: pullRequestComment}) => pullRequestComment.body);
     }
 
-    static getPullRequestBaseSHA(pullRequestNumber: number): Promise<string> {
-        return this.octokit.pulls
-            .get({
-                owner: CONST.GITHUB_OWNER,
-                repo: CONST.APP_REPO,
-                pull_number: pullRequestNumber,
-            })
-            .then(({data: pullRequest}) => pullRequest.base.sha);
+    static async getPullRequestMergeBaseSHA(pullRequestNumber: number): Promise<string> {
+        const {data: pullRequest} = await this.octokit.pulls.get({
+            owner: CONST.GITHUB_OWNER,
+            repo: CONST.APP_REPO,
+            pull_number: pullRequestNumber,
+        });
+        const {data: comparison} = await this.octokit.repos.compareCommits({
+            owner: CONST.GITHUB_OWNER,
+            repo: CONST.APP_REPO,
+            base: pullRequest.base.ref,
+            head: pullRequest.head.sha,
+        });
+        return comparison.merge_base_commit.sha;
     }
 
     static getAllReviewComments(pullRequestNumber: number): Promise<string[]> {

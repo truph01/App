@@ -146,9 +146,15 @@ class TranslationGenerator {
     /**
      * The git ref (SHA or branch) that the diff was computed against.
      * Used by extractRemovedPaths to get the old version of en.ts at the correct commit.
-     * Set in buildPathsFromGitDiff: merge-base SHA (local) or PR base SHA (CI).
+     * Set in buildPathsFromGitDiff: merge-base SHA (local or CI).
      */
     private diffBase: string;
+
+    /**
+     * Whether the GitHub API was successfully used for the diff.
+     * When false (fallback to git diff or local mode), extractRemovedPaths uses Git.show instead of the GitHub API.
+     */
+    private useGitHubAPI: boolean;
 
     /**
      * CLI instance for user prompts.
@@ -265,6 +271,7 @@ class TranslationGenerator {
         this.compareRef = this.cli.namedArgs['compare-ref'];
         this.prNumber = this.cli.namedArgs['pr-number'];
         this.diffBase = this.compareRef;
+        this.useGitHubAPI = false;
         this.pathsToAdd = new Set<TranslationPaths>();
         this.pathsToModify = this.cli.namedArgs.paths ?? new Set<TranslationPaths>();
         this.pathsToRemove = new Set<TranslationPaths>();
@@ -903,11 +910,14 @@ class TranslationGenerator {
                         console.log(`🌐 Using GitHub API diff for PR #${this.prNumber}`);
                     }
 
-                    // Get the PR base SHA so extractRemovedPaths can fetch the old en.ts at the correct commit
-                    this.diffBase = await GitHubUtils.getPullRequestBaseSHA(this.prNumber);
+                    // Get the actual merge-base commit (common ancestor of base branch and PR head).
+                    // GitHub's PR diff is a three-dot diff (merge-base...head), so removed line numbers
+                    // correspond to the file at the merge-base, NOT at the tip of the base branch.
+                    this.diffBase = await GitHubUtils.getPullRequestMergeBaseSHA(this.prNumber);
+                    this.useGitHubAPI = true;
 
                     if (this.verbose) {
-                        console.log(`📌 PR base SHA: ${this.diffBase.slice(0, 8)}`);
+                        console.log(`📌 PR merge-base SHA: ${this.diffBase.slice(0, 8)}`);
                     }
 
                     const prDiff = await GitHubUtils.getPullRequestDiff(this.prNumber);
@@ -934,6 +944,7 @@ class TranslationGenerator {
                         console.warn(`⚠️ GitHub API failed: ${TranslationGenerator.getErrorMessage(apiError)}. Falling back to git diff.`);
                     }
 
+                    this.useGitHubAPI = false;
                     if (this.compareRef) {
                         this.diffBase = this.compareRef;
                         diffResult = Git.diff(this.compareRef, undefined, relativePath);
@@ -1197,11 +1208,11 @@ class TranslationGenerator {
     private async extractRemovedPaths(removedLines: Set<number>, relativePath: string): Promise<void> {
         try {
             let oldEnContent: string;
-            if (this.prNumber) {
-                // CI mode: Use GitHub API to get file at the PR base SHA (may not be available locally in shallow clone)
+            if (this.useGitHubAPI) {
+                // GitHub API was used for the diff — fetch old file via API too (may not be available locally in shallow clone)
                 oldEnContent = await GitHubUtils.getFileContents(relativePath, this.diffBase);
             } else {
-                // Local mode: Use git show with the merge-base SHA
+                // Git was used for the diff — use git show with the diff base ref
                 oldEnContent = Git.show(this.diffBase, relativePath);
             }
 
