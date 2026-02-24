@@ -1560,7 +1560,7 @@ function findLastReportActions(reportActions: OnyxEntry<ReportActions>, canUserP
             }
         }
 
-        if (shouldReportActionBeVisibleAsLastAction(action, canUserPerformWriteAction) && action.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED) {
+        if (isReportActionVisibleAsLastAction(action, canUserPerformWriteAction) && action.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED) {
             if (!lastActionForDisplay || isNewerReportAction(action, lastActionForDisplay)) {
                 lastActionForDisplay = action;
             }

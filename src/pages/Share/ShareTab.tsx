@@ -103,6 +103,7 @@ function ShareTab({ref}: ShareTabProps) {
         visibleReportActionsData,
         currentUserAccountID,
         currentUserEmail,
+        allPolicies,
         personalDetails,
     ]);
 

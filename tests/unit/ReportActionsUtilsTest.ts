@@ -34,7 +34,7 @@ import {
     getUpdateACHAccountMessage,
     isIOUActionMatchingTransactionList,
     isNewerReportAction,
-    shouldReportActionBeVisibleAsLastAction,
+    isReportActionVisibleAsLastAction,
 } from '../../src/libs/ReportActionsUtils';
 import {buildOptimisticCreatedReportForUnapprovedAction} from '../../src/libs/ReportUtils';
 import ONYXKEYS from '../../src/ONYXKEYS';
@@ -3685,7 +3685,7 @@ describe('ReportActionsUtils', () => {
             const actions: ReportActions = {actionA, actionB, actionC};
             const {lastActionForDisplay} = findLastReportActions(actions);
             const fromOldApproach = getSortedReportActions(Object.values(actions)).findLast(
-                (a) => shouldReportActionBeVisibleAsLastAction(a) && a.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED,
+                (a) => isReportActionVisibleAsLastAction(a) && a.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED,
             );
             expect(lastActionForDisplay?.reportActionID).toBe(fromOldApproach?.reportActionID);
         });
