@@ -13,8 +13,8 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
-import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import useUserToInviteReports from '@hooks/useUserToInviteReports';
+import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import memoize from '@libs/memoize';
 import {
     filterAndOrderOptions,

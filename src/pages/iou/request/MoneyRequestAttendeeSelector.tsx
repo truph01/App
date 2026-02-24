@@ -17,9 +17,9 @@ import useReportAttributes from '@hooks/useReportAttributes';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useUserToInviteReports from '@hooks/useUserToInviteReports';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
-import useUserToInviteReports from '@hooks/useUserToInviteReports';
 import {
     formatSectionsFromSearchTerm,
     getFilteredRecentAttendees,

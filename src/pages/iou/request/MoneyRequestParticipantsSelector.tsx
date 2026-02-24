@@ -29,8 +29,8 @@ import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionS
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionDraftValues from '@hooks/useTransactionDraftValues';
-import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import useUserToInviteReports from '@hooks/useUserToInviteReports';
+import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getPlatform from '@libs/getPlatform';
 import goToSettings from '@libs/goToSettings';
 import {isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
