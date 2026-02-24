@@ -22,6 +22,7 @@ The navigation in the app is built on top of the `react-navigation` library. To 
   - [Dynamic routes](#dynamic-routes)
     - [What are dynamic routes?](#what-are-dynamic-routes)
     - [When to use dynamic routes](#when-to-use-dynamic-routes)
+    - [When not to use dynamic routes](#when-not-to-use-dynamic-routes)
     - [Dynamic routes configuration](#dynamic-routes-configuration)
     - [Entry screens (access control)](#entry-screens-access-control)
     - [Current limitations (work in progress)](#current-limitations-work-in-progress)
@@ -685,7 +686,7 @@ Dynamic routes allow the same screen to be reused across multiple flows while pr
 A dynamic route is a URL suffix (e.g. `verify-account`) that can be appended to any base path the user is currently on. The resulting URL is `{currentPath}/{suffix}` (e.g. `/settings/wallet/verify-account`).
 
 - **Static route:** A fixed path like `settings/wallet/verify-account`. The screen has one URL and typically one back destination.
-- **Dynamic route:** The same screen and suffix are reused across many base paths. The "back" destination is derived from the current URL (by removing the suffix), not from a `backTo` param.
+- **Dynamic route:** The same screen and suffix are reused across many base paths. The "back" destination is derived from the current URL (by removing the suffix), not from a `backTo` param. Dynamic routes guarantee deterministic back navigation by removing the suffix from the current path and preserving query parameters.
 
 
 ### When to use dynamic routes
@@ -693,8 +694,15 @@ A dynamic route is a URL suffix (e.g. `verify-account`) that can be appended to 
 - Use dynamic routes when:
   - The same screen is reused in multiple flows (e.g. Verify Account from Wallet, Travel, Reports).
   - The intended "back" behavior is wherever the user came from (current URL minus the suffix).
-- Do not use dynamic routes when:
-  - The screen has a single, fixed entry and a fixed back destination; use a normal static route instead.
+
+### When not to use dynamic routes
+
+Do not use dynamic routes when:
+- Your use case falls under the [current limitations](#current-limitations-work-in-progress):
+  - You need to stack multiple dynamic route suffixes (e.g. `/a/verify-account/another-flow`).
+  - Your suffix requires multiple path segments (e.g. `step-one/details`).
+  - Your suffix includes path or query parameters (e.g. `verify-account/:id` or `verify-account?tab=details`).
+- The screen has a single, fixed entry and a fixed back destination. In this case, use a normal static route instead.
 
 ### Dynamic routes configuration
 
@@ -727,6 +735,8 @@ When adding or extending a dynamic route, list every screen that should be able 
 - **Stacking:** Multiple dynamic route suffixes on top of each other (e.g. `/a/verify-account/another-flow`) are not supported. Only one dynamic suffix per path is allowed.
 - **Suffix shape:** Suffixes must be a single path segment. Compound suffixes with extra path segments (e.g. `a/b`) are not supported.
 - **Parameters:** Suffixes must not include path params (e.g. `a/:reportID`) or query params (e.g. `a?foo=bar`). Use a single literal segment like `verify-account` only.
+
+If you try to use dynamic routes for these cases now, you will either fail to navigate to the page at all or end up on a non-existent page, and the navigation will be broken.
 
 ### How to add a new dynamic route
 
