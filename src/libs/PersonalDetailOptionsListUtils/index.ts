@@ -383,20 +383,22 @@ function createOptionList(
     const currentUserRef = {
         current: undefined as OptionData | undefined,
     };
-    const allPersonalDetailsOptions = Object.values(personalDetails).map((personalDetail) => {
-        if (!personalDetail) {
-            return {} as OptionData;
-        }
-        const reportID = accountIDToReportIDMap[personalDetail.accountID];
-        const report = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
-        const reportAttributes = report?.reportID ? reportAttributesDerived?.[report.reportID] : undefined;
-        const isReportArchived = privateIsArchivedMap[reportID];
-        const option = createOption(personalDetail, report, formatPhoneNumber, config, reportAttributes, isReportArchived);
-        if (option.accountID === currentUserAccountID) {
-            currentUserRef.current = option;
-        }
-        return option;
-    });
+    const allPersonalDetailsOptions = Object.values(personalDetails)
+        .map((personalDetail) => {
+            if (!personalDetail || !personalDetail.accountID) {
+                return undefined;
+            }
+            const reportID = accountIDToReportIDMap[personalDetail.accountID];
+            const report = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
+            const reportAttributes = report?.reportID ? reportAttributesDerived?.[report.reportID] : undefined;
+            const isReportArchived = privateIsArchivedMap[reportID];
+            const option = createOption(personalDetail, report, formatPhoneNumber, config, reportAttributes, isReportArchived);
+            if (option.accountID === currentUserAccountID) {
+                currentUserRef.current = option;
+            }
+            return option;
+        })
+        .filter(Boolean) as OptionData[];
 
     return {
         currentUserOption: currentUserRef.current,
