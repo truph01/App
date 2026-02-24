@@ -118,7 +118,6 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
         setApprovalWorkflow({
             ...currentApprovalWorkflow,
             availableMembers: mergeWorkflowMembersWithAvailableMembers(currentApprovalWorkflow.members, defaultWorkflowMembers),
-            // availableMembers: [...currentApprovalWorkflow.members, ...defaultWorkflowMembers],
             usedApproverEmails,
             action: CONST.APPROVAL_WORKFLOW.ACTION.EDIT,
             errors: null,

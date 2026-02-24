@@ -1,12 +1,3 @@
-/**
- * Component test for WorkspaceWorkflowsApprovalsEditPage.
- *
- * Regresses on issue #83251: when editing a self-approval workflow (user A submits to user A),
- * availableMembers must not contain duplicate entries. Raw concatenation
- * [...members, ...defaultWorkflowMembers] produces duplicates because defaultWorkflowMembers
- * (from convertPolicyEmployeesToApprovalWorkflows) now includes all workspace members.
- * This test verifies the page uses mergeWorkflowMembersWithAvailableMembers.
- */
 import {act, render} from '@testing-library/react-native';
 import React from 'react';
 import Onyx from 'react-native-onyx';
@@ -14,7 +5,7 @@ import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import WorkspaceWorkflowsApprovalsEditPage from '@pages/workspace/workflows/approvals/WorkspaceWorkflowsApprovalsEditPage';
-import * as Workflow from '@userActions/Workflow';
+import {setApprovalWorkflow} from '@userActions/Workflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
@@ -99,7 +90,7 @@ describe('WorkspaceWorkflowsApprovalsEditPage', () => {
     });
 
     beforeEach(async () => {
-        jest.spyOn(Workflow, 'setApprovalWorkflow');
+        jest.spyOn(require('@userActions/Workflow'), 'setApprovalWorkflow');
         await act(async () => {
             await Onyx.clear();
             await Onyx.set(ONYXKEYS.HAS_LOADED_APP, true);
@@ -127,8 +118,8 @@ describe('WorkspaceWorkflowsApprovalsEditPage', () => {
         renderEditPage();
         await waitForBatchedUpdatesWithAct();
 
-        expect(Workflow.setApprovalWorkflow).toHaveBeenCalled();
-        const callArg = (Workflow.setApprovalWorkflow as jest.Mock).mock.calls[0][0];
+        expect(setApprovalWorkflow).toHaveBeenCalled();
+        const callArg = (setApprovalWorkflow as jest.Mock).mock.calls[0][0];
         const availableMembers = callArg.availableMembers ?? [];
         const emails = availableMembers.map((m: {email: string}) => m.email);
         const uniqueEmails = [...new Set(emails)];
