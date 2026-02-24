@@ -35,8 +35,8 @@ type VerifyPageProps = PlatformStackScreenProps<TwoFactorAuthNavigatorParamList,
 function VerifyPage({route}: VerifyPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [session] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: false});
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
+    const [session] = useOnyx(ONYXKEYS.SESSION);
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const contactMethod = getContactMethod(account?.primaryLogin, session?.email);
     const formRef = useRef<BaseTwoFactorAuthFormRef>(null);
 
@@ -93,7 +93,7 @@ function VerifyPage({route}: VerifyPageProps) {
                 total: 3,
             }}
             onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_2FA_ROOT.getRoute(route.params?.backTo, route.params?.forwardTo))}
-            shouldEnableViewportOffsetTop
+            shouldEnableMaxHeight={false}
         >
             <ScrollView
                 ref={scrollViewRef}
