@@ -344,8 +344,8 @@ function HeaderWithBackButton({
                         </Tooltip>
                     )}
                 </View>
-                {shouldDisplayHelpButton && <SidePanelButton />}
                 {shouldDisplaySearchRouter && <SearchButton />}
+                {shouldDisplayHelpButton && <SidePanelButton />}
             </View>
         </View>
     );

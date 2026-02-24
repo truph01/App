@@ -72,8 +72,8 @@ function TopBar({breadcrumbLabel, shouldDisplaySearch = true, shouldDisplayHelpB
                         <Text style={[styles.textBlue]}>{translate('common.cancel')}</Text>
                     </PressableWithoutFeedback>
                 )}
-                {shouldDisplayHelpButton && <SidePanelButton />}
                 {displaySearch && <SearchButton />}
+                {shouldDisplayHelpButton && <SidePanelButton />}
             </View>
             <LoadingBar shouldShow={!isWideRHPVisible && (shouldShowLoadingBarForReports || shouldShowLoadingBar)} />
         </View>

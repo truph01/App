@@ -391,8 +391,8 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
                                     {!shouldUseNarrowLayout && isOpenTaskReport(report, parentReportAction) && <TaskHeaderActionButton report={report} />}
                                     {!isParentReportLoading && canJoin && !shouldUseNarrowLayout && joinButton}
                                 </View>
-                                {!isInSidePanel && <SidePanelButton style={styles.ml2} />}
-                                {shouldDisplaySearchRouter && <SearchButton />}
+                                {shouldDisplaySearchRouter && <SearchButton style={styles.ml2} />}
+                                {!isInSidePanel && <SidePanelButton />}
                             </View>
                         </View>
                     )}
