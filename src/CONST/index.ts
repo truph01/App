@@ -8825,6 +8825,9 @@ const CONST = {
             JOIN_WORKSPACE: 'Onboarding-JoinWorkspace',
             CREATE_WORKSPACE: 'Onboarding-CreateWorkspace',
         },
+        BASE_ANCHOR_FOR_ATTACHMENTS_ONLY: {
+            DOWNLOAD_BUTTON: 'BaseAnchorForAttachmentsOnly-DownloadButton',
+        },
         REPORT_HEADER_SKELETON: {
             GO_BACK: 'ReportHeaderSkeleton-GoBack',
         },
