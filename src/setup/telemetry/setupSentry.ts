@@ -4,6 +4,7 @@ import {isDevelopment} from '@libs/Environment/Environment';
 import {breadcrumbsIntegration, browserProfilingIntegration, consoleIntegration, navigationIntegration, tracingIntegration} from '@libs/telemetry/integrations';
 import processBeforeSendTransactions from '@libs/telemetry/middlewares';
 import CONFIG from '@src/CONFIG';
+import CONST from '@src/CONST';
 import pkg from '../../../package.json';
 import makeDebugTransport from './debugTransport';
 
@@ -31,6 +32,8 @@ function setupSentry(): void {
         beforeSendTransaction: processBeforeSendTransactions,
         enableLogs: true,
     });
+
+    Sentry.setTag(CONST.TELEMETRY.TAG_BUILD_TYPE, CONFIG.IS_HYBRID_APP ? CONST.TELEMETRY.BUILD_TYPE_HYBRID_APP : CONST.TELEMETRY.BUILD_TYPE_STANDALONE);
 }
 
 export default setupSentry;
