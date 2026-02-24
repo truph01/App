@@ -13,6 +13,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import Navigation from '@libs/Navigation/Navigation';
+import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
@@ -33,10 +34,12 @@ function SaveTheWorldPage() {
             {
                 translationKey: 'teachersUnitePage.iKnowATeacher',
                 action: waitForNavigate(() => Navigation.navigate(ROUTES.I_KNOW_A_TEACHER)),
+                sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TEACHERS_UNITE.I_KNOW_A_TEACHER,
             },
             {
                 translationKey: 'teachersUnitePage.iAmATeacher',
                 action: waitForNavigate(() => Navigation.navigate(ROUTES.I_AM_A_TEACHER)),
+                sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TEACHERS_UNITE.I_AM_A_TEACHER,
             },
         ];
 
@@ -47,6 +50,7 @@ function SaveTheWorldPage() {
             shouldShowRightIcon: true,
             link: '',
             wrapperStyle: [styles.sectionMenuItemTopDescription],
+            sentryLabel: item.sentryLabel,
         }));
     }, [translate, waitForNavigate, styles]);
 

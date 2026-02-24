@@ -31,15 +31,15 @@ function PreferencesPage() {
     const {getCurrencySymbol} = useCurrencyListActions();
     const illustrations = useMemoizedLazyIllustrations(['Gears']);
     const preferencesIllustration = usePreferencesSectionIllustration();
-    const [priorityMode] = useOnyx(ONYXKEYS.NVP_PRIORITY_MODE, {canBeMissing: true});
+    const [priorityMode] = useOnyx(ONYXKEYS.NVP_PRIORITY_MODE);
 
     const platform = getPlatform(true);
-    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS, {canBeMissing: true});
+    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS);
     const isPlatformMuted = mutedPlatforms[platform];
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
-    const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME, {canBeMissing: true});
-    const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE, {canBeMissing: true});
-    const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID, {canBeMissing: true});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME);
+    const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE);
+    const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
 
     const personalPolicy = usePolicy(personalPolicyID);
 
@@ -108,6 +108,7 @@ function PreferencesPage() {
                                 description={translate('priorityModePage.priorityMode')}
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_PRIORITY_MODE)}
                                 wrapperStyle={styles.sectionMenuItemTopDescription}
+                                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_PREFERENCES.PRIORITY_MODE}
                             />
                             <MenuItemWithTopDescription
                                 shouldShowRightIcon
@@ -116,6 +117,7 @@ function PreferencesPage() {
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_LANGUAGE)}
                                 wrapperStyle={styles.sectionMenuItemTopDescription}
                                 hintText={!preferredLocale || !isFullySupportedLocale(preferredLocale) ? translate('languagePage.aiGenerated') : ''}
+                                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_PREFERENCES.LANGUAGE}
                             />
                             <MenuItemWithTopDescription
                                 shouldShowRightIcon
@@ -123,6 +125,7 @@ function PreferencesPage() {
                                 description={translate('billingCurrency.paymentCurrency')}
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_PAYMENT_CURRENCY)}
                                 wrapperStyle={styles.sectionMenuItemTopDescription}
+                                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_PREFERENCES.PAYMENT_CURRENCY}
                             />
                             <MenuItemWithTopDescription
                                 shouldShowRightIcon
@@ -130,6 +133,7 @@ function PreferencesPage() {
                                 description={translate('themePage.theme')}
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_THEME)}
                                 wrapperStyle={styles.sectionMenuItemTopDescription}
+                                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_PREFERENCES.THEME}
                             />
                         </View>
                     </Section>

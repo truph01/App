@@ -50,7 +50,7 @@ function ExpenseRulesPage() {
     const icons = useMemoizedLazyExpensifyIcons(['Pencil', 'Plus', 'Trashcan']);
     const illustrations = useMemoizedLazyIllustrations(['Flash']);
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
-    const [expenseRules = getEmptyArray<ExpenseRule>(), expenseRulesResult] = useOnyx(ONYXKEYS.NVP_EXPENSE_RULES, {canBeMissing: true});
+    const [expenseRules = getEmptyArray<ExpenseRule>(), expenseRulesResult] = useOnyx(ONYXKEYS.NVP_EXPENSE_RULES);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [selectedRules, setSelectedRules] = useState<string[]>([]);
     const [deleteConfirmModalVisible, setDeleteConfirmModalVisible] = useState(false);
@@ -198,6 +198,7 @@ function ExpenseRulesPage() {
                 icon={icons.Plus}
                 text={translate('expenseRulesPage.newRule')}
                 style={[shouldUseNarrowLayout && styles.flex1]}
+                sentryLabel={CONST.SENTRY_LABEL.SETTINGS_RULES.NEW_RULE}
             />
         </View>
     );
