@@ -121,7 +121,16 @@ jobs:
           path: ./
 
       - name: Set aabPath for Fastlane
-        run: echo "aabPath=$(find "$(pwd)" -name '*.aab' | head -1)" >> "$GITHUB_ENV"
+        run: |
+          echo "All .aab files in working directory:"
+          ls -la *.aab 2>/dev/null || echo "(none)"
+          AAB_PATH="$(realpath *.aab 2>/dev/null | head -1)"
+          if [ -z "$AAB_PATH" ]; then
+            echo "::error::No .aab file found in working directory"
+            exit 1
+          fi
+          echo "Selected: $AAB_PATH"
+          echo "aabPath=$AAB_PATH" >> "$GITHUB_ENV"
 
       - name: Setup Ruby
         # v1.229.0
@@ -234,7 +243,13 @@ jobs:
 
       - name: Find APK path
         id: find-apk
-        run: echo "APK_PATH=$(find "$(pwd)" -name '*.apk' | head -1)" >> "$GITHUB_OUTPUT"
+        run: |
+          APK_PATH="$(pwd)/Expensify.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::Expected Expensify.apk not found at $APK_PATH"
+            exit 1
+          fi
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Upload Android build to BrowserStack
         if: ${{ fromJSON(env.IS_APP_REPO) }}
@@ -274,7 +289,13 @@ jobs:
 
       - name: Find APK path
         id: find-apk
-        run: echo "APK_PATH=$(find "$(pwd)" -name '*.apk' | head -1)" >> "$GITHUB_OUTPUT"
+        run: |
+          APK_PATH="$(pwd)/Expensify.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::Expected Expensify.apk not found at $APK_PATH"
+            exit 1
+          fi
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Upload Android build to Applause
         if: ${{ fromJSON(env.IS_APP_REPO) }}
@@ -331,8 +352,25 @@ jobs:
 
       - name: Set artifact paths for Fastlane
         run: |
-          echo "ipaPath=$(find "$(pwd)" -maxdepth 1 -name '*.ipa' | head -1)" >> "$GITHUB_ENV"
-          echo "dsymPath=$(find "$(pwd)" -maxdepth 1 -name '*.dSYM.zip' | head -1)" >> "$GITHUB_ENV"
+          echo "All .ipa files in working directory:"
+          ls -la *.ipa 2>/dev/null || echo "(none)"
+          IPA_PATH="$(realpath *.ipa 2>/dev/null | head -1)"
+          if [ -z "$IPA_PATH" ]; then
+            echo "::error::No .ipa file found in working directory"
+            exit 1
+          fi
+          echo "Selected IPA: $IPA_PATH"
+          echo "ipaPath=$IPA_PATH" >> "$GITHUB_ENV"
+
+          echo "All .dSYM.zip files in working directory:"
+          ls -la *.dSYM.zip 2>/dev/null || echo "(none)"
+          DSYM_PATH="$(pwd)/Expensify.app.dSYM.zip"
+          if [ ! -f "$DSYM_PATH" ]; then
+            echo "::warning::Expensify.app.dSYM.zip not found, falling back to first .dSYM.zip"
+            DSYM_PATH="$(realpath *.dSYM.zip 2>/dev/null | head -1)"
+          fi
+          echo "Selected dSYM: $DSYM_PATH"
+          echo "dsymPath=$DSYM_PATH" >> "$GITHUB_ENV"
 
       - name: Setup Ruby
         # v1.229.0
@@ -442,7 +480,13 @@ jobs:
 
       - name: Find IPA path
         id: find-ipa
-        run: echo "IPA_PATH=$(find "$(pwd)" -maxdepth 1 -name '*.ipa' | head -1)" >> "$GITHUB_OUTPUT"
+        run: |
+          IPA_PATH="$(realpath *.ipa 2>/dev/null | head -1)"
+          if [ -z "$IPA_PATH" ]; then
+            echo "::error::No .ipa file found in working directory"
+            exit 1
+          fi
+          echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Upload iOS build to BrowserStack
         if: ${{ fromJSON(env.IS_APP_REPO) }}
@@ -482,7 +526,13 @@ jobs:
 
       - name: Find IPA path
         id: find-ipa
-        run: echo "IPA_PATH=$(find "$(pwd)" -maxdepth 1 -name '*.ipa' | head -1)" >> "$GITHUB_OUTPUT"
+        run: |
+          IPA_PATH="$(realpath *.ipa 2>/dev/null | head -1)"
+          if [ -z "$IPA_PATH" ]; then
+            echo "::error::No .ipa file found in working directory"
+            exit 1
+          fi
+          echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_OUTPUT"
 
       - name: Upload iOS build to Applause
         if: ${{ fromJSON(env.IS_APP_REPO) }}
