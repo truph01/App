@@ -290,6 +290,14 @@ function IOURequestStepScan({
 
     const viewfinderLayout = useRef<LayoutRectangle>(null);
 
+    const maybeCancelShutterSpan = useCallback(() => {
+        if (isMultiScanEnabled) {
+            return;
+        }
+
+        cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+    }, [isMultiScanEnabled]);
+
     const capturePhoto = useCallback(() => {
         if (!isMultiScanEnabled) {
             startSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION, {
@@ -299,9 +307,7 @@ function IOURequestStepScan({
         }
 
         if (!camera.current && (cameraPermissionStatus === RESULTS.DENIED || cameraPermissionStatus === RESULTS.BLOCKED)) {
-            if (!isMultiScanEnabled) {
-                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-            }
+            maybeCancelShutterSpan();
             askForPermissions();
             return;
         }
@@ -311,17 +317,13 @@ function IOURequestStepScan({
         };
 
         if (!camera.current) {
-            if (!isMultiScanEnabled) {
-                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-            }
+            maybeCancelShutterSpan();
             showCameraAlert();
             return;
         }
 
         if (didCapturePhoto) {
-            if (!isMultiScanEnabled) {
-                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-            }
+            maybeCancelShutterSpan();
             return;
         }
 
@@ -395,9 +397,7 @@ function IOURequestStepScan({
                     })
                     .catch((error: string) => {
                         setDidCapturePhoto(false);
-                        if (!isMultiScanEnabled) {
-                            cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-                        }
+                        maybeCancelShutterSpan();
                         showCameraAlert();
                         Log.warn('Error taking photo', error);
                     });
