@@ -36,8 +36,7 @@ describe('getStateFromPath', () => {
     const mockFindFocusedRoute = findFocusedRoute as jest.Mock;
     const mockRNGetStateFromPath = RNGetStateFromPath as jest.Mock;
     const mockGetStateForDynamicRoute = getStateForDynamicRoute as jest.Mock;
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const mockLogWarn = Log.warn as jest.Mock;
+    const mockLogWarn = jest.spyOn(Log, 'warn');
 
     beforeEach(() => {
         jest.clearAllMocks();

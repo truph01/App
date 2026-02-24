@@ -5,6 +5,7 @@ import {linkingConfig} from '@libs/Navigation/linkingConfig';
 import type {Route} from '@src/ROUTES';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Screen} from '@src/SCREENS';
+import SCREENS from '@src/SCREENS';
 import getLastSuffixFromPath from './getLastSuffixFromPath';
 import getMatchingNewRoute from './getMatchingNewRoute';
 import getRedirectedPath from './getRedirectedPath';
@@ -20,14 +21,15 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
     const redirectedPath = getRedirectedPath(normalizedPath);
     const normalizedPathAfterRedirection = getMatchingNewRoute(redirectedPath) ?? redirectedPath;
 
-    const dynamicRouteSuffix = getLastSuffixFromPath(path);
+    const dynamicRouteSuffix = getLastSuffixFromPath(normalizedPathAfterRedirection);
     if (isDynamicRouteSuffix(dynamicRouteSuffix)) {
-        const pathWithoutDynamicSuffix = path.replace(`/${dynamicRouteSuffix}`, '');
+        const pathWithoutDynamicSuffix = normalizedPathAfterRedirection.replace(`/${dynamicRouteSuffix}`, '');
 
         type DynamicRouteKey = keyof typeof DYNAMIC_ROUTES;
+        const dynamicRouteKeys = Object.keys(DYNAMIC_ROUTES) as DynamicRouteKey[];
 
         // Find the dynamic route key that matches the extracted suffix
-        const dynamicRoute: string = Object.keys(DYNAMIC_ROUTES).find((key) => DYNAMIC_ROUTES[key as DynamicRouteKey].path === dynamicRouteSuffix) ?? '';
+        const dynamicRoute: string = dynamicRouteKeys.find((key) => DYNAMIC_ROUTES[key].path === dynamicRouteSuffix) ?? '';
 
         // Get the currently focused route from the base path to check permissions
         const focusedRoute = findFocusedRoute(getStateFromPath(pathWithoutDynamicSuffix as Route) ?? {});
@@ -37,18 +39,13 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
         if (focusedRoute?.name) {
             if (entryScreens.includes(focusedRoute.name as Screen)) {
                 // Generate navigation state for the dynamic route
-                const verifyAccountState = getStateForDynamicRoute(normalizedPath, dynamicRoute as DynamicRouteKey);
-                return verifyAccountState;
+                const dynamicRouteState = getStateForDynamicRoute(normalizedPath, dynamicRoute as DynamicRouteKey);
+                return dynamicRouteState;
             }
 
-            // Fallback to root parsing so users can't land on /verify-account directly.
-            // This ensures navigation redirects back to the previous screen (root handles that).
+            // Fallback to not found page so users can't land on dynamic suffix directly.
             if (pathWithoutDynamicSuffix === '/' || pathWithoutDynamicSuffix === '') {
-                const state = RNGetStateFromPath(pathWithoutDynamicSuffix, linkingConfig.config);
-
-                if (!state) {
-                    throw new Error('Failed to parse the path to a navigation state.');
-                }
+                const state = {routes: [{name: SCREENS.NOT_FOUND, path: normalizedPathAfterRedirection}]};
 
                 return state;
             }
@@ -64,7 +61,6 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
     if (!state) {
         throw new Error('Failed to parse the path to a navigation state.');
     }
-
     return state;
 }
 

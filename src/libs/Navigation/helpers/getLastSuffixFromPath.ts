@@ -11,7 +11,7 @@ function getLastSuffixFromPath(path: string | undefined): string {
     const [normalizedPath] = splitPathAndQuery(path ?? '');
 
     if (!normalizedPath) {
-        Log.warn('[getLastSuffixFromPath.ts] Provided path is undefined or empty.');
+        Log.warn('[getLastSuffixFromPath.ts] Failed to parse the path, path is empty');
         return '';
     }
 
