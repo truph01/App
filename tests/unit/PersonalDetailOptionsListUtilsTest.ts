@@ -779,62 +779,44 @@ describe('PersonalDetailOptionsListUtils', () => {
     });
 
     describe('matchesSearchTerms', () => {
-        let spiderManOption: OptionData;
-        let currentUserOpt: OptionData;
-
-        beforeEach(() => {
-            const foundSpider = OPTIONS.options.find((o) => o.text === 'Spider-Man');
-            if (!foundSpider) {
-                throw new Error('Spider-Man option not found in test data');
-            }
-            spiderManOption = foundSpider;
-
-            const foundUser = OPTIONS.currentUserOption;
-            if (!foundUser) {
-                throw new Error('currentUserOption not found in test data');
-            }
-            currentUserOpt = foundUser;
-        });
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const getSpiderManOption = () => OPTIONS.options.find((o) => o.text === 'Spider-Man')!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const getCurrentUserOption = () => OPTIONS.currentUserOption!;
 
         it('should match when search terms are found in option text', () => {
-            expect(matchesSearchTerms(spiderManOption, ['spider'])).toBe(true);
+            expect(matchesSearchTerms(getSpiderManOption(), ['spider'])).toBe(true);
         });
 
         it('should match when search terms are found in option login', () => {
             // cspell:disable-next-line
-            const peterOption = OPTIONS.options.find((o) => o.login === 'peterparker@expensify.com');
-            if (!peterOption) {
-                // cspell:disable-next-line
-                throw new Error('peterparker option not found in test data');
-            }
-            // cspell:disable-next-line
-            expect(matchesSearchTerms(peterOption, ['peterparker'])).toBe(true);
+            expect(matchesSearchTerms(getSpiderManOption(), ['peterparker'])).toBe(true);
         });
 
         it('should not match when search terms are not found', () => {
-            expect(matchesSearchTerms(spiderManOption, ['nonexistent'])).toBe(false);
+            expect(matchesSearchTerms(getSpiderManOption(), ['nonexistent'])).toBe(false);
         });
 
         it('should require all search terms to match', () => {
-            expect(matchesSearchTerms(spiderManOption, ['spider', 'man'])).toBe(true);
-            expect(matchesSearchTerms(spiderManOption, ['spider', 'nonexistent'])).toBe(false);
+            expect(matchesSearchTerms(getSpiderManOption(), ['spider', 'man'])).toBe(true);
+            expect(matchesSearchTerms(getSpiderManOption(), ['spider', 'nonexistent'])).toBe(false);
         });
 
         it('should match against extraSearchTerms when provided', () => {
-            expect(matchesSearchTerms(currentUserOpt, ['you'], ['You', 'me'])).toBe(true);
-            expect(matchesSearchTerms(currentUserOpt, ['me'], ['You', 'me'])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['you'], ['You', 'me'])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['me'], ['You', 'me'])).toBe(true);
         });
 
         it('should not match unrelated search terms even with extraSearchTerms', () => {
-            expect(matchesSearchTerms(currentUserOpt, ['nonexistent'], ['You', 'me'])).toBe(false);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['nonexistent'], ['You', 'me'])).toBe(false);
         });
 
         it('should match against option text without needing extraSearchTerms', () => {
-            expect(matchesSearchTerms(currentUserOpt, ['iron'])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['iron'])).toBe(true);
         });
 
         it('should match with empty search terms', () => {
-            expect(matchesSearchTerms(currentUserOpt, [])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), [])).toBe(true);
         });
     });
 
