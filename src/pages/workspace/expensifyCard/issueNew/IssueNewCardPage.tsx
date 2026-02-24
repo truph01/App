@@ -1,6 +1,6 @@
-import {isDelegateAccessRestrictedSelector} from '@selectors/Account';
 import React, {useEffect, useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import {useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import DelegateNoAccessWrapper from '@components/DelegateNoAccessWrapper';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useOnyx from '@hooks/useOnyx';
@@ -50,7 +50,7 @@ function IssueNewCardPage({policy, route}: IssueNewCardPageProps) {
     const [issueNewCard] = useOnyx(`${ONYXKEYS.COLLECTION.ISSUE_NEW_EXPENSIFY_CARD}${policyID}`, {initWithStoredValues: false});
     const {currentStep} = issueNewCard ?? {};
     const backTo = route?.params?.backTo;
-    const [isDelegateAccessRestricted] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isDelegateAccessRestrictedSelector});
+    const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {isBetaEnabled} = usePermissions();
     const isSingleUseEnabled = isBetaEnabled(CONST.BETAS.SINGLE_USE_AND_EXPIRE_BY_CARDS);
 
