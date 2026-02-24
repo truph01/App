@@ -12,26 +12,24 @@ const ILLUSTRATION_SIZE = 68;
 
 const MSG = 'homePage.forYouSection.emptyStateMessages' as const;
 
-// ── Edit this table to update copy ──────────────────────────────────
-// [Illustration,      title,                description              ]
-const ENTRY_DATA: Array<[IllustrationName, string, string]> = [
-    ['ThumbsUpStars', 'youreDone', 'thumbsUpKeepEyeOut'],
-    ['SmallRocket', 'allCaughtUpTitle', 'todosWillLaunch'],
-    ['CowboyHat', 'youreDone', 'tasksWrangledKeepEyeOut'],
-    ['Trophy1', 'nothingToShow', 'youDidItKeepEyeOut'],
-    ['PalmTree', 'allCaughtUpTitle', 'relaxKeepEyeOut'],
-    ['FishbowlBlue', 'youreDone', 'floatTodosHere'],
-    ['Target', 'allCaughtUpTitle', 'stayOnTargetKeepEyeOut'],
-    ['Chair', 'nothingToShow', 'relaxTodosHere'],
-    ['Broom', 'youreDone', 'tasksCleanKeepEyeOut'],
-    ['House', 'allCaughtUpTitle', 'todosAppearHome'],
-    ['ConciergeBot', 'nothingToShow', 'beepBoopKeepEyeOut'],
-    ['CheckboxText', 'allCaughtUpTitle', 'checkOffTodosHere'],
-    ['Flash', 'youreDone', 'zapTodosHere'],
-    ['Sunglasses', 'nothingToShow', 'chillKeepEyeOut'],
-    ['F1Flags', 'allCaughtUpTitle', 'finishedKeepEyeOut'],
+const ILLUSTRATIONS: IllustrationName[] = [
+    'ThumbsUpStars',
+    'SmallRocket',
+    'CowboyHat',
+    'Trophy1',
+    'PalmTree',
+    'FishbowlBlue',
+    'Target',
+    'Chair',
+    'Broom',
+    'House',
+    'ConciergeBot',
+    'CheckboxText',
+    'Flash',
+    'Sunglasses',
+    'F1Flags',
+    'Fireworks',
 ];
-// ────────────────────────────────────────────────────────────────────
 
 type EmptyStateConfig = {
     titleKey: TranslationPaths;
@@ -39,10 +37,12 @@ type EmptyStateConfig = {
     illustrationName: IllustrationName;
 };
 
-const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ENTRY_DATA.map(([illustrationName, title, description]) => ({
-    titleKey: `${MSG}.${title}` as TranslationPaths,
-    descriptionKey: `${MSG}.${description}` as TranslationPaths,
-    illustrationName,
+const lcFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+
+const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ILLUSTRATIONS.map((name) => ({
+    titleKey: `${MSG}.${lcFirst(name)}Title` as TranslationPaths,
+    descriptionKey: `${MSG}.${lcFirst(name)}Description` as TranslationPaths,
+    illustrationName: name,
 }));
 
 const ILLUSTRATION_NAMES = EMPTY_STATE_CONFIGS.map((c) => c.illustrationName);
