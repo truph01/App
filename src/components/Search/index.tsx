@@ -1168,6 +1168,12 @@ function Search({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [shouldShowLoadingState]);
 
+    useEffect(() => {
+        return () => {
+            cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE);
+        };
+    }, []);
+
     const onLayoutSkeleton = useCallback(() => {
         endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
     }, []);
