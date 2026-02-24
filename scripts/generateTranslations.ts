@@ -144,6 +144,13 @@ class TranslationGenerator {
     private readonly prNumber: number;
 
     /**
+     * The git ref (SHA or branch) that the diff was computed against.
+     * Used by extractRemovedPaths to get the old version of en.ts at the correct commit.
+     * Set in buildPathsFromGitDiff: merge-base SHA (local) or PR base SHA (CI).
+     */
+    private diffBase: string;
+
+    /**
      * CLI instance for user prompts.
      */
     /* eslint-disable @typescript-eslint/naming-convention */
@@ -223,7 +230,7 @@ class TranslationGenerator {
                     default: 0,
                     parse: (val: string): number => {
                         const parsed = parseInt(val, 10);
-                        if (Number.isNaN(parsed) || parsed < 0) {
+                        if (Number.isNaN(parsed) || parsed <= 0) {
                             throw new Error(`Invalid PR number: "${val}". Please provide a valid positive integer.`);
                         }
                         return parsed;
@@ -257,6 +264,7 @@ class TranslationGenerator {
         this.targetLanguages = this.cli.namedArgs.locales;
         this.compareRef = this.cli.namedArgs['compare-ref'];
         this.prNumber = this.cli.namedArgs['pr-number'];
+        this.diffBase = this.compareRef;
         this.pathsToAdd = new Set<TranslationPaths>();
         this.pathsToModify = this.cli.namedArgs.paths ?? new Set<TranslationPaths>();
         this.pathsToRemove = new Set<TranslationPaths>();
@@ -894,6 +902,14 @@ class TranslationGenerator {
                     if (this.verbose) {
                         console.log(`🌐 Using GitHub API diff for PR #${this.prNumber}`);
                     }
+
+                    // Get the PR base SHA so extractRemovedPaths can fetch the old en.ts at the correct commit
+                    this.diffBase = await GitHubUtils.getPullRequestBaseSHA(this.prNumber);
+
+                    if (this.verbose) {
+                        console.log(`📌 PR base SHA: ${this.diffBase.slice(0, 8)}`);
+                    }
+
                     const prDiff = await GitHubUtils.getPullRequestDiff(this.prNumber);
                     const parsedDiff = Git.parseDiff(prDiff);
 
@@ -919,6 +935,7 @@ class TranslationGenerator {
                     }
 
                     if (this.compareRef) {
+                        this.diffBase = this.compareRef;
                         diffResult = Git.diff(this.compareRef, undefined, relativePath);
                     } else {
                         throw new Error('GitHub API failed and no --compare-ref provided for fallback');
@@ -932,12 +949,12 @@ class TranslationGenerator {
 
                 // This finds the common ancestor between compare-ref and HEAD,
                 // ensuring we only see changes made in the current branch
-                let diffBase = this.compareRef;
+                this.diffBase = this.compareRef;
                 try {
                     const mergeBaseResult = execFileSync('git', ['merge-base', this.compareRef, 'HEAD'], {encoding: 'utf8'});
                     const mergeBase = mergeBaseResult.trim();
                     if (mergeBase && TranslationGenerator.GIT_SHA_REGEX.test(mergeBase)) {
-                        diffBase = mergeBase;
+                        this.diffBase = mergeBase;
                         if (this.verbose) {
                             console.log(`🔀 Using merge-base ${mergeBase.slice(0, 8)} (common ancestor of ${this.compareRef} and HEAD)`);
                         }
@@ -948,7 +965,7 @@ class TranslationGenerator {
                         console.log(`⚠️ Could not calculate merge-base (${TranslationGenerator.getErrorMessage(mergeBaseError)}), using ${this.compareRef} directly`);
                     }
                 }
-                diffResult = Git.diff(diffBase, undefined, relativePath);
+                diffResult = Git.diff(this.diffBase, undefined, relativePath);
             }
 
             if (!diffResult.hasChanges) {
@@ -976,7 +993,7 @@ class TranslationGenerator {
 
             // For removed paths, we need to traverse the old version of en.ts
             if (changedLines.removedLines.size > 0) {
-                this.extractRemovedPaths(changedLines.removedLines);
+                await this.extractRemovedPaths(changedLines.removedLines, relativePath);
             }
 
             // Handle the case where the same path has both additions and removals (treat as modified, not deleted)
@@ -1174,12 +1191,19 @@ class TranslationGenerator {
 
     /**
      * Extract removed paths by traversing the old version of en.ts.
+     * Uses diffBase (merge-base SHA or PR base SHA) to get the file at the correct commit
+     * that the diff was computed against, ensuring line numbers align.
      */
-    private extractRemovedPaths(removedLines: Set<number>): void {
+    private async extractRemovedPaths(removedLines: Set<number>, relativePath: string): Promise<void> {
         try {
-            // Get the old version of en.ts from the compare ref
-            const relativePath = path.relative(process.cwd(), this.sourceFile.fileName);
-            const oldEnContent = Git.show(this.compareRef, relativePath);
+            let oldEnContent: string;
+            if (this.prNumber) {
+                // CI mode: Use GitHub API to get file at the PR base SHA (may not be available locally in shallow clone)
+                oldEnContent = await GitHubUtils.getFileContents(relativePath, this.diffBase);
+            } else {
+                // Local mode: Use git show with the merge-base SHA
+                oldEnContent = Git.show(this.diffBase, relativePath);
+            }
 
             const oldSourceFile = ts.createSourceFile(this.sourceFile.fileName, oldEnContent, ts.ScriptTarget.Latest, true);
             const oldTranslationsNode = this.findTranslationsNode(oldSourceFile);

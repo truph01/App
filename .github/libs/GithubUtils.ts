@@ -493,6 +493,16 @@ class GithubUtils {
             .then(({data: pullRequestComment}) => pullRequestComment.body);
     }
 
+    static getPullRequestBaseSHA(pullRequestNumber: number): Promise<string> {
+        return this.octokit.pulls
+            .get({
+                owner: CONST.GITHUB_OWNER,
+                repo: CONST.APP_REPO,
+                pull_number: pullRequestNumber,
+            })
+            .then(({data: pullRequest}) => pullRequest.base.sha);
+    }
+
     static getAllReviewComments(pullRequestNumber: number): Promise<string[]> {
         return this.paginate(
             this.octokit.pulls.listReviews,
