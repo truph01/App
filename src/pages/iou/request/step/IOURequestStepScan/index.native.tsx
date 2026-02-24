@@ -301,7 +301,7 @@ function IOURequestStepScan({
     const capturePhoto = useCallback(() => {
         if (!isMultiScanEnabled) {
             startSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION, {
-                name: 'shutter-to-confirmation',
+                name: CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION,
                 op: CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION,
             });
         }
