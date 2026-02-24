@@ -685,7 +685,7 @@ Dynamic routes allow the same screen to be reused across multiple flows while pr
 
 A dynamic route is a URL suffix (e.g. `verify-account`) that can be appended to any base path the user is currently on. The resulting URL is `{currentPath}/{suffix}` (e.g. `/settings/wallet/verify-account`).
 
-- **Static route:** A fixed path like `/settings/wallet/add-bank-account/verify-account`. The screen has one URL and typically one back destination.
+- **Static route:** A fixed path like `/workspaces/:policyID/members`. The screen has one URL and typically one back destination.
 - **Dynamic route:** The same screen and suffix are reused across many base paths. The "back" destination is derived from the current URL (by removing the suffix), not from a `backTo` param. Dynamic routes guarantee deterministic back navigation by removing the suffix from the current path and preserving query parameters.
 
 
