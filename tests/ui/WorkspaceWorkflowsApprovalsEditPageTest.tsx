@@ -9,6 +9,7 @@ import {setApprovalWorkflow} from '@userActions/Workflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
+import type {Member} from '@src/types/onyx/ApprovalWorkflow';
 import type {PersonalDetailsList} from '@src/types/onyx/PersonalDetails';
 import type {PolicyEmployeeList} from '@src/types/onyx/PolicyEmployee';
 import {buildPersonalDetails} from '../utils/TestHelper';
@@ -16,6 +17,7 @@ import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct'
 
 const POLICY_ID = 'workflow-approvals-edit-test-policy';
 const ALICE_EMAIL = 'alice@example.com';
+const ALICE_ACCOUNT_ID = 1;
 
 jest.mock('@react-navigation/native', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
@@ -61,7 +63,7 @@ function buildPolicy(): Policy {
 
 function buildPersonalDetailsList(): PersonalDetailsList {
     return {
-        1: buildPersonalDetails(ALICE_EMAIL, 1, 'alice'),
+        [ALICE_ACCOUNT_ID]: buildPersonalDetails(ALICE_EMAIL, ALICE_ACCOUNT_ID, 'alice'),
     };
 }
 
@@ -101,7 +103,7 @@ describe('WorkspaceWorkflowsApprovalsEditPage', () => {
 
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
             await Onyx.set(ONYXKEYS.PERSONAL_DETAILS_LIST, personalDetails);
-            await Onyx.merge(ONYXKEYS.SESSION, {email: ALICE_EMAIL, accountID: 1});
+            await Onyx.merge(ONYXKEYS.SESSION, {email: ALICE_EMAIL, accountID: ALICE_ACCOUNT_ID});
             await waitForBatchedUpdatesWithAct();
         });
     });
@@ -119,12 +121,14 @@ describe('WorkspaceWorkflowsApprovalsEditPage', () => {
         await waitForBatchedUpdatesWithAct();
 
         expect(setApprovalWorkflow).toHaveBeenCalled();
-        const callArg = (setApprovalWorkflow as jest.Mock).mock.calls[0][0];
-        const availableMembers = callArg.availableMembers ?? [];
-        const emails = availableMembers.map((m: {email: string}) => m.email);
+        const mockCalls = (setApprovalWorkflow as jest.Mock).mock.calls;
+        const firstCall = mockCalls.at(0);
+        const callArg = firstCall?.at(0) as {availableMembers?: Member[]} | undefined;
+        const availableMembers: Member[] = callArg?.availableMembers ?? [];
+        const emails = availableMembers.map((m) => m.email);
         const uniqueEmails = [...new Set(emails)];
 
-        expect(emails.length).toBe(uniqueEmails.length);
+        expect(emails).toHaveLength(uniqueEmails.length);
         expect(emails).toContain(ALICE_EMAIL);
     });
 });

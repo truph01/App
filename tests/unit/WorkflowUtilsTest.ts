@@ -561,7 +561,7 @@ describe('WorkflowUtils', () => {
             const result = mergeWorkflowMembersWithAvailableMembers(workflowMembers, allAvailableMembers);
 
             expect(result).toHaveLength(1);
-            expect(result[0].email).toBe('1@example.com');
+            expect(result.at(0)?.email).toBe('1@example.com');
         });
 
         it('Should preserve workflow member order and append additional members', () => {
