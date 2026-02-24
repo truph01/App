@@ -212,7 +212,7 @@ function Search({
     searchRequestResponseStatusCode,
     onDEWModalOpen,
 }: SearchProps) {
-    const {type, status, sortBy, sortOrder, hash, similarSearchHash, groupBy, view} = queryJSON;
+    const {type, status, sortBy, sortOrder, hash, recentSearchHash, similarSearchHash, groupBy, view} = queryJSON;
 
     const {isOffline} = useNetwork();
     const prevIsOffline = usePrevious(isOffline);
@@ -276,7 +276,7 @@ function Search({
 
     const {defaultCardFeed} = useCardFeedsForDisplay();
     const suggestedSearches = useMemo(() => getSuggestedSearches(accountID, defaultCardFeed?.id), [defaultCardFeed?.id, accountID]);
-    const searchKey = useMemo(() => Object.values(suggestedSearches).find((search) => search.similarSearchHash === similarSearchHash)?.key, [suggestedSearches, similarSearchHash]);
+    const searchKey = useMemo(() => Object.values(suggestedSearches).find((search) => search.recentSearchHash === recentSearchHash)?.key, [suggestedSearches, recentSearchHash]);
     const searchDataType = useMemo(() => (shouldUseLiveData ? CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT : searchResults?.search?.type), [shouldUseLiveData, searchResults?.search?.type]);
     const shouldCalculateTotals = useSearchShouldCalculateTotals(searchKey, hash, offset === 0);
 
@@ -307,9 +307,9 @@ function Search({
 
     const clearTransactionsAndSetHashAndKey = useCallback(() => {
         clearSelectedTransactions(hash);
-        setCurrentSearchHashAndKey(hash, searchKey);
+        setCurrentSearchHashAndKey(hash, recentSearchHash, searchKey);
         setCurrentSearchQueryJSON(queryJSON);
-    }, [hash, searchKey, clearSelectedTransactions, setCurrentSearchHashAndKey, setCurrentSearchQueryJSON, queryJSON]);
+    }, [hash, recentSearchHash, searchKey, clearSelectedTransactions, setCurrentSearchHashAndKey, setCurrentSearchQueryJSON, queryJSON]);
 
     useFocusEffect(clearTransactionsAndSetHashAndKey);
 
