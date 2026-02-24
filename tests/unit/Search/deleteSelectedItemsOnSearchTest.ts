@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import Onyx from 'react-native-onyx';
 import type {SelectedTransactionInfo} from '@components/Search/types';
-import {write} from '@libs/API';
 import {bulkDeleteReports} from '@libs/actions/Search';
+import {write} from '@libs/API';
 import {deleteAppReport} from '@userActions/Report';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import {WRITE_COMMANDS} from '@src/libs/API/types';
+import ONYXKEYS from '@src/ONYXKEYS';
 import {createRandomReport} from '../../utils/collections/reports';
 
 jest.mock('@userActions/Report', () => ({
