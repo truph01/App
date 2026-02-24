@@ -561,7 +561,7 @@ jobs:
           path: ./
 
       - name: Extract web build
-        run: tar -xzvf webBuild.tar.gz
+        run: tar -xzvf "${{ needs.webBuild.outputs.TAR_FILENAME }}"
 
       - name: Download storybook docs artifact
         continue-on-error: true
