@@ -1283,6 +1283,7 @@ function SearchPage({route}: SearchPageProps) {
                         onSortPressedCallback={onSortPressedCallback}
                         scrollHandler={scrollHandler}
                         initScanRequest={initScanRequest}
+                        isDragDisabled={isDragDisabled}
                         PDFValidationComponent={PDFValidationComponent}
                         ErrorModal={ErrorModal}
                         shouldShowFooter={shouldShowFooter}
