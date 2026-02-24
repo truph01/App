@@ -101,7 +101,7 @@ function SuggestionMention({
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Megaphone', 'FallbackAvatar']);
 
     const {currentReportID} = useCurrentReportIDState();
-    const [currentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${currentReportID}`, {canBeMissing: true});
+    const [currentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${currentReportID}`);
 
     // Smaller weight means higher order in suggestion list
     const getPersonalDetailsWeight = useCallback(
