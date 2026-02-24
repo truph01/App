@@ -4,7 +4,7 @@ import type {OnyxCollection} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import {FallbackAvatar} from '@components/Icon/Expensicons';
 import DateUtils from '@libs/DateUtils';
-import {canCreateOptimisticPersonalDetailOption, createOption, createOptionList, filterOption, matchesSearchTerms, getValidOptions} from '@libs/PersonalDetailOptionsListUtils';
+import {canCreateOptimisticPersonalDetailOption, createOption, createOptionList, filterOption, getValidOptions, matchesSearchTerms} from '@libs/PersonalDetailOptionsListUtils';
 import type {OptionData} from '@libs/PersonalDetailOptionsListUtils/types';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
@@ -779,46 +779,43 @@ describe('PersonalDetailOptionsListUtils', () => {
     });
 
     describe('matchesSearchTerms', () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const getSpiderManOption = () => OPTIONS.options.find((o) => o.text === 'Spider-Man')!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const getCurrentUserOption = () => OPTIONS.currentUserOption!;
+
         it('should match when search terms are found in option text', () => {
-            const option = OPTIONS.options.find((o) => o.text === 'Spider-Man') as OptionData;
-            expect(matchesSearchTerms(option, ['spider'])).toBe(true);
+            expect(matchesSearchTerms(getSpiderManOption(), ['spider'])).toBe(true);
         });
 
         it('should match when search terms are found in option login', () => {
-            const option = OPTIONS.options.find((o) => o.login === 'peterparker@expensify.com') as OptionData;
-            expect(matchesSearchTerms(option, ['peterparker'])).toBe(true);
+            expect(matchesSearchTerms(getSpiderManOption(), ['peterparker'])).toBe(true);
         });
 
         it('should not match when search terms are not found', () => {
-            const option = OPTIONS.options.find((o) => o.text === 'Spider-Man') as OptionData;
-            expect(matchesSearchTerms(option, ['nonexistent'])).toBe(false);
+            expect(matchesSearchTerms(getSpiderManOption(), ['nonexistent'])).toBe(false);
         });
 
         it('should require all search terms to match', () => {
-            const option = OPTIONS.options.find((o) => o.text === 'Spider-Man') as OptionData;
-            expect(matchesSearchTerms(option, ['spider', 'man'])).toBe(true);
-            expect(matchesSearchTerms(option, ['spider', 'nonexistent'])).toBe(false);
+            expect(matchesSearchTerms(getSpiderManOption(), ['spider', 'man'])).toBe(true);
+            expect(matchesSearchTerms(getSpiderManOption(), ['spider', 'nonexistent'])).toBe(false);
         });
 
         it('should match against extraSearchTerms when provided', () => {
-            const option = OPTIONS.currentUserOption as OptionData;
-            expect(matchesSearchTerms(option, ['you'], ['You', 'me'])).toBe(true);
-            expect(matchesSearchTerms(option, ['me'], ['You', 'me'])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['you'], ['You', 'me'])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['me'], ['You', 'me'])).toBe(true);
         });
 
         it('should not match unrelated search terms even with extraSearchTerms', () => {
-            const option = OPTIONS.currentUserOption as OptionData;
-            expect(matchesSearchTerms(option, ['nonexistent'], ['You', 'me'])).toBe(false);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['nonexistent'], ['You', 'me'])).toBe(false);
         });
 
         it('should match against option text without needing extraSearchTerms', () => {
-            const option = OPTIONS.currentUserOption as OptionData;
-            expect(matchesSearchTerms(option, ['iron'])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), ['iron'])).toBe(true);
         });
 
         it('should match with empty search terms', () => {
-            const option = OPTIONS.currentUserOption as OptionData;
-            expect(matchesSearchTerms(option, [])).toBe(true);
+            expect(matchesSearchTerms(getCurrentUserOption(), [])).toBe(true);
         });
     });
 
