@@ -1443,7 +1443,7 @@ function MoneyReportHeader({
                     return;
                 }
 
-                initSplitExpense(currentTransaction);
+                initSplitExpense(currentTransaction, policy);
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.MERGE]: {
