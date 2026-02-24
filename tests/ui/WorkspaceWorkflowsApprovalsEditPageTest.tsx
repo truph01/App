@@ -7,15 +7,14 @@
  * (from convertPolicyEmployeesToApprovalWorkflows) now includes all workspace members.
  * This test verifies the page uses mergeWorkflowMembersWithAvailableMembers.
  */
-
 import {act, render} from '@testing-library/react-native';
 import React from 'react';
 import Onyx from 'react-native-onyx';
 import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
-import * as Workflow from '@userActions/Workflow';
 import WorkspaceWorkflowsApprovalsEditPage from '@pages/workspace/workflows/approvals/WorkspaceWorkflowsApprovalsEditPage';
+import * as Workflow from '@userActions/Workflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
