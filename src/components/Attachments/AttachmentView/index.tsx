@@ -133,7 +133,7 @@ function AttachmentView({
     transaction: transactionProp,
 }: AttachmentViewProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Gallery']);
-    const [transactionFromOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`, {canBeMissing: true});
+    const [transactionFromOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
     const transaction = transactionProp ?? transactionFromOnyx;
     const session = useSession();
     const encryptedAuthToken = session?.encryptedAuthToken ?? '';
