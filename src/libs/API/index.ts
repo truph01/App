@@ -283,7 +283,7 @@ function paginate<TRequestType extends typeof CONST.API_REQUEST_TYPE.READ, TComm
     apiCommandParameters: ApiRequestCommandParameters[TCommand],
     onyxData: OnyxData<TKey>,
     config: PaginationConfig,
-): Promise<Response<TKey> | void>;
+): void;
 function paginate<TRequestType extends typeof CONST.API_REQUEST_TYPE.WRITE, TCommand extends CommandOfType<TRequestType>, TKey extends OnyxKey>(
     type: TRequestType,
     command: TCommand,
@@ -291,7 +291,7 @@ function paginate<TRequestType extends typeof CONST.API_REQUEST_TYPE.WRITE, TCom
     onyxData: OnyxData<TKey>,
     config: PaginationConfig,
     conflictResolver?: RequestConflictResolver<TKey>,
-): Promise<Response<TKey> | void>;
+): void;
 function paginate<TRequestType extends ApiRequestType, TCommand extends CommandOfType<TRequestType>, TKey extends OnyxKey>(
     type: TRequestType,
     command: TCommand,
@@ -299,7 +299,7 @@ function paginate<TRequestType extends ApiRequestType, TCommand extends CommandO
     onyxData: OnyxData<TKey>,
     config: PaginationConfig,
     conflictResolver: RequestConflictResolver<TKey> = {},
-): Promise<Response<TKey> | void> {
+): Promise<Response<TKey> | void> | void {
     Log.info('[API] Called API.paginate', false, {command, ...apiCommandParameters});
     const request: PaginatedRequest<TKey> = {
         ...prepareRequest(command, type, apiCommandParameters, onyxData, conflictResolver),

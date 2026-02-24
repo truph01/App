@@ -1,11 +1,10 @@
 import {useIsFocused} from '@react-navigation/native';
-import {useCallback, useMemo, useRef} from 'react';
+import {useCallback, useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {getNewerActions, getOlderActions} from '@userActions/Report';
 import CONST from '@src/CONST';
-import type {Report, ReportAction, Response} from '@src/types/onyx';
+import type {Report, ReportAction} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import type ONYXKEYS from '@src/ONYXKEYS';
 import useNetwork from './useNetwork';
 
 type UseLoadReportActionsArguments = {
@@ -33,9 +32,6 @@ type UseLoadReportActionsArguments = {
  * Used in the report displaying components
  */
 function useLoadReportActions({reportID, reportActions, allReportActionIDs, transactionThreadReport, hasOlderActions, hasNewerActions}: UseLoadReportActionsArguments) {
-    const isLoadingNewerChats = useRef(false);
-    const isLoadingOlderChats = useRef(false);
-
     const {isOffline} = useNetwork();
     const isFocused = useIsFocused();
     const newestReportAction = useMemo(() => reportActions?.at(0), [reportActions]);
@@ -89,7 +85,7 @@ function useLoadReportActions({reportID, reportActions, allReportActionIDs, tran
     const loadOlderChats = useCallback(
         (force = false) => {
             // Only fetch more if we are neither already fetching (so that we don't initiate duplicate requests) nor offline.
-            if (!force && (isOffline || isLoadingOlderChats.current)) {
+            if (!force && isOffline) {
                 return;
             }
 
@@ -98,19 +94,12 @@ function useLoadReportActions({reportID, reportActions, allReportActionIDs, tran
                 return;
             }
 
-            isLoadingOlderChats.current = true;
-            const getOlderActionsPromises: Array<Promise<Response<typeof ONYXKEYS.COLLECTION.REPORT_METADATA> | void>> = [];
-
             if (isTransactionThreadReport) {
-                getOlderActionsPromises.push(getOlderActions(reportID, currentReportOldest?.reportActionID));
-                getOlderActionsPromises.push(getOlderActions(transactionThreadReport?.reportID, transactionThreadOldest?.reportActionID));
+                getOlderActions(reportID, currentReportOldest?.reportActionID);
+                getOlderActions(transactionThreadReport?.reportID, transactionThreadOldest?.reportActionID);
             } else {
-                getOlderActionsPromises.push(getOlderActions(reportID, currentReportOldest?.reportActionID));
+                getOlderActions(reportID, currentReportOldest?.reportActionID);
             }
-
-            Promise.all(getOlderActionsPromises).finally(() => {
-                isLoadingOlderChats.current = false;
-            });
         },
         [
             currentReportOldest?.reportActionID,
@@ -132,7 +121,6 @@ function useLoadReportActions({reportID, reportActions, allReportActionIDs, tran
                     !newestReportAction ||
                     !hasNewerActions ||
                     isOffline ||
-                    isLoadingNewerChats.current ||
                     // If there was an error only try again once on initial mount. We should also still load
                     // more in case we have cached messages.
                     newestReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
@@ -140,19 +128,12 @@ function useLoadReportActions({reportID, reportActions, allReportActionIDs, tran
                 return;
             }
 
-            isLoadingNewerChats.current = true;
-            const getNewerActionsPromises: Array<Promise<Response<typeof ONYXKEYS.COLLECTION.REPORT_METADATA> | void>> = [];
-
             if (!isEmptyObject(transactionThreadReport)) {
-                getNewerActionsPromises.push(getNewerActions(reportID, currentReportNewest?.reportActionID));
-                getNewerActionsPromises.push(getNewerActions(transactionThreadReport.reportID, transactionThreadNewest?.reportActionID));
+                getNewerActions(reportID, currentReportNewest?.reportActionID);
+                getNewerActions(transactionThreadReport.reportID, transactionThreadNewest?.reportActionID);
             } else if (newestReportAction) {
-                getNewerActionsPromises.push(getNewerActions(reportID, newestReportAction.reportActionID));
+                getNewerActions(reportID, newestReportAction.reportActionID);
             }
-
-            Promise.all(getNewerActionsPromises).finally(() => {
-                isLoadingNewerChats.current = false;
-            });
         },
         [currentReportNewest?.reportActionID, hasNewerActions, isFocused, isOffline, newestReportAction, reportID, transactionThreadNewest?.reportActionID, transactionThreadReport],
     );

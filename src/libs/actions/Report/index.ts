@@ -1831,8 +1831,8 @@ function getOlderActions(reportID: string | undefined, reportActionID: string | 
     };
 
     return API.paginate(
-        CONST.API_REQUEST_TYPE.MAKE_REQUEST_WITH_SIDE_EFFECTS,
-        SIDE_EFFECT_REQUEST_COMMANDS.GET_OLDER_ACTIONS,
+        CONST.API_REQUEST_TYPE.READ,
+        READ_COMMANDS.GET_OLDER_ACTIONS,
         parameters,
         {optimisticData, successData, failureData},
         {
@@ -1848,7 +1848,7 @@ function getOlderActions(reportID: string | undefined, reportActionID: string | 
  */
 function getNewerActions(reportID: string | undefined, reportActionID: string | undefined) {
     if (!reportID || !reportActionID) {
-        return Promise.resolve();
+        return;
     }
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_METADATA>> = [
@@ -1889,8 +1889,8 @@ function getNewerActions(reportID: string | undefined, reportActionID: string | 
     };
 
     return API.paginate(
-        CONST.API_REQUEST_TYPE.MAKE_REQUEST_WITH_SIDE_EFFECTS,
-        SIDE_EFFECT_REQUEST_COMMANDS.GET_NEWER_ACTIONS,
+        CONST.API_REQUEST_TYPE.READ,
+        READ_COMMANDS.GET_NEWER_ACTIONS,
         parameters,
         {optimisticData, successData, failureData},
         {
