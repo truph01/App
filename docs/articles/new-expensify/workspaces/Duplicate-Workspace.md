@@ -38,6 +38,10 @@ Follow these steps to create a new workspace based on an existing one:
 5. If you choose to copy Members, review and confirm your selections before proceeding.  
 6. Click **Continue** to create your new workspace.
 
+![Click Duplicate Workspace]({{site.url}}/assets/images/ExpensifyHelp-DuplicateWorkspace_01.png){:width="100%"}
+
+![Choose which data and settings to carry over]({{site.url}}/assets/images/ExpensifyHelp-DuplicateWorkspace_02.png){:width="100%"}
+
 ---
 
 ## What happens after duplicating a workspace
