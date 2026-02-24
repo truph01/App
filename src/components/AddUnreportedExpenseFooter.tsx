@@ -44,12 +44,14 @@ function AddUnreportedExpenseFooter({selectedIds, report, reportToConfirm, repor
     const personalDetails = usePersonalDetails();
     const getSelectedTransactions = useCallback(
         (allTransactions: OnyxCollection<Transaction>) => {
-            const transactions = [...selectedIds]
-                .map((id) => allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${id}`])
-                .filter((transaction): transaction is NonNullable<typeof transaction> => transaction !== undefined);
-
-            return transactions.reduce<Record<string, Transaction>>((acc, transaction) => {
-                acc[transaction.transactionID] = transaction;
+            if (!allTransactions) {
+                return {};
+            }
+            return Array.from(selectedIds).reduce<Record<string, Transaction>>((acc, id) => {
+                const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${id}`];
+                if (transaction) {
+                    acc[transaction.transactionID] = transaction;
+                }
                 return acc;
             }, {});
         },
