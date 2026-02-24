@@ -9,7 +9,6 @@ import SafeString from '@src/utils/SafeString';
 import type {IOURequestType} from './actions/IOU';
 import {getCurrencyUnit} from './CurrencyUtils';
 import Navigation from './Navigation/Navigation';
-import Performance from './Performance';
 import {isPaidGroupPolicy} from './PolicyUtils';
 import {getOriginalMessage, isMoneyRequestAction} from './ReportActionsUtils';
 import {getReportTransactions} from './ReportUtils';
@@ -50,7 +49,6 @@ function navigateToStartMoneyRequestStep(requestType: IOURequestType, iouType: I
 }
 
 function navigateToParticipantPage(iouType: ValueOf<typeof CONST.IOU.TYPE>, transactionID: string, reportID: string) {
-    Performance.markStart(CONST.TIMING.OPEN_CREATE_EXPENSE_CONTACT);
     switch (iouType) {
         case CONST.IOU.TYPE.REQUEST:
             Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(CONST.IOU.TYPE.SUBMIT, transactionID, reportID));
