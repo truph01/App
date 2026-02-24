@@ -115,9 +115,13 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
             return clearApprovalWorkflow();
         }
 
+        // Deduplicate by email: current workflow members first, then defaultWorkflowMembers not already in workflow.
+        // Prevents duplicate keyForList (email) in Expenses From list which causes blank row when deselecting (#83251).
+        const memberEmails = new Set(currentApprovalWorkflow.members.map((m) => m.email));
+        const additionalMembers = defaultWorkflowMembers.filter((m) => !memberEmails.has(m.email));
         setApprovalWorkflow({
             ...currentApprovalWorkflow,
-            availableMembers: [...currentApprovalWorkflow.members, ...defaultWorkflowMembers],
+            availableMembers: [...currentApprovalWorkflow.members, ...additionalMembers],
             usedApproverEmails,
             action: CONST.APPROVAL_WORKFLOW.ACTION.EDIT,
             errors: null,
