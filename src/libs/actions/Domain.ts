@@ -1073,6 +1073,7 @@ function closeUserAccount(domainAccountID: number, domain: string, targetEmail: 
 
     const parameters: DeleteDomainMemberParams = {
         domain,
+        domainAccountID,
         targetEmail,
         overrideProcessingReports,
     };
