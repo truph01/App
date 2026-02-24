@@ -206,7 +206,9 @@ import {
     getCurrency,
     getDistanceInMeters,
     getMerchant,
+    getRateID,
     getUpdatedTransaction,
+    getWaypoints,
     hasAnyTransactionWithoutRTERViolation,
     hasDuplicateTransactions,
     hasSubmissionBlockingViolations,
@@ -6040,6 +6042,9 @@ type ConvertTrackedExpenseToRequestParams = {
         transactionThreadReportID?: string;
         distance?: number;
         isLinkedTrackedExpenseReportArchived: boolean | undefined;
+        waypoints?: string;
+        customUnitRateID?: string;
+        isDistance?: boolean;
     };
     chatParams: {
         reportID: string;
@@ -6076,6 +6081,9 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         attendees,
         transactionThreadReportID,
         isLinkedTrackedExpenseReportArchived,
+        waypoints,
+        customUnitRateID,
+        isDistance,
     } = transactionParams;
     const optimisticData: Array<OnyxUpdate<BuildOnyxDataForMoneyRequestKeys>> = [];
     const successData: Array<OnyxUpdate<BuildOnyxDataForMoneyRequestKeys>> = [];
@@ -6165,6 +6173,9 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         transactionThreadReportID,
         modifiedExpenseReportActionID: convertTrackedExpenseInformation.modifiedExpenseReportActionID,
         reportPreviewReportActionID: chatParams.reportPreviewReportActionID,
+        isDistance,
+        customUnitRateID,
+        waypoints,
     };
     API.write(WRITE_COMMANDS.CONVERT_TRACKED_EXPENSE_TO_REQUEST, parameters, {optimisticData, successData, failureData});
 }
@@ -6315,6 +6326,10 @@ function convertBulkTrackedExpensesToIOU({
             betas,
         });
 
+        const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
+        const transactionWaypoints = getWaypoints(transaction);
+        const sanitizedWaypointsForBulk = transactionWaypoints ? JSON.stringify(sanitizeRecentWaypoints(transactionWaypoints)) : undefined;
+
         const convertParams: ConvertTrackedExpenseToRequestParams = {
             payerParams: {
                 accountID: moneyRequestPayerAccountID,
@@ -6333,6 +6348,10 @@ function convertBulkTrackedExpensesToIOU({
                 linkedTrackedExpenseReportID: selfDMReportID,
                 transactionThreadReportID: moneyRequestTransactionThreadReportID,
                 isLinkedTrackedExpenseReportArchived: false,
+                isDistance: isDistanceRequest,
+                customUnitRateID: isDistanceRequest ? getRateID(transaction) : undefined,
+                waypoints: isDistanceRequest ? sanitizedWaypointsForBulk : undefined,
+                distance: isDistanceRequest ? (transaction.comment?.customUnit?.quantity ?? undefined) : undefined,
             },
             chatParams: {
                 reportID: moneyRequestChatReport.reportID,
@@ -6690,6 +6709,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
                           ...customUnitParams,
                       }
                     : undefined;
+            const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
             convertTrackedExpenseToRequest({
                 payerParams: {
                     accountID: payerAccountID,
@@ -6709,6 +6729,9 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
                     linkedTrackedExpenseReportID,
                     transactionThreadReportID: transactionThreadReportID ?? iouAction?.childReportID,
                     isLinkedTrackedExpenseReportArchived,
+                    isDistance: isDistanceRequest,
+                    customUnitRateID: isDistanceRequest ? customUnitRateID : undefined,
+                    waypoints: isDistanceRequest ? sanitizedWaypoints : undefined,
                 },
                 chatParams: {
                     reportID: chatReport.reportID,
