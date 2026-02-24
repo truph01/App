@@ -65,7 +65,7 @@ function WalletStatementPage({route}: WalletStatementPageProps) {
             const pdfURL = `${baseURL}secure?secureType=pdfreport&filename=${encodeURIComponent(fileName)}&downloadName=${encodeURIComponent(downloadFileName)}&email=${encodeURIComponent(
                 currentUserLogin,
             )}`;
-            fileDownload(translate, addEncryptedAuthTokenToURL(pdfURL, encryptedAuthToken), downloadFileName, '', isMobileSafari()).finally(() => setIsDownloading(false));
+            fileDownload(translate, addEncryptedAuthTokenToURL(pdfURL, encryptedAuthToken, true), downloadFileName, '', isMobileSafari()).finally(() => setIsDownloading(false));
             return;
         }
 
