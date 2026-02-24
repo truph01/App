@@ -28,6 +28,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearUserLocation, setUserLocation} from '@libs/actions/UserLocation';
 import {isMobile, isMobileWebKit} from '@libs/Browser';
+import {endSpan} from '@libs/telemetry/activeSpans';
 import {base64ToFile, isLocalFile as isLocalFileFileUtils} from '@libs/fileDownload/FileUtils';
 import getCurrentPosition from '@libs/getCurrentPosition';
 import Navigation from '@libs/Navigation/Navigation';
@@ -78,6 +79,12 @@ function IOURequestStepScan({
     const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan', 'Hand', 'ReceiptStack', 'Shutter']);
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash', 'ReplaceReceipt', 'SmartScan']);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
+
+    // End the create expense span on mount for web (no camera init tracking needed)
+    useEffect(() => {
+        endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+    }, []);
+
     const navigateBack = useCallback(() => {
         Navigation.goBack(backTo);
     }, [backTo]);
