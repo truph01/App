@@ -951,17 +951,17 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Corrigir',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Corrigir conexão do cartão corporativo ${feedName}` : 'Corrigir conexão do cartão corporativo'),
-                defaultSubtitle: 'Área de trabalho > Cartões corporativos',
+                defaultSubtitle: 'Espaço de trabalho',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Cartões corporativos`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Corrigir conexão com ${integrationName}`,
-                defaultSubtitle: 'Espaço de trabalho > Contabilidade',
+                defaultSubtitle: 'Espaço de trabalho',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Contabilidade`,
             },
             fixPersonalCardConnection: {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `Corrigir conexão do cartão pessoal ${cardName}` : 'Corrigir conexão do cartão pessoal'),
-                subtitle: 'Carteira > Cartões atribuídos',
+                subtitle: 'Carteira',
             },
         },
         assignedCards: 'Cartões atribuídos',

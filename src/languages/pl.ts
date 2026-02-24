@@ -953,17 +953,17 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: 'Napraw',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Napraw połączenie karty firmowej ${feedName}` : 'Napraw połączenie karty firmowej'),
-                defaultSubtitle: 'Workspace > Karty firmowe',
+                defaultSubtitle: 'Obszar roboczy',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Karty firmowe`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Napraw połączenie ${integrationName}`,
-                defaultSubtitle: 'Przestrzeń robocza > Księgowość',
+                defaultSubtitle: 'Obszar roboczy',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > Księgowość`,
             },
             fixPersonalCardConnection: {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `Napraw połączenie z prywatną kartą ${cardName}` : 'Napraw połączenie karty prywatnej'),
-                subtitle: 'Portfel > Przypisane karty',
+                subtitle: 'Portfel',
             },
         },
         assignedCards: 'Przypisane karty',

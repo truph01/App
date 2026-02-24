@@ -948,18 +948,15 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: '修正',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `${feedName} 会社カード接続を修正` : '法人クレジットカードの接続を修正'),
-                defaultSubtitle: 'ワークスペース > 会社カード',
+                defaultSubtitle: 'ワークスペース',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会社カード`,
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `${integrationName} 接続を修正`,
-                defaultSubtitle: 'ワークスペース > 会計',
+                defaultSubtitle: 'ワークスペース',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会計`,
             },
-            fixPersonalCardConnection: {
-                title: ({cardName}: {cardName?: string}) => (cardName ? `${cardName}個人カードの接続を修正` : '個人カードの連携を修正'),
-                subtitle: 'ウォレット > 割り当てられたカード',
-            },
+            fixPersonalCardConnection: {title: ({cardName}: {cardName?: string}) => (cardName ? `${cardName}個人カードの接続を修正` : '個人カードの連携を修正'), subtitle: 'ウォレット'},
         },
         assignedCards: '割り当て済みカード',
         assignedCardsRemaining: ({amount}: {amount: string}) => `残額：${amount}`,

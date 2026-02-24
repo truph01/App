@@ -938,13 +938,13 @@ const translations: TranslationDeepObject<typeof en> = {
             ctaFix: '修复',
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `修复 ${feedName} 公司卡连接` : '修复公司卡连接'),
-                defaultSubtitle: '工作区 > 公司卡片',
+                defaultSubtitle: '工作区',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 公司卡片`,
             },
-            fixPersonalCardConnection: {title: ({cardName}: {cardName?: string}) => (cardName ? `修复 ${cardName} 个人卡连接` : '修复个人银行卡连接'), subtitle: '钱包 > 已分配的卡片'},
+            fixPersonalCardConnection: {title: ({cardName}: {cardName?: string}) => (cardName ? `修复 ${cardName} 个人卡连接` : '修复个人银行卡连接'), subtitle: '钱包'},
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `修复 ${integrationName} 连接`,
-                defaultSubtitle: '工作区 > 会计',
+                defaultSubtitle: '工作区',
                 subtitle: ({policyName}: {policyName: string}) => `${policyName} > 会计`,
             },
         },
