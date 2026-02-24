@@ -24,7 +24,7 @@ type Props = WithPolicyProps;
 function WorkspaceOverviewClientIDPage({policy}: Props) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
 
     const submit = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CLIENT_ID_FORM>) => {
