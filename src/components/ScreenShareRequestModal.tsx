@@ -1,3 +1,4 @@
+import React from 'react';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {clearScreenShareRequest, joinScreenShare} from '@userActions/User';
