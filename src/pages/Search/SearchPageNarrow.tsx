@@ -1,13 +1,15 @@
 import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
+import type {ReactNode} from 'react';
 import {View} from 'react-native';
 import Animated, {clamp, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 import {scheduleOnRN} from 'react-native-worklets';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
-import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
+import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
+import DragAndDropProvider from '@components/DragAndDrop/Provider';
+import DropZoneUI from '@components/DropZone/DropZoneUI';
 import {useFullScreenBlockingViewActions} from '@components/FullScreenBlockingViewContextProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import type {PaymentMethodType} from '@components/KYCWall/types';
 import NavigationTabBar from '@components/Navigation/NavigationTabBar';
 import NAVIGATION_TABS from '@components/Navigation/NavigationTabBar/NAVIGATION_TABS';
 import TopBar from '@components/Navigation/TopBar';
@@ -18,14 +20,15 @@ import {useSearchContext} from '@components/Search/SearchContext';
 import SearchPageFooter from '@components/Search/SearchPageFooter';
 import SearchFiltersBar from '@components/Search/SearchPageHeader/SearchFiltersBar';
 import SearchPageHeader from '@components/Search/SearchPageHeader/SearchPageHeader';
-import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
-import type {BankAccountMenuItem, SearchParams, SearchQueryJSON} from '@components/Search/types';
+import type {SearchParams, SearchQueryJSON} from '@components/Search/types';
 import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useScrollEventEmitter from '@hooks/useScrollEventEmitter';
 import useStyleUtils from '@hooks/useStyleUtils';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
@@ -35,6 +38,7 @@ import {isSearchDataLoaded} from '@libs/SearchUIUtils';
 import variables from '@styles/variables';
 import {searchInServer} from '@userActions/Report';
 import {search} from '@userActions/Search';
+import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {SearchResults} from '@src/types/onyx';
 import type {SearchResultsInfo} from '@src/types/onyx/SearchResults';
@@ -46,7 +50,6 @@ const ANIMATION_DURATION_IN_MS = 300;
 type SearchPageNarrowProps = {
     queryJSON?: SearchQueryJSON;
     metadata?: SearchResultsInfo;
-    headerButtonsOptions: Array<DropdownOption<SearchHeaderOptionValue>>;
     searchResults?: SearchResults;
     isMobileSelectionModeEnabled: boolean;
     footerData: {
@@ -54,36 +57,34 @@ type SearchPageNarrowProps = {
         total: number | undefined;
         currency: string | undefined;
     };
-    currentSelectedPolicyID?: string | undefined;
-    currentSelectedReportID?: string | undefined;
-    confirmPayment?: (paymentType: PaymentMethodType | undefined) => void;
-    latestBankItems?: BankAccountMenuItem[] | undefined;
     shouldShowFooter: boolean;
+    children?: ReactNode;
+    initScanRequest: (e: DragEvent) => void;
+    PDFValidationComponent: ReactNode;
+    ErrorModal: ReactNode;
 };
 
 function SearchPageNarrow({
     queryJSON,
-    headerButtonsOptions,
     searchResults,
     isMobileSelectionModeEnabled,
     metadata,
     footerData,
-    currentSelectedPolicyID,
-    currentSelectedReportID,
-    latestBankItems,
-    confirmPayment,
     shouldShowFooter,
+    children,
+    initScanRequest,
+    PDFValidationComponent,
+    ErrorModal,
 }: SearchPageNarrowProps) {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {windowHeight} = useWindowDimensions();
     const styles = useThemeStyles();
+    const theme = useTheme();
     const StyleUtils = useStyleUtils();
     const {clearSelectedTransactions} = useSearchContext();
     const [searchRouterListVisible, setSearchRouterListVisible] = useState(false);
     const {isOffline} = useNetwork();
-    // Controls the visibility of the educational tooltip based on user scrolling.
-    // Hides the tooltip when the user is scrolling and displays it once scrolling stops.
     const triggerScrollEvent = useScrollEventEmitter();
     const route = useRoute();
     const {saveScrollOffset} = useContext(ScrollOffsetContext);
@@ -92,6 +93,8 @@ function SearchPageNarrow({
 
     const scrollOffset = useSharedValue(0);
     const topBarOffset = useSharedValue<number>(StyleUtils.searchHeaderDefaultOffset);
+
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['SmartScan'] as const);
 
     const handleBackButtonPress = useCallback(() => {
         if (!isMobileSelectionModeEnabled) {
@@ -181,6 +184,9 @@ function SearchPageNarrow({
     const isDataLoaded = isSearchDataLoaded(searchResults, queryJSON);
     const shouldShowLoadingState = !isOffline && (!isDataLoaded || !!metadata?.isLoading);
 
+    // Empty array passed as headerButtonsOptions since SearchBulkActionsButton handles bulk actions
+    const emptyOptions = CONST.EMPTY_ARRAY as [];
+
     return (
         <ScreenWrapper
             testID="SearchPageNarrow"
@@ -190,97 +196,102 @@ function SearchPageNarrow({
             shouldShowOfflineIndicator={!!searchResults}
         >
             <View style={[styles.flex1, styles.overflowHidden]}>
-                {!isMobileSelectionModeEnabled ? (
-                    <View style={[StyleUtils.getSearchPageNarrowHeaderStyles(), searchRouterListVisible && styles.flex1, styles.mh100]}>
-                        <View style={[styles.zIndex10, styles.appBG]}>
-                            <TopBar
-                                shouldShowLoadingBar={shouldShowLoadingState}
-                                breadcrumbLabel={translate('common.reports')}
-                                shouldDisplaySearch={false}
-                                cancelSearch={shouldDisplayCancelSearch ? cancelSearchCallback : undefined}
-                            />
-                        </View>
-                        <View style={[styles.flex1]}>
-                            <Animated.View
-                                style={[
-                                    topBarAnimatedStyle,
-                                    !searchRouterListVisible && styles.narrowSearchRouterInactiveStyle,
-                                    styles.flex1,
-                                    styles.bgTransparent,
-                                    styles.searchTopBarZIndexStyle,
-                                ]}
-                            >
-                                <View style={[styles.flex1, styles.pt2, styles.appBG]}>
-                                    <SearchPageHeader
-                                        queryJSON={queryJSON}
-                                        searchRouterListVisible={searchRouterListVisible}
-                                        hideSearchRouterList={() => {
-                                            setSearchRouterListVisible(false);
-                                        }}
-                                        onSearchRouterFocus={() => {
-                                            topBarOffset.set(StyleUtils.searchHeaderDefaultOffset);
-                                            setSearchRouterListVisible(true);
-                                        }}
-                                        headerButtonsOptions={headerButtonsOptions}
-                                        handleSearch={handleSearchAction}
-                                        isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
-                                    />
-                                </View>
-                                <View style={[styles.appBG]}>
-                                    {!searchRouterListVisible && (
-                                        <SearchFiltersBar
+                <DragAndDropProvider>
+                    {PDFValidationComponent}
+                    {!isMobileSelectionModeEnabled ? (
+                        <View style={[StyleUtils.getSearchPageNarrowHeaderStyles(), searchRouterListVisible && styles.flex1, styles.mh100]}>
+                            <View style={[styles.zIndex10, styles.appBG]}>
+                                <TopBar
+                                    shouldShowLoadingBar={shouldShowLoadingState}
+                                    breadcrumbLabel={translate('common.reports')}
+                                    shouldDisplaySearch={false}
+                                    cancelSearch={shouldDisplayCancelSearch ? cancelSearchCallback : undefined}
+                                />
+                            </View>
+                            <View style={[styles.flex1]}>
+                                <Animated.View
+                                    style={[
+                                        topBarAnimatedStyle,
+                                        !searchRouterListVisible && styles.narrowSearchRouterInactiveStyle,
+                                        styles.flex1,
+                                        styles.bgTransparent,
+                                        styles.searchTopBarZIndexStyle,
+                                    ]}
+                                >
+                                    <View style={[styles.flex1, styles.pt2, styles.appBG]}>
+                                        <SearchPageHeader
                                             queryJSON={queryJSON}
-                                            headerButtonsOptions={headerButtonsOptions}
+                                            searchRouterListVisible={searchRouterListVisible}
+                                            hideSearchRouterList={() => {
+                                                setSearchRouterListVisible(false);
+                                            }}
+                                            onSearchRouterFocus={() => {
+                                                topBarOffset.set(StyleUtils.searchHeaderDefaultOffset);
+                                                setSearchRouterListVisible(true);
+                                            }}
+                                            headerButtonsOptions={emptyOptions}
+                                            handleSearch={handleSearchAction}
                                             isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
                                         />
-                                    )}
-                                </View>
-                            </Animated.View>
+                                    </View>
+                                    <View style={[styles.appBG]}>
+                                        {!searchRouterListVisible && (
+                                            <SearchFiltersBar
+                                                queryJSON={queryJSON}
+                                                headerButtonsOptions={emptyOptions}
+                                                isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
+                                            />
+                                        )}
+                                    </View>
+                                </Animated.View>
+                            </View>
                         </View>
-                    </View>
-                ) : (
-                    <>
-                        <HeaderWithBackButton
-                            title={translate('common.selectMultiple')}
-                            onBackButtonPress={() => {
-                                topBarOffset.set(StyleUtils.searchHeaderDefaultOffset);
-                                clearSelectedTransactions();
-                                turnOffMobileSelectionMode();
-                            }}
+                    ) : (
+                        <>
+                            <HeaderWithBackButton
+                                title={translate('common.selectMultiple')}
+                                onBackButtonPress={() => {
+                                    topBarOffset.set(StyleUtils.searchHeaderDefaultOffset);
+                                    clearSelectedTransactions();
+                                    turnOffMobileSelectionMode();
+                                }}
+                            />
+                            {children}
+                        </>
+                    )}
+                    {!searchRouterListVisible && (
+                        <View style={[styles.flex1]}>
+                            <Search
+                                searchResults={searchResults}
+                                key={queryJSON.hash}
+                                queryJSON={queryJSON}
+                                onSearchListScroll={scrollHandler}
+                                contentContainerStyle={!isMobileSelectionModeEnabled ? styles.searchListContentContainerStyles : undefined}
+                                handleSearch={handleSearchAction}
+                                isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
+                                searchRequestResponseStatusCode={searchRequestResponseStatusCode}
+                            />
+                        </View>
+                    )}
+                    {shouldShowFooter && !searchRouterListVisible && (
+                        <SearchPageFooter
+                            count={footerData.count}
+                            total={footerData.total}
+                            currency={footerData.currency}
                         />
-                        <SearchPageHeader
-                            queryJSON={queryJSON}
-                            headerButtonsOptions={headerButtonsOptions}
-                            handleSearch={handleSearchAction}
-                            isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
-                            currentSelectedPolicyID={currentSelectedPolicyID}
-                            currentSelectedReportID={currentSelectedReportID}
-                            latestBankItems={latestBankItems}
-                            confirmPayment={confirmPayment}
+                    )}
+                    <DragAndDropConsumer onDrop={initScanRequest}>
+                        <DropZoneUI
+                            icon={expensifyIcons.SmartScan}
+                            dropTitle={translate('dropzone.scanReceipts')}
+                            dropStyles={styles.receiptDropOverlay(true)}
+                            dropTextStyles={styles.receiptDropText}
+                            dropWrapperStyles={{marginBottom: variables.bottomTabHeight}}
+                            dashedBorderStyles={[styles.dropzoneArea, styles.easeInOpacityTransition, styles.activeDropzoneDashedBorder(theme.receiptDropBorderColorActive, true)]}
                         />
-                    </>
-                )}
-                {!searchRouterListVisible && (
-                    <View style={[styles.flex1]}>
-                        <Search
-                            searchResults={searchResults}
-                            key={queryJSON.hash}
-                            queryJSON={queryJSON}
-                            onSearchListScroll={scrollHandler}
-                            contentContainerStyle={!isMobileSelectionModeEnabled ? styles.searchListContentContainerStyles : undefined}
-                            handleSearch={handleSearchAction}
-                            isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
-                            searchRequestResponseStatusCode={searchRequestResponseStatusCode}
-                        />
-                    </View>
-                )}
-                {shouldShowFooter && !searchRouterListVisible && (
-                    <SearchPageFooter
-                        count={footerData.count}
-                        total={footerData.total}
-                        currency={footerData.currency}
-                    />
-                )}
+                    </DragAndDropConsumer>
+                    {ErrorModal}
+                </DragAndDropProvider>
             </View>
         </ScreenWrapper>
     );
