@@ -148,7 +148,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     shouldDisableHoverStyle = false,
     setShouldDisableHoverStyle = () => {},
     shouldSkipContentHeaderHeightOffset,
-    sentryLabelSelectAllButton,
     ref,
 }: SelectionListProps<TItem>) {
     const styles = useThemeStyles();
@@ -653,7 +652,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                                 disabled={flattenedSections.allOptions.length === flattenedSections.disabledOptionsIndexes.length}
                                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                                 onMouseDown={shouldPreventDefaultFocusOnSelectRow ? (e) => e.preventDefault() : undefined}
-                                sentryLabel={sentryLabelSelectAllButton}
                             >
                                 <Text style={[styles.textStrong, styles.ph3, selectAllStyle]}>{translate('workspace.people.selectAll')}</Text>
                             </PressableWithFeedback>
