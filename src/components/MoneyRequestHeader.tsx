@@ -1,5 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
+import {validTransactionDraftsSelector} from '@selectors/TransactionDraft';
 import type {ReactNode} from 'react';
 import React, {useCallback, useMemo, useState} from 'react';
 import {View} from 'react-native';
@@ -15,7 +16,6 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLoadingBarVisibility from '@hooks/useLoadingBarVisibility';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
 import usePermissions from '@hooks/usePermissions';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -156,8 +156,8 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
     const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
-    const [transactionDrafts] = useOptimisticDraftTransactions(undefined);
-    const draftTransactionIDs = transactionDrafts?.map((item) => item.transactionID);
+    const [transactionDrafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftsSelector});
+    const draftTransactionIDs = Object.keys(transactionDrafts ?? {});
 
     const {deleteTransactions} = useDeleteTransactions({report: parentReport, reportActions: parentReportAction ? [parentReportAction] : [], policy});
     const {isBetaEnabled} = usePermissions();
@@ -206,7 +206,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
 
             for (const item of transactions) {
                 const existingTransactionID = getExistingTransactionID(item.linkedTrackedExpenseReportAction);
-                const existingTransactionDraft = transactionDrafts?.find((t) => t.transactionID === existingTransactionID);
+                const existingTransactionDraft = existingTransactionID ? transactionDrafts?.[existingTransactionID] : undefined;
 
                 duplicateTransactionAction({
                     transaction: item,
