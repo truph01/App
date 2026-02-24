@@ -3,10 +3,14 @@ import CONST from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 import {endSpan, getSpan} from './activeSpans';
 
+type MarkOpenReportEndOptions = {
+    warm?: boolean;
+};
+
 /**
  * Mark all 'open_report*' telemetry spans as finished.
  */
-function markOpenReportEnd(report: OnyxTypes.Report) {
+function markOpenReportEnd(report: OnyxTypes.Report, options: MarkOpenReportEndOptions = {}) {
     const {reportID, type, chatType} = report;
 
     const isTransactionThread = isReportTransactionThread(report);
@@ -21,7 +25,7 @@ function markOpenReportEnd(report: OnyxTypes.Report) {
         [CONST.TELEMETRY.ATTRIBUTE_CHAT_TYPE]: chatType,
     });
 
-    endSpan(spanId);
+    endSpan(spanId, {warm: options.warm});
 }
 
 export default markOpenReportEnd;
