@@ -61,7 +61,7 @@ function IOURequestStepDistanceRate({
 
     /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
 
-    const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`, {canBeMissing: true});
+    const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
 
     const policy: OnyxEntry<OnyxTypes.Policy> = policyReal ?? policyDraft;
 
