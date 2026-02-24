@@ -48,7 +48,7 @@ To create a new Traveler message:
 6. Select the **Page / Location** where the message should appear (for example, Checkout page).
 7. Set the **Start date and time**.
 8. Set the **End date and time**.
-Note: The message will only display during the time period you define.
+   **Note:** The message will only display during the time period you define.
 9. Enter a **Message header** (this is the title travelers will see).
 10. Enter the **Message body**.
 11. (Optional) Add:
