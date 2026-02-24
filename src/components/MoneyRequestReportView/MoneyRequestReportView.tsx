@@ -124,6 +124,7 @@ function MoneyRequestReportView({report, policy, reportMetadata, shouldDisplayRe
             return transactions;
         }
 
+        // When there are no pending delete transactions, which is most of the time, we can return the same transactions keeping the same reference avoiding extra work
         const hasPendingDelete = transactions.some((transaction) => transaction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
         if (!hasPendingDelete) {
             return transactions;
