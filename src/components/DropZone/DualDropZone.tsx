@@ -35,10 +35,10 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
     const theme = useTheme();
     const icons = useMemoizedLazyExpensifyIcons(['MessageInABottle', 'SmartScan', 'ReplaceReceipt']);
 
-    const {isWideRHPFocused, isSuperWideRHPFocused} = useWideRHPState();
-    const shouldStackVertically = (shouldUseNarrowLayout || isMediumScreenWidth) && !isWideRHPFocused && !isSuperWideRHPFocused;
+    const {isWideRHPFocused} = useWideRHPState();
+    const shouldStackVertically = (shouldUseNarrowLayout || isMediumScreenWidth) && !isWideRHPFocused;
     const scanReceiptsText = shouldAcceptSingleReceipt ? 'dropzone.addReceipt' : 'dropzone.scanReceipts';
-    const shouldStackRevertHorizontally = isWideRHPFocused || isSuperWideRHPFocused;
+    const shouldStackRevertHorizontally = isWideRHPFocused;
     let flexStyle: ViewStyle = styles.flexRow;
     if (shouldStackVertically) {
         flexStyle = styles.flexColumn;
@@ -65,7 +65,7 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
                         />
                     )}
                 </DropZoneWrapper>
-                <Animated.View style={isWideRHPFocused || isSuperWideRHPFocused ? styles.wideRHPDropZoneContainer : [styles.flex1, styles.h100]}>
+                <Animated.View style={isWideRHPFocused ? styles.wideRHPDropZoneContainer : [styles.flex1, styles.h100]}>
                     <DropZoneWrapper onDrop={onReceiptDrop}>
                         {({isDraggingOver}) => (
                             <DropZoneUI
