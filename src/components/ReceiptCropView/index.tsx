@@ -258,6 +258,46 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         return Math.max(min, Math.min(max, value));
     }, []);
 
+    const applyCropBoundsAndNotify = useCallback(
+        (newX: number, newY: number, newWidth: number, newHeight: number, imageLeft: number, imageRight: number, imageTop: number, imageBottom: number) => {
+            // clamp to image bounds
+            let x = newX;
+            let y = newY;
+            let w = newWidth;
+            let h = newHeight;
+
+            if (x < imageLeft) {
+                const diff = imageLeft - x;
+                x = imageLeft;
+                w -= diff;
+            }
+            if (x + w > imageRight) {
+                w = imageRight - x;
+            }
+            if (y < imageTop) {
+                const diff = imageTop - y;
+                y = imageTop;
+                h -= diff;
+            }
+            if (y + h > imageBottom) {
+                h = imageBottom - y;
+            }
+
+            cropX.set(x);
+            cropY.set(y);
+            cropWidth.set(w);
+            cropHeight.set(h);
+
+            onCropChange?.({
+                x: (x - imageOffsetX) * scaleX,
+                y: (y - imageOffsetY) * scaleY,
+                width: w * scaleX,
+                height: h * scaleY,
+            });
+        },
+        [cropX, cropY, cropWidth, cropHeight, imageOffsetX, scaleX, imageOffsetY, scaleY, onCropChange],
+    );
+
     /**
      * Create gesture handler for an edge
      */
@@ -305,40 +345,10 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
                             break;
                     }
 
-                    // Ensure crop rectangle stays within image bounds
-                    if (newX < imageLeft) {
-                        const diff = imageLeft - newX;
-                        newX = imageLeft;
-                        newWidth -= diff;
-                    }
-                    if (newX + newWidth > imageRight) {
-                        newWidth = imageRight - newX;
-                    }
-                    if (newY < imageTop) {
-                        const diff = imageTop - newY;
-                        newY = imageTop;
-                        newHeight -= diff;
-                    }
-                    if (newY + newHeight > imageBottom) {
-                        newHeight = imageBottom - newY;
-                    }
-
-                    cropX.set(newX);
-                    cropY.set(newY);
-                    cropWidth.set(newWidth);
-                    cropHeight.set(newHeight);
-
-                    const crop: CropRect = {
-                        x: (newX - imageOffsetX) * scaleX,
-                        y: (newY - imageOffsetY) * scaleY,
-                        width: newWidth * scaleX,
-                        height: newHeight * scaleY,
-                    };
-
-                    onCropChange?.(crop);
+                    applyCropBoundsAndNotify(newX, newY, newWidth, newHeight, imageLeft, imageRight, imageTop, imageBottom);
                 });
         },
-        [cropX, cropY, cropWidth, cropHeight, displayWidthSV, displayHeightSV, imageOffsetXSV, imageOffsetYSV, imageOffsetX, scaleX, imageOffsetY, scaleY, onCropChange, clamp],
+        [cropX, cropY, cropWidth, cropHeight, displayWidthSV, displayHeightSV, imageOffsetXSV, imageOffsetYSV, applyCropBoundsAndNotify, clamp],
     );
 
     /**
@@ -394,40 +404,10 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
                             break;
                     }
 
-                    // Ensure crop rectangle stays within image bounds
-                    if (newX < imageLeft) {
-                        const diff = imageLeft - newX;
-                        newX = imageLeft;
-                        newWidth -= diff;
-                    }
-                    if (newX + newWidth > imageRight) {
-                        newWidth = imageRight - newX;
-                    }
-                    if (newY < imageTop) {
-                        const diff = imageTop - newY;
-                        newY = imageTop;
-                        newHeight -= diff;
-                    }
-                    if (newY + newHeight > imageBottom) {
-                        newHeight = imageBottom - newY;
-                    }
-
-                    cropX.set(newX);
-                    cropY.set(newY);
-                    cropWidth.set(newWidth);
-                    cropHeight.set(newHeight);
-
-                    const crop: CropRect = {
-                        x: (newX - imageOffsetX) * scaleX,
-                        y: (newY - imageOffsetY) * scaleY,
-                        width: newWidth * scaleX,
-                        height: newHeight * scaleY,
-                    };
-
-                    onCropChange?.(crop);
+                    applyCropBoundsAndNotify(newX, newY, newWidth, newHeight, imageLeft, imageRight, imageTop, imageBottom);
                 });
         },
-        [cropX, cropY, cropWidth, cropHeight, displayWidthSV, displayHeightSV, imageOffsetXSV, imageOffsetYSV, imageOffsetX, scaleX, imageOffsetY, scaleY, onCropChange, clamp],
+        [cropX, cropY, cropWidth, cropHeight, displayWidthSV, displayHeightSV, imageOffsetXSV, imageOffsetYSV, applyCropBoundsAndNotify, clamp],
     );
 
     const borderStyle = useAnimatedStyle(() => {
@@ -452,12 +432,6 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         }).cornerTopLeft;
     });
 
-    const topLeftCornerVisualStyle = useAnimatedStyle(() => {
-        'worklet';
-
-        return StyleUtils.getCropViewStyles().cornerVisual;
-    });
-
     const topRightCornerStyle = useAnimatedStyle(() => {
         'worklet';
 
@@ -467,12 +441,6 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
         }).cornerTopRight;
-    });
-
-    const topRightCornerVisualStyle = useAnimatedStyle(() => {
-        'worklet';
-
-        return StyleUtils.getCropViewStyles().cornerVisual;
     });
 
     const bottomLeftCornerStyle = useAnimatedStyle(() => {
@@ -486,12 +454,6 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         }).cornerBottomLeft;
     });
 
-    const bottomLeftCornerVisualStyle = useAnimatedStyle(() => {
-        'worklet';
-
-        return StyleUtils.getCropViewStyles().cornerVisual;
-    });
-
     const bottomRightCornerStyle = useAnimatedStyle(() => {
         'worklet';
 
@@ -501,12 +463,6 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
         }).cornerBottomRight;
-    });
-
-    const bottomRightCornerVisualStyle = useAnimatedStyle(() => {
-        'worklet';
-
-        return StyleUtils.getCropViewStyles().cornerVisual;
     });
 
     // Edge handle styles - thicker tap target while keeping visual size
@@ -625,6 +581,12 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         }).overlayRight;
     });
 
+    const cornerVisualStyle = useAnimatedStyle(() => {
+        'worklet';
+
+        return StyleUtils.getCropViewStyles().cornerVisual;
+    });
+
     return (
         <GestureHandlerRootView style={[styles.flex1, styles.w100]}>
             <Animated.View
@@ -683,22 +645,22 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
                         {/* Corner handles */}
                         <GestureDetector gesture={createCornerGesture('topLeft')}>
                             <Animated.View style={topLeftCornerStyle}>
-                                <Animated.View style={topLeftCornerVisualStyle} />
+                                <Animated.View style={cornerVisualStyle} />
                             </Animated.View>
                         </GestureDetector>
                         <GestureDetector gesture={createCornerGesture('topRight')}>
                             <Animated.View style={topRightCornerStyle}>
-                                <Animated.View style={topRightCornerVisualStyle} />
+                                <Animated.View style={cornerVisualStyle} />
                             </Animated.View>
                         </GestureDetector>
                         <GestureDetector gesture={createCornerGesture('bottomLeft')}>
                             <Animated.View style={bottomLeftCornerStyle}>
-                                <Animated.View style={bottomLeftCornerVisualStyle} />
+                                <Animated.View style={cornerVisualStyle} />
                             </Animated.View>
                         </GestureDetector>
                         <GestureDetector gesture={createCornerGesture('bottomRight')}>
                             <Animated.View style={bottomRightCornerStyle}>
-                                <Animated.View style={bottomRightCornerVisualStyle} />
+                                <Animated.View style={cornerVisualStyle} />
                             </Animated.View>
                         </GestureDetector>
                     </>

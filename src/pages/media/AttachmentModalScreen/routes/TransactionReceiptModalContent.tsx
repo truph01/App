@@ -386,29 +386,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const threeDotsMenuItems: ThreeDotsMenuItemFactory = useCallback(
         ({file, source: innerSource, isLocalSource}) => {
             const menuItems = [];
-            if (shouldShowReplaceReceiptButton || isOdometerImage) {
-                menuItems.push({
-                    icon: expensifyIcons.Camera,
-                    text: translate('common.replace'),
-                    onSelected: () => {
-                        Navigation.dismissModal({
-                            callback: () =>
-                                Navigation.navigate(
-                                    isOdometerImage
-                                        ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, imageType)
-                                        : ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
-                                              action ?? CONST.IOU.ACTION.EDIT,
-                                              iouType,
-                                              draftTransactionID ?? transaction?.transactionID,
-                                              report?.reportID,
-                                              Navigation.getActiveRoute(),
-                                          ),
-                                ),
-                        });
-                    },
-                    sentryLabel: CONST.SENTRY_LABEL.RECEIPT_MODAL.REPLACE_RECEIPT,
-                });
-            }
             if ((!isOffline && allowDownload && !isLocalSource) || !!draftTransactionID) {
                 menuItems.push({
                     icon: expensifyIcons.Download,
@@ -439,7 +416,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             // eslint-disable-next-line react-hooks/exhaustive-deps
         },
         [
-            shouldShowReplaceReceiptButton,
             isOdometerImage,
             isOffline,
             allowDownload,
@@ -449,12 +425,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             transactionReport,
             isDraftTransaction,
             translate,
-            action,
-            iouType,
-            transactionID,
-            reportID,
-            imageType,
-            report?.reportID,
             expensifyIcons,
             onDownloadAttachment,
         ],
@@ -506,7 +476,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             );
         }
 
-        if (!shouldShowRotateAndCropReceiptButton && !shouldShowReplaceReceiptButton) {
+        if (!shouldShowRotateAndCropReceiptButton && !shouldShowReplaceReceiptButton && !isOdometerImage) {
             return null;
         }
 
@@ -530,20 +500,22 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         style={styles.transactionReceiptButton}
                     />
                 )}
-                {!!shouldShowReplaceReceiptButton && (
+                {(shouldShowReplaceReceiptButton || isOdometerImage) && (
                     <Button
                         icon={expensifyIcons.Camera}
                         onPress={() => {
                             Navigation.dismissModal({
                                 callback: () =>
                                     Navigation.navigate(
-                                        ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
-                                            action ?? CONST.IOU.ACTION.EDIT,
-                                            iouType,
-                                            draftTransactionID ?? transaction?.transactionID,
-                                            report?.reportID,
-                                            Navigation.getActiveRoute(),
-                                        ),
+                                        isOdometerImage
+                                            ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, imageType)
+                                            : ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
+                                                  action ?? CONST.IOU.ACTION.EDIT,
+                                                  iouType,
+                                                  draftTransactionID ?? transaction?.transactionID,
+                                                  report?.reportID,
+                                                  Navigation.getActiveRoute(),
+                                              ),
                                     ),
                             });
                         }}
@@ -555,23 +527,36 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         );
     }, [
         isCropping,
-        exitCropMode,
-        saveCrop,
-        cropRect,
-        isCropSaving,
-        translate,
         shouldShowRotateAndCropReceiptButton,
         shouldShowReplaceReceiptButton,
+        isOdometerImage,
+        styles.flexRow,
+        styles.gap2,
+        styles.ph5,
+        styles.pb5,
+        styles.justifyContentCenter,
+        styles.transactionReceiptButton,
+        expensifyIcons.Rotate,
+        expensifyIcons.Crop,
+        expensifyIcons.Camera,
+        expensifyIcons.Close,
+        expensifyIcons.Checkmark,
         rotateReceipt,
+        translate,
         isRotating,
         enterCropMode,
+        exitCropMode,
+        saveCrop,
+        isCropSaving,
+        cropRect,
         action,
         iouType,
+        transactionID,
+        reportID,
+        imageType,
         draftTransactionID,
         transaction?.transactionID,
         report?.reportID,
-        styles,
-        expensifyIcons,
     ]);
 
     const customAttachmentContent = useMemo(() => {
