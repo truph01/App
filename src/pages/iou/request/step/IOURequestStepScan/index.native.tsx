@@ -211,6 +211,7 @@ function IOURequestStepScan({
 
             return () => {
                 subscription.remove();
+                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
 
                 if (isLoaderVisible) {
                     setIsLoaderVisible(false);
@@ -282,7 +283,17 @@ function IOURequestStepScan({
     const viewfinderLayout = useRef<LayoutRectangle>(null);
 
     const capturePhoto = useCallback(() => {
+        if (!isMultiScanEnabled) {
+            startSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION, {
+                name: 'shutter-to-confirmation',
+                op: CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION,
+            });
+        }
+
         if (!camera.current && (cameraPermissionStatus === RESULTS.DENIED || cameraPermissionStatus === RESULTS.BLOCKED)) {
+            if (!isMultiScanEnabled) {
+                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+            }
             askForPermissions();
             return;
         }
@@ -296,6 +307,9 @@ function IOURequestStepScan({
         }
 
         if (didCapturePhoto) {
+            if (!isMultiScanEnabled) {
+                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+            }
             return;
         }
 
@@ -369,6 +383,9 @@ function IOURequestStepScan({
                     })
                     .catch((error: string) => {
                         setDidCapturePhoto(false);
+                        if (!isMultiScanEnabled) {
+                            cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+                        }
                         showCameraAlert();
                         Log.warn('Error taking photo', error);
                     });

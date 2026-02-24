@@ -323,6 +323,7 @@ function IOURequestStepConfirmation({
 
     useEffect(() => {
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+        endSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
     }, []);
 
     useEffect(() => {
