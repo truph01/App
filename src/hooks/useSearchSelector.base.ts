@@ -306,7 +306,6 @@ function useSearchSelectorBase({
         includeUserToInvite,
         countryCode,
         loginList,
-        allPolicies,
         excludeLogins,
         excludeFromSuggestionsOnly,
         includeRecentReports,

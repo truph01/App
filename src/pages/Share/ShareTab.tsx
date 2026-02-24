@@ -1,5 +1,5 @@
 import type {Ref} from 'react';
-import React, {useEffect, useImperativeHandle, useMemo, useRef} from 'react';
+import React, {useEffect, useImperativeHandle, useRef} from 'react';
 import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
@@ -69,43 +69,26 @@ function ShareTab({ref}: ShareTabProps) {
     const offlineMessage: string = isOffline ? `${translate('common.youAppearToBeOffline')} ${translate('search.resultsAreLimited')}` : '';
     const showLoadingPlaceholder = !areOptionsInitialized || !didScreenTransitionEnd;
 
-    const searchOptions = useMemo(() => {
-        if (!areOptionsInitialized) {
-            return defaultListOptions;
-        }
-        return getSearchOptions({
-            options,
-            draftComments,
-            nvpDismissedProductTraining,
-            betas: betas ?? [],
-            isUsedInChatFinder: false,
-            includeReadOnly: false,
-            searchQuery: textInputValue,
-            maxResults: 20,
-            includeUserToInvite: true,
-            countryCode,
-            loginList,
-            visibleReportActionsData,
-            currentUserAccountID,
-            currentUserEmail,
-            policyCollection: allPolicies,
-            personalDetails,
-        });
-    }, [
-        areOptionsInitialized,
-        options,
-        draftComments,
-        nvpDismissedProductTraining,
-        betas,
-        textInputValue,
-        countryCode,
-        loginList,
-        visibleReportActionsData,
-        currentUserAccountID,
-        currentUserEmail,
-        allPolicies,
-        personalDetails,
-    ]);
+    const searchOptions = areOptionsInitialized
+        ? getSearchOptions({
+              options,
+              draftComments,
+              nvpDismissedProductTraining,
+              betas: betas ?? [],
+              isUsedInChatFinder: false,
+              includeReadOnly: false,
+              searchQuery: textInputValue,
+              maxResults: 20,
+              includeUserToInvite: true,
+              countryCode,
+              loginList,
+              visibleReportActionsData,
+              currentUserAccountID,
+              currentUserEmail,
+              policyCollection: allPolicies,
+              personalDetails,
+          })
+        : defaultListOptions;
 
     let recentReportsOptions: OptionData[];
     if (textInputValue.trim() === '') {
