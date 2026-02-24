@@ -29,7 +29,6 @@ function SubscriptionSettingsPage({route}: SubscriptionSettingsPageProps) {
     const styles = useThemeStyles();
     const subscriptionPlan = useSubscriptionPlan();
     const illustrations = useMemoizedLazyIllustrations(['CreditCardsNew']);
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
     useDocumentTitle(`${translate('common.settings')} - ${translate('workspace.common.subscription')}`);
 
     useEffect(() => {

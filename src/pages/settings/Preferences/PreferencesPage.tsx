@@ -48,7 +48,6 @@ function PreferencesPage() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
     useDocumentTitle(`${translate('common.settings')} - ${translate('common.preferences')}`);
 
     return (

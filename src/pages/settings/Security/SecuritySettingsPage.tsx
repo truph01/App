@@ -64,8 +64,6 @@ function SecuritySettingsPage() {
     const securitySettingsIllustration = useSecuritySettingsSectionIllustration();
     const styles = useThemeStyles();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
-    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.security')}`);
     const waitForNavigate = useWaitForNavigation();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {windowWidth} = useWindowDimensions();
@@ -98,6 +96,7 @@ function SecuritySettingsPage() {
     const hasDelegators = delegators.length > 0;
 
     const hasEverRegisteredForMultifactorAuthentication = account?.multifactorAuthenticationPublicKeyIDs !== CONST.MULTIFACTOR_AUTHENTICATION.PUBLIC_KEYS_AUTHENTICATION_NEVER_REGISTERED;
+    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.security')}`);
 
     const setMenuPosition = useCallback(() => {
         if (!delegateButtonRef.current) {

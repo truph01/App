@@ -43,8 +43,6 @@ function ProfilePage() {
     const StyleUtils = useStyleUtils();
     const {translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
-    useDocumentTitle(`${translate('common.settings')} - ${translate('common.profile')}`);
     const {safeAreaPaddingBottomStyle} = useSafeAreaPaddings();
     const scrollEnabled = useScrollEnabled();
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
@@ -73,6 +71,8 @@ function ProfilePage() {
     const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE);
     const {isActingAsDelegate} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
+    useDocumentTitle(`${translate('common.settings')} - ${translate('common.profile')}`);
+
     const publicOptions = [
         {
             description: translate('displayNamePage.headerTitle'),

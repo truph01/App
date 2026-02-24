@@ -86,8 +86,6 @@ function WalletPage() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
-    useDocumentTitle(`${translate('common.settings')} - ${translate('common.wallet')}`);
     const network = useNetwork();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isBetaEnabled} = usePermissions();
@@ -108,6 +106,7 @@ function WalletPage() {
     const isPendingOnfidoResult = userWallet?.isPendingOnfidoResult ?? false;
     const hasFailedOnfido = userWallet?.hasFailedOnfido ?? false;
     const hasEligibleActiveAdmin = hasEligibleActiveAdminFromWorkspaces(allPolicies, currentUserLogin, paymentMethod?.selectedPaymentMethod?.bankAccountID?.toString());
+    useDocumentTitle(`${translate('common.settings')} - ${translate('common.wallet')}`);
 
     const updateShouldShowLoadingSpinner = useCallback(() => {
         // In order to prevent a loop, only update state of the spinner if there is a change

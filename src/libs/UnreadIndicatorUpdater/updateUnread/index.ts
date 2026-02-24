@@ -18,13 +18,6 @@ function setPageTitle(title: string) {
 }
 
 /**
- * Get the current page-specific title
- */
-function getPageTitle(): string {
-    return currentPageTitle;
-}
-
-/**
  * Update the actual document title and favicon
  */
 function updateDocumentTitle() {
@@ -60,4 +53,4 @@ window.addEventListener('popstate', () => {
 });
 
 export default updateUnread;
-export {setPageTitle, getPageTitle};
+export {setPageTitle};

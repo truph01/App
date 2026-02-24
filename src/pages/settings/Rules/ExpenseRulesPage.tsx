@@ -55,7 +55,6 @@ function ExpenseRulesPage() {
     const [selectedRules, setSelectedRules] = useState<string[]>([]);
     const [deleteConfirmModalVisible, setDeleteConfirmModalVisible] = useState(false);
     const styles = useThemeStyles();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
     useDocumentTitle(`${translate('common.settings')} - ${translate('expenseRulesPage.title')}`);
 
     useEffect(() => {

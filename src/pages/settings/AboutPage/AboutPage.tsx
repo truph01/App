@@ -57,13 +57,12 @@ function AboutPage() {
     const illustrations = useMemoizedLazyIllustrations(['PalmTree']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
-    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.about')}`);
     const popoverAnchor = useRef<View>(null);
     const waitForNavigate = useWaitForNavigation();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const aboutIllustration = useAboutSectionIllustration();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.about')}`);
 
     const menuItems = useMemo(() => {
         const baseMenuItems: MenuItem[] = [

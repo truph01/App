@@ -27,8 +27,8 @@ function SaveTheWorldPage() {
     const theme = useTheme();
     const illustrations = useMemoizedLazyIllustrations(['TeachersUnite']);
     const saveTheWorldIllustration = useSaveTheWorldSectionIllustration();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
     useDocumentTitle(`${translate('common.settings')} - ${translate('sidebarScreen.saveTheWorld')}`);
+
     const menuItems = useMemo(() => {
         const baseMenuItems = [
             {

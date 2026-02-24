@@ -54,8 +54,6 @@ function TroubleshootPage() {
     const troubleshootIllustration = useTroubleshootSectionIllustration();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    // Set the page title for accessibility (WCAG 2.4.2 Page Titled)
-    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.aboutPage.troubleshoot')}`);
     const {isProduction, isDevelopment} = useEnvironment();
     const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -66,6 +64,8 @@ function TroubleshootPage() {
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT);
     const shouldOpenSurveyReasonPage = tryNewDot?.classicRedirect?.dismissed === false;
     const {setShouldResetSearchQuery} = useSearchContext();
+    useDocumentTitle(`${translate('common.settings')} - ${translate('initialSettingsPage.aboutPage.troubleshoot')}`);
+
     const exportOnyxState = useCallback(() => {
         ExportOnyxState.readFromOnyxDatabase().then((value: Record<string, unknown>) => {
             const dataToShare = ExportOnyxState.maskOnyxState(value, shouldMaskOnyxState);
