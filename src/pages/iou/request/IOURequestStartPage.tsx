@@ -155,7 +155,7 @@ function IOURequestStartPage({
     const prevTransactionReportID = usePrevious(transaction?.reportID);
 
     useEffect(() => {
-        // Don't end span for scan flows - it will be ended when camera initializes
+        // Don't end span for scan flows - it will be ended when camera initializes (or canceled if permission is denied)
         if (transactionRequestType === CONST.IOU.REQUEST_TYPE.SCAN) {
             return;
         }

@@ -134,7 +134,10 @@ function IOURequestStepScan({
             return;
         }
         cameraInitialized.current = true;
-        endSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
+        // Only end camera init span if it was actually started
+        if (cameraInitSpanStarted.current) {
+            endSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
+        }
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
     }, []);
 
@@ -303,7 +306,11 @@ function IOURequestStepScan({
         };
 
         if (!camera.current) {
+            if (!isMultiScanEnabled) {
+                cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+            }
             showCameraAlert();
+            return;
         }
 
         if (didCapturePhoto) {
