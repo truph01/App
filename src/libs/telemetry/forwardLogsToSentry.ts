@@ -13,6 +13,9 @@ const PARAMETERS_WHITELIST = new Set(['timestamp', 'spanExists', 'spanId', 'span
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function shouldForwardLog(log: {message?: string; parameters?: Record<string, unknown> | undefined}) {
+    if (log.message?.includes('[Sentry]')) {
+        return true;
+    }
     if (log.message?.includes('[Reauthenticate]')) {
         return true;
     }
