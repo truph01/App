@@ -1,5 +1,5 @@
 import {domainMemberSettingsSelector, domainNameSelector, selectSecurityGroupForAccount, vacationDelegateSelector} from '@selectors/Domain';
-import {personalDetailsSelector} from '@selectors/PersonalDetails';
+import personalDetailsSelector from '@selectors/PersonalDetails';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
