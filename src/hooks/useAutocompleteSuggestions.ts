@@ -4,7 +4,7 @@ import type {SearchFilterKey, UserFriendlyKey} from '@components/Search/types';
 import {getCardFeedsForDisplay} from '@libs/CardFeedUtils';
 import {getCardDescription, isCard, isCardHiddenFromSearch} from '@libs/CardUtils';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
-import type {Options} from '@libs/OptionsListUtils';
+import type {OptionList} from '@libs/OptionsListUtils';
 import {getSearchOptions} from '@libs/OptionsListUtils';
 import {getAllTaxRates, getCleanedTagName, shouldShowPolicy} from '@libs/PolicyUtils';
 import {
@@ -19,9 +19,10 @@ import {getUserFriendlyKey, getUserFriendlyValue} from '@libs/SearchQueryUtils';
 import {getDatePresets, getHasOptions} from '@libs/SearchUIUtils';
 import CONST, {CONTINUATION_DETECTION_SEARCH_FILTER_KEYS} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {CardFeeds, CardList, PersonalDetailsList, Policy} from '@src/types/onyx';
+import type {Beta, CardFeeds, CardList, DismissedProductTraining, PersonalDetailsList, Policy} from '@src/types/onyx';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import {useCurrencyListState} from './useCurrencyList';
+import type {FeedKeysWithAssignedCards} from './useFeedKeysWithAssignedCards';
 import useOnyx from './useOnyx';
 
 type AutocompleteItemData = {
@@ -35,17 +36,17 @@ type UseAutocompleteSuggestionsParams = {
     autocompleteQueryValue: string;
     allCards: CardList | undefined;
     allFeeds: Record<string, CardFeeds | undefined> | undefined;
-    options: Options;
+    options: OptionList;
     draftComments: OnyxCollection<string>;
-    nvpDismissedProductTraining: OnyxEntry<Record<string, string>>;
-    betas: OnyxEntry<string[]>;
+    nvpDismissedProductTraining: OnyxEntry<DismissedProductTraining>;
+    betas: OnyxEntry<Beta[]>;
     countryCode: OnyxEntry<number>;
     loginList: OnyxEntry<Record<string, unknown>>;
     policies: NonNullable<OnyxCollection<Policy>>;
     currentUserAccountID: number;
     currentUserEmail: string;
     personalDetails: OnyxEntry<PersonalDetailsList>;
-    feedKeysWithCards: string[];
+    feedKeysWithCards?: FeedKeysWithAssignedCards;
     translate: LocaleContextProps['translate'];
 };
 

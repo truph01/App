@@ -85,17 +85,17 @@ const defaultParams = {
     autocompleteQueryValue: '',
     allCards: {},
     allFeeds: {},
-    options: {recentReports: [], personalDetails: [], userToInvite: null, currentUserOption: null},
+    options: {reports: [], personalDetails: []},
     draftComments: {},
-    nvpDismissedProductTraining: {},
-    betas: [],
+    nvpDismissedProductTraining: undefined,
+    betas: [] as never[],
     countryCode: 1,
     loginList: {},
     policies: {},
     currentUserAccountID: 100,
     currentUserEmail: 'me@example.com',
     personalDetails: {},
-    feedKeysWithCards: [],
+    feedKeysWithCards: undefined,
     translate: jest.fn((key: string) => key) as never,
 };
 
@@ -129,8 +129,8 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'tag:eng'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TAG);
-        expect(result.current.at(0).mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TAG);
+        expect(result.current.at(0)?.mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG);
     });
 
     it('returns recent tags when autocomplete value is empty', () => {
@@ -153,7 +153,7 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'category:tra'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.CATEGORY);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.CATEGORY);
     });
 
     it('returns currency suggestions when autocomplete key is currency', () => {
@@ -180,8 +180,8 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'from:john'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM);
-        expect(result.current.at(0).mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM);
+        expect(result.current.at(0)?.mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM);
     });
 
     it('returns type suggestions when autocomplete key is type', () => {
@@ -193,7 +193,7 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'type:exp'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TYPE);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TYPE);
     });
 
     it('excludes already autocompleted keys from results', () => {
@@ -239,8 +239,8 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'taxRate:vat'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TAX_RATE);
-        expect(result.current.at(0).mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TAX_RATE);
+        expect(result.current.at(0)?.mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE);
     });
 
     it('returns status suggestions when autocomplete key is status', () => {
@@ -252,7 +252,7 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'type:expense status:'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.STATUS);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.STATUS);
     });
 
     it('returns empty array for date key (presets filter)', () => {
@@ -264,7 +264,7 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'date:to'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
     });
 
     it('returns boolean suggestions for reimbursable key', () => {
@@ -276,7 +276,7 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'reimbursable:'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE);
     });
 
     it('returns in: suggestions for chat reports', () => {
@@ -288,8 +288,8 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'in:gen'}));
 
         expect(result.current.length).toBeGreaterThan(0);
-        expect(result.current.at(0).filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.IN);
-        expect(result.current.at(0).mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.IN);
+        expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.IN);
+        expect(result.current.at(0)?.mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.IN);
     });
 
     it('returns empty for in: with empty value when keys already completed', () => {
