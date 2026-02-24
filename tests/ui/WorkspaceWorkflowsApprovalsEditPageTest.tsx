@@ -43,7 +43,14 @@ jest.mock('@libs/Navigation/Navigation', () => ({
     dismissModal: jest.fn(),
 }));
 
-function buildPolicy(employeeList: PolicyEmployeeList): Policy {
+function buildPolicy(): Policy {
+    const employeeList: PolicyEmployeeList = {
+        [ALICE_EMAIL]: {
+            email: ALICE_EMAIL,
+            submitsTo: ALICE_EMAIL,
+            forwardsTo: undefined,
+        },
+    };
     return {
         id: POLICY_ID,
         name: 'Test Workspace',
@@ -99,14 +106,7 @@ describe('WorkspaceWorkflowsApprovalsEditPage', () => {
             await Onyx.set(ONYXKEYS.HAS_LOADED_APP, true);
             await Onyx.set(ONYXKEYS.IS_LOADING_REPORT_DATA, false);
 
-            const employeeList: PolicyEmployeeList = {
-                [ALICE_EMAIL]: {
-                    email: ALICE_EMAIL,
-                    submitsTo: ALICE_EMAIL,
-                    forwardsTo: undefined,
-                },
-            };
-            const policy = buildPolicy(employeeList);
+            const policy = buildPolicy();
             const personalDetails = buildPersonalDetailsList();
 
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
