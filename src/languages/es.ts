@@ -789,17 +789,17 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Reconectar la tarjeta corporativa de ${feedName}` : 'Reconectar la tarjeta corporativa'),
-                defaultSubtitle: 'Espacio de trabajo > Tarjetas de empresa',
-                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Tarjetas de empresa`,
+                defaultSubtitle: 'Espacio de trabajo',
+                subtitle: ({policyName}: {policyName: string}) => policyName,
             },
             fixPersonalCardConnection: {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `Arreglar la conexión de la tarjeta personal de ${cardName}` : 'Arreglar la conexión de la tarjeta personal'),
-                subtitle: 'Monedero > Tarjetas asignadas',
+                subtitle: 'Monedero',
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Reconectar con ${integrationName}`,
-                defaultSubtitle: 'Espacio de trabajo > Contabilidad',
-                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Contabilidad`,
+                defaultSubtitle: 'Espacio de trabajo',
+                subtitle: ({policyName}: {policyName: string}) => policyName,
             },
             addShippingAddress: {
                 title: 'Necesitamos tu dirección de envío',
