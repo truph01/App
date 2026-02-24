@@ -55,7 +55,13 @@ function WalletStatementPage({route}: WalletStatementPageProps) {
         }
 
         setIsDownloading(true);
-        if (walletStatement?.[yearMonth] && currentUserLogin) {
+        if (walletStatement?.[yearMonth]) {
+            if (!currentUserLogin) {
+                // Session email not yet available (e.g. during Onyx hydration); wait for it
+                // instead of falling through to regenerate the statement.
+                setIsDownloading(false);
+                return;
+            }
             // We already have a file URL for this statement, so we can download it immediately
             const downloadFileName = `Expensify_Statement_${yearMonth}.pdf`;
             const fileName = walletStatement[yearMonth];
