@@ -808,5 +808,22 @@ describe('PersonalDetailOptionsListUtils', () => {
             const result = filterOption(OPTIONS.currentUserOption, currentUserLogin);
             expect(result).toBeDefined();
         });
+
+        it('should match current user option when searching "You" with extraSearchTerms', () => {
+            const result = filterOption(OPTIONS.currentUserOption, 'you', ['You', 'me']);
+            expect(result).toBeDefined();
+            expect(result?.accountID).toBe(currentUserAccountID);
+        });
+
+        it('should match current user option when searching "me" with extraSearchTerms', () => {
+            const result = filterOption(OPTIONS.currentUserOption, 'me', ['You', 'me']);
+            expect(result).toBeDefined();
+            expect(result?.accountID).toBe(currentUserAccountID);
+        });
+
+        it('should not match current user option when searching unrelated term even with extraSearchTerms', () => {
+            const result = filterOption(OPTIONS.currentUserOption, 'non-matching-string', ['You', 'me']);
+            expect(result).toBeNull();
+        });
     });
 });

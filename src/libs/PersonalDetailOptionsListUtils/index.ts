@@ -178,18 +178,21 @@ function filterUserToInvite(options: Omit<Options, 'userToInvite'>, currentUserL
     });
 }
 
-function matchesSearchTerms(option: OptionData, searchTerms: string[]): boolean {
-    const searchText = deburr(`${option.text} ${option.login ?? ''}`.toLocaleLowerCase());
+function matchesSearchTerms(option: OptionData, searchTerms: string[], extraSearchTerms?: string[]): boolean {
+    let searchText = deburr(`${option.text} ${option.login ?? ''}`.toLocaleLowerCase());
+    if (extraSearchTerms?.length) {
+        searchText += ` ${extraSearchTerms.join(' ').toLocaleLowerCase()}`;
+    }
     return searchTerms.every((term) => searchText.includes(term));
 }
 
-function filterOption(option: OptionData | undefined, searchValue: string | undefined) {
+function filterOption(option: OptionData | undefined, searchValue: string | undefined, extraSearchTerms?: string[]) {
     if (!option) {
         return null;
     }
 
     const searchTerms = processSearchString(searchValue);
-    const isMatchingSearch = matchesSearchTerms(option, searchTerms);
+    const isMatchingSearch = matchesSearchTerms(option, searchTerms, extraSearchTerms);
 
     if (isMatchingSearch) {
         return option;
