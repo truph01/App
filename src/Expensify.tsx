@@ -22,7 +22,6 @@ import useDebugShortcut from './hooks/useDebugShortcut';
 import useIsAuthenticated from './hooks/useIsAuthenticated';
 import useLocalize from './hooks/useLocalize';
 import useOnyx from './hooks/useOnyx';
-import usePriorityMode from './hooks/usePriorityChange';
 import {updateLastRoute} from './libs/actions/App';
 import * as EmojiPickerAction from './libs/actions/EmojiPickerAction';
 // This lib needs to be imported, but it has nothing to export since all it contains is an Onyx connection
@@ -47,6 +46,7 @@ import Visibility from './libs/Visibility';
 import ONYXKEYS from './ONYXKEYS';
 import PopoverReportActionContextMenu from './pages/inbox/report/ContextMenu/PopoverReportActionContextMenu';
 import * as ReportActionContextMenu from './pages/inbox/report/ContextMenu/ReportActionContextMenu';
+import PriorityModeHandler from './PriorityModeHandler';
 import type {Route} from './ROUTES';
 import {accountIDSelector} from './selectors/Session';
 import {useSplashScreenActions, useSplashScreenState} from './SplashScreenStateContext';
@@ -78,7 +78,6 @@ function Expensify() {
     const [lastVisitedPath] = useOnyx(ONYXKEYS.LAST_VISITED_PATH);
 
     useDebugShortcut();
-    usePriorityMode();
 
     useEffect(() => {
         initializeMemoryTrackingTelemetry();
@@ -304,6 +303,7 @@ function Expensify() {
                 </>
             )}
 
+            <PriorityModeHandler />
             <DelegateAccessHandler />
             <FullstoryInitHandler />
             <DeepLinkHandler onInitialUrl={setInitialUrl} />
