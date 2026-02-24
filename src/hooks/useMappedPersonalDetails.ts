@@ -18,9 +18,7 @@ const personalDetailMapper = (personalDetail: OnyxInputOrEntry<PersonalDetails>)
  * shallowEqual on raw personal detail references, then maps the collection inline.
  */
 function useMappedPersonalDetails<T>(mapper: (personalDetail: OnyxEntry<PersonalDetails>) => T) {
-    const [personalDetails, metadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        canBeMissing: false,
-    });
+    const [personalDetails, metadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const transformed = Object.entries(personalDetails ?? {}).reduce<Record<string, T>>((acc, [key, entry]) => {
         acc[key] = mapper(entry ?? undefined);
         return acc;

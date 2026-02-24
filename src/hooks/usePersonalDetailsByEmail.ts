@@ -9,7 +9,7 @@ import useOnyx from './useOnyx';
  * shallowEqual on raw personal detail references, then remaps inline.
  */
 function usePersonalDetailsByEmail() {
-    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {canBeMissing: true});
+    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const result = personalDetails ? lodashMapKeys(personalDetails, (value, key) => value?.login ?? key) : undefined;
 
     return result;
