@@ -3,8 +3,7 @@ import BaseWidgetItem from '@components/BaseWidgetItem';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
-import Navigation from '@libs/Navigation/Navigation';
-import ROUTES from '@src/ROUTES';
+import navigateFromAddPaymentCardItem from './navigateFromAddPaymentCardItem';
 
 function AddPaymentCard() {
     const {translate} = useLocalize();
@@ -19,7 +18,7 @@ function AddPaymentCard() {
             title={translate('homePage.timeSensitiveSection.addPaymentCard.title')}
             subtitle={translate('homePage.timeSensitiveSection.addPaymentCard.subtitle')}
             ctaText={translate('homePage.timeSensitiveSection.addPaymentCard.cta')}
-            onCtaPress={() => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_ADD_PAYMENT_CARD)}
+            onCtaPress={navigateFromAddPaymentCardItem}
             buttonProps={{success: true}}
         />
     );
