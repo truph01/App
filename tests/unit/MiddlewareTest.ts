@@ -65,7 +65,7 @@ describe('Middleware', () => {
 
             // Then the response should not be undefined — the caller may need the raw response for side effects
             expect(result).toBeDefined();
-            expect(result?.transactionsPending3DSReview).toBeDefined();
+            expect(result?.jsonCode).toBe(200);
         });
     });
 

@@ -95,7 +95,7 @@ describe('OnyxUpdatesTest', () => {
 
         // Then the response should still be returned to the caller, not undefined
         expect(result).toBeDefined();
-        expect(result?.transactionsPending3DSReview).toBeDefined();
+        expect(result?.jsonCode).toBe(200);
     });
 
     it('applies full ReconnectApp Onyx updates even if they appear old', async () => {
