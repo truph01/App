@@ -432,6 +432,6 @@ function getHeaderMessage(translate: LocaleContextProps['translate'], searchValu
     return translate('common.noResultsFound');
 }
 
-export {createOption, getUserToInviteOption, canCreateOptimisticPersonalDetailOption, filterOption, getValidOptions, createOptionList, getHeaderMessage};
+export {createOption, getUserToInviteOption, canCreateOptimisticPersonalDetailOption, filterOption, matchesSearchTerms, getValidOptions, createOptionList, getHeaderMessage};
 
 export type {OptionData, Options};
