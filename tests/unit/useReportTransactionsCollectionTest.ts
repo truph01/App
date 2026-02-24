@@ -2,8 +2,8 @@ import {renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import useReportTransactionsCollection from '../../src/hooks/useReportTransactionsCollection';
 import ONYXKEYS from '../../src/ONYXKEYS';
-import type {ReportTransactionsAndViolationsDerivedValue} from '../../src/types/onyx/DerivedValues';
 import type {Transaction} from '../../src/types/onyx';
+import type {ReportTransactionsAndViolationsDerivedValue} from '../../src/types/onyx/DerivedValues';
 import createRandomTransaction from '../utils/collections/transaction';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
