@@ -103,7 +103,7 @@ function IOURequestStepScan({
             return;
         }
         startSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT, {
-            name: 'camera-init',
+            name: CONST.TELEMETRY.SPAN_CAMERA_INIT,
             op: CONST.TELEMETRY.SPAN_CAMERA_INIT,
         });
         cameraInitSpanStarted.current = true;
