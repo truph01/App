@@ -17,7 +17,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import {goBackFromInvalidPolicy, isPendingDeletePolicy, isPolicyAdmin} from '@libs/PolicyUtils';
-import {convertPolicyEmployeesToApprovalWorkflows} from '@libs/WorkflowUtils';
+import {convertPolicyEmployeesToApprovalWorkflows, mergeWorkflowMembersWithAvailableMembers} from '@libs/WorkflowUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import withPolicyAndFullscreenLoading from '@pages/workspace/withPolicyAndFullscreenLoading';
 import type {WithPolicyAndFullscreenLoadingProps} from '@pages/workspace/withPolicyAndFullscreenLoading';
@@ -115,13 +115,9 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
             return clearApprovalWorkflow();
         }
 
-        // Deduplicate by email: current workflow members first, then defaultWorkflowMembers not already in workflow.
-        // Prevents duplicate keyForList (email) in Expenses From list which causes blank row when deselecting (#83251).
-        const memberEmails = new Set(currentApprovalWorkflow.members.map((m) => m.email));
-        const additionalMembers = defaultWorkflowMembers.filter((m) => !memberEmails.has(m.email));
         setApprovalWorkflow({
             ...currentApprovalWorkflow,
-            availableMembers: [...currentApprovalWorkflow.members, ...additionalMembers],
+            availableMembers: mergeWorkflowMembersWithAvailableMembers(currentApprovalWorkflow.members, defaultWorkflowMembers),
             usedApproverEmails,
             action: CONST.APPROVAL_WORKFLOW.ACTION.EDIT,
             errors: null,

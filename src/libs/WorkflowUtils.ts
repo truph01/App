@@ -574,6 +574,17 @@ function getOpenConnectedToPolicyBusinessBankAccounts(bankAccountList: BankAccou
     });
 }
 
+/**
+ * Merge workflow members with all available members, deduplicating by email.
+ * Used when setting up the Edit page's availableMembers to prevent duplicate keyForList
+ * in the Expenses From list (which causes a blank row when deselecting - see #83251).
+ */
+function mergeWorkflowMembersWithAvailableMembers(workflowMembers: Member[], allAvailableMembers: Member[]): Member[] {
+    const memberEmails = new Set(workflowMembers.map((m) => m.email));
+    const additionalMembers = allAvailableMembers.filter((m) => !memberEmails.has(m.email));
+    return [...workflowMembers, ...additionalMembers];
+}
+
 export {
     calculateApprovers,
     convertPolicyEmployeesToApprovalWorkflows,
@@ -582,5 +593,6 @@ export {
     getEligibleExistingBusinessBankAccounts,
     getOpenConnectedToPolicyBusinessBankAccounts,
     INITIAL_APPROVAL_WORKFLOW,
+    mergeWorkflowMembersWithAvailableMembers,
     updateWorkflowDataOnApproverRemoval,
 };
