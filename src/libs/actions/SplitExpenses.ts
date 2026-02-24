@@ -5,13 +5,15 @@ import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTop
 import Navigation from '@libs/Navigation/Navigation';
 import {rand64} from '@libs/NumberUtils';
 import {getTransactionDetails} from '@libs/ReportUtils';
-import {buildOptimisticTransaction, getChildTransactions, getOriginalTransactionWithSplitInfo} from '@libs/TransactionUtils';
+import {buildOptimisticTransaction, getChildTransactions, getOriginalTransactionWithSplitInfo, isDistanceRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {Report, Transaction} from '@src/types/onyx';
+import type {Policy, Report, Transaction} from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
-import {initSplitExpenseItemData} from './IOU/Split';
+import type {TransactionCustomUnit} from '@src/types/onyx/Transaction';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
+import {initSplitExpenseItemData, updateSplitExpenseDistanceFromAmount} from './IOU/Split';
 
 // We use connectWithoutView because `initSplitExpense` doesn't affect the UI rendering and
 // this avoids unnecessary re-rendering for components when any transaction changes. This data should ONLY
@@ -36,7 +38,7 @@ Onyx.connectWithoutView({
 /**
  * Create a draft transaction to set up split expense details for the split expense flow
  */
-function initSplitExpense(transaction: OnyxEntry<Transaction>) {
+function initSplitExpense(transaction: OnyxEntry<Transaction>, policy?: OnyxEntry<Policy>): void {
     if (!transaction) {
         return;
     }
@@ -81,15 +83,50 @@ function initSplitExpense(transaction: OnyxEntry<Transaction>) {
     const transactionDetailsAmount = transactionDetails?.amount ?? 0;
     const transactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`];
 
+    const splitAmounts = [
+        calculateAmount(1, transactionDetailsAmount, transactionDetails?.currency ?? '', false),
+        calculateAmount(1, transactionDetailsAmount, transactionDetails?.currency ?? '', true),
+    ];
+    const splitCustomUnits: Array<TransactionCustomUnit | undefined> = [undefined, undefined];
+    const splitMerchants: Array<string | undefined> = [undefined, undefined];
+
+    if (isDistanceRequest(transaction)) {
+        const mileageRate = DistanceRequestUtils.getRate({transaction, policy: policy ?? undefined});
+        const {unit, rate} = mileageRate;
+
+        if (rate && rate > 0 && transaction?.comment?.customUnit) {
+            for (let i = 0; i < splitAmounts.length; i++) {
+                if (splitAmounts.at(i)) {
+                    const splitAmount = splitAmounts.at(i) ?? 0;
+                    const {customUnit: updatedCustomUnit, merchant} = updateSplitExpenseDistanceFromAmount(
+                        splitAmount,
+                        rate,
+                        unit,
+                        transaction.comment.customUnit,
+                        mileageRate,
+                        transactionDetails?.currency,
+                    );
+
+                    splitCustomUnits[i] = updatedCustomUnit;
+                    splitMerchants[i] = merchant;
+                }
+            }
+        }
+    }
+
     const splitExpenses = [
         initSplitExpenseItemData(transaction, transactionReport, {
-            amount: calculateAmount(1, transactionDetailsAmount, transactionDetails?.currency ?? '', false) ?? 0,
+            amount: splitAmounts.at(0) ?? 0,
             transactionID: rand64(),
+            customUnit: splitCustomUnits.at(0),
+            merchant: splitMerchants.at(0),
             isManuallyEdited: false,
         }),
         initSplitExpenseItemData(transaction, transactionReport, {
-            amount: calculateAmount(1, transactionDetailsAmount, transactionDetails?.currency ?? '', true) ?? 0,
+            amount: splitAmounts.at(1) ?? 0,
             transactionID: rand64(),
+            customUnit: splitCustomUnits.at(1),
+            merchant: splitMerchants.at(1),
             isManuallyEdited: false,
         }),
     ];
