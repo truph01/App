@@ -26,14 +26,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import getPlatform from '@libs/getPlatform';
 import Log from '@libs/Log';
 import {getIOUReportIDOfLastAction} from '@libs/OptionsListUtils';
-import {
-    getLastVisibleActionIncludingTransactionThread,
-    getOneTransactionThreadReportID,
-    getOriginalMessage,
-    isActionableTrackExpense,
-    isInviteOrRemovedAction,
-    isMoneyRequestAction,
-} from '@libs/ReportActionsUtils';
+import {getLastVisibleActionIncludingTransactionThread, getOriginalMessage, isActionableTrackExpense, isInviteOrRemovedAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {canUserPerformWriteAction as canUserPerformWriteActionUtil} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';

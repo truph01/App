@@ -3586,6 +3586,7 @@ describe('ReportActionsUtils', () => {
             ({
                 actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
                 reportActionID: '1',
+                reportID: 'testReportID',
                 created: '2024-01-01 00:00:00.000',
                 person: [{type: 'TEXT', style: 'strong', text: 'Actor'}],
                 message: [{html: 'hello', text: 'hello', type: 'COMMENT'}],
