@@ -13,35 +13,34 @@ const ILLUSTRATION_SIZE = 68;
 const MSG = 'homePage.forYouSection.emptyStateMessages' as const;
 
 // ── Edit this table to update copy ──────────────────────────────────
-// [Illustration,        subtitle,              description       ]
+// [Illustration,      title,                description              ]
 const ENTRY_DATA: Array<[IllustrationName, string, string]> = [
-    ['ThumbsUpStars', 'thumbsUpStar', 'keepAnEyeOut'],
-    ['SmallRocket', 'launchSomethingNew', 'upcomingTodos'],
-    ['CowboyHat', 'wrangledEveryTask', 'keepAnEyeOut'],
-    ['Trophy1', 'thankTheAcademy', 'upcomingTodos'],
-    ['PalmTree', 'hitTheBeach', 'keepAnEyeOut'],
-    ['FishbowlBlue', 'cuteFish', 'upcomingTodos'],
-    ['Target', 'rightOnTarget', 'keepAnEyeOut'],
-    ['Chair', 'takeASeat', 'upcomingTodos'],
-    ['Broom', 'niceAndTidy', 'keepAnEyeOut'],
-    ['House', 'welcomeHome', 'upcomingTodos'],
-    ['ConciergeBot', 'beepBoop', 'keepAnEyeOut'],
-    ['CheckboxText', 'checkedEveryBox', 'upcomingTodos'],
-    ['Trophy', 'shinyTrophy', 'keepAnEyeOut'],
-    ['Flash', 'fastAsLightning', 'upcomingTodos'],
-    ['Sunglasses', 'tooCool', 'keepAnEyeOut'],
-    ['F1Flags', 'crossedFinishLine', 'upcomingTodos'],
+    ['ThumbsUpStars', 'youreDone', 'thumbsUpKeepEyeOut'],
+    ['SmallRocket', 'allCaughtUpTitle', 'todosWillLaunch'],
+    ['CowboyHat', 'youreDone', 'tasksWrangledKeepEyeOut'],
+    ['Trophy1', 'nothingToShow', 'youDidItKeepEyeOut'],
+    ['PalmTree', 'allCaughtUpTitle', 'relaxKeepEyeOut'],
+    ['FishbowlBlue', 'youreDone', 'floatTodosHere'],
+    ['Target', 'allCaughtUpTitle', 'stayOnTargetKeepEyeOut'],
+    ['Chair', 'nothingToShow', 'relaxTodosHere'],
+    ['Broom', 'youreDone', 'tasksCleanKeepEyeOut'],
+    ['House', 'allCaughtUpTitle', 'todosAppearHome'],
+    ['ConciergeBot', 'nothingToShow', 'beepBoopKeepEyeOut'],
+    ['CheckboxText', 'allCaughtUpTitle', 'checkOffTodosHere'],
+    ['Flash', 'youreDone', 'zapTodosHere'],
+    ['Sunglasses', 'nothingToShow', 'chillKeepEyeOut'],
+    ['F1Flags', 'allCaughtUpTitle', 'finishedKeepEyeOut'],
 ];
 // ────────────────────────────────────────────────────────────────────
 
 type EmptyStateConfig = {
-    subtitleKey: TranslationPaths;
+    titleKey: TranslationPaths;
     descriptionKey: TranslationPaths;
     illustrationName: IllustrationName;
 };
 
-const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ENTRY_DATA.map(([illustrationName, subtitle, description]) => ({
-    subtitleKey: `${MSG}.${subtitle}` as TranslationPaths,
+const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ENTRY_DATA.map(([illustrationName, title, description]) => ({
+    titleKey: `${MSG}.${title}` as TranslationPaths,
     descriptionKey: `${MSG}.${description}` as TranslationPaths,
     illustrationName,
 }));
@@ -66,7 +65,7 @@ function EmptyState() {
                 height={ILLUSTRATION_SIZE}
             />
             <View style={styles.forYouEmptyStateTextContainer}>
-                <Text style={styles.forYouEmptyStateTitle}>{translate(CONFIG.subtitleKey)}</Text>
+                <Text style={styles.forYouEmptyStateTitle}>{translate(CONFIG.titleKey)}</Text>
                 <Text style={styles.forYouEmptyStateDescription}>{translate(CONFIG.descriptionKey)}</Text>
             </View>
         </View>

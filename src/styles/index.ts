@@ -3709,6 +3709,7 @@ const staticStyles = (theme: ThemeColors) =>
             alignItems: 'center',
             gap: 8,
             width: '100%',
+            paddingHorizontal: 20,
         },
 
         forYouEmptyStateTitle: {
