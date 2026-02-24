@@ -3780,7 +3780,7 @@ const CONST = {
             MOCK_BANK: 'Mock Bank',
             OTHER: 'Other',
         },
-        OLDDOT_BANKS: {
+        NON_CONNECTABLE_BANKS: {
             PEX: 'PEX',
         },
         BANK_CONNECTIONS: {

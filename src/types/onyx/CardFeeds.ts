@@ -35,7 +35,7 @@ type BankName = ValueOf<typeof CONST.COMPANY_CARDS.BANKS>;
 /**
  * OldDot bank name
  */
-type OldDotBankName = ValueOf<typeof CONST.COMPANY_CARDS.OLDDOT_BANKS>;
+type OldDotBankName = ValueOf<typeof CONST.COMPANY_CARDS.NON_CONNECTABLE_BANKS>;
 
 /**
  *
