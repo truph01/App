@@ -130,11 +130,11 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
     // Convert hook's degree rotation to radians for Skia rendering
     const angleRad = (Math.abs(labelRotation) * Math.PI) / 180;
 
-    const {formatValue} = useChartLabelFormats({
+    const {formatYAxisLabel} = useChartLabelFormats({
         data,
         font,
-        unit: yAxisUnit,
-        unitPosition: yAxisUnitPosition,
+        yAxisUnit,
+        yAxisUnitPosition,
     });
 
     const checkIsOverDot = useCallback((args: HitTestArgs) => {
@@ -150,7 +150,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
         checkIsOver: checkIsOverDot,
     });
 
-    const tooltipData = useTooltipData(activeDataIndex, data, formatValue);
+    const tooltipData = useTooltipData(activeDataIndex, data, formatYAxisLabel);
 
     // Custom x-axis labels with hybrid positioning:
     // - At 0° (horizontal): center label under the point (like bar chart)
@@ -303,7 +303,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
                             {
                                 font,
                                 labelColor: theme.textSupporting,
-                                formatYLabel: formatValue,
+                                formatYLabel: formatYAxisLabel,
                                 tickCount: Y_AXIS_TICK_COUNT,
                                 lineWidth: Y_AXIS_LINE_WIDTH,
                                 lineColor: theme.border,
