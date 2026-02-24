@@ -181,7 +181,7 @@ function filterUserToInvite(options: Omit<Options, 'userToInvite'>, currentUserL
 function matchesSearchTerms(option: OptionData, searchTerms: string[], extraSearchTerms?: string[]): boolean {
     let searchText = deburr(`${option.text} ${option.login ?? ''}`.toLocaleLowerCase());
     if (extraSearchTerms?.length) {
-        searchText += ` ${extraSearchTerms.join(' ').toLocaleLowerCase()}`;
+        searchText += ` ${deburr(extraSearchTerms.join(' ').toLocaleLowerCase())}`;
     }
     return searchTerms.every((term) => searchText.includes(term));
 }
