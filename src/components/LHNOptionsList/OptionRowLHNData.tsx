@@ -121,6 +121,7 @@ function OptionRowLHNData({
         movedFromReport,
         movedToReport,
         currentUserAccountID,
+        chatReport,
         reportAttributesDerived,
     ]);
 

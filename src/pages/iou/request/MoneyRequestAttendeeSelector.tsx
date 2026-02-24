@@ -152,7 +152,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
         };
     }
 
-    const {userToInviteExpenseReport, userToInviteChatReport} = useUserToInviteReports(availableOptions?.userToInvite);
+    const {userToInviteExpenseReport, userToInviteChatReport} = useUserToInviteReports(orderedAvailableOptions?.userToInvite);
 
     const shouldShowErrorMessage = selectedOptions.length < 1;
 

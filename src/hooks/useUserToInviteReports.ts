@@ -1,4 +1,4 @@
-import useOnyx from '@hooks/useOnyx';
+import useOnyx from './useOnyx';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {SearchOptionData} from '@libs/OptionsListUtils/types';
 import ONYXKEYS from '@src/ONYXKEYS';
