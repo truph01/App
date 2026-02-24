@@ -171,14 +171,13 @@ function LHNOptionsList({style, contentContainerStyles, data, onSelectRow, optio
     const renderItem = useCallback(
         ({item, index}: RenderItemProps): ReactElement => {
             const reportID = item.reportID;
+            const itemReportAttributes = reportAttributes?.[reportID];
             const itemParentReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${item.parentReportID}`];
             const itemReportNameValuePairs = reportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`];
-            const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${item.chatReportID}`];
             const itemReportActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`];
-            const itemOneTransactionThreadReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${getOneTransactionThreadReportID(item, chatReport, itemReportActions, isOffline)}`];
+            const itemOneTransactionThreadReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${itemReportAttributes?.oneTransactionThreadReportID}`];
             const itemParentReportActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${item?.parentReportID}`];
             const itemParentReportAction = item?.parentReportActionID ? itemParentReportActions?.[item?.parentReportActionID] : undefined;
-            const itemReportAttributes = reportAttributes?.[reportID];
 
             let invoiceReceiverPolicyID = '-1';
             if (item?.invoiceReceiver && 'policyID' in item.invoiceReceiver) {

@@ -67,7 +67,7 @@ function ShareTab({ref}: ShareTabProps) {
     const [isSearchingForReports] = useOnyx(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, {initWithStoredValues: false});
 
     const offlineMessage: string = isOffline ? `${translate('common.youAppearToBeOffline')} ${translate('search.resultsAreLimited')}` : '';
-    const showLoadingPlaceholder = useMemo(() => !areOptionsInitialized || !didScreenTransitionEnd, [areOptionsInitialized, didScreenTransitionEnd]);
+    const showLoadingPlaceholder = !areOptionsInitialized || !didScreenTransitionEnd;
 
     const searchOptions = useMemo(() => {
         if (!areOptionsInitialized) {
@@ -106,10 +106,10 @@ function ShareTab({ref}: ShareTabProps) {
         personalDetails,
     ]);
 
-    const recentReportsOptions = useMemo(() => {
-        if (textInputValue.trim() === '') {
-            return optionsOrderBy(searchOptions.recentReports, recentReportComparator, 20);
-        }
+    let recentReportsOptions: OptionData[];
+    if (textInputValue.trim() === '') {
+        recentReportsOptions = optionsOrderBy(searchOptions.recentReports, recentReportComparator, 20);
+    } else {
         const orderedOptions = combineOrderingOfReportsAndPersonalDetails(searchOptions, textInputValue, {
             sortByReportTypeInSearch: true,
             preferChatRoomsOverThreads: true,
@@ -119,27 +119,23 @@ function ShareTab({ref}: ShareTabProps) {
         if (searchOptions.userToInvite) {
             reportOptions.push(searchOptions.userToInvite);
         }
-        return reportOptions.slice(0, 20);
-    }, [searchOptions, textInputValue]);
+        recentReportsOptions = reportOptions.slice(0, 20);
+    }
 
+    const trimmedDebouncedTextInputValue = debouncedTextInputValue.trim();
     useEffect(() => {
-        searchInServer(debouncedTextInputValue.trim());
-    }, [debouncedTextInputValue]);
+        searchInServer(trimmedDebouncedTextInputValue);
+    }, [trimmedDebouncedTextInputValue]);
 
-    const styledRecentReports = useMemo(() => {
-        return recentReportsOptions.map((item, index) => ({
-            ...item,
-            pressableStyle: styles.br2,
-            text: StringUtils.lineBreaksToSpaces(item.text),
-            wrapperStyle: [styles.pr3, styles.pl3],
-            keyForList: `${item.reportID}-${index}`,
-        }));
-    }, [recentReportsOptions, styles]);
+    const styledRecentReports = recentReportsOptions.map((item, index) => ({
+        ...item,
+        pressableStyle: styles.br2,
+        text: StringUtils.lineBreaksToSpaces(item.text),
+        wrapperStyle: [styles.pr3, styles.pl3],
+        keyForList: `${item.reportID}-${index}`,
+    }));
 
-    const header = useMemo(() => {
-        const headerMessage = getHeaderMessage(styledRecentReports.length !== 0, false, textInputValue.trim(), countryCode, false);
-        return headerMessage;
-    }, [textInputValue, styledRecentReports.length, countryCode]);
+    const header = getHeaderMessage(styledRecentReports.length !== 0, false, textInputValue.trim(), countryCode, false);
 
     const onSelectRow = (item: OptionData) => {
         let reportID = item?.reportID ?? CONST.DEFAULT_NUMBER_ID;
@@ -158,27 +154,21 @@ function ShareTab({ref}: ShareTabProps) {
         }
     };
 
-    const textInputOptions = useMemo(
-        () => ({
-            value: textInputValue,
-            label: translate('selectionList.nameEmailOrPhoneNumber'),
-            hint: offlineMessage,
-            onChangeText: setTextInputValue,
-            headerMessage: header,
-            disableAutoFocus: true,
-        }),
-        [textInputValue, setTextInputValue, translate, offlineMessage, header],
-    );
+    const textInputOptions = {
+        value: textInputValue,
+        label: translate('selectionList.nameEmailOrPhoneNumber'),
+        hint: offlineMessage,
+        onChangeText: setTextInputValue,
+        headerMessage: header,
+        disableAutoFocus: true,
+    };
 
-    const customListHeader = useMemo(
-        () =>
-            textInputValue.trim() === '' ? (
-                <View style={[styles.optionsListSectionHeader, styles.justifyContentCenter]}>
-                    <Text style={[styles.ph5, styles.textLabelSupporting]}>{translate('search.recentChats')}</Text>
-                </View>
-            ) : undefined,
-        [textInputValue, styles, translate],
-    );
+    const customListHeader =
+        textInputValue.trim() === '' ? (
+            <View style={[styles.optionsListSectionHeader, styles.justifyContentCenter]}>
+                <Text style={[styles.ph5, styles.textLabelSupporting]}>{translate('search.recentChats')}</Text>
+            </View>
+        ) : undefined;
 
     return (
         <SelectionList
