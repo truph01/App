@@ -1,3 +1,4 @@
+import {requiresTwoFactorAuthSelector} from '@selectors/Account';
 import {domainMemberSettingsSelector, domainNameSelector, selectSecurityGroupForAccount, vacationDelegateSelector} from '@selectors/Domain';
 import personalDetailsSelector from '@selectors/PersonalDetails';
 import React, {useState} from 'react';
@@ -57,7 +58,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
         selector: domainMemberSettingsSelector,
     });
 
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [accountRequiresTwoFactorAuth] = useOnyx(ONYXKEYS.ACCOUNT, {selector: requiresTwoFactorAuthSelector});
 
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
@@ -130,7 +131,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                             return;
                         }
 
-                        if (!value && account?.requiresTwoFactorAuth) {
+                        if (!value && accountRequiresTwoFactorAuth) {
                             clearValidateDomainTwoFactorCodeError();
                             Navigation.navigate(ROUTES.DOMAIN_MEMBER_FORCE_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
                         } else {
@@ -143,7 +144,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     onCloseError={() => clearTwoFactorAuthExemptEmailsErrors(domainAccountID, memberLogin)}
                 />
                 <View style={styles.mt6} />
-                {!!account?.requiresTwoFactorAuth && (
+                {!!accountRequiresTwoFactorAuth && (
                     <MenuItem
                         title={translate('domain.common.resetTwoFactorAuth')}
                         icon={icons.Flag}
