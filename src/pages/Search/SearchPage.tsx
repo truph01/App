@@ -61,6 +61,7 @@ import {
     unholdMoneyRequestOnSearch,
     updateAdvancedFilters,
 } from '@libs/actions/Search';
+import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setNameValuePair} from '@libs/actions/User';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -82,7 +83,6 @@ import {navigateToSearchRHP, shouldShowDeleteOption} from '@libs/SearchUIUtils';
 import {hasTransactionBeenRejected} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import {canIOUBePaid, dismissRejectUseExplanation} from '@userActions/IOU';
-import {initSplitExpense} from '@userActions/IOU/Split';
 import {openOldDotLink} from '@userActions/Link';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -249,6 +249,9 @@ function SearchPage({route}: SearchPageProps) {
 
     const {status, hash} = queryJSON ?? {};
     const selectedTransactionsKeys = Object.keys(selectedTransactions ?? {});
+    const firstTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${selectedTransactionsKeys.at(0)}`];
+    const [firstTransactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${firstTransaction?.reportID}`);
+    const [firstTransactionPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${firstTransactionReport?.policyID}`);
 
     const beginExportWithTemplate = useCallback(
         async (templateName: string, templateType: string, policyID: string | undefined) => {
@@ -383,19 +386,21 @@ function SearchPage({route}: SearchPageProps) {
         clearSelectedTransactions(undefined, true);
     }, [
         isOffline,
-        areAllMatchingItemsSelected,
-        showConfirmModal,
-        translate,
-        selectedTransactionsKeys,
         status,
-        hash,
-        selectedReports,
+        areAllMatchingItemsSelected,
         queryJSON,
-        selectAllMatchingItems,
+        selectedReports,
+        selectedReportIDs,
+        selectedTransactionReportIDs,
+        selectedTransactionsKeys,
+        translate,
         clearSelectedTransactions,
         setIsDownloadErrorModalVisible,
         selectedReportIDs,
         selectedTransactionReportIDs,
+        showConfirmModal,
+        hash,
+        selectAllMatchingItems,
     ]);
 
     const handleApproveWithDEWCheck = useCallback(async () => {
@@ -1127,7 +1132,6 @@ function SearchPage({route}: SearchPageProps) {
 
         const isSplittable = !!firstTransactionMeta?.canSplit;
         const isAlreadySplit = !!firstTransactionMeta?.hasBeenSplit;
-        const firstTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${selectedTransactionsKeys.at(0)}`];
 
         const canSplitTransaction = selectedTransactionsKeys.length === 1 && !isAlreadySplit && isSplittable;
 
@@ -1137,7 +1141,7 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.ArrowSplit,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
-                    initSplitExpense(allTransactions, allReports, firstTransaction);
+                    initSplitExpense(firstTransaction, firstTransactionPolicy);
                 },
             });
         }
@@ -1180,6 +1184,19 @@ function SearchPage({route}: SearchPageProps) {
         selectedTransactions,
         queryJSON?.type,
         expensifyIcons,
+        expensifyIcons.Export,
+        expensifyIcons.ArrowRight,
+        expensifyIcons.Table,
+        expensifyIcons.ThumbsUp,
+        expensifyIcons.ThumbsDown,
+        expensifyIcons.Send,
+        expensifyIcons.MoneyBag,
+        expensifyIcons.Stopwatch,
+        expensifyIcons.ArrowCollapse,
+        expensifyIcons.DocumentMerge,
+        expensifyIcons.ArrowSplit,
+        expensifyIcons.Trashcan,
+        expensifyIcons.Exclamation,
         translate,
         areAllMatchingItemsSelected,
         isOffline,
@@ -1212,6 +1229,10 @@ function SearchPage({route}: SearchPageProps) {
         dismissedHoldUseExplanation,
         localeCompare,
         allReports,
+        currentUserPersonalDetails.accountID,
+        localeCompare,
+        firstTransaction,
+        firstTransactionPolicy,
         handleDeleteSelectedTransactions,
         theme.icon,
         styles.colorMuted,
