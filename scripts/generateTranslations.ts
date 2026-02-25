@@ -1296,6 +1296,10 @@ class TranslationGenerator {
                             let updatedProperties = [...properties];
 
                             for (const [addPath, translatedCodeString] of translatedCodeMap) {
+                                // Only inject paths that are actually new additions, not modifications
+                                if (!this.pathsToAdd.has(addPath as TranslationPaths)) {
+                                    continue;
+                                }
                                 // Parse the translated code string back to an AST expression
                                 const translatedExpression = TSCompilerUtils.parseCodeStringToAST(translatedCodeString);
 
