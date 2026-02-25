@@ -1,6 +1,8 @@
+import type {OnyxEntry} from 'react-native-onyx';
 import {selectFilteredReportActions} from '@libs/ReportUtils';
 import {getSections, getSortedSections} from '@libs/SearchUIUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type LastSearchParams from '@src/types/onyx/ReportNavigation';
 import useActionLoadingReportIDs from './useActionLoadingReportIDs';
 import useArchivedReportsIdSet from './useArchivedReportsIdSet';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
@@ -10,6 +12,7 @@ import useOnyx from './useOnyx';
 type UseSearchSectionsResult = {
     allReports: Array<string | undefined>;
     isSearchLoading: boolean;
+    lastSearchQuery: OnyxEntry<LastSearchParams>;
 };
 
 function useSearchSections(): UseSearchSectionsResult {
@@ -60,7 +63,7 @@ function useSearchSections(): UseSearchSectionsResult {
         allReports = getSortedSections(type, status ?? '', searchData, localeCompare, translate, sortBy, sortOrder, groupBy).map((value) => value.reportID);
     }
 
-    return {allReports, isSearchLoading: !!currentSearchResults?.search?.isLoading};
+    return {allReports, isSearchLoading: !!currentSearchResults?.search?.isLoading, lastSearchQuery};
 }
 
 export default useSearchSections;
