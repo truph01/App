@@ -236,7 +236,7 @@ function getRulesModifiedMessage(
         {standaloneFragments: [], listEntries: []},
     );
 
-    const fragments = listEntries.map(([key, value], i) => {
+    const listFragment = listEntries.map(([key, value], i) => {
         const isFirst = i === 0;
 
         if (key === 'tax') {
@@ -260,10 +260,8 @@ function getRulesModifiedMessage(
         return translate('iou.rulesModifiedFields.common', key, updatedValue, isFirst);
     });
 
-    const listFragment = fragments.length > 0 ? translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules) : undefined;
-
-    const parts = [...standaloneFragments, listFragment].filter(Boolean);
-    return parts.join(', ');
+    const fragments = [...standaloneFragments, ...listFragment];
+    return fragments.length > 0 ? translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules) : undefined;
 }
 
 /**
