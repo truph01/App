@@ -33,9 +33,10 @@ type CardFeedWithDomainID = `${CardFeedWithNumber}${typeof CONST.COMPANY_CARD.FE
 type BankName = ValueOf<typeof CONST.COMPANY_CARDS.BANKS>;
 
 /**
- * OldDot bank name
+ * Bank name for card feeds that can be displayed in NewDot but cannot be added
+ * as a new connection (e.g. banks without an OAuth or Plaid integration).
  */
-type OldDotBankName = ValueOf<typeof CONST.COMPANY_CARDS.NON_CONNECTABLE_BANKS>;
+type NonConnectableBankName = ValueOf<typeof CONST.COMPANY_CARDS.NON_CONNECTABLE_BANKS>;
 
 /**
  *
@@ -323,7 +324,7 @@ export type {
     CardFeedWithNumber,
     CardFeedWithDomainID,
     BankName,
-    OldDotBankName,
+    NonConnectableBankName as OldDotBankName,
     CardType,
     CardTypeName,
     CompanyCardFeed,
