@@ -35,10 +35,11 @@ function useActiveTransactionIDsEffect(visualOrderTransactionIDs: string[]) {
             return;
         }
         setActiveTransactionIDs(visualOrderTransactionIDs);
-        return () => {
-            clearActiveTransactionIDs();
-        };
     }, [visualOrderTransactionIDs]);
+
+    useEffect(() => {
+        return () => clearActiveTransactionIDs();
+    }, []);
 }
 
 describe('MoneyRequestReportTransactionList - Active Transaction IDs Effect', () => {
@@ -107,7 +108,7 @@ describe('MoneyRequestReportTransactionList - Active Transaction IDs Effect', ()
         expect(mockClearActiveTransactionIDs).toHaveBeenCalledTimes(1);
     });
 
-    it('should NOT call clearActiveTransactionIDs on unmount when route was NOT SEARCH_REPORT', () => {
+    it('should call clearActiveTransactionIDs on unmount even when route was NOT SEARCH_REPORT', () => {
         // Given the focused route is NOT SEARCH_REPORT
         mockFindFocusedRoute.mockReturnValue({name: 'SomeOtherRoute', key: 'test-key'});
 
@@ -118,8 +119,8 @@ describe('MoneyRequestReportTransactionList - Active Transaction IDs Effect', ()
 
         unmount();
 
-        // Then clearActiveTransactionIDs should NOT be called (since the effect returned early)
-        expect(mockClearActiveTransactionIDs).not.toHaveBeenCalled();
+        // Then clearActiveTransactionIDs should still be called (cleanup runs on unmount regardless of route)
+        expect(mockClearActiveTransactionIDs).toHaveBeenCalledTimes(1);
     });
 
     it('should update active transaction IDs when the list changes', () => {
@@ -145,7 +146,7 @@ describe('MoneyRequestReportTransactionList - Active Transaction IDs Effect', ()
         expect(mockSetActiveTransactionIDs).toHaveBeenLastCalledWith(newTransactionIDs);
     });
 
-    it('should call setActiveTransactionIDs on reference change (idempotent guard is in the action layer)', () => {
+    it('should call setActiveTransactionIDs on reference change without clearing first (idempotent guard is in the action layer)', () => {
         // Given the focused route is SEARCH_REPORT
         mockFindFocusedRoute.mockReturnValue({name: SCREENS.RIGHT_MODAL.SEARCH_REPORT, key: 'test-key'});
 
@@ -162,9 +163,12 @@ describe('MoneyRequestReportTransactionList - Active Transaction IDs Effect', ()
         const sameContentNewArray = ['trans1', 'trans2'];
         rerender({ids: sameContentNewArray});
 
-        // Then the effect fires (new reference), but setActiveTransactionIDs internally skips the Onyx write
+        // Then the effect fires (new reference), but setActiveTransactionIDs internally skips the Onyx write.
+        // Crucially, clearActiveTransactionIDs is NOT called on re-render (only on unmount),
+        // preventing the null→same-IDs flash.
         expect(mockSetActiveTransactionIDs).toHaveBeenCalledTimes(2);
         expect(mockSetActiveTransactionIDs).toHaveBeenLastCalledWith(sameContentNewArray);
+        expect(mockClearActiveTransactionIDs).not.toHaveBeenCalled();
     });
 
     it('should handle empty transaction IDs array', () => {

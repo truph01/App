@@ -286,10 +286,11 @@ function MoneyRequestReportTransactionList({
             return;
         }
         setActiveTransactionIDs(visualOrderTransactionIDs);
-        return () => {
-            clearActiveTransactionIDs();
-        };
     }, [visualOrderTransactionIDs]);
+
+    useEffect(() => {
+        return () => clearActiveTransactionIDs();
+    }, []);
 
     const sortedTransactionsMap = useMemo(() => {
         const map = new Map<string, OnyxTypes.Transaction>();
