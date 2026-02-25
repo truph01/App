@@ -959,17 +959,17 @@ const translations = {
             },
             fixCompanyCardConnection: {
                 title: ({feedName}: {feedName: string}) => (feedName ? `Fix ${feedName} company card connection` : 'Fix company card connection'),
-                defaultSubtitle: 'Workspace > Company cards',
-                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Company cards`,
+                defaultSubtitle: 'Workspace',
+                subtitle: ({policyName}: {policyName: string}) => policyName,
             },
             fixPersonalCardConnection: {
                 title: ({cardName}: {cardName?: string}) => (cardName ? `Fix ${cardName} personal card connection` : 'Fix personal card connection'),
-                subtitle: 'Wallet > Assigned cards',
+                subtitle: 'Wallet',
             },
             fixAccountingConnection: {
                 title: ({integrationName}: {integrationName: string}) => `Fix ${integrationName} connection`,
-                defaultSubtitle: 'Workspace > Accounting',
-                subtitle: ({policyName}: {policyName: string}) => `${policyName} > Accounting`,
+                defaultSubtitle: 'Workspace',
+                subtitle: ({policyName}: {policyName: string}) => policyName,
             },
             addShippingAddress: {
                 title: 'We need your shipping address',
