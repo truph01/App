@@ -1204,6 +1204,10 @@ function Search({
         );
     }
 
+    // Reset so useFocusEffect on later warm revisits (new tab press, cached list, no skeleton)
+    // correctly cancels the fresh skeleton span instead of skipping because of an earlier cold load.
+    hasHadSkeletonLayout.current = false;
+
     if (searchResults === undefined) {
         Log.alert('[Search] Undefined search type');
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
