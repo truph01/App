@@ -755,6 +755,7 @@ function Search({
 
     const isUnmounted = useRef(false);
     const hasHadFirstLayout = useRef(false);
+    const hasHadSkeletonLayout = useRef(false);
 
     useEffect(
         () => () => {
@@ -1164,12 +1165,15 @@ function Search({
 
     const onLayoutSkeleton = useCallback(() => {
         hasHadFirstLayout.current = true;
+        hasHadSkeletonLayout.current = true;
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
         endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
     }, []);
 
     // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
     // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
+    // Only end the skeleton span when the skeleton actually laid out; otherwise cancel it so we
+    // don't record a false ManualOnLayoutSkeletonReports success on warm revisits (no skeleton shown).
     useFocusEffect(
         useCallback(() => {
             if (!hasHadFirstLayout.current) {
@@ -1177,7 +1181,9 @@ function Search({
             }
             endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
             endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
-            endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+            if (!hasHadSkeletonLayout.current) {
+                cancelSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+            }
             markNavigateAfterExpenseCreateEnd();
         }, []),
     );
