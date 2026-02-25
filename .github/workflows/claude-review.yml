@@ -68,6 +68,7 @@ jobs:
       - name: Post code review results
         if: steps.code-review.outcome == 'success' && steps.filter.outputs.code == 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
           STRUCTURED_OUTPUT: ${{ steps.code-review.outputs.structured_output }}
         run: |
           if [ -z "$STRUCTURED_OUTPUT" ]; then
