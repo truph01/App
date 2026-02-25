@@ -2,7 +2,7 @@ import React from 'react';
 import type {SearchQueryJSON} from '@components/Search/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import SearchSelectedNarrow from '@pages/Search/SearchSelectedNarrow';
-import CONST from '@src/CONST';
+import type CONST from '@src/CONST';
 import type DeepValueOf from '@src/types/utils/DeepValueOf';
 import SearchPageHeaderInput from './SearchPageHeaderInput';
 
