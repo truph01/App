@@ -9200,7 +9200,7 @@ function getAllReportActionsErrorsAndReportActionThatRequiresAttention(
         reportAction = getReportActionWithSmartscanError(reportActionsArray, report);
     }
 
-    if (!isReportArchived && report?.statusNum === CONST.REPORT.STATUS_NUM.OPEN) {
+    if (!isReportArchived && isReportOwner(report) && report?.statusNum === CONST.REPORT.STATUS_NUM.OPEN) {
         const mostRecentActiveDEWAction = getMostRecentActiveDEWSubmitFailedAction(reportActionsArray);
         if (mostRecentActiveDEWAction) {
             reportActionErrors.dewSubmitFailed = getMicroSecondOnyxErrorWithTranslationKey('iou.error.genericCreateFailureMessage');
