@@ -1,4 +1,6 @@
-import React, {createContext, useCallback, useContext, useMemo, useRef} from 'react';
+// This component is compiled by the React Compiler
+/* eslint-disable react/jsx-no-constructed-context-values */
+import React, {createContext, useContext, useRef} from 'react';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 import type {FullScreenActionsContextType, FullScreenStateContextType, ResponsiveLayoutProperties} from './types';
 
@@ -9,16 +11,16 @@ function FullScreenContextProvider({children}: ChildrenProps) {
     const isFullScreenRef = useRef(false);
     const lockedWindowDimensionsRef = useRef<ResponsiveLayoutProperties | null>(null);
 
-    const lockWindowDimensions = useCallback((newResponsiveLayoutProperties: ResponsiveLayoutProperties) => {
+    const lockWindowDimensions = (newResponsiveLayoutProperties: ResponsiveLayoutProperties) => {
         lockedWindowDimensionsRef.current = newResponsiveLayoutProperties;
-    }, []);
+    };
 
-    const unlockWindowDimensions = useCallback(() => {
+    const unlockWindowDimensions = () => {
         lockedWindowDimensionsRef.current = null;
-    }, []);
+    };
 
-    const stateValue = useMemo(() => ({isFullScreenRef, lockedWindowDimensionsRef}), []);
-    const actionsValue = useMemo(() => ({lockWindowDimensions, unlockWindowDimensions}), [lockWindowDimensions, unlockWindowDimensions]);
+    const stateValue = {isFullScreenRef, lockedWindowDimensionsRef};
+    const actionsValue = {lockWindowDimensions, unlockWindowDimensions};
 
     return (
         <FullScreenStateContext.Provider value={stateValue}>
