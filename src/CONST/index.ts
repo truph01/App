@@ -8664,6 +8664,11 @@ const CONST = {
                 CHOOSE_FILES: 'Scan-ChooseFiles',
                 SHUTTER: 'Scan-Shutter',
             },
+            ODOMETER_IMAGE: {
+                FLASH: 'OdometerImage-Flash',
+                GALLERY: 'OdometerImage-Gallery',
+                SHUTTER: 'OdometerImage-Shutter',
+            },
         },
         NEW_CHAT: {
             SELECT_PARTICIPANT: 'NewChat-SelectParticipant',
@@ -8672,6 +8677,7 @@ const CONST = {
             CARD_LIST_ROW: 'WorkspaceExpensifyCard-CardListRow',
         },
         WORKSPACE: {
+            APPROVAL_WORKFLOW_SECTION: 'Workspace-ApprovalWorkflowSection',
             TOGGLE_SETTINGS_ROW: 'Workspace-ToggleSettingsRow',
             DUPLICATE_SELECT_FEATURES_SELECT_ALL: 'WorkspaceDuplicate-SelectFeaturesSelectAll',
             WORKSPACE_MENU_ITEM: 'Workspace-WorkspaceMenuItem',
