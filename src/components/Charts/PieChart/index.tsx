@@ -3,16 +3,17 @@ import React from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import useThemeStyles from '@hooks/useThemeStyles';
-import type {BarChartProps} from './BarChartContent';
+import type {PieChartProps} from './PieChartContent';
 
-const getBarChartContent = () => import('./BarChartContent');
-function BarChart(props: BarChartProps) {
+const getPieChartContent = () => import('./PieChartContent');
+
+function PieChart(props: PieChartProps) {
     const styles = useThemeStyles();
 
     return (
         <WithSkiaWeb
             opts={{locateFile: (file: string) => `/${file}`}}
-            getComponent={getBarChartContent}
+            getComponent={getPieChartContent}
             componentProps={props}
             fallback={
                 <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter, styles.highlightBG, styles.br4, styles.p5]}>
@@ -23,6 +24,6 @@ function BarChart(props: BarChartProps) {
     );
 }
 
-BarChart.displayName = 'BarChart';
+PieChart.displayName = 'PieChart';
 
-export default BarChart;
+export default PieChart;

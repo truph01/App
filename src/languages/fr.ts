@@ -7238,6 +7238,7 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
             table: 'Table',
             bar: 'Bar',
             line: 'Ligne',
+            pie: 'Tarte',
         },
         chartTitles: {
             [CONST.SEARCH.GROUP_BY.FROM]: 'De',
