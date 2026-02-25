@@ -70,6 +70,7 @@ function Switch({isOn, onToggle, accessibilityLabel, disabled, showLockIcon, dis
             }
             hasUserToggled.current = true;
             onToggle(!isOn);
+
             // If onToggle doesn't result in an isOn change (e.g., a modal is shown instead),
             // useLayoutEffect won't fire to clear hasUserToggled. Clear it in the next frame
             // to prevent stale flags from misclassifying future recycled prop changes.
