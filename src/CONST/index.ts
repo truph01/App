@@ -1222,6 +1222,7 @@ const CONST = {
             MERGE: 'merge',
             REPORT_LAYOUT: 'reportLayout',
             DUPLICATE: 'duplicate',
+            DUPLICATE_REPORT: 'duplicateReport',
         },
         PRIMARY_ACTIONS: {
             SUBMIT: 'submit',
@@ -8498,6 +8499,7 @@ const CONST = {
             ADD_EXPENSE_TRACK_DISTANCE: 'MoreMenu-AddExpenseTrackDistance',
             ADD_EXPENSE_UNREPORTED: 'MoreMenu-AddExpenseUnreported',
             PAY: 'MoreMenu-Pay',
+            DUPLICATE_REPORT: 'MoreMenu-DuplicateReport',
         },
         REPORT_PREVIEW: {
             CARD: 'ReportPreview-Card',
