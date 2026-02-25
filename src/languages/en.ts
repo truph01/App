@@ -3928,6 +3928,8 @@ const translations = {
             workspaceOwner: 'Owner',
             workspaceType: 'Workspace type',
             workspaceAvatar: 'Workspace avatar',
+            clientID: 'Client ID',
+            clientIDInputHint: "Enter the client's unique identifier",
             mustBeOnlineToViewMembers: 'You need to be online in order to view members of this workspace.',
             moreFeatures: 'More features',
             requested: 'Requested',

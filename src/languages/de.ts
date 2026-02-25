@@ -3901,6 +3901,8 @@ ${
             workspaceOwner: 'Inhaber',
             workspaceType: 'Arbeitsbereichstyp',
             workspaceAvatar: 'Workspace-Avatar',
+            clientID: 'Kunden-ID',
+            clientIDInputHint: 'Geben Sie die eindeutige Kennung des Kunden ein',
             mustBeOnlineToViewMembers: 'Du musst online sein, um die Mitglieder dieses Arbeitsbereichs anzeigen zu können.',
             moreFeatures: 'Mehr Funktionen',
             requested: 'Angefordert',

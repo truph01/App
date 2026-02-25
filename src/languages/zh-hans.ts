@@ -3812,6 +3812,8 @@ ${
             workspaceOwner: '所有者',
             workspaceType: '工作区类型',
             workspaceAvatar: '工作区头像',
+            clientID: '客户ID',
+            clientIDInputHint: '请输入客户的唯一标识符',
             mustBeOnlineToViewMembers: '您需要联网才能查看此工作区的成员。',
             moreFeatures: '更多功能',
             requested: '已请求',

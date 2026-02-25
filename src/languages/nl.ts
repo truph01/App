@@ -3884,6 +3884,8 @@ ${
             workspaceOwner: 'Eigenaar',
             workspaceType: 'Werkruimtetype',
             workspaceAvatar: 'Workspace-avatar',
+            clientID: 'Klant-ID',
+            clientIDInputHint: 'Voer de unieke identificatie van de klant in',
             mustBeOnlineToViewMembers: 'Je moet online zijn om de leden van deze workspace te bekijken.',
             moreFeatures: 'Meer functies',
             requested: 'Aangevraagd',

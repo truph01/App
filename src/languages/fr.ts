@@ -3909,6 +3909,8 @@ ${
             workspaceOwner: 'Responsable',
             workspaceType: 'Type d’espace de travail',
             workspaceAvatar: "Avatar de l'espace de travail",
+            clientID: 'ID client',
+            clientIDInputHint: "Entrez l'identifiant unique du client",
             mustBeOnlineToViewMembers: 'Vous devez être en ligne pour voir les membres de cet espace de travail.',
             moreFeatures: 'Plus de fonctionnalités',
             requested: 'Demandé',
