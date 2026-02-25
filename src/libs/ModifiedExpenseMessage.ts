@@ -1,7 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
-import type {ValueOf} from 'type-fest';
+import type {Entries, ValueOf} from 'type-fest';
 import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -212,20 +212,32 @@ function getRulesModifiedMessage(
     const route = policyID && hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
     const entries = ObjectUtils.typedEntries(fields);
 
-    const fragments = entries.map(([key, value], i) => {
+    // reportName ("moved to report X"), reimbursable/billable ("marked the expense as reimbursable/billable"), are standalone clauses with their own verb.
+    // They must not be mixed into the "set ... and ..." list produced by the other field fragments.
+    type StandaloneKey = 'reportName' | 'reimbursable' | 'billable';
+    const standaloneKeys = new Set<StandaloneKey>(['reportName', 'reimbursable', 'billable']);
+
+    const {standaloneFragments, listEntries} = entries.reduce<{standaloneFragments: string[]; listEntries: Entries<PolicyRulesModifiedFields>}>(
+        (acc, entry) => {
+            const [key, value] = entry;
+            if (standaloneKeys.has(key as StandaloneKey)) {
+                if (key === 'reportName') {
+                    acc.standaloneFragments.push(translate('iou.rulesModifiedFields.reportName', value as string));
+                } else if (key === 'reimbursable') {
+                    acc.standaloneFragments.push(translate('iou.rulesModifiedFields.reimbursable', value as boolean));
+                } else {
+                    acc.standaloneFragments.push(translate('iou.rulesModifiedFields.billable', value as boolean));
+                }
+            } else {
+                acc.listEntries.push(entry as Entries<PolicyRulesModifiedFields>[number]);
+            }
+            return acc;
+        },
+        {standaloneFragments: [], listEntries: []},
+    );
+
+    const fragments = listEntries.map(([key, value], i) => {
         const isFirst = i === 0;
-
-        if (key === 'reimbursable') {
-            return translate('iou.rulesModifiedFields.reimbursable', value as boolean);
-        }
-
-        if (key === 'billable') {
-            return translate('iou.rulesModifiedFields.billable', value as boolean);
-        }
-
-        if (key === 'reportName') {
-            return translate('iou.rulesModifiedFields.reportName', value as string);
-        }
 
         if (key === 'tax') {
             const taxEntry = value as PolicyRulesModifiedFields['tax'];
@@ -248,7 +260,10 @@ function getRulesModifiedMessage(
         return translate('iou.rulesModifiedFields.common', key, updatedValue, isFirst);
     });
 
-    return translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules);
+    const listFragment = fragments.length > 0 ? translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules) : undefined;
+
+    const parts = [...standaloneFragments, listFragment].filter(Boolean);
+    return parts.join(', ');
 }
 
 /**
