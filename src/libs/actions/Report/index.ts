@@ -1563,9 +1563,17 @@ function openReport(
  * @param participantLoginList The list of user logins included in the group chat
  * @param newReportObject The optimistic report object for the new group chat
  * @param currentUserLogin The login of the current user
+ * @param introSelected The intro selected data for guided setup
  * @param avatar The avatar file to upload for the group chat (optional)
  */
-function createGroupChat(reportID: string, participantLoginList: string[], newReportObject: OptimisticChatReport, currentUserLogin: string, avatar?: File | CustomRNImageManipulatorResult) {
+function createGroupChat(
+    reportID: string,
+    participantLoginList: string[],
+    newReportObject: OptimisticChatReport,
+    currentUserLogin: string,
+    introSelected: OnyxEntry<IntroSelected>,
+    avatar?: File | CustomRNImageManipulatorResult,
+) {
     const optimisticReport = {
         reportName: CONST.REPORT.DEFAULT_REPORT_NAME,
     };
@@ -1725,7 +1733,7 @@ function createGroupChat(reportID: string, participantLoginList: string[], newRe
     }
 
     // Preserve guided setup data when creating group chats
-    const guidedSetup = getGuidedSetupDataForOpenReport(deprecatedIntroSelected);
+    const guidedSetup = getGuidedSetupDataForOpenReport(introSelected);
     if (guidedSetup) {
         optimisticData.push(...guidedSetup.optimisticData);
         successData.push(...guidedSetup.successData);
@@ -1895,6 +1903,7 @@ function navigateToAndCreateGroupChat(
     reportName: string,
     currentUserLogin: string,
     optimisticReportID: string,
+    introSelected: OnyxEntry<IntroSelected>,
     avatarUri?: string,
     avatarFile?: File | CustomRNImageManipulatorResult | undefined,
 ) {
@@ -1902,7 +1911,7 @@ function navigateToAndCreateGroupChat(
 
     // If we are creating a group chat then participantAccountIDs is expected to contain currentUserAccountID
     const newChat = buildOptimisticGroupChatReport(participantAccountIDs, reportName, avatarUri ?? '', optimisticReportID, CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
-    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin, avatarFile);
+    createGroupChat(newChat.reportID, userLogins, newChat, currentUserLogin, introSelected, avatarFile);
 
     navigateToReport(newChat.reportID);
 }

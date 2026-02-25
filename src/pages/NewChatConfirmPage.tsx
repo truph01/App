@@ -43,6 +43,8 @@ function NewChatConfirmPage() {
     const personalData = useCurrentUserPersonalDetails();
     const [newGroupDraft, newGroupDraftMetaData] = useOnyx(ONYXKEYS.NEW_GROUP_CHAT_DRAFT);
     const [allPersonalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+
     const icons = useMemoizedLazyExpensifyIcons(['Camera']);
 
     const selectedOptions = useMemo((): Participant[] => {
@@ -99,8 +101,8 @@ function NewChatConfirmPage() {
         }
 
         const logins: string[] = (newGroupDraft.participants ?? []).map((participant) => participant.login).filter((login): login is string => !!login);
-        navigateToAndCreateGroupChat(logins, newGroupDraft.reportName ?? '', personalData.login ?? '', optimisticReportID.current, newGroupDraft.avatarUri ?? '', avatarFile);
-    }, [newGroupDraft, avatarFile, personalData.login]);
+        navigateToAndCreateGroupChat(logins, newGroupDraft.reportName ?? '', personalData.login ?? '', optimisticReportID.current, introSelected, newGroupDraft.avatarUri ?? '', avatarFile);
+    }, [newGroupDraft, avatarFile, personalData.login, introSelected]);
 
     const stashedLocalAvatarImage = newGroupDraft?.avatarUri;
 
