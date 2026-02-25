@@ -26,26 +26,21 @@ function AccountManagerBanner({reportID}: AccountManagerBannerProps) {
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [isBannerVisible, setIsBannerVisible] = useState(true);
 
-    let chatWithAccountManagerText = '';
-    if (accountManagerReportID) {
-        const participants = getParticipantsAccountIDsForDisplay(accountManagerReport, false, true);
-        const participantPersonalDetails = getPersonalDetailsForAccountIDs([participants?.at(0) ?? -1], personalDetails);
-        const participantPersonalDetail = Object.values(participantPersonalDetails).at(0);
-        const displayName = getDisplayNameOrDefault(participantPersonalDetail);
-        const login = participantPersonalDetail?.login;
-        if (displayName && login) {
-            chatWithAccountManagerText = translate('common.chatWithAccountManager', `${displayName} (${login})`);
-        }
+    if (!accountManagerReportID || !isConciergeChatReport(report) || !isBannerVisible) {
+        return null;
     }
+
+    const participants = getParticipantsAccountIDsForDisplay(accountManagerReport, false, true);
+    const participantPersonalDetails = getPersonalDetailsForAccountIDs([participants?.at(0) ?? -1], personalDetails);
+    const participantPersonalDetail = Object.values(participantPersonalDetails).at(0);
+    const displayName = getDisplayNameOrDefault(participantPersonalDetail);
+    const login = participantPersonalDetail?.login;
+    const chatWithAccountManagerText = displayName && login ? translate('common.chatWithAccountManager', `${displayName} (${login})`) : '';
 
     const dismissBanner = () => setIsBannerVisible(false);
     const chatWithAccountManager = () => {
         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(accountManagerReportID));
     };
-
-    if (!accountManagerReportID || !isConciergeChatReport(report) || !isBannerVisible) {
-        return null;
-    }
 
     return (
         <Banner
