@@ -159,75 +159,59 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
     // - At 45° (rotated): right-align so the last character is under the point
     const renderOutsideComponents = useCallback(
         (args: CartesianChartRenderArg<{x: number; y: number}, 'y'>) => {
-            if (!font) {
-                return (
-                    <>
-                        <LeftFrameLine
-                            chartBounds={args.chartBounds}
-                            yTicks={args.yTicks}
-                            yScale={args.yScale}
-                            color={theme.border}
-                        />
-                        <ScatterPoints
-                            points={args.points.y}
-                            radius={DOT_RADIUS}
-                            color={DEFAULT_CHART_COLOR}
-                        />
-                    </>
-                );
-            }
+            const fontMetrics = font?.getMetrics();
+            const ascent = fontMetrics ? Math.abs(fontMetrics.ascent) : 0;
+            const descent = fontMetrics ? Math.abs(fontMetrics.descent) : 0;
+            const labelY = fontMetrics ? args.chartBounds.bottom + AXIS_LABEL_GAP + rotatedLabelYOffset(ascent, descent, angleRad) : 0;
 
-            const fontMetrics = font.getMetrics();
-            const ascent = Math.abs(fontMetrics.ascent);
-            const descent = Math.abs(fontMetrics.descent);
-            const labelY = args.chartBounds.bottom + AXIS_LABEL_GAP + rotatedLabelYOffset(ascent, descent, angleRad);
+            const xLabels = font
+                ? truncatedLabels.map((label, i) => {
+                      if (i % labelSkipInterval !== 0) {
+                          return null;
+                      }
 
-            const xLabels = truncatedLabels.map((label, i) => {
-                if (i % labelSkipInterval !== 0) {
-                    return null;
-                }
+                      const tickX = args.xScale(i);
+                      const labelWidth = labelWidths.at(i) ?? 0;
 
-                const tickX = args.xScale(i);
-                const labelWidth = labelWidths.at(i) ?? 0;
+                      // At 0°: center the label under the point (like bar chart)
+                      // At 45°: right-align so the last character is under the point
+                      if (angleRad === 0) {
+                          return (
+                              <SkiaText
+                                  key={`x-label-${label}`}
+                                  x={tickX - labelWidth / 2}
+                                  y={labelY}
+                                  text={label}
+                                  font={font}
+                                  color={theme.textSupporting}
+                              />
+                          );
+                      }
 
-                // At 0°: center the label under the point (like bar chart)
-                // At 45°: right-align so the last character is under the point
-                if (angleRad === 0) {
-                    return (
-                        <SkiaText
-                            key={`x-label-${label}`}
-                            x={tickX - labelWidth / 2}
-                            y={labelY}
-                            text={label}
-                            font={font}
-                            color={theme.textSupporting}
-                        />
-                    );
-                }
+                      const textX = tickX - labelWidth; // right-aligned for rotated labels
+                      const origin = vec(tickX, labelY);
 
-                const textX = tickX - labelWidth; // right-aligned for rotated labels
-                const origin = vec(tickX, labelY);
+                      // Rotate around the anchor, then translate to correct for ascent/descent
+                      // asymmetry (ascent > descent shifts the visual center left of the anchor).
+                      const correction = rotatedLabelCenterCorrection(ascent, descent, angleRad);
 
-                // Rotate around the anchor, then translate to correct for ascent/descent
-                // asymmetry (ascent > descent shifts the visual center left of the anchor).
-                const correction = rotatedLabelCenterCorrection(ascent, descent, angleRad);
-
-                return (
-                    <Group
-                        key={`x-label-${label}`}
-                        origin={origin}
-                        transform={[{translateX: correction}, {rotate: -angleRad}]}
-                    >
-                        <SkiaText
-                            x={textX}
-                            y={labelY}
-                            text={label}
-                            font={font}
-                            color={theme.textSupporting}
-                        />
-                    </Group>
-                );
-            });
+                      return (
+                          <Group
+                              key={`x-label-${label}`}
+                              origin={origin}
+                              transform={[{translateX: correction}, {rotate: -angleRad}]}
+                          >
+                              <SkiaText
+                                  x={textX}
+                                  y={labelY}
+                                  text={label}
+                                  font={font}
+                                  color={theme.textSupporting}
+                              />
+                          </Group>
+                      );
+                  })
+                : null;
 
             return (
                 <>
