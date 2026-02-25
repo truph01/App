@@ -241,10 +241,10 @@ function SearchPageHeaderInput({queryJSON, searchRouterListVisible, hideSearchRo
             } else if (item?.reportID) {
                 Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(item?.reportID));
             } else if ('login' in item) {
-                navigateToAndOpenReport(item.login ? [item.login] : [], false);
+                navigateToAndOpenReport(item.login ? [item.login] : [], currentUserAccountID, false);
             }
         },
-        [autocompleteSubstitutions, onSearchQueryChange, submitSearch, textInputValue],
+        [autocompleteSubstitutions, onSearchQueryChange, submitSearch, textInputValue, currentUserAccountID],
     );
 
     const searchQueryItem = useMemo(
