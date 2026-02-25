@@ -121,4 +121,7 @@ Yes. To remove a card:
 3. Select **Remove Payment Method**.  
 4. All pending bookings tied to that card will be automatically suspended.  
 
+### Why was my Central Billing travel expense assigned to the booker instead of me?
+Expensify assigns central billing expenses to the cardholder by matching card details and personal information (such as name). If your name in Expensify doesn't match the name on the card, or if another workspace member has the same last four digits of a card on file, we assign the expense to the booker so it doesn't appear in the wrong person's account. To have expenses assigned to you, make sure your Expensify profile name matches the cardholder name and that your card is connected to your account so you're the clear match.  
+
 </div>
