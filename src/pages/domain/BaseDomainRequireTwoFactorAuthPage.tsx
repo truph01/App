@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
 import FixedFooter from '@components/FixedFooter';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -62,35 +63,37 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                     shouldDisplayHelpButton={false}
                 />
 
-                <ScrollView
-                    keyboardShouldPersistTaps="handled"
-                    contentContainerStyle={styles.flexGrow1}
-                >
-                    <View style={[styles.mh5, styles.mb4, styles.mt3]}>
-                        <TwoFactorAuthForm
-                            ref={baseTwoFactorAuthRef}
-                            shouldAllowRecoveryCode
-                            onSubmit={onSubmit}
-                            shouldAutoFocus={false}
-                            onInputChange={() => {
-                                if (isEmptyObject(validateDomainTwoFactorCodeErrors?.errors)) {
-                                    return;
-                                }
-                                clearValidateDomainTwoFactorCodeError();
-                            }}
-                            errorMessage={getLatestErrorMessage(validateDomainTwoFactorCodeErrors)}
+                <FullPageOfflineBlockingView>
+                    <ScrollView
+                        keyboardShouldPersistTaps="handled"
+                        contentContainerStyle={styles.flexGrow1}
+                    >
+                        <View style={[styles.mh5, styles.mb4, styles.mt3]}>
+                            <TwoFactorAuthForm
+                                ref={baseTwoFactorAuthRef}
+                                shouldAllowRecoveryCode
+                                onSubmit={onSubmit}
+                                shouldAutoFocus={false}
+                                onInputChange={() => {
+                                    if (isEmptyObject(validateDomainTwoFactorCodeErrors?.errors)) {
+                                        return;
+                                    }
+                                    clearValidateDomainTwoFactorCodeError();
+                                }}
+                                errorMessage={getLatestErrorMessage(validateDomainTwoFactorCodeErrors)}
+                            />
+                        </View>
+                    </ScrollView>
+                    <FixedFooter style={[styles.mt2, styles.pt2]}>
+                        <Button
+                            success
+                            large
+                            text={translate('common.disable')}
+                            isLoading={!!pendingAction}
+                            onPress={() => baseTwoFactorAuthRef.current?.validateAndSubmitForm()}
                         />
-                    </View>
-                </ScrollView>
-                <FixedFooter style={[styles.mt2, styles.pt2]}>
-                    <Button
-                        success
-                        large
-                        text={translate('common.disable')}
-                        isLoading={!!pendingAction}
-                        onPress={() => baseTwoFactorAuthRef.current?.validateAndSubmitForm()}
-                    />
-                </FixedFooter>
+                    </FixedFooter>
+                </FullPageOfflineBlockingView>
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
     );
