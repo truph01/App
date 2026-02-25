@@ -755,7 +755,6 @@ function Search({
 
     const isUnmounted = useRef(false);
     const hasHadFirstLayout = useRef(false);
-    const lastSeenReportsTabNavigationId = useRef(0);
 
     useEffect(
         () => () => {
