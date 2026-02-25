@@ -290,7 +290,7 @@ function MoneyRequestReportTransactionList({
         return () => {
             clearActiveTransactionIDs();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- visualOrderTransactionIDsKey is a primitive proxy for visualOrderTransactionIDs to avoid re-firing on referential changes
     }, [visualOrderTransactionIDsKey]);
 
     const sortedTransactionsMap = useMemo(() => {
