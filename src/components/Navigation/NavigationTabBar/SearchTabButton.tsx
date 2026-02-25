@@ -44,14 +44,9 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
         }
         clearSelectedText();
         interceptAnonymousUser(() => {
-            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON, {
-                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON,
-                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON,
-            });
-
-            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST, {
-                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST,
-                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST,
+            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {
+                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS,
+                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS,
             });
 
             const lastSearchRoute = getLastRoute(navigationRef.getRootState(), NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, SCREENS.SEARCH.ROOT);
