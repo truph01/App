@@ -1159,6 +1159,9 @@ function Search({
         });
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
+        if (!hasHadSkeletonLayout.current) {
+            cancelSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+        }
         markNavigateAfterExpenseCreateEnd();
         handleSelectionListScroll(sortedData, searchListRef.current);
     }, [handleSelectionListScroll, sortedData, queryJSON?.inputQuery]);
