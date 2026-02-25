@@ -1514,8 +1514,9 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         duplicateNonDefaultWorkspacePerDiemError: 'Non puoi duplicare le spese di diaria tra diversi spazi di lavoro perché le tariffe potrebbero essere diverse tra gli spazi di lavoro.',
         rulesModifiedFields: {
-            reportName: (value: string) => `spostata nel report «${value}»`,
-            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments} via <a href="${route}">${isPersonalRules ? 'regole spesa' : 'regole della workspace'}</a>`,
+            reportName: (value: string) => `ha spostato questa spesa nel report "${value}"`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments} tramite <a href="${route}">${isPersonalRules ? 'regole spese personali' : 'regole della workspace'}</a>`,
         },
     },
     transactionMerge: {

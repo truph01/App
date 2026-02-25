@@ -1509,9 +1509,9 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         duplicateNonDefaultWorkspacePerDiemError: 'Você não pode duplicar despesas de diárias entre espaços de trabalho porque as tarifas podem variar entre eles.',
         rulesModifiedFields: {
-            reportName: (value: string) => `movido para o relatório "${value}"`,
+            reportName: (value: string) => `moveu esta despesa para o relatório "${value}"`,
             format: (fragments: string, route: string, isPersonalRules: boolean) =>
-                `${fragments} via <a href="${route}">${isPersonalRules ? 'regras de despesa' : 'regras do workspace'}</a>`,
+                `${fragments} via <a href="${route}">${isPersonalRules ? 'regras de despesas pessoais' : 'regras do workspace'}</a>`,
         },
     },
     transactionMerge: {

@@ -1504,8 +1504,9 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         duplicateNonDefaultWorkspacePerDiemError: 'ワークスペースごとに日当レートが異なる場合があるため、日当経費をワークスペース間で複製することはできません。',
         rulesModifiedFields: {
-            reportName: (value: string) => `レポート「${value}」に移動しました`,
-            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments}（<a href="${route}">${isPersonalRules ? '経費ルール' : 'ワークスペースルール'}</a> 経由）`,
+            reportName: (value: string) => `この経費をレポート「${value}」に移動しました`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments}（<a href="${route}">${isPersonalRules ? '個人経費ルール' : 'ワークスペースルール'}</a> 経由）`,
         },
     },
     transactionMerge: {

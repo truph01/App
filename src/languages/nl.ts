@@ -1512,9 +1512,9 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         duplicateNonDefaultWorkspacePerDiemError: 'Je kunt dagvergoedingen niet dupliceren tussen werkruimtes, omdat de tarieven per werkruimte kunnen verschillen.',
         rulesModifiedFields: {
-            reportName: (value: string) => `verplaatst naar rapport ‘${value}’`,
+            reportName: (value: string) => `heeft deze uitgave verplaatst naar rapport „${value}”`,
             format: (fragments: string, route: string, isPersonalRules: boolean) =>
-                `${fragments} via <a href="${route}">${isPersonalRules ? 'uitgaveregels' : 'werkruimte-instellingen'}</a>`,
+                `${fragments} via <a href="${route}">${isPersonalRules ? 'persoonlijke onkostregels' : 'werkruimte­regels'}</a>`,
         },
     },
     transactionMerge: {

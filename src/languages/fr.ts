@@ -1523,9 +1523,9 @@ const translations: TranslationDeepObject<typeof en> = {
         duplicateNonDefaultWorkspacePerDiemError:
             'Vous ne pouvez pas dupliquer les indemnités journalières entre plusieurs espaces de travail, car les taux peuvent différer d’un espace de travail à l’autre.',
         rulesModifiedFields: {
-            reportName: (value: string) => `déplacé vers la note de frais « ${value} »`,
+            reportName: (value: string) => `a déplacé cette dépense vers la note de frais « ${value} »`,
             format: (fragments: string, route: string, isPersonalRules: boolean) =>
-                `${fragments} via <a href="${route}">${isPersonalRules ? 'Règles de dépenses' : 'Règles de l’espace de travail'}</a>`,
+                `${fragments} via <a href="${route}">${isPersonalRules ? 'règles de dépenses personnelles' : 'Règles de l’espace de travail'}</a>`,
         },
     },
     transactionMerge: {

@@ -1483,8 +1483,8 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         duplicateNonDefaultWorkspacePerDiemError: '您无法在不同工作区之间复制每日津贴报销，因为各工作区的补贴标准可能不同。',
         rulesModifiedFields: {
-            reportName: (value: string) => `已移动到报表“${value}”`,
-            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments} 通过 <a href="${route}">${isPersonalRules ? '报销规则' : '工作区规则'}</a>`,
+            reportName: (value: string) => `已将此报销移至报销单“${value}”`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments} 通过 <a href="${route}">${isPersonalRules ? '个人报销规则' : '工作区规则'}</a>`,
         },
     },
     transactionMerge: {

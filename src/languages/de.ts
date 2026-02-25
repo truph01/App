@@ -1518,8 +1518,9 @@ const translations: TranslationDeepObject<typeof en> = {
         duplicateNonDefaultWorkspacePerDiemError:
             'Sie können Per-Diem-Ausgaben nicht über mehrere Workspaces hinweg duplizieren, da sich die Sätze zwischen den Workspaces unterscheiden können.',
         rulesModifiedFields: {
-            reportName: (value: string) => `zu Bericht „${value}“ verschoben`,
-            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments} über <a href="${route}">${isPersonalRules ? 'Ausgabenregeln' : 'Workspace-Regeln'}</a>`,
+            reportName: (value: string) => `hat diese Ausgabe in den Bericht „${value}“ verschoben`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments} über <a href="${route}">${isPersonalRules ? 'Regeln für persönliche Ausgaben' : 'Workspace-Regeln'}</a>`,
         },
     },
     transactionMerge: {
