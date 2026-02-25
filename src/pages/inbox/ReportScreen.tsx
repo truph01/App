@@ -1006,7 +1006,7 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
                                 >
                                     {headerView}
                                 </OfflineWithFeedback>
-                                <AccountManagerBanner report={report} />
+                                <AccountManagerBanner reportID={reportIDFromRoute} />
                                 <View style={[styles.flex1, styles.flexRow]}>
                                     {shouldShowWideRHP && (
                                         <Animated.View style={styles.wideRHPMoneyRequestReceiptViewContainer}>
