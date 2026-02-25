@@ -707,10 +707,32 @@ describe('actions/Domain', () => {
             apiWriteSpy.mockRestore();
         });
 
-        it('keeps all exempt emails in optimisticData when force2FA is false', () => {
+        it('adds targetEmail to exempt emails in optimisticData when force2FA is false and no twoFactorAuthCode is provided', () => {
             const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
 
             setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, exemptEmails, targetEmail, false);
+
+            expect(apiWriteSpy).toHaveBeenCalledWith(
+                WRITE_COMMANDS.SET_TWO_FACTOR_AUTH_EXEMPT_EMAIL_FOR_DOMAIN,
+                expect.objectContaining({enabled: true}),
+                expect.objectContaining({
+                    optimisticData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
+                            value: {settings: {twoFactorAuthExemptEmails: [...exemptEmails, targetEmail]}},
+                        }),
+                    ]),
+                }),
+            );
+
+            apiWriteSpy.mockRestore();
+        });
+
+        it('keeps exempt emails unchanged in optimisticData when force2FA is false and twoFactorAuthCode is provided', () => {
+            const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
+            const twoFactorAuthCode = '123456';
+
+            setTwoFactorAuthExemptEmailForDomain(domainAccountID, accountID, exemptEmails, targetEmail, false, twoFactorAuthCode);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.SET_TWO_FACTOR_AUTH_EXEMPT_EMAIL_FOR_DOMAIN,
