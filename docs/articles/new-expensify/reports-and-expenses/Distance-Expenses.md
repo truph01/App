@@ -1,135 +1,133 @@
 ---
 title: Distance Expenses
-description: Learn how to create a distance expense using GPS tracking, map-based routes, or manual entry, and how the reimbursement rate is determined in New Expensify.
-keywords: [New Expensify, distance expense, mileage reimbursement, create expense, distance rate, workspace rate, personal policy, map route, reimbursement rate, manual mileage, manual distance, global create, track distance, GPS, GPS tracking, GPS mileage, start GPS, track route]
-date: 2025-06-18T00:00:00Z
+description: Learn how to create a Distance expense using GPS tracking, map-based routes, or manual entry, and how the reimbursement rate is determined in New Expensify.
+keywords: [New Expensify, distance expense, mileage reimbursement, create expense, distance rate, workspace rate, map route, reimbursement rate, manual mileage, manual distance, global create, track distance, GPS, GPS tracking, start GPS, track route, track mileage, mileage tracking, calculate mileage reimbursement, mileage rate]
+internalScope: Audience is all members. Covers creating Distance expenses using GPS tracking, map-based routes, and manual entry, plus how reimbursement rates are applied. Does not cover configuring Workspace distance rates in detail or broader report submission workflows.
 ---
 
-Expensify offers three ways to create a distance expense: **GPS tracking** on mobile, **map-based routes** using start and end locations, or **manual entry** by typing in the distance. This guide explains each method and how the reimbursement rate is determined.
+# Distance Expenses 
+
+Expensify offers three ways to create a Distance expense: **GPS tracking** on mobile, **map-based routes** using start and end locations, or **manual entry** by typing in the distance. This guide explains each method and how the reimbursement rate is determined.
 
 ---
 
-# Create a GPS Distance Expense (Mobile Only)
+## How to create a GPS Distance expense (Mobile only)
 
 GPS tracking lets Expensify record your actual driving route in the background while you drive. When you stop, the app generates a receipt with a map of the route you took.
 
-1. Tap the green **+** button and select **Track distance**.
-2. Select the **GPS** tab.
-3. Tap **Start GPS** to begin tracking your route.
-4. Drive to your destination. Tracking runs in the background — you don't need to keep the app open.
-   - If you navigate away from the tracking screen, tap the green **+** button again to return to your active GPS session.
-5. When you arrive, tap **Stop** and confirm in the modal that appears.
-6. Review the route, distance, and calculated amount.
-7. Choose a workspace or recipient and add expense details like description, category, or tags.
-8. Tap **Create expense** to submit.
+To create an expense using GPS tracking based on the distance traveled: 
 
-**Note:** GPS tracking is available on iOS and Android only. On web or desktop, you'll see a prompt to download the mobile app when selecting the GPS option.
+1. Tap the **➕ Create** button.
+2. Select **Track distance**.
+3. Select **GPS** from the top row. 
+5. Tap **Start** and drive to your destination — tracking runs in the background.
+6. Tap **Stop** when you arrive and confirm by selecting **Stop GPS tracking**.
+7. Review the route and expense details, then tap **Create expense**.
+
+**Note:** GPS tracking is available on iOS and Android only. On Web, you'll see a prompt to download the mobile app when selecting the GPS option.
 
 ---
 
-# Create a Map-Based Distance Expense
+## How to create a map-based Distance expense (Web and Mobile)
 
-To submit a distance-based expense using the Start and End locations of your trip:
+To create an expense using distance between the starting and ending locations of your trip:
 
-1. From the navigation tabs, click the green **+** button and select **Create expense**.
-2. Select **Distance** from the top row.
-3. Enter your **Start** and **Finish** locations.
+1. Select the **➕ Create** button and select **Track distance**.
+2. Select **Map** from the top row.
+3. Enter the **Start** and **Stop** locations.
    - To include additional stops, click **Add stop**.
-4. Click **Next**.
-5. Choose a workspace from your recent options or search to select the correct one.
-6. On the confirmation screen, review and confirm:
-   - **Distance**
-   - **Amount**
-   - **Date**
-   - (Optional) Add a **description**, **category**, or **tag**
-7. Click **Create expense** to submit the mileage expense for approval.
+4. Select **Next**.
+5. On the confirmation screen, review and confirm:
+   - Distance
+   - Amount
+   - Date
+   - (Optional) Add a description, category, or tag. 
+6. Select **Create expense**. 
 
 ---
 
-# Create a Manual Distance Expense
+## How to create a manual Distance expense (Web and Mobile)
 
-To submit a distance-based expense by entering the distance manually:
+To create an expense by inputting a distance manually:
 
-1. Click the green “+” sign and select **Track distance** from any page in the app or directly  
-from an expense chat
-2. Choose the **Manual** tab
-3. Enter the number of miles or kilometers you need to be reimbursed for
-4. Review the calculated reimbursement amount
-5. Tap **Next** to continue
-6. Confirm the expense details, recipient, category, and add a receipt if needed
-7. Submit the expense
+1. Click the **➕ Create** button and select **Track distance**.
+2. Select **Manual** from the top row.
+3. Enter the number of miles or kilometers you need to be reimbursed for.
+4. Select **Next**.
+5. On the confirmation screen, review and confirm:
+   - Distance
+   - Amount
+   - Date
+   - (Optional) Add a description, category, tag or receipt. 
+6. Select **Next**.
+7. Select **Create expense**. 
 
-A Workspace Admin will be notified of the expense and, depending on your workspace settings, can reimburse you through Expensify or another method.
+Once a Distance expense is created, it can be submitted on a report. To learn how to add expenses to a report, see [Create and Submit Reports](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Create-and-Submit-Reports). 
 
 ---
 
-# How Reimbursement Rates Are Determined
+## How reimbursement rates are set for Distance expenses
 
-## Submitting to a workspace
+**Distance expenses created on a Workspace**
 
-If you're submitting the expense to a workspace:
+If you are creating expenses on a Workspace: 
 
-- You'll choose from the distance rates that are enabled on that workspace.
-- The **Workspace Admin** manages available rates.
-- The **unit** (miles or kilometers) depends on the workspace’s distance unit setting.
+- Workspace Admins set and manage the reimbursement rates for the workspace's distance unit (miles or kilometers)
+- When creating a Distance expense, the available reimbursement rates will show for selection
 
 [Learn how to manage distance rates as a Workspace Admin](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Managing-Distance-Rates)
 
-## Not submitting to a workspace
+**Distance expenses created for personal tracking**
 
-If you're not submitting to a workspace (e.g., personal tracking):
+**If you're creating expenses outside of a Workspace:**
 
-- Expensify will apply a **default rate** based on your **reporting currency**.
-   - Example: For USD, the rate is based on the current IRS reimbursement rate and uses **miles**.
-   - Other currencies use sensible defaults determined by Expensify’s internal research.
-- You can’t customize this rate unless you upgrade to a workspace.
-- Default distance rates are updated annually.
+- Expensify sets a default rate based on your reporting currency. 
+   - Example: For USD, the rate is based on the current IRS reimbursement rate and uses miles.
+ - Distance default rates are updated annually. 
+
+**Note:** Only Workspace Admins can set a custom distance rate. It's not possible to set a custom distance rate for personal expenses outside of a Workspace 
 
 ---
 
 # FAQ
 
-## Is there an easy way to reuse recent locations?
+## Can I reuse recent locations?
 
 Yes! When selecting the **Start** and **Finish** addresses, recently used locations will appear for quick selection.
 
 ## How do I create a round-trip expense?
 
-To create a round-trip distance expense, enter the same location for both the starting point and destination, and add one or more waypoints in between.
+To create a round-trip Distance expense, enter the same location for both the starting point and destination, and add one or more waypoints in between.
 
 For example, if you're starting and ending in San Francisco but making a stop in Los Angeles, enter:
 **San Francisco → Los Angeles → San Francisco**
 
-## How is the expense calculated?
+## How are Distance expense amounts calculated?
 
-The amount is automatically calculated by multiplying the distance by the workspace’s rate. If no workspace is assigned to the expense, a default rate is applied based on your default currency. Distance expenses are rounded to two decimal places.
+The expense amount is automatically calculated by multiplying the distance by the Workspace’s distance rate. If no Workspace is assigned to the expense, a default rate is applied based on your default currency. Distance expenses are rounded to two decimal places.
 
-## Can I edit an expense after I’ve created it?
+## Can I edit a Distance expense after I’ve created it?
 
-Yes! You can edit the expense before it is approved.
+Yes! You can edit the expense before it is approved. To learn how to edit an expense, see [Managing Expenses in a Report](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Managing-Expenses-in-a-Report).
 
-## Can I split a distance expense?
+## Can Distance expenses be split?
 
-Only map-based distance expenses can be split, manual distance expenses are not available for splitting. If you need a manual distance expense split with another user, you can each create your own expense for half the distance each.
+Only map-based distance expenses can be split. Manual Distance expenses are not available for splitting. If you need a manual Distance expense split with another user, you can each create your own expense for half the distance each.
 
-## Can I update the distance unit or rate?
+## Can I update the Distance expense unit or rate?
 
-The distance unit and rate can only be updated at the workspace level, not at the expense level. If you need these updated, you will need to speak with an admin.
+The distance unit and rate can only be updated by a Workspace Admin on the Workspace. It is not possible to adjust the distance rate or unit at the expense level. 
 
-## Can I move my distance expense to a new workspace?
+## What happens if a Distance expense is moved to a different Workspace?
 
-Yes, you can do this before the expenses have been approved. However, be aware that doing so will automatically update the distance rate and unit based on the new workspace.
+When a Distance expense is moved to a different Workspace, the expense is automatically updated to use the new Workspace's unit and distance rate. 
 
-## What if I enter 0 miles or kilometers?
 
-You cannot create a distance expense for 0 miles or kilometers. If you do, you'll see this error:
-**"Please enter a valid distance before continuing."**
-
-## Do I need to keep the app open during GPS tracking?
+## Do I need to keep the mobile app open during GPS tracking?
 
 No. GPS tracking runs in the background on your mobile device. A notification confirms that tracking is active, so you can use other apps or lock your phone while driving.
 
-## What does the GPS receipt look like?
+## What does the GPS Distance expense receipt look like?
 
 The GPS receipt shows a map of your actual route driven, along with the total distance and calculated reimbursement amount. It looks similar to a map-based distance receipt, but reflects the path you actually took rather than a suggested route.
 
