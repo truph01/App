@@ -1763,6 +1763,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         newContactMethod: 'Nieuwe contactmethode',
         goBackContactMethods: 'Ga terug naar contactmethoden',
+        yourDefaultContactMethodRestrictedSwitch: 'Dit is je huidige standaardcontactmethode. Je bedrijf heeft beperkt dat je deze kunt verwijderen of wijzigen.',
     },
     pronouns: {
         coCos: 'Co / Cos',

@@ -1757,6 +1757,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         newContactMethod: '新しい連絡方法',
         goBackContactMethods: '連絡方法に戻る',
+        yourDefaultContactMethodRestrictedSwitch: 'これは現在のデフォルトの連絡方法です。会社により、これを削除または変更することは制限されています。',
     },
     pronouns: {
         coCos: '会社 / コスト',

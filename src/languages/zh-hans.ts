@@ -1733,6 +1733,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         newContactMethod: '新联系方式',
         goBackContactMethods: '返回联系方式',
+        yourDefaultContactMethodRestrictedSwitch: '这是你当前的默认联系方式。你的公司已限制移除或更改它。',
     },
     pronouns: {
         coCos: '公司/成本',

@@ -1765,6 +1765,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         newContactMethod: 'Nuovo metodo di contatto',
         goBackContactMethods: 'Torna ai metodi di contatto',
+        yourDefaultContactMethodRestrictedSwitch: 'Questo è il tuo metodo di contatto predefinito attuale. La tua azienda ne ha limitato la rimozione o la modifica.',
     },
     pronouns: {
         coCos: 'Co / Cos',

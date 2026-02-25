@@ -1610,6 +1610,7 @@ const translations: TranslationDeepObject<typeof en> = {
         setAsDefault: 'Establecer como predeterminado',
         yourDefaultContactMethod:
             'Este es tu método de contacto predeterminado. Antes de poder eliminarlo, tendrás que elegir otro método de contacto y haz clic en "Establecer como predeterminado".',
+        yourDefaultContactMethodRestrictedSwitch: 'Este es tu método de contacto predeterminado actual. Tu empresa ha restringido su eliminación o modificación.',
         removeContactMethod: 'Eliminar método de contacto',
         removeAreYouSure: '¿Estás seguro de que quieres eliminar este método de contacto? Esta acción no se puede deshacer.',
         failedNewContact: 'Se ha producido un error al añadir este método de contacto.',

@@ -1788,6 +1788,7 @@ const translations = {
         enterMagicCode: (contactMethod: string) => `Please enter the magic code sent to ${contactMethod}. It should arrive within a minute or two.`,
         setAsDefault: 'Set as default',
         yourDefaultContactMethod: "This is your current default contact method. Before you can delete it, you'll need to choose another contact method and click “Set as default”.",
+        yourDefaultContactMethodRestrictedSwitch: 'This is your current default contact method. Your company has restricted removing or changing it.',
         removeContactMethod: 'Remove contact method',
         removeAreYouSure: "Are you sure you want to remove this contact method? This action can't be undone.",
         failedNewContact: 'Failed to add this contact method.',
