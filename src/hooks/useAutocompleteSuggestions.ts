@@ -275,9 +275,7 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.TYPE: {
-            const filteredTypes = DATA_TYPE_VALUES
-                .filter((type) => type.toLowerCase().includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(type.toLowerCase()))
-                .sort();
+            const filteredTypes = DATA_TYPE_VALUES.filter((type) => type.toLowerCase().includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(type.toLowerCase())).sort();
 
             return filteredTypes.map((type) => ({filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TYPE, text: type}));
         }
@@ -345,9 +343,9 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE: {
-            const filteredWithdrawalTypes = WITHDRAWAL_TYPE_VALUES
-                .filter((withdrawalType) => withdrawalType.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(withdrawalType))
-                .sort();
+            const filteredWithdrawalTypes = WITHDRAWAL_TYPE_VALUES.filter(
+                (withdrawalType) => withdrawalType.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(withdrawalType),
+            ).sort();
 
             return filteredWithdrawalTypes.map((withdrawalType) => ({
                 filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.WITHDRAWAL_TYPE,
