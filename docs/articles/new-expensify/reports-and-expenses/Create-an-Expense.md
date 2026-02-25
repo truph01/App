@@ -60,7 +60,7 @@ You can create an expense by scanning a receipt, entering details manually, or t
 
 You can create a distance expense using map-based locations or GPS tracking.
 
-**Map-based (all platforms):**
+**Map-based (Web and Mobile):**
 
 1. Click the **➕ Create** button.
 2. Select **Track distance**.
@@ -70,13 +70,13 @@ You can create a distance expense using map-based locations or GPS tracking.
 6. Choose the recipient and add expense details like description, category, tags, tax, date, and set whether the expense is reimbursable.
 7. Click **Create expense**.
 
-**GPS tracking (mobile only):**
+**GPS tracking (Mobile only):**
 
 1. Tap the **➕ Create** button.
 2. Select **Track distance**.
-3. Select the **GPS** tab and tap **Start GPS**.
+3. Select **GPS** and tap **Start**.
 4. Drive to your destination — tracking runs in the background.
-5. Tap **Stop** when you arrive and confirm.
+5. Tap **Stop** when you arrive and confirm by selecting **Stop GPS tracking**.
 6. Review the route and expense details, then tap **Create expense**.
 
 For more details on all distance methods including manual entry, see [Distance Expenses](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Distance-Expenses).
