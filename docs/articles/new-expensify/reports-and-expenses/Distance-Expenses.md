@@ -5,7 +5,7 @@ keywords: [New Expensify, distance expense, mileage reimbursement, create expens
 internalScope: Audience is all members. Covers creating Distance expenses using GPS tracking, map-based routes, and manual entry, plus how reimbursement rates are applied. Does not cover configuring Workspace distance rates in detail or broader report submission workflows.
 ---
 
-# Distance Expenses 
+# Distance Expenses
 
 Expensify offers three ways to create a Distance expense: **GPS tracking** on mobile, **map-based routes** using start and end locations, or **manual entry** by typing in the distance. This guide explains each method and how the reimbursement rate is determined.
 
@@ -19,10 +19,10 @@ To create an expense using GPS tracking based on the distance traveled:
 
 1. Tap the **➕ Create** button.
 2. Select **Track distance**.
-3. Select **GPS** from the top row. 
-5. Tap **Start** and drive to your destination — tracking runs in the background.
-6. Tap **Stop** when you arrive and confirm by selecting **Stop GPS tracking**.
-7. Review the route and expense details, then tap **Create expense**.
+3. Select **GPS** from the top row.
+4. Tap **Start** and drive to your destination — tracking runs in the background.
+5. Tap **Stop** when you arrive and confirm by selecting **Stop GPS tracking**.
+6. Review the route and expense details, then tap **Create expense**.
 
 **Note:** GPS tracking is available on iOS and Android only. On Web, you'll see a prompt to download the mobile app when selecting the GPS option.
 
@@ -59,8 +59,7 @@ To create an expense by inputting a distance manually:
    - Amount
    - Date
    - (Optional) Add a description, category, tag or receipt. 
-6. Select **Next**.
-7. Select **Create expense**. 
+6. Select **Create expense**.
 
 Once a Distance expense is created, it can be submitted on a report. To learn how to add expenses to a report, see [Create and Submit Reports](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Create-and-Submit-Reports). 
 
@@ -68,24 +67,24 @@ Once a Distance expense is created, it can be submitted on a report. To learn ho
 
 ## How reimbursement rates are set for Distance expenses
 
-**Distance expenses created on a Workspace**
+### Distance expenses created on a Workspace
 
 If you are creating expenses on a Workspace: 
 
-- Workspace Admins set and manage the reimbursement rates for the workspace's distance unit (miles or kilometers)
-- When creating a Distance expense, the available reimbursement rates will show for selection
+- Workspace Admins set and manage the reimbursement rates for the workspace's distance unit (miles or kilometers).
+- When creating a Distance expense, the available reimbursement rates will show for selection.
 
 [Learn how to manage distance rates as a Workspace Admin](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Managing-Distance-Rates)
 
-**Distance expenses created for personal tracking**
+### Distance expenses created for personal tracking
 
-**If you're creating expenses outside of a Workspace:**
+If you're creating expenses outside of a Workspace:
 
 - Expensify sets a default rate based on your reporting currency. 
    - Example: For USD, the rate is based on the current IRS reimbursement rate and uses miles.
- - Distance default rates are updated annually. 
+   - Distance default rates are updated annually.
 
-**Note:** Only Workspace Admins can set a custom distance rate. It's not possible to set a custom distance rate for personal expenses outside of a Workspace 
+**Note:** Only Workspace Admins can set a custom distance rate. It's not possible to set a custom distance rate for personal expenses outside of a Workspace.
 
 ---
 
@@ -120,8 +119,7 @@ The distance unit and rate can only be updated by a Workspace Admin on the Works
 
 ## What happens if a Distance expense is moved to a different Workspace?
 
-When a Distance expense is moved to a different Workspace, the expense is automatically updated to use the new Workspace's unit and distance rate. 
-
+When a Distance expense is moved to a different Workspace, the expense is automatically updated to use the new Workspace's unit and distance rate.
 
 ## Do I need to keep the mobile app open during GPS tracking?
 

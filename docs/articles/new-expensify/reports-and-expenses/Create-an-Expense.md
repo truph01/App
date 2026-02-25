@@ -60,7 +60,7 @@ You can create an expense by scanning a receipt, entering details manually, or t
 
 You can create a distance expense using map-based locations or GPS tracking.
 
-**Map-based (Web and Mobile):**
+### Map-based (Web and Mobile)
 
 1. Click the **➕ Create** button.
 2. Select **Track distance**.
@@ -70,7 +70,7 @@ You can create a distance expense using map-based locations or GPS tracking.
 6. Choose the recipient and add expense details like description, category, tags, tax, date, and set whether the expense is reimbursable.
 7. Click **Create expense**.
 
-**GPS tracking (Mobile only):**
+### GPS tracking (Mobile only)
 
 1. Tap the **➕ Create** button.
 2. Select **Track distance**.
