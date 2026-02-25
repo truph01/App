@@ -50,7 +50,7 @@ This document lists all implemented telemetry metrics in the Expensify App.
 
 **Constant**: `CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS`
 **Sentry Name**: `ManualNavigateToReports`
-**Threshold**: 300ms/600ms (cold/warm) (P90)
+**Threshold**: 400ms (P90)
 **What's Measured**: Time from clicking search tab to results rendered (either list or skeleton)
 **Start**: User clicks search/reports tab ([`src/components/Navigation/NavigationTabBar/SearchTabButton.tsx`](https://github.com/Expensify/App/blob/42c42d7fb1984adde1d96ef2285d3c8e1177a4aa/src/components/Navigation/NavigationTabBar/SearchTabButton.tsx#L47))
 **End**:
