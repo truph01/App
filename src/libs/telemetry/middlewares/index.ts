@@ -34,5 +34,4 @@ function processBeforeSendLogs(log: Log): Log | null {
 }
 
 export type {TelemetryBeforeSend, TelemetryBeforeSendLog};
-export {processBeforeSendLogs};
-export default processBeforeSendTransactions;
+export {processBeforeSendTransactions, processBeforeSendLogs};
