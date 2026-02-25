@@ -9,7 +9,6 @@ import waitForBatchedUpdates from '../../utils/waitForBatchedUpdates';
 const mockGetExportTemplates = jest.fn();
 const mockGetConnectedIntegrationNamesForPolicies = jest.fn(() => new Set<string>());
 
-
 jest.mock('@libs/actions/Search', () => ({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     getExportTemplates: (...args: unknown[]) => mockGetExportTemplates(...args),

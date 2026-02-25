@@ -161,6 +161,7 @@ function SearchPage({route}: SearchPageProps) {
         'NetSuiteSquare',
         'IntacctSquare',
         'QBDSquare',
+        'CertiniaSquare',
         'Pencil',
     ] as const);
 

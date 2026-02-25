@@ -1,4 +1,4 @@
-import {useSearchContext} from '@components/Search/SearchContext';
+import {useSearchStateContext} from '@components/Search/SearchContext';
 import {getStandardExportTemplateDisplayName} from '@libs/AccountingUtils';
 import {getExportTemplates} from '@libs/actions/Search';
 import {getConnectedIntegrationNamesForPolicies} from '@libs/PolicyUtils';
@@ -21,7 +21,7 @@ type UseExportedToFilterDataResult = {
  * When currentSearchQueryJSON has policyID, options are scoped to those workspaces so form hydration and autocomplete stay consistent.
  */
 export default function useExportedToFilterOptions(): UseExportedToFilterDataResult {
-    const {currentSearchQueryJSON} = useSearchContext();
+    const {currentSearchQueryJSON} = useSearchStateContext();
     const policyIDs = currentSearchQueryJSON?.policyID;
 
     const {translate, localeCompare} = useLocalize();
