@@ -1777,9 +1777,8 @@ const CONST = {
         // Span names
         SPAN_OPEN_REPORT: 'ManualOpenReport',
         SPAN_APP_STARTUP: 'ManualAppStartup',
-        SPAN_NAVIGATE_TO_REPORTS_TAB: 'ManualNavigateToReportsTab',
-        SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER: 'ManualNavigateToReportsTabRender',
-        SPAN_ON_LAYOUT_SKELETON_REPORTS: 'ManualOnLayoutSkeletonReports',
+        SPAN_NAVIGATE_TO_REPORTS_LIST: 'ManualNavigateToReportsList',
+        SPAN_NAVIGATE_TO_REPORTS_SKELETON: 'ManualNavigateToReportsSkeleton',
         SPAN_NAVIGATE_TO_INBOX_TAB: 'ManualNavigateToInboxTab',
         SPAN_OD_ND_TRANSITION: 'ManualOdNdTransition',
         SPAN_OD_ND_TRANSITION_LOGGED_OUT: 'ManualOdNdTransitionLoggedOut',

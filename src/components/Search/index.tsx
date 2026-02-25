@@ -755,7 +755,7 @@ function Search({
 
     const isUnmounted = useRef(false);
     const hasHadFirstLayout = useRef(false);
-    const hasHadSkeletonLayout = useRef(false);
+    const lastSeenReportsTabNavigationId = useRef(0);
 
     useEffect(
         () => () => {
@@ -1154,24 +1154,16 @@ function Search({
 
     const onLayout = useCallback(() => {
         hasHadFirstLayout.current = true;
-        getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER)?.setAttributes({
-            inputQuery: queryJSON?.inputQuery,
-        });
-        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
-        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
-        if (!hasHadSkeletonLayout.current) {
-            cancelSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
-        }
+        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON);
         markNavigateAfterExpenseCreateEnd();
         handleSelectionListScroll(sortedData, searchListRef.current);
-    }, [handleSelectionListScroll, sortedData, queryJSON?.inputQuery]);
+    }, [handleSelectionListScroll, sortedData]);
 
     const onLayoutSkeleton = useCallback(() => {
         hasHadFirstLayout.current = true;
-        hasHadSkeletonLayout.current = true;
-        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
-        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
-        endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON);
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
     }, []);
 
     // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
@@ -1181,21 +1173,21 @@ function Search({
     // Only end the skeleton span when the skeleton actually laid out; otherwise cancel it.
     useFocusEffect(
         useCallback(() => {
-            const hasLayoutOrContentVisible = hasHadFirstLayout.current || !shouldShowLoadingState;
-            if (!hasLayoutOrContentVisible) {
+            if (!hasHadFirstLayout.current) {
                 return;
             }
-            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
-            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
-            if (!hasHadSkeletonLayout.current) {
-                cancelSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+            if (shouldShowLoadingState) {
+                endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON);
+                cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
+            } else {
+                endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
+                cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON);
             }
             markNavigateAfterExpenseCreateEnd();
         }, [shouldShowLoadingState]),
     );
 
     if (shouldShowLoadingState) {
-        hasHadFirstLayout.current = false;
         return (
             <Animated.View
                 entering={FadeIn.duration(CONST.SEARCH.ANIMATION.FADE_DURATION)}
@@ -1211,20 +1203,16 @@ function Search({
         );
     }
 
-    // Reset per-navigation state so the next focus/layout cycle is for this navigation, not a previous one.
-    hasHadFirstLayout.current = false;
-    hasHadSkeletonLayout.current = false;
-
     if (searchResults === undefined) {
         Log.alert('[Search] Undefined search type');
-        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE);
         return <FullPageOfflineBlockingView>{null}</FullPageOfflineBlockingView>;
     }
 
     if (hasErrors) {
         const isInvalidQuery = searchRequestResponseStatusCode === CONST.JSON_CODE.INVALID_SEARCH_QUERY;
-        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE);
         return (
             <View style={[shouldUseNarrowLayout ? styles.searchListContentContainerStyles : styles.mt3, styles.flex1]}>
@@ -1241,7 +1229,7 @@ function Search({
 
     const visibleDataLength = filteredData.filter((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isOffline).length;
     if (shouldShowEmptyState(isDataLoaded, visibleDataLength, searchDataType)) {
-        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST);
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE);
         return (
             <View style={[shouldUseNarrowLayout ? styles.searchListContentContainerStyles : styles.mt3, styles.flex1]}>

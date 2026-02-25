@@ -44,22 +44,15 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
         }
         clearSelectedText();
         interceptAnonymousUser(() => {
-            const parentSpan = startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB, {
-                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB,
-                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB,
-            });
-            parentSpan?.setAttribute(CONST.TELEMETRY.ATTRIBUTE_ROUTE_FROM, selectedTab ?? '');
-
-            startSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS, {
-                name: CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS,
-                op: CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS,
-                parentSpan,
+            getNextReportsTabNavigationId();
+            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON, {
+                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON,
+                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON,
             });
 
-            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER, {
-                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
-                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
-                parentSpan,
+            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST, {
+                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST,
+                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST,
             });
 
             const lastSearchRoute = getLastRoute(navigationRef.getRootState(), NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, SCREENS.SEARCH.ROOT);

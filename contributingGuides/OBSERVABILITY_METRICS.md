@@ -48,7 +48,7 @@ This document lists all implemented telemetry metrics in the Expensify App.
 
 ### Navigate to Reports Tab
 
-**Constant**: `CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB`
+**Constant**: `CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST`
 **Sentry Name**: `ManualNavigateToReportsTab`
 **Threshold**: 400ms (P90)
 **What's Measured**: Time from clicking search tab to results rendered
