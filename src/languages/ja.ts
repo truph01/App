@@ -65,8 +65,11 @@ import type {
     UpdatedPolicyBudgetNotificationParams,
     UpdatedPolicyCategoriesParams,
     UpdatedPolicyCategoryMaxAmountNoReceiptParams,
+    UpdatedPolicyCurrencyDefaultTaxParams,
+    UpdatedPolicyCustomTaxNameParams,
     UpdatedPolicyCustomUnitSubRateParams,
     UpdatedPolicyDefaultTitleParams,
+    UpdatedPolicyForeignCurrencyDefaultTaxParams,
     UpdatedPolicyManualApprovalThresholdParams,
     UpdatedPolicyOwnershipParams,
     UpdatedPolicyPreventSelfApprovalParams,
@@ -131,6 +134,7 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
+
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -390,6 +394,7 @@ const translations: TranslationDeepObject<typeof en> = {
         card: 'カード',
         whyDoWeAskForThis: 'なぜこの情報が必要なのですか？',
         required: '必須',
+        automatic: '自動',
         showing: '表示中',
         of: 'の',
         default: 'デフォルト',
@@ -529,11 +534,13 @@ const translations: TranslationDeepObject<typeof en> = {
         exchangeRate: '為替レート',
         reimbursableTotal: '精算対象合計',
         nonReimbursableTotal: '未払い対象外の合計',
+        opensInNewTab: '新しいタブで開きます',
         locked: 'ロックされています',
         month: '月',
         week: '週',
         year: '年',
         quarter: '四半期',
+        vacationDelegate: '休暇代理人',
         expensifyLogo: 'Expensifyロゴ',
     },
     socials: {
@@ -954,6 +961,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'ウォレット > 割り当てられたカード',
             },
         },
+        assignedCards: '割り当て済みカード',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `残額：${amount}`,
         announcements: 'お知らせ',
         discoverSection: {
             title: '発見',
@@ -1162,6 +1171,7 @@ const translations: TranslationDeepObject<typeof en> = {
         pendingMatchWithCreditCardDescription: 'レシートはカード取引との照合待ちです。現金としてマークしてキャンセルします。',
         markAsCash: '現金としてマーク',
         routePending: 'ルート保留中…',
+        automaticallyEnterExpenseDetails: 'コンシェルジュが自動的に経費の詳細を入力するか、手動で追加することができます。',
         receiptScanning: () => ({
             one: 'レシートをスキャンしています…',
             other: 'レシートをスキャンしています…',
@@ -3045,7 +3055,6 @@ ${
         time: '時間',
         clearAfter: 'クリアまでの時間',
         whenClearStatus: 'ステータスをいつクリアしますか？',
-        vacationDelegate: '休暇代理人',
         setVacationDelegate: `休暇中に不在の間、あなたに代わってレポートを承認する代理人を設定しましょう。`,
         cannotSetVacationDelegate: `現在、次のメンバーの代理人になっているため、休暇代理人を設定できません：`,
         vacationDelegateError: '休暇の代理人を更新中にエラーが発生しました。',
@@ -6279,6 +6288,7 @@ ${reportName}
                 adultEntertainment: 'アダルトエンターテインメント',
                 requireCompanyCard: 'すべての購入に会社カードを必須にする',
                 requireCompanyCardDescription: 'マイレージや日当経費を含む、すべての現金支出にフラグを付ける。',
+                requireCompanyCardDisabledTooltip: 'ロック解除するには、「その他の機能」内の「会社カード」を有効にしてください。',
             },
             expenseReportRules: {
                 title: '詳細設定',
@@ -6328,7 +6338,7 @@ ${reportName}
                 matchTypeContains: '含む',
                 matchTypeExact: '完全一致',
                 duplicateRuleTitle: '同様のマーチャントルールが既に存在します',
-                duplicateRulePrompt: (merchantName: string) => `既にルールが存在しますが、「${merchantName}」用に新しいルールを保存しますか？`,
+                duplicateRulePrompt: (merchantName: string) => `「${merchantName}」に対する既存のルールが、このルールよりも優先されます。保存しますか？`,
                 saveAnyway: 'とにかく保存',
                 applyToExistingUnsubmittedExpenses: '既存の未提出経費に適用',
             },
@@ -6731,6 +6741,9 @@ ${reportName}
         changedReimburser: ({newReimburser, previousReimburser}: UpdatedPolicyReimburserParams) =>
             previousReimburser ? `認可された支払者を「${newReimburser}」（以前は「${previousReimburser}」）に変更しました` : `承認済み支払担当者を「${newReimburser}」に変更しました`,
         updateReimbursementEnabled: ({enabled}: UpdatedPolicyReimbursementEnabledParams) => `${enabled ? '有効' : '無効'}件の精算`,
+        updateCustomTaxName: ({oldName, newName}: UpdatedPolicyCustomTaxNameParams) => `カスタム税区分名を「${newName}」（以前は「${oldName}」）に変更しました`,
+        updateCurrencyDefaultTax: ({oldName, newName}: UpdatedPolicyCurrencyDefaultTaxParams) => `ワークスペースの通貨デフォルト税率を「${newName}」（以前は「${oldName}」）に変更しました`,
+        updateForeignCurrencyDefaultTax: ({oldName, newName}: UpdatedPolicyForeignCurrencyDefaultTaxParams) => `外貨のデフォルト税率を「${newName}」に変更しました（以前は「${oldName}」）。`,
         addTax: ({taxName}: UpdatedPolicyTaxParams) => `税「${taxName}」を追加しました`,
         deleteTax: ({taxName}: UpdatedPolicyTaxParams) => `税金「${taxName}」を削除しました`,
         updateTax: ({oldValue, taxName, updatedField, newValue}: UpdatedPolicyTaxParams) => {
@@ -7347,6 +7360,9 @@ ${reportName}
         scrollToNewestMessages: '最新のメッセージまでスクロール',
         preStyledText: '事前にスタイル設定されたテキスト',
         viewAttachment: '添付ファイルを表示',
+        selectAllFeatures: 'すべての機能を選択',
+        selectAllTransactions: 'すべての取引を選択',
+        selectAllItems: 'すべての項目を選択',
     },
     parentReportAction: {
         deletedReport: '削除されたレポート',
@@ -7462,6 +7478,9 @@ ${reportName}
             endTitle: '走行距離計（終了時）の写真',
             deleteOdometerPhoto: '走行距離計の写真を削除',
             deleteOdometerPhotoConfirmation: 'この走行距離計の写真を削除してもよろしいですか？',
+            cameraAccessRequired: '写真を撮影するにはカメラへのアクセス権限が必要です。',
+            snapPhotoStart: '<muted-text-label>移動を<strong>開始</strong>するときに、走行距離計の写真を撮影してください。</muted-text-label>',
+            snapPhotoEnd: '<muted-text-label>走行の<strong>終了時</strong>に、オドメーターの写真を撮影してください。</muted-text-label>',
         },
     },
     gps: {
@@ -8374,15 +8393,23 @@ ${reportName}
             error: {
                 removeMember: 'このユーザーを削除できません。もう一度お試しください。',
                 addMember: 'このメンバーを追加できませんでした。もう一度お試しください。',
+                vacationDelegate: 'このユーザーを休暇代理人として設定できませんでした。もう一度お試しください。',
             },
             forceTwoFactorAuth: '2要素認証を必須にする',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>2 要素認証を必須にするには、<a href="${samlPageUrl}">SAML</a> を無効にしてください。</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>このドメインのすべてのメンバーに二要素認証を必須にします。ドメインメンバーは、サインイン時に自分のアカウントで二要素認証を設定するよう求められます。</muted-text>`,
             forceTwoFactorAuthError: '2要素認証の強制設定を変更できませんでした。後でもう一度お試しください。',
+            cannotSetVacationDelegateForMember: (email: string) => `${email} に休暇代理人を設定できません。現在、このユーザーは次のメンバーの代理人になっています。`,
         },
         common: {settings: '設定'},
         groups: {title: 'グループ', memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`})},
+    },
+    proactiveAppReview: {
+        title: '新しい Expensify をお楽しみいただけていますか？',
+        description: '経費精算の体験をさらに良くできるよう、お知らせください。',
+        positiveButton: 'やった！',
+        negativeButton: 'そうでもありません',
     },
 };
 export default translations;

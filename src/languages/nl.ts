@@ -65,8 +65,11 @@ import type {
     UpdatedPolicyBudgetNotificationParams,
     UpdatedPolicyCategoriesParams,
     UpdatedPolicyCategoryMaxAmountNoReceiptParams,
+    UpdatedPolicyCurrencyDefaultTaxParams,
+    UpdatedPolicyCustomTaxNameParams,
     UpdatedPolicyCustomUnitSubRateParams,
     UpdatedPolicyDefaultTitleParams,
+    UpdatedPolicyForeignCurrencyDefaultTaxParams,
     UpdatedPolicyManualApprovalThresholdParams,
     UpdatedPolicyOwnershipParams,
     UpdatedPolicyPreventSelfApprovalParams,
@@ -131,6 +134,7 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
+
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -390,6 +394,7 @@ const translations: TranslationDeepObject<typeof en> = {
         card: 'Kaart',
         whyDoWeAskForThis: 'Waarom vragen we dit?',
         required: 'Vereist',
+        automatic: 'Automatisch',
         showing: 'Wordt weergegeven',
         of: 'of',
         default: 'Standaard',
@@ -525,6 +530,7 @@ const translations: TranslationDeepObject<typeof en> = {
         actionRequired: 'Actie vereist',
         duplicate: 'Dupliceren',
         duplicated: 'Gedupliceerd',
+        opensInNewTab: 'Opent in een nieuw tabblad',
         locked: 'Vergrendeld',
         duplicateExpense: 'Dubbele uitgave',
         exchangeRate: 'Wisselkoers',
@@ -534,6 +540,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Week',
         year: 'Jaar',
         quarter: 'Kwartaal',
+        vacationDelegate: 'Vertegenwoordiger tijdens vakantie',
         expensifyLogo: 'Expensify-logo',
     },
     socials: {
@@ -958,6 +965,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Wallet > Toegewezen kaarten',
             },
         },
+        assignedCards: 'Toegewezen kaarten',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} resterend`,
         announcements: 'Aankondigingen',
         discoverSection: {
             title: 'Ontdekken',
@@ -1166,6 +1175,7 @@ const translations: TranslationDeepObject<typeof en> = {
         pendingMatchWithCreditCardDescription: 'Bon wordt nog gekoppeld aan kaarttransactie. Markeer als contant om te annuleren.',
         markAsCash: 'Markeren als contant',
         routePending: 'Routeren in behandeling...',
+        automaticallyEnterExpenseDetails: 'Concierge zal automatisch de uitgavendetails voor je invoeren, of je kunt ze handmatig toevoegen.',
         receiptScanning: () => ({
             one: 'Bon wordt gescand...',
             other: 'Bonnetjes scannen...',
@@ -3060,7 +3070,6 @@ ${
         time: 'Tijd',
         clearAfter: 'Wissen na',
         whenClearStatus: 'Wanneer moeten we je status wissen?',
-        vacationDelegate: 'Vertegenwoordiger tijdens vakantie',
         setVacationDelegate: `Stel een vervangende fiatteur in om rapporten namens jou goed te keuren terwijl je afwezig bent.`,
         cannotSetVacationDelegate: `Je kunt geen vakantiedelegaat instellen omdat je momenteel de delegaat bent voor de volgende leden:`,
         vacationDelegateError: 'Er is een fout opgetreden bij het bijwerken van je vervanger tijdens vakantie.',
@@ -6320,6 +6329,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 adultEntertainment: 'Volwassenenentertainment',
                 requireCompanyCard: 'Verplicht bedrijfskaarten voor alle aankopen',
                 requireCompanyCardDescription: 'Markeer alle contante uitgaven, inclusief kilometer- en dagvergoedingen.',
+                requireCompanyCardDisabledTooltip: 'Schakel Bedrijfskaarten in (onder Meer functies) om te ontgrendelen.',
             },
             expenseReportRules: {
                 title: 'Geavanceerd',
@@ -6369,7 +6379,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 matchTypeContains: 'Bevat',
                 matchTypeExact: 'Komt exact overeen',
                 duplicateRuleTitle: 'Vergelijkbare handelaarregel bestaat al',
-                duplicateRulePrompt: (merchantName: string) => `Wil je een nieuwe regel voor ‘${merchantName}’ opslaan, ook al heb je er al een bestaande?`,
+                duplicateRulePrompt: (merchantName: string) => `Je bestaande regel voor ‘${merchantName}’ krijgt voorrang op deze regel. Toch opslaan?`,
                 saveAnyway: 'Toch opslaan',
                 applyToExistingUnsubmittedExpenses: 'Toepassen op bestaande niet-ingediende uitgaven',
             },
@@ -6782,6 +6792,11 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 ? `heeft de gemachtigde betaler gewijzigd in „${newReimburser}” (voorheen „${previousReimburser}”)`
                 : `heeft de gemachtigde betaler gewijzigd naar ‘${newReimburser}’`,
         updateReimbursementEnabled: ({enabled}: UpdatedPolicyReimbursementEnabledParams) => `${enabled ? 'ingeschakeld' : 'uitgeschakeld'} terugbetalingen`,
+        updateCustomTaxName: ({oldName, newName}: UpdatedPolicyCustomTaxNameParams) => `de aangepaste belastingnaam gewijzigd in "${newName}" (voorheen "${oldName}")`,
+        updateCurrencyDefaultTax: ({oldName, newName}: UpdatedPolicyCurrencyDefaultTaxParams) =>
+            `heeft het standaardbelastingtarief van de werkruimtevaluta gewijzigd in "${newName}" (voorheen "${oldName}")`,
+        updateForeignCurrencyDefaultTax: ({oldName, newName}: UpdatedPolicyForeignCurrencyDefaultTaxParams) =>
+            `heeft het standaardbelastingtarief voor vreemde valuta gewijzigd in '${newName}' (voorheen '${oldName}')`,
         addTax: ({taxName}: UpdatedPolicyTaxParams) => `heeft de belasting ‘${taxName}’ toegevoegd`,
         deleteTax: ({taxName}: UpdatedPolicyTaxParams) => `heeft de belasting ‘${taxName}’ verwijderd`,
         updateTax: ({oldValue, taxName, updatedField, newValue}: UpdatedPolicyTaxParams) => {
@@ -7400,6 +7415,9 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
         scrollToNewestMessages: 'Scroll naar nieuwste berichten',
         preStyledText: 'Vooraf opgemaakte tekst',
         viewAttachment: 'Bijlage bekijken',
+        selectAllFeatures: 'Selecteer alle functies',
+        selectAllTransactions: 'Selecteer alle transacties',
+        selectAllItems: 'Alle items selecteren',
     },
     parentReportAction: {
         deletedReport: 'Verwijderd rapport',
@@ -7516,6 +7534,9 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             endTitle: 'Eindfoto kilometerteller',
             deleteOdometerPhoto: 'Kilometerstandfoto verwijderen',
             deleteOdometerPhotoConfirmation: 'Weet je zeker dat je deze kilometertellerfoto wilt verwijderen?',
+            cameraAccessRequired: 'Cameratoegang is nodig om foto’s te maken.',
+            snapPhotoStart: '<muted-text-label>Maak een foto van je kilometerteller aan het <strong>begin</strong> van je rit.</muted-text-label>',
+            snapPhotoEnd: '<muted-text-label>Maak een foto van je kilometerteller aan het <strong>einde</strong> van je rit.</muted-text-label>',
         },
     },
     gps: {
@@ -8435,15 +8456,24 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             error: {
                 removeMember: 'Kan deze gebruiker niet verwijderen. Probeer het opnieuw.',
                 addMember: 'Kan dit lid niet toevoegen. Probeer het opnieuw.',
+                vacationDelegate: 'Kan deze gebruiker niet als vakantiemandataris instellen. Probeer het opnieuw.',
             },
             forceTwoFactorAuth: 'Tweeledige verificatie afdwingen',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Schakel <a href="${samlPageUrl}">SAML</a> uit om het gebruik van twee-factor-authenticatie af te dwingen.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Tweeledige verificatie vereisen voor alle leden van dit domein. Domeinleden worden gevraagd om tweefactorauthenticatie voor hun account in te stellen wanneer ze zich aanmelden.</muted-text>`,
             forceTwoFactorAuthError: 'Verplichte twee-factor-authenticatie kon niet worden gewijzigd. Probeer het later opnieuw.',
+            cannotSetVacationDelegateForMember: (email: string) =>
+                `Je kunt geen vakantiemandataris instellen voor ${email} omdat die persoon momenteel gedelegeerde is voor de volgende leden:`,
         },
         common: {settings: 'Instellingen'},
         groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
+    },
+    proactiveAppReview: {
+        title: 'Geniet je van de nieuwe Expensify?',
+        description: 'Laat het ons weten, zodat we je uitgavenervaring nog beter kunnen maken.',
+        positiveButton: 'Ja!',
+        negativeButton: 'Niet echt',
     },
 };
 export default translations;

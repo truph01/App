@@ -65,8 +65,11 @@ import type {
     UpdatedPolicyBudgetNotificationParams,
     UpdatedPolicyCategoriesParams,
     UpdatedPolicyCategoryMaxAmountNoReceiptParams,
+    UpdatedPolicyCurrencyDefaultTaxParams,
+    UpdatedPolicyCustomTaxNameParams,
     UpdatedPolicyCustomUnitSubRateParams,
     UpdatedPolicyDefaultTitleParams,
+    UpdatedPolicyForeignCurrencyDefaultTaxParams,
     UpdatedPolicyManualApprovalThresholdParams,
     UpdatedPolicyOwnershipParams,
     UpdatedPolicyPreventSelfApprovalParams,
@@ -131,6 +134,7 @@ import type {
     ZipCodeExampleFormatParams,
 } from './params';
 import type {TranslationDeepObject} from './types';
+
 type StateValue = {
     stateISO: string;
     stateName: string;
@@ -390,6 +394,7 @@ const translations: TranslationDeepObject<typeof en> = {
         card: 'Karta',
         whyDoWeAskForThis: 'Dlaczego o to prosimy?',
         required: 'Wymagane',
+        automatic: 'Automatyczny',
         showing: 'Wyświetlanie',
         of: 'z',
         default: 'Domyślne',
@@ -525,6 +530,7 @@ const translations: TranslationDeepObject<typeof en> = {
         actionRequired: 'Wymagane działanie',
         duplicate: 'Duplikuj',
         duplicated: 'Zduplikowano',
+        opensInNewTab: 'Otwiera się w nowej karcie',
         locked: 'Zablokowane',
         duplicateExpense: 'Zduplikowany wydatek',
         exchangeRate: 'Kurs wymiany',
@@ -534,6 +540,7 @@ const translations: TranslationDeepObject<typeof en> = {
         week: 'Tydzień',
         year: 'Rok',
         quarter: 'Kwartał',
+        vacationDelegate: 'Zastępca urlopowy',
         expensifyLogo: 'Logo Expensify',
     },
     socials: {
@@ -959,6 +966,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Portfel > Przypisane karty',
             },
         },
+        assignedCards: 'Przypisane karty',
+        assignedCardsRemaining: ({amount}: {amount: string}) => `Pozostało ${amount}`,
         announcements: 'Ogłoszenia',
         discoverSection: {
             title: 'Odkryj',
@@ -1166,6 +1175,7 @@ const translations: TranslationDeepObject<typeof en> = {
         pendingMatchWithCreditCardDescription: 'Oczekuje na dopasowanie paragonu do transakcji kartą. Oznacz jako gotówkę, aby anulować.',
         markAsCash: 'Oznacz jako gotówkę',
         routePending: 'Trasa w toku…',
+        automaticallyEnterExpenseDetails: 'Concierge automatycznie wprowadzi szczegóły wydatku za Ciebie lub możesz dodać je ręcznie.',
         receiptScanning: () => ({
             one: 'Skanowanie paragonu...',
             other: 'Skanowanie paragonów...',
@@ -3052,7 +3062,6 @@ ${
         time: 'Czas',
         clearAfter: 'Wyczyść po',
         whenClearStatus: 'Kiedy powinniśmy wyczyścić Twój status?',
-        vacationDelegate: 'Zastępca urlopowy',
         setVacationDelegate: `Ustaw zastępcę na czas urlopu, aby zatwierdzał raporty w Twoim imieniu, gdy jesteś poza biurem.`,
         cannotSetVacationDelegate: `Nie możesz ustawić delegata urlopowego, ponieważ obecnie jesteś delegatem dla następujących członków:`,
         vacationDelegateError: 'Wystąpił błąd podczas aktualizowania Twojego zastępcy urlopowego.',
@@ -6314,6 +6323,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 adultEntertainment: 'Rozrywka dla dorosłych',
                 requireCompanyCard: 'Wymagaj kart służbowych dla wszystkich zakupów',
                 requireCompanyCardDescription: 'Oznacz wszystkie wydatki gotówkowe, w tym koszty za przejechane kilometry i ryczałty dzienne.',
+                requireCompanyCardDisabledTooltip: 'Włącz karty firmowe (w sekcji Więcej funkcji), aby odblokować.',
             },
             expenseReportRules: {
                 title: 'Zaawansowane',
@@ -6363,7 +6373,7 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 matchTypeContains: 'Zawiera',
                 matchTypeExact: 'Dokładnie pasuje',
                 duplicateRuleTitle: 'Podobna reguła dla sprzedawcy już istnieje',
-                duplicateRulePrompt: (merchantName: string) => `Czy chcesz zapisać nową regułę dla „${merchantName}”, mimo że masz już istniejącą?`,
+                duplicateRulePrompt: (merchantName: string) => `Twoja istniejąca reguła dla „${merchantName}” będzie mieć pierwszeństwo przed tą. Zapisać mimo to?`,
                 saveAnyway: 'Zapisz mimo to',
                 applyToExistingUnsubmittedExpenses: 'Zastosuj do istniejących niewysłanych wydatków',
             },
@@ -6772,6 +6782,11 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 ? `zmienił(a) upoważnioną osobę zwracającą wydatki na „${newReimburser}” (wcześniej „${previousReimburser}”)`
                 : `zmienił(a) upoważnionego płatnika na „${newReimburser}”`,
         updateReimbursementEnabled: ({enabled}: UpdatedPolicyReimbursementEnabledParams) => `${enabled ? 'włączone' : 'wyłączone'} zwrotów kosztów`,
+        updateCustomTaxName: ({oldName, newName}: UpdatedPolicyCustomTaxNameParams) => `zmieniono niestandardową nazwę podatku na „${newName}" (poprzednio „${oldName}")`,
+        updateCurrencyDefaultTax: ({oldName, newName}: UpdatedPolicyCurrencyDefaultTaxParams) =>
+            `zmienił domyślną stawkę podatku waluty w przestrzeni roboczej na „${newName}" (wcześniej „${oldName}")`,
+        updateForeignCurrencyDefaultTax: ({oldName, newName}: UpdatedPolicyForeignCurrencyDefaultTaxParams) =>
+            `zmieniono domyślną stawkę podatku dla obcej waluty na „${newName}" (wcześniej „${oldName}")`,
         addTax: ({taxName}: UpdatedPolicyTaxParams) => `dodano podatek „${taxName}”`,
         deleteTax: ({taxName}: UpdatedPolicyTaxParams) => `usunął(-ę) podatek „${taxName}”`,
         updateTax: ({oldValue, taxName, updatedField, newValue}: UpdatedPolicyTaxParams) => {
@@ -7387,6 +7402,9 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
         scrollToNewestMessages: 'Przewiń do najnowszych wiadomości',
         preStyledText: 'Wstępnie ostylowany tekst',
         viewAttachment: 'Zobacz załącznik',
+        selectAllFeatures: 'Zaznacz wszystkie funkcje',
+        selectAllTransactions: 'Zaznacz wszystkie transakcje',
+        selectAllItems: 'Zaznacz wszystkie elementy',
     },
     parentReportAction: {
         deletedReport: 'Usunięty raport',
@@ -7503,6 +7521,9 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             endTitle: 'Końcowe zdjęcie licznika przebiegu',
             deleteOdometerPhoto: 'Usuń zdjęcie licznika przebiegu',
             deleteOdometerPhotoConfirmation: 'Na pewno chcesz usunąć to zdjęcie licznika?',
+            cameraAccessRequired: 'Aby robić zdjęcia, wymagany jest dostęp do aparatu.',
+            snapPhotoStart: '<muted-text-label>Zrób zdjęcie licznika kilometrów na <strong>początku</strong> podróży.</muted-text-label>',
+            snapPhotoEnd: '<muted-text-label>Zrób zdjęcie licznika kilometrów na <strong>koniec</strong> swojej podróży.</muted-text-label>',
         },
     },
     gps: {
@@ -8420,15 +8441,23 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             error: {
                 removeMember: 'Nie można usunąć tego użytkownika. Spróbuj ponownie.',
                 addMember: 'Nie można dodać tego członka. Spróbuj ponownie.',
+                vacationDelegate: 'Nie można ustawić tego użytkownika jako zastępującego na czas nieobecności. Spróbuj ponownie.',
             },
             forceTwoFactorAuth: 'Wymuś uwierzytelnianie dwuskładnikowe',
             forceTwoFactorAuthSAMLEnabledDescription: (samlPageUrl: string) =>
                 `<muted-text>Wyłącz proszę <a href="${samlPageUrl}">SAML</a>, aby wymusić uwierzytelnianie dwuskładnikowe.</muted-text>`,
             forceTwoFactorAuthDescription: `<muted-text>Wymagaj uwierzytelniania dwuskładnikowego od wszystkich członków tej domeny. Członkowie domeny zostaną poproszeni o skonfigurowanie uwierzytelniania dwuskładnikowego na swoim koncie po zalogowaniu.</muted-text>`,
             forceTwoFactorAuthError: 'Nie udało się zmienić wymuszania uwierzytelniania dwuskładnikowego. Spróbuj ponownie później.',
+            cannotSetVacationDelegateForMember: (email: string) => `Nie możesz ustawić zastępstwa urlopowego dla ${email}, ponieważ jest on/ona obecnie zastępcą dla następujących członków:`,
         },
         common: {settings: 'Ustawienia'},
         groups: {title: 'Grupy', memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`})},
+    },
+    proactiveAppReview: {
+        title: 'Podoba Ci się nowy Expensify?',
+        description: 'Daj nam znać, abyśmy mogli pomóc uczynić Twoje rozliczanie wydatków jeszcze lepszym.',
+        positiveButton: 'Tak!',
+        negativeButton: 'Niekoniecznie',
     },
 };
 export default translations;
