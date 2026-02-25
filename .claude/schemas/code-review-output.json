@@ -6,10 +6,18 @@
       "items": {
         "type": "object",
         "properties": {
-          "ruleId": { "type": "string" },
-          "path": { "type": "string" },
-          "line": { "type": "integer" },
-          "body": { "type": "string" }
+          "ruleId": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "body": {
+            "type": "string"
+          }
         },
         "required": ["ruleId", "path", "line", "body"]
       }
