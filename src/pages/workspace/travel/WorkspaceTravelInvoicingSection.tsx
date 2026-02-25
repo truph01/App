@@ -7,7 +7,6 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Section from '@components/Section';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
 import {
@@ -51,7 +50,6 @@ type WorkspaceTravelInvoicingSectionProps = {
 function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSectionProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const {isBetaEnabled} = usePermissions();
     const workspaceAccountID = useWorkspaceAccountID(policyID);
 
     // Modal states
@@ -137,7 +135,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             return;
         }
 
-        if (isBetaEnabled(CONST.BETAS.TRAVEL_INVOICING) && areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+        if (areTravelPersonalDetailsMissing(privatePersonalDetails)) {
             Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS.getRoute(policyID));
             return;
         }

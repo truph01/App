@@ -1,12 +1,6 @@
 import React, {useEffect} from 'react';
-import {View} from 'react-native';
-import FormProvider from '@components/Form/FormProvider';
-import InputWrapper from '@components/Form/InputWrapper';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
-import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
-import TextInput from '@components/TextInput';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -19,6 +13,7 @@ import {getFieldRequiredErrors, isRequiredFulfilled, isValidLegalName} from '@li
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/PersonalDetailsForm';
+import {BaseLegalNamePage} from '@pages/settings/Profile/PersonalDetails/LegalNamePage';
 
 const STEP_FIELDS = [INPUT_IDS.LEGAL_FIRST_NAME, INPUT_IDS.LEGAL_LAST_NAME];
 
@@ -65,49 +60,20 @@ function TravelLegalNamePage() {
     };
 
     return (
-        <ScreenWrapper
-            includeSafeAreaPaddingBottom={false}
-            shouldEnableMaxHeight
-            testID="TravelLegalNamePage"
+        <BaseLegalNamePage
+            formID={ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM}
+            submitButtonText={translate('common.next')}
+            onBackButtonPress={handleBackButtonPress}
+            onSubmit={handleSubmit}
+            validate={validate}
+            headerTitle={translate('travel.bookTravel')}
+            shouldSaveDraft
+            defaultFirstName={draftValues?.[INPUT_IDS.LEGAL_FIRST_NAME] ?? privatePersonalDetails?.[INPUT_IDS.LEGAL_FIRST_NAME]}
+            defaultLastName={draftValues?.[INPUT_IDS.LEGAL_LAST_NAME] ?? privatePersonalDetails?.[INPUT_IDS.LEGAL_LAST_NAME]}
         >
-            <HeaderWithBackButton
-                title={translate('travel.bookTravel')}
-                onBackButtonPress={handleBackButtonPress}
-            />
-            <FormProvider
-                formID={ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM}
-                submitButtonText={translate('common.next')}
-                validate={validate}
-                onSubmit={handleSubmit}
-                style={[styles.mt3, styles.mh5, styles.flexGrow1]}
-                enabledWhenOffline
-            >
-                <View>
-                    <Text style={[styles.textHeadlineLineHeightXXL, styles.mb3]}>{translate('privatePersonalDetails.enterLegalName')}</Text>
-                    <Text style={[styles.textSupporting, styles.mb6]}>{translate('workspace.moreFeatures.travel.personalDetailsDescription')}</Text>
-                    <InputWrapper
-                        InputComponent={TextInput}
-                        inputID={INPUT_IDS.LEGAL_FIRST_NAME}
-                        label={translate('personalInfoStep.legalFirstName')}
-                        aria-label={translate('personalInfoStep.legalFirstName')}
-                        role={CONST.ROLE.PRESENTATION}
-                        defaultValue={draftValues?.[INPUT_IDS.LEGAL_FIRST_NAME] ?? privatePersonalDetails?.[INPUT_IDS.LEGAL_FIRST_NAME] ?? ''}
-                        shouldSaveDraft
-                        containerStyles={[styles.mb6]}
-                    />
-                    <InputWrapper
-                        InputComponent={TextInput}
-                        inputID={INPUT_IDS.LEGAL_LAST_NAME}
-                        label={translate('personalInfoStep.legalLastName')}
-                        aria-label={translate('personalInfoStep.legalLastName')}
-                        role={CONST.ROLE.PRESENTATION}
-                        defaultValue={draftValues?.[INPUT_IDS.LEGAL_LAST_NAME] ?? privatePersonalDetails?.[INPUT_IDS.LEGAL_LAST_NAME] ?? ''}
-                        shouldSaveDraft
-                        containerStyles={[styles.mb6]}
-                    />
-                </View>
-            </FormProvider>
-        </ScreenWrapper>
+            <Text style={[styles.textHeadlineLineHeightXXL, styles.mb3]}>{translate('privatePersonalDetails.enterLegalName')}</Text>
+            <Text style={[styles.textSupporting, styles.mb6]}>{translate('workspace.moreFeatures.travel.personalDetailsDescription')}</Text>
+        </BaseLegalNamePage>
     );
 }
 
