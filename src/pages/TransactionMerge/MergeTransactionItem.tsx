@@ -20,7 +20,7 @@ function MergeTransactionItem<TItem extends ListItem>({item, isFocused, showTool
     const styles = useThemeStyles();
     const transactionItem = item as unknown as TransactionListItemType;
     const theme = useTheme();
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`, {canBeMissing: true});
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`);
     const policy = usePolicy(report?.policyID);
 
     const animatedHighlightStyle = useAnimatedHighlightStyle({
