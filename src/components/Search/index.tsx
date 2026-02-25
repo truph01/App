@@ -1167,16 +1167,19 @@ function Search({
         hasHadFirstLayout.current = true;
         hasHadSkeletonLayout.current = true;
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
+        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
         endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
     }, []);
 
     // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
     // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
-    // Only end the skeleton span when the skeleton actually laid out; otherwise cancel it so we
-    // don't record a false ManualOnLayoutSkeletonReports success on warm revisits (no skeleton shown).
+    // Only end spans when we have had layout for this navigation or content is already visible (warm):
+    // otherwise a new tab press would have its spans ended at focus time before layout runs.
+    // Only end the skeleton span when the skeleton actually laid out; otherwise cancel it.
     useFocusEffect(
         useCallback(() => {
-            if (!hasHadFirstLayout.current) {
+            const hasLayoutOrContentVisible = hasHadFirstLayout.current || !shouldShowLoadingState;
+            if (!hasLayoutOrContentVisible) {
                 return;
             }
             endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
@@ -1185,10 +1188,11 @@ function Search({
                 cancelSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
             }
             markNavigateAfterExpenseCreateEnd();
-        }, []),
+        }, [shouldShowLoadingState]),
     );
 
     if (shouldShowLoadingState) {
+        hasHadFirstLayout.current = false;
         return (
             <Animated.View
                 entering={FadeIn.duration(CONST.SEARCH.ANIMATION.FADE_DURATION)}
@@ -1204,8 +1208,8 @@ function Search({
         );
     }
 
-    // Reset so useFocusEffect on later warm revisits (new tab press, cached list, no skeleton)
-    // correctly cancels the fresh skeleton span instead of skipping because of an earlier cold load.
+    // Reset per-navigation state so the next focus/layout cycle is for this navigation, not a previous one.
+    hasHadFirstLayout.current = false;
     hasHadSkeletonLayout.current = false;
 
     if (searchResults === undefined) {
