@@ -7076,6 +7076,8 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
         groupColumns: 'Agrupar colunas',
         expenseColumns: 'Colunas de despesas',
         statements: 'Extratos',
+        cardStatements: 'Extratos de cartão',
+        monthlyAccrual: 'Acréscimo mensal',
         unapprovedCash: 'Dinheiro não aprovado',
         unapprovedCard: 'Cartão não aprovado',
         reconciliation: 'Conciliação',
