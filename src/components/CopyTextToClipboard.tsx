@@ -1,8 +1,8 @@
 import React, {useCallback} from 'react';
 import type {AccessibilityRole, StyleProp, TextStyle} from 'react-native';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import Clipboard from '@libs/Clipboard';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import CONST from '@src/CONST';
 import PressableWithDelayToggle from './Pressable/PressableWithDelayToggle';
 import type {PressableWithDelayToggleProps} from './Pressable/PressableWithDelayToggle';

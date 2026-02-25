@@ -6,13 +6,13 @@ import Icon from '@components/Icon';
 import Image from '@components/Image';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import {ShowContextMenuContext, showContextMenuForReport} from '@components/ShowContextMenuContext';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useThemeStyles from '@hooks/useThemeStyles';
 import ControlSelection from '@libs/ControlSelection';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import {isArchivedNonExpenseReport} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type VideoPlayerThumbnailProps = {
     /** Url of thumbnail image. */

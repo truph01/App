@@ -4,12 +4,12 @@ import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Icon from '@components/Icon';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import Tooltip from '@components/Tooltip';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type SendButtonProps = {
     /** Whether the button is disabled */

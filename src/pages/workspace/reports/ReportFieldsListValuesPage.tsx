@@ -16,7 +16,7 @@ import CustomListHeader from '@components/SelectionListWithModal/CustomListHeade
 import TableListItemSkeleton from '@components/Skeletons/TableRowSkeleton';
 import Switch from '@components/Switch';
 import Text from '@components/Text';
-import {useMemoizedLazyIllustrations, useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
 import useOnyx from '@hooks/useOnyx';

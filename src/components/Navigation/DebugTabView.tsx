@@ -6,6 +6,7 @@ import Button from '@components/Button';
 import Icon from '@components/Icon';
 import Text from '@components/Text';
 import useIndicatorStatus from '@hooks/useIndicatorStatus';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import type {IndicatorStatus} from '@hooks/useNavigationTabBarIndicatorChecks';
 import useOnyx from '@hooks/useOnyx';
@@ -24,7 +25,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import type {ReimbursementAccount} from '@src/types/onyx';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import NAVIGATION_TABS from './NavigationTabBar/NAVIGATION_TABS';
 
 type DebugTabViewProps = {

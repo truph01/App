@@ -10,6 +10,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Switch from '@components/Switch';
 import Text from '@components/Text';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -29,7 +30,6 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Report, Transaction} from '@src/types/onyx';
 import type {Rate, TaxRateAttributes} from '@src/types/onyx/Policy';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type PolicyDistanceRateDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DISTANCE_RATE_DETAILS>;
 

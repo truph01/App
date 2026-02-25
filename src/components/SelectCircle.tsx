@@ -1,9 +1,9 @@
 import React from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import Icon from './Icon';
 
 type SelectCircleProps = {

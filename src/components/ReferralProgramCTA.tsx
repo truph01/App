@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import useDismissedReferralBanners from '@hooks/useDismissedReferralBanners';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import Navigation from '@src/libs/Navigation/Navigation';
 import ROUTES from '@src/ROUTES';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import {getButtonRole} from './Button/utils';
 import Icon from './Icon';
 import {PressableWithoutFeedback} from './Pressable';

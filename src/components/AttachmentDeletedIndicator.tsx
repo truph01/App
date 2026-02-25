@@ -1,11 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useNetwork from '@hooks/useNetwork';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import Icon from './Icon';
 
 type AttachmentDeletedIndicatorProps = {

@@ -5,6 +5,7 @@ import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -29,7 +30,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {ReportAttributesDerivedValue} from '@src/types/onyx';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import DebugReportActions from './DebugReportActions';
 
 type DebugReportPageProps = PlatformStackScreenProps<DebugParamList, typeof SCREENS.DEBUG.REPORT>;

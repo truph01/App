@@ -19,6 +19,7 @@ import TextInputClearButton from '@components/TextInput/TextInputClearButton';
 import TextInputLabel from '@components/TextInput/TextInputLabel';
 import TextInputMeasurement from '@components/TextInput/TextInputMeasurement';
 import useHtmlPaste from '@hooks/useHtmlPaste';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useMarkdownStyle from '@hooks/useMarkdownStyle';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -27,7 +28,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import isInputAutoFilled from '@libs/isInputAutoFilled';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 function BaseTextInput({
     label = '',

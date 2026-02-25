@@ -13,7 +13,7 @@ import Text from '@components/Text';
 import useBottomSafeSafeAreaPaddingStyle from '@hooks/useBottomSafeSafeAreaPaddingStyle';
 import useDefaultFundID from '@hooks/useDefaultFundID';
 import useExpensifyCardUkEuSupported from '@hooks/useExpensifyCardUkEuSupported';
-import {useMemoizedLazyIllustrations, useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';

@@ -5,11 +5,11 @@ import {View} from 'react-native';
 import Icon from '@components/Icon';
 import Text from '@components/Text';
 import TextLink from '@components/TextLink';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type PDFInfoMessageProps = {
     /** Callback function to indicate that PDF password form should be shown */

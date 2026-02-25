@@ -10,6 +10,7 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import SpacerView from '@components/SpacerView';
 import Text from '@components/Text';
 import UnreadActionIndicator from '@components/UnreadActionIndicator';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -48,7 +49,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Policy, Report} from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type MoneyReportViewProps = {
     /** The report currently being looked at */

@@ -1,8 +1,8 @@
 import React from 'react';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import Icon from './Icon';
 import PressableWithFeedback from './Pressable/PressableWithFeedback';
 

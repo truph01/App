@@ -8,6 +8,7 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Switch from '@components/Switch';
 import Text from '@components/Text';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearTaxRateFieldError, deletePolicyTaxes, setPolicyTaxesEnabled} from '@libs/actions/TaxRate';
@@ -23,7 +24,6 @@ import withPolicyAndFullscreenLoading from '@pages/workspace/withPolicyAndFullsc
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type WorkspaceEditTaxPageBaseProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.TAX_EDIT>;
 

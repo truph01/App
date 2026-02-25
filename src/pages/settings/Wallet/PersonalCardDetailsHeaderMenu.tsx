@@ -4,6 +4,7 @@ import ActivityIndicator from '@components/ActivityIndicator';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getDefaultCardName} from '@libs/CardUtils';
@@ -16,7 +17,6 @@ import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Card, PersonalDetails} from '@src/types/onyx';
 import type IconAsset from '@src/types/utils/IconAsset';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type PersonalCardDetailsHeaderMenuProps = {
     card: Card;

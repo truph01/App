@@ -3,6 +3,7 @@ import type {StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import Badge from '@components/Badge';
 import Button from '@components/Button';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -12,7 +13,6 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getFreeTrialText} from '@libs/SubscriptionUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type FreeTrialProps = {
     badgeStyles?: StyleProp<ViewStyle>;

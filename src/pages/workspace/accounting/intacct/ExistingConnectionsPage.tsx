@@ -5,6 +5,7 @@ import MenuItemList from '@components/MenuItemList';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {copyExistingPolicyConnection} from '@libs/actions/connections';
@@ -17,7 +18,6 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type ExistingConnectionsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.EXISTING_SAGE_INTACCT_CONNECTIONS>;
 

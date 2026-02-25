@@ -10,6 +10,7 @@ import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import useCardFeeds from '@hooks/useCardFeeds';
 import useCardsList from '@hooks/useCardsList';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
@@ -26,7 +27,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type WorkspaceCompanyCardsSettingsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.COMPANY_CARDS_SETTINGS>;
 

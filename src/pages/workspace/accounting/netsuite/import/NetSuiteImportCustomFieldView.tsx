@@ -5,6 +5,7 @@ import ConnectionLayout from '@components/ConnectionLayout';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {updateNetSuiteCustomLists, updateNetSuiteCustomSegments} from '@libs/actions/connections/NetSuiteCommands';
@@ -19,7 +20,6 @@ import type {TranslationPaths} from '@src/languages/types';
 import ROUTES from '@src/ROUTES';
 import INPUT_IDS from '@src/types/form/NetSuiteCustomFieldForm';
 import type {NetSuiteCustomList, NetSuiteCustomSegment} from '@src/types/onyx/Policy';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type CustomField = NetSuiteCustomList | NetSuiteCustomSegment;
 type ImportCustomFieldsKeys = ValueOf<typeof CONST.NETSUITE_CONFIG.IMPORT_CUSTOM_FIELDS>;

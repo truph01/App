@@ -5,7 +5,7 @@ import Icon from '@components/Icon';
 import {PressableWithFeedback} from '@components/Pressable';
 import RenderHTML from '@components/RenderHTML';
 import Tooltip from '@components/Tooltip';
-import {useMemoizedLazyIllustrations, useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';

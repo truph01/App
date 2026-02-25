@@ -5,13 +5,13 @@ import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeed
 import Text from '@components/Text';
 import TextLink from '@components/TextLink';
 import Tooltip from '@components/Tooltip';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import colors from '@styles/theme/colors';
 import CONST from '@src/CONST';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import type LocationErrorMessageProps from './types';
 
 type BaseLocationErrorMessageProps = LocationErrorMessageProps & {
