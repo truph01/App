@@ -1,12 +1,15 @@
-import type {EventHint, TransactionEvent} from '@sentry/core';
+import type {EventHint, Log, TransactionEvent} from '@sentry/core';
 import copyTagsToChildSpans from './copyTagsToChildSpans';
 import emailDomainFilter from './emailDomainFilter';
 import httpClientCancelledFilter from './httpClientCancelledFilter';
 import minDurationFilter from './minDurationFilter';
+import onyxLogFilter from './onyxLogFilter';
 
 type TelemetryBeforeSend = (event: TransactionEvent, hint: EventHint) => TransactionEvent | null | Promise<TransactionEvent | null>;
+type TelemetryBeforeSendLog = (log: Log) => Log | null;
 
 const middlewares: TelemetryBeforeSend[] = [emailDomainFilter, minDurationFilter, httpClientCancelledFilter, copyTagsToChildSpans];
+const logMiddlewares: TelemetryBeforeSendLog[] = [onyxLogFilter];
 
 function processBeforeSendTransactions(event: TransactionEvent, hint: EventHint): Promise<TransactionEvent | null> {
     return middlewares.reduce(
@@ -21,5 +24,15 @@ function processBeforeSendTransactions(event: TransactionEvent, hint: EventHint)
     );
 }
 
-export type {TelemetryBeforeSend};
+function processBeforeSendLogs(log: Log): Log | null {
+    return logMiddlewares.reduce<Log | null>((acc, middleware) => {
+        if (acc == null) {
+            return null;
+        }
+        return middleware(acc);
+    }, log);
+}
+
+export type {TelemetryBeforeSend, TelemetryBeforeSendLog};
+export {processBeforeSendLogs};
 export default processBeforeSendTransactions;
