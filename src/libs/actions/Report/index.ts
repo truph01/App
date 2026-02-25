@@ -4643,13 +4643,14 @@ function searchForReports(isOffline: boolean, searchInput: string, policyID?: st
 
     const searchForRoomToMentionParams: SearchForRoomsToMentionParams = {query: searchInput.toLowerCase(), policyID};
     const searchForReportsOrUsersParams: SearchForReportsParams | SearchForUsersParams = {searchInput: searchInput.toLowerCase(), canCancel: true};
+    const searchInServerCommand = isUserSearch ? READ_COMMANDS.SEARCH_FOR_USERS : READ_COMMANDS.SEARCH_FOR_REPORTS;
 
     // We want to cancel all pending SearchForReports API calls before making another one
     if (!policyID) {
-        HttpUtils.cancelPendingRequests(isUserSearch ? READ_COMMANDS.SEARCH_FOR_USERS : READ_COMMANDS.SEARCH_FOR_REPORTS);
+        HttpUtils.cancelPendingRequests(searchInServerCommand);
     }
 
-    API.read(policyID ? READ_COMMANDS.SEARCH_FOR_ROOMS_TO_MENTION : READ_COMMANDS.SEARCH_FOR_REPORTS, policyID ? searchForRoomToMentionParams : searchForReportsOrUsersParams, {
+    API.read(policyID ? READ_COMMANDS.SEARCH_FOR_ROOMS_TO_MENTION : searchInServerCommand, policyID ? searchForRoomToMentionParams : searchForReportsOrUsersParams, {
         successData,
         failureData,
     });
