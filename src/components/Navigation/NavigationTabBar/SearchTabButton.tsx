@@ -47,6 +47,7 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
             startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {
                 name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS,
                 op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS,
+                forceTransaction: true,
             });
 
             const lastSearchRoute = getLastRoute(navigationRef.getRootState(), NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, SCREENS.SEARCH.ROOT);
