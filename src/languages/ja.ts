@@ -7123,12 +7123,7 @@ ${reportName}
         },
         has: '持っている',
         groupBy: 'グループ化基準',
-        view: {
-            label: '表示',
-            table: 'テーブル',
-            bar: 'バー',
-            line: '折れ線',
-        },
+        view: {label: '表示', table: 'テーブル', bar: 'バー', line: '折れ線', pie: '円グラフ'},
         chartTitles: {
             [CONST.SEARCH.GROUP_BY.FROM]: '差出人',
             [CONST.SEARCH.GROUP_BY.CARD]: 'カード',

@@ -7203,6 +7203,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             table: 'Tabella',
             bar: 'Bar',
             line: 'Linea',
+            pie: 'Torta',
         },
         chartTitles: {
             [CONST.SEARCH.GROUP_BY.FROM]: 'Da',
@@ -7237,7 +7238,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
         exportedTo: 'Esportato in',
         exportAll: {
             selectAllMatchingItems: 'Seleziona tutti gli elementi corrispondenti',
-            allMatchingItemsSelected: 'Tutti gli elementi corrispondenti sono stati selezionati',
+            allMatchingItemsSelected: 'Tutti gli elementi corrispondenti selezionati',
         },
         spendOverTime: 'Spesa nel tempo',
     },

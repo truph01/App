@@ -7011,12 +7011,7 @@ ${reportName}
         },
         has: '有',
         groupBy: '分组依据',
-        view: {
-            label: '查看',
-            table: '表',
-            bar: '栏',
-            line: '折线',
-        },
+        view: {label: '查看', table: '表格', bar: '栏', line: '折线', pie: '饼图'},
         chartTitles: {
             [CONST.SEARCH.GROUP_BY.FROM]: '来自',
             [CONST.SEARCH.GROUP_BY.CARD]: '卡片',
@@ -7050,7 +7045,7 @@ ${reportName}
         exportedTo: '已导出到',
         exportAll: {
             selectAllMatchingItems: '选择所有匹配的项目',
-            allMatchingItemsSelected: '已选中所有匹配项',
+            allMatchingItemsSelected: '已选择所有匹配的项目',
         },
         spendOverTime: '随时间支出',
     },
