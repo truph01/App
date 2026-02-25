@@ -176,14 +176,6 @@ function SearchAutocompleteInput({
         });
     }, [exportedToSharedValue, exportedToFilterOptions]);
 
-    useEffect(() => {
-        scheduleOnLiveMarkdownRuntime(() => {
-            'worklet';
-
-            exportedToSharedValue.set(exportedToFilterOptions);
-        });
-    }, [exportedToSharedValue, exportedToFilterOptions]);
-
     const currentUserDisplayName = currentUserPersonalDetails.displayName ?? '';
     const parser = (input: string) => {
         'worklet';

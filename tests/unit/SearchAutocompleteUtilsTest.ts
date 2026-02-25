@@ -1,4 +1,5 @@
 import type {SubstitutionMap} from '@components/Search/SearchRouter/getQueryWithSubstitutions';
+import {getSearchValueForConnection, getStandardExportTemplateDisplayName} from '@libs/AccountingUtils';
 import {getTrimmedUserSearchQueryPreservingComma, parseForLiveMarkdown} from '@libs/SearchAutocompleteUtils';
 import CONST from '@src/CONST';
 import createSharedValueMock from '../utils/createSharedValueMock';
@@ -462,6 +463,33 @@ describe('SearchAutocompleteUtils', () => {
             // User typed "to:user1,joh" - should preserve "to:user1,"
             const result = getTrimmedUserSearchQueryPreservingComma('to:user1,joh', 'to');
             expect(result).toBe('to:user1,');
+        });
+    });
+
+    describe('AccountingUtils exported-to search filter helpers', () => {
+        describe('getSearchValueForConnection', () => {
+            it('returns user-friendly name for QBO', () => {
+                expect(getSearchValueForConnection(CONST.POLICY.CONNECTIONS.NAME.QBO)).toBe('QuickBooks Online');
+            });
+
+            it('returns user-friendly name for Sage Intacct', () => {
+                expect(getSearchValueForConnection(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT)).toBe('Sage Intacct');
+            });
+        });
+
+        describe('getStandardExportTemplateDisplayName', () => {
+            it('returns display name for expense level export template', () => {
+                expect(getStandardExportTemplateDisplayName(CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT)).toBe(CONST.REPORT.EXPORT_OPTION_LABELS.EXPENSE_LEVEL_EXPORT);
+            });
+
+            it('returns display name for report level export template', () => {
+                expect(getStandardExportTemplateDisplayName(CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT)).toBe(CONST.REPORT.EXPORT_OPTION_LABELS.REPORT_LEVEL_EXPORT);
+            });
+
+            it('returns template name as-is when no standard mapping', () => {
+                const customName = 'Custom Export Layout';
+                expect(getStandardExportTemplateDisplayName(customName)).toBe(customName);
+            });
         });
     });
 });
