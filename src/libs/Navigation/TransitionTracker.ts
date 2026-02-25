@@ -1,6 +1,6 @@
-type CancelHandle = {cancel: () => void};
+import CONST from '@src/CONST';
 
-const MAX_TRANSITION_DURATION_MS = 1000;
+type CancelHandle = {cancel: () => void};
 
 let activeCount = 0;
 
@@ -45,7 +45,7 @@ function startTransition(): void {
             activeTimeouts.splice(idx, 1);
         }
         decrementAndFlush();
-    }, MAX_TRANSITION_DURATION_MS);
+    }, CONST.MAX_TRANSITION_DURATION_MS);
 
     activeTimeouts.push(timeout);
 }

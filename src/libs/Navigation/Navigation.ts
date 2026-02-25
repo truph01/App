@@ -400,9 +400,8 @@ type GoBackOptions = {
     waitForTransition?: boolean;
 };
 
-const defaultGoBackOptions: Required<GoBackOptions> = {
+const defaultGoBackOptions: Required<Pick<GoBackOptions, 'compareParams' | 'waitForTransition'>> = {
     compareParams: true,
-    afterTransition: () => {},
     waitForTransition: false,
 };
 
@@ -480,23 +479,15 @@ function goBack(backToRoute?: Route, options?: GoBackOptions) {
     TransitionTracker.runAfterTransitions(() => {
         if (backToRoute) {
             goUp(backToRoute, options);
-            if (options?.afterTransition) {
-                TransitionTracker.runAfterTransitions(options.afterTransition);
-            }
-            return;
-        }
-
-        if (shouldPopToSidebar) {
+        } else if (shouldPopToSidebar) {
             popToSidebar();
-            return;
-        }
-
-        if (!navigationRef.current?.canGoBack()) {
+        } else if (!navigationRef.current?.canGoBack()) {
             Log.hmmm('[Navigation] Unable to go back');
             return;
+        } else {
+            navigationRef.current?.goBack();
         }
 
-        navigationRef.current?.goBack();
         if (options?.afterTransition) {
             TransitionTracker.runAfterTransitions(options.afterTransition);
         }

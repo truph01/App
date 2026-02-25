@@ -37,8 +37,8 @@ const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
             subscription.remove();
         });
 
-        Keyboard.dismiss();
         TransitionTracker.startTransition();
+        Keyboard.dismiss();
         if (options?.afterTransition) {
             TransitionTracker.runAfterTransitions(options.afterTransition);
         }
