@@ -22,6 +22,8 @@ import type {ReportAttributes, ReportAttributesDerivedValue} from '@src/types/on
 import type {Participant} from '@src/types/onyx/IOU';
 import type {Unit} from '@src/types/onyx/Policy';
 import type {Receipt, WaypointCollection} from '@src/types/onyx/Transaction';
+import ONYXKEYS from '@src/ONYXKEYS';
+import getOnyxValue from 'tests/utils/getOnyxValue';
 import type {GpsPoint} from './index';
 import {
     createDistanceRequest,
@@ -378,59 +380,61 @@ function handleMoneyRequestStepScanParticipants({
                             lat: successData.coords.latitude,
                             long: successData.coords.longitude,
                         };
-                        const deprecatedRecentWaypoints = getRecentWaypoints();
-                        createTransaction({
-                            transactions,
-                            iouType,
-                            report,
-                            currentUserAccountID,
-                            currentUserEmail: currentUserLogin,
-                            backToReport,
-                            shouldGenerateTransactionThreadReport,
-                            isASAPSubmitBetaEnabled,
-                            transactionViolations,
-                            quickAction,
-                            policyRecentlyUsedCurrencies,
-                            introSelected,
-                            activePolicyID,
-                            files,
-                            participant,
-                            gpsPoint,
-                            policyParams,
-                            billable: false,
-                            reimbursable: defaultReimbursable,
-                            isSelfTourViewed,
-                            betas,
-                            personalDetails,
-                            recentWaypoints: deprecatedRecentWaypoints,
-                        });
+                        getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS).then((value: OnyxEntry<RecentWaypoint[]>) =>
+                            createTransaction({
+                                transactions,
+                                iouType,
+                                report,
+                                currentUserAccountID,
+                                currentUserEmail: currentUserLogin,
+                                backToReport,
+                                shouldGenerateTransactionThreadReport,
+                                isASAPSubmitBetaEnabled,
+                                transactionViolations,
+                                quickAction,
+                                policyRecentlyUsedCurrencies,
+                                introSelected,
+                                activePolicyID,
+                                files,
+                                participant,
+                                gpsPoint,
+                                policyParams,
+                                billable: false,
+                                reimbursable: defaultReimbursable,
+                                isSelfTourViewed,
+                                betas,
+                                personalDetails,
+                                recentWaypoints: value,
+                            }),
+                        );
                     },
                     (errorData) => {
                         Log.info('[IOURequestStepScan] getCurrentPosition failed', false, errorData);
                         // When there is an error, the money can still be requested, it just won't include the GPS coordinates
-                        const deprecatedRecentWaypoints = getRecentWaypoints();
-                        createTransaction({
-                            transactions,
-                            iouType,
-                            report,
-                            currentUserAccountID,
-                            currentUserEmail: currentUserLogin,
-                            backToReport,
-                            shouldGenerateTransactionThreadReport,
-                            isASAPSubmitBetaEnabled,
-                            transactionViolations,
-                            quickAction,
-                            policyRecentlyUsedCurrencies,
-                            introSelected,
-                            activePolicyID,
-                            files,
-                            participant,
-                            reimbursable: defaultReimbursable,
-                            isSelfTourViewed,
-                            betas,
-                            personalDetails,
-                            recentWaypoints: deprecatedRecentWaypoints,
-                        });
+                        getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS).then((value: OnyxEntry<RecentWaypoint[]>) =>
+                            createTransaction({
+                                transactions,
+                                iouType,
+                                report,
+                                currentUserAccountID,
+                                currentUserEmail: currentUserLogin,
+                                backToReport,
+                                shouldGenerateTransactionThreadReport,
+                                isASAPSubmitBetaEnabled,
+                                transactionViolations,
+                                quickAction,
+                                policyRecentlyUsedCurrencies,
+                                introSelected,
+                                activePolicyID,
+                                files,
+                                participant,
+                                reimbursable: defaultReimbursable,
+                                isSelfTourViewed,
+                                betas,
+                                personalDetails,
+                                recentWaypoints: value,
+                            }),
+                        );
                     },
                 );
                 return;
