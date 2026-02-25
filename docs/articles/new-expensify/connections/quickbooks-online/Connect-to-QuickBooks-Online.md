@@ -6,7 +6,7 @@ order: 1
 ---
 
 
-To use the QuickBooks Online connection, you must have a QuickBooks Online account and an Expensify **Collect** plan. The **QuickBooks Self-Employed** subscription is not supported.
+To use the QuickBooks Online connection, you must have a **QuickBooks Online account** and an Expensify **Collect** plan. The QuickBooks Online connection works with **Intuit Enterprise Suite (ISE)** as well. The QuickBooks Self-Employed subscription is not supported.
 
 ---
 
@@ -14,20 +14,20 @@ To use the QuickBooks Online connection, you must have a QuickBooks Online accou
 
 Expensify's QuickBooks Online integration includes different features depending on your subscription level. While some options may appear in the app, you’ll see an error if your plan doesn’t support them.
 
-| Feature                    | Simple Start | Essentials | Essentials Plus |
-|----------------------------|--------------|------------|-----------------|
-| Expense Reports            | ✅            | ✅          | ✅               |
-| GL Accounts as Categories  | ✅            | ✅          | ✅               |
-| Credit Card Transactions   | ✅            | ✅          | ✅               |
-| Debit Card Transaction     |              | ✅          | ✅               |
-| Classes                    |              | ✅          | ✅               |
-| Customers                  |              | ✅          | ✅               |
-| Projects                   |              | ✅          | ✅               |
-| Vendor Bills               |              | ✅          | ✅               |
-| Journal Entries            |              | ✅          | ✅               |
-| Tax                        |              | ✅          | ✅               |
-| Billable                   |              |            | ✅               |
-| Location                   |              |            | ✅               |
+| Feature                    | Simple Start | Essentials | Essentials Plus | Intuit Enterprise Suite |
+|----------------------------|--------------|------------|-----------------|------------------------|
+| Expense Reports            | ✅            | ✅          | ✅               | ✅                      |
+| GL Accounts as Categories  | ✅            | ✅          | ✅               | ✅                      |
+| Credit Card Transactions   | ✅            | ✅          | ✅               | ✅                      |
+| Debit Card Transaction     |              | ✅          | ✅               | ✅                      |
+| Classes                    |              | ✅          | ✅               | ✅                      |
+| Customers                  |              | ✅          | ✅               | ✅                      |
+| Projects                   |              | ✅          | ✅               | ✅                      |
+| Vendor Bills               |              | ✅          | ✅               | ✅                      |
+| Journal Entries            |              | ✅          | ✅               | ✅                      |
+| Tax                        |              | ✅          | ✅               | ✅                      |
+| Billable                   |              |            | ✅               | ✅                      |
+| Location                   |              |            | ✅               | ✅                      |
 
 ---
 
