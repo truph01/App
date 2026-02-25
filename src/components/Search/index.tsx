@@ -64,7 +64,7 @@ import {
     shouldShowEmptyState,
     shouldShowYear as shouldShowYearUtil,
 } from '@libs/SearchUIUtils';
-import {getSpan, cancelSpan, endSpan, startSpan} from '@libs/telemetry/activeSpans';
+import {cancelSpan, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import markNavigateAfterExpenseCreateEnd from '@libs/telemetry/markNavigateAfterExpenseCreateEnd';
 import {getOriginalTransactionWithSplitInfo, hasValidModifiedAmount, isOnHold, isTransactionPendingDelete} from '@libs/TransactionUtils';
 import Navigation, {navigationRef} from '@navigation/Navigation';
@@ -1162,14 +1162,13 @@ function Search({
 
     const onLayoutSkeleton = useCallback(() => {
         hasHadFirstLayout.current = true;
+        const span = getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
+        span?.setAttributes({[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: false});
         endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
     }, []);
 
     // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
     // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
-    // Only end spans when we have had layout for this navigation or content is already visible (warm):
-    // otherwise a new tab press would have its spans ended at focus time before layout runs.
-    // Only end the skeleton span when the skeleton actually laid out; otherwise cancel it.
     useFocusEffect(
         useCallback(() => {
             if (!hasHadFirstLayout.current) {
