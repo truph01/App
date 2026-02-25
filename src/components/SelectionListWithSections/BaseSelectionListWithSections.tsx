@@ -304,6 +304,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         wasIncrementPageCancelledRef.current = false;
     }, [flattenedSections.allOptions.length, currentPage]);
 
+    // When new items are received, check if we're at the bottom of the list and should increment the current page
     useEffect(() => {
         if (!wasIncrementPageCancelledRef.current) {
             return;
