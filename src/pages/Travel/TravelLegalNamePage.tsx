@@ -10,10 +10,10 @@ import {updateLegalName} from '@libs/actions/PersonalDetails';
 import {formatPhoneNumber} from '@libs/LocalePhoneNumber';
 import Navigation from '@libs/Navigation/Navigation';
 import {getFieldRequiredErrors, isRequiredFulfilled, isValidLegalName} from '@libs/ValidationUtils';
+import {BaseLegalNamePage} from '@pages/settings/Profile/PersonalDetails/LegalNamePage';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/PersonalDetailsForm';
-import {BaseLegalNamePage} from '@pages/settings/Profile/PersonalDetails/LegalNamePage';
 
 const STEP_FIELDS = [INPUT_IDS.LEGAL_FIRST_NAME, INPUT_IDS.LEGAL_LAST_NAME];
 

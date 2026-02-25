@@ -22,7 +22,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {OnyxFormKey} from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/LegalNameForm';
 import type {PrivatePersonalDetails} from '@src/types/onyx';
-import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 
 type BaseLegalNamePageProps<TFormID extends OnyxFormKey> = {
@@ -62,7 +61,7 @@ function BaseLegalNamePage<TFormID extends OnyxFormKey>({
     const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP);
 
     const styles = useThemeStyles();
-    const {translate, formatPhoneNumber} = useLocalize();
+    const {translate} = useLocalize();
     const legalFirstName = defaultFirstName ?? privatePersonalDetails?.legalFirstName ?? '';
     const legalLastName = defaultLastName ?? privatePersonalDetails?.legalLastName ?? '';
 
@@ -173,8 +172,6 @@ function LegalNamePage() {
         />
     );
 }
-
-LegalNamePage.displayName = 'LegalNamePage';
 
 export {BaseLegalNamePage};
 export default LegalNamePage;
