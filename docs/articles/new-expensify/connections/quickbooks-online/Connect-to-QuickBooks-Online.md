@@ -6,7 +6,11 @@ order: 1
 ---
 
 
-To use the QuickBooks Online connection, you must have a **QuickBooks Online account** and an Expensify **Collect** plan. The QuickBooks Online connection works with **Intuit Enterprise Suite (ISE)** as well. The QuickBooks Self-Employed subscription is not supported.
+To use the QuickBooks Online connection, you must have a **QuickBooks Online account** and an Expensify **Collect** plan.
+
+The QuickBooks Online connection also works with **Intuit Enterprise Suite**.
+
+The **QuickBooks Self-Employed** subscription is not supported.
 
 ---
 
