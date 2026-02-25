@@ -8,6 +8,7 @@ import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
 import MenuItem from '@components/MenuItem';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import TextInput from '@components/TextInput';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -28,7 +29,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/SageIntacctDimensionsForm';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import DimensionTypeSelector from './DimensionTypeSelector';
 
 type SageIntacctEditUserDimensionsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_EDIT_USER_DIMENSION>;
@@ -38,8 +38,8 @@ function SageIntacctEditUserDimensionsPage({route}: SageIntacctEditUserDimension
     const {translate} = useLocalize();
 
     const editedUserDimensionName: string = route.params.dimensionName;
-    const policy = usePolicy(route.params.policyID);
-    const policyID: string = policy?.id ?? `${CONST.DEFAULT_NUMBER_ID}`;
+    const policyID = route.params.policyID;
+    const policy = usePolicy(policyID);
     const config = policy?.connections?.intacct?.config;
     const userDimensions = policy?.connections?.intacct?.config?.mappings?.dimensions;
     const editedUserDimension = userDimensions?.find((userDimension) => userDimension.dimension === editedUserDimensionName);

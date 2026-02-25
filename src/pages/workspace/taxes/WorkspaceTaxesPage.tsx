@@ -69,7 +69,7 @@ function WorkspaceTaxesPage({
     const defaultExternalID = policy?.taxRates?.defaultExternalID;
     const foreignTaxDefault = policy?.taxRates?.foreignTaxDefault;
     const hasAccountingConnections = hasAccountingConnectionsPolicyUtils(policy);
-    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policy?.id}`, {canBeMissing: true});
+    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policy?.id}`);
     const isSyncInProgress = isConnectionInProgress(connectionSyncProgress, policy);
     const hasSyncError = shouldShowSyncError(policy, isSyncInProgress);
 
@@ -326,6 +326,7 @@ function WorkspaceTaxesPage({
                 <Button
                     success
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TAX_CREATE.getRoute(policyID))}
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAXES.ADD_BUTTON}
                     icon={icons.Plus}
                     text={translate('workspace.taxes.addRate')}
                     style={[shouldUseNarrowLayout && styles.flex1]}
@@ -336,6 +337,7 @@ function WorkspaceTaxesPage({
                 onPress={() => {}}
                 shouldUseOptionIcon
                 customText={translate('common.more')}
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAXES.MORE_DROPDOWN}
                 options={secondaryActions}
                 isSplitButton={false}
                 wrapperStyle={hasAccountingConnections ? styles.flexGrow1 : styles.flexGrow0}
@@ -351,6 +353,7 @@ function WorkspaceTaxesPage({
             isSplitButton={false}
             style={[shouldUseNarrowLayout && styles.flexGrow1, shouldUseNarrowLayout && styles.mb3]}
             isDisabled={!selectedTaxesIDs.length}
+            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAXES.BULK_ACTIONS_DROPDOWN}
         />
     );
 
@@ -442,9 +445,7 @@ function WorkspaceTaxesPage({
                     onConfirm={deleteTaxes}
                     onCancel={() => setIsDeleteModalVisible(false)}
                     prompt={
-                        selectedTaxesIDs.length > 1
-                            ? translate('workspace.taxes.deleteMultipleTaxConfirmation', {taxAmount: selectedTaxesIDs.length})
-                            : translate('workspace.taxes.deleteTaxConfirmation')
+                        selectedTaxesIDs.length > 1 ? translate('workspace.taxes.deleteMultipleTaxConfirmation', selectedTaxesIDs.length) : translate('workspace.taxes.deleteTaxConfirmation')
                     }
                     confirmText={translate('common.delete')}
                     cancelText={translate('common.cancel')}

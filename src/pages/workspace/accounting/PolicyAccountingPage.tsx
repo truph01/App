@@ -67,8 +67,8 @@ type RouteParams = {
 };
 
 function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
-    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policy?.id}`, {canBeMissing: true});
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID, {canBeMissing: true});
+    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policy?.id}`);
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, datetimeToRelative: getDatetimeToRelative, getLocalDateFromDatetime} = useLocalize();
@@ -80,7 +80,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
     const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
     const [datetimeToRelative, setDateTimeToRelative] = useState('');
     const {startIntegrationFlow, popoverAnchorRefs} = useAccountingContext();
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const {isLargeScreenWidth} = useResponsiveLayout();
     const route = useRoute();
     const params = route.params as RouteParams | undefined;
@@ -334,6 +334,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                                     }
                                     popoverAnchorRefs.current[integration].current = ref;
                                 }}
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.SETUP_BUTTON}
                             />
                         ),
                     };
@@ -436,6 +437,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                             horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
                             vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
                         }}
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.THREE_DOT_MENU}
                     />
                 ),
             },
@@ -513,6 +515,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                                 }
                                 popoverAnchorRefs.current[integration].current = r;
                             }}
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.SETUP_BUTTON}
                         />
                     ),
                     interactive: false,

@@ -37,7 +37,7 @@ function ReportFieldsValueSettingsPage({
 }: ReportFieldsValueSettingsPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [formDraft] = useOnyx(ONYXKEYS.FORMS.WORKSPACE_REPORT_FIELDS_FORM_DRAFT, {canBeMissing: true});
+    const [formDraft] = useOnyx(ONYXKEYS.FORMS.WORKSPACE_REPORT_FIELDS_FORM_DRAFT);
 
     const [isDeleteTagModalOpen, setIsDeleteTagModalOpen] = useState(false);
 
@@ -125,7 +125,12 @@ function ReportFieldsValueSettingsPage({
                 <View style={styles.flexGrow1}>
                     <View style={[styles.mt2, styles.mh5]}>
                         <View style={[styles.flexRow, styles.mb5, styles.mr2, styles.alignItemsCenter, styles.justifyContentBetween]}>
-                            <Text>{translate('workspace.reportFields.enableValue')}</Text>
+                            <Text
+                                accessible={false}
+                                aria-hidden
+                            >
+                                {translate('workspace.reportFields.enableValue')}
+                            </Text>
                             <Switch
                                 isOn={!currentValueDisabled}
                                 accessibilityLabel={translate('workspace.reportFields.enableValue')}

@@ -11,6 +11,7 @@ import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import TextLink from '@components/TextLink';
 import type {BaseTwoFactorAuthFormRef} from '@components/TwoFactorAuthForm/types';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -24,7 +25,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import ToggleTwoFactorAuthForm from './ToggleTwoFactorAuthForm';
 import TwoFactorAuthWrapper from './TwoFactorAuthWrapper';
 
@@ -35,8 +35,8 @@ type VerifyPageProps = PlatformStackScreenProps<TwoFactorAuthNavigatorParamList,
 function VerifyPage({route}: VerifyPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [session] = useOnyx(ONYXKEYS.SESSION, {canBeMissing: false});
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: true});
+    const [session] = useOnyx(ONYXKEYS.SESSION);
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const icons = useMemoizedLazyExpensifyIcons(['Copy'] as const);
     const contactMethod = getContactMethod(account?.primaryLogin, session?.email);
     const formRef = useRef<BaseTwoFactorAuthFormRef>(null);

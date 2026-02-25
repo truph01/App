@@ -9,6 +9,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
 import type {ListItem} from '@components/SelectionList/types';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -22,7 +23,6 @@ import ROUTES from '@src/ROUTES';
 import type {AccountData, BankAccount} from '@src/types/onyx';
 import type {BankName} from '@src/types/onyx/Bank';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 
 type BankAccountListItem = ListItem & {
     value?: number;
@@ -30,7 +30,7 @@ type BankAccountListItem = ListItem & {
 };
 
 function ChooseTransferAccountPage() {
-    const [walletTransfer, walletTransferResult] = useOnyx(ONYXKEYS.WALLET_TRANSFER, {canBeMissing: true});
+    const [walletTransfer, walletTransferResult] = useOnyx(ONYXKEYS.WALLET_TRANSFER);
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -56,7 +56,7 @@ function ChooseTransferAccountPage() {
         openPersonalBankAccountSetupView({});
     };
 
-    const [bankAccountsList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST, {canBeMissing: true});
+    const [bankAccountsList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
     const icons = useMemoizedLazyExpensifyIcons(['Plus'] as const);
     const selectedAccountID = walletTransfer?.selectedAccountID;
     const bankAccountOptions = useMemo(() => {

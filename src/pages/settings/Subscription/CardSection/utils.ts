@@ -3,7 +3,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import {convertAmountToDisplayString} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
-import {getAmountOwed, getSubscriptionStatus, PAYMENT_STATUS} from '@libs/SubscriptionUtils';
+import {getSubscriptionStatus, PAYMENT_STATUS} from '@libs/SubscriptionUtils';
 import CONST from '@src/CONST';
 import type {StripeCustomerID} from '@src/types/onyx';
 import type BillingStatus from '@src/types/onyx/BillingStatus';
@@ -35,6 +35,7 @@ type GetBillingStatusProps = {
     creditCardEyesIcon?: IconAsset;
     closeIcon?: IconAsset;
     fundList: OnyxEntry<FundList>;
+    amountOwed: number;
     ownerBillingGraceEndPeriod: OnyxEntry<number>;
 };
 
@@ -51,10 +52,9 @@ function getBillingStatus({
     closeIcon,
     fundList,
     ownerBillingGraceEndPeriod,
+    amountOwed,
 }: GetBillingStatusProps): BillingStatusResult | undefined {
     const cardEnding = (accountData?.cardNumber ?? '')?.slice(-4);
-
-    const amountOwed = getAmountOwed();
 
     const subscriptionStatus = getSubscriptionStatus(
         stripeCustomerId,
@@ -63,6 +63,7 @@ function getBillingStatus({
         retryBillingFailed,
         fundList,
         billingStatus,
+        amountOwed,
         ownerBillingGraceEndPeriod,
     );
 

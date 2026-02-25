@@ -99,6 +99,7 @@ async function main() {
         'src/libs/actions/Task.ts',
         'src/libs/OptionsListUtils/index.ts',
         'src/hooks/useAvatarMenu.ts',
+        'src/libs/PersonalDetailOptionsListUtils/index.ts',
     ];
 
     // Find all TypeScript files in src directory

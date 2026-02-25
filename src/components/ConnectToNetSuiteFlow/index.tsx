@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import PopoverMenu from '@components/PopoverMenu';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -7,11 +8,11 @@ import {isAuthenticationError} from '@libs/actions/connections';
 import {getAdminPoliciesConnectedToNetSuite} from '@libs/actions/Policy/Policy';
 import Navigation from '@libs/Navigation/Navigation';
 import {useAccountingContext} from '@pages/workspace/accounting/AccountingContext';
+import {getInitialSubPageForNetsuiteTokenInput} from '@pages/workspace/accounting/netsuite/utils';
 import type {AnchorPosition} from '@styles/index';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import type {ConnectToNetSuiteFlowProps} from './types';
 
 function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
@@ -27,7 +28,7 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
     const [reuseConnectionPopoverPosition, setReuseConnectionPopoverPosition] = useState<AnchorPosition>({horizontal: 0, vertical: 0});
     const {popoverAnchorRefs} = useAccountingContext();
 
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {canBeMissing: true});
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const icons = useMemoizedLazyExpensifyIcons(['Copy', 'LinkCopy'] as const);
     const shouldGoToCredentialsPage = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE);
 
@@ -38,7 +39,7 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
             icon: icons.LinkCopy,
             text: translate('workspace.common.createNewConnection'),
             onSelected: () => {
-                Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID));
+                Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getInitialSubPageForNetsuiteTokenInput(policy)));
                 setIsReuseConnectionsPopoverOpen(false);
             },
         },
@@ -54,7 +55,7 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
 
     useEffect(() => {
         if (shouldGoToCredentialsPage || !hasPoliciesConnectedToNetSuite) {
-            Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID));
+            Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getInitialSubPageForNetsuiteTokenInput(policy)));
             return;
         }
         setIsReuseConnectionsPopoverOpen(true);
