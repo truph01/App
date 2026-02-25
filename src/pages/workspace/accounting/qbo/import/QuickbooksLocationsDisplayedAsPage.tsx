@@ -8,10 +8,10 @@ import {updateQuickbooksOnlineSyncLocations} from '@libs/actions/connections/Qui
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {isControlPolicy, settingsPendingAction} from '@libs/PolicyUtils';
+import {shouldShowLocationsLineItemsRestriction} from '@pages/workspace/accounting/qbo/utils';
 import type {WithPolicyProps} from '@pages/workspace/withPolicy';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import {clearQBOErrorField} from '@userActions/Policy/Policy';
-import {shouldShowLocationsLineItemsRestriction} from '@pages/workspace/accounting/qbo/utils';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 
