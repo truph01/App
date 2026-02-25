@@ -158,8 +158,9 @@ function useAutocompleteSuggestions({
                 .sort()
                 .slice(0, 10);
 
+            const friendlyKey = getUserFriendlyKey(autocompleteKey);
             return filteredCurrencies.map((currencyName) => ({
-                filterKey: getUserFriendlyKey(autocompleteKey),
+                filterKey: friendlyKey,
                 text: currencyName,
             }));
         }

@@ -78,7 +78,7 @@ jest.mock('@libs/SearchUIUtils', () => ({
     getHasOptions: jest.fn(() => [{value: 'attachment'}, {value: 'note'}]),
 }));
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
+// eslint-disable-next-line @typescript-eslint/naming-convention -- jest.requireMock returns a module-shaped object; destructured name must match the original export
 const {parseForAutocomplete} = jest.requireMock<{parseForAutocomplete: jest.Mock}>('@libs/SearchAutocompleteUtils');
 
 const defaultParams = {
