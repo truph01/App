@@ -356,6 +356,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
             const optionDataUnpinned = SidebarUtils.getOptionData({
@@ -375,6 +376,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1343,6 +1345,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1408,6 +1411,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1448,6 +1452,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1487,6 +1492,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1526,6 +1532,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1593,6 +1600,7 @@ describe('SidebarUtils', () => {
                 lastActionReport: undefined,
                 isReportArchived: undefined,
                 currentUserAccountID: 0,
+
                 reportAttributesDerived: undefined,
             });
 
@@ -1689,6 +1697,7 @@ describe('SidebarUtils', () => {
                     isReportArchived: true,
                     lastActionReport: undefined,
                     currentUserAccountID: 0,
+
                     reportAttributesDerived: undefined,
                 });
 
@@ -1869,6 +1878,7 @@ describe('SidebarUtils', () => {
                     lastActionReport: undefined,
                     isReportArchived: undefined,
                     currentUserAccountID: 0,
+
                     reportAttributesDerived: mockReportAttributesDerived,
                 });
 
