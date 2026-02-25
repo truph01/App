@@ -44,7 +44,6 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
         }
         clearSelectedText();
         interceptAnonymousUser(() => {
-            getNextReportsTabNavigationId();
             startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON, {
                 name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON,
                 op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_SKELETON,

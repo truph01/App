@@ -49,7 +49,19 @@ This document lists all implemented telemetry metrics in the Expensify App.
 ### Navigate to Reports Tab
 
 **Constant**: `CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST`
-**Sentry Name**: `ManualNavigateToReportsTab`
+**Sentry Name**: `ManualNavigateToReportsList`
+**Threshold**: 400ms (P90)
+**What's Measured**: Time from clicking search tab to results list rendered
+**Start**: User clicks search/reports tab ([`src/components/Navigation/NavigationTabBar/index.tsx`](https://github.com/Expensify/App/blob/8f123f449f1a4533830b18a1040c9a5f1949821d/src/components/Navigation/NavigationTabBar/index.tsx#L175))
+**End**:
+- User sees: Search results list displayed
+- Technical: Search results layout complete (onLayout event)
+  - Search results data loaded from Onyx
+  - Results sorted and sectioned
+  - List layout rendered ([`src/components/Search/index.tsx`](https://github.com/Expensify/App/blob/8f123f449f1a4533830b18a1040c9a5f1949821d/src/components/Search/index.tsx#L961))
+
+**Constant**: `CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_LIST`
+**Sentry Name**: `ManualNavigateToReportsList`
 **Threshold**: 400ms (P90)
 **What's Measured**: Time from clicking search tab to results rendered
 **Start**: User clicks search/reports tab ([`src/components/Navigation/NavigationTabBar/index.tsx`](https://github.com/Expensify/App/blob/8f123f449f1a4533830b18a1040c9a5f1949821d/src/components/Navigation/NavigationTabBar/index.tsx#L175))
