@@ -15,7 +15,7 @@ import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setDraftInviteAccountID} from '@libs/actions/Card';
 import {searchInServer} from '@libs/actions/Report';
-import {getCardAssignmentDateOption, getCardAssignmentStartDate, getDefaultCardName} from '@libs/CardUtils';
+import {getCardAssignmentStartDate, getDefaultCardName} from '@libs/CardUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import {getHeaderMessage, getSearchValueForPhoneOrEmail, sortAlphabetically} from '@libs/OptionsListUtils';
@@ -92,7 +92,9 @@ function AssigneeStep({route}: AssigneeStepProps) {
                 cardToAssign.cardName = assignCard.cardToAssign.cardName;
                 cardToAssign.customCardName = assignCard.cardToAssign.customCardName ?? defaultCardName;
                 cardToAssign.startDate = getCardAssignmentStartDate(isEditing, assignCard?.cardToAssign?.startDate);
-                cardToAssign.dateOption = getCardAssignmentDateOption(isEditing, assignCard?.cardToAssign?.dateOption);
+                cardToAssign.dateOption = !isEditing
+                    ? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM
+                    : (assignCard?.cardToAssign?.dateOption ?? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM);
                 setAssignCardStepAndData({
                     cardToAssign,
                     isEditing: false,
@@ -125,7 +127,9 @@ function AssigneeStep({route}: AssigneeStepProps) {
             cardToAssign.cardName = assignCard.cardToAssign.cardName;
             cardToAssign.customCardName = assignCard.cardToAssign.customCardName ?? defaultCardName;
             cardToAssign.startDate = getCardAssignmentStartDate(isEditing, assignCard?.cardToAssign?.startDate);
-            cardToAssign.dateOption = getCardAssignmentDateOption(isEditing, assignCard?.cardToAssign?.dateOption);
+            cardToAssign.dateOption = !isEditing
+                ? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM
+                : (assignCard?.cardToAssign?.dateOption ?? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM);
             setAssignCardStepAndData({
                 cardToAssign,
                 isEditing: false,

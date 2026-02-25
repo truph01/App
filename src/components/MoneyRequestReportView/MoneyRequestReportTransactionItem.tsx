@@ -11,18 +11,20 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useResponsiveLayoutOnWideRHP from '@hooks/useResponsiveLayoutOnWideRHP';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useTransactionViolations from '@hooks/useTransactionViolations';
 import ControlSelection from '@libs/ControlSelection';
 import canUseTouchScreen from '@libs/DeviceCapabilities/canUseTouchScreen';
 import {getTransactionPendingAction, isTransactionPendingDelete} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import type {Report} from '@src/types/onyx';
+import type {Report, TransactionViolation} from '@src/types/onyx';
 import type {TransactionWithOptionalHighlight} from './MoneyRequestReportTransactionList';
 
 type MoneyRequestReportTransactionItemProps = {
     /** The transaction that is being displayed */
     transaction: TransactionWithOptionalHighlight;
+
+    /** Transaction violations */
+    violations?: TransactionViolation[];
 
     /** Report to which the transaction belongs */
     report: Report;
@@ -63,6 +65,7 @@ type MoneyRequestReportTransactionItemProps = {
 
 function MoneyRequestReportTransactionItem({
     transaction,
+    violations,
     report,
     isSelectionModeEnabled,
     toggleTransaction,
@@ -84,8 +87,6 @@ function MoneyRequestReportTransactionItem({
     const theme = useTheme();
     const isPendingDelete = isTransactionPendingDelete(transaction);
     const pendingAction = getTransactionPendingAction(transaction);
-    // Filter violations based on user visibility and dismissal state at the row level.
-    const filteredViolations = useTransactionViolations(transaction.transactionID);
 
     const viewRef = useRef<View>(null);
 
@@ -114,7 +115,6 @@ function MoneyRequestReportTransactionItem({
                     handleOnPress(transaction.transactionID);
                 }}
                 accessibilityLabel={translate('iou.viewDetails')}
-                sentryLabel={CONST.SENTRY_LABEL.REPORT.MONEY_REQUEST_REPORT_TRANSACTION_ITEM}
                 role={getButtonRole(true)}
                 isNested
                 id={transaction.transactionID}
@@ -133,7 +133,7 @@ function MoneyRequestReportTransactionItem({
                 {({hovered}) => (
                     <TransactionItemRow
                         transactionItem={transaction}
-                        violations={filteredViolations}
+                        violations={violations}
                         report={report}
                         isSelected={isSelected}
                         dateColumnSize={dateColumnSize}

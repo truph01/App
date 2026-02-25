@@ -32,7 +32,6 @@ const defaultSearchInfo: SearchResultsInfo = {
 
 const defaultSearchContextData: SearchContextData = {
     currentSearchHash: -1,
-    currentRecentSearchHash: -1,
     currentSearchKey: undefined,
     currentSearchQueryJSON: undefined,
     currentSearchResults: undefined,
@@ -82,10 +81,10 @@ function SearchContextProvider({children}: ChildrenProps) {
     const todoSearchResultsData = useTodos();
 
     const currentSearchKey = searchContextData.currentSearchKey;
-    const currentRecentSearchHash = searchContextData.currentRecentSearchHash;
+    const currentSearchHash = searchContextData.currentSearchHash;
     const {accountID} = useCurrentUserPersonalDetails();
     const suggestedSearches = useMemo(() => getSuggestedSearches(accountID), [accountID]);
-    const shouldUseLiveData = !!currentSearchKey && isTodoSearch(currentRecentSearchHash, suggestedSearches);
+    const shouldUseLiveData = !!currentSearchKey && isTodoSearch(currentSearchHash, suggestedSearches);
 
     // If viewing a to-do search, use live data from useTodos, otherwise return the snapshot data
     // We do this so that we can show the counters for the to-do search results without visiting the specific to-do page, e.g. show `Approve [3]` while viewing the `Submit` to-do search.
@@ -110,16 +109,15 @@ function SearchContextProvider({children}: ChildrenProps) {
         return snapshotSearchResults ?? undefined;
     }, [shouldUseLiveData, currentSearchKey, todoSearchResultsData, snapshotSearchResults]);
 
-    const setCurrentSearchHashAndKey = useCallback((searchHash: number, recentHash: number, searchKey: SearchKey | undefined) => {
+    const setCurrentSearchHashAndKey = useCallback((searchHash: number, searchKey: SearchKey | undefined) => {
         setSearchContextData((prevState) => {
-            if (searchHash === prevState.currentSearchHash && recentHash === prevState.currentRecentSearchHash && searchKey === prevState.currentSearchKey) {
+            if (searchHash === prevState.currentSearchHash && searchKey === prevState.currentSearchKey) {
                 return prevState;
             }
 
             return {
                 ...prevState,
                 currentSearchHash: searchHash,
-                currentRecentSearchHash: recentHash,
                 currentSearchKey: searchKey,
             };
         });

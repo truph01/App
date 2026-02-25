@@ -49,10 +49,10 @@ function getIsBotAuthor(user: {login?: string; type?: string} | null | undefined
 
     const knownBotLogins: string[] = [CONST.COMMENT.NAME_MELVIN_BOT, CONST.COMMENT.NAME_MELVIN_USER, CONST.COMMENT.NAME_CODEX, CONST.COMMENT.NAME_GITHUB_ACTIONS];
 
-    const isKnownBotLogin = knownBotLogins.includes(user.login ?? '');
     const isBotType = user.type === CONST.COMMENT.TYPE_BOT;
+    const isKnownLogin = knownBotLogins.includes(user.login ?? '');
 
-    return isKnownBotLogin || isBotType;
+    return isBotType || isKnownLogin;
 }
 
 // Main function to process the workflow event
@@ -111,10 +111,6 @@ async function run() {
         const newProposalCreatedAt = new Date(payload.comment.created_at).getTime();
         const newProposalBody = payload.comment.body;
         const newProposalAuthor = payload.comment.user.login;
-        if (getIsBotAuthor(payload.comment.user)) {
-            console.log('New comment is from a bot. Skipping duplicate check.');
-            return;
-        }
         // Fetch all comments in the issue
         console.log('Get comments for issue #', issueNumber);
         const commentsResponse = await GithubUtils.getAllCommentDetails(issueNumber);

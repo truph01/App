@@ -447,6 +447,10 @@ const staticStyles = (theme: ThemeColors) =>
             height: undefined,
         },
 
+        lineHeightNormal: {
+            lineHeight: variables.lineHeightNormal,
+        },
+
         lineHeightLarge: {
             lineHeight: variables.lineHeightLarge,
         },
@@ -932,12 +936,11 @@ const staticStyles = (theme: ThemeColors) =>
             paddingTop: 8,
             paddingBottom: 8,
             alignItems: 'flex-start',
-            borderRadius: 20,
+            borderRadius: variables.componentBorderRadiusMedium,
         },
 
-        actionableItemButtonText: {
-            textAlign: 'left',
-            ...wordBreak.breakWord,
+        actionableItemButtonBackgroundHovered: {
+            borderColor: theme.buttonPressedBG,
         },
 
         hoveredComponentBG: {
@@ -3618,19 +3621,6 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: colors.green400,
         },
 
-        odometerPhotoInformationContainer: {
-            ...positioning.pAbsolute,
-            ...flex.flexRow,
-            ...flex.alignItemsCenter,
-            ...spacing.gap4,
-            bottom: variables.bottomPositionOdometerPhotoInformationContainer,
-            left: variables.leftPositionOdometerPhotoInformationContainer,
-            right: variables.rightPositionOdometerPhotoInformationContainer,
-            padding: variables.paddingOdometerPhotoInformationContainer,
-            backgroundColor: theme.componentBG,
-            borderRadius: variables.componentBorderRadiusLarge,
-        },
-
         webButtonShadow: {
             boxShadow: `0px 0px 24px 16px ${theme.appBG}`,
         },
@@ -6217,10 +6207,6 @@ const dynamicStyles = (theme: ThemeColors) =>
                 overflow: 'hidden',
             };
         },
-
-        getEmptyStateCompanyCardsIllustrationContainer: (shouldUseNarrowLayout: boolean) => (shouldUseNarrowLayout ? {height: 220} : {aspectRatio: 680 / 220}),
-
-        getEmptyStateCompanyCardsIllustration: (shouldUseNarrowLayout: boolean) => (shouldUseNarrowLayout ? {width: 680, height: 220} : {}),
     }) satisfies DynamicStyles;
 
 // Styles that cannot be wrapped in StyleSheet.create because they eg. must be passed to 3rd party libraries as JS objects

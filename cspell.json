@@ -519,7 +519,6 @@
         "pdfs",
         "Perfetto",
         "persistable",
-        "peterparker",
         "Pettinella",
         "phonenumber",
         "Picklist",
@@ -831,9 +830,7 @@
         "pgrep",
         "skia",
         "canvaskit",
-        "Invoicify",
-        "UKEU",
-        "USCA"
+        "Invoicify"
     ],
     "ignorePaths": [
         "src/languages/de.ts",

@@ -1,6 +1,3 @@
-import Log from '@libs/Log';
-import splitPathAndQuery from './splitPathAndQuery';
-
 /**
  * Extracts the last segment from a URL path, removing query parameters and trailing slashes.
  *
@@ -8,14 +5,15 @@ import splitPathAndQuery from './splitPathAndQuery';
  * @returns The last segment of the path as a string
  */
 function getLastSuffixFromPath(path: string | undefined): string {
-    const [normalizedPath] = splitPathAndQuery(path ?? '');
+    const pathWithoutParams = path?.split('?').at(0);
 
-    if (!normalizedPath) {
-        Log.warn('[getLastSuffixFromPath.ts] Failed to parse the path, path is empty');
-        return '';
+    if (!pathWithoutParams) {
+        throw new Error('[getLastSuffixFromPath.ts] Failed to parse the path, path is empty');
     }
 
-    const lastSuffix = normalizedPath.split('/').pop() ?? '';
+    const pathWithoutTrailingSlash = pathWithoutParams.endsWith('/') ? pathWithoutParams.slice(0, -1) : pathWithoutParams;
+
+    const lastSuffix = pathWithoutTrailingSlash.split('/').pop() ?? '';
 
     return lastSuffix;
 }

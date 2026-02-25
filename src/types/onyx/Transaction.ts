@@ -650,9 +650,6 @@ type AdditionalTransactionChanges = {
 
     /** Odometer end reading for distance expenses */
     odometerEnd?: number;
-
-    /** The unit for the distance/quantity */
-    quantity?: number;
 };
 
 /** Model of transaction changes  */

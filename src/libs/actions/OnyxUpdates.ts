@@ -200,7 +200,7 @@ function apply<TKey extends OnyxKey>({lastUpdateID, type, request, response, upd
             return applyHTTPSOnyxUpdates(request, responseWithoutOnyxData, Number(lastUpdateID));
         }
 
-        return Promise.resolve(response);
+        return Promise.resolve();
     }
     if (lastUpdateID && (lastUpdateIDAppliedToClient === undefined || Number(lastUpdateID) > lastUpdateIDAppliedToClient)) {
         Onyx.merge(ONYXKEYS.ONYX_UPDATES_LAST_UPDATE_ID_APPLIED_TO_CLIENT, Number(lastUpdateID));

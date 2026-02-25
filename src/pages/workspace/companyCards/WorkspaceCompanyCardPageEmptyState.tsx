@@ -36,14 +36,7 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer}: 
     const workspaceAccountID = policy?.workspaceAccountID ?? CONST.DEFAULT_NUMBER_ID;
     const shouldShowExpensifyCardPromotionBanner = !hasIssuedExpensifyCard(workspaceAccountID, allWorkspaceCards);
 
-    const illustrations = useMemoizedLazyIllustrations([
-        'CreditCardsNew',
-        'HandCard',
-        'MagnifyingGlassMoney',
-        'CompanyCardsEmptyStateUSCA',
-        'CompanyCardsEmptyStateUKEU',
-        'CompanyCardsEmptyStateGeneric',
-    ]);
+    const illustrations = useMemoizedLazyIllustrations(['CreditCardsNew', 'HandCard', 'MagnifyingGlassMoney', 'CompanyCardsEmptyState']);
 
     const features = [
         {
@@ -68,20 +61,6 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer}: 
             translationKey: feature.translationKey,
         }));
 
-    const getCompanyCardIllustration = () => {
-        const currency = policy?.outputCurrency ?? '';
-
-        if (currency === CONST.CURRENCY.USD || currency === CONST.CURRENCY.CAD) {
-            return illustrations.CompanyCardsEmptyStateUSCA;
-        }
-
-        if (currency === CONST.CURRENCY.GBP || currency === CONST.CURRENCY.EUR) {
-            return illustrations.CompanyCardsEmptyStateUKEU;
-        }
-
-        return illustrations.CompanyCardsEmptyStateGeneric;
-    };
-
     const handleCtaPress = () => {
         if (!policy?.id) {
             return;
@@ -104,10 +83,10 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer}: 
                 ctaText={translate('workspace.companyCards.addCards')}
                 ctaAccessibilityLabel={translate('workspace.companyCards.addCards')}
                 onCtaPress={handleCtaPress}
-                illustrationBackgroundColor={colors.blue800}
-                illustration={getCompanyCardIllustration()}
-                illustrationStyle={styles.getEmptyStateCompanyCardsIllustration(shouldUseNarrowLayout)}
-                illustrationContainerStyle={styles.getEmptyStateCompanyCardsIllustrationContainer(shouldUseNarrowLayout)}
+                illustrationBackgroundColor={colors.blue700}
+                illustration={illustrations.CompanyCardsEmptyState}
+                illustrationStyle={styles.emptyStateCardIllustration}
+                illustrationContainerStyle={[styles.emptyStateCardIllustrationContainer, styles.justifyContentStart]}
                 titleStyles={styles.textHeadlineH1}
                 isButtonDisabled={workspaceAccountID === CONST.DEFAULT_NUMBER_ID}
             />

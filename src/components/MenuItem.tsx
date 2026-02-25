@@ -781,10 +781,10 @@ function MenuItem({
                                 disabledStyle={shouldUseDefaultCursorWhenDisabled && [styles.cursorDefault]}
                                 disabled={disabled || isExecuting}
                                 ref={mergeRefs(ref, popoverAnchor)}
-                                role={interactive ? role : undefined}
+                                role={role}
                                 accessibilityLabel={`${enhancedAccessibilityLabel}${brickRoadIndicator ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
                                 accessible={shouldBeAccessible}
-                                tabIndex={interactive ? tabIndex : -1}
+                                tabIndex={tabIndex}
                                 onFocus={onFocus}
                                 sentryLabel={sentryLabel}
                             >

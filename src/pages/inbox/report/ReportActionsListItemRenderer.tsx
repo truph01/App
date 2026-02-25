@@ -8,6 +8,9 @@ import ReportActionItem from './ReportActionItem';
 import ReportActionItemParentAction from './ReportActionItemParentAction';
 
 type ReportActionsListItemRendererProps = {
+    /** All the data of the report collection */
+    allReports: OnyxCollection<Report>;
+
     /** All the data of the policy collection */
     policies: OnyxCollection<Policy>;
 
@@ -93,6 +96,7 @@ type ReportActionsListItemRendererProps = {
 };
 
 function ReportActionsListItemRenderer({
+    allReports,
     policies,
     reportAction,
     parentReportAction,
@@ -198,6 +202,7 @@ function ReportActionsListItemRenderer({
     if (shouldDisplayParentAction && isChatThread(report)) {
         return (
             <ReportActionItemParentAction
+                allReports={allReports}
                 policies={policies}
                 shouldHideThreadDividerLine={shouldDisplayParentAction && shouldHideThreadDividerLine}
                 shouldDisplayReplyDivider={shouldDisplayReplyDivider}
@@ -223,6 +228,7 @@ function ReportActionsListItemRenderer({
 
     return (
         <ReportActionItem
+            allReports={allReports}
             policies={policies}
             shouldHideThreadDividerLine={shouldHideThreadDividerLine}
             parentReportAction={parentReportAction}

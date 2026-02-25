@@ -60,7 +60,6 @@ import {
     unholdMoneyRequestOnSearch,
     updateAdvancedFilters,
 } from '@libs/actions/Search';
-import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setNameValuePair} from '@libs/actions/User';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -81,6 +80,7 @@ import {navigateToSearchRHP, shouldShowDeleteOption} from '@libs/SearchUIUtils';
 import {hasTransactionBeenRejected} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import {canIOUBePaid, dismissRejectUseExplanation} from '@userActions/IOU';
+import {initSplitExpense} from '@userActions/IOU/Split';
 import {openOldDotLink} from '@userActions/Link';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -241,9 +241,6 @@ function SearchPage({route}: SearchPageProps) {
 
     const {status, hash} = queryJSON ?? {};
     const selectedTransactionsKeys = Object.keys(selectedTransactions ?? {});
-    const firstTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${selectedTransactionsKeys.at(0)}`];
-    const [firstTransactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${firstTransaction?.reportID}`);
-    const [firstTransactionPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${firstTransactionReport?.policyID}`);
 
     const beginExportWithTemplate = useCallback(
         async (templateName: string, templateType: string, policyID: string | undefined) => {
@@ -378,18 +375,17 @@ function SearchPage({route}: SearchPageProps) {
         clearSelectedTransactions(undefined, true);
     }, [
         isOffline,
-        status,
         areAllMatchingItemsSelected,
-        queryJSON,
-        selectedReports,
-        selectedReportIDs,
-        selectedTransactionReportIDs,
-        selectedTransactionsKeys,
-        translate,
-        clearSelectedTransactions,
         showConfirmModal,
+        translate,
+        selectedTransactionsKeys,
+        status,
         hash,
+        selectedReports,
+        queryJSON,
         selectAllMatchingItems,
+        clearSelectedTransactions,
+        setIsDownloadErrorModalVisible,
     ]);
 
     const handleApproveWithDEWCheck = useCallback(async () => {
@@ -1021,6 +1017,7 @@ function SearchPage({route}: SearchPageProps) {
 
         const isSplittable = !!firstTransactionMeta?.canSplit;
         const isAlreadySplit = !!firstTransactionMeta?.hasBeenSplit;
+        const firstTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${selectedTransactionsKeys.at(0)}`];
 
         const canSplitTransaction = selectedTransactionsKeys.length === 1 && !isAlreadySplit && isSplittable;
 
@@ -1030,7 +1027,7 @@ function SearchPage({route}: SearchPageProps) {
                 icon: expensifyIcons.ArrowSplit,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
-                    initSplitExpense(firstTransaction, firstTransactionPolicy);
+                    initSplitExpense(allTransactions, allReports, firstTransaction);
                 },
             });
         }
@@ -1067,59 +1064,59 @@ function SearchPage({route}: SearchPageProps) {
 
         return options;
     }, [
+        searchResults,
         selectedTransactionsKeys,
         status,
         hash,
         selectedTransactions,
-        queryJSON?.type,
-        expensifyIcons.Export,
-        expensifyIcons.ArrowRight,
-        expensifyIcons.Table,
-        expensifyIcons.ThumbsUp,
-        expensifyIcons.ThumbsDown,
-        expensifyIcons.Send,
-        expensifyIcons.MoneyBag,
-        expensifyIcons.Stopwatch,
-        expensifyIcons.ArrowCollapse,
-        expensifyIcons.DocumentMerge,
-        expensifyIcons.ArrowSplit,
-        expensifyIcons.Trashcan,
-        expensifyIcons.Exclamation,
         translate,
+        localeCompare,
         areAllMatchingItemsSelected,
         isOffline,
         selectedReports,
+        selectedTransactionReportIDs,
         lastPaymentMethods,
         selectedReportIDs,
-        personalPolicyID,
-        searchResults,
-        currentSearchResults?.data,
-        selectedTransactionReportIDs,
+        allTransactions,
+        queryJSON?.type,
         selectedPolicyIDs,
         policies,
         integrationsExportTemplates,
         csvExportLayouts,
-        handleBasicExport,
-        beginExportWithTemplate,
-        handleApproveWithDEWCheck,
-        allTransactionViolations,
-        isDelegateAccessRestricted,
-        dismissedRejectUseExplanation,
-        showDelegateNoAccessModal,
         clearSelectedTransactions,
+        beginExportWithTemplate,
         bulkPayButtonOptions,
         onBulkPaySelected,
-        areAllTransactionsFromSubmitter,
-        dismissedHoldUseExplanation,
-        currentUserPersonalDetails.accountID,
-        localeCompare,
-        firstTransaction,
-        firstTransactionPolicy,
+        handleBasicExport,
+        handleApproveWithDEWCheck,
         handleDeleteSelectedTransactions,
+        allReports,
         theme.icon,
         styles.colorMuted,
         styles.fontWeightNormal,
         styles.textWrap,
+        expensifyIcons.ArrowCollapse,
+        expensifyIcons.ArrowRight,
+        expensifyIcons.ArrowSplit,
+        expensifyIcons.DocumentMerge,
+        expensifyIcons.Exclamation,
+        expensifyIcons.Export,
+        expensifyIcons.MoneyBag,
+        expensifyIcons.Send,
+        expensifyIcons.Stopwatch,
+        expensifyIcons.Table,
+        expensifyIcons.ThumbsDown,
+        expensifyIcons.ThumbsUp,
+        expensifyIcons.Trashcan,
+        dismissedHoldUseExplanation,
+        dismissedRejectUseExplanation,
+        areAllTransactionsFromSubmitter,
+        allTransactionViolations,
+        currentSearchResults?.data,
+        isDelegateAccessRestricted,
+        showDelegateNoAccessModal,
+        currentUserPersonalDetails.accountID,
+        personalPolicyID,
     ]);
 
     const {initScanRequest, PDFValidationComponent, ErrorModal} = useReceiptScanDrop();

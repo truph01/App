@@ -1,6 +1,6 @@
 import React, {memo, useMemo} from 'react';
 import {View} from 'react-native';
-import type {OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import RenderHTML from '@components/RenderHTML';
 import MoneyReportView from '@components/ReportActionItem/MoneyReportView';
@@ -28,6 +28,9 @@ import ReportActionItemCreated from './ReportActionItemCreated';
 import ReportActionItemSingle from './ReportActionItemSingle';
 
 type ReportActionItemContentCreatedProps = {
+    /** All the data of the report collection */
+    allReports: OnyxCollection<OnyxTypes.Report>;
+
     /**  The context value containing the report and action data, along with the show context menu props */
     contextValue: ShowContextMenuContextProps;
 
@@ -47,7 +50,15 @@ type ReportActionItemContentCreatedProps = {
     shouldHideThreadDividerLine: boolean;
 };
 
-function ReportActionItemContentCreated({contextValue, parentReport, parentReportAction, transactionID, draftMessage, shouldHideThreadDividerLine}: ReportActionItemContentCreatedProps) {
+function ReportActionItemContentCreated({
+    contextValue,
+    allReports,
+    parentReport,
+    parentReportAction,
+    transactionID,
+    draftMessage,
+    shouldHideThreadDividerLine,
+}: ReportActionItemContentCreatedProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {report, action, transactionThreadReport} = contextValue;
@@ -108,6 +119,7 @@ function ReportActionItemContentCreated({contextValue, parentReport, parentRepor
                 <ShowContextMenuContext.Provider value={contextMenuValue}>
                     <View>
                         <MoneyRequestView
+                            allReports={allReports}
                             transactionThreadReport={report}
                             parentReportID={report?.parentReportID}
                             expensePolicy={policy}
@@ -170,6 +182,7 @@ function ReportActionItemContentCreated({contextValue, parentReport, parentRepor
                         <ShowContextMenuContext.Provider value={contextMenuValue}>
                             <View>
                                 <MoneyRequestView
+                                    allReports={allReports}
                                     transactionThreadReport={transactionThreadReport}
                                     parentReportID={transactionThreadReport?.parentReportID}
                                     expensePolicy={policy}

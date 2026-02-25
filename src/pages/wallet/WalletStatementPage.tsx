@@ -3,18 +3,14 @@ import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useState} from 'react';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import {useSession} from '@components/OnyxListItemProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
 import WalletStatementModal from '@components/WalletStatementModal';
-import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import useThemePreference from '@hooks/useThemePreference';
-import addEncryptedAuthTokenToURL from '@libs/addEncryptedAuthTokenToURL';
-import {isMobileSafari} from '@libs/Browser';
 import {getOldDotURLFromEnvironment} from '@libs/Environment/Environment';
 import fileDownload from '@libs/fileDownload';
 import Navigation from '@libs/Navigation/Navigation';
@@ -30,15 +26,12 @@ type WalletStatementPageProps = PlatformStackScreenProps<WalletStatementNavigato
 
 function WalletStatementPage({route}: WalletStatementPageProps) {
     const [walletStatement] = useOnyx(ONYXKEYS.WALLET_STATEMENT);
-    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const themePreference = useThemePreference();
     const yearMonth = route.params.yearMonth ?? null;
     const isWalletStatementGenerating = walletStatement?.isGenerating ?? false;
     const prevIsWalletStatementGenerating = usePrevious(isWalletStatementGenerating);
     const [isDownloading, setIsDownloading] = useState(isWalletStatementGenerating);
     const {translate} = useLocalize();
-    const session = useSession();
-    const encryptedAuthToken = session?.encryptedAuthToken ?? '';
     const {environment} = useEnvironment();
     const {isOffline} = useNetwork();
 
@@ -53,7 +46,7 @@ function WalletStatementPage({route}: WalletStatementPageProps) {
     }, []);
 
     const processDownload = useCallback(() => {
-        if (isWalletStatementGenerating || !currentUserLogin) {
+        if (isWalletStatementGenerating) {
             return;
         }
 
@@ -62,15 +55,13 @@ function WalletStatementPage({route}: WalletStatementPageProps) {
             // We already have a file URL for this statement, so we can download it immediately
             const downloadFileName = `Expensify_Statement_${yearMonth}.pdf`;
             const fileName = walletStatement[yearMonth];
-            const pdfURL = `${baseURL}secure?secureType=pdfreport&filename=${encodeURIComponent(fileName)}&downloadName=${encodeURIComponent(downloadFileName)}&email=${encodeURIComponent(
-                currentUserLogin,
-            )}`;
-            fileDownload(translate, addEncryptedAuthTokenToURL(pdfURL, encryptedAuthToken, true), downloadFileName, '', isMobileSafari()).finally(() => setIsDownloading(false));
+            const pdfURL = `${baseURL}secure?secureType=pdfreport&filename=${fileName}&downloadName=${downloadFileName}`;
+            fileDownload(translate, pdfURL, downloadFileName).finally(() => setIsDownloading(false));
             return;
         }
 
         generateStatementPDF(yearMonth);
-    }, [baseURL, currentUserLogin, isWalletStatementGenerating, translate, walletStatement, yearMonth, encryptedAuthToken]);
+    }, [baseURL, isWalletStatementGenerating, translate, walletStatement, yearMonth]);
 
     // eslint-disable-next-line rulesdir/prefer-early-return
     useEffect(() => {

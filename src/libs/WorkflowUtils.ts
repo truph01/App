@@ -574,15 +574,6 @@ function getOpenConnectedToPolicyBusinessBankAccounts(bankAccountList: BankAccou
     });
 }
 
-/**
- * Combine workflow members with available members, deduplicating by email.
- */
-function mergeWorkflowMembersWithAvailableMembers(workflowMembers: Member[], allAvailableMembers: Member[]): Member[] {
-    const memberEmails = new Set(workflowMembers.map((m) => m.email));
-    const additionalMembers = allAvailableMembers.filter((m) => !memberEmails.has(m.email));
-    return [...workflowMembers, ...additionalMembers];
-}
-
 export {
     calculateApprovers,
     convertPolicyEmployeesToApprovalWorkflows,
@@ -591,6 +582,5 @@ export {
     getEligibleExistingBusinessBankAccounts,
     getOpenConnectedToPolicyBusinessBankAccounts,
     INITIAL_APPROVAL_WORKFLOW,
-    mergeWorkflowMembersWithAvailableMembers,
     updateWorkflowDataOnApproverRemoval,
 };

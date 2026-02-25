@@ -253,21 +253,13 @@ function getForReportAction({
     movedFromReport,
     movedToReport,
     policyForMovingExpensesID,
-    currentUserLogin: currentUserLoginParam,
 }: {
     reportAction: OnyxEntry<ReportAction>;
     policyID: string | undefined;
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     policyForMovingExpensesID?: string;
-    currentUserLogin?: string;
 }): string {
-    // Temporary fallback to storedCurrentUserLogin since currentUserLogin can be empty string.
-    // Remove once all callers pass currentUserLogin explicitly and the migration to getForReportActionTemp is complete.
-    let currentUserLogin = currentUserLoginParam;
-    if (!currentUserLogin) {
-        currentUserLogin = storedCurrentUserLogin;
-    }
     if (!isModifiedExpenseAction(reportAction)) {
         return '';
     }
@@ -379,7 +371,7 @@ function getForReportAction({
         } else if (reportActionOriginalMessage?.source === CONST.CATEGORY_SOURCE.MCC) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             const policy = getPolicy(policyID);
-            const isAdmin = isPolicyAdmin(policy, currentUserLogin);
+            const isAdmin = isPolicyAdmin(policy, storedCurrentUserLogin);
 
             // For admins, create a hyperlink to the workspace rules page
             if (isAdmin && policy?.id) {
@@ -565,7 +557,7 @@ function getForReportActionTemp({
     movedFromReport,
     movedToReport,
     policyTags,
-    currentUserLogin: currentUserLoginParam,
+    currentUserLogin,
 }: {
     translate: LocalizedTranslate;
     reportAction: OnyxEntry<ReportAction>;
@@ -575,12 +567,6 @@ function getForReportActionTemp({
     policyTags: OnyxEntry<PolicyTagLists>;
     currentUserLogin: string;
 }): string {
-    // Temporary fallback to storedCurrentUserLogin since currentUserLogin can be empty string.
-    // Remove once all callers pass currentUserLogin explicitly and the migration to getForReportActionTemp is complete.
-    let currentUserLogin = currentUserLoginParam;
-    if (!currentUserLogin) {
-        currentUserLogin = storedCurrentUserLogin;
-    }
     if (!isModifiedExpenseAction(reportAction)) {
         return '';
     }

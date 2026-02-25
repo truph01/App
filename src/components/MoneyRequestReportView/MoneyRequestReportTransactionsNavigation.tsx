@@ -35,7 +35,6 @@ const parentReportActionIDsSelector = (reportActions: OnyxEntry<OnyxTypes.Report
 
 function MoneyRequestReportTransactionsNavigation({currentTransactionID, isFromReviewDuplicates}: MoneyRequestReportRHPNavigationButtonsProps) {
     const [transactionIDsList = getEmptyArray<string>()] = useOnyx(ONYXKEYS.TRANSACTION_THREAD_NAVIGATION_TRANSACTION_IDS);
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
 
     const {markReportIDAsExpense} = useWideRHPActions();
 
@@ -134,7 +133,7 @@ function MoneyRequestReportTransactionsNavigation({currentTransactionID, isFromR
         }
         // The transaction thread doesn't exist yet, so we should create it
         if (!nextThreadReportID) {
-            const transactionThreadReport = createTransactionThreadReport(introSelected, parentReport, nextParentReportAction, nextTransaction);
+            const transactionThreadReport = createTransactionThreadReport(parentReport, nextParentReportAction, nextTransaction);
             navigationParams.reportID = transactionThreadReport?.reportID;
         }
         // Wait for the next frame to ensure Onyx has processed the optimistic data updates from setOptimisticTransactionThread or createTransactionThreadReport before navigating
@@ -162,7 +161,7 @@ function MoneyRequestReportTransactionsNavigation({currentTransactionID, isFromR
         }
         // The transaction thread doesn't exist yet, so we should create it
         if (!prevThreadReportID) {
-            const transactionThreadReport = createTransactionThreadReport(introSelected, parentReport, prevParentReportAction, prevTransaction);
+            const transactionThreadReport = createTransactionThreadReport(parentReport, prevParentReportAction, prevTransaction);
             navigationParams.reportID = transactionThreadReport?.reportID;
         }
         // Wait for the next frame to ensure Onyx has processed the optimistic data updates from setOptimisticTransactionThread or createTransactionThreadReport before navigating

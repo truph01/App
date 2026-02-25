@@ -89,10 +89,8 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
         });
     }, [transformedOptions, currentUserEmail, cleanSearchTerm, formatPhoneNumber, countryCode, loginList]);
 
-    const currentUserSearchTerms = useMemo(() => [translate('common.you'), translate('common.me')], [translate]);
-
     const filteredCurrentUserOption = useMemo(() => {
-        const newOption = filterOption(currentOption, cleanSearchTerm, currentUserSearchTerms);
+        const newOption = filterOption(currentOption, cleanSearchTerm);
         if (newOption) {
             return {
                 ...newOption,
@@ -100,7 +98,7 @@ function UserSelectPopup({value, closeOverlay, onChange, isSearchable}: UserSele
             };
         }
         return newOption;
-    }, [currentOption, cleanSearchTerm, selectedAccountIDs, currentUserSearchTerms]);
+    }, [currentOption, cleanSearchTerm, selectedAccountIDs]);
 
     const listData = useMemo(() => {
         if (!filteredCurrentUserOption) {

@@ -120,7 +120,7 @@ jobs:
           path: ./
 
       - name: Extract web build
-        run: tar -xzvf "${{ needs.buildWeb.outputs.TAR_FILENAME }}"
+        run: tar -xzvf webBuild.tar.gz
 
       - name: Configure AWS Credentials
         # v6
