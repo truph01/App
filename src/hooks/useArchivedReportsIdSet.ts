@@ -1,9 +1,9 @@
 import type {OnyxCollection} from 'react-native-onyx';
 import {isArchivedReport} from '@libs/ReportUtils';
 import type {ArchivedReportsIDSet} from '@libs/SearchUIUtils';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportNameValuePairs} from '@src/types/onyx';
-import CONST from '@src/CONST';
 import useOnyx from './useOnyx';
 
 /**
