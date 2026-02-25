@@ -213,6 +213,8 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.IN: {
+            // If autocompleteValue is empty or just whitespace and we have already completed keys,
+            // return empty array to hide suggestion list (consistent with group-by behavior)
             if (!autocompleteValue.trim() && alreadyAutocompletedKeys.size > 0) {
                 return [];
             }
@@ -338,6 +340,8 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED: {
+            // We don't want to show the "Expensify Card" feeds in the autocomplete suggestion list as they don't have real "Statements"
+            // Thus passing an empty object to the `allCards` parameter.
             const feedAutoCompleteList = Object.values(getCardFeedsForDisplay(allFeeds, {}, translate, feedKeysWithCards));
             const filteredFeeds = feedAutoCompleteList
                 .filter((feed) => feed.name.toLowerCase().includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(feed.name.toLowerCase()))
