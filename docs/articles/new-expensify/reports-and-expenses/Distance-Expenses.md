@@ -67,7 +67,7 @@ Once a Distance expense is created, it can be submitted on a report. To learn ho
 
 ## How reimbursement rates are set for Distance expenses
 
-### Distance expenses created on a Workspace
+**Distance expenses created on a Workspace**
 
 If you are creating expenses on a Workspace: 
 
@@ -76,7 +76,7 @@ If you are creating expenses on a Workspace:
 
 [Learn how to manage distance rates as a Workspace Admin](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Managing-Distance-Rates)
 
-### Distance expenses created for personal tracking
+**Distance expenses created for personal tracking**
 
 If you're creating expenses outside of a Workspace:
 
