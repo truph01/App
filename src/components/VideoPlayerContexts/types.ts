@@ -30,12 +30,14 @@ type VolumeContext = {
     toggleMute: () => void;
 };
 
-type VideoPopoverMenuContext = {
+type VideoPopoverMenuStateContextType = {
     /**
      * The items displayed in the video popover menu.
      */
     menuItems: PopoverMenuItem[];
+};
 
+type VideoPopoverMenuActionsContextType = {
     /**
      * Updates the video player reference used by the popover menu.
      * @param ref The video player ref.
@@ -81,4 +83,4 @@ type FullScreenContext = {
 
 type PlaybackSpeed = TupleToUnion<typeof CONST.VIDEO_PLAYER.PLAYBACK_SPEEDS>;
 
-export type {VolumeContext, VideoPopoverMenuContext, FullScreenContext, PlaybackSpeed};
+export type {VolumeContext, VideoPopoverMenuStateContextType, VideoPopoverMenuActionsContextType, FullScreenContext, PlaybackSpeed};
