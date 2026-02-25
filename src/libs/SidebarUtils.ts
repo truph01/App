@@ -1267,4 +1267,5 @@ export default {
     shouldShowRedBrickRoad,
     getReportsToDisplayInLHN,
     updateReportsToDisplayInLHN,
+    shouldDisplayReportInLHN,
 };
