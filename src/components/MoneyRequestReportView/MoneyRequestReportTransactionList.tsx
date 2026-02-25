@@ -280,7 +280,6 @@ function MoneyRequestReportTransactionList({
         return groupedTransactions.flatMap((group) => group.transactions.filter((transaction) => !isTransactionPendingDelete(transaction)).map((transaction) => transaction.transactionID));
     }, [groupedTransactions, sortedTransactions, shouldShowGroupedTransactions]);
 
-    const visualOrderTransactionIDsKey = useMemo(() => visualOrderTransactionIDs.join(','), [visualOrderTransactionIDs]);
     useEffect(() => {
         const focusedRoute = findFocusedRoute(navigationRef.getRootState());
         if (focusedRoute?.name !== SCREENS.RIGHT_MODAL.SEARCH_REPORT) {
@@ -290,8 +289,7 @@ function MoneyRequestReportTransactionList({
         return () => {
             clearActiveTransactionIDs();
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- visualOrderTransactionIDsKey is a primitive proxy for visualOrderTransactionIDs to avoid re-firing on referential changes
-    }, [visualOrderTransactionIDsKey]);
+    }, [visualOrderTransactionIDs]);
 
     const sortedTransactionsMap = useMemo(() => {
         const map = new Map<string, OnyxTypes.Transaction>();
