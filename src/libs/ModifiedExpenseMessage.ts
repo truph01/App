@@ -532,6 +532,7 @@ function getForReportAction({
     if (hasPersonalRulesModifiedFields) {
         const personalRulesModifiedFields = reportActionOriginalMessage.personalRulesModifiedFields;
         if (personalRulesModifiedFields) {
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             return getRulesModifiedMessage(translateLocal, personalRulesModifiedFields, true);
         }
     }
