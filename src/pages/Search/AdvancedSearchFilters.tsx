@@ -107,7 +107,7 @@ const baseFilterConfig = {
     exportedTo: {
         getTitle: getFilterDisplayTitle,
         description: 'search.exportedTo' as const,
-        route: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO),
+        route: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.EXPORTED_TO),
     },
     posted: {
         getTitle: getFilterDisplayTitle,
