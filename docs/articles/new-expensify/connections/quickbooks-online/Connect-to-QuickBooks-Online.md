@@ -2,8 +2,7 @@
 title: Connect to QuickBooks Online
 description: Integrate QuickBooks Online with Expensify
 keywords: [New Expensify, QuickBooks Online, QBO integration, connect QuickBooks, reconnect QuickBooks, accounting sync, Expensify control plan, accounting sync, QuickBooks ISE, QuickBooks Essentials,Quickbooks Simple Start]
-internalScope: Audience is Workspace Admins. Covers connecting and reconnecting QuickBooks Online to Expensify and supported features. Does not cover QuickBooks Desktop or advanced accounting configuration.
-QuickBooks Online, QBO integration, connect QuickBooks Online, reconnect QuickBooks, QuickBooks Online red dot error, Intuit login error, accounting sync, Workspace Admin, automate expense syncing
+internalScope: Audience is Workspace Admins. Covers connecting and reconnecting QuickBooks Online to Expensify and supported features. Does not cover QuickBooks Desktop or advanced accounting configuration. QuickBooks Online, QBO integration, connect QuickBooks Online, reconnect QuickBooks, QuickBooks Online red dot error, Intuit login error, accounting sync, Workspace Admin, automate expense syncing
 order: 1
 ---
 
