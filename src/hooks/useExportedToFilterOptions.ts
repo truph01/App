@@ -1,6 +1,8 @@
+import {useSearchContext} from '@components/Search/SearchContext';
 import {getStandardExportTemplateDisplayName} from '@libs/AccountingUtils';
 import {getExportTemplates} from '@libs/actions/Search';
 import {getConnectedIntegrationNamesForPolicies} from '@libs/PolicyUtils';
+import {getAllPolicyValues} from '@libs/SearchQueryUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ExportTemplate} from '@src/types/onyx';
@@ -16,14 +18,20 @@ type UseExportedToFilterDataResult = {
 /**
  * Hook that prepares all data needed for the exported to search filter.
  * It collects export templates and all connected integrations to build the filter options.
+ * When currentSearchQueryJSON has policyID, options are scoped to those workspaces so form hydration and autocomplete stay consistent.
  */
 export default function useExportedToFilterOptions(): UseExportedToFilterDataResult {
+    const {currentSearchQueryJSON} = useSearchContext();
+    const policyIDs = currentSearchQueryJSON?.policyID;
+
     const {translate, localeCompare} = useLocalize();
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES);
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
-    const policyLevelExportTemplates = Object.values(policies ?? {}).flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
+    // When search is scoped to workspaces, use only those policies otherwise use all.
+    const policiesToUse = policyIDs !== undefined ? getAllPolicyValues(policyIDs, ONYXKEYS.COLLECTION.POLICY, policies) : Object.values(policies ?? {});
+    const policyLevelExportTemplates = policiesToUse.flatMap((policy) => getExportTemplates([], {}, translate, policy, false));
     const accountLevelExportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, true);
     const combinedExportTemplates = [...accountLevelExportTemplates, ...policyLevelExportTemplates];
 
@@ -51,7 +59,7 @@ export default function useExportedToFilterOptions(): UseExportedToFilterDataRes
 
     customExportTemplates.sort((a, b) => localeCompare(a, b));
 
-    const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies);
+    const connectedIntegrationNames = policyIDs && policyIDs.length === 0 ? new Set<string>() : getConnectedIntegrationNamesForPolicies(policies, policyIDs);
 
     const displayNameToConnectionName = new Map<string, string>(
         Object.entries(CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY).map(([connectionName, displayName]) => [displayName, connectionName]),
