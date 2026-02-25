@@ -215,7 +215,7 @@ function ScreenWrapperContainer({
         >
             <View
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                style={[style, paddingTopStyle, shouldEnableMaxHeight && {marginTop: viewportOffsetTop}]}
+                style={[shouldEnableMaxHeight && {marginTop: viewportOffsetTop}, style, paddingTopStyle]}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...keyboardDismissPanResponder.panHandlers}
             >
