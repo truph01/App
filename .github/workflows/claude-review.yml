@@ -48,6 +48,10 @@ jobs:
             "$GITHUB_WORKSPACE/.claude/skills/coding-standards/rules" \
             "$GITHUB_WORKSPACE/.claude/allowed-rules.txt"
 
+      - name: Load code review JSON schema
+        id: schema
+        run: echo "json=$(jq -c . "$GITHUB_WORKSPACE/.claude/schemas/code-review-output.json")" >> "$GITHUB_OUTPUT"
+
       - name: Run Claude Code (code)
         id: code-review
         if: steps.filter.outputs.code == 'true'
@@ -59,10 +63,10 @@ jobs:
           prompt: "/review-code-pr REPO: ${{ github.repository }} PR_NUMBER: ${{ github.event.pull_request.number }}"
           claude_args: |
             --model claude-opus-4-6
-            --allowedTools "Task,Glob,Grep,Read,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(addPrReaction.sh:*),Bash(createInlineComment.sh:*)" --json-schema '{"type":"object","properties":{"violations":{"type":"array","items":{"type":"object","properties":{"ruleId":{"type":"string"},"path":{"type":"string"},"line":{"type":"integer"},"body":{"type":"string"}},"required":["ruleId","path","line","body"]}}},"required":["violations"]}'
+            --allowedTools "Task,Glob,Grep,Read,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(addPrReaction.sh:*),Bash(createInlineComment.sh:*)" --json-schema '${{ steps.schema.outputs.json }}'
 
       - name: Post code review results
-        if: steps.filter.outputs.code == 'true'
+        if: steps.code-review.outcome == 'success' && steps.filter.outputs.code == 'true'
         env:
           STRUCTURED_OUTPUT: ${{ steps.code-review.outputs.structured_output }}
         run: |
