@@ -261,7 +261,7 @@ function getRulesModifiedMessage(
     });
 
     const fragments = [...standaloneFragments, ...listFragment];
-    return fragments.length > 0 ? translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules) : undefined;
+    return fragments.length > 0 ? translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules) : '';
 }
 
 /**
