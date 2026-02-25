@@ -26,7 +26,6 @@ import type {GpsPoint} from './index';
 import {
     createDistanceRequest,
     getMoneyRequestParticipantsFromReport,
-    getRecentWaypoints,
     requestMoney,
     setCustomUnitRateID,
     setMoneyRequestDistance,
