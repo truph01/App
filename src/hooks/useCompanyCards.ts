@@ -65,7 +65,7 @@ function buildCompanyCardEntries(
     // Phase 1: Assigned cards first — these are the source of truth.
     // Skip Amex Direct parent cards even if they were previously assigned.
     for (const card of Object.values(assignedCards)) {
-        if (!card?.cardName || parentCardNames.has(card.cardName)) {
+        if (!card?.cardName || parentCardNames.has(normalizeCardName(card.cardName))) {
             continue;
         }
         const encryptedCardNumber = card.encryptedCardNumber ?? card.cardName;
