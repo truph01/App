@@ -1511,6 +1511,11 @@ const translations: TranslationDeepObject<typeof en> = {
         },
         duplicateNonDefaultWorkspacePerDiemError:
             'Nie możesz duplikować wydatków z tytułu diet między przestrzeniami roboczymi, ponieważ stawki mogą się różnić między poszczególnymi przestrzeniami.',
+        rulesModifiedFields: {
+            reportName: (value: string) => `przeniesiono do raportu „${value}”`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments} przez <a href="${route}">${isPersonalRules ? 'zasady wydatków' : 'zasady miejsca pracy'}</a>`,
+        },
     },
     transactionMerge: {
         listPage: {

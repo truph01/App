@@ -1508,6 +1508,11 @@ const translations: TranslationDeepObject<typeof en> = {
             format: (fragments: string, route: string) => `${fragments} via <a href="${route}">regras do espaço de trabalho</a>`,
         },
         duplicateNonDefaultWorkspacePerDiemError: 'Você não pode duplicar despesas de diárias entre espaços de trabalho porque as tarifas podem variar entre eles.',
+        rulesModifiedFields: {
+            reportName: (value: string) => `movido para o relatório "${value}"`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments} via <a href="${route}">${isPersonalRules ? 'regras de despesa' : 'regras do workspace'}</a>`,
+        },
     },
     transactionMerge: {
         listPage: {

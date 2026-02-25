@@ -1503,6 +1503,10 @@ const translations: TranslationDeepObject<typeof en> = {
             format: (fragments: string, route: string) => `${fragments}（<a href="${route}">ワークスペースルール</a>経由）`,
         },
         duplicateNonDefaultWorkspacePerDiemError: 'ワークスペースごとに日当レートが異なる場合があるため、日当経費をワークスペース間で複製することはできません。',
+        rulesModifiedFields: {
+            reportName: (value: string) => `レポート「${value}」に移動しました`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments}（<a href="${route}">${isPersonalRules ? '経費ルール' : 'ワークスペースルール'}</a> 経由）`,
+        },
     },
     transactionMerge: {
         listPage: {

@@ -1511,6 +1511,11 @@ const translations: TranslationDeepObject<typeof en> = {
             format: (fragments: string, route: string) => `${fragments} via <a href="${route}">werkruimte­regels</a>`,
         },
         duplicateNonDefaultWorkspacePerDiemError: 'Je kunt dagvergoedingen niet dupliceren tussen werkruimtes, omdat de tarieven per werkruimte kunnen verschillen.',
+        rulesModifiedFields: {
+            reportName: (value: string) => `verplaatst naar rapport ‘${value}’`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments} via <a href="${route}">${isPersonalRules ? 'uitgaveregels' : 'werkruimte-instellingen'}</a>`,
+        },
     },
     transactionMerge: {
         listPage: {
