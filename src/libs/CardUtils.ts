@@ -815,7 +815,9 @@ function getAmexDirectParentCardNames(accountList: string[], feedName?: CompanyC
 
     // Identify parent cards (2 segments) that have a matching child with same card type AND digits
     // Filter for parents that exist in the child lookup
-    const parentNames = parsedAccounts.filter(({segments}) => segments.length === 2 && childKeys.has(`${segments.at(0)}\0${segments.at(1)}`)).map((account) => account.name);
+    const parentNames = parsedAccounts
+        .filter(({segments}) => segments.length === 2 && childKeys.has(`${segments.at(0)}\0${segments.at(1)}`))
+        .map((account) => normalizeCardName(account.name));
 
     return new Set(parentNames);
 }
@@ -828,7 +830,7 @@ function filterAmexDirectParentCard(accountList: string[], feedName?: CompanyCar
     if (parentCards.size === 0) {
         return accountList;
     }
-    return accountList.filter((name) => !parentCards.has(name));
+    return accountList.filter((name) => !parentCards.has(normalizeCardName(name)));
 }
 
 /**
