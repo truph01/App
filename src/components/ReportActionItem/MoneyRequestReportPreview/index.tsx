@@ -124,7 +124,7 @@ function MoneyRequestReportPreview({
     const newTransactions = useNewTransactions(hasOnceLoadedReportActions, transactions);
     const isFocused = useIsFocused();
     // We only want to highlight the new expenses if the screen is focused.
-    const newTransactionIDs = useMemo(() => (isFocused ? new Set(newTransactions.map((transaction) => transaction.transactionID)) : undefined), [isFocused, newTransactions]);
+    const newTransactionIDs = isFocused ? new Set(newTransactions.map((transaction) => transaction.transactionID)) : undefined;
 
     const renderItem: ListRenderItem<Transaction> = ({item}) => (
         <TransactionPreview
