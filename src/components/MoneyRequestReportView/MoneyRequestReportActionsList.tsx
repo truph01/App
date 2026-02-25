@@ -20,7 +20,7 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {PressableWithFeedback} from '@components/Pressable';
 import ScrollView from '@components/ScrollView';
-import {useSearchContext} from '@components/Search/SearchContext';
+import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import Text from '@components/Text';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -111,9 +111,6 @@ type MoneyRequestReportListProps = {
     /** List of transactions that arrived when the report was open */
     newTransactions: OnyxTypes.Transaction[];
 
-    /** Violations indexed by transaction ID */
-    violations?: Record<string, OnyxTypes.TransactionViolation[]>;
-
     /** If the report has newer actions to load */
     hasNewerActions: boolean;
 
@@ -133,7 +130,6 @@ function MoneyRequestReportActionsList({
     reportActions = [],
     transactions = [],
     newTransactions,
-    violations,
     hasNewerActions,
     hasOlderActions,
     hasPendingDeletionTransaction,
@@ -201,7 +197,8 @@ function MoneyRequestReportActionsList({
     const [enableScrollToEnd, setEnableScrollToEnd] = useState<boolean>(false);
     const [lastActionEventId, setLastActionEventId] = useState<string>('');
 
-    const {selectedTransactionIDs, setSelectedTransactions, clearSelectedTransactions} = useSearchContext();
+    const {selectedTransactionIDs} = useSearchStateContext();
+    const {setSelectedTransactions, clearSelectedTransactions} = useSearchActionsContext();
 
     useFilterSelectedTransactions(transactions);
 
@@ -853,7 +850,6 @@ function MoneyRequestReportActionsList({
                                     newTransactions={newTransactions}
                                     hasPendingDeletionTransaction={hasPendingDeletionTransaction}
                                     reportActions={reportActions}
-                                    violations={violations}
                                     scrollToNewTransaction={scrollToNewTransaction}
                                     policy={policy}
                                     hasComments={visibleReportActions.length > 0}
