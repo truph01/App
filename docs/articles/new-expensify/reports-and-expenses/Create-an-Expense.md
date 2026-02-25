@@ -73,7 +73,8 @@ You can create an expense by scanning a receipt, entering details manually, or t
 3. Select **GPS** and tap **Start**.
 4. Drive to your destination — tracking runs in the background.
 5. Tap **Stop** when you arrive and confirm by selecting **Stop GPS tracking**.
-6. Review the route and expense details, then tap **Create expense**.
+6. Review the route summary, then tap **Next**.
+7. Review the expense details, then tap **Create expense**.
 
 For more details on all distance methods including manual entry, see [Distance Expenses](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Distance-Expenses).
 

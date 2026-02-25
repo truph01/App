@@ -22,7 +22,8 @@ To create an expense using GPS tracking based on the distance traveled:
 3. Select **GPS** from the top row.
 4. Tap **Start** and drive to your destination — tracking runs in the background.
 5. Tap **Stop** when you arrive and confirm by selecting **Stop GPS tracking**.
-6. Review the route and expense details, then tap **Create expense**.
+6. Review the route summary showing your start and end addresses, then tap **Next**.
+7. Review the expense details, then tap **Create expense**.
 
 **Note:** GPS tracking is available on iOS and Android only. On Web, you'll see a prompt to download the mobile app when selecting the GPS option.
 
