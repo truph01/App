@@ -1084,6 +1084,7 @@ function changeTransactionsReport({
                 reportID: transaction.reportID,
                 comment: transaction.comment,
                 modifiedAmount: transaction.modifiedAmount,
+                modifiedCurrency: transaction.modifiedCurrency,
                 modifiedMerchant: transaction.modifiedMerchant,
                 ...(shouldClearAmount && {pendingAction: transaction.pendingAction ?? null}),
                 ...(shouldClearAmount && {convertedAmount: transaction.convertedAmount}),
