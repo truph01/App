@@ -681,6 +681,7 @@ type CreateDistanceRequestInformation = {
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
     customUnitPolicyID?: string;
     shouldHandleNavigation?: boolean;
+    personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
 };
 
@@ -1006,12 +1007,6 @@ Onyx.connectWithoutView({
     callback: (value) => (recentAttendees = value),
 });
 
-let deprecatedRecentWaypoints: OnyxTypes.RecentWaypoint[] = [];
-Onyx.connect({
-    key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
-    callback: (val) => (deprecatedRecentWaypoints = val ?? []),
-});
-
 function getAllPersonalDetails(): OnyxTypes.PersonalDetailsList {
     return allPersonalDetails;
 }
@@ -1038,10 +1033,6 @@ function getCurrentUserEmail(): string {
 
 function getUserAccountID(): number {
     return userAccountID;
-}
-
-function getRecentWaypoints(): OnyxTypes.RecentWaypoint[] {
-    return deprecatedRecentWaypoints;
 }
 
 /**
@@ -1975,6 +1966,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
         currentUserEmailParam,
         hasViolations,
         quickAction,
+        personalDetails,
     } = moneyRequestParams;
     const {policy, policyCategories, policyTagList} = policyParams;
     const {
@@ -2189,7 +2181,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
     if (isMoneyRequestToManagerMcTest) {
         const date = new Date();
         const isTestReceipt = transaction.receipt?.isTestReceipt ?? false;
-        const managerMcTestParticipant = getManagerMcTestParticipant(currentUserAccountIDParam) ?? {};
+        const managerMcTestParticipant = getManagerMcTestParticipant(currentUserAccountIDParam, personalDetails) ?? {};
         const optimisticIOUReportAction = buildOptimisticIOUReportAction({
             type: isScanRequest && !isTestReceipt ? CONST.IOU.REPORT_ACTION_TYPE.CREATE : CONST.IOU.REPORT_ACTION_TYPE.PAY,
             amount: iou.report?.total ?? 0,
@@ -3625,7 +3617,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         iouReport.parentReportActionID = reportPreviewAction.reportActionID;
     }
 
-    const shouldCreateOptimisticPersonalDetails = isNewChatReport && !allPersonalDetails[payerAccountID];
+    const shouldCreateOptimisticPersonalDetails = isNewChatReport && !(personalDetails?.[payerAccountID] ?? allPersonalDetails[payerAccountID]);
     // Add optimistic personal details for participant
     const optimisticPersonalDetailListAction = shouldCreateOptimisticPersonalDetails
         ? {
@@ -8296,6 +8288,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
         recentWaypoints = [],
         customUnitPolicyID,
         shouldHandleNavigation = true,
+        personalDetails,
         betas,
     } = distanceRequestInformation;
     const {policy, policyCategories, policyTagList, policyRecentlyUsedCategories, policyRecentlyUsedTags} = policyParams;
@@ -8454,6 +8447,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             transactionViolations,
             quickAction,
             policyRecentlyUsedCurrencies,
+            personalDetails,
             betas,
         });
 
@@ -13875,7 +13869,6 @@ export {
     getAllReportActionsFromIOU,
     getCurrentUserEmail,
     getUserAccountID,
-    getRecentWaypoints,
     getReceiptError,
     getSearchOnyxUpdate,
     getPolicyTags,
