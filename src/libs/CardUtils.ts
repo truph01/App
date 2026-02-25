@@ -36,7 +36,7 @@ import type {
     CompanyCardFeedWithDomainID,
     CompanyCardFeedWithNumber,
     CompanyFeeds,
-    OldDotBankName,
+    NonConnectableBankName,
 } from '@src/types/onyx/CardFeeds';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type IconAsset from '@src/types/utils/IconAsset';
@@ -574,7 +574,7 @@ function getBankName(feedType: CardFeedWithNumber | CardFeedWithDomainID): strin
         [CONST.EXPENSIFY_CARD.BANK]: CONST.COMPANY_CARDS.BANKS.AMEX,
         [CONST.COMPANY_CARD.FEED_BANK_NAME.MOCK_BANK]: CONST.COMPANY_CARDS.BANKS.MOCK_BANK,
         [CONST.COMPANY_CARD.FEED_BANK_NAME.PEX]: CONST.COMPANY_CARDS.NON_CONNECTABLE_BANKS.PEX,
-    } satisfies Partial<Record<CardFeed, BankName | OldDotBankName | CardTypeName>>;
+    } satisfies Partial<Record<CardFeed, BankName | NonConnectableBankName | CardTypeName>>;
 
     // In existing OldDot setups other variations of feeds could exist, ex: vcf2, vcf3, oauth.americanexpressfdx.com 2003
     const feedKey = (Object.keys(feedNamesMapping) as Array<keyof typeof feedNamesMapping>).find((feed) => feedType?.startsWith(feed));
@@ -590,8 +590,8 @@ function getBankName(feedType: CardFeedWithNumber | CardFeedWithDomainID): strin
     return feedNamesMapping[feedKey];
 }
 
-const getBankCardDetailsImage = (bank: BankName | OldDotBankName, illustrations: IllustrationsType, companyCardIllustrations: CompanyCardBankIcons): IconAsset => {
-    const iconMap: Record<BankName | OldDotBankName, IconAsset> = {
+const getBankCardDetailsImage = (bank: BankName | NonConnectableBankName, illustrations: IllustrationsType, companyCardIllustrations: CompanyCardBankIcons): IconAsset => {
+    const iconMap: Record<BankName | NonConnectableBankName, IconAsset> = {
         [CONST.COMPANY_CARDS.BANKS.AMEX]: companyCardIllustrations.AmexCardCompanyCardDetail,
         [CONST.COMPANY_CARDS.BANKS.BANK_OF_AMERICA]: companyCardIllustrations.BankOfAmericaCompanyCardDetail,
         [CONST.COMPANY_CARDS.BANKS.CAPITAL_ONE]: companyCardIllustrations.CapitalOneCompanyCardDetail,
@@ -736,7 +736,7 @@ function getPlaidCountry(outputCurrency?: string, currencyList?: CurrencyList, c
     return country ?? '';
 }
 
-function getCorrectStepForPlaidSelectedBank(selectedBank: BankName | OldDotBankName) {
+function getCorrectStepForPlaidSelectedBank(selectedBank: BankName | NonConnectableBankName) {
     if (selectedBank === CONST.COMPANY_CARDS.BANKS.STRIPE) {
         return CONST.COMPANY_CARDS.STEP.CARD_INSTRUCTIONS;
     }

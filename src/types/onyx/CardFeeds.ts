@@ -324,7 +324,7 @@ export type {
     CardFeedWithNumber,
     CardFeedWithDomainID,
     BankName,
-    NonConnectableBankName as OldDotBankName,
+    NonConnectableBankName,
     CardType,
     CardTypeName,
     CompanyCardFeed,
