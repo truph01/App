@@ -800,28 +800,20 @@ function getAmexDirectParentCardNames(accountList: string[], feedName?: CompanyC
         return new Set();
     }
 
-    // Collect (cardType, digits) pairs from child cards (3+ segments)
-    const childKeys = new Set<string>();
-    for (const name of accountList) {
-        const segments = name.split(' - ');
-        const cardType = segments.at(0);
-        const digits = segments.at(-1);
-        if (segments.length >= 3 && cardType && digits) {
-            childKeys.add(`${cardType}\0${digits}`);
-        }
-    }
+    // Map account names into parts once to avoid repeated splitting
+    const parsedAccounts = accountList.map((name) => ({
+        name,
+        segments: name.split(' - '),
+    }));
+
+    // Create a lookup for children: "CardType|Digits"
+    const childKeys = new Set(parsedAccounts.filter(({segments}) => segments.length >= 3).map(({segments}) => `${segments.at(0)}\0${segments.at(-1)}`));
 
     // Identify parent cards (2 segments) that have a matching child with same card type AND digits
-    const parentCards = new Set<string>();
-    for (const name of accountList) {
-        const segments = name.split(' - ');
-        const cardType = segments.at(0);
-        const digits = segments.at(1);
-        if (segments.length === 2 && cardType && digits && childKeys.has(`${cardType}\0${digits}`)) {
-            parentCards.add(name);
-        }
-    }
-    return parentCards;
+    // Filter for parents that exist in the child lookup
+    const parentNames = parsedAccounts.filter(({segments}) => segments.length === 2 && childKeys.has(`${segments.at(0)}\0${segments.at(1)}`)).map((account) => account.name);
+
+    return new Set(parentNames);
 }
 
 /**
