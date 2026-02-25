@@ -830,6 +830,9 @@ type OriginalMessageModifiedExpense = {
     /** The fields that were modified by policy rules */
     policyRulesModifiedFields?: PolicyRulesModifiedFields;
 
+    /** The fields that were modified by personal rules */
+    personalRulesModifiedFields?: PersonalRulesModifiedFields;
+
     /** The Concierge reasoning for the action */
     reasoning?: string;
 };
@@ -863,6 +866,12 @@ type PolicyRulesModifiedFields = {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         field_id_TAX: PolicyRuleTaxRate;
     };
+};
+
+/** Personal rules modified fields */
+type PersonalRulesModifiedFields = PolicyRulesModifiedFields & {
+    /** The value that the report name was changed to */
+    reportName?: string;
 };
 
 /** Model of a `travel update` report action */
@@ -1410,6 +1419,7 @@ export type {
     OriginalMessageSource,
     Decision,
     PolicyRulesModifiedFields,
+    PersonalRulesModifiedFields,
     OriginalMessageChangeLog,
     OriginalMessagePolicyChangeLog,
     JoinWorkspaceResolution,

@@ -7,7 +7,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Policy, PolicyTagLists, Report, ReportAction} from '@src/types/onyx';
-import type {PolicyRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
+import type {PolicyRulesModifiedFields, PersonalRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
 import ObjectUtils from '@src/types/utils/ObjectUtils';
 import {getDecodedCategoryName, isCategoryMissing} from './CategoryUtils';
 import {convertToDisplayString} from './CurrencyUtils';
@@ -202,8 +202,8 @@ function getMovedFromOrToReportMessage(translate: LocalizedTranslate, movedFromR
     }
 }
 
-function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields, policyID: string, hasPolicyRuleAccess: boolean) {
-    const route = hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
+function getRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields | PersonalRulesModifiedFields, isPersonalRules: boolean, policyID?: string, hasPolicyRuleAccess?: boolean) {
+    const route = policyID && hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
     const entries = ObjectUtils.typedEntries(fields);
 
     const fragments = entries.map(([key, value], i) => {
@@ -233,6 +233,9 @@ function getPolicyRulesModifiedMessage(translate: LocalizedTranslate, fields: Po
         // The backend saves the description field as `comment` key, but we need to display it as `description` key.
         if (key === 'comment') {
             return translate('iou.policyRulesModifiedFields.common', 'description', Parser.htmlToMarkdown(updatedValue), isFirst);
+        }
+        if (key === 'reportName') {
+            return translate('iou.policyRulesModifiedFields.common', key, updatedValue, isFirst);
         }
 
         return translate('iou.policyRulesModifiedFields.common', key, updatedValue, isFirst);
@@ -522,13 +525,18 @@ function getForReportAction({
     if (hasPolicyRulesModifiedFields) {
         const rulePolicyID = reportActionOriginalMessage.policyID;
         const policyRulesModifiedFields = reportActionOriginalMessage.policyRulesModifiedFields;
+        const personalRulesModifiedFields = reportActionOriginalMessage.personalRulesModifiedFields;
+
+        if (personalRulesModifiedFields) {
+            return getRulesModifiedMessage(translateLocal, personalRulesModifiedFields, true);
+        }
 
         if (policyRulesModifiedFields && rulePolicyID) {
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             const rulePolicy = getPolicy(rulePolicyID);
             const hasPolicyRuleAccess = !!rulePolicy?.areRulesEnabled && isPolicyAdmin(rulePolicy, storedCurrentUserLogin);
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            return getPolicyRulesModifiedMessage(translateLocal, policyRulesModifiedFields, rulePolicyID, hasPolicyRuleAccess);
+            return getRulesModifiedMessage(translateLocal, policyRulesModifiedFields, false,rulePolicyID, hasPolicyRuleAccess);
         }
     }
 
@@ -774,10 +782,15 @@ function getForReportActionTemp({
     const hasPolicyRulesModifiedFields = isReportActionOriginalMessageAnObject && 'policyRulesModifiedFields' in reportActionOriginalMessage && 'policyID' in reportActionOriginalMessage;
     if (hasPolicyRulesModifiedFields) {
         const policyRulesModifiedFields = reportActionOriginalMessage.policyRulesModifiedFields;
+        const personalRulesModifiedFields = reportActionOriginalMessage.personalRulesModifiedFields;
+
+        if (personalRulesModifiedFields) {
+            return getRulesModifiedMessage(translate, personalRulesModifiedFields, true);
+        }
 
         if (policyRulesModifiedFields && policy?.id) {
             const hasPolicyRuleAccess = !!policy?.areRulesEnabled && isPolicyAdmin(policy, currentUserLogin);
-            return getPolicyRulesModifiedMessage(translate, policyRulesModifiedFields, policy?.id, hasPolicyRuleAccess);
+            return getRulesModifiedMessage(translate, policyRulesModifiedFields, false, policy?.id, hasPolicyRuleAccess);
         }
     }
 
