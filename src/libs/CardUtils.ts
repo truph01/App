@@ -1345,7 +1345,6 @@ export {
     isCardClosed,
     isPlaidSupportedCountry,
     filterAmexDirectParentCard,
-    getAmexDirectParentCardNames,
     getFilteredCardList,
     hasOnlyOneCardToAssign,
     checkIfNewFeedConnected,
