@@ -7,7 +7,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Policy, PolicyTagLists, Report, ReportAction} from '@src/types/onyx';
-import type {PolicyRulesModifiedFields, PersonalRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
+import type {PersonalRulesModifiedFields, PolicyRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
 import ObjectUtils from '@src/types/utils/ObjectUtils';
 import {getDecodedCategoryName, isCategoryMissing} from './CategoryUtils';
 import {convertToDisplayString} from './CurrencyUtils';
@@ -202,7 +202,13 @@ function getMovedFromOrToReportMessage(translate: LocalizedTranslate, movedFromR
     }
 }
 
-function getRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRulesModifiedFields | PersonalRulesModifiedFields, isPersonalRules: boolean, policyID?: string, hasPolicyRuleAccess?: boolean) {
+function getRulesModifiedMessage(
+    translate: LocalizedTranslate,
+    fields: PolicyRulesModifiedFields | PersonalRulesModifiedFields,
+    isPersonalRules: boolean,
+    policyID?: string,
+    hasPolicyRuleAccess?: boolean,
+) {
     const route = policyID && hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
     const entries = ObjectUtils.typedEntries(fields);
 
@@ -540,7 +546,7 @@ function getForReportAction({
             const rulePolicy = getPolicy(rulePolicyID);
             const hasPolicyRuleAccess = !!rulePolicy?.areRulesEnabled && isPolicyAdmin(rulePolicy, storedCurrentUserLogin);
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            return getRulesModifiedMessage(translateLocal, policyRulesModifiedFields, false,rulePolicyID, hasPolicyRuleAccess);
+            return getRulesModifiedMessage(translateLocal, policyRulesModifiedFields, false, rulePolicyID, hasPolicyRuleAccess);
         }
     }
 
