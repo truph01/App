@@ -1528,7 +1528,8 @@ const translations = {
                 const field = translations.common[key].toLowerCase();
                 return isFirst ? `set the ${field} to "${value}"` : `${field} to "${value}"`;
             },
-            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments} via <a href="${route}">${isPersonalRules ? 'personal expense rules' : 'workspace rules'}</a>`,
+            format: (fragments: string, route: string, isPersonalRules: boolean) =>
+                `${fragments} via <a href="${route}">${isPersonalRules ? 'personal expense rules' : 'workspace rules'}</a>`,
         },
         duplicateNonDefaultWorkspacePerDiemError: "You can't duplicate per diem expenses across workspaces because the rates may differ between workspaces.",
     },
