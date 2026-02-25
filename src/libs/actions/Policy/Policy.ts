@@ -199,7 +199,7 @@ type BuildPolicyDataOptions = {
 
 // TODO: Remove this type once we complete refactoring the buildPolicyData function to use isSelfTourViewed. Refactor issue: https://github.com/Expensify/App/issues/66424
 type CreateWorkspaceDataOptions = Omit<BuildPolicyDataOptions, 'isSelfTourViewed'> & {
-    isSelfTourViewed: boolean;
+    isSelfTourViewed: boolean | undefined;
 };
 
 type DuplicatePolicyDataOptions = {

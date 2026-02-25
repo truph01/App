@@ -536,7 +536,7 @@ function getMissingOnyxUpdates(updateIDFrom = 0, updateIDTo: number | string = 0
 }
 
 type CreateWorkspaceWithPolicyDraftParams = {
-    isSelfTourViewed: boolean;
+    isSelfTourViewed: boolean | undefined;
     introSelected: OnyxEntry<OnyxTypes.IntroSelected>;
     policyOwnerEmail?: string;
     policyName?: string;
@@ -606,7 +606,7 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
 }
 
 type SavePolicyDraftByNewWorkspaceParams = {
-    isSelfTourViewed: boolean;
+    isSelfTourViewed: boolean | undefined;
     policyID?: string;
     policyName?: string;
     policyOwnerEmail?: string;
@@ -675,7 +675,12 @@ function savePolicyDraftByNewWorkspace({
  * When the exitTo route is 'workspace/new', we create a new
  * workspace and navigate to it
  */
-function setUpPoliciesAndNavigate(session: OnyxEntry<OnyxTypes.Session>, introSelected: OnyxEntry<OnyxTypes.IntroSelected>, activePolicyID: string | undefined, isSelfTourViewed: boolean) {
+function setUpPoliciesAndNavigate(
+    session: OnyxEntry<OnyxTypes.Session>,
+    introSelected: OnyxEntry<OnyxTypes.IntroSelected>,
+    activePolicyID: string | undefined,
+    isSelfTourViewed: boolean | undefined,
+) {
     const currentUrl = getCurrentUrl();
     if (!session || !currentUrl?.includes('exitTo')) {
         return;
