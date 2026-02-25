@@ -50,6 +50,27 @@ type UseAutocompleteSuggestionsParams = {
     translate: LocaleContextProps['translate'];
 };
 
+// Static autocomplete lists derived from CONST values, computed once at module load
+const DATA_TYPE_VALUES = Object.values(CONST.SEARCH.DATA_TYPES);
+const GROUP_BY_FRIENDLY_VALUES = Object.values(CONST.SEARCH.GROUP_BY).map((value) => getUserFriendlyValue(value));
+const VIEW_FRIENDLY_VALUES = Object.values(CONST.SEARCH.VIEW).map((value) => getUserFriendlyValue(value));
+const EXPENSE_TYPE_FRIENDLY_VALUES = Object.values(CONST.SEARCH.TRANSACTION_TYPE).map((value) => getUserFriendlyValue(value));
+const WITHDRAWAL_TYPE_VALUES = Object.values(CONST.SEARCH.WITHDRAWAL_TYPE);
+const BOOLEAN_VALUES = Object.values(CONST.SEARCH.BOOLEAN);
+const ACTION_FILTER_VALUES = Object.values(CONST.SEARCH.ACTION_FILTERS);
+const IS_VALUES_LIST = Object.values(CONST.SEARCH.IS_VALUES);
+const EXPENSE_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.EXPENSE);
+const EXPENSE_REPORT_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.EXPENSE_REPORT);
+const INVOICE_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.INVOICE);
+const TRIP_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.TRIP);
+const TASK_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.TASK);
+const DEFAULT_STATUS_VALUES = Object.values({
+    ...CONST.SEARCH.STATUS.EXPENSE,
+    ...CONST.SEARCH.STATUS.INVOICE,
+    ...CONST.SEARCH.STATUS.TRIP,
+    ...CONST.SEARCH.STATUS.TASK,
+});
+
 /**
  * Computes autocomplete suggestions for the search router.
  *
@@ -254,8 +275,7 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.TYPE: {
-            const typeAutocompleteList = Object.values(CONST.SEARCH.DATA_TYPES);
-            const filteredTypes = typeAutocompleteList
+            const filteredTypes = DATA_TYPE_VALUES
                 .filter((type) => type.toLowerCase().includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(type.toLowerCase()))
                 .sort();
 
@@ -267,7 +287,7 @@ function useAutocompleteSuggestions({
                     case CONST.SEARCH.DATA_TYPES.EXPENSE:
                     case CONST.SEARCH.DATA_TYPES.INVOICE:
                     case CONST.SEARCH.DATA_TYPES.TRIP:
-                        return Object.values(CONST.SEARCH.GROUP_BY).map((value) => getUserFriendlyValue(value));
+                        return GROUP_BY_FRIENDLY_VALUES;
                     default:
                         return [];
                 }
@@ -278,8 +298,7 @@ function useAutocompleteSuggestions({
             return filteredGroupBy.map((groupByValue) => ({filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.GROUP_BY, text: groupByValue}));
         }
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.VIEW: {
-            const viewAutocompleteList = Object.values(CONST.SEARCH.VIEW).map((value) => getUserFriendlyValue(value));
-            const filteredViews = viewAutocompleteList.filter(
+            const filteredViews = VIEW_FRIENDLY_VALUES.filter(
                 (viewValue) => viewValue.toLowerCase().includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(viewValue.toLowerCase()),
             );
             return filteredViews.map((viewValue) => ({filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.VIEW, text: viewValue}));
@@ -289,27 +308,22 @@ function useAutocompleteSuggestions({
                 let suggestedStatuses;
                 switch (currentType) {
                     case CONST.SEARCH.DATA_TYPES.EXPENSE:
-                        suggestedStatuses = Object.values(CONST.SEARCH.STATUS.EXPENSE);
+                        suggestedStatuses = EXPENSE_STATUS_VALUES;
                         break;
                     case CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT:
-                        suggestedStatuses = Object.values(CONST.SEARCH.STATUS.EXPENSE_REPORT);
+                        suggestedStatuses = EXPENSE_REPORT_STATUS_VALUES;
                         break;
                     case CONST.SEARCH.DATA_TYPES.INVOICE:
-                        suggestedStatuses = Object.values(CONST.SEARCH.STATUS.INVOICE);
+                        suggestedStatuses = INVOICE_STATUS_VALUES;
                         break;
                     case CONST.SEARCH.DATA_TYPES.TRIP:
-                        suggestedStatuses = Object.values(CONST.SEARCH.STATUS.TRIP);
+                        suggestedStatuses = TRIP_STATUS_VALUES;
                         break;
                     case CONST.SEARCH.DATA_TYPES.TASK:
-                        suggestedStatuses = Object.values(CONST.SEARCH.STATUS.TASK);
+                        suggestedStatuses = TASK_STATUS_VALUES;
                         break;
                     default:
-                        suggestedStatuses = Object.values({
-                            ...CONST.SEARCH.STATUS.EXPENSE,
-                            ...CONST.SEARCH.STATUS.INVOICE,
-                            ...CONST.SEARCH.STATUS.TRIP,
-                            ...CONST.SEARCH.STATUS.TASK,
-                        });
+                        suggestedStatuses = DEFAULT_STATUS_VALUES;
                 }
                 return suggestedStatuses.filter((value) => value !== '').map((value) => getUserFriendlyValue(value));
             })();
@@ -321,8 +335,9 @@ function useAutocompleteSuggestions({
             return filteredStatuses.map((status) => ({filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.STATUS, text: status}));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE: {
-            const expenseTypes = Object.values(CONST.SEARCH.TRANSACTION_TYPE).map((value) => getUserFriendlyValue(value));
-            const filteredExpenseTypes = expenseTypes.filter((expenseType) => expenseType.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(expenseType)).sort();
+            const filteredExpenseTypes = EXPENSE_TYPE_FRIENDLY_VALUES.filter(
+                (expenseType) => expenseType.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(expenseType),
+            ).sort();
 
             return filteredExpenseTypes.map((expenseType) => ({
                 filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.EXPENSE_TYPE,
@@ -330,8 +345,7 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE: {
-            const withdrawalTypes = Object.values(CONST.SEARCH.WITHDRAWAL_TYPE);
-            const filteredWithdrawalTypes = withdrawalTypes
+            const filteredWithdrawalTypes = WITHDRAWAL_TYPE_VALUES
                 .filter((withdrawalType) => withdrawalType.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(withdrawalType))
                 .sort();
 
@@ -376,8 +390,7 @@ function useAutocompleteSuggestions({
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE: {
-            const booleanTypes = Object.values(CONST.SEARCH.BOOLEAN);
-            const filteredValues = booleanTypes.filter((value) => value.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(value)).sort();
+            const filteredValues = BOOLEAN_VALUES.filter((value) => value.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(value)).sort();
 
             return filteredValues.map((value) => ({
                 filterKey: autocompleteKey,
@@ -405,7 +418,7 @@ function useAutocompleteSuggestions({
             }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.ACTION: {
-            const filteredActionTypes = Object.values(CONST.SEARCH.ACTION_FILTERS).filter((actionType) => {
+            const filteredActionTypes = ACTION_FILTER_VALUES.filter((actionType) => {
                 return actionType.toLowerCase().includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(actionType.toLowerCase());
             });
 
@@ -429,7 +442,7 @@ function useAutocompleteSuggestions({
             const isAutocompleteList = (() => {
                 switch (currentType) {
                     case CONST.SEARCH.DATA_TYPES.CHAT:
-                        return Object.values(CONST.SEARCH.IS_VALUES);
+                        return IS_VALUES_LIST;
                     default:
                         return [];
                 }
