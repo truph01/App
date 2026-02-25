@@ -29,7 +29,6 @@ jest.mock('@react-navigation/native', () => ({
  * to allow isolated testing of the useEffect behavior.
  */
 function useActiveTransactionIDsEffect(visualOrderTransactionIDs: string[]) {
-    // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     const visualOrderTransactionIDsKey = useMemo(() => visualOrderTransactionIDs.join(','), [visualOrderTransactionIDs]);
 
     useEffect(() => {
