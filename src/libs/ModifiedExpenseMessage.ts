@@ -210,38 +210,39 @@ function getRulesModifiedMessage(translate: LocalizedTranslate, fields: PolicyRu
         const isFirst = i === 0;
 
         if (key === 'reimbursable') {
-            return translate('iou.policyRulesModifiedFields.reimbursable', value as boolean);
+            return translate('iou.rulesModifiedFields.reimbursable', value as boolean);
         }
 
         if (key === 'billable') {
-            return translate('iou.policyRulesModifiedFields.billable', value as boolean);
+            return translate('iou.rulesModifiedFields.billable', value as boolean);
+        }
+
+        if (key === 'reportName') {
+            return translate('iou.rulesModifiedFields.reportName', value as string);
         }
 
         if (key === 'tax') {
             const taxEntry = value as PolicyRulesModifiedFields['tax'];
             const taxRateName = taxEntry?.field_id_TAX.name ?? '';
-            return translate('iou.policyRulesModifiedFields.tax', taxRateName, isFirst);
+            return translate('iou.rulesModifiedFields.tax', taxRateName, isFirst);
         }
 
         const updatedValue = value as string;
         if (key === 'category') {
-            return translate('iou.policyRulesModifiedFields.common', key, getDecodedCategoryName(updatedValue), isFirst);
+            return translate('iou.rulesModifiedFields.common', key, getDecodedCategoryName(updatedValue), isFirst);
         }
         if (key === 'tag') {
-            return translate('iou.policyRulesModifiedFields.common', key, getCommaSeparatedTagNameWithSanitizedColons(updatedValue), isFirst);
+            return translate('iou.rulesModifiedFields.common', key, getCommaSeparatedTagNameWithSanitizedColons(updatedValue), isFirst);
         }
         // The backend saves the description field as `comment` key, but we need to display it as `description` key.
         if (key === 'comment') {
-            return translate('iou.policyRulesModifiedFields.common', 'description', Parser.htmlToMarkdown(updatedValue), isFirst);
-        }
-        if (key === 'reportName') {
-            return translate('iou.policyRulesModifiedFields.common', key, updatedValue, isFirst);
+            return translate('iou.rulesModifiedFields.common', 'description', Parser.htmlToMarkdown(updatedValue), isFirst);
         }
 
-        return translate('iou.policyRulesModifiedFields.common', key, updatedValue, isFirst);
+        return translate('iou.rulesModifiedFields.common', key, updatedValue, isFirst);
     });
 
-    return translate('iou.policyRulesModifiedFields.format', formatList(fragments), route);
+    return translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules);
 }
 
 /**
