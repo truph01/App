@@ -57,7 +57,7 @@ function AddUnreportedExpenseFooter({selectedIds, report, reportToConfirm, repor
         },
         [selectedIds],
     );
-    const [selectedTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {selector: getSelectedTransactions});
+    const [selectedTransactions = CONST.EMPTY_OBJECT] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {selector: getSelectedTransactions});
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const [policyRecentlyUsedCurrencies] = useOnyx(ONYXKEYS.RECENTLY_USED_CURRENCIES);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
@@ -75,9 +75,7 @@ function AddUnreportedExpenseFooter({selectedIds, report, reportToConfirm, repor
         InteractionManager.runAfterInteractions(() => {
             if (report && isIOUReport(report)) {
                 convertBulkTrackedExpensesToIOU({
-                    transactions: [...selectedIds]
-                        .map((id) => selectedTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${id}`])
-                        .filter((transaction): transaction is NonNullable<typeof transaction> => transaction !== undefined),
+                    transactions: Object.values(selectedTransactions),
                     iouReport: report,
                     chatReport,
                     isASAPSubmitBetaEnabled,
