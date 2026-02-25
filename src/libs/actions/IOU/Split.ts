@@ -1880,6 +1880,7 @@ function getDistanceMerchantFromDistance(distanceInUnits: number, unit: Unit | u
         (phrase, ...parameters) => Localize.translate(currentLocale, phrase, ...parameters),
         (digit) => toLocaleDigit(currentLocale, digit),
         getCurrencySymbol,
+        true,
     );
 }
 
@@ -1978,8 +1979,7 @@ function initDraftSplitExpenseDataForEdit(draftTransaction: OnyxEntry<OnyxTypes.
             reportID,
             created: splitTransactionData?.created ?? '',
             category: splitTransactionData?.category ?? '',
-            distance: splitTransactionData?.customUnit?.quantity ?? undefined,
-            customUnitRateID: splitTransactionData?.customUnit?.customUnitRateID,
+            customUnit: splitTransactionData?.customUnit,
             waypoints: splitTransactionData?.waypoints ?? undefined,
             odometerStart: splitTransactionData?.odometerStart ?? undefined,
             odometerEnd: splitTransactionData?.odometerEnd ?? undefined,
