@@ -51,7 +51,7 @@ function cancelSpan(spanId: string) {
     if (!span) {
         return;
     }
-    Log.info(`[Sentry][${spanId}] Canceling span`, undefined, {spanId, spanExists: !!span, timestamp: Date.now()});
+    Log.info(`[Sentry][${spanId}] Canceling span`, undefined, {spanId, timestamp: Date.now()});
     span?.setAttribute(CONST.TELEMETRY.ATTRIBUTE_CANCELED, true);
     // In Sentry there are only OK or ERROR status codes.
     // We treat canceled spans as OK, so we can properly track spans that are not finished at all (their status would be different)
