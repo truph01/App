@@ -2,6 +2,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {useEffect} from 'react';
 import {InteractionManager} from 'react-native';
 import useOnyx from '@hooks/useOnyx';
+import {doesDeleteNavigateBackUrlIncludeDuplicatesReview} from '@libs/TransactionNavigationUtils';
 import {clearDeleteTransactionNavigateBackUrl} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 
@@ -16,6 +17,9 @@ function DeleteTransactionNavigateBackHandler() {
 
     useEffect(() => {
         if (!isFocused || !deleteTransactionNavigateBackUrl) {
+            return;
+        }
+        if (doesDeleteNavigateBackUrlIncludeDuplicatesReview(deleteTransactionNavigateBackUrl)) {
             return;
         }
         // Clear the URL after all interactions are processed to ensure all updates are completed before hiding the skeleton
