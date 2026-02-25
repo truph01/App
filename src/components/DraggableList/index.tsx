@@ -2,7 +2,7 @@ import type {DragEndEvent} from '@dnd-kit/core';
 import {closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {restrictToParentElement, restrictToVerticalAxis} from '@dnd-kit/modifiers';
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from '@dnd-kit/sortable';
-import React, {Fragment, useEffect, useRef, useState} from 'react';
+import React, {Fragment, useEffect, useId, useRef} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type {ScrollView as RNScrollView} from 'react-native';
 import ScrollView from '@components/ScrollView';
@@ -28,8 +28,8 @@ function DraggableList<T>({
 }: DraggableListProps<T> & {ref?: React.ForwardedRef<RNScrollView>}) {
     const styles = useThemeStyles();
 
-    // Generate a unique ID per mount to ensure DndContext state resets when component remounts
-    const [instanceId] = useState(() => `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    // Unique ID per mount to ensure DndContext state resets when component remounts
+    const instanceId = useId();
 
     // Track if a drag is currently active to avoid dispatching global Escape when not needed
     const isDraggingRef = useRef(false);
