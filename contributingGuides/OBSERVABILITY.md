@@ -117,7 +117,7 @@ User-facing latency with thresholds (P90):
 - **App start time**: 3s
 - **OD → ND transition**: 3s
 - **Open report**: 1s
-- **Navigate to Reports tab**: 400ms
+- **Navigate to Reports tab**: 300ms/600ms (cold/warm)
 - **Navigate to Inbox tab**: 400ms
 - **Open search modal**: 400ms
 - **Open Create Expense**: 400ms
