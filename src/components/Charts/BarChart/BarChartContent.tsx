@@ -22,7 +22,9 @@ import variables from '@styles/variables';
 /** Inner padding between bars (0.3 = 30% of bar width) */
 const BAR_INNER_PADDING = 0.3;
 
-/** Extra pixel spacing between the chart boundary and the data range, applied per side (Victory's `domainPadding` prop) */
+/** Extra pixel spacing between the chart boundary and the data range, applied per side (Victory's `domainPadding` prop) 
+ * We need bottom: 1 for proper display of the bottom label
+*/
 const BASE_DOMAIN_PADDING = {top: 32, bottom: 1, left: 0, right: 0};
 
 type BarChartProps = CartesianChartProps & {

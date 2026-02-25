@@ -1,4 +1,4 @@
-import {Circle, Group, Line as SkiaLine, Text as SkiaText, useFont, vec} from '@shopify/react-native-skia';
+import {Group, Text as SkiaText, useFont, vec} from '@shopify/react-native-skia';
 import React, {useCallback, useMemo, useState} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import {View} from 'react-native';
@@ -7,6 +7,8 @@ import {CartesianChart, Line} from 'victory-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import ChartHeader from '@components/Charts/components/ChartHeader';
 import ChartTooltip from '@components/Charts/components/ChartTooltip';
+import LeftFrameLine from '@components/Charts/components/LeftFrameLine';
+import ScatterPoints from '@components/Charts/components/ScatterPoints';
 import {AXIS_LABEL_GAP, CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, X_AXIS_LINE_WIDTH, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
 import fontSource from '@components/Charts/font';
 import type {HitTestArgs} from '@components/Charts/hooks';
@@ -155,40 +157,22 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
     // Custom x-axis labels with hybrid positioning:
     // - At 0° (horizontal): center label under the point (like bar chart)
     // - At 45° (rotated): right-align so the last character is under the point
-    const renderCustomXLabels = useCallback(
+    const renderOutsideComponents = useCallback(
         (args: CartesianChartRenderArg<{x: number; y: number}, 'y'>) => {
-            const scatterPoints = args.points.y.map((pt) =>
-                typeof pt.y === 'number' ? (
-                    <Circle
-                        key={`point-${pt.xValue}-${pt.yValue}`}
-                        cx={pt.x}
-                        cy={pt.y}
-                        r={DOT_RADIUS}
-                        color={DEFAULT_CHART_COLOR}
-                    />
-                ) : null,
-            );
-
-            // Draw the left frame line anchored at the first tick rather than at the domain minimum.
-            // This prevents a visual gap between the frame and the lowest grid line that occurs when
-            // victory-native's nice() and ticks() use different step sizes (nice uses count=10,
-            // ticks uses Y_AXIS_TICK_COUNT=5), causing the domain minimum to land below the first tick.
-            const minTick = args.yTicks.length > 0 ? Math.min(...args.yTicks) : null;
-            const frameBottomY = minTick !== null ? args.yScale(minTick) : args.chartBounds.bottom;
-            const leftFrame = (
-                <SkiaLine
-                    p1={vec(args.chartBounds.left, args.chartBounds.top)}
-                    p2={vec(args.chartBounds.left, frameBottomY)}
-                    color={theme.border}
-                    strokeWidth={1}
-                />
-            );
-
             if (!font) {
                 return (
                     <>
-                        {leftFrame}
-                        {scatterPoints}
+                        <LeftFrameLine
+                            chartBounds={args.chartBounds}
+                            yTicks={args.yTicks}
+                            yScale={args.yScale}
+                            color={theme.border}
+                        />
+                        <ScatterPoints
+                            points={args.points.y}
+                            radius={DOT_RADIUS}
+                            color={DEFAULT_CHART_COLOR}
+                        />
                     </>
                 );
             }
@@ -247,8 +231,17 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
 
             return (
                 <>
-                    {leftFrame}
-                    {scatterPoints}
+                    <LeftFrameLine
+                        chartBounds={args.chartBounds}
+                        yTicks={args.yTicks}
+                        yScale={args.yScale}
+                        color={theme.border}
+                    />
+                    <ScatterPoints
+                        points={args.points.y}
+                        radius={DOT_RADIUS}
+                        color={DEFAULT_CHART_COLOR}
+                    />
                     {xLabels}
                 </>
             );
@@ -294,7 +287,7 @@ function LineChartContent({data, title, titleIcon, isLoading, yAxisUnit, yAxisUn
                         actionsRef={actionsRef}
                         customGestures={customGestures}
                         onChartBoundsChange={handleChartBoundsChange}
-                        renderOutside={renderCustomXLabels}
+                        renderOutside={renderOutsideComponents}
                         xAxis={{
                             tickCount: data.length,
                             lineWidth: X_AXIS_LINE_WIDTH,
