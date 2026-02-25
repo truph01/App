@@ -45,7 +45,7 @@ You can create an expense by scanning a receipt, entering details manually, or t
 
 ---
 
-## How to manually create an expense
+## How to manually create a cash expense
 
 1. Click the **➕ Create** button.
 2. Select **Create Expense** then **Manual**.
@@ -56,11 +56,7 @@ You can create an expense by scanning a receipt, entering details manually, or t
 
 ---
 
-## How to create a distance expense
-
-You can create a distance expense using map-based locations or GPS tracking.
-
-### Map-based (Web and Mobile)
+## How to create a Distance expense from a map (Web and Mobile)
 
 1. Click the **➕ Create** button.
 2. Select **Track distance**.
@@ -70,7 +66,7 @@ You can create a distance expense using map-based locations or GPS tracking.
 6. Choose the recipient and add expense details like description, category, tags, tax, date, and set whether the expense is reimbursable.
 7. Click **Create expense**.
 
-### GPS tracking (Mobile only)
+## How to create a Distance expense from a GPS (Mobile only)
 
 1. Tap the **➕ Create** button.
 2. Select **Track distance**.
