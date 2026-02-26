@@ -5790,6 +5790,9 @@ const staticStyles = (theme: ThemeColors) =>
         paymentMethodErrorRow: {
             paddingHorizontal: variables.iconSizeMenuItem + variables.iconSizeNormal / 2,
         },
+        transactionReceiptButton: {
+            width: variables.transactionReceiptButtonWidth,
+        },
         chartHeader: {
             flexDirection: 'row',
             alignItems: 'center',
@@ -5836,6 +5839,28 @@ const staticStyles = (theme: ThemeColors) =>
         },
         lineChartChartContainer: {
             minHeight: 250,
+        },
+        pieChartContainer: {
+            borderRadius: variables.componentBorderRadiusLarge,
+            padding: variables.qrShareHorizontalPadding,
+        },
+        pieChartChartContainer: {
+            height: 250,
+            position: 'relative',
+        },
+        pieChartLegendContainer: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginHorizontal: variables.qrShareHorizontalPadding,
+            marginTop: variables.qrShareHorizontalPadding,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+        },
+        pieChartLegendDot: {
+            borderRadius: '50%',
+            width: 12,
+            height: 12,
         },
         discoverSectionImage: {
             width: '100%',
