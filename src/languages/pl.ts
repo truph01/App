@@ -1473,7 +1473,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 markedAsResolved: 'oznaczono powód odrzucenia jako rozwiązany',
             },
         },
-        moveExpenses: () => ({one: 'Przenieś wydatek', other: 'Przenieś wydatki'}),
+        moveExpenses: 'Przenieś do raportu',
         moveExpensesError: 'Nie możesz przenosić diet do raportów w innych przestrzeniach roboczych, ponieważ stawki diet mogą się różnić między przestrzeniami roboczymi.',
         changeApprover: {
             title: 'Zmień osobę zatwierdzającą',

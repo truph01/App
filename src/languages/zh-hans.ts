@@ -1445,7 +1445,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 markedAsResolved: '已将拒绝原因标记为已解决',
             },
         },
-        moveExpenses: () => ({one: '移动报销', other: '移动报销费用'}),
+        moveExpenses: '移动到报告',
         moveExpensesError: '您无法将每日津贴报销移动到其他工作区的报表中，因为不同工作区的每日津贴标准可能不同。',
         changeApprover: {
             title: '更改审批人',

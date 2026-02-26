@@ -1474,7 +1474,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 markedAsResolved: 'heeft de afwijsreden als opgelost gemarkeerd',
             },
         },
-        moveExpenses: () => ({one: 'Kosten verplaatsen', other: 'Declaraties verplaatsen'}),
+        moveExpenses: 'Verplaatsen naar rapport',
         moveExpensesError: 'Je kunt dagvergoedingdeclaraties niet naar rapporten in andere werkruimten verplaatsen, omdat de dagvergoedingsbedragen per werkruimte kunnen verschillen.',
         changeApprover: {
             title: 'Goedkeurder wijzigen',
