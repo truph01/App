@@ -389,21 +389,10 @@ function objectHas(objectLiteral: ts.ObjectLiteralExpression, dotNotationPath: s
                         currentNode = property.initializer;
                         found = true;
                         break;
+                    } else {
+                        // Next level is not an object, so path doesn't exist
+                        return false;
                     }
-
-                    // Handle arrow functions returning object literals, e.g. () => ({one: '...', other: '...'})
-                    if (ts.isArrowFunction(property.initializer)) {
-                        const {body} = property.initializer;
-                        const innerExpr = ts.isParenthesizedExpression(body) ? body.expression : body;
-                        if (ts.isObjectLiteralExpression(innerExpr)) {
-                            currentNode = innerExpr;
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    // Next level is not an object, so path doesn't exist
-                    return false;
                 }
             }
         }
