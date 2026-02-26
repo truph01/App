@@ -63,6 +63,7 @@ import {
 } from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import {dismissRejectUseExplanation} from '@userActions/IOU';
+import {setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
 import {markAsCash as markAsCashAction} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -80,15 +81,13 @@ import HeaderWithBackButton from './HeaderWithBackButton';
 import HoldOrRejectEducationalModal from './HoldOrRejectEducationalModal';
 import HoldSubmitterEducationalModal from './HoldSubmitterEducationalModal';
 import Icon from './Icon';
-// eslint-disable-next-line no-restricted-imports
-import * as Expensicons from './Icon/Expensicons';
 import LoadingBar from './LoadingBar';
 import {ModalActions} from './Modal/Global/ModalContext';
 import type {MoneyRequestHeaderStatusBarProps} from './MoneyRequestHeaderStatusBar';
 import MoneyRequestHeaderStatusBar from './MoneyRequestHeaderStatusBar';
 import MoneyRequestReportTransactionsNavigation from './MoneyRequestReportView/MoneyRequestReportTransactionsNavigation';
 import {usePersonalDetails} from './OnyxListItemProvider';
-import {useSearchContext} from './Search/SearchContext';
+import {useSearchActionsContext, useSearchStateContext} from './Search/SearchContext';
 import {useWideRHPState} from './WideRHPContextProvider';
 
 type MoneyRequestHeaderProps = {
@@ -113,7 +112,18 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
         PlatformStackRouteProp<ReportsSplitNavigatorParamList, typeof SCREENS.REPORT> | PlatformStackRouteProp<RightModalNavigatorParamList, typeof SCREENS.RIGHT_MODAL.SEARCH_REPORT>
     >();
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowSplit', 'ArrowCollapse']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+        'ArrowCollapse',
+        'ArrowSplit',
+        'Checkmark',
+        'ExpenseCopy',
+        'Flag',
+        'Hourglass',
+        'Info',
+        'Stopwatch',
+        'ThumbsDown',
+        'Trashcan',
+    ] as const);
     const [transaction] = useOnyx(
         `${ONYXKEYS.COLLECTION.TRANSACTION}${
             isMoneyRequestAction(parentReportAction) ? (getOriginalMessage(parentReportAction)?.IOUTransactionID ?? CONST.DEFAULT_NUMBER_ID) : CONST.DEFAULT_NUMBER_ID
@@ -151,7 +161,8 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
     const isOnHold = isOnHoldTransactionUtils(transaction);
     const isDuplicate = isDuplicateTransactionUtils(transaction, email ?? '', accountID, report, policy, transactionViolations);
     const reportID = report?.reportID;
-    const {removeTransaction, currentSearchHash} = useSearchContext();
+    const {currentSearchHash} = useSearchStateContext();
+    const {removeTransaction} = useSearchActionsContext();
     const {isExpenseSplit} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
     const [transactionDrafts] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftsSelector});
@@ -258,14 +269,14 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
 
     const getStatusBarProps: () => MoneyRequestHeaderStatusBarProps | undefined = () => {
         if (isOnHold) {
-            return {icon: getStatusIcon(Expensicons.Stopwatch), description: translate('iou.expenseOnHold')};
+            return {icon: getStatusIcon(expensifyIcons.Stopwatch), description: translate('iou.expenseOnHold')};
         }
         if (isMarkAsResolvedAction(parentReport, transactionViolations, policy)) {
-            return {icon: getStatusIcon(Expensicons.Hourglass), description: translate('iou.reject.rejectedStatus')};
+            return {icon: getStatusIcon(expensifyIcons.Hourglass), description: translate('iou.reject.rejectedStatus')};
         }
 
         if (isDuplicate) {
-            return {icon: getStatusIcon(Expensicons.Flag), description: translate('iou.expenseDuplicate')};
+            return {icon: getStatusIcon(expensifyIcons.Flag), description: translate('iou.expenseDuplicate')};
         }
 
         if (isExpensifyCardTransaction(transaction) && isPending(transaction)) {
@@ -281,7 +292,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                 return undefined;
             }
             return {
-                icon: getStatusIcon(Expensicons.Hourglass),
+                icon: getStatusIcon(expensifyIcons.Hourglass),
                 description: (
                     <BrokenConnectionDescription
                         transactionID={transaction?.transactionID}
@@ -292,7 +303,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
             };
         }
         if (hasPendingRTERViolation) {
-            return {icon: getStatusIcon(Expensicons.Hourglass), description: translate('iou.pendingMatchWithCreditCardDescription')};
+            return {icon: getStatusIcon(expensifyIcons.Hourglass), description: translate('iou.pendingMatchWithCreditCardDescription')};
         }
         if (isScanning(transaction)) {
             return {icon: getStatusIcon(icons.ReceiptScan), description: translate('iou.receiptScanInProgressDescription')};
@@ -414,7 +425,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
     > = {
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD]: {
             text: translate('iou.hold'),
-            icon: Expensicons.Stopwatch,
+            icon: expensifyIcons.Stopwatch,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD,
             onSelected: () => {
                 if (!parentReportAction) {
@@ -438,7 +449,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REMOVE_HOLD]: {
             text: translate('iou.unhold'),
-            icon: Expensicons.Stopwatch,
+            icon: expensifyIcons.Stopwatch,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REMOVE_HOLD,
             onSelected: () => {
                 if (!parentReportAction) {
@@ -476,7 +487,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE]: {
             text: isDuplicateActive ? translate('common.duplicateExpense') : translate('common.duplicated'),
-            icon: isDuplicateActive ? Expensicons.ExpenseCopy : Expensicons.Checkmark,
+            icon: isDuplicateActive ? expensifyIcons.ExpenseCopy : expensifyIcons.Checkmark,
             iconFill: isDuplicateActive ? undefined : theme.icon,
             value: CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE,
             onSelected: () => {
@@ -513,14 +524,14 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.VIEW_DETAILS]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS,
             text: translate('iou.viewDetails'),
-            icon: Expensicons.Info,
+            icon: expensifyIcons.Info,
             onSelected: () => {
                 navigateToDetailsPage(report, Navigation.getActiveRoute());
             },
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.DELETE]: {
             text: translate('common.delete'),
-            icon: Expensicons.Trashcan,
+            icon: expensifyIcons.Trashcan,
             value: CONST.REPORT.SECONDARY_ACTIONS.DELETE,
             onSelected: () => {
                 showConfirmModal({
@@ -537,6 +548,8 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
                     if (!parentReportAction || !transaction) {
                         throw new Error('Data missing');
                     }
+                    const backToRoute = route.params?.backTo ?? Navigation.getActiveRoute();
+                    setDeleteTransactionNavigateBackUrl(backToRoute);
                     if (isTrackExpenseAction(parentReportAction)) {
                         deleteTrackExpense({
                             chatReportID: report?.parentReportID,
@@ -568,7 +581,7 @@ function MoneyRequestHeader({report, parentReportAction, policy, onBackButtonPre
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT]: {
             text: translate('common.reject'),
-            icon: Expensicons.ThumbsDown,
+            icon: expensifyIcons.ThumbsDown,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT,
             onSelected: () => {
                 if (isDelegateAccessRestricted) {

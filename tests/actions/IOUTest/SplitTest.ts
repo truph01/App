@@ -1624,6 +1624,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
             currentUserAccountIDParam: CARLOS_ACCOUNT_ID,
             currentUserEmailParam: CARLOS_EMAIL,
+            isSelfTourViewed: false,
         });
         setWorkspaceApprovalMode(policyID, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC);
         await waitForBatchedUpdates();
@@ -1829,6 +1830,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
             currentUserAccountIDParam: CARLOS_ACCOUNT_ID,
             currentUserEmailParam: CARLOS_EMAIL,
+            isSelfTourViewed: false,
         });
 
         // Change the approval mode for the policy since default is Submit and Close
@@ -1993,6 +1995,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
             currentUserEmailParam: RORY_EMAIL,
+            isSelfTourViewed: false,
         });
 
         // Change the approval mode for the policy since default is Submit and Close
@@ -2161,6 +2164,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
             currentUserAccountIDParam: CARLOS_ACCOUNT_ID,
             currentUserEmailParam: CARLOS_EMAIL,
+            isSelfTourViewed: false,
         });
 
         setWorkspaceApprovalMode(policyID, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC);
@@ -2338,6 +2342,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
             currentUserAccountIDParam: CARLOS_ACCOUNT_ID,
             currentUserEmailParam: CARLOS_EMAIL,
+            isSelfTourViewed: false,
         });
 
         // Change the approval mode for the policy since default is Submit and Close

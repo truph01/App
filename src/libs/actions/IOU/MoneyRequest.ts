@@ -27,7 +27,6 @@ import type {GpsPoint} from './index';
 import {
     createDistanceRequest,
     getMoneyRequestParticipantsFromReport,
-    getRecentWaypoints,
     requestMoney,
     setCustomUnitRateID,
     setMoneyRequestDistance,
@@ -110,6 +109,7 @@ type MoneyRequestStepScanParticipantsFlowParams = {
     isSelfTourViewed: boolean;
     allTransactionDrafts?: OnyxCollection<Transaction>;
     betas: OnyxEntry<Beta[]>;
+    recentWaypoints: OnyxEntry<RecentWaypoint[]>;
 };
 
 type MoneyRequestStepDistanceNavigationParams = {
@@ -311,6 +311,7 @@ function handleMoneyRequestStepScanParticipants({
     isSelfTourViewed,
     allTransactionDrafts,
     betas,
+    recentWaypoints,
 }: MoneyRequestStepScanParticipantsFlowParams) {
     if (backTo) {
         Navigation.goBack(backTo);
@@ -391,7 +392,6 @@ function handleMoneyRequestStepScanParticipants({
                             lat: successData.coords.latitude,
                             long: successData.coords.longitude,
                         };
-                        const recentWaypoints = getRecentWaypoints();
                         createTransaction({
                             transactions,
                             iouType,
@@ -422,7 +422,6 @@ function handleMoneyRequestStepScanParticipants({
                     (errorData) => {
                         Log.info('[IOURequestStepScan] getCurrentPosition failed', false, errorData);
                         // When there is an error, the money can still be requested, it just won't include the GPS coordinates
-                        const recentWaypoints = getRecentWaypoints();
                         createTransaction({
                             transactions,
                             iouType,
@@ -450,7 +449,6 @@ function handleMoneyRequestStepScanParticipants({
                 );
                 return;
             }
-            const recentWaypoints = getRecentWaypoints();
             createTransaction({
                 transactions,
                 iouType,

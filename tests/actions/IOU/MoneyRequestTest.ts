@@ -428,6 +428,7 @@ describe('MoneyRequest', () => {
             selfDMReport,
             isSelfTourViewed: false,
             betas: [],
+            recentWaypoints: [] as RecentWaypoint[],
         };
 
         beforeEach(async () => {
@@ -440,6 +441,7 @@ describe('MoneyRequest', () => {
                     },
                 },
             });
+            baseParams.recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
         });
 
         afterEach(async () => {
