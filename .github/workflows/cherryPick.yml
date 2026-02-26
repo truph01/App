@@ -144,9 +144,10 @@ jobs:
         if: ${{ inputs.PULL_REQUEST_URL != '' }}
         id: getCPMergeCommit
         run: |
-          read -r MERGE_COMMIT_SHA MERGE_ACTOR <<< "$(gh pr view ${{ inputs.PULL_REQUEST_URL }} --json mergeCommit,mergedBy --jq '"\(.mergeCommit.oid) \(.mergedBy.login)"')"
+          read -r MERGE_COMMIT_SHA MERGE_ACTOR PR_AUTHOR <<< "$(gh pr view ${{ inputs.PULL_REQUEST_URL }} --json mergeCommit,mergedBy,author --jq '"\(.mergeCommit.oid) \(.mergedBy.login) \(.author.login)"')"
           echo "MERGE_COMMIT_SHA=$MERGE_COMMIT_SHA" >> "$GITHUB_OUTPUT"
           echo "MERGE_ACTOR=$MERGE_ACTOR" >> "$GITHUB_OUTPUT"
+          echo "PR_AUTHOR=$PR_AUTHOR" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
 
@@ -259,9 +260,7 @@ jobs:
         if: steps.cherryPick.outputs.HAS_CONFLICTS == 'true'
         id: resolveSlack
         run: |
-          # Best-effort lookup: parses the PHP whitelist for 'github' => 'slack' associations.
-          # This relies on the current structure of www-whitelist.php — if the format changes,
-          # the grep will miss and we fall back to tagging the full @appdeployers group.
+          # Match Slack IDs to Github IDs using the whitelist
           WHITELIST=$(gh api repos/Expensify/Salt/contents/www/files/www-whitelist.php \
             --jq '.content' | base64 -d 2>/dev/null || true)
 
@@ -270,25 +269,32 @@ jobs:
             if [ -n "$WHITELIST" ] && [ -n "$github_user" ]; then
               echo "$WHITELIST" \
                 | grep -F -A 10 "'github' => '$github_user'" \
-                | grep "'slack'" \
-                | head -1 \
-                | grep -oP "'slack'\s*=>\s*'\K[^']+" || true
+                | grep -oP -m 1 "'slack'\s*=>\s*'\K[^']+" || true
             fi
           }
 
-          MERGE_AUTHOR="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
+          PR_AUTHOR="${{ steps.getCPMergeCommit.outputs.PR_AUTHOR }}"
+          MERGER="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
           CP_INITIATOR="${{ github.actor }}"
 
-          MERGE_SLACK=$(resolve_slack_id "$MERGE_AUTHOR")
+          PR_AUTHOR_SLACK=$(resolve_slack_id "$PR_AUTHOR")
+          MERGER_SLACK=$(resolve_slack_id "$MERGER")
           CP_SLACK=$(resolve_slack_id "$CP_INITIATOR")
 
-          # Fall back to the full @appdeployers group if any lookup fails
-          if [ -z "$MERGE_SLACK" ] || [ -z "$CP_SLACK" ]; then
+          # Collect unique, successfully resolved Slack IDs; fall back to @appdeployers if none resolve
+          MENTIONS=""
+          SEEN=""
+          for sid in $PR_AUTHOR_SLACK $MERGER_SLACK $CP_SLACK; do
+            if [ -n "$sid" ] && [[ ! " $SEEN " =~ " $sid " ]]; then
+              MENTIONS="${MENTIONS:+$MENTIONS / }<@$sid>"
+              SEEN="$SEEN $sid"
+            fi
+          done
+
+          if [ -z "$MENTIONS" ]; then
             echo "SLACK_MENTION=<!subteam^S4TJJ3PSL>" >> "$GITHUB_OUTPUT"
-          elif [ "$MERGE_AUTHOR" = "$CP_INITIATOR" ]; then
-            echo "SLACK_MENTION=<@$MERGE_SLACK>" >> "$GITHUB_OUTPUT"
           else
-            echo "SLACK_MENTION=<@$MERGE_SLACK> / <@$CP_SLACK>" >> "$GITHUB_OUTPUT"
+            echo "SLACK_MENTION=$MENTIONS" >> "$GITHUB_OUTPUT"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
@@ -314,9 +320,7 @@ jobs:
       - name: Add assignees to conflict PRs
         if: steps.cherryPick.outputs.HAS_CONFLICTS == 'true'
         run: |
-          gh pr edit --add-assignee "${{ github.actor }},${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
-          ORIGINAL_PR_AUTHOR="$(gh pr view ${{ inputs.PULL_REQUEST_URL }} --json author --jq .author.login)"
-          gh pr edit --add-assignee "$ORIGINAL_PR_AUTHOR"
+          gh pr edit --add-assignee "${{ github.actor }},${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }},${{ steps.getCPMergeCommit.outputs.PR_AUTHOR }}"
         env:
           GITHUB_TOKEN: ${{ steps.setupGitForOSBotify.outputs.OS_BOTIFY_API_TOKEN }}
         # In cases when the original PR author is outside the org, the `gh pr edit` command will fail. But we don't want to fail the workflow in that case.
