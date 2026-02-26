@@ -1515,7 +1515,7 @@ const translations: TranslationDeepObject<typeof en> = {
         duplicateNonDefaultWorkspacePerDiemError:
             'Vous ne pouvez pas dupliquer les indemnités journalières entre plusieurs espaces de travail, car les taux peuvent différer d’un espace de travail à l’autre.',
         rulesModifiedFields: {
-            reimbursable: (value: boolean) => (value ? 'a marqué la dépense comme « remboursable »' : 'a marqué la dépense comme « non remboursable »'),
+            reimbursable: (value: boolean) => (value ? 'a marqué la dépense comme « remboursable »' : 'a marqué la dépense comme « non remboursable »'),
             billable: (value: boolean) => (value ? 'a marqué la dépense comme « facturable »' : 'a marqué la dépense comme « non refacturable »'),
             tax: (value: string, isFirst: boolean) => (isFirst ? `définir le taux de taxe sur « ${value} »` : `taux de taxe à « ${value} »`),
             reportName: (value: string) => `a déplacé cette dépense vers la note de frais « ${value} »`,

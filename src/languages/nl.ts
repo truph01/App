@@ -1500,11 +1500,11 @@ const translations: TranslationDeepObject<typeof en> = {
             ratePreview: (rate: string) => `${rate} / uur`,
             amountTooLargeError: 'Het totale bedrag is te hoog. Verlaag het aantal uren of verlaag het tarief.',
         },
-        correctRateError: 'Herstel de koersfout en probeer het opnieuw.',
+        correctRateError: 'Los de tarieffout op en probeer het opnieuw.',
         AskToExplain: `. <a href="${CONST.CONCIERGE_EXPLAIN_LINK_PATH}"><strong>Uitleggen</strong></a> &#x2728;`,
         duplicateNonDefaultWorkspacePerDiemError: 'Je kunt dagvergoedingen niet dupliceren tussen werkruimtes, omdat de tarieven per werkruimte kunnen verschillen.',
         rulesModifiedFields: {
-            reimbursable: (value: boolean) => (value ? `heeft de uitgave gemarkeerd als „vergoedbaar“` : `markeerde de uitgave als ‘niet-terugbetaalbaar’`),
+            reimbursable: (value: boolean) => (value ? 'markeerde de uitgave als „terugbetaalbaar”' : 'heeft de uitgave als ‘niet-vergoedbaar’ gemarkeerd'),
             billable: (value: boolean) => (value ? `heeft de uitgave gemarkeerd als ‘door te belasten’` : `heeft de uitgave gemarkeerd als ‘niet factureerbaar’`),
             tax: (value: string, isFirst: boolean) => (isFirst ? `stel het belastingtarief in op „${value}”` : `belastingtarief naar „${value}”`),
             reportName: (value: string) => `heeft deze uitgave verplaatst naar rapport „${value}”`,
