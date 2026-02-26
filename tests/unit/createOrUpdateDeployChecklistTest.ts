@@ -232,7 +232,7 @@ describe('createOrUpdateDeployChecklist', () => {
                 section += `https://github.com/${CONST.GITHUB_OWNER}/${CONST.MOBILE_EXPENSIFY_REPO}/pull/${mobileExpensifyPR}\n`;
             }
         }
-        section += '\n</details>';
+        section += '\n</details>\n';
         return section;
     }
 
