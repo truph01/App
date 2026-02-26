@@ -12788,7 +12788,7 @@ const getCommit = (0, memoize_1.default)(GithubUtils_1.default.octokit.git.getCo
 /**
  * Process deploy checklist comments for a list of PRs
  */
-async function commentDeployChecklistPRs(prList, repoName, recentTags, getDeployMessage) {
+async function commentOnDeployChecklistPRs(prList, repoName, recentTags, getDeployMessage) {
     for (const prNumber of prList) {
         try {
             const { data: pr } = await GithubUtils_1.default.octokit.pulls.get({
@@ -12914,10 +12914,10 @@ async function run() {
         }
     }
     // Comment on the PRs
-    await commentDeployChecklistPRs(prList, CONST_1.default.APP_REPO, appRecentTags, getDeployMessage);
+    await commentOnDeployChecklistPRs(prList, CONST_1.default.APP_REPO, appRecentTags, getDeployMessage);
     console.log(`✅ Added staging deploy comment ${prList.length} App PRs`);
     if (mobileExpensifyPRList.length > 0) {
-        await commentDeployChecklistPRs(mobileExpensifyPRList, CONST_1.default.MOBILE_EXPENSIFY_REPO, mobileExpensifyRecentTags, getDeployMessage);
+        await commentOnDeployChecklistPRs(mobileExpensifyPRList, CONST_1.default.MOBILE_EXPENSIFY_REPO, mobileExpensifyRecentTags, getDeployMessage);
         console.log(`✅ Completed staging deploy comment on ${mobileExpensifyPRList.length} Mobile-Expensify PRs`);
     }
 }
