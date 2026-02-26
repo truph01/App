@@ -143,7 +143,7 @@ export default {
         marginRight: 0,
     },
 
-    mr0half: {
+    mrhalf: {
         marginRight: 2,
     },
 
