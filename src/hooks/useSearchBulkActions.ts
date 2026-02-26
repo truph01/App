@@ -79,6 +79,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const {selectedTransactions, selectedReports, areAllMatchingItemsSelected, currentSearchResults} = useSearchStateContext();
     const {clearSelectedTransactions, selectAllMatchingItems} = useSearchActionsContext();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const {accountID} = currentUserPersonalDetails;
     const allTransactions = useAllTransactions();
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const selfDMReport = useSelfDMReport();
@@ -90,7 +91,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS);
     const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
-    const {accountID} = useCurrentUserPersonalDetails();
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);

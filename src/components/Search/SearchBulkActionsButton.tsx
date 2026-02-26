@@ -33,6 +33,7 @@ type SearchBulkActionsButtonProps = {
 function SearchBulkActionsButton({queryJSON}: SearchBulkActionsButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    // We need isSmallScreenWidth (not just shouldUseNarrowLayout) because DecisionModal requires it for correct modal type
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const {selectedTransactions, areAllMatchingItemsSelected, shouldShowSelectAllMatchingItems} = useSearchStateContext();
