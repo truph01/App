@@ -36,7 +36,7 @@ import type {
     CompanyCardFeedWithDomainID,
     CompanyCardFeedWithNumber,
     CompanyFeeds,
-type NonConnectableBankName,
+    NonConnectableBankName,
 } from '@src/types/onyx/CardFeeds';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type IconAsset from '@src/types/utils/IconAsset';
