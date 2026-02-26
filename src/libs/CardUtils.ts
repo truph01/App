@@ -577,7 +577,6 @@ function getBankName(feedType: CardFeedWithNumber | CardFeedWithDomainID): strin
         [CONST.COMPANY_CARD.FEED_BANK_NAME.AMEX_FILE_DOWNLOAD]: CONST.COMPANY_CARDS.BANKS.AMEX,
         [CONST.COMPANY_CARD.FEED_BANK_NAME.MOCK_BANK]: CONST.COMPANY_CARDS.BANKS.MOCK_BANK,
         [CONST.COMPANY_CARD.FEED_BANK_NAME.PEX]: CONST.COMPANY_CARDS.NON_CONNECTABLE_BANKS.PEX,
-        [CONST.EXPENSIFY_CARD.BANK]: CONST.COMPANY_CARDS.BANKS.AMEX,
     } satisfies Partial<Record<CardFeed, BankName | NonConnectableBankName | CardTypeName>>;
 
     // In existing OldDot setups other variations of feeds could exist, ex: vcf2, vcf3, oauth.americanexpressfdx.com 2003
