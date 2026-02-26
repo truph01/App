@@ -5197,6 +5197,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                         confirm: 'Compris',
                     },
                 },
+                personalDetailsDescription: 'Pour pouvoir réserver un voyage, veuillez saisir votre nom légal tel qu’il apparaît sur votre pièce d’identité délivrée par le gouvernement.',
             },
             expensifyCard: {
                 title: 'Carte Expensify',

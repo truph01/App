@@ -5152,6 +5152,7 @@ const translations = {
                         confirm: 'Got it',
                     },
                 },
+                personalDetailsDescription: 'In order to book travel, please enter your legal name as it appears on your government-issued ID.',
             },
             expensifyCard: {
                 title: 'Expensify Card',

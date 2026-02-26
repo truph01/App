@@ -5151,6 +5151,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                         confirm: 'Entendi',
                     },
                 },
+                personalDetailsDescription: 'Para reservar viagens, insira seu nome legal exatamente como consta no documento de identificação emitido pelo governo.',
             },
             expensifyCard: {
                 title: 'Cartão Expensify',
