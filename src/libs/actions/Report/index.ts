@@ -43,6 +43,7 @@ import type {
     ResolveActionableReportMentionWhisperParams,
     SearchForReportsParams,
     SearchForRoomsToMentionParams,
+    SearchForUsersParams,
     TogglePinnedChatParams,
     TransactionThreadInfo,
     UpdateChatNameParams,
@@ -210,6 +211,7 @@ import type {
     ReportUserIsTyping,
     Transaction,
     TransactionViolations,
+    VisibleReportActionsDerivedValue,
 } from '@src/types/onyx';
 import type {Decision} from '@src/types/onyx/OriginalMessage';
 import type {CurrentUserPersonalDetails, Timezone} from '@src/types/onyx/PersonalDetails';
@@ -2312,6 +2314,7 @@ function deleteReportComment(
     isReportArchived: boolean | undefined,
     isOriginalReportArchived: boolean | undefined,
     currentEmail: string,
+    visibleReportActionsDataParam?: VisibleReportActionsDerivedValue,
 ) {
     const reportID = report?.reportID;
     const originalReportID = getOriginalReportID(reportID, reportAction, undefined);
@@ -2358,7 +2361,7 @@ function deleteReportComment(
             (action) =>
                 action.reportActionID !== reportAction.reportActionID &&
                 ReportActionsUtils.didMessageMentionCurrentUser(action, currentEmail) &&
-                ReportActionsUtils.shouldReportActionBeVisible(action, action.reportActionID),
+                ReportActionsUtils.isReportActionVisible(action, reportID, undefined, visibleReportActionsDataParam),
         );
         optimisticReport.lastMentionedTime = latestMentionedReportAction?.created ?? null;
     }
@@ -2512,6 +2515,7 @@ function editReportComment(
     isOriginalParentReportArchived: boolean | undefined,
     currentUserLogin: string,
     videoAttributeCache?: Record<string, string>,
+    visibleReportActionsDataParam?: VisibleReportActionsDerivedValue,
 ) {
     const originalReportID = originalReport?.reportID;
     if (!originalReportID || !originalReportAction) {
@@ -2544,7 +2548,7 @@ function editReportComment(
 
     //  Delete the comment if it's empty
     if (!htmlForNewComment) {
-        deleteReportComment(originalReport, originalReportAction, ancestors, isOriginalReportArchived, isOriginalParentReportArchived, currentUserLogin);
+        deleteReportComment(originalReport, originalReportAction, ancestors, isOriginalReportArchived, isOriginalParentReportArchived, currentUserLogin, visibleReportActionsDataParam);
         return;
     }
 
@@ -4852,7 +4856,7 @@ function savePrivateNotesDraft(reportID: string, note: string) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.PRIVATE_NOTES_DRAFT}${reportID}`, note);
 }
 
-function searchForReports(isOffline: boolean, searchInput: string, policyID?: string) {
+function searchForReports(isOffline: boolean, searchInput: string, policyID?: string, isUserSearch = false) {
     // We do not try to make this request while offline because it sets a loading indicator optimistically
     if (isOffline) {
         Onyx.set(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, false);
@@ -4876,20 +4880,21 @@ function searchForReports(isOffline: boolean, searchInput: string, policyID?: st
     ];
 
     const searchForRoomToMentionParams: SearchForRoomsToMentionParams = {query: searchInput.toLowerCase(), policyID};
-    const searchForReportsParams: SearchForReportsParams = {searchInput: searchInput.toLowerCase(), canCancel: true};
+    const searchForReportsOrUsersParams: SearchForReportsParams | SearchForUsersParams = {searchInput: searchInput.toLowerCase(), canCancel: true};
+    const searchInServerCommand = isUserSearch ? READ_COMMANDS.SEARCH_FOR_USERS : READ_COMMANDS.SEARCH_FOR_REPORTS;
 
     // We want to cancel all pending SearchForReports API calls before making another one
     if (!policyID) {
-        HttpUtils.cancelPendingRequests(READ_COMMANDS.SEARCH_FOR_REPORTS);
+        HttpUtils.cancelPendingRequests(searchInServerCommand);
     }
 
-    API.read(policyID ? READ_COMMANDS.SEARCH_FOR_ROOMS_TO_MENTION : READ_COMMANDS.SEARCH_FOR_REPORTS, policyID ? searchForRoomToMentionParams : searchForReportsParams, {
+    API.read(policyID ? READ_COMMANDS.SEARCH_FOR_ROOMS_TO_MENTION : searchInServerCommand, policyID ? searchForRoomToMentionParams : searchForReportsOrUsersParams, {
         successData,
         failureData,
     });
 }
 
-function searchInServer(searchInput: string, policyID?: string) {
+function performServerSearch(searchInput: string, policyID?: string, isUserSearch = false) {
     // We are not getting isOffline from components as useEffect change will re-trigger the search on network change
     const isOffline = NetworkStore.isOffline();
     if (isOffline || !searchInput.trim().length) {
@@ -4901,7 +4906,15 @@ function searchInServer(searchInput: string, policyID?: string) {
     // we want to show the loading state right away. Otherwise, we will see a flashing UI where the client options are sorted and
     // tell the user there are no options, then we start searching, and tell them there are no options again.
     Onyx.set(ONYXKEYS.IS_SEARCHING_FOR_REPORTS, true);
-    searchForReports(isOffline, searchInput, policyID);
+    searchForReports(isOffline, searchInput, policyID, isUserSearch);
+}
+
+function searchInServer(searchInput: string, policyID?: string) {
+    performServerSearch(searchInput, policyID);
+}
+
+function searchUserInServer(searchInput: string) {
+    performServerSearch(searchInput, undefined, true);
 }
 
 function updateLastVisitTime(reportID: string) {
@@ -5193,34 +5206,23 @@ function exportToIntegration(reportID: string, connectionName: ConnectionName) {
     API.write(WRITE_COMMANDS.REPORT_EXPORT, params, {optimisticData, failureData});
 }
 
-function markAsManuallyExported(reportIDs: string[], connectionName: ConnectionName) {
+function markAsManuallyExported(reportID: string, connectionName: ConnectionName) {
+    const action = buildOptimisticExportIntegrationAction(connectionName, true);
     const label = CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName];
+    const optimisticReportActionID = action.reportActionID;
 
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [];
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [];
-    const reportData: Array<{reportID: string; label: string; optimisticReportActionID: string}> = [];
-
-    // Process each report ID
-    for (const reportID of reportIDs) {
-        const action = buildOptimisticExportIntegrationAction(connectionName, true);
-        const optimisticReportActionID = action.reportActionID;
-
-        reportData.push({
-            reportID,
-            label,
-            optimisticReportActionID,
-        });
-
-        optimisticData.push({
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
+        {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
             value: {
                 [optimisticReportActionID]: action,
             },
-        });
+        },
+    ];
 
-        successData.push({
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
+        {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
             value: {
@@ -5228,9 +5230,11 @@ function markAsManuallyExported(reportIDs: string[], connectionName: ConnectionN
                     pendingAction: null,
                 },
             },
-        });
+        },
+    ];
 
-        failureData.push({
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
+        {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
             value: {
@@ -5238,12 +5242,18 @@ function markAsManuallyExported(reportIDs: string[], connectionName: ConnectionN
                     errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
                 },
             },
-        });
-    }
+        },
+    ];
 
     const params = {
         markedManually: true,
-        data: JSON.stringify(reportData),
+        data: JSON.stringify([
+            {
+                reportID,
+                label,
+                optimisticReportActionID,
+            },
+        ]),
     } satisfies MarkAsExportedParams;
 
     API.write(WRITE_COMMANDS.MARK_AS_EXPORTED, params, {optimisticData, successData, failureData});
@@ -5694,6 +5704,19 @@ function deleteAppReport(
         key: `${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`,
         value: {hasOutstandingChildRequest: report?.hasOutstandingChildRequest},
     });
+
+    if (hash) {
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
+            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
+            value: {
+                data: {
+                    [`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]: {pendingAction: null},
+                },
+            },
+        });
+    }
 
     const parameters: DeleteAppReportParams = {
         reportID,
@@ -6728,7 +6751,6 @@ function changeReportPolicyAndInviteSubmitter({
         policyMemberAccountIDs,
         CONST.POLICY.ROLE.USER,
         formatPhoneNumber,
-        undefined,
         CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
     );
     const optimisticPolicyExpenseChatReportID = membersChats.reportCreationData[submitterEmail].reportID;
@@ -6958,6 +6980,7 @@ export {
     saveReportActionDraft,
     saveReportDraftComment,
     searchInServer,
+    searchUserInServer,
     setDeleteTransactionNavigateBackUrl,
     setGroupDraft,
     setIsComposerFullSize,
