@@ -12,7 +12,6 @@ import {quitAndNavigateBack} from '@libs/actions/TwoFactorAuthActions';
 import CONST from '@src/CONST';
 import type {StepCounterParams} from '@src/languages/params';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 
 type TwoFactorAuthWrapperProps = ChildrenProps & {
