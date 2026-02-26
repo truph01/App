@@ -104,7 +104,7 @@ async function buildChronologicalSection({
             section += `${mobileExpensifyUrl}\n`;
         }
     }
-    section += '\n</details>';
+    section += '\n</details>\n';
     return section;
 }
 
