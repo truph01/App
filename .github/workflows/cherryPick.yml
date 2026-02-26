@@ -144,37 +144,9 @@ jobs:
         if: ${{ inputs.PULL_REQUEST_URL != '' }}
         id: getCPMergeCommit
         run: |
-          read -r MERGE_COMMIT_SHA MERGE_ACTOR <<< "$(gh pr view ${{ inputs.PULL_REQUEST_URL }} --json mergeCommit,author --jq '"\(.mergeCommit.oid) \(.author.login)"')"
+          read -r MERGE_COMMIT_SHA MERGE_ACTOR <<< "$(gh pr view ${{ inputs.PULL_REQUEST_URL }} --json mergeCommit,mergedBy --jq '"\(.mergeCommit.oid) \(.mergedBy.login)"')"
           echo "MERGE_COMMIT_SHA=$MERGE_COMMIT_SHA" >> "$GITHUB_OUTPUT"
           echo "MERGE_ACTOR=$MERGE_ACTOR" >> "$GITHUB_OUTPUT"
-        env:
-          GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
-
-      - name: Resolve Slack mention for merge actor
-        if: ${{ inputs.PULL_REQUEST_URL != '' }}
-        id: resolveSlack
-        run: |
-          # Download the employee whitelist from Salt repo to get GitHub→Slack mapping
-          WHITELIST=$(gh api repos/Expensify/Salt/contents/www/files/www-whitelist.php \
-            --jq '.content' | base64 -d 2>/dev/null || true)
-
-          GITHUB_USER="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
-          SLACK_ID=""
-
-          if [ -n "$WHITELIST" ]; then
-            SLACK_ID=$(echo "$WHITELIST" \
-              | grep -F -A 10 "'github' => '$GITHUB_USER'" \
-              | grep "'slack'" \
-              | head -1 \
-              | grep -oP "'slack'\s*=>\s*'\K[^']+" || true)
-          fi
-
-          if [ -n "$SLACK_ID" ]; then
-            echo "SLACK_MENTION=<@$SLACK_ID>" >> "$GITHUB_OUTPUT"
-          else
-            # Tag the whole team if whitelist lookup fails
-            echo "SLACK_MENTION=<!subteam^S4TJJ3PSL>" >> "$GITHUB_OUTPUT"
-          fi
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
 
@@ -282,6 +254,35 @@ jobs:
           echo "PR_URL=$PR_URL" >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ steps.setupGitForOSBotify.outputs.OS_BOTIFY_API_TOKEN }}
+
+      - name: Resolve Slack mention for merge actor
+        if: steps.cherryPick.outputs.HAS_CONFLICTS == 'true'
+        id: resolveSlack
+        run: |
+          # Best-effort lookup: parses the PHP whitelist for 'github' => 'slack' associations.
+          # This relies on the current structure of www-whitelist.php — if the format changes,
+          # the grep will miss and we fall back to tagging the full @appdeployers group.
+          WHITELIST=$(gh api repos/Expensify/Salt/contents/www/files/www-whitelist.php \
+            --jq '.content' | base64 -d 2>/dev/null || true)
+
+          GITHUB_USER="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
+          SLACK_ID=""
+
+          if [ -n "$WHITELIST" ]; then
+            SLACK_ID=$(echo "$WHITELIST" \
+              | grep -F -A 10 "'github' => '$GITHUB_USER'" \
+              | grep "'slack'" \
+              | head -1 \
+              | grep -oP "'slack'\s*=>\s*'\K[^']+" || true)
+          fi
+
+          if [ -n "$SLACK_ID" ]; then
+            echo "SLACK_MENTION=<@$SLACK_ID>" >> "$GITHUB_OUTPUT"
+          else
+            echo "SLACK_MENTION=<!subteam^S4TJJ3PSL>" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
 
       - name: Announce CP conflict in #deployer
         if: steps.cherryPick.outputs.HAS_CONFLICTS == 'true'
