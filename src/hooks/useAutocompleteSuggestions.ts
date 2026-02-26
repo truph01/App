@@ -20,8 +20,10 @@ import {getDatePresets, getHasOptions} from '@libs/SearchUIUtils';
 import CONST, {CONTINUATION_DETECTION_SEARCH_FILTER_KEYS} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Beta, CardFeeds, CardList, DismissedProductTraining, PersonalDetailsList, Policy} from '@src/types/onyx';
+import type {VisibleReportActionsDerivedValue} from '@src/types/onyx/DerivedValues';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import {useCurrencyListState} from './useCurrencyList';
+import useExportedToFilterOptions from './useExportedToFilterOptions';
 import type {FeedKeysWithAssignedCards} from './useFeedKeysWithAssignedCards';
 import useOnyx from './useOnyx';
 
@@ -43,6 +45,7 @@ type UseAutocompleteSuggestionsParams = {
     countryCode: OnyxEntry<number>;
     loginList: OnyxEntry<Record<string, unknown>>;
     policies: NonNullable<OnyxCollection<Policy>>;
+    visibleReportActionsData?: VisibleReportActionsDerivedValue;
     currentUserAccountID: number;
     currentUserEmail: string;
     personalDetails: OnyxEntry<PersonalDetailsList>;
@@ -88,6 +91,7 @@ function useAutocompleteSuggestions({
     countryCode,
     loginList,
     policies,
+    visibleReportActionsData,
     currentUserAccountID,
     currentUserEmail,
     personalDetails,
@@ -100,6 +104,7 @@ function useAutocompleteSuggestions({
     const [allPoliciesTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
     const [allRecentTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS);
     const {currencyList} = useCurrencyListState();
+    const {exportedToFilterOptions} = useExportedToFilterOptions();
 
     const parsedQuery = parseForAutocomplete(autocompleteQueryValue);
     const {autocomplete, ranges = []} = parsedQuery ?? {};
@@ -221,6 +226,7 @@ function useAutocompleteSuggestions({
                 countryCode,
                 loginList,
                 shouldShowGBR: true,
+                visibleReportActionsData,
                 policyCollection: policies,
                 currentUserAccountID,
                 currentUserEmail,
@@ -256,6 +262,7 @@ function useAutocompleteSuggestions({
                 countryCode,
                 loginList,
                 shouldShowGBR: true,
+                visibleReportActionsData,
                 policyCollection: policies,
                 currentUserAccountID,
                 currentUserEmail,
@@ -450,6 +457,20 @@ function useAutocompleteSuggestions({
             });
 
             return filteredIsValues.map((isValue) => ({filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.IS, text: isValue}));
+        }
+        case CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO: {
+            const filteredExportedTo = exportedToFilterOptions
+                .filter((value) => {
+                    const lowerValue = value.toLowerCase();
+                    return lowerValue.includes(autocompleteValue.toLowerCase()) && !alreadyAutocompletedKeys.has(lowerValue);
+                })
+                .sort()
+                .slice(0, 10);
+            return filteredExportedTo.map((value) => ({
+                filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.EXPORTED_TO,
+                text: value,
+                mapKey: CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO,
+            }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTED:
