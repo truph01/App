@@ -1058,18 +1058,6 @@ const staticStyles = (theme: ThemeColors) =>
             minHeight: 28,
         },
 
-        frozenBadge: {
-            backgroundColor: theme.reportStatusBadge.approved.backgroundColor,
-            borderWidth: 0,
-            borderRadius: variables.componentBorderRadiusXLarge,
-            paddingHorizontal: 12,
-            minHeight: 28,
-        },
-
-        frozenBadgeText: {
-            color: theme.reportStatusBadge.approved.textColor,
-        },
-
         badgeNewFeature: {
             minHeight: 20,
             height: 20,

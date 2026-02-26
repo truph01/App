@@ -41,9 +41,6 @@ type BadgeProps = {
     /** Any additional styles to pass to the left icon container. */
     iconStyles?: StyleProp<ViewStyle>;
 
-    /** Optional fill color for the icon */
-    iconFill?: string;
-
     /** Additional styles from OfflineWithFeedback applied to the row */
     style?: StyleProp<ViewStyle>;
 
@@ -62,7 +59,6 @@ function Badge({
     onPress = () => {},
     icon,
     iconStyles = [],
-    iconFill,
     style,
     shouldUseXXSmallIcon = false,
 }: BadgeProps) {
@@ -100,7 +96,7 @@ function Badge({
                         width={shouldUseXXSmallIcon ? variables.iconSizeXXSmall : variables.iconSizeExtraSmall}
                         height={shouldUseXXSmallIcon ? variables.iconSizeXXSmall : variables.iconSizeExtraSmall}
                         src={icon}
-                        fill={iconFill ?? iconColor}
+                        fill={iconColor}
                     />
                 </View>
             )}
