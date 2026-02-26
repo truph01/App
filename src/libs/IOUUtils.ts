@@ -1,18 +1,17 @@
+import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {OnyxInputOrEntry, PersonalDetails, Policy, Report} from '@src/types/onyx';
-import type {Attendee} from '@src/types/onyx/IOU';
-import type Transaction from '@src/types/onyx/Transaction';
+import type {Attendee, Participant} from '@src/types/onyx/IOU';
 import SafeString from '@src/utils/SafeString';
 import type {IOURequestType} from './actions/IOU';
 import {getCurrencyUnit} from './CurrencyUtils';
 import Navigation from './Navigation/Navigation';
-import Performance from './Performance';
 import {isPaidGroupPolicy} from './PolicyUtils';
-import {getReportTransactions, isExpenseRequest, isPolicyExpenseChat} from './ReportUtils';
-import {getCurrency, getTagArrayFromName, isMerchantMissing, isScanRequest} from './TransactionUtils';
+import {getReportTransactions} from './ReportUtils';
+import {getCurrency, getTagArrayFromName} from './TransactionUtils';
 
 function navigateToStartMoneyRequestStep(requestType: IOURequestType, iouType: IOUType, transactionID: string, reportID: string, iouAction?: IOUAction): void {
     if (iouAction === CONST.IOU.ACTION.CATEGORIZE || iouAction === CONST.IOU.ACTION.SUBMIT || iouAction === CONST.IOU.ACTION.SHARE) {
@@ -49,7 +48,6 @@ function navigateToStartMoneyRequestStep(requestType: IOURequestType, iouType: I
 }
 
 function navigateToParticipantPage(iouType: ValueOf<typeof CONST.IOU.TYPE>, transactionID: string, reportID: string) {
-    Performance.markStart(CONST.TIMING.OPEN_CREATE_EXPENSE_CONTACT);
     switch (iouType) {
         case CONST.IOU.TYPE.REQUEST:
             Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(CONST.IOU.TYPE.SUBMIT, transactionID, reportID));
@@ -324,32 +322,6 @@ function formatCurrentUserToAttendee(currentUser?: PersonalDetails, reportID?: s
     return [initialAttendee];
 }
 
-/**
- * Checks if merchant is required and missing for a transaction.
- * Merchant is required for policy expense chats, expense requests, or when any participant is a policy expense chat.
- * For scan requests, merchant is not required unless it's a split bill being edited.
- *
- * @param transaction - The transaction to check
- * @param report - The report associated with the transaction
- * @param isEditingSplitBill - Whether this is editing a split bill
- * @returns true if merchant is required and missing, false otherwise
- */
-function shouldRequireMerchant(transaction: OnyxInputOrEntry<Transaction> | undefined, report: OnyxInputOrEntry<Report> | undefined, isEditingSplitBill = false): boolean {
-    if (!transaction) {
-        return false;
-    }
-
-    // Check if merchant is required based on report type and participants
-    const isMerchantRequired = !!(isPolicyExpenseChat(report) || isExpenseRequest(report) || transaction?.participants?.some((participant) => !!participant.isPolicyExpenseChat));
-
-    // For scan requests, merchant is not required unless it's a split bill being edited
-    if (isScanRequest(transaction) && !isEditingSplitBill) {
-        return false;
-    }
-
-    return isMerchantRequired && isMerchantMissing(transaction);
-}
-
 function navigateToConfirmationPage(
     iouType: IOUType,
     transactionID: string,
@@ -384,6 +356,26 @@ function navigateToConfirmationPage(
     }
 }
 
+function calculateDefaultReimbursable({
+    iouType,
+    policy,
+    policyForMovingExpenses,
+    participant,
+    transactionReportID,
+}: {
+    iouType: ValueOf<typeof CONST.IOU.TYPE>;
+    policy?: OnyxEntry<Policy>;
+    policyForMovingExpenses?: OnyxEntry<Policy>;
+    participant?: Participant;
+    transactionReportID?: string;
+}): boolean {
+    const isCreatingTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
+    const isUnreported = transactionReportID === CONST.REPORT.UNREPORTED_REPORT_ID;
+    const isPolicyExpenseChat = !!participant?.isPolicyExpenseChat;
+    const reportPolicy = isCreatingTrackExpense || isUnreported ? policyForMovingExpenses : policy;
+    return (isPolicyExpenseChat && isPaidGroupPolicy(reportPolicy)) || isCreatingTrackExpense ? (reportPolicy?.defaultReimbursable ?? true) : true;
+}
+
 export {
     calculateAmount,
     calculateSplitAmountFromPercentage,
@@ -398,6 +390,6 @@ export {
     formatCurrentUserToAttendee,
     navigateToParticipantPage,
     shouldShowReceiptEmptyState,
-    shouldRequireMerchant,
     navigateToConfirmationPage,
+    calculateDefaultReimbursable,
 };
