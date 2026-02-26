@@ -62,7 +62,7 @@ class ExpensiMarkWithContext extends ExpensiMark {
     }
 
     isHTML(text: string): boolean {
-        return /<[^>]+>/.test(text);
+        return /<[^>]+>/.test(text) || /&[#\w]+;/.test(text);
     }
 
     truncateHTML(htmlString: string, limit: number, extras?: {ellipsis: string | undefined}): string {
