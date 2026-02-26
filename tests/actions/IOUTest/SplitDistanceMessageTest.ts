@@ -120,8 +120,8 @@ describe('split distance system message', () => {
             iouReport,
             transactionChanges: {
                 waypoints: {
-                    waypoint0: {lat: 37.78, lng: -122.40, address: 'Start', name: 'Start'},
-                    waypoint1: {lat: 37.80, lng: -122.47, address: 'End', name: 'End'},
+                    waypoint0: {lat: 37.78, lng: -122.4, address: 'Start', name: 'Start'},
+                    waypoint1: {lat: 37.8, lng: -122.47, address: 'End', name: 'End'},
                 },
                 merchant: '10.00 mi @ $0.70 / mi',
                 amount: 700,
@@ -150,8 +150,8 @@ describe('split distance system message', () => {
             iouReport,
             transactionChanges: {
                 waypoints: {
-                    waypoint0: {lat: 37.78, lng: -122.40, address: 'Start', name: 'Start'},
-                    waypoint1: {lat: 37.80, lng: -122.47, address: 'End', name: 'End'},
+                    waypoint0: {lat: 37.78, lng: -122.4, address: 'Start', name: 'Start'},
+                    waypoint1: {lat: 37.8, lng: -122.47, address: 'End', name: 'End'},
                 },
                 merchant: '10.00 mi @ $0.70 / mi',
                 amount: 700,
@@ -186,8 +186,8 @@ describe('split distance system message', () => {
             iouReport,
             transactionChanges: {
                 waypoints: {
-                    waypoint0: {lat: 37.78, lng: -122.40, address: 'Start', name: 'Start'},
-                    waypoint1: {lat: 37.80, lng: -122.47, address: 'End', name: 'End'},
+                    waypoint0: {lat: 37.78, lng: -122.4, address: 'Start', name: 'Start'},
+                    waypoint1: {lat: 37.8, lng: -122.47, address: 'End', name: 'End'},
                 },
                 amount: 700,
             },
@@ -215,8 +215,8 @@ describe('split distance system message', () => {
             iouReport,
             transactionChanges: {
                 waypoints: {
-                    waypoint0: {lat: 37.78, lng: -122.40, address: 'Start', name: 'Start'},
-                    waypoint1: {lat: 37.80, lng: -122.47, address: 'End', name: 'End'},
+                    waypoint0: {lat: 37.78, lng: -122.4, address: 'Start', name: 'Start'},
+                    waypoint1: {lat: 37.8, lng: -122.47, address: 'End', name: 'End'},
                 },
                 merchant: '10.00 mi @ $0.70 / mi',
             },
