@@ -81,7 +81,7 @@ import type SearchResults from '@src/types/onyx/SearchResults';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import arraysEqual from '@src/utils/arraysEqual';
 import SearchChartView from './SearchChartView';
-import {useSearchContext} from './SearchContext';
+import {useSearchActionsContext, useSearchStateContext} from './SearchContext';
 import SearchList from './SearchList';
 import {SearchScopeProvider} from './SearchScopeProvider';
 import type {SearchColumnType, SearchParams, SearchQueryJSON, SelectedTransactionInfo, SelectedTransactions, SortOrder} from './types';
@@ -227,23 +227,18 @@ function Search({
     const navigation = useNavigation<PlatformStackNavigationProp<SearchFullscreenNavigatorParamList>>();
     const isFocused = useIsFocused();
     const {markReportIDAsExpense} = useWideRHPActions();
+    const {currentSearchHash, selectedTransactions, shouldTurnOffSelectionMode, lastSearchType, areAllMatchingItemsSelected, shouldResetSearchQuery, shouldUseLiveData} =
+        useSearchStateContext();
     const {
-        currentSearchHash,
         setCurrentSearchHashAndKey,
         setCurrentSearchQueryJSON,
         setSelectedTransactions,
-        selectedTransactions,
         clearSelectedTransactions,
-        shouldTurnOffSelectionMode,
         setShouldShowFiltersBarLoading,
-        lastSearchType,
-        shouldShowSelectAllMatchingItems,
-        areAllMatchingItemsSelected,
+        setShouldShowSelectAllMatchingItems,
         selectAllMatchingItems,
-        shouldResetSearchQuery,
         setShouldResetSearchQuery,
-        shouldUseLiveData,
-    } = useSearchContext();
+    } = useSearchActionsContext();
     const [offset, setOffset] = useState(0);
 
     const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
@@ -756,6 +751,7 @@ function Search({
     }, [isSearchResultsEmpty, prevIsSearchResultEmpty]);
 
     const isUnmounted = useRef(false);
+    const hasHadFirstLayout = useRef(false);
 
     useEffect(
         () => () => {
@@ -807,12 +803,12 @@ function Search({
 
             // If the user has selected all the expenses in their view but there are more expenses matched by the search
             // give them the option to select all matching expenses
-            shouldShowSelectAllMatchingItems(!!(areAllItemsSelected && searchResults?.search?.hasMoreResults));
+            setShouldShowSelectAllMatchingItems(!!(areAllItemsSelected && searchResults?.search?.hasMoreResults));
             if (!areAllItemsSelected) {
                 selectAllMatchingItems(false);
             }
         },
-        [filteredData, validGroupBy, type, searchResults?.search?.hasMoreResults, shouldShowSelectAllMatchingItems, selectAllMatchingItems],
+        [filteredData, validGroupBy, type, searchResults?.search?.hasMoreResults, setShouldShowSelectAllMatchingItems, selectAllMatchingItems],
     );
 
     const toggleTransaction = useCallback(
@@ -910,6 +906,10 @@ function Search({
 
     const onSelectRow = useCallback(
         (item: SearchListItem, transactionPreviewData?: TransactionPreviewData) => {
+            if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+                return;
+            }
+
             if (isMobileSelectionModeEnabled) {
                 toggleTransaction(item);
                 return;
@@ -1153,34 +1153,15 @@ function Search({
     ]);
 
     const onLayout = useCallback(() => {
-        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
-        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER);
+        hasHadFirstLayout.current = true;
+        const span = getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
+        span?.setAttributes({[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: true});
+        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
         markNavigateAfterExpenseCreateEnd();
         // Reset the ref after the span is ended so future render-time cancelSpan calls are no longer guarded.
         spanExistedOnMount.current = false;
         handleSelectionListScroll(sortedData, searchListRef.current);
     }, [handleSelectionListScroll, sortedData]);
-
-    useEffect(() => {
-        if (shouldShowLoadingState) {
-            return;
-        }
-
-        const renderSpanParent = getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
-
-        if (renderSpanParent) {
-            startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER, {
-                name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
-                op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB_RENDER,
-                parentSpan: renderSpanParent,
-            }).setAttributes({
-                inputQuery: queryJSON?.inputQuery,
-            });
-        }
-
-        // Exclude `queryJSON?.inputQuery` since it’s only telemetry metadata and would cause the span to start multiple times.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [shouldShowLoadingState]);
 
     useEffect(() => {
         const spanExisted = spanExistedOnMount.current;
@@ -1190,17 +1171,36 @@ function Search({
             }
             cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const cancelNavigationSpans = useCallback(() => {
-        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS_TAB);
+        cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
         cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_AFTER_EXPENSE_CREATE);
         spanExistedOnMount.current = false;
     }, []);
 
     const onLayoutSkeleton = useCallback(() => {
-        endSpan(CONST.TELEMETRY.SPAN_ON_LAYOUT_SKELETON_REPORTS);
+        hasHadFirstLayout.current = true;
+        const span = getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
+        span?.setAttributes({[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: false});
+        endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
     }, []);
+
+    // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
+    // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
+    useFocusEffect(
+        useCallback(() => {
+            if (!hasHadFirstLayout.current) {
+                return;
+            }
+            const span = getSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
+            span?.setAttributes({[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: !shouldShowLoadingState});
+            endSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
+            markNavigateAfterExpenseCreateEnd();
+            spanExistedOnMount.current = false;
+        }, [shouldShowLoadingState]),
+    );
 
     if (shouldShowLoadingState) {
         return (
