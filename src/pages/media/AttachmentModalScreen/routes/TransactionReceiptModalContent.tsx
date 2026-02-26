@@ -413,7 +413,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                 });
             }
             return menuItems;
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         },
         [
             isOdometerImage,
