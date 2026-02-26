@@ -1483,7 +1483,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 const field = translations.common[key].toLowerCase();
                 return isFirst ? `将 ${field} 设置为“${value}”` : `${field} 至 “${value}”`;
             },
-            format: (fragments: string, route: string, isPersonalRules: boolean) => `${fragments} 通过 <a href="${route}">${isPersonalRules ? '个人报销规则' : '工作区规则'}</a>`,
+            formatPersonalRules: (fragments: string, route: string) => `${fragments} 通过 <a href="${route}">个人报销规则</a>`,
+            formatPolicyRules: (fragments: string, route: string) => `${fragments} 通过 <a href="${route}">工作区规则</a>`,
         },
     },
     transactionMerge: {

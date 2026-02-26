@@ -1504,8 +1504,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 const field = translations.common[key].toLowerCase();
                 return isFirst ? `${field} を「${value}」に設定する` : `${field} から「${value}」へ`;
             },
-            format: (fragments: string, route: string, isPersonalRules: boolean) =>
-                `${fragments}（<a href="${route}">${isPersonalRules ? '個人経費ルール' : 'ワークスペースルール'}</a> 経由）`,
+            formatPersonalRules: (fragments: string, route: string) => `${fragments} (<a href="${route}">個人経費ルール</a> 経由)`,
+            formatPolicyRules: (fragments: string, route: string) => `${fragments} (<a href="${route}">ワークスペースルール</a> 経由)`,
         },
     },
     transactionMerge: {

@@ -1514,8 +1514,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 const field = translations.common[key].toLowerCase();
                 return isFirst ? `imposta ${field} su "${value}"` : `${field} a "${value}"`;
             },
-            format: (fragments: string, route: string, isPersonalRules: boolean) =>
-                `${fragments} tramite <a href="${route}">${isPersonalRules ? 'regole spese personali' : 'regole della workspace'}</a>`,
+            formatPersonalRules: (fragments: string, route: string) => `${fragments} tramite <a href="${route}">regole spese personali</a>`,
+            formatPolicyRules: (fragments: string, route: string) => `${fragments} tramite <a href="${route}">regole spazio di lavoro</a>`,
         },
     },
     transactionMerge: {
