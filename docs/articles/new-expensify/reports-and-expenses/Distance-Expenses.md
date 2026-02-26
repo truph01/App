@@ -36,7 +36,7 @@ To create an expense using distance between the starting and ending locations of
 1. Select the **➕ Create** button and select **Track distance**.
 2. Select **Map** from the top row.
 3. Enter the **Start** and **Stop** locations.
-   - To include additional stops, click **Add stop**.
+   - To include additional stops, select **Add stop**.
 4. Select **Next**.
 5. On the confirmation screen, review and confirm:
    - Distance
@@ -51,7 +51,7 @@ To create an expense using distance between the starting and ending locations of
 
 To create an expense by inputting a distance manually:
 
-1. Click the **➕ Create** button and select **Track distance**.
+1. Select the **➕ Create** button and select **Track distance**.
 2. Select **Manual** from the top row.
 3. Enter the number of miles or kilometers you need to be reimbursed for.
 4. Select **Next**.
@@ -59,7 +59,7 @@ To create an expense by inputting a distance manually:
    - Distance
    - Amount
    - Date
-   - (Optional) Add a description, category, tag or receipt. 
+   - (Optional) Add a description, category, tag or receipt.
 6. Select **Create expense**.
 
 Once a Distance expense is created, it can be submitted on a report. To learn how to add expenses to a report, see [Create and Submit Reports](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Create-and-Submit-Reports). 
@@ -68,7 +68,7 @@ Once a Distance expense is created, it can be submitted on a report. To learn ho
 
 ## How reimbursement rates are set for Distance expenses
 
-**Distance expenses created on a Workspace**
+### Distance expenses created on a Workspace
 
 If you are creating expenses on a Workspace: 
 
@@ -77,7 +77,7 @@ If you are creating expenses on a Workspace:
 
 [Learn how to manage distance rates as a Workspace Admin](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Managing-Distance-Rates)
 
-**Distance expenses created for personal tracking**
+### Distance expenses created for personal tracking
 
 If you're creating expenses outside of a Workspace:
 
@@ -93,7 +93,7 @@ If you're creating expenses outside of a Workspace:
 
 ## Can I reuse recent locations?
 
-Yes! When selecting the **Start** and **Finish** addresses, recently used locations will appear for quick selection.
+Yes! When selecting the **Start** and **Stop** addresses, recently used locations will appear for quick selection.
 
 ## How do I create a round-trip expense?
 
