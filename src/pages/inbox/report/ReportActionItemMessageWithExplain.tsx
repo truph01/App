@@ -69,7 +69,7 @@ function ReportActionItemMessageWithExplain({message, action, childReport, origi
                 <View style={[styles.flexRow, styles.alignItemsCenter]}>
                     <TextLinkBlock
                         onPress={() => explain(childReport, originalReport, action, translate, personalDetail.accountID, personalDetail?.timezone)}
-                        style={[styles.chatItemMessage, styles.link, styles.mrhalf]}
+                        style={[styles.chatItemMessage, styles.link, styles.mrHalf]}
                         text={translate('common.explain')}
                     />
                     <Icon
