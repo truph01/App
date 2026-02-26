@@ -255,7 +255,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.setupGitForOSBotify.outputs.OS_BOTIFY_API_TOKEN }}
 
-      - name: Resolve Slack mention for merge actor
+      - name: Resolve Slack mentions for merge actor and CP initiator
         if: steps.cherryPick.outputs.HAS_CONFLICTS == 'true'
         id: resolveSlack
         run: |
@@ -265,21 +265,30 @@ jobs:
           WHITELIST=$(gh api repos/Expensify/Salt/contents/www/files/www-whitelist.php \
             --jq '.content' | base64 -d 2>/dev/null || true)
 
-          GITHUB_USER="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
-          SLACK_ID=""
+          resolve_slack_id() {
+            local github_user="$1"
+            if [ -n "$WHITELIST" ] && [ -n "$github_user" ]; then
+              echo "$WHITELIST" \
+                | grep -F -A 10 "'github' => '$github_user'" \
+                | grep "'slack'" \
+                | head -1 \
+                | grep -oP "'slack'\s*=>\s*'\K[^']+" || true
+            fi
+          }
 
-          if [ -n "$WHITELIST" ]; then
-            SLACK_ID=$(echo "$WHITELIST" \
-              | grep -F -A 10 "'github' => '$GITHUB_USER'" \
-              | grep "'slack'" \
-              | head -1 \
-              | grep -oP "'slack'\s*=>\s*'\K[^']+" || true)
-          fi
+          MERGE_AUTHOR="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
+          CP_INITIATOR="${{ github.actor }}"
 
-          if [ -n "$SLACK_ID" ]; then
-            echo "SLACK_MENTION=<@$SLACK_ID>" >> "$GITHUB_OUTPUT"
-          else
+          MERGE_SLACK=$(resolve_slack_id "$MERGE_AUTHOR")
+          CP_SLACK=$(resolve_slack_id "$CP_INITIATOR")
+
+          # Fall back to the full @appdeployers group if any lookup fails
+          if [ -z "$MERGE_SLACK" ] || [ -z "$CP_SLACK" ]; then
             echo "SLACK_MENTION=<!subteam^S4TJJ3PSL>" >> "$GITHUB_OUTPUT"
+          elif [ "$MERGE_AUTHOR" = "$CP_INITIATOR" ]; then
+            echo "SLACK_MENTION=<@$MERGE_SLACK>" >> "$GITHUB_OUTPUT"
+          else
+            echo "SLACK_MENTION=<@$MERGE_SLACK> / <@$CP_SLACK>" >> "$GITHUB_OUTPUT"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
