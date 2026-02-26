@@ -81,7 +81,7 @@ If you are creating expenses on a Workspace:
 
 If you're creating expenses outside of a Workspace:
 
-- Expensify sets a default rate based on your reporting currency. 
+- Expensify sets a default rate based on your payment currency. 
    - Example: For USD, the rate is based on the current IRS reimbursement rate and uses miles.
    - Distance default rates are updated annually.
 
