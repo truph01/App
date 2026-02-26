@@ -68,7 +68,7 @@ const dismiss = (options?: DismissKeyboardOptions): Promise<void> => {
         Keyboard.dismiss();
         TransitionTracker.startTransition();
         if (options?.afterTransition) {
-            TransitionTracker.runAfterTransitions(options.afterTransition);
+            TransitionTracker.runAfterTransitions({callback: options.afterTransition});
         }
     });
 };

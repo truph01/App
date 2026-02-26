@@ -321,15 +321,17 @@ function navigate(route: Route, options?: LinkToOptions) {
     }
 
     const runImmediately = !options?.waitForTransition;
-    TransitionTracker.runAfterTransitions(() => {
-        const targetRoute = route.startsWith(CONST.SAML_REDIRECT_URL) ? ROUTES.HOME : route;
-        linkTo(navigationRef.current, targetRoute, options);
-        closeSidePanelOnNarrowScreen(route);
-
-        if (options?.afterTransition) {
-            TransitionTracker.runAfterTransitions(options.afterTransition);
-        }
-    }, runImmediately);
+    TransitionTracker.runAfterTransitions({
+        callback: () => {
+            const targetRoute = route.startsWith(CONST.SAML_REDIRECT_URL) ? ROUTES.HOME : route;
+            linkTo(navigationRef.current, targetRoute, options);
+            closeSidePanelOnNarrowScreen(route);
+            if (options?.afterTransition) {
+                TransitionTracker.runAfterTransitions({callback: options.afterTransition, waitForUpcomingTransition: true});
+            }
+        },
+        runImmediately,
+    });
 }
 /**
  * When routes are compared to determine whether the fallback route passed to the goUp function is in the state,
@@ -476,22 +478,25 @@ function goBack(backToRoute?: Route, options?: GoBackOptions) {
     }
 
     const runImmediately = !options?.waitForTransition;
-    TransitionTracker.runAfterTransitions(() => {
-        if (backToRoute) {
-            goUp(backToRoute, options);
-        } else if (shouldPopToSidebar) {
-            popToSidebar();
-        } else if (!navigationRef.current?.canGoBack()) {
-            Log.hmmm('[Navigation] Unable to go back');
-            return;
-        } else {
-            navigationRef.current?.goBack();
-        }
+    TransitionTracker.runAfterTransitions({
+        callback: () => {
+            if (backToRoute) {
+                goUp(backToRoute, options);
+            } else if (shouldPopToSidebar) {
+                popToSidebar();
+            } else if (!navigationRef.current?.canGoBack()) {
+                Log.hmmm('[Navigation] Unable to go back');
+                return;
+            } else {
+                navigationRef.current?.goBack();
+            }
 
-        if (options?.afterTransition) {
-            TransitionTracker.runAfterTransitions(options.afterTransition);
-        }
-    }, runImmediately);
+            if (options?.afterTransition) {
+                TransitionTracker.runAfterTransitions({callback: options.afterTransition, waitForUpcomingTransition: true});
+            }
+        },
+        runImmediately,
+    });
 }
 
 /**
@@ -729,17 +734,28 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
  * For detailed information about dismissing modals,
  * see the NAVIGATION.md documentation.
  */
-function dismissModal({ref = navigationRef, afterTransition, waitForTransition}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
+function dismissModal({
+    ref = navigationRef,
+    afterTransition = () => {
+        console.log('This is in callback');
+    },
+    waitForTransition,
+}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedText();
     const runImmediately = !waitForTransition;
     isNavigationReady().then(() => {
-        TransitionTracker.runAfterTransitions(() => {
-            ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
+        TransitionTracker.runAfterTransitions({
+            callback: () => {
+                ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
 
-            if (afterTransition) {
-                TransitionTracker.runAfterTransitions(afterTransition);
-            }
-        }, runImmediately);
+                if (afterTransition) {
+                    console.log('before callback');
+                    TransitionTracker.runAfterTransitions({callback: afterTransition, waitForUpcomingTransition: true});
+                    console.log('after runAfterTransitions callback');
+                }
+            },
+            runImmediately,
+        });
     });
 }
 
@@ -883,7 +899,7 @@ function dismissToModalStack(modalStackNames: Set<string>, options: {afterTransi
     navigationRef.dispatch({...StackActions.pop(routesToPop), target: rhpState.key});
 
     if (options?.afterTransition) {
-        TransitionTracker.runAfterTransitions(options.afterTransition);
+        TransitionTracker.runAfterTransitions({callback: options.afterTransition, waitForUpcomingTransition: true});
     }
 }
 
