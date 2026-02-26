@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
@@ -51,7 +51,7 @@ import {openOldDotLink} from '@userActions/Link';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {Report, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {Report, SearchResults, Transaction, TransactionViolations} from '@src/types/onyx';
 import useAllTransactions from './useAllTransactions';
 import useBulkPayOptions from './useBulkPayOptions';
 import useConfirmModal from './useConfirmModal';
@@ -91,6 +91,16 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS);
     const [transactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
+
+    // Cache the last search results that had data, so the merge option remains available
+    // while results are temporarily unset (e.g. during sorting/loading).
+    const lastNonEmptySearchResultsRef = useRef<SearchResults | undefined>(undefined);
+    useEffect(() => {
+        if (currentSearchResults?.data) {
+            lastNonEmptySearchResultsRef.current = currentSearchResults;
+        }
+    }, [currentSearchResults]);
+    const searchResults = currentSearchResults?.data ? currentSearchResults : lastNonEmptySearchResultsRef.current;
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);
@@ -885,8 +895,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             });
         }
 
-        if (selectedTransactionsKeys.length < 3 && currentSearchResults?.search.type !== CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT && currentSearchResults?.data) {
-            const {transactions: searchedTransactions, reports, policies: transactionPolicies} = getTransactionsAndReportsFromSearch(currentSearchResults, selectedTransactionsKeys);
+        if (selectedTransactionsKeys.length < 3 && searchResults?.search.type !== CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT && searchResults?.data) {
+            const {transactions: searchedTransactions, reports, policies: transactionPolicies} = getTransactionsAndReportsFromSearch(searchResults, selectedTransactionsKeys);
 
             if (isMergeActionForSelectedTransactions(searchedTransactions, reports, transactionPolicies, currentUserPersonalDetails.accountID)) {
                 const transactionID = searchedTransactions.at(0)?.transactionID;
@@ -1008,7 +1018,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         lastPaymentMethods,
         selectedReportIDs,
         personalPolicyID,
-        currentSearchResults,
+        searchResults,
+        currentSearchResults?.data,
         selectedTransactionReportIDs,
         selectedPolicyIDs,
         policies,
