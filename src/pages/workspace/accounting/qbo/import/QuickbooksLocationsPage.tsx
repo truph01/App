@@ -6,7 +6,7 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useAccordionAnimation from '@hooks/useAccordionAnimation';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {updateQuickbooksOnlineSyncLocations} from '@libs/actions/connections/QuickbooksOnline';
+import {updateQuickbooksOnlineSyncLocations as updateQuickbooksOnlineSyncLocationsAction} from '@libs/actions/connections/QuickbooksOnline';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {areSettingsInErrorFields, isControlPolicy, settingsPendingAction} from '@libs/PolicyUtils';
@@ -37,7 +37,7 @@ function QuickbooksLocationsPage({policy}: WithPolicyProps) {
                 );
                 return;
             }
-            updateQuickbooksOnlineSyncLocations(policyID, settingValue, qboConfig?.syncLocations);
+            updateQuickbooksOnlineSyncLocationsAction(policyID, settingValue, qboConfig?.syncLocations);
         },
         [policy, policyID, qboConfig?.syncLocations],
     );
@@ -91,9 +91,7 @@ function QuickbooksLocationsPage({policy}: WithPolicyProps) {
                         onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_LOCATIONS_DISPLAYED_AS.getRoute(policyID))}
                         shouldShowRightIcon={canUseTagsForLocations}
                         wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt4]}
-                        brickRoadIndicator={
-                            areSettingsInErrorFields([CONST.QUICKBOOKS_CONFIG.SYNC_LOCATIONS], qboConfig?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined
-                        }
+                        brickRoadIndicator={areSettingsInErrorFields([CONST.QUICKBOOKS_CONFIG.SYNC_LOCATIONS], qboConfig?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                         hintText={translate('workspace.qbo.locationsLineItemsRestrictionDescription')}
                     />
                 </OfflineWithFeedback>
