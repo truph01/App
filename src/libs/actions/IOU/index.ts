@@ -4560,7 +4560,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     const hasModifiedAmount = 'amount' in transactionChanges;
     // For split transactions, the merchant and amount are already computed in transactionChanges,
     // so we can build a valid optimistic MODIFIED_EXPENSE even when waypoints are pending.
-    const hasSplitDistanceMessageFields = !!isSplitTransaction && 'merchant' in transactionChanges && 'amount' in transactionChanges;
+    const hasSplitDistanceMessageFields = !!isSplitTransaction && 'merchant' in transactionChanges && hasModifiedAmount;
     if (transaction && updatedTransaction && (hasPendingWaypoints || hasModifiedDistanceRate)) {
         // Delete the draft transaction when editing waypoints when the server responds successfully and there are no errors
         successData.push({
