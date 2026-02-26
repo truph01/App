@@ -807,6 +807,11 @@ const translations: TranslationDeepObject<typeof en> = {
                 subtitle: 'Proporciona una dirección para recibir tu Tarjeta Expensify.',
                 cta: 'Añade dirección',
             },
+            addPaymentCard: {
+                title: 'Añade una tarjeta de pago para seguir usando Expensify',
+                subtitle: 'Cuenta > Suscripción',
+                cta: 'Añadir',
+            },
             activateCard: {
                 title: 'Activa tu Tarjeta Expensify',
                 subtitle: 'Valida tu tarjeta y empieza a gastar.',
