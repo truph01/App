@@ -1,5 +1,5 @@
-import type {OnyxEntry} from 'react-native-onyx';
 import {shallowEqual} from 'fast-equals';
+import type {OnyxEntry} from 'react-native-onyx';
 import CONST from '@src/CONST';
 import type {TodosDerivedValue} from '@src/types/onyx';
 
