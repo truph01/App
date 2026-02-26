@@ -249,6 +249,12 @@ class TranslationGenerator {
             this.buildPathsFromGitDiff();
         }
 
+        // Reclassify paths: move pathsToModify entries that don't exist in the target file to pathsToAdd.
+        // This is needed for both --paths and --compare-ref modes.
+        if (this.isIncremental) {
+            this.reclassifyPathsByTargetExistence();
+        }
+
         if (this.verbose) {
             console.log(`🎯 Initial path sets:`);
             console.log(`   pathsToModify: ${Array.from(this.pathsToModify).join(', ')}`);
@@ -883,29 +889,6 @@ class TranslationGenerator {
                 }
             }
 
-            // Classify pathsToModify into actual modify vs add based on target file existence
-            // We need to check against each target language file to properly classify paths
-            for (const targetLanguage of this.targetLanguages) {
-                const targetPath = path.join(this.languagesDir, `${targetLanguage}.ts`);
-
-                if (fs.existsSync(targetPath)) {
-                    const existingContent = fs.readFileSync(targetPath, 'utf8');
-                    const existingSourceFile = ts.createSourceFile(targetPath, existingContent, ts.ScriptTarget.Latest, true);
-
-                    // Check each path in pathsToModify to see if it actually exists in this target file
-                    const existingTranslationsNode = this.findTranslationsNode(existingSourceFile);
-                    for (const pathToCheck of this.pathsToModify) {
-                        if (!TSCompilerUtils.objectHas(existingTranslationsNode, pathToCheck)) {
-                            this.pathsToModify.delete(pathToCheck);
-                            this.pathsToAdd.add(pathToCheck);
-                        }
-                    }
-
-                    // Break after first existing target file since path classification should be consistent
-                    break;
-                }
-            }
-
             if (this.verbose) {
                 console.log(`🔄 Paths to modify: ${Array.from(this.pathsToModify).join(', ')}`);
                 console.log(`➕ Paths to add: ${Array.from(this.pathsToAdd).join(', ')}`);
@@ -913,6 +896,33 @@ class TranslationGenerator {
             }
         } catch (error) {
             throw new Error('Error building paths from git diff, giving up on --compare-ref incremental translation');
+        }
+    }
+
+    /**
+     * Classify pathsToModify into actual modify vs add based on target file existence.
+     * Paths that don't exist in the target file are moved from pathsToModify to pathsToAdd.
+     */
+    private reclassifyPathsByTargetExistence(): void {
+        for (const targetLanguage of this.targetLanguages) {
+            const targetPath = path.join(this.languagesDir, `${targetLanguage}.ts`);
+
+            if (fs.existsSync(targetPath)) {
+                const existingContent = fs.readFileSync(targetPath, 'utf8');
+                const existingSourceFile = ts.createSourceFile(targetPath, existingContent, ts.ScriptTarget.Latest, true);
+
+                // Check each path in pathsToModify to see if it actually exists in this target file
+                const existingTranslationsNode = this.findTranslationsNode(existingSourceFile);
+                for (const pathToCheck of this.pathsToModify) {
+                    if (!TSCompilerUtils.objectHas(existingTranslationsNode, pathToCheck)) {
+                        this.pathsToModify.delete(pathToCheck);
+                        this.pathsToAdd.add(pathToCheck);
+                    }
+                }
+
+                // Break after first existing target file since path classification should be consistent
+                break;
+            }
         }
     }
 
