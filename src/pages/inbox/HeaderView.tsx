@@ -25,6 +25,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLoadingBarVisibility from '@hooks/useLoadingBarVisibility';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useParentReportAction from '@hooks/useParentReportAction';
 import usePolicy from '@hooks/usePolicy';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -78,8 +79,13 @@ import {callFunctionIfActionIsAllowed} from '@userActions/Session';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
-import type {Report, ReportAction} from '@src/types/onyx';
+import type {Account, Report, ReportAction, ReportMetadata} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+
+const accountGuideDetailsSelector = (account: OnyxEntry<Account>) => account?.guideDetails;
+
+const reportMetadataSelector = (reportMetadata: OnyxEntry<ReportMetadata>): OnyxEntry<ReportMetadata> =>
+    reportMetadata ? {pendingChatMembers: reportMetadata.pendingChatMembers} : undefined;
 
 type HeaderViewProps = {
     /** Toggles the navigationMenu open and closed */
@@ -110,16 +116,16 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
     const [invoiceReceiverPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${invoiceReceiverPolicyID}`);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID) ?? getNonEmptyStringOnyxID(report?.reportID)}`);
     const [grandParentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(parentReport?.parentReportID)}`);
-    const [grandParentReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(parentReport?.parentReportID)}`);
+    const grandParentReportAction = useParentReportAction(parentReport);
     const policy = usePolicy(report?.policyID);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID);
     const shouldShowLoadingBar = useLoadingBarVisibility();
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
     const [lastDayFreeTrial] = useOnyx(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL);
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [accountGuideDetails] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountGuideDetailsSelector});
     const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`);
-    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${report?.reportID}`);
+    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${report?.reportID}`, {selector: reportMetadataSelector});
     const isReportArchived = isArchivedReport(reportNameValuePairs);
 
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
@@ -144,7 +150,7 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
     // This is used to check if the report is a chat thread and has a parent invoice report.
     const isParentInvoiceAndIsChatThread = isChatThread && !!parentReport && isInvoiceReport(parentReport);
     const reportHeaderData = (!isTaskReport && !isChatThread && report?.parentReportID) || isParentInvoiceAndIsChatThread ? parentReport : report;
-    const isParentOneTransactionThread = isOneTransactionThread(parentReport, grandParentReport, grandParentReportActions?.[`${parentReport?.parentReportActionID}`]);
+    const isParentOneTransactionThread = isOneTransactionThread(parentReport, grandParentReport, grandParentReportAction);
     const parentNavigationReport = isParentOneTransactionThread ? parentReport : reportHeaderData;
     const isReportHeaderDataArchived = useReportIsArchived(reportHeaderData?.reportID);
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
@@ -185,9 +191,9 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
     };
 
     const shouldShowGuideBooking =
-        !!account &&
-        account?.guideDetails?.email !== CONST.EMAIL.CONCIERGE &&
-        !!account?.guideDetails?.calendarLink &&
+        !!accountGuideDetails &&
+        accountGuideDetails?.email !== CONST.EMAIL.CONCIERGE &&
+        !!accountGuideDetails?.calendarLink &&
         isAdminRoom(report) &&
         !!canUserPerformWriteAction(report, isReportArchived) &&
         !isChatThread &&
