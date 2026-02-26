@@ -6,7 +6,9 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import waitForBatchedUpdatesWithAct from '../../utils/waitForBatchedUpdatesWithAct';
 
 describe('useReceiptScanDrop', () => {
-    afterEach(async () => Onyx.clear());
+    afterEach(async () => {
+        await Onyx.clear();
+    });
 
     it('should disable drag for anonymous users', async () => {
         await Onyx.merge(ONYXKEYS.SESSION, {authTokenType: CONST.AUTH_TOKEN_TYPES.ANONYMOUS});
