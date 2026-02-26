@@ -172,8 +172,8 @@ jobs:
           if [ -n "$SLACK_ID" ]; then
             echo "SLACK_MENTION=<@$SLACK_ID>" >> "$GITHUB_OUTPUT"
           else
-            # Fallback: mention by GitHub username if whitelist lookup fails
-            echo "SLACK_MENTION=$GITHUB_USER (GitHub)" >> "$GITHUB_OUTPUT"
+            # Tag the whole team if whitelist lookup fails
+            echo "SLACK_MENTION=<!subteam^S4TJJ3PSL>" >> "$GITHUB_OUTPUT"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
