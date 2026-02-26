@@ -1,5 +1,6 @@
 import React, {useCallback} from 'react';
 import BaseVacationDelegateSelectionComponent from '@components/BaseVacationDelegateSelectionComponent';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -20,6 +21,20 @@ function VacationDelegatePage() {
     const {showConfirmModal} = useConfirmModal();
 
     const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE);
+
+    const showErrorModal = useCallback(
+        async (message?: string) => {
+            await showConfirmModal({
+                title: translate('common.headsUp'),
+                prompt: message ?? translate('statusPage.vacationDelegateError'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
+
+            clearVacationDelegateError(vacationDelegate?.previousDelegate);
+        },
+        [showConfirmModal, translate, vacationDelegate?.previousDelegate],
+    );
 
     const showWarningModal = useCallback(
         async (delegateLogin: string) => {
@@ -56,6 +71,11 @@ function VacationDelegatePage() {
                     return;
                 }
 
+                if (response.jsonCode === CONST.JSON_CODE.EXP_ERROR) {
+                    showErrorModal(response.message as string | undefined);
+                    return;
+                }
+
                 if (response.jsonCode === CONST.JSON_CODE.POLICY_DIFF_WARNING) {
                     showWarningModal(option?.login ?? '');
                     return;
@@ -64,7 +84,7 @@ function VacationDelegatePage() {
                 Navigation.goBack(ROUTES.SETTINGS_STATUS);
             });
         },
-        [currentUserLogin, vacationDelegate, showWarningModal],
+        [currentUserLogin, vacationDelegate, showWarningModal, showErrorModal],
     );
 
     return (
@@ -72,14 +92,16 @@ function VacationDelegatePage() {
             includeSafeAreaPaddingBottom={false}
             testID="VacationDelegatePage"
         >
-            <BaseVacationDelegateSelectionComponent
-                vacationDelegate={vacationDelegate}
-                onSelectRow={onSelectRow}
-                headerTitle={translate('common.vacationDelegate')}
-                onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
-                cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
-                includeCurrentUser={false}
-            />
+            <FullPageOfflineBlockingView>
+                <BaseVacationDelegateSelectionComponent
+                    vacationDelegate={vacationDelegate}
+                    onSelectRow={onSelectRow}
+                    headerTitle={translate('common.vacationDelegate')}
+                    onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
+                    cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
+                    includeCurrentUser={false}
+                />
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }
