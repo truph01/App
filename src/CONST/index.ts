@@ -229,6 +229,7 @@ const CONST = {
     ANIMATED_PROGRESS_BAR_DURATION: 750,
     ANIMATION_IN_TIMING: 100,
     COMPOSER_FOCUS_DELAY: 150,
+    MAX_TRANSITION_DURATION_MS: 1000,
     ANIMATION_DIRECTION: {
         IN: 'in',
         OUT: 'out',
@@ -8254,10 +8255,6 @@ const CONST = {
         ADD_EXPENSE_APPROVALS: 'addExpenseApprovals',
     },
 
-    MODAL_EVENTS: {
-        CLOSED: 'modalClosed',
-    },
-
     LIST_BEHAVIOR: {
         REGULAR: 'regular',
         INVERTED: 'inverted',
@@ -8638,6 +8635,9 @@ const CONST = {
             SAVE_BUTTON: 'SplitExpense-SaveButton',
             REMOVE_SPLIT_BUTTON: 'SplitExpense-RemoveSplitButton',
             EDIT_SAVE_BUTTON: 'SplitExpense-EditSaveButton',
+        },
+        MERGE_EXPENSE: {
+            MERGE_TRANSACTION_ITEM: 'MergeExpense-MergeTransactionItem',
         },
         IOU_REQUEST_STEP: {
             DISTANCE_NEXT_BUTTON: 'IOURequestStep-DistanceNextButton',
