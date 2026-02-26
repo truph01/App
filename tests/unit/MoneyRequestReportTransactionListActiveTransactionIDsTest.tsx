@@ -38,7 +38,9 @@ function useActiveTransactionIDsEffect(visualOrderTransactionIDs: string[]) {
     }, [visualOrderTransactionIDs]);
 
     useEffect(() => {
-        return () => clearActiveTransactionIDs();
+        return () => {
+            clearActiveTransactionIDs();
+        };
     }, []);
 }
 

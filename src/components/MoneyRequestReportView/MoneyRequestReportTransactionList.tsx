@@ -289,7 +289,9 @@ function MoneyRequestReportTransactionList({
     }, [visualOrderTransactionIDs]);
 
     useEffect(() => {
-        return () => clearActiveTransactionIDs();
+        return () => {
+            clearActiveTransactionIDs();
+        };
     }, []);
 
     const sortedTransactionsMap = useMemo(() => {
