@@ -3799,6 +3799,9 @@ const CONST = {
             MOCK_BANK: 'Mock Bank',
             OTHER: 'Other',
         },
+        NON_CONNECTABLE_BANKS: {
+            PEX: 'PEX',
+        },
         BANK_CONNECTIONS: {
             WELLS_FARGO: 'wellsfargo',
             BANK_OF_AMERICA: 'bankofamerica',
