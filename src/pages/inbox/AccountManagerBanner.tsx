@@ -44,7 +44,7 @@ function AccountManagerBanner({reportID}: AccountManagerBannerProps) {
 
     return (
         <Banner
-            containerStyles={[styles.mh4, styles.mt4, styles.p4, styles.br2]}
+            containerStyles={[styles.mh4, styles.mt4, styles.p4, styles.br2, styles.breakWord]}
             text={chatWithAccountManagerText}
             onClose={dismissBanner}
             onButtonPress={chatWithAccountManager}
