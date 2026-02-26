@@ -38,6 +38,7 @@ function MergeTransactionItem<TItem extends ListItem>({item, isFocused, showTool
         <OfflineWithFeedback pendingAction={item.pendingAction}>
             <PressableWithFeedback
                 ref={pressableRef}
+                sentryLabel={CONST.SENTRY_LABEL.MERGE_EXPENSE.MERGE_TRANSACTION_ITEM}
                 onPress={() => {
                     onSelectRow(item);
                 }}
