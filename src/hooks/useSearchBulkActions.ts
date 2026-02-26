@@ -299,7 +299,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             return;
         }
 
-        exportSearchItemsToCSV(
+        let didFail = false;
+        await exportSearchItemsToCSV(
             {
                 query: status,
                 jsonQuery: JSON.stringify(queryJSON),
@@ -307,12 +308,15 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 transactionIDList: selectedTransactionsKeys,
             },
             () => {
+                didFail = true;
                 setEmptyReportsCount(0);
                 setIsDownloadErrorModalVisible(true);
             },
             translate,
         );
-        clearSelectedTransactions(undefined, true);
+        if (!didFail) {
+            clearSelectedTransactions(undefined, true);
+        }
     }, [
         isOffline,
         status,
