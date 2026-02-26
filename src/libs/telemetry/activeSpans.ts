@@ -1,14 +1,10 @@
 import type {StartSpanOptions} from '@sentry/core';
 import * as Sentry from '@sentry/react-native';
+import {spanToJSON} from '@sentry/react-native';
 import Log from '@libs/Log';
 import CONST from '@src/CONST';
 
-type ActiveSpanEntry = {
-    span: ReturnType<typeof Sentry.startInactiveSpan>;
-    startTime: number;
-};
-
-const activeSpans = new Map<string, ActiveSpanEntry>();
+const activeSpans = new Map<string, ReturnType<typeof Sentry.startInactiveSpan>>();
 
 type StartSpanExtraOptions = Partial<{
     /**
@@ -28,42 +24,42 @@ function startSpan(spanId: string, options: StartSpanOptions, extraOptions: Star
         timestamp: Date.now(),
     });
     const span = Sentry.startInactiveSpan(options);
-    const startTime = Date.now();
 
     if (extraOptions.minDuration) {
         span.setAttribute(CONST.TELEMETRY.ATTRIBUTE_MIN_DURATION, extraOptions.minDuration);
     }
-    activeSpans.set(spanId, {span, startTime});
+    activeSpans.set(spanId, span);
 
     return span;
 }
 
 function endSpan(spanId: string) {
-    const entry = activeSpans.get(spanId);
+    const span = activeSpans.get(spanId);
 
-    if (!entry) {
+    if (!span) {
         Log.info(`[Sentry][${spanId}] Trying to end span but it does not exist`, undefined, {spanId, timestamp: Date.now()});
         return;
     }
     const now = Date.now();
-    const durationMs = now - entry.startTime;
+    const startTimestamp = spanToJSON(span).start_timestamp;
+    const durationMs = Math.round(now - startTimestamp * 1000);
     Log.info(`[Sentry][${spanId}] Ending span (${durationMs}ms)`, undefined, {spanId, durationMs, timestamp: now});
-    entry.span.setStatus({code: 1});
-    entry.span.setAttribute(CONST.TELEMETRY.ATTRIBUTE_FINISHED_MANUALLY, true);
-    entry.span.end();
+    span.setStatus({code: 1});
+    span.setAttribute(CONST.TELEMETRY.ATTRIBUTE_FINISHED_MANUALLY, true);
+    span.end();
     activeSpans.delete(spanId);
 }
 
 function cancelSpan(spanId: string) {
-    const entry = activeSpans.get(spanId);
-    if (!entry) {
+    const span = activeSpans.get(spanId);
+    if (!span) {
         return;
     }
     Log.info(`[Sentry][${spanId}] Canceling span`, undefined, {spanId, timestamp: Date.now()});
-    entry.span.setAttribute(CONST.TELEMETRY.ATTRIBUTE_CANCELED, true);
+    span.setAttribute(CONST.TELEMETRY.ATTRIBUTE_CANCELED, true);
     // In Sentry there are only OK or ERROR status codes.
     // We treat canceled spans as OK, so we can properly track spans that are not finished at all (their status would be different)
-    entry.span.setStatus({code: 1});
+    span.setStatus({code: 1});
     endSpan(spanId);
 }
 
@@ -82,7 +78,7 @@ function cancelSpansByPrefix(prefix: string) {
 }
 
 function getSpan(spanId: string) {
-    return activeSpans.get(spanId)?.span;
+    return activeSpans.get(spanId);
 }
 
 export {startSpan, endSpan, getSpan, cancelSpan, cancelAllSpans, cancelSpansByPrefix};
