@@ -1,8 +1,7 @@
 import {PortalHost} from '@gorhom/portal';
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import {accountIDSelector} from '@selectors/Session';
-import {deepEqual} from 'fast-equals';
-import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {ViewStyle} from 'react-native';
 // We use Animated for all functionality related to wide RHP to make it easier
 // to interact with react-navigation components (e.g., CardContainer, interpolator), which also use Animated.
@@ -1059,9 +1058,6 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
                                         {isCurrentReportLoadedFromOnyx ? (
                                             <ReportFooter
                                                 report={report}
-                                                reportMetadata={reportMetadata}
-                                                policy={policy}
-                                                pendingAction={reportPendingAction}
                                                 lastReportAction={lastReportAction}
                                                 reportTransactions={reportTransactions}
                                                 // If the report is from the 'Send Money' flow, we add the comment to the `iou` report because for these we don't combine reportActions even if there is a single transaction (they always have a single transaction)
@@ -1081,5 +1077,4 @@ function ReportScreen({route, navigation, isInSidePanel = false}: ReportScreenPr
     );
 }
 
-// eslint-disable-next-line rulesdir/no-deep-equal-in-memo
-export default memo(ReportScreen, (prevProps, nextProps) => deepEqual(prevProps.route, nextProps.route));
+export default ReportScreen;

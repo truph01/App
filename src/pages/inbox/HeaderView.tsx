@@ -1,6 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import {isPast} from 'date-fns';
-import React, {memo, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
@@ -429,4 +429,4 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
     );
 }
 
-export default memo(HeaderView);
+export default HeaderView;
