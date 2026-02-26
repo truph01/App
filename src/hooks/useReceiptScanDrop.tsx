@@ -25,7 +25,7 @@ import useSelfDMReport from './useSelfDMReport';
 function useReceiptScanDrop() {
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const selfDMReport = useSelfDMReport();
-    const [userBillingGraceEndPeriodCollection] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
+    const [userBillingGraceEndPeriods] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [currentDate] = useOnyx(ONYXKEYS.CURRENT_DATE);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
@@ -76,7 +76,7 @@ function useReceiptScanDrop() {
             setMoneyRequestReceipt(transactionID, source, file.name ?? '', true, file.type);
         }
 
-        if (isPaidGroupPolicy(activePolicy) && activePolicy?.isPolicyExpenseChatEnabled && !shouldRestrictUserBillableActions(activePolicy.id, userBillingGraceEndPeriodCollection)) {
+        if (isPaidGroupPolicy(activePolicy) && activePolicy?.isPolicyExpenseChatEnabled && !shouldRestrictUserBillableActions(activePolicy.id, userBillingGraceEndPeriods)) {
             const shouldAutoReport = !!activePolicy?.autoReporting || !!personalPolicy?.autoReporting;
             const report = shouldAutoReport ? getPolicyExpenseChat(currentUserPersonalDetails.accountID, activePolicy?.id) : selfDMReport;
             const transactionReportID = isSelfDM(report) ? CONST.REPORT.UNREPORTED_REPORT_ID : report?.reportID;
