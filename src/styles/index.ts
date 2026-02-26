@@ -3712,7 +3712,7 @@ const staticStyles = (theme: ThemeColors) =>
         forYouEmptyStateTitle: {
             ...FontUtils.fontFamily.platform.EXP_NEW_KANSAS_MEDIUM,
             fontSize: variables.fontSizeXLarge,
-            lineHeight: 28,
+            lineHeight: variables.lineHeightXXLarge,
             textAlign: 'center',
             color: theme.text,
         },

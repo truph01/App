@@ -12,7 +12,7 @@ const ILLUSTRATION_SIZE = 68;
 
 const MSG = 'homePage.forYouSection.emptyStateMessages' as const;
 
-const ILLUSTRATIONS: IllustrationName[] = [
+const ILLUSTRATIONS = [
     'ThumbsUpStars',
     'SmallRocket',
     'CowboyHat',
@@ -29,7 +29,7 @@ const ILLUSTRATIONS: IllustrationName[] = [
     'Sunglasses',
     'F1Flags',
     'Fireworks',
-];
+] as const;
 
 type EmptyStateConfig = {
     titleKey: TranslationPaths;
@@ -39,11 +39,16 @@ type EmptyStateConfig = {
 
 const lcFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
-const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ILLUSTRATIONS.map((name) => ({
-    titleKey: `${MSG}.${lcFirst(name)}Title` as TranslationPaths,
-    descriptionKey: `${MSG}.${lcFirst(name)}Description` as TranslationPaths,
-    illustrationName: name,
-}));
+const EMPTY_STATE_CONFIGS: EmptyStateConfig[] = ILLUSTRATIONS.map((name) => {
+    const uncapitalizedName = lcFirst(name) as Uncapitalize<typeof name>;
+    const titleKey: TranslationPaths = `${MSG}.${uncapitalizedName}Title`;
+    const descriptionKey: TranslationPaths = `${MSG}.${uncapitalizedName}Description`;
+    return {
+        titleKey,
+        descriptionKey,
+        illustrationName: name,
+    };
+});
 
 const ILLUSTRATION_NAMES = EMPTY_STATE_CONFIGS.map((c) => c.illustrationName);
 
