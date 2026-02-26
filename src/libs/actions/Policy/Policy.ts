@@ -3684,6 +3684,7 @@ function openPolicyExpensifyCardsPage(policyID: string, workspaceAccountID: numb
             key: `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${workspaceAccountID}`,
             value: {
                 isLoading: false,
+                hasOnceLoaded: true,
             },
         },
     ];
