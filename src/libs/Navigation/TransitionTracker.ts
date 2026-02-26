@@ -3,8 +3,15 @@ import CONST from '@src/CONST';
 type CancelHandle = {cancel: () => void};
 
 type RunAfterTransitionsOptions = {
+    /** The function to invoke once all active transitions have completed. */
     callback: () => void;
+
+    /** If true, the callback fires synchronously regardless of any active transitions. Defaults to false. */
     runImmediately?: boolean;
+
+    /** If true, waits for the next transition to start before queuing the callback, so it runs after that transition ends.
+     *  Useful when a navigation action has just been dispatched but the transition has not yet been registered.
+     * Defaults to false. */
     waitForUpcomingTransition?: boolean;
 };
 
@@ -85,14 +92,6 @@ function endTransition(): void {
 }
 
 /**
- * Returns a promise that resolves when the next transition starts (when startTransition is called).
- * Used to wait for a navigation transition to be registered before scheduling runAfterTransitions.
- */
-function getPromiseForNextTransitionStart(): Promise<void> {
-    return promiseForNextTransitionStart;
-}
-
-/**
  * Schedules a callback to run after all transitions complete. If no transitions are active
  * or `runImmediately` is true, the callback fires synchronously.
  *
@@ -106,12 +105,14 @@ function runAfterTransitions({callback, runImmediately = false, waitForUpcomingT
     if (waitForUpcomingTransition) {
         let cancelled = false;
         let innerHandle: CancelHandle | null = null;
-        getPromiseForNextTransitionStart().then(() => {
-            if (cancelled) {
-                return;
+
+        (async () => {
+            await promiseForNextTransitionStart;
+            if (!cancelled) {
+                innerHandle = runAfterTransitions({callback});
             }
-            innerHandle = runAfterTransitions({callback});
-        });
+        })();
+
         return {
             cancel: () => {
                 cancelled = true;
