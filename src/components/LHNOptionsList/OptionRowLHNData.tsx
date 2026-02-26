@@ -97,6 +97,7 @@ function OptionRowLHNData({
         return item;
         // Listen parentReportAction to update title of thread report when parentReportAction changed
         // Listen to transaction to update title of transaction report when transaction changed
+        // Listen to lastAction to update when action is deleted or gets pendingAction
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         fullReport,
@@ -118,6 +119,8 @@ function OptionRowLHNData({
         invoiceReceiverPolicy,
         lastMessageTextFromReport,
         card,
+        lastAction,
+        lastActionReport,
         translate,
         localeCompare,
         isReportArchived,
