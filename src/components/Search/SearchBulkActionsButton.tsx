@@ -10,8 +10,6 @@ import HoldSubmitterEducationalModal from '@components/HoldSubmitterEducationalM
 import KYCWall from '@components/KYCWall';
 import {KYCWallContext} from '@components/KYCWall/KYCWallContext';
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
-import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
-import type {SearchQueryJSON} from '@components/Search/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
@@ -25,6 +23,8 @@ import {isExpenseReport} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import {useSearchActionsContext, useSearchStateContext} from './SearchContext';
+import type {SearchQueryJSON} from './types';
 
 type SearchBulkActionsButtonProps = {
     queryJSON: SearchQueryJSON;

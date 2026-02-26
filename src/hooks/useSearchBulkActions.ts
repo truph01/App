@@ -9,18 +9,6 @@ import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchHeaderOptionValue} from '@components/Search/SearchPageHeader/SearchPageHeader';
 import type {PaymentData, SearchQueryJSON} from '@components/Search/types';
-import useAllTransactions from '@hooks/useAllTransactions';
-import useBulkPayOptions from '@hooks/useBulkPayOptions';
-import useConfirmModal from '@hooks/useConfirmModal';
-import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
-import useLocalize from '@hooks/useLocalize';
-import useNetwork from '@hooks/useNetwork';
-import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
-import useSelfDMReport from '@hooks/useSelfDMReport';
-import useTheme from '@hooks/useTheme';
-import useThemeStyles from '@hooks/useThemeStyles';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {deleteAppReport, moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter} from '@libs/actions/Report';
 import {
@@ -64,6 +52,18 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Report, Transaction, TransactionViolations} from '@src/types/onyx';
+import useAllTransactions from './useAllTransactions';
+import useBulkPayOptions from './useBulkPayOptions';
+import useConfirmModal from './useConfirmModal';
+import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
+import {useMemoizedLazyExpensifyIcons} from './useLazyAsset';
+import useLocalize from './useLocalize';
+import useNetwork from './useNetwork';
+import useOnyx from './useOnyx';
+import usePermissions from './usePermissions';
+import useSelfDMReport from './useSelfDMReport';
+import useTheme from './useTheme';
+import useThemeStyles from './useThemeStyles';
 
 type UseSearchBulkActionsParams = {
     queryJSON: SearchQueryJSON | undefined;
@@ -1004,7 +1004,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         selectedReportIDs,
         personalPolicyID,
         currentSearchResults,
-        currentSearchResults?.data,
         selectedTransactionReportIDs,
         selectedPolicyIDs,
         policies,
