@@ -177,11 +177,13 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     // When the user saves their legal name and navigates back, privatePersonalDetails updates
     // and this effect re-triggers handleToggle(true) to continue the enabling flow
     useEffect(() => {
-        if (shouldResumeToggleRef.current && !areTravelPersonalDetailsMissing(privatePersonalDetails)) {
-            shouldResumeToggleRef.current = false;
-            handleToggle(true);
+        if (!shouldResumeToggleRef.current || areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            return;
         }
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+
+        shouldResumeToggleRef.current = false;
+        handleToggle(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to trigger this effect when privatePersonalDetails changes
     }, [privatePersonalDetails]);
 
     const getCentralInvoicingSubtitle = () => {

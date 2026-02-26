@@ -186,11 +186,13 @@ function BookTravelButton({
     // When the user saves their legal name and navigates back, privatePersonalDetails updates
     // and this effect re-triggers bookATrip() to continue the booking flow
     useEffect(() => {
-        if (shouldResumeBookingRef.current && !areTravelPersonalDetailsMissing(privatePersonalDetails)) {
-            shouldResumeBookingRef.current = false;
-            bookATrip();
+        if (!shouldResumeBookingRef.current || areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            return;
         }
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+
+        shouldResumeBookingRef.current = false;
+        bookATrip();
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to trigger this effect when privatePersonalDetails changes
     }, [privatePersonalDetails]);
 
     return (
