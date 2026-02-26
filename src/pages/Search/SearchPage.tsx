@@ -69,7 +69,7 @@ function SearchPage({route}: SearchPageProps) {
 
     const selectedTransactionsKeys = Object.keys(selectedTransactions ?? {});
 
-    const {initScanRequest, PDFValidationComponent, ErrorModal} = useReceiptScanDrop();
+    const {initScanRequest, PDFValidationComponent, ErrorModal, isDragDisabled} = useReceiptScanDrop();
     const {resetVideoPlayerData} = usePlaybackActionsContext();
 
     const [isSorting, setIsSorting] = useState(false);
@@ -161,7 +161,7 @@ function SearchPage({route}: SearchPageProps) {
     return (
         <Animated.View style={[styles.flex1]}>
             {shouldUseNarrowLayout ? (
-                <DragAndDropProvider>
+                <DragAndDropProvider isDisabled={isDragDisabled}>
                     {PDFValidationComponent}
                     <SearchPageNarrow
                         queryJSON={queryJSON}
@@ -194,6 +194,7 @@ function SearchPage({route}: SearchPageProps) {
                     onSortPressedCallback={onSortPressedCallback}
                     scrollHandler={scrollHandler}
                     initScanRequest={initScanRequest}
+                    isDragDisabled={isDragDisabled}
                     PDFValidationComponent={PDFValidationComponent}
                     ErrorModal={ErrorModal}
                     shouldShowFooter={shouldShowFooter}
