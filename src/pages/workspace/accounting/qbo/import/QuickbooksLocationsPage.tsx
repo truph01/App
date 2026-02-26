@@ -10,7 +10,7 @@ import * as QuickbooksOnline from '@libs/actions/connections/QuickbooksOnline';
 import * as ErrorUtils from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import * as PolicyUtils from '@libs/PolicyUtils';
-import {shouldShowLocationsLineItemsRestriction, shouldSwitchLocationsToReportFields} from '@pages/workspace/accounting/qbo/utils';
+import {canImportLocationsAsTags, shouldSwitchLocationsToReportFields} from '@pages/workspace/accounting/qbo/utils';
 import type {WithPolicyProps} from '@pages/workspace/withPolicy';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
@@ -26,7 +26,7 @@ function QuickbooksLocationsPage({policy}: WithPolicyProps) {
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
     const isSwitchOn = !!(qboConfig?.syncLocations && qboConfig?.syncLocations !== CONST.INTEGRATION_ENTITY_MAP_TYPES.NONE);
     const isTagsSelected = qboConfig?.syncLocations === CONST.INTEGRATION_ENTITY_MAP_TYPES.TAG;
-    const shouldShowLineItemsRestriction = shouldShowLocationsLineItemsRestriction(qboConfig);
+    const canUseTagsForLocations = canImportLocationsAsTags(qboConfig);
     const {isAccordionExpanded, shouldAnimateAccordionSection} = useAccordionAnimation(isSwitchOn);
 
     const updateQuickbooksOnlineSyncLocations = useCallback(
@@ -70,9 +70,9 @@ function QuickbooksLocationsPage({policy}: WithPolicyProps) {
                         // eslint-disable-next-line no-nested-ternary
                         isSwitchOn
                             ? CONST.INTEGRATION_ENTITY_MAP_TYPES.NONE
-                            : shouldShowLineItemsRestriction
-                              ? CONST.INTEGRATION_ENTITY_MAP_TYPES.REPORT_FIELD
-                              : CONST.INTEGRATION_ENTITY_MAP_TYPES.TAG,
+                            : canUseTagsForLocations
+                              ? CONST.INTEGRATION_ENTITY_MAP_TYPES.TAG
+                              : CONST.INTEGRATION_ENTITY_MAP_TYPES.REPORT_FIELD,
                     )
                 }
                 errors={ErrorUtils.getLatestErrorField(qboConfig, CONST.QUICKBOOKS_CONFIG.SYNC_LOCATIONS)}
@@ -85,11 +85,11 @@ function QuickbooksLocationsPage({policy}: WithPolicyProps) {
             >
                 <OfflineWithFeedback pendingAction={PolicyUtils.settingsPendingAction([CONST.QUICKBOOKS_CONFIG.SYNC_LOCATIONS], qboConfig?.pendingFields)}>
                     <MenuItemWithTopDescription
-                        interactive={!shouldShowLineItemsRestriction}
+                        interactive={canUseTagsForLocations}
                         title={!isTagsSelected ? translate('workspace.common.reportFields') : translate('workspace.common.tags')}
                         description={translate('workspace.common.displayedAs')}
                         onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_LOCATIONS_DISPLAYED_AS.getRoute(policyID))}
-                        shouldShowRightIcon={!shouldShowLineItemsRestriction}
+                        shouldShowRightIcon={canUseTagsForLocations}
                         wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt4]}
                         brickRoadIndicator={
                             PolicyUtils.areSettingsInErrorFields([CONST.QUICKBOOKS_CONFIG.SYNC_LOCATIONS], qboConfig?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined

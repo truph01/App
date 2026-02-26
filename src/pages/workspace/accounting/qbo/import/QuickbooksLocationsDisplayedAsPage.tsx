@@ -8,7 +8,7 @@ import {updateQuickbooksOnlineSyncLocations} from '@libs/actions/connections/Qui
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {isControlPolicy, settingsPendingAction} from '@libs/PolicyUtils';
-import {shouldShowLocationsLineItemsRestriction} from '@pages/workspace/accounting/qbo/utils';
+import {canImportLocationsAsTags} from '@pages/workspace/accounting/qbo/utils';
 import type {WithPolicyProps} from '@pages/workspace/withPolicy';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import {clearQBOErrorField} from '@userActions/Policy/Policy';
@@ -28,7 +28,7 @@ function QuickbooksLocationsDisplayedAsPage({policy}: WithPolicyProps) {
     const data: CardListItem[] = useMemo(() => {
         const items: CardListItem[] = [];
 
-        if (!shouldShowLocationsLineItemsRestriction(qboConfig)) {
+        if (canImportLocationsAsTags(qboConfig)) {
             items.push({
                 value: CONST.INTEGRATION_ENTITY_MAP_TYPES.TAG,
                 text: translate('workspace.common.tags'),
