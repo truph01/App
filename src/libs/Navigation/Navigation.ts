@@ -735,13 +735,7 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
  * For detailed information about dismissing modals,
  * see the NAVIGATION.md documentation.
  */
-function dismissModal({
-    ref = navigationRef,
-    afterTransition = () => {
-        console.log('This is in callback');
-    },
-    waitForTransition,
-}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
+function dismissModal({ref = navigationRef, afterTransition, waitForTransition}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedText();
     const runImmediately = !waitForTransition;
     isNavigationReady().then(() => {
@@ -750,9 +744,7 @@ function dismissModal({
                 ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
 
                 if (afterTransition) {
-                    console.log('before callback');
                     TransitionTracker.runAfterTransitions({callback: afterTransition, waitForUpcomingTransition: true});
-                    console.log('after runAfterTransitions callback');
                 }
             },
             runImmediately,

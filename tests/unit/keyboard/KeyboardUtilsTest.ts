@@ -1,5 +1,5 @@
-import type {DismissKeyboardOptions} from '@src/utils/keyboard/types';
 import type {SimplifiedKeyboardEvent} from '@src/utils/keyboard';
+import type {DismissKeyboardOptions} from '@src/utils/keyboard/types';
 
 const mockKeyboardListeners: Record<string, Array<(e: SimplifiedKeyboardEvent) => void>> = {};
 const mockKeyboardControllerListeners: Record<string, Array<(e: SimplifiedKeyboardEvent) => void>> = {};
