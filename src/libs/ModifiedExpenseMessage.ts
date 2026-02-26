@@ -214,20 +214,15 @@ function getRulesModifiedMessage(
 
     // reportName ("moved to report X"), reimbursable/billable ("marked the expense as reimbursable/billable"), are standalone clauses with their own verb.
     // They must not be mixed into the "set ... and ..." list produced by the other field fragments.
-    type StandaloneKey = 'reportName' | 'reimbursable' | 'billable';
-    const standaloneKeys = new Set<StandaloneKey>(['reportName', 'reimbursable', 'billable']);
-
     const {standaloneFragments, listEntries} = entries.reduce<{standaloneFragments: string[]; listEntries: Entries<PolicyRulesModifiedFields>}>(
         (acc, entry) => {
             const [key, value] = entry;
-            if (standaloneKeys.has(key as StandaloneKey)) {
-                if (key === 'reportName') {
-                    acc.standaloneFragments.push(translate('iou.rulesModifiedFields.reportName', value as string));
-                } else if (key === 'reimbursable') {
-                    acc.standaloneFragments.push(translate('iou.rulesModifiedFields.reimbursable', value as boolean));
-                } else {
-                    acc.standaloneFragments.push(translate('iou.rulesModifiedFields.billable', value as boolean));
-                }
+            if (key === 'reportName') {
+                acc.standaloneFragments.push(translate('iou.rulesModifiedFields.reportName', value as string));
+            } else if (key === 'reimbursable') {
+                acc.standaloneFragments.push(translate('iou.rulesModifiedFields.reimbursable', value as boolean));
+            } else if (key === 'billable') {
+                acc.standaloneFragments.push(translate('iou.rulesModifiedFields.billable', value as boolean));
             } else {
                 acc.listEntries.push(entry as Entries<PolicyRulesModifiedFields>[number]);
             }
@@ -261,7 +256,7 @@ function getRulesModifiedMessage(
     });
 
     const fragments = [...standaloneFragments, ...listFragment];
-    return fragments.length > 0 ? translate('iou.rulesModifiedFields.format', formatList(fragments), route, isPersonalRules) : '';
+    return fragments.length > 0 ? translate(isPersonalRules ? 'iou.rulesModifiedFields.formatPersonalRules' : 'iou.rulesModifiedFields.formatPolicyRules', formatList(fragments), route) : '';
 }
 
 /**

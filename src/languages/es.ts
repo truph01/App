@@ -1368,8 +1368,8 @@ const translations: TranslationDeepObject<typeof en> = {
                 const field = translations.common[key].toLowerCase();
                 return isFirst ? `estableció el ${field} a "${value}"` : `${field} a "${value}"`;
             },
-            format: (fragments: string, route: string, isPersonalRules: boolean) =>
-                `${fragments} a través de <a href="${route}">${isPersonalRules ? 'reglas de gastos personales' : 'reglas del espacio de trabajo'}</a>`,
+            formatPersonalRules: (fragments: string, route: string) => `${fragments} vía <a href="${route}">reglas de gastos personales</a>`,
+            formatPolicyRules: (fragments: string, route: string) => `${fragments} vía <a href="${route}">reglas del espacio de trabajo</a>`,
         },
         duplicateNonDefaultWorkspacePerDiemError: 'No puedes duplicar gastos de viáticos entre espacios de trabajo porque las tarifas pueden variar entre ellos.',
     },
