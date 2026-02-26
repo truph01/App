@@ -276,7 +276,7 @@ describe('MoneyRequest', () => {
                 ...baseParams,
                 transactions: [transactionWithLinkedAction],
                 allTransactionDrafts: {
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draftTransaction.transactionID}`]: draftTransaction,
+                    [draftTransaction.transactionID]: draftTransaction,
                 },
             });
 
@@ -327,32 +327,14 @@ describe('MoneyRequest', () => {
             createTransaction({
                 ...baseParams,
                 allTransactionDrafts: {
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draft1.transactionID}`]: draft1,
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draft2.transactionID}`]: draft2,
+                    [draft1.transactionID]: draft1,
+                    [draft2.transactionID]: draft2,
                 },
             });
 
             expect(IOU.requestMoney).toHaveBeenCalledWith(
                 expect.objectContaining({
                     draftTransactionIDs: expect.arrayContaining([draft1.transactionID, draft2.transactionID]),
-                }),
-            );
-        });
-
-        it('should filter out null entries from allTransactionDrafts when computing draftTransactionIDs', () => {
-            const draft1 = createRandomTransaction(101);
-
-            createTransaction({
-                ...baseParams,
-                allTransactionDrafts: {
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${draft1.transactionID}`]: draft1,
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}nullEntry`]: undefined,
-                },
-            });
-
-            expect(IOU.requestMoney).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    draftTransactionIDs: [draft1.transactionID],
                 }),
             );
         });
@@ -429,6 +411,7 @@ describe('MoneyRequest', () => {
             isSelfTourViewed: false,
             betas: [],
             recentWaypoints: [] as RecentWaypoint[],
+            allTransactionDrafts: {},
         };
 
         beforeEach(async () => {

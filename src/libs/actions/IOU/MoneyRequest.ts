@@ -107,7 +107,7 @@ type MoneyRequestStepScanParticipantsFlowParams = {
     shouldGenerateTransactionThreadReport: boolean;
     selfDMReport: OnyxEntry<Report>;
     isSelfTourViewed: boolean;
-    allTransactionDrafts?: OnyxCollection<Transaction>;
+    allTransactionDrafts: OnyxCollection<Transaction>;
     betas: OnyxEntry<Beta[]>;
     recentWaypoints: OnyxEntry<RecentWaypoint[]>;
 };
@@ -181,9 +181,7 @@ function createTransaction({
     personalDetails,
     recentWaypoints,
 }: CreateTransactionParams) {
-    const draftTransactionIDs = Object.values(allTransactionDrafts ?? {})
-        .filter((transaction): transaction is NonNullable<typeof transaction> => !!transaction)
-        .map((transaction) => transaction.transactionID);
+    const draftTransactionIDs = Object.keys(allTransactionDrafts ?? {});
 
     for (const [index, receiptFile] of files.entries()) {
         const transaction = transactions.find((item) => item.transactionID === receiptFile.transactionID);
@@ -221,7 +219,7 @@ function createTransaction({
             });
         } else {
             const existingTransactionID = getExistingTransactionID(transaction?.linkedTrackedExpenseReportAction);
-            const existingTransactionDraft = allTransactionDrafts?.[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${existingTransactionID}`];
+            const existingTransactionDraft = existingTransactionID ? allTransactionDrafts?.[existingTransactionID] : undefined;
 
             requestMoney({
                 report,
