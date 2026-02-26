@@ -1,6 +1,6 @@
-import LoadingBar from '@components/LoadingBar';
 import useLoadingBarVisibility from '@hooks/useLoadingBarVisibility';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import LoadingBar from './LoadingBar';
 
 function HeaderLoadingBar() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();

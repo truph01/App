@@ -6,6 +6,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import CaretWrapper from '@components/CaretWrapper';
 import DisplayNames from '@components/DisplayNames';
+import HeaderLoadingBar from '@components/HeaderLoadingBar';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import OnboardingHelpDropdownButton from '@components/OnboardingHelpDropdownButton';
@@ -79,7 +80,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import type {Account, Report, ReportAction, ReportMetadata} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import HeaderLoadingBar from './HeaderLoadingBar';
 
 const accountGuideDetailsSelector = (account: OnyxEntry<Account>) => account?.guideDetails;
 
