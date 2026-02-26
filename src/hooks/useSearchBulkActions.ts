@@ -96,9 +96,10 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     // while results are temporarily unset (e.g. during sorting/loading).
     const lastNonEmptySearchResultsRef = useRef<SearchResults | undefined>(undefined);
     useEffect(() => {
-        if (currentSearchResults?.data) {
-            lastNonEmptySearchResultsRef.current = currentSearchResults;
+        if (!currentSearchResults?.data) {
+            return;
         }
+        lastNonEmptySearchResultsRef.current = currentSearchResults;
     }, [currentSearchResults]);
     const searchResults = currentSearchResults?.data ? currentSearchResults : lastNonEmptySearchResultsRef.current;
 
