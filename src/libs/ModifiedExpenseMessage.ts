@@ -209,7 +209,6 @@ function getRulesModifiedMessage(
     policyID?: string,
     hasPolicyRuleAccess?: boolean,
 ) {
-    const route = policyID && hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
     const entries = ObjectUtils.typedEntries(fields);
 
     // reportName ("moved to report X"), reimbursable/billable ("marked the expense as reimbursable/billable"), are standalone clauses with their own verb.
@@ -256,6 +255,10 @@ function getRulesModifiedMessage(
     });
 
     const fragments = [...standaloneFragments, ...listFragment];
+    let route = policyID && hasPolicyRuleAccess ? `${environmentURL}/${ROUTES.WORKSPACE_RULES.getRoute(policyID)}` : CONST.CONFIGURE_EXPENSE_REPORT_RULES_HELP_URL;
+    if (isPersonalRules) {
+        route = `${environmentURL}/${ROUTES.SETTINGS_RULES}`;
+    }
     return fragments.length > 0 ? translate(isPersonalRules ? 'iou.rulesModifiedFields.formatPersonalRules' : 'iou.rulesModifiedFields.formatPolicyRules', formatList(fragments), route) : '';
 }
 
