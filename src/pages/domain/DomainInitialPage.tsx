@@ -60,7 +60,7 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
     const domainAccountID = route.params?.domainAccountID;
     const [domain, domainMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`);
     const domainName = domain?.email ? Str.extractEmailDomain(domain.email) : undefined;
-    const [isAdmin] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_ADMIN_ACCESS}${domainAccountID}`);
+    const [isAdmin, adminMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_ADMIN_ACCESS}${domainAccountID}`);
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
 
     const domainMenuItems: DomainMenuItem[] = [
@@ -101,7 +101,7 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
 
     useConfirmReadyToOpenApp();
 
-    const shouldShowFullScreenLoadingIndicator = isLoadingOnyxValue(domainMetadata);
+    const shouldShowFullScreenLoadingIndicator = isLoadingOnyxValue(domainMetadata, adminMetadata);
 
     useEffect(() => {
         if (shouldShowFullScreenLoadingIndicator || (domain && isAdmin)) {
