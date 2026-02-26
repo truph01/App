@@ -110,17 +110,15 @@ The expense amount is automatically calculated by multiplying the distance by th
 
 Yes! You can edit the expense before it is approved. To learn how to edit an expense, see [Managing Expenses in a Report](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Managing-Expenses-in-a-Report).
 
-## Can Distance expenses be split?
-
-Only map-based distance expenses can be split. Manual Distance expenses are not available for splitting. If you need a manual Distance expense split with another user, you can each create your own expense for half the distance each.
-
 ## Can I update the Distance expense unit or rate?
 
 The distance unit and rate can only be updated by a Workspace Admin on the Workspace. It is not possible to adjust the distance rate or unit at the expense level. 
 
 ## What happens if a Distance expense is moved to a different Workspace?
 
-When a Distance expense is moved to a different Workspace, the expense is automatically updated to use the new Workspace's unit and distance rate.
+When a Distance expense is moved to another Workspace, it keeps its original unit and rate.
+
+If the rate isn’t valid in the new Workspace, the expense will show a “Rate not valid for this workspace” violation. Selecting a valid rate will update the expense.
 
 ## Do I need to keep the mobile app open during GPS tracking?
 
