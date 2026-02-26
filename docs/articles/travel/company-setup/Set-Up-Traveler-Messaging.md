@@ -23,7 +23,7 @@ If you don’t see the Traveler messaging option, confirm that you have the corr
 
 ## Where to find Traveler Messaging
 
-### On web or mobile
+**On web or mobile**
 
 1. Click **Program** in the top navigation.
 2. Select **Company**.
@@ -76,7 +76,7 @@ To create a separate audience group, click **Add new audience**.
 
 To remove a condition, click the trash can icon.
 
-### Available audience conditions
+**What conditions can I use to target Traveler Messaging?**
 
 You can target Traveler messaging based on:
 
@@ -164,3 +164,4 @@ Yes. When creating the message, select **Email** as the Mode of delivery instead
 Yes. Open the message from the list, make changes, and save. Changes will follow the updated schedule and audience conditions.
 
 
+****
