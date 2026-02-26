@@ -145,9 +145,11 @@ jobs:
         id: getCPMergeCommit
         run: |
           read -r MERGE_COMMIT_SHA MERGE_ACTOR PR_AUTHOR <<< "$(gh pr view ${{ inputs.PULL_REQUEST_URL }} --json mergeCommit,mergedBy,author --jq '"\(.mergeCommit.oid) \(.mergedBy.login) \(.author.login)"')"
-          echo "MERGE_COMMIT_SHA=$MERGE_COMMIT_SHA" >> "$GITHUB_OUTPUT"
-          echo "MERGE_ACTOR=$MERGE_ACTOR" >> "$GITHUB_OUTPUT"
-          echo "PR_AUTHOR=$PR_AUTHOR" >> "$GITHUB_OUTPUT"
+          {
+            echo "MERGE_COMMIT_SHA=$MERGE_COMMIT_SHA"
+            echo "MERGE_ACTOR=$MERGE_ACTOR"
+            echo "PR_AUTHOR=$PR_AUTHOR"
+          } >> "$GITHUB_OUTPUT"
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
 
@@ -285,7 +287,8 @@ jobs:
           MENTIONS=""
           SEEN=""
           for sid in $PR_AUTHOR_SLACK $MERGER_SLACK $CP_SLACK; do
-            if [ -n "$sid" ] && [[ ! " $SEEN " =~ " $sid " ]]; then
+            pattern=" $sid "
+            if [ -n "$sid" ] && [[ ! " $SEEN " =~ $pattern ]]; then
               MENTIONS="${MENTIONS:+$MENTIONS / }<@$sid>"
               SEEN="$SEEN $sid"
             fi
