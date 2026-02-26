@@ -66,9 +66,6 @@ type ReportFooterProps = {
     /** The pending action when we are adding a chat */
     pendingAction?: PendingAction;
 
-    /** Whether the composer is in full size */
-    isComposerFullSize?: boolean;
-
     /** A method to call when the input is focus */
     onComposerFocus?: () => void;
 
@@ -85,7 +82,6 @@ function ReportFooter({
     report = {reportID: '-1'},
     reportMetadata,
     policy,
-    isComposerFullSize = false,
     onComposerBlur,
     onComposerFocus,
     reportTransactions,
@@ -107,6 +103,7 @@ function ReportFooter({
     const [isBlockedFromChat] = useOnyx(ONYXKEYS.NVP_BLOCKED_FROM_CHAT, {
         selector: isBlockedFromChatSelector,
     });
+    const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${report.reportID}`);
 
     const chatFooterStyles = {...styles.chatFooter, minHeight: !isOffline ? CONST.CHAT_FOOTER_MIN_HEIGHT : 0};
     const isReportArchived = useReportIsArchived(report?.reportID);
@@ -285,7 +282,6 @@ export default memo(
         // Report comes from useOnyx - reference is stable
         prevProps.report === nextProps.report &&
         prevProps.pendingAction === nextProps.pendingAction &&
-        prevProps.isComposerFullSize === nextProps.isComposerFullSize &&
         prevProps.lastReportAction === nextProps.lastReportAction &&
         // reportMetadata comes from useOnyx - reference is stable
         prevProps.reportMetadata === nextProps.reportMetadata &&
