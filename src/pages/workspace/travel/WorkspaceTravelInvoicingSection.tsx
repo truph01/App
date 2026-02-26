@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import AnimatedSubmitButton from '@components/AnimatedSubmitButton';
 import ConfirmModal from '@components/ConfirmModal';
@@ -55,6 +55,9 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     // Modal states
     const [isDisableConfirmModalVisible, setIsDisableConfirmModalVisible] = useState(false);
     const [isOutstandingBalanceModalVisible, setIsOutstandingBalanceModalVisible] = useState(false);
+
+    // Ref to track if we should auto-resume the toggle flow after returning from TravelLegalNamePage
+    const shouldResumeToggleRef = useRef(false);
 
     // For Travel Invoicing, we use a travel-specific card settings key
     // Uses the same key pattern as Expensify Card: private_expensifyCardSettings_{workspaceAccountID}
@@ -136,6 +139,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         }
 
         if (areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            shouldResumeToggleRef.current = true;
             Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS.getRoute(policyID));
             return;
         }
@@ -168,6 +172,17 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         setIsDisableConfirmModalVisible(false);
         toggleTravelInvoicing(policyID, workspaceAccountID, false);
     };
+
+    // Auto-resume the toggle flow after returning from TravelLegalNamePage
+    // When the user saves their legal name and navigates back, privatePersonalDetails updates
+    // and this effect re-triggers handleToggle(true) to continue the enabling flow
+    useEffect(() => {
+        if (shouldResumeToggleRef.current && !areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            shouldResumeToggleRef.current = false;
+            handleToggle(true);
+        }
+        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+    }, [privatePersonalDetails]);
 
     const getCentralInvoicingSubtitle = () => {
         if (!isTravelInvoicingEnabled) {

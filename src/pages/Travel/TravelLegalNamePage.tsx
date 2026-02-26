@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
+import type {FormOnyxValues} from '@components/Form/types';
 import Text from '@components/Text';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
@@ -9,13 +9,9 @@ import {clearDraftValues} from '@libs/actions/FormActions';
 import {updateLegalName} from '@libs/actions/PersonalDetails';
 import {formatPhoneNumber} from '@libs/LocalePhoneNumber';
 import Navigation from '@libs/Navigation/Navigation';
-import {getFieldRequiredErrors, isRequiredFulfilled, isValidLegalName} from '@libs/ValidationUtils';
-import {BaseLegalNamePage} from '@pages/settings/Profile/PersonalDetails/LegalNamePage';
-import CONST from '@src/CONST';
+import BaseLegalNamePage, {validateLegalName} from '@pages/settings/Profile/PersonalDetails/BaseLegalNamePage';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/PersonalDetailsForm';
-
-const STEP_FIELDS = [INPUT_IDS.LEGAL_FIRST_NAME, INPUT_IDS.LEGAL_LAST_NAME];
 
 function TravelLegalNamePage() {
     const {translate} = useLocalize();
@@ -26,32 +22,9 @@ function TravelLegalNamePage() {
 
     useEffect(() => () => clearDraftValues(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM), []);
 
-    const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM> => {
-        const errors = getFieldRequiredErrors(values, STEP_FIELDS, translate);
-
-        const firstName = values[INPUT_IDS.LEGAL_FIRST_NAME];
-        if (!isRequiredFulfilled(firstName)) {
-            errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.fieldRequired');
-        } else if (!isValidLegalName(firstName)) {
-            errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('privatePersonalDetails.error.hasInvalidCharacter');
-        } else if (firstName.length > CONST.LEGAL_NAME.MAX_LENGTH) {
-            errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.characterLimitExceedCounter', firstName.length, CONST.LEGAL_NAME.MAX_LENGTH);
-        }
-
-        const lastName = values[INPUT_IDS.LEGAL_LAST_NAME];
-        if (!isRequiredFulfilled(lastName)) {
-            errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.fieldRequired');
-        } else if (!isValidLegalName(lastName)) {
-            errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('privatePersonalDetails.error.hasInvalidCharacter');
-        } else if (lastName.length > CONST.LEGAL_NAME.MAX_LENGTH) {
-            errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.characterLimitExceedCounter', lastName.length, CONST.LEGAL_NAME.MAX_LENGTH);
-        }
-
-        return errors;
-    };
-
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>) => {
         updateLegalName(values.legalFirstName?.trim() ?? '', values.legalLastName?.trim() ?? '', formatPhoneNumber, currentUserPersonalDetails);
+        Navigation.closeRHPFlow();
     };
 
     const handleBackButtonPress = () => {
@@ -65,7 +38,7 @@ function TravelLegalNamePage() {
             submitButtonText={translate('common.next')}
             onBackButtonPress={handleBackButtonPress}
             onSubmit={handleSubmit}
-            validate={validate}
+            validate={validateLegalName}
             headerTitle={translate('travel.bookTravel')}
             shouldSaveDraft
             defaultFirstName={draftValues?.[INPUT_IDS.LEGAL_FIRST_NAME] ?? privatePersonalDetails?.[INPUT_IDS.LEGAL_FIRST_NAME]}
