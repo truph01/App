@@ -8,7 +8,7 @@ import Checkbox from '@components/Checkbox';
 import MenuItem from '@components/MenuItem';
 import Modal from '@components/Modal';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
-import {useSearchContext} from '@components/Search/SearchContext';
+import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SortOrder} from '@components/Search/types';
 import Text from '@components/Text';
 import {useWideRHPActions} from '@components/WideRHPContextProvider';
@@ -193,7 +193,8 @@ function MoneyRequestReportTransactionList({
         return hasPendingDeletionTransaction || transactions.some(getTransactionPendingAction);
     }, [hasPendingDeletionTransaction, transactions]);
 
-    const {selectedTransactionIDs, setSelectedTransactions, clearSelectedTransactions} = useSearchContext();
+    const {selectedTransactionIDs} = useSearchStateContext();
+    const {setSelectedTransactions, clearSelectedTransactions} = useSearchActionsContext();
     useHandleSelectionMode(selectedTransactionIDs);
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
 
@@ -515,6 +516,7 @@ function MoneyRequestReportTransactionList({
                                               shouldBeHighlighted={highlightedTransactionIDs.has(transaction.transactionID)}
                                               columns={columnsToShow}
                                               report={report}
+                                              policy={policy}
                                               isSelectionModeEnabled={isMobileSelectionModeEnabled}
                                               toggleTransaction={toggleTransaction}
                                               isSelected={isTransactionSelected(transaction.transactionID)}
@@ -538,6 +540,7 @@ function MoneyRequestReportTransactionList({
                               shouldBeHighlighted={highlightedTransactionIDs.has(transaction.transactionID)}
                               columns={columnsToShow}
                               report={report}
+                              policy={policy}
                               isSelectionModeEnabled={isMobileSelectionModeEnabled}
                               toggleTransaction={toggleTransaction}
                               isSelected={isTransactionSelected(transaction.transactionID)}

@@ -206,7 +206,9 @@ import {
     getCurrency,
     getDistanceInMeters,
     getMerchant,
+    getRateID,
     getUpdatedTransaction,
+    getWaypoints,
     hasAnyTransactionWithoutRTERViolation,
     hasDuplicateTransactions,
     hasSubmissionBlockingViolations,
@@ -1008,12 +1010,6 @@ Onyx.connectWithoutView({
     callback: (value) => (recentAttendees = value),
 });
 
-let deprecatedRecentWaypoints: OnyxTypes.RecentWaypoint[] = [];
-Onyx.connect({
-    key: ONYXKEYS.NVP_RECENT_WAYPOINTS,
-    callback: (val) => (deprecatedRecentWaypoints = val ?? []),
-});
-
 function getAllPersonalDetails(): OnyxTypes.PersonalDetailsList {
     return allPersonalDetails;
 }
@@ -1040,10 +1036,6 @@ function getCurrentUserEmail(): string {
 
 function getUserAccountID(): number {
     return userAccountID;
-}
-
-function getRecentWaypoints(): OnyxTypes.RecentWaypoint[] {
-    return deprecatedRecentWaypoints;
 }
 
 /**
@@ -4568,6 +4560,10 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     const hasModifiedDistanceRate = 'customUnitRateID' in transactionChanges;
     const hasModifiedCreated = 'created' in transactionChanges;
     const hasModifiedAmount = 'amount' in transactionChanges;
+    const hasModifiedMerchant = 'merchant' in transactionChanges;
+    // For split transactions, the merchant and amount are already computed in transactionChanges,
+    // so we can build a valid optimistic MODIFIED_EXPENSE even when waypoints are pending.
+    const hasSplitDistanceMessageFields = !!isSplitTransaction && hasModifiedMerchant && hasModifiedAmount;
     if (transaction && updatedTransaction && (hasPendingWaypoints || hasModifiedDistanceRate)) {
         // Delete the draft transaction when editing waypoints when the server responds successfully and there are no errors
         successData.push({
@@ -4593,15 +4589,17 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
 
     // Step 3: Build the modified expense report actions
     // We don't create a modified report action if:
-    // - we're updating the waypoints
+    // - we're updating the waypoints (unless it's a split transaction with computed merchant + amount)
     // - we're updating the distance rate while the waypoints are still pending
     // - we're merging two expenses (server does not create MODIFIED_EXPENSE in this flow)
     // In these cases, there isn't a valid optimistic mileage data we can use,
-    // and the report action is created on the server with the distance-related response from the MapBox API
+    // and the report action is created on the server with the distance-related response from the MapBox API.
+    // For split transactions, the merchant and amount are already available in transactionChanges,
+    // so we can build the optimistic report action even when waypoints are pending.
     const updatedReportAction = shouldBuildOptimisticModifiedExpenseReportAction
         ? buildOptimisticModifiedExpenseReportAction(transactionThreadReport, transaction, transactionChanges, isFromExpenseReport, policy, updatedTransaction, allowNegative)
         : null;
-    if (!hasPendingWaypoints && !(hasModifiedDistanceRate && isFetchingWaypointsFromServer(transaction)) && updatedReportAction) {
+    if ((!hasPendingWaypoints || hasSplitDistanceMessageFields) && !(hasModifiedDistanceRate && isFetchingWaypointsFromServer(transaction)) && updatedReportAction) {
         apiParams.reportActionID = updatedReportAction.reportActionID;
 
         optimisticData.push({
@@ -4889,7 +4887,6 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     const hasModifiedReimbursable = 'reimbursable' in transactionChanges;
     const hasModifiedTaxCode = 'taxCode' in transactionChanges;
     const hasModifiedDate = 'date' in transactionChanges;
-    const hasModifiedMerchant = 'merchant' in transactionChanges;
     const hasModifiedAttendees = 'attendees' in transactionChanges;
 
     const isInvoice = isInvoiceReportReportUtils(iouReport);
@@ -6063,6 +6060,9 @@ type ConvertTrackedExpenseToRequestParams = {
         transactionThreadReportID?: string;
         distance?: number;
         isLinkedTrackedExpenseReportArchived: boolean | undefined;
+        waypoints?: string;
+        customUnitRateID?: string;
+        isDistance?: boolean;
     };
     chatParams: {
         reportID: string;
@@ -6099,6 +6099,9 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         attendees,
         transactionThreadReportID,
         isLinkedTrackedExpenseReportArchived,
+        waypoints,
+        customUnitRateID,
+        isDistance,
     } = transactionParams;
     const optimisticData: Array<OnyxUpdate<BuildOnyxDataForMoneyRequestKeys>> = [];
     const successData: Array<OnyxUpdate<BuildOnyxDataForMoneyRequestKeys>> = [];
@@ -6188,6 +6191,9 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         transactionThreadReportID,
         modifiedExpenseReportActionID: convertTrackedExpenseInformation.modifiedExpenseReportActionID,
         reportPreviewReportActionID: chatParams.reportPreviewReportActionID,
+        isDistance,
+        customUnitRateID,
+        waypoints,
     };
     API.write(WRITE_COMMANDS.CONVERT_TRACKED_EXPENSE_TO_REQUEST, parameters, {optimisticData, successData, failureData});
 }
@@ -6338,6 +6344,10 @@ function convertBulkTrackedExpensesToIOU({
             betas,
         });
 
+        const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
+        const transactionWaypoints = getWaypoints(transaction);
+        const sanitizedWaypointsForBulk = transactionWaypoints ? JSON.stringify(sanitizeRecentWaypoints(transactionWaypoints)) : undefined;
+
         const convertParams: ConvertTrackedExpenseToRequestParams = {
             payerParams: {
                 accountID: moneyRequestPayerAccountID,
@@ -6356,6 +6366,10 @@ function convertBulkTrackedExpensesToIOU({
                 linkedTrackedExpenseReportID: selfDMReportID,
                 transactionThreadReportID: moneyRequestTransactionThreadReportID,
                 isLinkedTrackedExpenseReportArchived: false,
+                isDistance: isDistanceRequest,
+                customUnitRateID: isDistanceRequest ? getRateID(transaction) : undefined,
+                waypoints: isDistanceRequest ? sanitizedWaypointsForBulk : undefined,
+                distance: isDistanceRequest ? (transaction.comment?.customUnit?.quantity ?? undefined) : undefined,
             },
             chatParams: {
                 reportID: moneyRequestChatReport.reportID,
@@ -6713,6 +6727,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
                           ...customUnitParams,
                       }
                     : undefined;
+            const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
             convertTrackedExpenseToRequest({
                 payerParams: {
                     accountID: payerAccountID,
@@ -6732,6 +6747,9 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
                     linkedTrackedExpenseReportID,
                     transactionThreadReportID: transactionThreadReportID ?? iouAction?.childReportID,
                     isLinkedTrackedExpenseReportArchived,
+                    isDistance: isDistanceRequest,
+                    customUnitRateID: isDistanceRequest ? customUnitRateID : undefined,
+                    waypoints: isDistanceRequest ? sanitizedWaypoints : undefined,
                 },
                 chatParams: {
                     reportID: chatReport.reportID,
@@ -10444,9 +10462,7 @@ function canIOUBePaid(
         if (chatReport?.invoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL) {
             return chatReport?.invoiceReceiver?.accountID === userAccountID;
         }
-        // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        return (invoiceReceiverPolicy ?? getPolicy(chatReport?.invoiceReceiver?.policyID))?.role === CONST.POLICY.ROLE.ADMIN;
+        return invoiceReceiverPolicy?.role === CONST.POLICY.ROLE.ADMIN;
     }
 
     const isPayer = isPayerReportUtils(userAccountID, currentUserEmail, iouReport, bankAccountList, policy, onlyShowPayElsewhere);
@@ -10517,6 +10533,7 @@ function getIOUReportActionToApproveOrPay(
     chatReport: OnyxEntry<OnyxTypes.Report>,
     updatedIouReport: OnyxEntry<OnyxTypes.Report>,
     reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>,
+    invoiceReceiverPolicy: OnyxEntry<OnyxTypes.Policy>,
 ): OnyxEntry<ReportAction> {
     const chatReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReport?.reportID}`] ?? {};
 
@@ -10529,7 +10546,8 @@ function getIOUReportActionToApproveOrPay(
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         const policy = getPolicy(iouReport?.policyID);
         // Only show to the actual payer, exclude admins with bank account access
-        const shouldShowSettlementButton = canIOUBePaid(iouReport, chatReport, policy, undefined) || canApproveIOU(iouReport, policy, reportMetadata);
+        const shouldShowSettlementButton =
+            canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) || canApproveIOU(iouReport, policy, reportMetadata);
         return action.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW && shouldShowSettlementButton && !isDeletedAction(action);
     });
 }
@@ -11219,15 +11237,11 @@ function retractReport(
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`,
             value: {
-                // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                 stateNum: expenseReport.stateNum,
-                // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
-                statusNum: expenseReport.stateNum,
-                // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
+                statusNum: expenseReport.statusNum,
                 hasReportBeenRetracted: false,
                 nextStep: expenseReport.nextStep ?? null,
                 pendingFields: {
-                    // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                     partial: null,
                     nextStep: null,
                 },
@@ -12373,6 +12387,16 @@ function setMoneyRequestTaxAmount(transactionID: string, taxAmount: number | nul
     Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {taxAmount});
 }
 
+type TaxRateValues = {
+    taxCode: string | null;
+    taxAmount: number | null;
+    taxValue: string | null;
+};
+
+function setMoneyRequestTaxRateValues(transactionID: string, taxRateValues: TaxRateValues, isDraft = true) {
+    Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {...taxRateValues});
+}
+
 // eslint-disable-next-line rulesdir/no-negated-variables
 function navigateToStartStepIfScanFileCannotBeRead(
     receiptFilename: string | undefined,
@@ -12941,7 +12965,7 @@ function prepareRejectMoneyRequestData(
             movedToReport = existingOpenReport;
             rejectedToReportID = existingOpenReport.reportID;
 
-            const [, , iouAction, ,] = buildOptimisticMoneyRequestEntities({
+            const [, , iouAction] = buildOptimisticMoneyRequestEntities({
                 iouReport: movedToReport,
                 type: CONST.IOU.REPORT_ACTION_TYPE.CREATE,
                 amount: transactionAmount,
@@ -13032,7 +13056,7 @@ function prepareRejectMoneyRequestData(
                 reportTransactions,
                 betas,
             });
-            const [, createdActionForExpenseReport, iouAction, ,] = buildOptimisticMoneyRequestEntities({
+            const [, createdActionForExpenseReport, iouAction] = buildOptimisticMoneyRequestEntities({
                 iouReport: newExpenseReport,
                 type: CONST.IOU.REPORT_ACTION_TYPE.CREATE,
                 amount: transactionAmount,
@@ -13830,6 +13854,7 @@ export {
     setMoneyRequestTag,
     setMoneyRequestTaxAmount,
     setMoneyRequestTaxRate,
+    setMoneyRequestTaxRateValues,
     startMoneyRequest,
     submitReport,
     trackExpense,
@@ -13882,7 +13907,6 @@ export {
     getAllReportActionsFromIOU,
     getCurrentUserEmail,
     getUserAccountID,
-    getRecentWaypoints,
     getReceiptError,
     getSearchOnyxUpdate,
     getPolicyTags,

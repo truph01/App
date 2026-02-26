@@ -53,6 +53,7 @@ import {
     getTaxValue,
     hasMissingSmartscanFields,
     hasRoute as hasRouteUtil,
+    hasTaxRateWithMatchingValue,
     isMerchantMissing,
     isScanRequest as isScanRequestUtil,
 } from '@libs/TransactionUtils';
@@ -442,6 +443,7 @@ function MoneyRequestConfirmationList({
         category: iouCategory,
         tag: getTag(transaction),
         taxCode: transaction?.taxCode,
+        taxValue: transaction?.taxValue,
         policyCategories,
         policyTagLists: policyTags,
         policyTaxRates: policy?.taxRates?.taxes,
@@ -1020,7 +1022,7 @@ function MoneyRequestConfirmationList({
                 return;
             }
 
-            if (shouldShowTax && !!transaction.taxCode && !Object.keys(policy?.taxRates?.taxes ?? {}).some((key) => key === transaction.taxCode)) {
+            if (shouldShowTax && !!transaction.taxCode && !hasTaxRateWithMatchingValue(policy, transaction)) {
                 setFormError('violations.taxOutOfPolicy');
                 return;
             }
