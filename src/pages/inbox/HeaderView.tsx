@@ -7,7 +7,6 @@ import Button from '@components/Button';
 import CaretWrapper from '@components/CaretWrapper';
 import DisplayNames from '@components/DisplayNames';
 import Icon from '@components/Icon';
-import LoadingBar from '@components/LoadingBar';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import OnboardingHelpDropdownButton from '@components/OnboardingHelpDropdownButton';
 import ParentNavigationSubtitle from '@components/ParentNavigationSubtitle';
@@ -22,7 +21,6 @@ import Tooltip from '@components/Tooltip';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useHasTeam2025Pricing from '@hooks/useHasTeam2025Pricing';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
-import useLoadingBarVisibility from '@hooks/useLoadingBarVisibility';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useParentReportAction from '@hooks/useParentReportAction';
@@ -81,6 +79,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import type {Account, Report, ReportAction, ReportMetadata} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import HeaderLoadingBar from './HeaderLoadingBar';
 
 const accountGuideDetailsSelector = (account: OnyxEntry<Account>) => account?.guideDetails;
 
@@ -120,7 +119,6 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
     const policy = usePolicy(report?.policyID);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID);
-    const shouldShowLoadingBar = useLoadingBarVisibility();
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
     const [lastDayFreeTrial] = useOnyx(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL);
     const [accountGuideDetails] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountGuideDetailsSelector});
@@ -422,7 +420,7 @@ function HeaderView({report, parentReportAction, onNavigationMenuButtonClicked, 
                         </View>
                     </View>
                 )}
-                <LoadingBar shouldShow={shouldShowLoadingBar && shouldUseNarrowLayout} />
+                <HeaderLoadingBar />
             </View>
             {shouldShowEarlyDiscountBanner && (
                 <EarlyDiscountBanner
