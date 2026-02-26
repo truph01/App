@@ -1996,24 +1996,42 @@ const createStyleUtils = (theme: ThemeColors, styles: ThemeStyles) => ({
     },
 
     /**
-     * Returns all necessary styles for crop view components
-     * @param params - Object containing dynamic crop values (cropX, cropY, cropWidth, cropHeight, etc.)
+     * Returns a single crop view style by key. Use this from useAnimatedStyle to avoid building all 14 styles per frame.
+     * @param params - Object containing dynamic crop values (same as getCropViewStyles)
+     * @param key - Which style to return
      */
-    getCropViewStyles: (params?: {
-        cropX?: number;
-        cropY?: number;
-        cropWidth?: number;
-        cropHeight?: number;
-        imageLeft?: number;
-        imageTop?: number;
-        imgDisplayWidth?: number;
-        cropLeft?: number;
-        cropRight?: number;
-        cropTop?: number;
-        cropBottom?: number;
-        imageRight?: number;
-        imageBottom?: number;
-    }) => {
+    getCropViewStyle: (
+        key:
+            | 'cornerVisual'
+            | 'border'
+            | 'cornerTopLeft'
+            | 'cornerTopRight'
+            | 'cornerBottomLeft'
+            | 'cornerBottomRight'
+            | 'edgeTop'
+            | 'edgeBottom'
+            | 'edgeLeft'
+            | 'edgeRight'
+            | 'overlayTop'
+            | 'overlayBottom'
+            | 'overlayLeft'
+            | 'overlayRight',
+        params?: {
+            cropX?: number;
+            cropY?: number;
+            cropWidth?: number;
+            cropHeight?: number;
+            imageLeft?: number;
+            imageTop?: number;
+            imgDisplayWidth?: number;
+            cropLeft?: number;
+            cropRight?: number;
+            cropTop?: number;
+            cropBottom?: number;
+            imageRight?: number;
+            imageBottom?: number;
+        },
+    ) => {
         'worklet';
 
         const {
@@ -2032,122 +2050,138 @@ const createStyleUtils = (theme: ThemeColors, styles: ThemeStyles) => ({
             imageBottom = 0,
         } = params ?? {};
 
-        return {
-            cornerVisual: {
-                position: 'absolute' as const,
-                left: (variables.cornerTapTargetSize - variables.cornerHandleSize) / 2,
-                top: (variables.cornerTapTargetSize - variables.cornerHandleSize) / 2,
-                width: variables.cornerHandleSize,
-                height: variables.cornerHandleSize,
-                borderRadius: variables.cornerHandleSize / 2,
-                backgroundColor: theme.success,
-            },
-            border: {
-                ...styles.pAbsolute,
-                left: cropX,
-                top: cropY,
-                width: cropWidth,
-                height: cropHeight,
-                borderWidth: variables.cropBorderWidth,
-                borderColor: theme.success,
-            },
-            cornerTopLeft: {
-                ...styles.pAbsolute,
-                left: cropX - variables.cornerTapTargetSize / 2,
-                top: cropY - variables.cornerTapTargetSize / 2,
-                width: variables.cornerTapTargetSize,
-                height: variables.cornerTapTargetSize,
-                ...styles.cursorNwseResize,
-            },
-            cornerTopRight: {
-                ...styles.pAbsolute,
-                left: cropX + cropWidth - variables.cornerTapTargetSize / 2,
-                top: cropY - variables.cornerTapTargetSize / 2,
-                width: variables.cornerTapTargetSize,
-                height: variables.cornerTapTargetSize,
-                ...styles.cursorNeswResize,
-            },
-            cornerBottomLeft: {
-                ...styles.pAbsolute,
-                left: cropX - variables.cornerTapTargetSize / 2,
-                top: cropY + cropHeight - variables.cornerTapTargetSize / 2,
-                width: variables.cornerTapTargetSize,
-                height: variables.cornerTapTargetSize,
-                ...styles.cursorNeswResize,
-            },
-            cornerBottomRight: {
-                ...styles.pAbsolute,
-                left: cropX + cropWidth - variables.cornerTapTargetSize / 2,
-                top: cropY + cropHeight - variables.cornerTapTargetSize / 2,
-                width: variables.cornerTapTargetSize,
-                height: variables.cornerTapTargetSize,
-                ...styles.cursorNwseResize,
-            },
-            edgeTop: {
-                ...styles.pAbsolute,
-                left: cropX,
-                top: cropY - variables.edgeHandleTapTargetThickness / 2,
-                width: cropWidth,
-                height: variables.edgeHandleTapTargetThickness,
-                ...styles.cursorNsResize,
-            },
-            edgeBottom: {
-                ...styles.pAbsolute,
-                left: cropX,
-                top: cropY + cropHeight - variables.edgeHandleTapTargetThickness / 2,
-                width: cropWidth,
-                height: variables.edgeHandleTapTargetThickness,
-                ...styles.cursorNsResize,
-            },
-            edgeLeft: {
-                ...styles.pAbsolute,
-                left: cropX - variables.edgeHandleTapTargetThickness / 2,
-                top: cropY,
-                width: variables.edgeHandleTapTargetThickness,
-                height: cropHeight,
-                ...styles.cursorEwResize,
-            },
-            edgeRight: {
-                ...styles.pAbsolute,
-                left: cropX + cropWidth - variables.edgeHandleTapTargetThickness / 2,
-                top: cropY,
-                width: variables.edgeHandleTapTargetThickness,
-                height: cropHeight,
-                ...styles.cursorEwResize,
-            },
-            overlayTop: {
-                ...styles.pAbsolute,
-                left: imageLeft,
-                top: imageTop,
-                width: imgDisplayWidth,
-                height: Math.max(0, cropTop - imageTop),
-                backgroundColor: theme.transparentWhite,
-            },
-            overlayBottom: {
-                ...styles.pAbsolute,
-                left: imageLeft,
-                top: cropBottom,
-                width: imgDisplayWidth,
-                height: Math.max(0, imageBottom - cropBottom),
-                backgroundColor: theme.transparentWhite,
-            },
-            overlayLeft: {
-                ...styles.pAbsolute,
-                left: imageLeft,
-                top: cropTop,
-                width: Math.max(0, cropLeft - imageLeft),
-                height: cropHeight,
-                backgroundColor: theme.transparentWhite,
-            },
-            overlayRight: {
-                ...styles.pAbsolute,
-                left: cropRight,
-                top: cropTop,
-                width: Math.max(0, imageRight - cropRight),
-                height: cropHeight,
-                backgroundColor: theme.transparentWhite,
-            },
-        };
+        switch (key) {
+            case 'cornerVisual':
+                return {
+                    position: 'absolute' as const,
+                    left: (variables.cornerTapTargetSize - variables.cornerHandleSize) / 2,
+                    top: (variables.cornerTapTargetSize - variables.cornerHandleSize) / 2,
+                    width: variables.cornerHandleSize,
+                    height: variables.cornerHandleSize,
+                    borderRadius: variables.cornerHandleSize / 2,
+                    backgroundColor: theme.success,
+                };
+            case 'border':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX,
+                    top: cropY,
+                    width: cropWidth,
+                    height: cropHeight,
+                    borderWidth: variables.cropBorderWidth,
+                    borderColor: theme.success,
+                };
+            case 'cornerTopLeft':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX - variables.cornerTapTargetSize / 2,
+                    top: cropY - variables.cornerTapTargetSize / 2,
+                    width: variables.cornerTapTargetSize,
+                    height: variables.cornerTapTargetSize,
+                    ...styles.cursorNwseResize,
+                };
+            case 'cornerTopRight':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX + cropWidth - variables.cornerTapTargetSize / 2,
+                    top: cropY - variables.cornerTapTargetSize / 2,
+                    width: variables.cornerTapTargetSize,
+                    height: variables.cornerTapTargetSize,
+                    ...styles.cursorNeswResize,
+                };
+            case 'cornerBottomLeft':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX - variables.cornerTapTargetSize / 2,
+                    top: cropY + cropHeight - variables.cornerTapTargetSize / 2,
+                    width: variables.cornerTapTargetSize,
+                    height: variables.cornerTapTargetSize,
+                    ...styles.cursorNeswResize,
+                };
+            case 'cornerBottomRight':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX + cropWidth - variables.cornerTapTargetSize / 2,
+                    top: cropY + cropHeight - variables.cornerTapTargetSize / 2,
+                    width: variables.cornerTapTargetSize,
+                    height: variables.cornerTapTargetSize,
+                    ...styles.cursorNwseResize,
+                };
+            case 'edgeTop':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX,
+                    top: cropY - variables.edgeHandleTapTargetThickness / 2,
+                    width: cropWidth,
+                    height: variables.edgeHandleTapTargetThickness,
+                    ...styles.cursorNsResize,
+                };
+            case 'edgeBottom':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX,
+                    top: cropY + cropHeight - variables.edgeHandleTapTargetThickness / 2,
+                    width: cropWidth,
+                    height: variables.edgeHandleTapTargetThickness,
+                    ...styles.cursorNsResize,
+                };
+            case 'edgeLeft':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX - variables.edgeHandleTapTargetThickness / 2,
+                    top: cropY,
+                    width: variables.edgeHandleTapTargetThickness,
+                    height: cropHeight,
+                    ...styles.cursorEwResize,
+                };
+            case 'edgeRight':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropX + cropWidth - variables.edgeHandleTapTargetThickness / 2,
+                    top: cropY,
+                    width: variables.edgeHandleTapTargetThickness,
+                    height: cropHeight,
+                    ...styles.cursorEwResize,
+                };
+            case 'overlayTop':
+                return {
+                    ...styles.pAbsolute,
+                    left: imageLeft,
+                    top: imageTop,
+                    width: imgDisplayWidth,
+                    height: Math.max(0, cropTop - imageTop),
+                    backgroundColor: theme.transparentWhite,
+                };
+            case 'overlayBottom':
+                return {
+                    ...styles.pAbsolute,
+                    left: imageLeft,
+                    top: cropBottom,
+                    width: imgDisplayWidth,
+                    height: Math.max(0, imageBottom - cropBottom),
+                    backgroundColor: theme.transparentWhite,
+                };
+            case 'overlayLeft':
+                return {
+                    ...styles.pAbsolute,
+                    left: imageLeft,
+                    top: cropTop,
+                    width: Math.max(0, cropLeft - imageLeft),
+                    height: cropHeight,
+                    backgroundColor: theme.transparentWhite,
+                };
+            case 'overlayRight':
+                return {
+                    ...styles.pAbsolute,
+                    left: cropRight,
+                    top: cropTop,
+                    width: Math.max(0, imageRight - cropRight),
+                    height: cropHeight,
+                    backgroundColor: theme.transparentWhite,
+                };
+            default:
+                return {};
+        }
     },
 });
 

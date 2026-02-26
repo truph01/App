@@ -306,8 +306,6 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
             return Gesture.Pan()
                 .runOnJS(true)
                 .onChange((event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
-                    'worklet';
-
                     const currentX = cropX.get();
                     const currentY = cropY.get();
                     const currentWidth = cropWidth.get();
@@ -359,8 +357,6 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
             return Gesture.Pan()
                 .runOnJS(true)
                 .onChange((event: GestureUpdateEvent<PanGestureHandlerEventPayload & PanGestureChangeEventPayload>) => {
-                    'worklet';
-
                     const currentX = cropX.get();
                     const currentY = cropY.get();
                     const currentWidth = cropWidth.get();
@@ -413,101 +409,101 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
     const borderStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('border', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).border;
+        });
     });
 
     const topLeftCornerStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('cornerTopLeft', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).cornerTopLeft;
+        });
     });
 
     const topRightCornerStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('cornerTopRight', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).cornerTopRight;
+        });
     });
 
     const bottomLeftCornerStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('cornerBottomLeft', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).cornerBottomLeft;
+        });
     });
 
     const bottomRightCornerStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('cornerBottomRight', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).cornerBottomRight;
+        });
     });
 
     // Edge handle styles - thicker tap target while keeping visual size
     const topEdgeStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('edgeTop', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).edgeTop;
+        });
     });
 
     const bottomEdgeStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('edgeBottom', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).edgeBottom;
+        });
     });
 
     const leftEdgeStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('edgeLeft', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).edgeLeft;
+        });
     });
 
     const rightEdgeStyle = useAnimatedStyle(() => {
         'worklet';
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('edgeRight', {
             cropX: cropX.get(),
             cropY: cropY.get(),
             cropWidth: cropWidth.get(),
             cropHeight: cropHeight.get(),
-        }).edgeRight;
+        });
     });
 
     const overlayTopStyle = useAnimatedStyle(() => {
@@ -518,12 +514,12 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         const imgDisplayWidth = displayWidthSV.get();
         const cropTop = cropY.get();
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('overlayTop', {
             imageLeft,
             imageTop,
             imgDisplayWidth,
             cropTop,
-        }).overlayTop;
+        });
     });
 
     const overlayBottomStyle = useAnimatedStyle(() => {
@@ -536,13 +532,13 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         const cropBottom = cropY.get() + cropHeight.get();
         const imageBottom = imageTop + imgDisplayHeight;
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('overlayBottom', {
             imageLeft,
             imageTop,
             imgDisplayWidth,
             cropBottom,
             imageBottom,
-        }).overlayBottom;
+        });
     });
 
     const overlayLeftStyle = useAnimatedStyle(() => {
@@ -553,12 +549,12 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         const cropTop = cropY.get();
         const cropHeightValue = cropHeight.get();
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('overlayLeft', {
             imageLeft,
             cropLeft,
             cropTop,
             cropHeight: cropHeightValue,
-        }).overlayLeft;
+        });
     });
 
     const overlayRightStyle = useAnimatedStyle(() => {
@@ -571,21 +567,17 @@ function ReceiptCropView({imageUri, onCropChange, initialCrop, isAuthTokenRequir
         const cropTop = cropY.get();
         const cropHeightValue = cropHeight.get();
 
-        return StyleUtils.getCropViewStyles({
+        return StyleUtils.getCropViewStyle('overlayRight', {
             imageLeft,
             imgDisplayWidth,
             cropRight,
             imageRight,
             cropTop,
             cropHeight: cropHeightValue,
-        }).overlayRight;
+        });
     });
 
-    const cornerVisualStyle = useAnimatedStyle(() => {
-        'worklet';
-
-        return StyleUtils.getCropViewStyles().cornerVisual;
-    });
+    const cornerVisualStyle = StyleUtils.getCropViewStyle('cornerVisual');
 
     return (
         <GestureHandlerRootView style={[styles.flex1, styles.w100]}>
