@@ -1,7 +1,8 @@
 ---
 title: Enable Expensify Travel on a workspace
 description: Learn how Workspace Admins can enable Expensify Travel to manage business travel bookings and expenses in one place.
-keywords: Expensify Travel, enable travel, workspace admin, business travel, travel management, travel policy, book travel, company travel
+keywords: [Expensify Travel, enable travel, workspace admin, business travel, travel management, travel policy, book travel, company travel]
+internalScope: Audience is Workspace Admins. Covers enabling Expensify Travel and the Add trip names to expenses setting. Does not cover booking restrictions or travel policy configuration
 ---
 
 # Enable Expensify Travel on a workspace
@@ -40,11 +41,11 @@ To customize your company’s travel rules — like flight class, hotel limits, 
 
 ## Why are trip names being added to my expense descriptions?
 
-If **Add trip names to expenses** is enabled, Expensify automatically includes the trip name in expense descriptions for expenses created during an Expensify Travel trip.
+When **Add trip names to expenses** is toggled on, Expensify automatically includes the trip name in expense descriptions for expenses created during an Expensify Travel trip.
 
 Workspace Admins can turn this setting on or off by going to **Workspaces > [Workspace Name] > Travel** and toggling **Add trip names to expenses**.
 
-Note: **Add trip names to expenses** only appears in New Expensify, but it controls description behavior for both New Expensify and Classic expenses.
+**Note:** The **Add trip names to expenses** toggle only appears in New Expensify, but it controls description behavior for both New Expensify and Expensify Classic expenses.
 
 ## Can I set up travel policy rules after enabling Expensify Travel?
 
