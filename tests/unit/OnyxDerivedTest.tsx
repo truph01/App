@@ -123,8 +123,9 @@ describe('OnyxDerived', () => {
             const transaction = createRandomTransaction(1);
 
             // When the report attributes are recomputed with both report and transaction updates
-            reportAttributes.compute([reports, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined], {});
+            reportAttributes.compute([reports, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined], {areAllConnectionsSet: false});
             const reportAttributesComputedValue = reportAttributes.compute([reports, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined], {
+                areAllConnectionsSet: false,
                 sourceValues: {
                     [ONYXKEYS.COLLECTION.REPORT]: {
                         [`${ONYXKEYS.COLLECTION.REPORT}${reportID1}`]: reports[`${ONYXKEYS.COLLECTION.REPORT}${reportID1}`],

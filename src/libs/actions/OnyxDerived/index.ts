@@ -56,6 +56,7 @@ function init() {
             const context: DerivedValueContext<typeof key, typeof dependencies> = {
                 currentValue: undefined,
                 sourceValues: undefined,
+                areAllConnectionsSet: false,
             };
 
             const recomputeDerivedValue = (sourceKey?: string, sourceValue?: unknown, triggeredByIndex?: number) => {
@@ -74,6 +75,7 @@ function init() {
                 }
 
                 context.currentValue = derivedValue;
+                context.areAllConnectionsSet = areAllConnectionsSet;
                 context.sourceValues = sourceKey && sourceValue !== undefined ? {[sourceKey]: sourceValue} : undefined;
 
                 // @ts-expect-error TypeScript can't confirm the shape of dependencyValues matches the compute function's parameters
