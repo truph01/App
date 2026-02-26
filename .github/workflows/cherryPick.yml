@@ -150,6 +150,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
 
+      - name: Resolve Slack mention for merge actor
+        if: ${{ inputs.PULL_REQUEST_URL != '' }}
+        id: resolveSlack
+        run: |
+          # Download the employee whitelist from Salt repo to get GitHub→Slack mapping
+          WHITELIST=$(gh api repos/Expensify/Salt/contents/www/files/www-whitelist.php \
+            --jq '.content' | base64 -d 2>/dev/null || true)
+
+          GITHUB_USER="${{ steps.getCPMergeCommit.outputs.MERGE_ACTOR }}"
+          SLACK_ID=""
+
+          if [ -n "$WHITELIST" ]; then
+            SLACK_ID=$(echo "$WHITELIST" \
+              | grep -F -A 10 "'github' => '$GITHUB_USER'" \
+              | grep "'slack'" \
+              | head -1 \
+              | grep -oP "'slack'\s*=>\s*'\K[^']+" || true)
+          fi
+
+          if [ -n "$SLACK_ID" ]; then
+            echo "SLACK_MENTION=<@$SLACK_ID>" >> "$GITHUB_OUTPUT"
+          else
+            # Fallback: mention by GitHub username if whitelist lookup fails
+            echo "SLACK_MENTION=$GITHUB_USER (GitHub)" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
+
       - name: Cherry-pick the Mobile-Expensify version bump to Mobile-Expensify target branch
         working-directory: Mobile-Expensify
         run: |
@@ -265,7 +293,7 @@ jobs:
               channel: '#deployer',
               attachments: [{
                 color: "#DB4545",
-                pretext: `<!subteam^S4TJJ3PSL>`,
+                pretext: `${{ steps.resolveSlack.outputs.SLACK_MENTION }}`,
                 text: "🚨 Cherry-pick to ${{ inputs.TARGET }} has conflicts and requires manual resolution.\nOriginal PR: ${{ inputs.PULL_REQUEST_URL }}\nConflict PR: ${{ steps.createPullRequest.outputs.PR_URL }}"
               }]
             }
