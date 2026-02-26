@@ -89,7 +89,7 @@ function TwoFactorAuthWrapper({
         );
     }
 
-    const defaultGoBack = () => quitAndNavigateBack(ROUTES.SETTINGS_SECURITY);
+    const defaultGoBack = () => quitAndNavigateBack();
 
     return (
         <ScreenWrapper
