@@ -72,7 +72,7 @@ function VacationDelegatePage() {
                 }
 
                 if (response.jsonCode === CONST.JSON_CODE.EXP_ERROR) {
-                    showErrorModal(response.message as string | undefined);
+                    showErrorModal(response.message);
                     return;
                 }
 
