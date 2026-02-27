@@ -222,17 +222,7 @@ function SettlementButton({
         }
 
         return false;
-    }, [
-        policy,
-        isAccountLocked,
-        isUserValidated,
-        chatReportID,
-        reportID,
-        showLockedAccountModal,
-        isDelegateAccessRestricted,
-        showDelegateNoAccessModal,
-        userBillingGraceEndPeriods,
-    ]);
+    }, [policy, isAccountLocked, isUserValidated, chatReportID, reportID, showLockedAccountModal, isDelegateAccessRestricted, showDelegateNoAccessModal, userBillingGraceEndPeriods]);
 
     const getPaymentSubItems = useCallback(
         (payAsBusiness: boolean) => {
