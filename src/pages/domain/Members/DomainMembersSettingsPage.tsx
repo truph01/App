@@ -28,18 +28,13 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
 
-    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
-    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
-        canBeMissing: true,
-    });
+    const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
+    const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
     const [domainSettings] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
-        canBeMissing: false,
         selector: domainMemberSettingsSelector,
     });
-    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {canBeMissing: true, selector: domainNameSelector});
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {canBeMissing: false});
+    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
 
     const {environmentURL} = useEnvironment();
     const samlPageUrl = `${environmentURL}${addLeadingForwardSlash(ROUTES.DOMAIN_SAML.getRoute(domainAccountID))}`;
@@ -48,7 +43,7 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
         <BaseDomainSettingsPage domainAccountID={domainAccountID}>
             <ToggleSettingOptionRow
                 wrapperStyle={[styles.ph5]}
-                switchAccessibilityLabel={translate('domain.members.forceTwoFactorAuth')}
+                switchAccessibilityLabel={translate('domain.common.forceTwoFactorAuth')}
                 isActive={!!domainSettings?.twoFactorAuthRequired}
                 disabled={!!domainSettings?.samlEnabled || isOffline}
                 onToggle={(value) => {
@@ -64,14 +59,14 @@ function DomainMembersSettingsPage({route}: DomainMembersSettingsPageProps) {
                         toggleTwoFactorAuthRequiredForDomain(domainAccountID, domainName, value);
                     }
                 }}
-                title={translate('domain.members.forceTwoFactorAuth')}
+                title={translate('domain.common.forceTwoFactorAuth')}
                 subtitle={
                     <View style={[styles.flexRow, styles.renderHTML, styles.mt1]}>
                         <RenderHTML
                             html={
                                 domainSettings?.samlEnabled
-                                    ? translate('domain.members.forceTwoFactorAuthSAMLEnabledDescription', samlPageUrl)
-                                    : translate('domain.members.forceTwoFactorAuthDescription')
+                                    ? translate('domain.common.forceTwoFactorAuthSAMLEnabledDescription', samlPageUrl)
+                                    : translate('domain.common.forceTwoFactorAuthDescription')
                             }
                         />
                     </View>
