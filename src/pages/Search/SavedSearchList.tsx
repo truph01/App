@@ -10,7 +10,6 @@ import useFeedKeysWithAssignedCards from '@hooks/useFeedKeysWithAssignedCards';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useSearchTypeMenuSections from '@hooks/useSearchTypeMenuSections';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setSearchContext} from '@libs/actions/Search';
 import {mergeCardListWithWorkspaceFeeds} from '@libs/CardUtils';
@@ -34,7 +33,6 @@ function SavedSearchList({hash}: SavedSearchListProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const isFocused = useIsFocused();
-    const {typeMenuSections} = useSearchTypeMenuSections();
 
     const [savedSearches] = useOnyx(ONYXKEYS.SAVED_SEARCHES);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
@@ -51,10 +49,7 @@ function SavedSearchList({hash}: SavedSearchListProps) {
         shouldShowProductTrainingTooltip: shouldShowSavedSearchTooltip,
         renderProductTrainingTooltip: renderSavedSearchTooltip,
         hideProductTrainingTooltip: hideSavedSearchTooltip,
-    } = useProductTrainingContext(
-        CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.RENAME_SAVED_SEARCH,
-        !!typeMenuSections.find((section) => section.translationPath === 'search.savedSearchesMenuItemTitle') && isFocused,
-    );
+    } = useProductTrainingContext(CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.RENAME_SAVED_SEARCH, isFocused);
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bookmark', 'Pencil'] as const);
 
