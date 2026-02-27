@@ -1405,9 +1405,11 @@ const translations: TranslationDeepObject<typeof en> = {
         expenseOnHold: 'この経費は保留されています。今後の手順についてコメントを確認してください。',
         expensesOnHold: 'すべての経費が保留になっています。次のステップについてはコメントを確認してください。',
         expenseDuplicate: 'この経費は別の経費と詳細がよく似ています。続行するには重複しているものを確認してください。',
-        someDuplicatesArePaid: 'これらの重複のうち、いくつかはすでに承認または支払い済みです。',
+        someDuplicatesArePaid: 'これらの重複の一部は、すでに承認または支払い済みです。',
         reviewDuplicates: '重複を確認',
         keepAll: 'すべて保持',
+        noDuplicatesTitle: '準備完了！',
+        noDuplicatesDescription: '確認が必要な重複取引はありません。',
         confirmApprove: '承認金額を確認',
         confirmApprovalAmount: '準拠している経費のみを承認するか、レポート全体を承認します。',
         confirmApprovalAllHoldAmount: () => ({
