@@ -179,7 +179,7 @@ function TransactionDuplicateReview() {
         );
     }
 
-    if (transactionID && duplicateTransactionIDs.length === 0) {
+    if (!shouldShowNotFound && transactionID && duplicateTransactionIDs.length === 0) {
         return (
             <ScreenWrapper testID="TransactionDuplicateReview">
                 <HeaderWithBackButton
