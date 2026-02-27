@@ -7393,7 +7393,7 @@ const translations = {
                 takeControl: `took control`,
                 actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) => {
                     const amountAndMerchantText = [amount, merchant].filter((s) => !!s?.length).join(' ');
-                    return `Open the Expensify mobile app to review your ${amountAndMerchantText && `${amountAndMerchantText} `}transaction`;
+                    return `Open the Expensify mobile app to review your ${amountAndMerchantText ? `${amountAndMerchantText} ` : ''}transaction`;
                 },
                 integrationSyncFailed: (label: string, errorMessage: string, workspaceAccountingLink?: string) =>
                     `there was a problem syncing with ${label}${errorMessage ? ` ("${errorMessage}")` : ''}. Please fix the issue in <a href="${workspaceAccountingLink}">workspace settings</a>.`,
