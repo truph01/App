@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react-native';
 import {Platform} from 'react-native';
 import {isDevelopment} from '@libs/Environment/Environment';
 import {breadcrumbsIntegration, browserProfilingIntegration, consoleIntegration, navigationIntegration, tracingIntegration} from '@libs/telemetry/integrations';
-import processBeforeSendTransactions from '@libs/telemetry/middlewares';
+import {processBeforeSendLogs, processBeforeSendTransactions} from '@libs/telemetry/middlewares';
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import pkg from '../../../package.json';
@@ -31,6 +31,7 @@ function setupSentry(): void {
         release: `${pkg.name}@${pkg.version}`,
         beforeSendTransaction: processBeforeSendTransactions,
         enableLogs: true,
+        beforeSendLog: processBeforeSendLogs,
     });
 
     Sentry.setTag(CONST.TELEMETRY.TAG_BUILD_TYPE, CONFIG.IS_HYBRID_APP ? CONST.TELEMETRY.BUILD_TYPE_HYBRID_APP : CONST.TELEMETRY.BUILD_TYPE_STANDALONE);
