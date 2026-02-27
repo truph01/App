@@ -5,7 +5,8 @@
 # generates dSYMs from the unstripped binary before this phase runs.
 #
 # Expected Xcode environment variables:
-#   CONFIGURATION, BUILT_PRODUCTS_DIR, EXECUTABLE_FOLDER_PATH, EXECUTABLE_NAME
+#   CONFIGURATION, BUILT_PRODUCTS_DIR, EXECUTABLE_FOLDER_PATH, EXECUTABLE_NAME,
+#   EXPANDED_CODE_SIGN_IDENTITY
 
 set -e
 
@@ -35,6 +36,7 @@ if [ -d "$APP_FRAMEWORKS_DIR" ]; then
     fi
     echo "Stripping framework: $framework_name"
     strip -rSTx "$framework_binary"
+    codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY:--}" --preserve-metadata=identifier,entitlements "$framework_dir"
   done
 else
   echo "No Frameworks directory found at $APP_FRAMEWORKS_DIR"
