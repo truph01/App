@@ -1426,7 +1426,7 @@ const translations: TranslationDeepObject<typeof en> = {
         reviewDuplicates: 'Examiner les doublons',
         keepAll: 'Tout garder',
         noDuplicatesTitle: 'Tout est en ordre !',
-        noDuplicatesDescription: 'Il n\'y a aucune transaction en double à vérifier ici.',
+        noDuplicatesDescription: "Il n'y a aucune transaction en double à vérifier ici.",
         confirmApprove: 'Confirmer le montant approuvé',
         confirmApprovalAmount: 'Approuvez uniquement les dépenses conformes, ou approuvez l’intégralité de la note de frais.',
         confirmApprovalAllHoldAmount: () => ({
