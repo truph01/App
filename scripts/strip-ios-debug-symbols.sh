@@ -23,15 +23,11 @@ strip -rSTx "${APP_DIR_PATH}/${EXECUTABLE_NAME}"
 
 APP_FRAMEWORKS_DIR="${APP_DIR_PATH}/Frameworks"
 if [ -d "$APP_FRAMEWORKS_DIR" ]; then
-  find "$APP_FRAMEWORKS_DIR" -maxdepth 2 -mindepth 2 -type f -perm -111 | while read -r framework_binary; do
-    # Skip Apple-signed frameworks (modifying them would invalidate the signature)
-    if codesign -v -R="anchor apple" "$framework_binary" &> /dev/null; then
-      echo "Skipping Apple-signed framework: $framework_binary"
-      continue
-    fi
-    echo "Stripping framework: $framework_binary"
-    strip -rSTx "$framework_binary"
-  done
+  find "$APP_FRAMEWORKS_DIR" -maxdepth 2 -mindepth 2 -type f -perm -111 -exec bash -c '
+    codesign -v -R="anchor apple" "$1" &> /dev/null || strip -rSTx "$1"
+  ' _ {} \;
+else
+  echo "No Frameworks directory found at $APP_FRAMEWORKS_DIR"
 fi
 
 echo "Symbol stripping complete."
