@@ -7416,8 +7416,10 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `firmowe konto bankowe ${maskedBankAccountNumber} zostało automatycznie zablokowane z powodu problemu z rozliczeniami zwrotów lub Karty Expensify. Napraw problem w <a href="${linkURL}">ustawieniach przestrzeni roboczej</a>.`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''} opuścił czat`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
-                    `Otwórz aplikację mobilną Expensify, aby przejrzeć transakcję ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''}`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) => {
+                    const amountAndMerchantText = [amount, merchant].filter((s) => !!s?.length).join(' ');
+                    return `Otwórz aplikację mobilną Expensify, aby przejrzeć transakcję${amountAndMerchantText ? ` ${amountAndMerchantText}` : ''}`;
+                },
             },
             error: {
                 invalidCredentials: 'Nieprawidłowe dane logowania, sprawdź konfigurację swojego połączenia.',

@@ -449,8 +449,8 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
         }
 
         if (state.scenario.onCancel) {
-            const {reason} = await state.scenario.onCancel(state.payload);
-            dispatch({type: 'SET_ERROR', payload: {reason}});
+            const result = await state.scenario.onCancel(state.payload);
+            dispatch({type: 'SET_ERROR', payload: {reason: result.reason, payload: result.payload}});
             return;
         }
 

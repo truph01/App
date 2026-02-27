@@ -7249,8 +7249,10 @@ ${reportName}
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `由于报销或 Expensify 卡结算问题，企业银行账户 ${maskedBankAccountNumber} 已被自动锁定。请在<a href="${linkURL}">工作区设置</a>中解决该问题。`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''}离开了聊天`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
-                    `打开 Expensify 移动应用以查看你${merchant && merchant.length > 0 ? `在 ${merchant} ` : ''}的 ${amount} 交易`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) => {
+                    const amountAndMerchantText = [amount, merchant].filter((s) => !!s?.length).join(' ');
+                    return `打开 Expensify 移动应用以查看你${amountAndMerchantText ? `的 ${amountAndMerchantText} ` : '的 '}交易`;
+                },
             },
             error: {
                 invalidCredentials: '凭证无效，请检查您的连接配置。',

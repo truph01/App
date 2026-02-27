@@ -77,21 +77,13 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false, 
     const cardList = useNonPersonalCardList();
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
 
-    const {
-        primaryColor: defaultPrimaryColor,
-        secondaryColor: defaultSecondaryColor,
-        titleColor: defaultTitleColor,
-        MCCIcon: defaultMCCIcon,
-        tripIcon: defaultTripIcon,
-        backgroundImage: defaultBackgroundImage,
-    } = useEReceipt(transactionItem ?? transaction);
-    const primaryColor = overrideTheme?.primaryColor ?? defaultPrimaryColor;
-    const secondaryColor = overrideTheme?.secondaryColor ?? defaultSecondaryColor;
-    const titleColor = overrideTheme?.titleColor ?? defaultTitleColor;
-    const MCCIcon = overrideTheme?.MCCIcon ?? defaultMCCIcon;
-    const tripIcon = overrideTheme?.tripIcon ?? defaultTripIcon;
-    const backgroundImage = overrideTheme?.backgroundImage ?? defaultBackgroundImage;
-    const titleText = overrideTheme?.titleText ?? translate('eReceipt.guaranteed');
+    const defaultTheme = useEReceipt(transactionItem ?? transaction);
+
+    const {primaryColor, secondaryColor, titleColor, MCCIcon, tripIcon, backgroundImage, titleText} = {
+        ...defaultTheme,
+        titleText: translate('eReceipt.guaranteed'),
+        ...(overrideTheme ?? {}),
+    };
 
     const isLoadedRef = useRef(false);
 

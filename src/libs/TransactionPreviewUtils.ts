@@ -132,6 +132,7 @@ const dotSeparator: TranslationPathOrText = {text: ` ${CONST.DOT_SEPARATOR} `};
 /**
  * Normalize the last four digits to always return 4 characters.
  * This keeps leading zeros when the value is stored as a number.
+ * If the number is shorter than 4 digits, it will be padded with zeros.
  */
 function formatLastFourPAN(lastFourPAN?: number | string): string {
     if (lastFourPAN === undefined || lastFourPAN === null) {

@@ -36,9 +36,11 @@ Onyx.connectWithoutView({
             return;
         }
         const queuedTransactionIDs = Object.keys(queue);
-        const blocklistEntriesToCleanup = Object.keys(locallyProcessed3DSTransactionReviews).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
-        if (blocklistEntriesToCleanup.length > 0) {
-            cleanUpLocallyProcessed3DSTransactionReviews(blocklistEntriesToCleanup);
+        const locallyProcessedTransactionIDsToCleanup = Object.keys(locallyProcessed3DSTransactionReviews).filter(
+            (locallyProcessedTransactionID) => !queuedTransactionIDs.includes(locallyProcessedTransactionID),
+        );
+        if (locallyProcessedTransactionIDsToCleanup.length > 0) {
+            cleanUpLocallyProcessed3DSTransactionReviews(locallyProcessedTransactionIDsToCleanup);
         }
     },
 });
@@ -244,7 +246,7 @@ async function authorizeTransaction({transactionID, signedChallenge, authenticat
                         key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
                         onyxMethod: Onyx.METHOD.MERGE,
                         value: {
-                            [transactionID]: CONST.MULTIFACTOR_AUTHENTICATION.LOCALLY_PROCESSED_TRANSACTION_ACTION.AUTHORIZE,
+                            [transactionID]: CONST.MULTIFACTOR_AUTHENTICATION.LOCALLY_PROCESSED_TRANSACTION_ACTION.APPROVE,
                         },
                     },
                 ],
@@ -253,10 +255,10 @@ async function authorizeTransaction({transactionID, signedChallenge, authenticat
 
         const {jsonCode, message} = response ?? {};
 
-        return parseHttpRequest(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.AUTHORIZE_TRANSACTION, message);
+        return parseHttpRequest(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.APPROVE_TRANSACTION, message);
     } catch (error) {
         Log.hmmm('[MultifactorAuthentication] Failed to authorize transaction', {error});
-        return parseHttpRequest(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.AUTHORIZE_TRANSACTION, undefined);
+        return parseHttpRequest(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.APPROVE_TRANSACTION, undefined);
     }
 }
 

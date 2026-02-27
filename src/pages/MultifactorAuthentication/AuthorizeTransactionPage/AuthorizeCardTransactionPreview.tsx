@@ -30,18 +30,21 @@ type AuthorizeCardTransactionPreviewProps = {
 function AuthorizeCardTransactionPreview({transactionID, amount, currency, merchant, created, lastFourPAN}: AuthorizeCardTransactionPreviewProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const theme = useTheme();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const theme = useTheme();
     const icons = useMemoizedLazyExpensifyIcons(['CreditCard', 'ReceiptBody']);
 
     const reportPreviewStyles = StyleUtils.getMoneyRequestReportPreviewStyle(shouldUseNarrowLayout, 1);
     const transactionPreviewWidth = reportPreviewStyles.transactionPreviewStandaloneStyle.width;
+    const containerStyle = [styles.border, styles.moneyRequestPreviewBox, reportPreviewStyles.transactionPreviewStandaloneStyle];
 
+    // Show skeleton when transaction data is not yet available (e.g. initial load before parent has received it from Onyx).
+    // Data is loaded by the parent; this component does not fetch.
     const shouldShowSkeleton = !amount && !currency && !merchant && !created && !lastFourPAN;
     if (shouldShowSkeleton) {
         return (
-            <View style={[styles.border, styles.moneyRequestPreviewBox, reportPreviewStyles.transactionPreviewStandaloneStyle]}>
+            <View style={containerStyle}>
                 <TransactionPreviewSkeletonView transactionPreviewWidth={transactionPreviewWidth} />
             </View>
         );
@@ -58,32 +61,26 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
     const cardEndingText = shouldShowCardEnding ? `${translate('paymentMethodList.accountLastFour')} ${formattedLastFourPAN}` : '';
     const shouldShowMerchantOrDescription = !!merchant;
     const shouldWrapDisplayAmount = !shouldShowMerchantOrDescription;
-    const shouldShowCategoryOrTag = shouldShowCardEnding;
-    const previewTextViewGap = (shouldShowCategoryOrTag || !shouldWrapDisplayAmount) && styles.gap2;
+    const previewTextViewGap = (shouldShowCardEnding || !shouldWrapDisplayAmount) && styles.gap2;
 
     const colorStyles = StyleUtils.getEReceiptColorStyles(CONST.ERECEIPT_COLORS.GREEN);
-    const primaryColor = colorStyles?.backgroundColor;
-    const secondaryColor = colorStyles?.color;
-    const titleColor = colorStyles?.titleColor;
-    const MCCIcon = CreditCardExclamation;
-    const backgroundImage = eReceiptBGs.EReceiptBG_Green;
-    const titleText = translate('multifactorAuthentication.reviewTransaction.attemptedTransaction');
+    const receiptOverrideTheme = {
+        primaryColor: colorStyles?.backgroundColor,
+        secondaryColor: colorStyles?.color,
+        titleColor: colorStyles?.titleColor,
+        MCCIcon: CreditCardExclamation,
+        backgroundImage: eReceiptBGs.EReceiptBG_Green,
+        titleText: translate('multifactorAuthentication.reviewTransaction.attemptedTransaction'),
+    };
 
     return (
-        <View style={[styles.border, styles.moneyRequestPreviewBox, reportPreviewStyles.transactionPreviewStandaloneStyle]}>
+        <View style={containerStyle}>
             <View style={styles.reportActionItemImagesContainer}>
                 <View style={[styles.reportActionItemImages, StyleUtils.getHeight(variables.previewEReceiptHeight)]}>
                     <EReceiptWithSizeCalculation
                         transactionID={transactionID}
                         receiptType="default"
-                        overrideTheme={{
-                            primaryColor,
-                            secondaryColor,
-                            titleColor,
-                            MCCIcon,
-                            backgroundImage,
-                            titleText,
-                        }}
+                        overrideTheme={receiptOverrideTheme}
                     />
                 </View>
             </View>
@@ -131,7 +128,7 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
                                 </View>
                             </View>
                         </View>
-                        {shouldShowCategoryOrTag && (
+                        {shouldShowCardEnding && (
                             <View style={[styles.flexRow, styles.alignItemsCenter]}>
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1, styles.flexShrink1]}>
                                     <Icon

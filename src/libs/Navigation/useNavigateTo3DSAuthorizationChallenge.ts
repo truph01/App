@@ -62,9 +62,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
             return undefined;
         }
 
-        // we decided "not yet processed" was more legible than "non blocklisted"
-        // eslint-disable-next-line rulesdir/no-negated-variables
-        const pendingTransactionsNotYetProcessedLocally = Object.values(transactionsPending3DSReview).filter((challenge) => {
+        const pendingTransactionsAwaitingLocalProcessing = Object.values(transactionsPending3DSReview).filter((challenge) => {
             // We can't process a transaction without an ID, so don't bother showing it.
             if (!challenge?.transactionID) {
                 return false;
@@ -85,7 +83,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
         });
 
         // Return only the next eligible transaction
-        return getFirstSortedTransactionPending3DSReview(pendingTransactionsNotYetProcessedLocally);
+        return getFirstSortedTransactionPending3DSReview(pendingTransactionsAwaitingLocalProcessing);
     }, [transactionsPending3DSReview, locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult]);
 
     useEffect(() => {
@@ -94,7 +92,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
             return;
         }
 
-        Log.info('[useNavigateTo3DSAuthorizationChallenge] Effect triggered for transaction', undefined, {transactionID: transactionPending3DSReview?.transactionID});
+        Log.info('[useNavigateTo3DSAuthorizationChallenge] Effect triggered for transaction', undefined, {transactionID: transactionPending3DSReview.transactionID});
 
         if (isCurrentlyActingOn3DSChallenge) {
             Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - user is still acting on a challenge');
@@ -103,6 +101,7 @@ function useNavigateTo3DSAuthorizationChallenge() {
 
         // Note: Importing AuthorizeTransaction in this file causes the browser to get stuck in an infinite reload loop
         // Issue to fix this: https://github.com/Expensify/App/issues/83021
+        // When adding Passkey support, update this list and the switch below.
         const allowedAuthenticationMethods = [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS];
         const doesDeviceSupportAnAllowedAuthenticationMethod = allowedAuthenticationMethods.some((method) => {
             switch (method) {

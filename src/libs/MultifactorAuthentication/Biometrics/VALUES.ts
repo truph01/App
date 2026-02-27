@@ -80,7 +80,7 @@ const REASON = {
         SIGNATURE_MISSING: 'Signature is missing',
         /** The device supports biometrics but the user has none enrolled (e.g. no fingerprint/face set up in device settings). */
         NO_ELIGIBLE_METHODS: 'No eligible methods available',
-        /** The device hardware does not support biometrics at all. */
+        /** The device hardware does not support biometrics at all (e.g. web/mWeb). */
         UNSUPPORTED_DEVICE: 'Unsupported device',
         BAD_REQUEST: 'Bad request',
         LOCAL_REGISTRATION_COMPLETE: 'Local registration complete',
@@ -156,7 +156,8 @@ const API_RESPONSE_MAP = {
         },
     },
 
-    AUTHORIZE_TRANSACTION: {
+    /** Transaction review (3DS) - approve/deny endpoints */
+    APPROVE_TRANSACTION: {
         [HTTP_STATUS.SUCCESS]: REASON.BACKEND.TRANSACTION_APPROVED,
         [HTTP_STATUS.CLIENT_ERROR]: {
             ...MULTIFACTOR_AUTHENTICATION_COMMAND_BASE_CLIENT_ERRORS,
@@ -276,10 +277,10 @@ const MULTIFACTOR_AUTHENTICATION_VALUES = {
     PUBLIC_KEYS_AUTHENTICATION_NEVER_REGISTERED: undefined,
 
     /**
-     * Used to determine the action for a particular transaction under LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS Onyx key
+     * Used to determine the action for a particular transaction under LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS Onyx key.
      */
     LOCALLY_PROCESSED_TRANSACTION_ACTION: {
-        AUTHORIZE: 'Authorize',
+        APPROVE: 'Approve',
         DENY: 'Deny',
     },
 

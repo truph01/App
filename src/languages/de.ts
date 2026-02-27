@@ -7463,8 +7463,10 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `Das Geschäftskonto ${maskedBankAccountNumber} wurde aufgrund eines Problems mit entweder der Erstattung oder dem Ausgleich der Expensify Karte automatisch gesperrt. Bitte beheben Sie das Problem in Ihren <a href="${linkURL}">Workspace-Einstellungen</a>.`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''} hat den Chat verlassen`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
-                    `Öffne die Expensify Mobile-App, um deine ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''}-Transaktion zu prüfen`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) => {
+                    const amountAndMerchantText = [amount, merchant].filter((s) => !!s?.length).join(' ');
+                    return `Öffne die Expensify Mobile-App, um deine${amountAndMerchantText ? ` ${amountAndMerchantText}-` : ' '}Transaktion zu prüfen`;
+                },
             },
             error: {
                 invalidCredentials: 'Ungültige Anmeldedaten, bitte überprüfen Sie die Konfiguration Ihrer Verbindung.',

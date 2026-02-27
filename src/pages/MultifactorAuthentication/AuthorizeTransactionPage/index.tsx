@@ -48,6 +48,8 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
     const [isConfirmModalVisible, setConfirmModalVisibility] = useState(false);
 
     const showConfirmModal = () => {
+        // FullPageOfflineBlockingView doesn't wrap HeaderWithBackButton, so we handle navigation manually when offline.
+        // Offline mode isn't supported in MFA; navigate users away immediately without showing the confirmation modal.
         if (isOffline) {
             Navigation.closeRHPFlow();
             return;
@@ -59,7 +61,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         setConfirmModalVisibility(false);
     };
 
-    const approveTransaction = () => {
+    const onApproveTransaction = () => {
         executeScenario(CONST.MULTIFACTOR_AUTHENTICATION.SCENARIO.AUTHORIZE_TRANSACTION, {
             transactionID,
         });
@@ -115,7 +117,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
                     <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
                     <MultifactorAuthenticationAuthorizeTransactionActions
                         isLoading={isDenyingTransaction}
-                        onAuthorize={approveTransaction}
+                        onAuthorize={onApproveTransaction}
                         onDeny={onDenyTransaction}
                     />
                     <AuthorizeTransactionCancelConfirmModal

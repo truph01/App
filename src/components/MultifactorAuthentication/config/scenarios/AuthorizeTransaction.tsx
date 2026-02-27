@@ -23,6 +23,7 @@ type Payload = {
     transactionID: string;
 };
 
+/** Type guard for AuthorizeTransaction scenario. We only check transactionID because Payload for this scenario has no other fields. */
 function isAuthorizeTransactionPayload(payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined): payload is Payload {
     return !!payload && 'transactionID' in payload;
 }
@@ -122,7 +123,7 @@ export {
 };
 
 export default {
-    // Make sure to update the switch-case in useNavigateTo3DSAuthorizationChallenge when we add Passkey support
+    // Allowed methods are hardcoded here; keep in sync with allowedAuthenticationMethods in useNavigateTo3DSAuthorizationChallenge.
     allowedAuthenticationMethods: [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS],
     action: authorizeTransaction,
 
@@ -148,7 +149,8 @@ export default {
         if (!isAuthorizeTransactionPayload(payload)) {
             return {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.CANCELED};
         }
-        return denyTransaction({transactionID: payload.transactionID});
+        const result = await denyTransaction({transactionID: payload.transactionID});
+        return {...result, payload};
     },
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_DENIED]: <DeniedTransactionSuccessScreen />,
