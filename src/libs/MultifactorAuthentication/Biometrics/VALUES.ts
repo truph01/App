@@ -87,6 +87,7 @@ const REASON = {
         UNHANDLED_ERROR: 'An unhandled error occurred',
         REQUESTED_TRANSACTION_UNAVAILABLE: 'Requested transaction is unavailable',
         UNKNOWN_RESPONSE: 'Unknown response',
+        CANCELED: 'Flow canceled by user',
     },
     KEYSTORE: {
         KEY_DELETED: 'Key successfully deleted from SecureStore',

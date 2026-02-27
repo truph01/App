@@ -141,10 +141,9 @@ export default {
     defaultServerFailureScreen: <ApproveTransactionServerFailureScreen />,
     onCancel: async (payload) => {
         if (!isAuthorizeTransactionPayload(payload)) {
-            return {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.EXPO.CANCELED};
+            return {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.CANCELED};
         }
-        const {reason} = await denyTransaction({transactionID: payload.transactionID});
-        return {reason};
+        return denyTransaction({transactionID: payload.transactionID});
     },
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.BACKEND.TRANSACTION_DENIED]: <DeniedTransactionSuccessScreen />,
