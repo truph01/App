@@ -1416,6 +1416,8 @@ const translations: TranslationDeepObject<typeof en> = {
         someDuplicatesArePaid: 'Sommige van deze duplicaten zijn al goedgekeurd of betaald.',
         reviewDuplicates: 'Dubbele items controleren',
         keepAll: 'Alles behouden',
+        noDuplicatesTitle: 'All set!',
+        noDuplicatesDescription: 'There are no duplicate transactions for review here.',
         confirmApprove: 'Bevestig goedkeuringsbedrag',
         confirmApprovalAmount: 'Keur alleen conforme uitgaven goed, of keur het hele rapport goed.',
         confirmApprovalAllHoldAmount: () => ({

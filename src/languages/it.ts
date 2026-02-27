@@ -1418,6 +1418,8 @@ const translations: TranslationDeepObject<typeof en> = {
         someDuplicatesArePaid: 'Alcuni di questi duplicati sono già stati approvati o pagati.',
         reviewDuplicates: 'Controlla i duplicati',
         keepAll: 'Mantieni tutto',
+        noDuplicatesTitle: 'All set!',
+        noDuplicatesDescription: 'There are no duplicate transactions for review here.',
         confirmApprove: 'Conferma l’importo approvato',
         confirmApprovalAmount: 'Approva solo le spese conformi oppure approva l’intero rapporto.',
         confirmApprovalAllHoldAmount: () => ({

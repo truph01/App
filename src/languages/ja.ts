@@ -1408,6 +1408,8 @@ const translations: TranslationDeepObject<typeof en> = {
         someDuplicatesArePaid: 'これらの重複のうち、いくつかはすでに承認または支払い済みです。',
         reviewDuplicates: '重複を確認',
         keepAll: 'すべて保持',
+        noDuplicatesTitle: 'All set!',
+        noDuplicatesDescription: 'There are no duplicate transactions for review here.',
         confirmApprove: '承認金額を確認',
         confirmApprovalAmount: '準拠している経費のみを承認するか、レポート全体を承認します。',
         confirmApprovalAllHoldAmount: () => ({

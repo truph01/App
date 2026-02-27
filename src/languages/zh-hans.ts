@@ -1388,6 +1388,8 @@ const translations: TranslationDeepObject<typeof en> = {
         someDuplicatesArePaid: '其中有些重复项已经被批准或支付。',
         reviewDuplicates: '查看重复项',
         keepAll: '全部保留',
+        noDuplicatesTitle: 'All set!',
+        noDuplicatesDescription: 'There are no duplicate transactions for review here.',
         confirmApprove: '确认批准金额',
         confirmApprovalAmount: '仅批准合规报销，或批准整份报销报告。',
         confirmApprovalAllHoldAmount: () => ({
