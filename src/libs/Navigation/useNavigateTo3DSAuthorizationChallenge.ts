@@ -12,11 +12,11 @@ import type {TransactionPending3DSReview} from '@src/types/onyx';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import Navigation, {isMFAFlowScreen} from './Navigation';
 
-// We want predictable, stable ordering for transaction challenges to ensurewe don't
+// We want predictable, stable ordering for transaction challenges to ensure we don't
 // accidentally navigate the user while they're in the middle of acting on a challenge.
-// Prioritize created date, but if they're the same sort by expired date,
-// and if those are the same, sort by ID
-function sortTransactionsPending3DSReview(transactions: TransactionPending3DSReview[]) {
+// Prioritize created date, but if they're the same sort by expired date, and if those
+// are the same, sort by ID.
+function getFirstSortedTransactionPending3DSReview(transactions: TransactionPending3DSReview[]): TransactionPending3DSReview | undefined {
     return transactions
         .sort((a, b) => {
             const createdDiff = new Date(a.created).getTime() - new Date(b.created).getTime();
@@ -34,7 +34,8 @@ function sortTransactionsPending3DSReview(transactions: TransactionPending3DSRev
         .at(0);
 }
 
-/** Listens to changes to ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS and navigates to ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION if necessary */
+/** Listens to changes to ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS (as well as the currently focused route)
+ * and navigates to ROUTES.MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION if necessary */
 function useNavigateTo3DSAuthorizationChallenge() {
     const [locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult] = useOnyx(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS);
     const [transactionsPending3DSReview] = useOnyx(ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW);
@@ -60,13 +61,35 @@ function useNavigateTo3DSAuthorizationChallenge() {
         if (!transactionsPending3DSReview || isLoadingOnyxValue(locallyProcessedReviewsResult)) {
             return undefined;
         }
-        const nonBlocklistedTransactions = Object.values(transactionsPending3DSReview).filter((challenge) =>
-            locallyProcessed3DSTransactionReviews && challenge.transactionID ? !locallyProcessed3DSTransactionReviews[challenge.transactionID] : true,
-        );
-        return sortTransactionsPending3DSReview(nonBlocklistedTransactions);
+
+        // we decided "not yet processed" was more legible than "non blocklisted"
+        // eslint-disable-next-line rulesdir/no-negated-variables
+        const pendingTransactionsNotYetProcessedLocally = Object.values(transactionsPending3DSReview).filter((challenge) => {
+            // We can't process a transaction without an ID, so don't bother showing it.
+            if (!challenge?.transactionID) {
+                return false;
+            }
+
+            // No transactions processed locally, so all pending transactions are eligible
+            if (!locallyProcessed3DSTransactionReviews) {
+                return true;
+            }
+
+            // This transaction was already processed locally, don't process it again
+            if (challenge.transactionID in locallyProcessed3DSTransactionReviews) {
+                return false;
+            }
+
+            // Transaction is valid and has never been processed locally
+            return true;
+        });
+
+        // Return only the next eligible transaction
+        return getFirstSortedTransactionPending3DSReview(pendingTransactionsNotYetProcessedLocally);
     }, [transactionsPending3DSReview, locallyProcessed3DSTransactionReviews, locallyProcessedReviewsResult]);
 
     useEffect(() => {
+        // transactionPending3DSReview is undefined when there are no pending transactions
         if (!transactionPending3DSReview?.transactionID) {
             return;
         }
@@ -109,14 +132,14 @@ function useNavigateTo3DSAuthorizationChallenge() {
                 return;
             }
 
-            // Make an API call to double check that the challenge is still valid
-            const challengeStillValid = await isTransactionStillPending3DSReview(transactionPending3DSReview.transactionID);
+            // Make an API call to double check that the challenge is still eligible for review (i.e. has not been reviewed on another device)  
+            const challengeStillPendingReview = await isTransactionStillPending3DSReview(transactionPending3DSReview.transactionID);  
 
-            // If we know that a challenge isn't valid anymore, better to bail out of navigating to the flow rather than showing the user the "already reviewed" outcome screen
-            if (!challengeStillValid) {
-                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - challenge is no longer valid');
-                return;
-            }
+            // If we know that a challenge is no longer pending review, bail rather than showing the user the "already reviewed" outcome screen  
+            if (!challengeStillPendingReview) {  
+                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - challenge is no longer pending review');  
+                return;  
+            }  
 
             if (cancel) {
                 Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - effect was cleaned up while GetTransactionsPending3DSReview was in-flight');
@@ -138,4 +161,4 @@ function useNavigateTo3DSAuthorizationChallenge() {
 }
 
 export default useNavigateTo3DSAuthorizationChallenge;
-export {sortTransactionsPending3DSReview};
+export {getFirstSortedTransactionPending3DSReview as sortTransactionsPending3DSReview};
