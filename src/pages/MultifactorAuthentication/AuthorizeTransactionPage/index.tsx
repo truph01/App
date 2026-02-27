@@ -87,20 +87,13 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         return <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>{denyOutcomeScreen}</ScreenWrapper>;
     }
 
-    // When the transaction denial succeeds, the transaction gets removed from the queue slightly sooner than denyTransaction resolves.
-    // We handle this case specially here so that the user does not see a momentary flash of the AlreadyReviewedFailureScreen
-    if (isDenyingTransaction && !transaction) {
-        return (
-            <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                <DeniedTransactionSuccessScreen />
-            </ScreenWrapper>
-        );
-    }
-
     if (!transaction) {
+        // isDenyingTransaction is handled here because:
+        // When the transaction denial succeeds, the transaction gets removed from the queue slightly sooner than denyTransaction resolves.
+        // We handle this case specially here so that the user does not see a momentary flash of the AlreadyReviewedFailureScreen
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                <AlreadyReviewedFailureScreen />
+                {isDenyingTransaction ? <DeniedTransactionSuccessScreen /> : <AlreadyReviewedFailureScreen />}
             </ScreenWrapper>
         );
     }
