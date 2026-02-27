@@ -4229,7 +4229,7 @@ function getActionableCard3DSTransactionApprovalMessage(
         return undefined;
     }
     const {amount, currency, merchant} = originalMessage;
-    const formattedAmount = convertToDisplayString(amount, currency);
+    const formattedAmount = amount ? convertToDisplayString(amount, currency) : '';
     return translate('report.actions.type.actionableCard3DSTransactionApproval', formattedAmount, merchant);
 }
 

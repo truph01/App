@@ -16,6 +16,44 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {LocallyProcessed3DSChallengeReviews} from '@src/types/onyx';
 
 /**
+ * These subscriptions keep ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS tidy as values within it are no longer needed
+ */
+
+let locallyProcessed3DSTransactionReviews: OnyxEntry<LocallyProcessed3DSChallengeReviews> = {};
+
+Onyx.connectWithoutView({
+    key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
+    callback: (storedLocallyProcessed3DSTransactionReviews) => {
+        locallyProcessed3DSTransactionReviews = storedLocallyProcessed3DSTransactionReviews;
+    },
+});
+
+// Clean up list of locally-reviewed transactions when they are removed from queue by the server
+Onyx.connectWithoutView({
+    key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
+    callback: (queue) => {
+        if (!locallyProcessed3DSTransactionReviews || !queue) {
+            return;
+        }
+        const queuedTransactionIDs = Object.keys(queue);
+        const blocklistEntriesToCleanup = Object.keys(locallyProcessed3DSTransactionReviews).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
+        if (blocklistEntriesToCleanup.length > 0) {
+            cleanUpLocallyProcessed3DSTransactionReviews(blocklistEntriesToCleanup);
+        }
+    },
+});
+
+function cleanUpLocallyProcessed3DSTransactionReviews(entriesToDelete: string[]) {
+    const value: Record<string, null> = {};
+    for (const entry of entriesToDelete) {
+        value[entry] = null;
+    }
+    Onyx.merge(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS, value);
+}
+
+/**
+ * The rest of this file is concerned with MFA-related API calls
+ *
  * To keep the code clean and readable, these functions return parsed data in order to:
  *
  * - Check whether multifactorial authentication scenario was successful as we need to know it as fast as possible
@@ -189,7 +227,7 @@ async function revokeMultifactorAuthenticationCredentials() {
     }
 }
 
-/** Check whether a given transaction is still pending review _and_ update the transactionsPending3DSReview key in Onyx */
+/** Check whether a given transaction is still pending review and update the transactionsPending3DSReview key in Onyx */
 async function isTransactionStillPending3DSReview(transactionID: string) {
     const response = await makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.GET_TRANSACTIONS_PENDING_3DS_REVIEW, null, {});
     return !!response?.transactionsPending3DSReview?.[transactionID];
@@ -265,38 +303,6 @@ function clearLocalMFAPublicKeyList() {
         multifactorAuthenticationPublicKeyIDs: CONST.MULTIFACTOR_AUTHENTICATION.PUBLIC_KEYS_PREVIOUSLY_BUT_NOT_CURRENTLY_REGISTERED,
     });
 }
-
-function cleanUpLocallyProcessed3DSTransactionReviews(entriesToDelete: string[]) {
-    const value: Record<string, null> = {};
-    for (const entry of entriesToDelete) {
-        value[entry] = null;
-    }
-    Onyx.merge(ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS, value);
-}
-
-let locallyProcessed3DSTransactionReviews: OnyxEntry<LocallyProcessed3DSChallengeReviews> = {};
-
-Onyx.connectWithoutView({
-    key: ONYXKEYS.LOCALLY_PROCESSED_3DS_TRANSACTION_REVIEWS,
-    callback: (blocklist) => {
-        locallyProcessed3DSTransactionReviews = blocklist;
-    },
-});
-
-// Clean up list of locally-reviewed transactions when they are removed from queue by the server
-Onyx.connectWithoutView({
-    key: ONYXKEYS.TRANSACTIONS_PENDING_3DS_REVIEW,
-    callback: (queue) => {
-        if (!locallyProcessed3DSTransactionReviews || !queue) {
-            return;
-        }
-        const queuedTransactionIDs = Object.keys(queue);
-        const blocklistEntriesToCleanup = Object.keys(locallyProcessed3DSTransactionReviews).filter((blocklistedTransactionID) => !queuedTransactionIDs.includes(blocklistedTransactionID));
-        if (blocklistEntriesToCleanup.length > 0) {
-            cleanUpLocallyProcessed3DSTransactionReviews(blocklistEntriesToCleanup);
-        }
-    },
-});
 
 export {
     registerAuthenticationKey,
