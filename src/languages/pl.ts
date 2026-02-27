@@ -661,7 +661,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Możesz spróbować ponownie u sprzedawcy. Jeśli nie próbowałeś(-aś) wykonać tej transakcji, <concierge-link>skontaktuj się z Concierge</concierge-link>, aby zgłosić potencjalne oszustwo.',
             youNeedToTryAgainAtMerchant: 'Ta transakcja nie została zweryfikowana, więc ją odrzuciliśmy. Musisz spróbować ponownie u sprzedawcy.',
             goBackToTheMerchant: 'Wróć do strony sprzedawcy, aby kontynuować transakcję.',
-            authorizationFailed: 'Twoje zatwierdzenie nie powiodło się, więc odrzuciliśmy tę transakcję. Możesz spróbować ponownie u sprzedawcy.',
             attemptedTransaction: 'Próbowana transakcja',
             transactionFailed: 'Transakcja nie powiodła się',
             transactionCouldNotBeCompleted: 'Twoja transakcja nie mogła zostać zrealizowana. Spróbuj ponownie u sprzedawcy.',

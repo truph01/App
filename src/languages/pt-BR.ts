@@ -660,7 +660,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Você pode tentar novamente no estabelecimento. Se você não fez esta transação, <concierge-link>entre em contato com a Concierge</concierge-link> para relatar possível fraude.',
             youNeedToTryAgainAtMerchant: 'Essa transação não foi verificada, então nós a negamos. Você precisará tentar novamente no estabelecimento.',
             goBackToTheMerchant: 'Volte ao site do estabelecimento para continuar a transação.',
-            authorizationFailed: 'Sua aprovação falhou, então recusamos esta transação. Você pode tentar novamente no estabelecimento.',
             attemptedTransaction: 'Transação tentada',
             transactionFailed: 'Transação falhou',
             transactionCouldNotBeCompleted: 'Não foi possível concluir sua transação. Tente novamente no estabelecimento.',

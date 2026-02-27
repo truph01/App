@@ -655,7 +655,6 @@ const translations: TranslationDeepObject<typeof en> = {
             youCanTryAgainAtMerchantOrReachOut: '您可以在商家处重试。如果您没有发起此交易，请<concierge-link>联系 Concierge</concierge-link>报告潜在欺诈。',
             youNeedToTryAgainAtMerchant: '此交易未通过验证，因此已被拒绝。请在商户处重新尝试。',
             goBackToTheMerchant: '返回商家网站以继续完成交易。',
-            authorizationFailed: '您的授权失败，因此我们拒绝了这笔交易。您可以在商户处再试一次。',
             attemptedTransaction: '已尝试的交易',
             transactionFailed: '交易失败',
             transactionCouldNotBeCompleted: '您的交易未能完成。请在商户处重试。',

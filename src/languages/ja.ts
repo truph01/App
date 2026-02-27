@@ -661,7 +661,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 '加盟店でもう一度お試しください。もしこの取引に心当たりがない場合は、不正の可能性がありますので、<concierge-link>Concierge に連絡してください</concierge-link>。',
             youNeedToTryAgainAtMerchant: 'この取引は未認証のため、拒否されました。再度加盟店でお試しください。',
             goBackToTheMerchant: '取引を続行するには、加盟店のサイトに戻ってください。',
-            authorizationFailed: '承認に失敗したため、この取引は拒否されました。加盟店でもう一度お試しください。',
             attemptedTransaction: '試行された取引',
             transactionFailed: '取引に失敗しました',
             transactionCouldNotBeCompleted: '取引を完了できませんでした。加盟店で再度お試しください。',

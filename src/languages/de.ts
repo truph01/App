@@ -662,7 +662,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Du kannst es erneut beim Händler versuchen. Wenn du diese Transaktion nicht versucht hast, <concierge-link>wende dich an Concierge</concierge-link>, um möglichen Betrug zu melden.',
             youNeedToTryAgainAtMerchant: 'Diese Transaktion wurde nicht verifiziert, daher haben wir sie abgelehnt. Bitte versuch es erneut direkt beim Händler.',
             goBackToTheMerchant: 'Gehe zurück zur Händlerseite, um die Transaktion fortzusetzen.',
-            authorizationFailed: 'Ihre Genehmigung ist fehlgeschlagen, daher haben wir diese Transaktion abgelehnt. Sie können es beim Händler erneut versuchen.',
             attemptedTransaction: 'Versuchte Transaktion',
             transactionFailed: 'Transaktion fehlgeschlagen',
             transactionCouldNotBeCompleted: 'Ihre Transaktion konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut beim Händler.',

@@ -522,7 +522,6 @@ const translations: TranslationDeepObject<typeof en> = {
             youCanTryAgainAtMerchantOrReachOut: 'Puedes intentarlo de nuevo en el comercio. Si no realizaste esta transacción, comunícate con Concierge para reportar un posible fraude.',
             youNeedToTryAgainAtMerchant: 'Esta transacción no fue verificada, por lo que la hemos rechazado. Necesitarás intentarlo de nuevo en el comercio.',
             goBackToTheMerchant: 'Regresa al sitio del comercio para continuar la transacción.',
-            authorizationFailed: 'Tu aprobación falló, así que hemos rechazado esta transacción. Puedes intentarlo de nuevo en el comercio.',
             transactionFailed: 'Transacción fallida',
             transactionCouldNotBeCompleted: 'Su transacción no pudo ser completada. Por favor, inténtelo de nuevo en el comercio.',
             transactionCouldNotBeCompletedReachOut:

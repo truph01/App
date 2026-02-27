@@ -661,7 +661,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Je kunt het opnieuw proberen bij de winkelier. Als je deze transactie niet hebt geprobeerd uit te voeren, <concierge-link>neem dan contact op met Concierge</concierge-link> om mogelijke fraude te melden.',
             youNeedToTryAgainAtMerchant: 'Deze transactie is niet geverifieerd, dus we hebben haar geweigerd. Je moet het opnieuw proberen bij de handelaar.',
             goBackToTheMerchant: 'Ga terug naar de website van de verkoper om door te gaan met de transactie.',
-            authorizationFailed: 'Je goedkeuring is mislukt, daarom hebben we deze transactie geweigerd. Je kunt het opnieuw proberen bij de winkelier.',
             attemptedTransaction: 'Poging tot transactie',
             transactionFailed: 'Transactie mislukt',
             transactionCouldNotBeCompleted: 'Je transactie kon niet worden voltooid. Probeer het alsjeblieft opnieuw bij de verkoper.',

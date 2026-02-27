@@ -662,7 +662,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 'Puoi riprovare presso l’esercente. Se non hai effettuato tu questa transazione, <concierge-link>contatta Concierge</concierge-link> per segnalare un possibile uso fraudolento.',
             youNeedToTryAgainAtMerchant: 'Questa transazione non è stata verificata, quindi l’abbiamo rifiutata. Dovrai riprovare direttamente presso l’esercente.',
             goBackToTheMerchant: 'Torna al sito dell’esercente per continuare la transazione.',
-            authorizationFailed: 'La tua autorizzazione non è andata a buon fine, quindi abbiamo rifiutato questa transazione. Puoi riprovare presso l’esercente.',
             attemptedTransaction: 'Transazione tentata',
             transactionFailed: 'Transazione non riuscita',
             transactionCouldNotBeCompleted: 'Impossibile completare la transazione. Riprova presso l’esercente.',
