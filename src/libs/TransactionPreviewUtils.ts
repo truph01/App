@@ -139,7 +139,7 @@ function formatLastFourPAN(lastFourPAN?: number | string): string {
         return '';
     }
     const digitsOnly = String(lastFourPAN).replaceAll(/\D/g, '');
-    return digitsOnly ? digitsOnly.slice(-4).padStart(4, '0') : '';
+    return digitsOnly ? digitsOnly.slice(-4).padStart(4, 'X') : '';
 }
 
 function getMultiLevelTagViolationsCount(violations: OnyxTypes.TransactionViolations): number {

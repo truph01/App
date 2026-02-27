@@ -101,7 +101,8 @@ function useNavigateTo3DSAuthorizationChallenge() {
 
         // Note: Importing AuthorizeTransaction in this file causes the browser to get stuck in an infinite reload loop
         // Issue to fix this: https://github.com/Expensify/App/issues/83021
-        // When adding Passkey support, update this list and the switch below.
+        // TODO: when adding Passkey support, update this list and the switch below.
+        // Passkey issue: https://github.com/expensify/app/issues/79470
         const allowedAuthenticationMethods = [CONST.MULTIFACTOR_AUTHENTICATION.TYPE.BIOMETRICS];
         const doesDeviceSupportAnAllowedAuthenticationMethod = allowedAuthenticationMethods.some((method) => {
             switch (method) {

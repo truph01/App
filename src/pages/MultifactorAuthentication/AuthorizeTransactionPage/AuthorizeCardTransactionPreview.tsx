@@ -57,7 +57,7 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
     const displayAmount = amount === undefined ? '' : convertToDisplayString(amount, currency ?? '');
 
     const formattedLastFourPAN = formatLastFourPAN(lastFourPAN);
-    const shouldShowCardEnding = !!formattedLastFourPAN;
+    const shouldShowCardEnding = formattedLastFourPAN.length > 0;
     const cardEndingText = shouldShowCardEnding ? `${translate('paymentMethodList.accountLastFour')} ${formattedLastFourPAN}` : '';
     const shouldShowMerchantOrDescription = !!merchant;
 
