@@ -378,7 +378,7 @@ function hasSubscriptionRedDotError(
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
     amountOwed: number,
-    ownerBillingGraceEndPeriod: OnyxEntry<number> = ownerBillingGraceEndPeriodDeprecated,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     return (
         getSubscriptionStatus(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, amountOwed, ownerBillingGraceEndPeriod)
@@ -397,7 +397,7 @@ function hasSubscriptionGreenDotInfo(
     fundList: OnyxEntry<FundList>,
     billingStatus: OnyxEntry<BillingStatus>,
     amountOwed: number,
-    ownerBillingGraceEndPeriod: OnyxEntry<number> = ownerBillingGraceEndPeriodDeprecated,
+    ownerBillingGraceEndPeriod: OnyxEntry<number>,
 ): boolean {
     return (
         getSubscriptionStatus(stripeCustomerId, retryBillingSuccessful, billingDisputePending, retryBillingFailed, fundList, billingStatus, amountOwed, ownerBillingGraceEndPeriod)
