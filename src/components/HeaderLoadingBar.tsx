@@ -1,3 +1,4 @@
+import React from 'react';
 import useLoadingBarVisibility from '@hooks/useLoadingBarVisibility';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import LoadingBar from './LoadingBar';
