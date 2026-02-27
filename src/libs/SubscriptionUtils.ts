@@ -66,6 +66,7 @@ Onyx.connect({
     callback: (value) => (privateAmountOwed = value),
 });
 
+/** @deprecated This value is deprecated and will be removed soon after migration. */
 let ownerBillingGraceEndPeriodDeprecated: OnyxEntry<number>;
 Onyx.connect({
     key: ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END,
@@ -491,6 +492,7 @@ function doesUserHavePaymentCardAdded(userBillingFundID: number | undefined): bo
 function shouldRestrictUserBillableActions(
     policyID: string,
     userBillingGraceEndPeriodCollection: OnyxCollection<BillingGraceEndPeriod> = deprecatedUserBillingGraceEndPeriodCollection,
+    ownerBillingGraceEndPeriod: OnyxEntry<number> = ownerBillingGraceEndPeriodDeprecated,
 ): boolean {
     const currentDate = new Date();
 
@@ -516,10 +518,10 @@ function shouldRestrictUserBillableActions(
     // We should restrict the workspace's owner actions if it's past its grace period end date and it's owing some amount.
     if (
         isPolicyOwner(policy, currentUserAccountID) &&
-        ownerBillingGraceEndPeriodDeprecated &&
+        ownerBillingGraceEndPeriod &&
         privateAmountOwed !== undefined &&
         privateAmountOwed > 0 &&
-        isAfter(currentDate, fromUnixTime(ownerBillingGraceEndPeriodDeprecated))
+        isAfter(currentDate, fromUnixTime(ownerBillingGraceEndPeriod))
     ) {
         return true;
     }
