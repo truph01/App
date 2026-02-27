@@ -139,6 +139,11 @@ export default {
     successScreen: <ApprovedTransactionSuccessScreen />,
     defaultClientFailureScreen: <ApproveTransactionClientFailureScreen />,
     defaultServerFailureScreen: <ApproveTransactionServerFailureScreen />,
+    /**
+     * Called when the user confirms they want to exit the flow (via the cancel confirmation modal).
+     * Unlike `callback` which fire-and-forgets the deny (because the outcome screen will be shown regardless),
+     * onCancel awaits denyTransaction so the returned reason determines which outcome screen is displayed.
+     */
     onCancel: async (payload) => {
         if (!isAuthorizeTransactionPayload(payload)) {
             return {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.GENERIC.CANCELED};
