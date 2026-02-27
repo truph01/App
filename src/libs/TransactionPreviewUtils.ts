@@ -131,14 +131,13 @@ const dotSeparator: TranslationPathOrText = {text: ` ${CONST.DOT_SEPARATOR} `};
 
 /**
  * Normalize the last four digits to always return 4 characters.
- * This keeps leading zeros when the value is stored as a number.
- * If the number is shorter than 4 digits, it will be padded with zeros.
+ * If the number is shorter than 4 digits, it will be padded with X's.
  */
-function formatLastFourPAN(lastFourPAN?: number | string): string {
-    if (lastFourPAN === undefined || lastFourPAN === null) {
+function formatLastFourPAN(lastFourPAN?: string): string {
+    if (lastFourPAN === undefined || lastFourPAN.length === 0) {
         return '';
     }
-    const digitsOnly = String(lastFourPAN).replaceAll(/\D/g, '');
+    const digitsOnly = lastFourPAN.replaceAll(/\D/g, '');
     return digitsOnly ? digitsOnly.slice(-4).padStart(4, 'X') : '';
 }
 

@@ -19,7 +19,7 @@ type TransactionPending3DSReview = {
     expires: string;
 
     /** Last 4 digits of the card PAN */
-    lastFourPAN: number;
+    lastFourPAN: string;
 
     /** transactionID of the pending transaction */
     transactionID: string;

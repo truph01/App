@@ -143,7 +143,6 @@ function convertToDisplayStringWithExplicitCurrency(amountInCents: number, curre
         return convertToDisplayStringWithoutCurrency(amountInCents);
     }
     return convertToDisplayString(amountInCents, currency);
-
 }
 
 /**

@@ -8,7 +8,7 @@ describe('sortTransactionsPending3DSReview', () => {
         merchant: 'Test Merchant',
         created: '2024-01-01T12:00:00.000Z',
         expires: '2024-01-01T12:08:00.000Z',
-        lastFourPAN: 1234,
+        lastFourPAN: '1234',
         transactionID: '123',
         ...overrides,
     });

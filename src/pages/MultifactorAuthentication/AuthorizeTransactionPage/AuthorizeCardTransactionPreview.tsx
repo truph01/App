@@ -24,7 +24,7 @@ type AuthorizeCardTransactionPreviewProps = {
     currency?: string;
     merchant?: string;
     created?: string;
-    lastFourPAN?: number;
+    lastFourPAN?: string;
 };
 
 function AuthorizeCardTransactionPreview({transactionID, amount, currency, merchant, created, lastFourPAN}: AuthorizeCardTransactionPreviewProps) {
@@ -39,9 +39,9 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
     const transactionPreviewWidth = reportPreviewStyles.transactionPreviewStandaloneStyle.width;
     const containerStyle = [styles.border, styles.moneyRequestPreviewBox, reportPreviewStyles.transactionPreviewStandaloneStyle];
 
-    // Show skeleton when transaction data is not yet available (e.g. initial load before parent has received it from Onyx).
+    // Show skeleton when required transaction data is not yet available (e.g. initial load before parent has received it from Onyx).
     // Data is loaded by the parent; this component does not fetch.
-    const shouldShowSkeleton = !amount && !currency && !merchant && !created && !lastFourPAN;
+    const shouldShowSkeleton = !created && !transactionID;
     if (shouldShowSkeleton) {
         return (
             <View style={containerStyle}>

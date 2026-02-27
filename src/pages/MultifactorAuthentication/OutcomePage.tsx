@@ -3,7 +3,7 @@ import {DefaultClientFailureScreen} from '@components/MultifactorAuthentication/
 import {useMultifactorAuthenticationState} from '@components/MultifactorAuthentication/Context';
 import type {ErrorState} from '@components/MultifactorAuthentication/Context/State';
 
-/** Show server failure screen when status is 5xx or unknown (e.g. network/parse error). Otherwise treat as client error (4xx). */
+/** Server failure screen generally represents "unknown error" so also show when status is unknown (e.g. network/parse error). */
 function isServerError(error: ErrorState): boolean {
     return error.httpStatusCode === undefined || error.httpStatusCode >= 500;
 }
