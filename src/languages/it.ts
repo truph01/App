@@ -7450,7 +7450,8 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `il conto bancario aziendale ${maskedBankAccountNumber} è stato bloccato automaticamente a causa di un problema con il rimborso o con il regolamento della Carta Expensify. Risolvi il problema nelle <a href="${linkURL}">impostazioni dello spazio di lavoro</a>.`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''} ha lasciato la chat`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) => `Apri l’app mobile di Expensify per esaminare la tua transazione di ${amount} ${merchant}`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
+                    `Apri l'app mobile di Expensify per esaminare la tua transazione di ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''}`,
             },
             error: {
                 invalidCredentials: 'Credenziali non valide, controlla la configurazione della tua connessione.',

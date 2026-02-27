@@ -7365,7 +7365,8 @@ ${reportName}
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `ビジネス銀行口座 ${maskedBankAccountNumber} は、払い戻しまたは Expensify カードの精算に問題が発生したため自動的にロックされました。問題を解決するには、<a href="${linkURL}">ワークスペース設定</a>で修正してください。`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''}がチャットから退出しました`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) => `Expensify モバイルアプリを開いて、${amount} ${merchant} の取引を確認してください`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
+                    `Expensify モバイルアプリを開いて、${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''} の取引を確認してください`,
             },
             error: {
                 invalidCredentials: '認証情報が無効です。接続の設定を確認してください。',

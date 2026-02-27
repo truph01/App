@@ -7429,7 +7429,8 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `zakelijke bankrekening ${maskedBankAccountNumber} is automatisch vergrendeld vanwege een probleem met terugbetalingen of Expensify Kaart-afwikkeling. Los het probleem op in je <a href="${linkURL}">werkruimte-instellingen</a>.`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''}heeft de chat verlaten`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) => `Open de mobiele Expensify-app om je ${amount} ${merchant}-transactie te bekijken`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
+                    `Open de mobiele Expensify-app om je ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''}-transactie te bekijken`,
             },
             error: {
                 invalidCredentials: 'Ongeldige inloggegevens, controleer de configuratie van je verbinding.',

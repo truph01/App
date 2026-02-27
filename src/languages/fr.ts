@@ -7485,7 +7485,8 @@ Rendez obligatoires des informations de dépense comme les reçus et les descrip
                 settlementAccountLocked: ({maskedBankAccountNumber}: OriginalMessageSettlementAccountLocked, linkURL: string) =>
                     `le compte bancaire professionnel ${maskedBankAccountNumber} a été automatiquement verrouillé en raison d’un problème lié soit au remboursement, soit au règlement de la Carte Expensify. Veuillez corriger le problème dans vos <a href="${linkURL}">paramètres d’espace de travail</a>.`,
                 leftTheChatWithName: (nameOrEmail: string) => `${nameOrEmail ? `${nameOrEmail}: ` : ''} a quitté la discussion`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) => `Ouvrez l’application mobile Expensify pour examiner votre transaction de ${amount} ${merchant}`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
+                    `Ouvrez l'application mobile Expensify pour examiner votre transaction de ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''}`,
             },
             error: {
                 invalidCredentials: 'Identifiants invalides, veuillez vérifier la configuration de votre connexion.',

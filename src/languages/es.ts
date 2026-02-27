@@ -7238,7 +7238,8 @@ ${amount} para ${merchant} - ${date}`,
                 unshare: ({to}) => `miembro eliminado ${to}`,
                 stripePaid: (amount, currency) => `pagado ${currency}${amount}`,
                 takeControl: `tomó el control`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) => `Abra la aplicación móvil de Expensify para revisar su transacción de ${amount} ${merchant}`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
+                    `Abra la aplicación móvil de Expensify para revisar su transacción de ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''}`,
                 integrationSyncFailed: (label, errorMessage, workspaceAccountingLink) =>
                     `hubo un problema al sincronizar con ${label}${errorMessage ? ` ("${errorMessage}")` : ''}. Por favor, soluciona el problema en la <a href="${workspaceAccountingLink}">configuración del espacio de trabajo</a>.`,
                 companyCardConnectionBroken: ({feedName, workspaceCompanyCardRoute}: {feedName: string; workspaceCompanyCardRoute: string}) =>
