@@ -1416,10 +1416,10 @@ const translations: TranslationDeepObject<typeof en> = {
         expensesOnHold: 'Tutte le spese sono state messe in sospeso. Controlla i commenti per conoscere i prossimi passaggi.',
         expenseDuplicate: 'Questa spesa ha dettagli simili a un’altra. Controlla i duplicati per continuare.',
         someDuplicatesArePaid: 'Alcuni di questi duplicati sono già stati approvati o pagati.',
-        reviewDuplicates: 'Controlla i duplicati',
+        reviewDuplicates: 'Controlla duplicati',
         keepAll: 'Mantieni tutto',
-        noDuplicatesTitle: 'All set!',
-        noDuplicatesDescription: 'There are no duplicate transactions for review here.',
+        noDuplicatesTitle: 'Tutto a posto!',
+        noDuplicatesDescription: 'Non ci sono transazioni duplicate da verificare qui.',
         confirmApprove: 'Conferma l’importo approvato',
         confirmApprovalAmount: 'Approva solo le spese conformi oppure approva l’intero rapporto.',
         confirmApprovalAllHoldAmount: () => ({
