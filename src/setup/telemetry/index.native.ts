@@ -9,7 +9,7 @@ export default function (): void {
 
     let nativeAppStartTimeMs: number | undefined;
     try {
-        const appStartTime = AppStartTimeNitroModule.appStartTime;
+        const appStartTime = (AppStartTimeNitroModule as {readonly appStartTime: number}).appStartTime;
         nativeAppStartTimeMs = appStartTime > 0 ? appStartTime : undefined;
     } catch (error) {
         Log.warn('[Telemetry] Failed to read native app start time from NitroModule', {error});
