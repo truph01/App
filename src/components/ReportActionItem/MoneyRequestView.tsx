@@ -423,7 +423,7 @@ function MoneyRequestView({
         (transactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY) || (isDistanceRequest && !rate)) && !isTrackExpense;
     const calculateFromTransactionData = isTrackExpense && !rate;
     const distanceUnit = calculateFromTransactionData ? transaction?.comment?.customUnit?.distanceUnit : unit;
-    const distanceRate = calculateFromTransactionData ? Math.abs(transaction?.convertedAmount ?? 0) / (transaction?.comment?.customUnit?.quantity ?? 1) : rate;
+    const distanceRate = calculateFromTransactionData ? (transactionAmount ?? 0) / (transaction?.comment?.customUnit?.quantity ?? 1) : rate;
     let rateToDisplay = isCustomUnitOutOfPolicy
         ? translate('common.rateOutOfPolicy')
         : DistanceRequestUtils.getRateForDisplay(distanceUnit, distanceRate, currency, translate, toLocaleDigit, getCurrencySymbol, isOffline);
