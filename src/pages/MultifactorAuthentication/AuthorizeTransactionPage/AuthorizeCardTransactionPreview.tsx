@@ -83,52 +83,50 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
                 </View>
             </View>
             <View style={[styles.expenseAndReportPreviewBoxBody, styles.mtn1]}>
-                <View style={styles.gap3}>
-                    <View style={styles.gap2}>
-                        <Text
-                            style={[styles.textLabelSupporting, styles.lh16]}
-                            numberOfLines={1}
-                        >
-                            {headerText}
-                        </Text>
-                        <View style={[styles.flexRow, styles.gap2]}>
-                            <View style={[styles.flex1, styles.gap2]}>
-                                {shouldShowMerchantOrDescription && (
-                                    <Text
-                                        fontSize={variables.fontSizeNormal}
-                                        style={styles.flexShrink1}
-                                        numberOfLines={1}
-                                    >
-                                        {merchant}
-                                    </Text>
-                                )}
-                                {shouldShowCardEnding && (
-                                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}>
-                                        <Icon
-                                            src={icons.CreditCard}
-                                            height={variables.iconSizeExtraSmall}
-                                            width={variables.iconSizeExtraSmall}
-                                            fill={theme.icon}
-                                        />
-                                        <Text
-                                            numberOfLines={1}
-                                            style={[styles.textMicroSupporting, styles.pre, styles.flexShrink1]}
-                                        >
-                                            {cardEndingText}
-                                        </Text>
-                                    </View>
-                                )}
-                            </View>
-                            {!!displayAmount && (
+                <View style={styles.gap2}>
+                    <View style={[styles.flexRow, styles.gap2]}>
+                        <View style={[styles.flex1, styles.gap2]}>
+                            <Text
+                                style={[styles.textLabelSupporting, styles.lh16]}
+                                numberOfLines={1}
+                            >
+                                {headerText}
+                            </Text>
+                            {shouldShowMerchantOrDescription && (
                                 <Text
                                     fontSize={variables.fontSizeNormal}
-                                    style={styles.flexShrink0}
+                                    style={styles.flexShrink1}
                                     numberOfLines={1}
                                 >
-                                    {displayAmount}
+                                    {merchant}
                                 </Text>
                             )}
+                            {shouldShowCardEnding && (
+                                <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}>
+                                    <Icon
+                                        src={icons.CreditCard}
+                                        height={variables.iconSizeExtraSmall}
+                                        width={variables.iconSizeExtraSmall}
+                                        fill={theme.icon}
+                                    />
+                                    <Text
+                                        numberOfLines={1}
+                                        style={[styles.textMicroSupporting, styles.pre, styles.flexShrink1]}
+                                    >
+                                        {cardEndingText}
+                                    </Text>
+                                </View>
+                            )}
                         </View>
+                        {!!displayAmount && (
+                            <Text
+                                fontSize={variables.fontSizeNormal}
+                                style={[styles.flexShrink0, styles.alignSelfCenter]}
+                                numberOfLines={1}
+                            >
+                                {displayAmount}
+                            </Text>
+                        )}
                     </View>
                 </View>
             </View>
