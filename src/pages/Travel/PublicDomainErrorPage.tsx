@@ -24,10 +24,7 @@ function PublicDomainErrorPage({route}: PublicDomainErrorPageProps) {
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
 
     return (
-        <AccessOrNotFoundWrapper
-            policyID={activePolicyID}
-            featureName={CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED}
-        >
+        <AccessOrNotFoundWrapper policyID={activePolicyID}>
             <ScreenWrapper
                 shouldEnableMaxHeight
                 testID="PublicDomainErrorPage"
