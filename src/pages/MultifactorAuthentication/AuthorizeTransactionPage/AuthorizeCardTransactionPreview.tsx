@@ -12,7 +12,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {convertToDisplayString} from '@libs/CurrencyUtils';
+import {convertToDisplayStringWithExplicitCurrency} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import {formatLastFourPAN} from '@libs/TransactionPreviewUtils';
 import variables from '@styles/variables';
@@ -54,7 +54,7 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
         ? DateUtils.formatWithUTCTimeZone(created, DateUtils.doesDateBelongToAPastYear(created) ? CONST.DATE.MONTH_DAY_YEAR_ABBR_FORMAT : CONST.DATE.MONTH_DAY_ABBR_FORMAT)
         : '';
     const headerText = [formattedDate, translate('common.card')].filter(Boolean).join(` ${CONST.DOT_SEPARATOR} `);
-    const displayAmount = amount === undefined ? '' : convertToDisplayString(amount, currency ?? '');
+    const displayAmount = amount === undefined ? '' : convertToDisplayStringWithExplicitCurrency(amount, currency);
 
     const formattedLastFourPAN = formatLastFourPAN(lastFourPAN);
     const shouldShowCardEnding = formattedLastFourPAN.length > 0;
