@@ -7391,8 +7391,8 @@ const translations = {
                 unshare: ({to}: UnshareParams) => `removed member ${to}`,
                 stripePaid: (amount: string, currency: string) => `paid ${currency}${amount}`,
                 takeControl: `took control`,
-                actionableCard3DSTransactionApproval: (amount: string, merchant: string) =>
-                    `Open the Expensify mobile app to review your ${amount}${merchant?.length > 0 ? ` ${merchant}` : ''} transaction`,
+                actionableCard3DSTransactionApproval: (amount: string, merchant: string | undefined) =>
+                    `Open the Expensify mobile app to review your ${amount}${merchant && merchant.length > 0 ? ` ${merchant}` : ''} transaction`,
                 integrationSyncFailed: (label: string, errorMessage: string, workspaceAccountingLink?: string) =>
                     `there was a problem syncing with ${label}${errorMessage ? ` ("${errorMessage}")` : ''}. Please fix the issue in <a href="${workspaceAccountingLink}">workspace settings</a>.`,
                 companyCardConnectionBroken: ({feedName, workspaceCompanyCardRoute}: {feedName: string; workspaceCompanyCardRoute: string}) =>

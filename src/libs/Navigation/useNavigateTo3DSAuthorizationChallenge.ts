@@ -132,14 +132,14 @@ function useNavigateTo3DSAuthorizationChallenge() {
                 return;
             }
 
-            // Make an API call to double check that the challenge is still eligible for review (i.e. has not been reviewed on another device)  
-            const challengeStillPendingReview = await isTransactionStillPending3DSReview(transactionPending3DSReview.transactionID);  
+            // Make an API call to double check that the challenge is still eligible for review (i.e. has not been reviewed on another device)
+            const challengeStillPendingReview = await isTransactionStillPending3DSReview(transactionPending3DSReview.transactionID);
 
-            // If we know that a challenge is no longer pending review, bail rather than showing the user the "already reviewed" outcome screen  
-            if (!challengeStillPendingReview) {  
-                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - challenge is no longer pending review');  
-                return;  
-            }  
+            // If we know that a challenge is no longer pending review, bail rather than showing the user the "already reviewed" outcome screen
+            if (!challengeStillPendingReview) {
+                Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - challenge is no longer pending review');
+                return;
+            }
 
             if (cancel) {
                 Log.info('[useNavigateTo3DSAuthorizationChallenge] Ignoring navigation - effect was cleaned up while GetTransactionsPending3DSReview was in-flight');
