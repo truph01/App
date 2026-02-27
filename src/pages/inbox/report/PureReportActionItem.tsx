@@ -1879,6 +1879,7 @@ function PureReportActionItem({
                             accountIDs={oldestFourAccountIDs}
                             onSecondaryInteraction={showPopover}
                             isActive={isReportActionActive && !isContextMenuActive}
+                            currentUserAccountID={currentUserAccountID}
                         />
                     </View>
                 )}
