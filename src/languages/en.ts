@@ -677,7 +677,7 @@ const translations = {
             youCanTryAgainAtMerchantOrReachOut:
                 "You can try again at the merchant. If you didn't attempt this transaction, <concierge-link>reach out to Concierge</concierge-link> to report potential fraud.",
             youNeedToTryAgainAtMerchant: "This transaction was not verified, so we denied it. You'll need to try again at the merchant.",
-            goBackToTheMerchant: 'Go back to the merchant site to continue the transaction.',
+            goBackToTheMerchant: 'Return to the merchant site to continue the transaction.',
             transactionFailed: 'Transaction failed',
             transactionCouldNotBeCompleted: 'Your transaction could not be completed. Please try again at the merchant.',
             transactionCouldNotBeCompletedReachOut:
