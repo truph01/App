@@ -185,7 +185,18 @@ function MoneyRequestReportTransactionList({
     const shouldShowGroupedTransactions = isExpenseReport(report) && !isIOUReport(report);
 
     const addExpenseDropdownOptions = useMemo(
-        () => getAddExpenseDropdownOptions(translate, expensifyIcons, report?.reportID, policy, userBillingGraceEndPeriodCollection, ownerBillingGraceEndPeriod, undefined, undefined, lastDistanceExpenseType),
+        () =>
+            getAddExpenseDropdownOptions(
+                translate,
+                expensifyIcons,
+                report?.reportID,
+                policy,
+                userBillingGraceEndPeriodCollection,
+                ownerBillingGraceEndPeriod,
+                undefined,
+                undefined,
+                lastDistanceExpenseType,
+            ),
         [translate, expensifyIcons, report?.reportID, policy, userBillingGraceEndPeriodCollection, ownerBillingGraceEndPeriod, lastDistanceExpenseType],
     );
 

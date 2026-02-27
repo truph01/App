@@ -369,7 +369,7 @@ describe('SubscriptionUtils', () => {
         it('should return undefined by default', () => {
             const stripeCustomerIdForDefault: Partial<OnyxEntry<StripeCustomerID>> = {};
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0)).toBeUndefined();
+            expect(getSubscriptionStatus(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0, undefined)).toBeUndefined();
         });
 
         it('should return POLICY_OWNER_WITH_AMOUNT_OWED status', async () => {
@@ -421,7 +421,7 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.NVP_PRIVATE_BILLING_DISPUTE_PENDING]: 1,
             });
 
-            expect(getSubscriptionStatus(stripeCustomerId, false, 1, undefined, undefined, undefined, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerId, false, 1, undefined, undefined, undefined, 0, undefined)).toEqual({
                 status: PAYMENT_STATUS.BILLING_DISPUTE_PENDING,
                 isError: true,
             });
@@ -434,7 +434,7 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.NVP_PRIVATE_STRIPE_CUSTOMER_ID]: STRIPE_CUSTOMER_ID,
             });
 
-            expect(getSubscriptionStatus(stripeCustomerId, false, 0, undefined, undefined, undefined, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerId, false, 0, undefined, undefined, undefined, 0, undefined)).toEqual({
                 status: PAYMENT_STATUS.CARD_AUTHENTICATION_REQUIRED,
                 isError: true,
             });
@@ -447,7 +447,7 @@ describe('SubscriptionUtils', () => {
                 [ONYXKEYS.NVP_PRIVATE_BILLING_STATUS]: BILLING_STATUS_INSUFFICIENT_FUNDS,
             });
 
-            expect(getSubscriptionStatus(stripeCustomerId, false, undefined, undefined, undefined, BILLING_STATUS_INSUFFICIENT_FUNDS, AMOUNT_OWED)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerId, false, undefined, undefined, undefined, BILLING_STATUS_INSUFFICIENT_FUNDS, AMOUNT_OWED, undefined)).toEqual({
                 status: PAYMENT_STATUS.INSUFFICIENT_FUNDS,
                 isError: true,
             });
@@ -466,7 +466,7 @@ describe('SubscriptionUtils', () => {
             };
 
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForCardExpired, false, undefined, undefined, undefined, BILLING_STATUS_EXPIRED_CARD, AMOUNT_OWED)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerIdForCardExpired, false, undefined, undefined, undefined, BILLING_STATUS_EXPIRED_CARD, AMOUNT_OWED, undefined)).toEqual({
                 status: PAYMENT_STATUS.CARD_EXPIRED,
                 isError: true,
             });
@@ -486,7 +486,7 @@ describe('SubscriptionUtils', () => {
             };
 
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForCardExpireSoon, false, undefined, undefined, FUND_LIST, {}, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerIdForCardExpireSoon, false, undefined, undefined, FUND_LIST, {}, 0, undefined)).toEqual({
                 status: PAYMENT_STATUS.CARD_EXPIRE_SOON,
             });
         });
@@ -503,7 +503,7 @@ describe('SubscriptionUtils', () => {
                 currency: 'USD',
             };
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForRetryBillingSuccess, true, undefined, undefined, {}, undefined, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerIdForRetryBillingSuccess, true, undefined, undefined, {}, undefined, 0, undefined)).toEqual({
                 status: PAYMENT_STATUS.RETRY_BILLING_SUCCESS,
                 isError: false,
             });
@@ -522,7 +522,7 @@ describe('SubscriptionUtils', () => {
                 currency: 'USD',
             };
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForRetryBillingError, false, undefined, true, {}, undefined, 0)).toEqual({
+            expect(getSubscriptionStatus(stripeCustomerIdForRetryBillingError, false, undefined, true, {}, undefined, 0, undefined)).toEqual({
                 status: PAYMENT_STATUS.RETRY_BILLING_ERROR,
                 isError: true,
             });
@@ -578,11 +578,10 @@ describe('SubscriptionUtils', () => {
 
         it('should return true when there is a subscription status with isError true', async () => {
             await Onyx.multiSet({
-                [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: GRACE_PERIOD_DATE,
                 [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: AMOUNT_OWED,
             });
 
-            expect(hasSubscriptionRedDotError(stripeCustomerId, false, undefined, undefined, undefined, undefined, AMOUNT_OWED)).toBeTruthy();
+            expect(hasSubscriptionRedDotError(stripeCustomerId, false, undefined, undefined, undefined, undefined, AMOUNT_OWED, GRACE_PERIOD_DATE)).toBeTruthy();
         });
 
         it('should return false when there is no subscription status error', () => {
@@ -592,7 +591,7 @@ describe('SubscriptionUtils', () => {
                 currency: 'USD',
                 status: 'succeeded',
             };
-            expect(hasSubscriptionRedDotError(stripeCustomerIdWithNoError, false, undefined, undefined, undefined, undefined, 0)).toBeFalsy();
+            expect(hasSubscriptionRedDotError(stripeCustomerIdWithNoError, false, undefined, undefined, undefined, undefined, 0, undefined)).toBeFalsy();
         });
     });
 
@@ -617,11 +616,11 @@ describe('SubscriptionUtils', () => {
                 currency: 'USD',
             };
             // @ts-expect-error - This is a test case
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerIdForRetryBillingSuccess, true, undefined, undefined, {}, undefined, 0)).toBeTruthy();
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerIdForRetryBillingSuccess, true, undefined, undefined, {}, undefined, 0, undefined)).toBeTruthy();
         });
 
         it('should return false when there is no subscription status or isError is true', () => {
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, undefined, undefined, undefined, undefined, 0)).toBeFalsy();
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, undefined, undefined, undefined, undefined, 0, undefined)).toBeFalsy();
         });
     });
 
@@ -668,7 +667,7 @@ describe('SubscriptionUtils', () => {
             // No Onyx value set, no parameter passed
             const stripeCustomerIdForDefault: Partial<OnyxEntry<StripeCustomerID>> = {};
             // @ts-expect-error - This is a test case
-            expect(getSubscriptionStatus(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0)).toBeUndefined();
+            expect(getSubscriptionStatus(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0, undefined)).toBeUndefined();
         });
     });
 
@@ -706,12 +705,12 @@ describe('SubscriptionUtils', () => {
             // No Onyx value set, no parameter passed
             const stripeCustomerIdForDefault: Partial<OnyxEntry<StripeCustomerID>> = {};
             // @ts-expect-error - This is a test case
-            expect(hasSubscriptionRedDotError(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0)).toBe(false);
+            expect(hasSubscriptionRedDotError(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0, undefined)).toBe(false);
         });
 
         it('should return true when billing dispute is pending regardless of grace period', async () => {
             // Billing dispute pending should return error
-            expect(hasSubscriptionRedDotError(stripeCustomerId, false, 1, undefined, undefined, undefined, 0)).toBe(true);
+            expect(hasSubscriptionRedDotError(stripeCustomerId, false, 1, undefined, undefined, undefined, 0, undefined)).toBe(true);
         });
     });
 
@@ -733,7 +732,7 @@ describe('SubscriptionUtils', () => {
             // No Onyx value set, no parameter passed - undefined status means not green dot
             const stripeCustomerIdForDefault: Partial<OnyxEntry<StripeCustomerID>> = {};
             // @ts-expect-error - This is a test case
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0)).toBe(false);
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerIdForDefault, false, undefined, undefined, undefined, undefined, 0, undefined)).toBe(false);
         });
 
         it('should return true when retry billing is successful (non-error state)', async () => {
@@ -748,12 +747,12 @@ describe('SubscriptionUtils', () => {
                 currency: 'USD',
             };
             // @ts-expect-error - This is a test case
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerIdForSuccess, true, undefined, undefined, {}, undefined, 0)).toBe(true);
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerIdForSuccess, true, undefined, undefined, {}, undefined, 0, undefined)).toBe(true);
         });
 
         it('should return false when billing dispute is pending (error state)', async () => {
             // Billing dispute pending should return error, not green dot
-            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, 1, undefined, undefined, undefined, 0)).toBe(false);
+            expect(hasSubscriptionGreenDotInfo(stripeCustomerId, false, 1, undefined, undefined, undefined, 0, undefined)).toBe(false);
         });
     });
 

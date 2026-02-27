@@ -647,7 +647,17 @@ function MoneyRequestReportPreviewContent({
                 iouReport?.parentReportID,
                 lastDistanceExpenseType,
             ),
-        [translate, expensifyIcons, iouReport?.reportID, iouReport?.parentReportID, policy, userBillingGraceEndPeriodCollection, ownerBillingGraceEndPeriod, chatReportID, lastDistanceExpenseType],
+        [
+            translate,
+            expensifyIcons,
+            iouReport?.reportID,
+            iouReport?.parentReportID,
+            policy,
+            userBillingGraceEndPeriodCollection,
+            ownerBillingGraceEndPeriod,
+            chatReportID,
+            lastDistanceExpenseType,
+        ],
     );
 
     const isReportDeleted = action?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;

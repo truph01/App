@@ -66,7 +66,6 @@ Onyx.connect({
     callback: (value) => (privateAmountOwed = value),
 });
 
-/** @deprecated This value is deprecated and will be removed soon after migration. */
 let ownerBillingGraceEndPeriodDeprecated: OnyxEntry<number>;
 Onyx.connect({
     key: ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END,
