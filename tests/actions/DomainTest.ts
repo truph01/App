@@ -964,15 +964,14 @@ describe('actions/Domain', () => {
             const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
             const domainAccountID = 123;
             const groupID = '456';
-            const domainName = 'test.com';
             const previousGroupID = '789';
             const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
 
-            setDefaultSecurityGroup(domainAccountID, groupID, domainName, previousGroupID);
+            setDefaultSecurityGroup(domainAccountID, groupID, previousGroupID);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.SET_DEFAULT_DOMAIN_SECURITY_GROUP,
-                {domainAccountID, groupID, domainName},
+                {domainAccountID, groupID},
                 {
                     optimisticData: expect.arrayContaining([
                         expect.objectContaining({
@@ -1025,14 +1024,13 @@ describe('actions/Domain', () => {
             const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
             const domainAccountID = 123;
             const groupID = '456';
-            const domainName = 'test.com';
             const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
 
-            setDefaultSecurityGroup(domainAccountID, groupID, domainName, undefined);
+            setDefaultSecurityGroup(domainAccountID, groupID, undefined);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.SET_DEFAULT_DOMAIN_SECURITY_GROUP,
-                {domainAccountID, groupID, domainName},
+                {domainAccountID, groupID},
                 expect.objectContaining({
                     failureData: expect.arrayContaining([
                         expect.objectContaining({

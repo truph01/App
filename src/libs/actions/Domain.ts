@@ -1819,7 +1819,6 @@ function clearDomainSecurityGroupSettingError(domainAccountID: number, groupID: 
  * Sets the default security group for a domain
  * @param domainAccountID - The account ID of the domain
  * @param groupID - The ID of the security group to set as default
- * @param domainName - The name of the domain
  * @param previousGroupID - The ID of the previously default security group
  */
 function setDefaultSecurityGroup(domainAccountID: number, groupID: string, previousGroupID?: string) {
