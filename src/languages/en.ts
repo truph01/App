@@ -8650,6 +8650,10 @@ const translations = {
             error: {
                 settings: '<rbr>Couldn’t save this change. Please try again or <concierge-link>contact Concierge</concierge-link> for more support.</rbr>',
             },
+            permissions: 'Group permissions',
+            RestrictExpenseWorkspaceCreation: 'Restrict expense workspace creation/removal',
+            RestrictExpenseWorkspaceCreationDescription: 'Prevent members from being able to create an expense workspace or remove themselves from an expense workspace. This is useful for preventing people from using Expensify to submit reports for use outside your domain when combined with strict workspace enforcement.',
+            
         },
     },
 };
