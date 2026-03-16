@@ -1,7 +1,8 @@
 import type {DomainSecurityGroupWithID} from '@selectors/Domain';
-import {groupsSelector} from '@selectors/Domain';
+import {defaultSecurityGroupIDSelector, groupsSelector} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
+import Badge from '@components/Badge';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
@@ -39,8 +40,10 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
+    const [defaultGroupID] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: defaultSecurityGroupIDSelector});
 
     const data = groups.map((group) => {
+        const isDefault = group.id === defaultGroupID;
         return {
             keyForList: group.id,
             groupID: group.id,
@@ -48,6 +51,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
             rightElement: (
                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]}>
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
+                    {isDefault && <Badge text={translate('common.default')} />}
                 </View>
             ),
         };
