@@ -8907,7 +8907,7 @@ ${amount} para ${merchant} - ${date}`,
             },
             permissions: 'Permisos de grupo',
             RestrictExpenseWorkspaceCreation: "Restringir la creación/eliminación de espacios de trabajo de gastos",
-            RestrictExpenseWorkspaceCreationDescription: "Evita que los miembros creen un espacio de trabajo de gastos o se eliminen a sí mismos de uno. Esto es útil para evitar que las personas utilicen Expensify para enviar informes destinados a usarse fuera de tu dominio cuando se combina con la aplicación estricta de espacios de trabajo."
+            RestrictExpenseWorkspaceCreationDescription: "Evita que los miembros creen un espacio de trabajo de gastos o se eliminen a sí mismos de uno. Esto, cuando se combina con la aplicación estricta de espacios de trabajo, es útil para evitar que se utilice Expensify para enviar informes destinados a usarse fuera de tu dominio."
         },
     },
     gps: {
