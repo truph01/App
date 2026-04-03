@@ -14,6 +14,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {hasSynchronizationErrorMessage, isConnectionInProgress} from '@libs/actions/connections';
 import {isCurrentUserValidated} from '@libs/UserUtils';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
 import type {ConnectionName, PolicyConnectionName} from '@src/types/onyx/Policy';
@@ -28,6 +29,7 @@ import FixCompanyCardConnection from './items/FixCompanyCardConnection';
 import FixFailedBilling from './items/FixFailedBilling';
 import FixPersonalCardConnection from './items/FixPersonalCardConnection';
 import ReviewCardFraud from './items/ReviewCardFraud';
+import UnlockBankAccount from './items/UnlockBankAccount';
 import ValidateAccount from './items/ValidateAccount';
 
 type BrokenAccountingConnection = {
@@ -57,6 +59,14 @@ type BrokenPersonalCardConnection = {
     cardID: string;
 };
 
+type LockedBankAccount = {
+    /** The ID of the locked bank account */
+    bankAccountID: number;
+
+    /** The policy name — undefined means personal account */
+    policyName?: string;
+};
+
 function TimeSensitiveSection() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -80,6 +90,7 @@ function TimeSensitiveSection() {
     });
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
+    const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
 
     // Get card feed errors for company card connections (Release 4)
     const cardFeedErrors = useCardFeedErrors();
@@ -143,6 +154,22 @@ function TimeSensitiveSection() {
         }
     }
 
+    // Find locked bank accounts — workspace VBAs (admin policies with locked achAccount) and personal accounts
+    const lockedBankAccounts: LockedBankAccount[] = [];
+    const workspaceLockedBankAccountIDs = new Set<number>();
+    for (const policy of adminPolicies ?? []) {
+        if (policy.achAccount?.state === CONST.BANK_ACCOUNT.STATE.LOCKED && policy.achAccount.bankAccountID) {
+            lockedBankAccounts.push({bankAccountID: policy.achAccount.bankAccountID, policyName: policy.name});
+            workspaceLockedBankAccountIDs.add(policy.achAccount.bankAccountID);
+        }
+    }
+    for (const account of Object.values(bankAccountList ?? {})) {
+        const {bankAccountID, state} = account.accountData ?? {};
+        if (state === CONST.BANK_ACCOUNT.STATE.LOCKED && bankAccountID && !workspaceLockedBankAccountIDs.has(bankAccountID)) {
+            lockedBankAccounts.push({bankAccountID});
+        }
+    }
+
     const hasBrokenCompanyCards = brokenCompanyCardConnections.length > 0;
     const hasBrokenPersonalCards = brokenPersonalCardConnections.length > 0;
     const hasBrokenAccountingConnections = brokenAccountingConnections.length > 0;
@@ -153,6 +180,7 @@ function TimeSensitiveSection() {
     // If a widget has additional conditions in the render (e.g. && !!discountInfo), those
     // must be reflected here to avoid showing an empty "Time sensitive" section.
     const hasAnyTimeSensitiveContent =
+        lockedBankAccounts.length > 0 ||
         shouldShowValidateAccount ||
         shouldShowFixFailedBilling ||
         shouldShowReviewCardFraud ||
@@ -174,9 +202,10 @@ function TimeSensitiveSection() {
     // 4. Add payment card (trial ended, no payment card)
     // 5. Broken bank connections (company cards)
     // 6. Broken bank connections (personal cards)
-    // 7. Broken accounting connections
-    // 8. Expensify card shipping
-    // 9. Expensify card activation
+    // 7. Locked bank accounts (workspace VBAs and personal)
+    // 8. Broken accounting connections
+    // 9. Expensify card shipping
+    // 10. Expensify card activation
     return (
         <WidgetContainer title={translate('homePage.timeSensitiveSection.title')}>
             <View style={styles.getForYouSectionContainerStyle(shouldUseNarrowLayout)}>
@@ -231,7 +260,16 @@ function TimeSensitiveSection() {
                     );
                 })}
 
-                {/* Priority 7: Broken accounting connections */}
+                {/* Priority 7: Locked bank accounts */}
+                {lockedBankAccounts.map((account) => (
+                    <UnlockBankAccount
+                        key={`locked-bank-account-${account.bankAccountID}`}
+                        bankAccountID={account.bankAccountID}
+                        policyName={account.policyName}
+                    />
+                ))}
+
+                {/* Priority 8: Broken accounting connections */}
                 {brokenAccountingConnections.map((connection) => (
                     <FixAccountingConnection
                         key={`accounting-${connection.policyID}-${connection.connectionName}`}
@@ -241,7 +279,7 @@ function TimeSensitiveSection() {
                     />
                 ))}
 
-                {/* Priority 8: Expensify card shipping */}
+                {/* Priority 9: Expensify card shipping */}
                 {shouldShowAddShippingAddress &&
                     cardsNeedingShippingAddress.map((card) => (
                         <AddShippingAddress
@@ -250,7 +288,7 @@ function TimeSensitiveSection() {
                         />
                     ))}
 
-                {/* Priority 9: Expensify card activation */}
+                {/* Priority 10: Expensify card activation */}
                 {shouldShowActivateCard &&
                     cardsNeedingActivation.map((card) => (
                         <ActivateCard
