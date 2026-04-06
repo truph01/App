@@ -77,13 +77,14 @@ function ConciergeDraftGate({reportID, children}: React.PropsWithChildren<{repor
                 channelName,
                 eventType,
                 (eventData) => {
-                    setDraft((currentDraft) => applyConciergeDraftEvent(currentDraft, eventData as ConciergeDraftEvent, reportID));
+                    const conciergeDraftEvent = eventData as ConciergeDraftEvent;
+                    setDraft((currentDraft) => applyConciergeDraftEvent(currentDraft, conciergeDraftEvent, reportID));
                 },
                 handleResubscribe,
             );
 
             listener.catch((error: unknown) => {
-                Log.hmmm('[ConciergeDraftGate] Failed to subscribe to Pusher concierge draft events', {eventType, reportID, error});
+                Log.hmmm('Failed to subscribe to Pusher concierge draft events', {eventType, reportID, error});
             });
 
             return listener;

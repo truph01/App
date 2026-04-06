@@ -9,6 +9,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import {renderScrollComponent as renderActionSheetAwareScrollView} from '@components/ActionSheetAwareScrollView';
 import Button from '@components/Button';
 import InvertedFlatList from '@components/FlatList/InvertedFlatList';
+import {AUTOSCROLL_TO_TOP_THRESHOLD} from '@components/FlatList/hooks/useFlatListScrollKey';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import ReportActionsSkeletonView from '@components/ReportActionsSkeletonView';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -236,6 +237,10 @@ function ReportActionsList({
 
         return getSortedReportActions([...sortedVisibleReportActions, draftReportAction], true);
     }, [draftReportAction, sortedVisibleReportActions]);
+    const draftMessageHTML = draftReportAction ? getReportActionMessage(draftReportAction)?.html : undefined;
+    const isSyntheticDraftVisible = !!draftReportAction && !sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID);
+    const draftAutoScrollKey = isSyntheticDraftVisible ? `${draftReportAction.reportActionID}:${draftMessageHTML ?? ''}` : '';
+    const previousDraftAutoScrollKey = usePrevious(draftAutoScrollKey);
     const topReportAction = renderedVisibleReportActions.at(-1);
     const [shouldScrollToEndAfterLayout, setShouldScrollToEndAfterLayout] = useState(shouldFocusToTopOnMount && !reportActionID);
     const isAnonymousUser = useIsAnonymousUser();
@@ -399,6 +404,21 @@ function ReportActionsList({
         scrollToEnd: reportScrollManager.scrollToBottom,
         resetKey: linkedReportActionID,
     });
+
+    useEffect(() => {
+        if (!draftAutoScrollKey || previousDraftAutoScrollKey === draftAutoScrollKey) {
+            return;
+        }
+
+        if (scrollOffsetRef.current >= AUTOSCROLL_TO_TOP_THRESHOLD || !hasNewestReportActionRef.current) {
+            return;
+        }
+
+        setIsFloatingMessageCounterVisible(false);
+        requestAnimationFrame(() => {
+            reportScrollManager.scrollToBottom();
+        });
+    }, [draftAutoScrollKey, previousDraftAutoScrollKey, reportScrollManager, setIsFloatingMessageCounterVisible]);
 
     useEffect(() => {
         const shouldTriggerScroll = shouldFocusToTopOnMount && prevHasCreatedActionAdded && !hasCreatedActionAdded;
@@ -789,7 +809,6 @@ function ReportActionsList({
 
     // Native mobile does not render updates flatlist the changes even though component did update called.
     // To notify there something changes we can use extraData prop to flatlist
-    const draftMessageHTML = draftReportAction ? getReportActionMessage(draftReportAction)?.html : undefined;
     const extraData = useMemo(
         () => [shouldUseNarrowLayout ? unreadMarkerReportActionID : undefined, isArchivedNonExpenseReport(report, isReportArchived), draftReportAction?.reportActionID, draftMessageHTML],
         [draftMessageHTML, draftReportAction?.reportActionID, unreadMarkerReportActionID, shouldUseNarrowLayout, report, isReportArchived],
