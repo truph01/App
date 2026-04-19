@@ -813,8 +813,7 @@ type DuplicateReportParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
-    currentUserLogin: string;
-    currentUserAccountID: number;
+    c;
 };
 
 function duplicateReport({
@@ -964,6 +963,8 @@ type BulkDuplicateExpensesParams = {
     draftTransactionIDs: string[];
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 };
 
 function bulkDuplicateExpenses({
@@ -985,6 +986,8 @@ function bulkDuplicateExpenses({
     draftTransactionIDs,
     betas,
     recentWaypoints,
+    currentUserAccountID,
+    currentUserLogin,
 }: BulkDuplicateExpensesParams) {
     const transactionsToDuplicate = transactionIDs.map((id) => allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${id}`]).filter((t): t is OnyxTypes.Transaction => !!t);
 
@@ -1039,8 +1042,8 @@ function bulkDuplicateExpenses({
             shouldDeferAutoSubmit: !isLastExpense,
             existingIOUReport: optimisticIOUReport,
             optimisticReportPreviewActionID: sharedReportPreviewActionID,
-            currentUserAccountID: getUserAccountID(),
-            currentUserLogin: getCurrentUserEmail(),
+            currentUserAccountID,
+            currentUserLogin,
         });
 
         if (result?.iouReport) {

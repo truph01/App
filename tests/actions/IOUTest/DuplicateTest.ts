@@ -2469,6 +2469,8 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 recentWaypoints: [],
+                currentUserAccountID: RORY_ACCOUNT_ID,
+                currentUserLogin: RORY_EMAIL,
             });
 
             await waitForBatchedUpdates();
