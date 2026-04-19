@@ -5,6 +5,7 @@ import type {SearchGroupBy} from '@components/Search/types';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {ListItem} from '@components/SelectionList/types';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import type {GroupBySection} from '@libs/SearchUIUtils';
@@ -41,6 +42,8 @@ type GroupByPopupProps = {
 
 function GroupByPopup({label, value, sections, style, closeOverlay, onChange, modalHeadingRef}: GroupByPopupProps) {
     const styles = useThemeStyles();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
     const {windowHeight} = useWindowDimensions();
     const [selectedItem, setSelectedItem] = useState(value);
 
@@ -83,6 +86,8 @@ function GroupByPopup({label, value, sections, style, closeOverlay, onChange, mo
         closeOverlay();
     }, [closeOverlay, onChange]);
 
+    const shouldShowLabel = isSmallScreenWidth && !!label;
+
     return (
         <BasePopup
             label={label}
@@ -93,7 +98,7 @@ function GroupByPopup({label, value, sections, style, closeOverlay, onChange, mo
             style={style}
             modalHeadingRef={modalHeadingRef}
         >
-            <View style={[styles.getSelectionListPopoverHeight(optionsCount, windowHeight, false)]}>
+            <View style={[styles.getSelectionListPopoverHeight(optionsCount, windowHeight, false, isInLandscapeMode, shouldShowLabel)]}>
                 <SelectionListWithSections
                     sections={listSections}
                     shouldSingleExecuteRowSelect

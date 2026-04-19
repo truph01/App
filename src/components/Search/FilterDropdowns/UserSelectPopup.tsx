@@ -50,7 +50,7 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
     const {translate} = useLocalize();
     const personalDetails = usePersonalDetails();
     const {windowHeight} = useWindowDimensions();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
     const shouldFocusInputOnScreenFocus = canFocusInputOnScreenFocus();
@@ -165,7 +165,14 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
 
     const shouldShowSearchInput = isSearchable ?? totalOptionsCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
     const headingHeightOffset = shouldUseNarrowLayout && !!label ? variables.lineHeightLarge + 16 : 0;
-    const popoverHeightStyle = styles.getUserSelectionListPopoverHeight(listData.length || 1, windowHeight, shouldUseNarrowLayout, shouldShowSearchInput);
+    const popoverHeightStyle = styles.getCommonSelectionListPopoverHeight(
+        listData.length || 1,
+        variables.optionRowHeightCompact,
+        windowHeight,
+        shouldUseNarrowLayout,
+        isInLandscapeMode,
+        shouldShowSearchInput,
+    );
 
     const textInputOptions = useMemo(
         () =>
@@ -206,6 +213,7 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
                 isLoadingNewOptions={isLoadingNewOptions}
                 shouldShowLoadingPlaceholder={!areOptionsInitialized}
                 onEndReached={onListEndReached}
+                style={{contentContainerStyle: [styles.pb0]}}
             />
         </BasePopup>
     );

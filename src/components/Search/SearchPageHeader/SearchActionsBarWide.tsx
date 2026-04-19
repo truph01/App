@@ -1,24 +1,17 @@
 import React from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import DropdownButton from '@components/Search/FilterDropdowns/DropdownButton';
-import type {DropdownButtonProps} from '@components/Search/FilterDropdowns/DropdownButton';
-import useFilterFeedValue from '@components/Search/hooks/useFilterFeedValue';
-import useFilterFromValue from '@components/Search/hooks/useFilterFromValue';
-import useFilterWorkspaceValue from '@components/Search/hooks/useFilterWorkspaceValue';
 import SearchBulkActionsButton from '@components/Search/SearchBulkActionsButton';
+import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
-import SearchActionsSkeleton from '@components/Skeletons/SearchActionsSkeleton';
-import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
-import FILTER_KEYS from '@src/types/form/SearchAdvancedFiltersForm';
-import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
+import useThemeStyles from '@hooks/useThemeStyles';
 import type {SearchResults} from '@src/types/onyx';
 import SearchActionsBarCreateButton from './SearchActionsBarCreateButton';
 import SearchAdvancedFiltersButton from './SearchAdvancedFiltersButton';
 import SearchDisplayDropdownButton from './SearchDisplayDropdownButton';
+import SearchFiltersBarWide from './SearchFiltersBarWide';
 import SearchPageInputWide from './SearchPageInputWide';
 import SearchSaveButton from './SearchSaveButton';
-import useSearchActionsBar from './useSearchActionsBar';
 
 type SearchActionsBarWideProps = {
     queryJSON: SearchQueryJSON;
@@ -27,72 +20,17 @@ type SearchActionsBarWideProps = {
     onSort: () => void;
 };
 
-type SearchDropdownProps = Omit<DropdownButtonProps, 'viewportOffsetTop'>;
-
-function FromDropdown({value, ...rest}: SearchDropdownProps) {
-    const fromValue = useFilterFromValue(value);
-    return (
-        <DropdownButton
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...rest}
-            value={fromValue ?? []}
-        />
-    );
-}
-
-function WorkspaceDropdown({value, ...rest}: SearchDropdownProps) {
-    const workspaceValue = useFilterWorkspaceValue(value);
-    return (
-        <DropdownButton
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...rest}
-            value={workspaceValue ?? []}
-        />
-    );
-}
-
-function FeedDropdown({value, ...rest}: SearchDropdownProps) {
-    const feedValue = useFilterFeedValue(value);
-    return (
-        <DropdownButton
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...rest}
-            value={feedValue}
-        />
-    );
-}
-
-const FILTER_KEY_TO_COMPONENT: Partial<Record<SearchAdvancedFiltersKey, React.ComponentType<SearchDropdownProps>>> = {
-    [FILTER_KEYS.FROM]: FromDropdown,
-    [FILTER_KEYS.POLICY_ID]: WorkspaceDropdown,
-    [FILTER_KEYS.FEED]: FeedDropdown,
-};
-
-// NOTE: This is intentionally unused for now. It will be wired up in https://github.com/Expensify/App/issues/84876
 function SearchActionsBarWide({queryJSON, searchResults, handleSearch, onSort}: SearchActionsBarWideProps) {
-    const {filters, hasErrors, shouldShowActionsBarLoading, shouldShowSelectedDropdown, styles} = useSearchActionsBar(queryJSON, false);
-
-    if (hasErrors) {
-        return null;
-    }
-
-    if (shouldShowActionsBarLoading) {
-        const skeletonReasonAttributes: SkeletonSpanReasonAttributes = {
-            context: 'SearchActionsBarWide',
-            shouldShowActionsBarLoading,
-        };
-        return (
-            <SearchActionsSkeleton
-                shouldAnimate
-                reasonAttributes={skeletonReasonAttributes}
-            />
-        );
-    }
+    const styles = useThemeStyles();
+    const {selectedTransactions} = useSearchStateContext();
+    const hasSelectedItems = Object.keys(selectedTransactions ?? {}).length > 0;
 
     return (
-        <View style={[styles.searchActionsBarContainer, styles.gap2]}>
-            {shouldShowSelectedDropdown ? (
-                <SearchBulkActionsButton queryJSON={queryJSON} />
+        <View style={[styles.searchActionsBarContainer, styles.gap2, styles.mt3]}>
+            {hasSelectedItems ? (
+                <View style={styles.searchBulkActionsButton}>
+                    <SearchBulkActionsButton queryJSON={queryJSON} />
+                </View>
             ) : (
                 <>
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.pRelative, styles.w100, styles.flexWrap, styles.flexShrink1, styles.gap2, styles.zIndex10]}>
@@ -100,19 +38,7 @@ function SearchActionsBarWide({queryJSON, searchResults, handleSearch, onSort}: 
                             queryJSON={queryJSON}
                             handleSearch={handleSearch}
                         />
-                        {filters.map((item) => {
-                            const Component = FILTER_KEY_TO_COMPONENT[item.key] ?? DropdownButton;
-                            return (
-                                <Component
-                                    key={item.key}
-                                    label={item.label}
-                                    value={item.value}
-                                    PopoverComponent={item.PopoverComponent}
-                                    shouldDelayBottomDockedDismissAccessibility
-                                    sentryLabel={item.sentryLabel}
-                                />
-                            );
-                        })}
+                        <SearchFiltersBarWide queryJSON={queryJSON} />
                     </View>
                     <View style={styles.filtersBar}>
                         <SearchAdvancedFiltersButton queryJSON={queryJSON} />

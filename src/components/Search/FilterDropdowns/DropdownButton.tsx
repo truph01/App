@@ -1,5 +1,5 @@
 import {willAlertModalBecomeVisibleSelector} from '@selectors/Modal';
-import type {ComponentProps, ComponentType, Ref} from 'react';
+import type {ComponentProps, ComponentType, ReactNode, Ref, RefObject} from 'react';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
 import type {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {View} from 'react-native';
@@ -31,6 +31,8 @@ type PopoverComponentProps = {
 };
 
 type DropdownButtonProps = WithSentryLabel & {
+    children?: (triggerRef: RefObject<View | null>, onPress: () => void) => ReactNode;
+
     /** The label to display on the select */
     label: string;
 
@@ -42,6 +44,8 @@ type DropdownButtonProps = WithSentryLabel & {
 
     /** The component to render in the popover */
     PopoverComponent: ComponentType<PopoverComponentProps>;
+
+    ButtonComponent?: React.ComponentType<{onPress: () => void; ref: RefObject<View | null>}>;
 
     /** Whether to use medium size button instead of small */
     medium?: boolean;
@@ -64,7 +68,6 @@ type DropdownButtonProps = WithSentryLabel & {
 
 const PADDING_MODAL = 8;
 const BOTTOM_DOCKED_DISMISS_ACCESSIBILITY_DELAY = 2500;
-
 const ANCHOR_ORIGIN = {
     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
@@ -75,6 +78,7 @@ function DropdownButton({
     value,
     viewportOffsetTop,
     PopoverComponent,
+    ButtonComponent,
     medium = false,
     labelStyle,
     innerStyles,
@@ -124,19 +128,21 @@ function DropdownButton({
      * Toggle the overlay between open & closed
      */
     const toggleOverlay = useCallback(() => {
-        if (!isOverlayVisible && willAlertModalBecomeVisible) {
-            return;
-        }
+        setIsOverlayVisible((previousValue) => {
+            if (!previousValue && willAlertModalBecomeVisible) {
+                return false;
+            }
 
-        setIsOverlayVisible((previousValue) => !previousValue);
-    }, [isOverlayVisible, willAlertModalBecomeVisible]);
+            return !previousValue;
+        });
+    }, [willAlertModalBecomeVisible]);
 
     /**
      * Calculate popover position and toggle overlay
      */
     const calculatePopoverPositionAndToggleOverlay = useCallback(() => {
         calculatePopoverPosition(anchorRef, ANCHOR_ORIGIN).then((pos) => {
-            setPopoverTriggerPosition({...pos, vertical: pos.vertical + PADDING_MODAL});
+            setPopoverTriggerPosition({...pos, vertical: pos.vertical});
             toggleOverlay();
         });
     }, [calculatePopoverPosition, toggleOverlay]);
@@ -168,28 +174,35 @@ function DropdownButton({
             style={wrapperStyle}
         >
             {/* Dropdown Trigger */}
-            <Button
-                ref={triggerRef}
-                innerStyles={[isOverlayVisible && styles.buttonHoveredBG, {maxWidth: 256}, innerStyles]}
-                onPress={calculatePopoverPositionAndToggleOverlay}
-                sentryLabel={sentryLabel}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...(medium ? {medium: true} : {small: true})}
-            >
-                <CaretWrapper
-                    style={[styles.flex1, styles.mw100, caretWrapperStyle]}
-                    caretWidth={medium ? variables.iconSizeSmall : variables.iconSizeExtraSmall}
-                    caretHeight={medium ? variables.iconSizeSmall : variables.iconSizeExtraSmall}
-                    isActive={isOverlayVisible}
+            {ButtonComponent ? (
+                <ButtonComponent
+                    ref={triggerRef}
+                    onPress={calculatePopoverPositionAndToggleOverlay}
+                />
+            ) : (
+                <Button
+                    ref={triggerRef}
+                    innerStyles={[isOverlayVisible && styles.buttonHoveredBG, {maxWidth: 256}, innerStyles]}
+                    onPress={calculatePopoverPositionAndToggleOverlay}
+                    sentryLabel={sentryLabel}
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...(medium ? {medium: true} : {small: true})}
                 >
-                    <Text
-                        numberOfLines={1}
-                        style={[styles.textMicroBold, styles.flexShrink1, labelStyle]}
+                    <CaretWrapper
+                        style={[styles.flex1, styles.mw100, caretWrapperStyle]}
+                        caretWidth={medium ? variables.iconSizeSmall : variables.iconSizeExtraSmall}
+                        caretHeight={medium ? variables.iconSizeSmall : variables.iconSizeExtraSmall}
+                        isActive={isOverlayVisible}
                     >
-                        {buttonText}
-                    </Text>
-                </CaretWrapper>
-            </Button>
+                        <Text
+                            numberOfLines={1}
+                            style={[styles.textMicroBold, styles.flexShrink1, labelStyle]}
+                        >
+                            {buttonText}
+                        </Text>
+                    </CaretWrapper>
+                </Button>
+            )}
 
             {/* Dropdown overlay */}
             <PopoverWithMeasuredContent
