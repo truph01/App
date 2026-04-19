@@ -17,6 +17,7 @@ import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useReportIsArchived from '@hooks/useReportIsArchived';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useReportTransactions from '@hooks/useReportTransactions';
 import useSelfDMReport from '@hooks/useSelfDMReport';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
@@ -35,7 +36,7 @@ import {
 import dismissModalAndOpenReportInInboxTabHelper from '@libs/Navigation/helpers/dismissModalAndOpenReportInInboxTab';
 import Navigation from '@libs/Navigation/Navigation';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
-import {getPolicyExpenseChat, getReportOrDraftReport, getTransactionDetails, isMoneyRequestReport, isPolicyExpenseChat, isSelfDM, shouldEnableNegative} from '@libs/ReportUtils';
+import {getPolicyExpenseChat, getTransactionDetails, isMoneyRequestReport, isPolicyExpenseChat, isSelfDM, shouldEnableNegative} from '@libs/ReportUtils';
 import shouldUseDefaultExpensePolicy from '@libs/shouldUseDefaultExpensePolicy';
 import {calculateTaxAmount, getAmount, getCurrency, getDefaultTaxCode, getRequestType, getTaxValue, hasReceipt, isDistanceRequest, isExpenseUnreported} from '@libs/TransactionUtils';
 import MoneyRequestAmountForm from '@pages/iou/MoneyRequestAmountForm';
@@ -97,10 +98,10 @@ function IOURequestStepAmount({
     const reportTransactions = useReportTransactions(report?.reportID);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
-    const [iouOrExpenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.chatReportID)}`);
+    const iouOrExpenseReport = useReportOrReportDraft(report?.chatReportID);
     const actualChatReportID = iouOrExpenseReport && isMoneyRequestReport(iouOrExpenseReport) ? iouOrExpenseReport.chatReportID : undefined;
-    const [actualChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(actualChatReportID)}`);
-    const [transactionAssociatedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transaction?.reportID)}`);
+    const actualChatReport = useReportOrReportDraft(actualChatReportID);
+    const transactionAssociatedReport = useReportOrReportDraft(transaction?.reportID);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -377,8 +378,7 @@ function IOURequestStepAmount({
 
                 // Preserve user's participant selection to avoid forcing them back to default workspace.
                 const iouReportID = transaction?.reportID;
-                const selectedReport =
-                    iouReportID === CONST.REPORT.UNREPORTED_REPORT_ID ? selfDMReport : getReportOrDraftReport(iouReportID, undefined, undefined, undefined, transactionAssociatedReport);
+                const selectedReport = iouReportID === CONST.REPORT.UNREPORTED_REPORT_ID ? selfDMReport : transactionAssociatedReport;
                 const navigationIOUType = isSelfDM(selectedReport) ? CONST.IOU.TYPE.TRACK : CONST.IOU.TYPE.SUBMIT;
                 const chatReportID = selectedReport?.chatReportID ?? selectedReport?.reportID;
 

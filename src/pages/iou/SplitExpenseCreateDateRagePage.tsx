@@ -14,6 +14,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetSplitExpensesByDateRange} from '@libs/actions/IOU/Split';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -21,7 +22,6 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SplitExpenseParamList} from '@libs/Navigation/types';
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
-import {getReportOrDraftReport} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -43,8 +43,7 @@ function SplitExpenseCreateDateRagePage({route}: SplitExpenseCreateDateRagePageP
     const transaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`];
     const originalTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transaction?.comment?.originalTransactionID)}`];
 
-    const [reportOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
-    const report = getReportOrDraftReport(reportID, undefined, undefined, undefined, reportOnyx);
+    const report = useReportOrReportDraft(reportID);
     const currentReport = report ?? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`];
 
     const policy = usePolicy(currentReport?.policyID);

@@ -18,6 +18,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useReportIsArchived from '@hooks/useReportIsArchived';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {addAttachmentWithComment, addComment, openReport} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
@@ -26,7 +27,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {ShareNavigatorParamList} from '@libs/Navigation/types';
 import {getReportDisplayOption} from '@libs/OptionsListUtils';
 import {shouldValidateFile} from '@libs/ReceiptUtils';
-import {getReportOrDraftReport, isDraftReport} from '@libs/ReportUtils';
+import {isDraftReport} from '@libs/ReportUtils';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import AttachmentModalContext from '@pages/media/AttachmentModalScreen/AttachmentModalContext';
 import variables from '@styles/variables';
@@ -64,8 +65,7 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
     const [errorTitle, setErrorTitle] = useState<string | undefined>(undefined);
     const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
-    const [reportOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportOrAccountID}`);
-    const report: OnyxEntry<ReportType> = getReportOrDraftReport(reportOrAccountID, undefined, undefined, undefined, reportOnyx);
+    const report: OnyxEntry<ReportType> = useReportOrReportDraft(reportOrAccountID);
     const privateIsArchived = useReportIsArchived(report?.reportID);
     const ancestors = useAncestors(report);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);

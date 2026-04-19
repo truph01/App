@@ -21,6 +21,7 @@ import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useRootNavigationState from '@hooks/useRootNavigationState';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -81,7 +82,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
 
     const {contextualReportID, isSearchRouterScreen} = useRootNavigationState(getContextualReportData);
 
-    const [contextualReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${contextualReportID}`);
+    const contextualReport = useReportOrReportDraft(contextualReportID);
     const [contextualReportNVP] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${contextualReportID}`, {
         selector: privateIsArchivedSelector,
     });

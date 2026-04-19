@@ -24,6 +24,7 @@ import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransaction
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isMobileSafari} from '@libs/Browser';
@@ -40,7 +41,7 @@ import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopm
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
-import {getReportOrDraftReport, isMoneyRequestReport, isProcessingReport, isReportOutstanding, isSelectedManagerMcTest} from '@libs/ReportUtils';
+import {isMoneyRequestReport, isProcessingReport, isReportOutstanding, isSelectedManagerMcTest} from '@libs/ReportUtils';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {
@@ -127,8 +128,7 @@ function IOURequestStepConfirmation({
      * Additionally, if neither reportReal nor reportDraft exist, we fallback to the transactionReport
      * to ensure proper navigation after expense creation.
      */
-    const [transactionReportOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transaction?.reportID)}`);
-    const transactionReport = getReportOrDraftReport(transaction?.reportID, undefined, undefined, undefined, transactionReportOnyx);
+    const transactionReport = useReportOrReportDraft(transaction?.reportID);
     const reportWithDraftFallback = useMemo(() => reportReal ?? reportDraft, [reportDraft, reportReal]);
     const canUseReport = !(isProcessingReport(transactionReport) && !policyReal?.harvesting?.enabled) && isReportOutstanding(transactionReport, policyReal?.id, undefined, false);
 
