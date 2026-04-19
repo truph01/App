@@ -22,7 +22,6 @@ import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {BankAccountList} from '@src/types/onyx';
-import type PrivatePersonalDetails from '@src/types/onyx/PrivatePersonalDetails';
 import Address from './InternationalDepositAccount/PersonalInfo/substeps/AddressStep';
 import LegalName from './InternationalDepositAccount/PersonalInfo/substeps/LegalNameStep';
 import PhoneNumber from './InternationalDepositAccount/PersonalInfo/substeps/PhoneNumberStep';
@@ -80,8 +79,8 @@ function getPageNamesForCompletedSteps(completedSteps: number[]): string[] {
     return completedSteps.map((step) => PAGE_NAMES.at(step - 1)).filter((name): name is string => !!name);
 }
 
-function getFirstPageName(bankAccountList?: OnyxEntry<BankAccountList>, bankAccountID?: number, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): string {
-    const completedSteps = bankAccountID ? getCompletedStepsForBankAccount(bankAccountList, bankAccountID, privatePersonalDetails) : [];
+function getFirstPageName(bankAccountList?: OnyxEntry<BankAccountList>, bankAccountID?: number): string {
+    const completedSteps = bankAccountID ? getCompletedStepsForBankAccount(bankAccountList, bankAccountID) : [];
     const skipPageNames = new Set(getPageNamesForCompletedSteps(completedSteps));
     const firstPage = PAGE_NAMES.find((name) => !skipPageNames.has(name));
     return firstPage ?? PAGE_NAME.LEGAL_NAME;
@@ -111,7 +110,7 @@ function UpdatePersonalBankAccountPage() {
         Navigation.goBack(ROUTES.SETTINGS_WALLET);
     }, [isPersonalBankAccountLoaded, bankAccountID]);
 
-    const completedSteps = bankAccountID ? getCompletedStepsForBankAccount(bankAccountList, bankAccountID, privatePersonalDetails) : [];
+    const completedSteps = bankAccountID ? getCompletedStepsForBankAccount(bankAccountList, bankAccountID) : [];
 
     const exitFlow = () => {
         clearPersonalBankAccount();
@@ -208,7 +207,7 @@ function UpdatePersonalBankAccountPage() {
     }
     const skipPages = skipPageCandidates.length >= formPages.length ? [] : skipPageCandidates;
 
-    const firstPageName = getFirstPageName(bankAccountList, personalBankAccount?.bankAccountID, privatePersonalDetails);
+    const firstPageName = getFirstPageName(bankAccountList, personalBankAccount?.bankAccountID);
     const firstNonSkippedIndex = formPages.findIndex((p) => p.pageName === firstPageName);
 
     const {CurrentPage, currentPageName, prevPage, nextPage} = useSubPage({

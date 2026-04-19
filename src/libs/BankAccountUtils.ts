@@ -3,8 +3,6 @@ import type {OnyxEntry} from 'react-native-onyx';
 import CONST from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 import type AccountData from '@src/types/onyx/AccountData';
-import type PrivatePersonalDetails from '@src/types/onyx/PrivatePersonalDetails';
-import {getCurrentAddress} from './PersonalDetailsUtils';
 
 function getDefaultCompanyWebsite(session: OnyxEntry<OnyxTypes.Session>, account: OnyxEntry<OnyxTypes.Account>, shouldShowPublicDomain = false): string {
     return account?.isFromPublicDomain && !shouldShowPublicDomain ? '' : `https://www.${Str.extractEmailDomain(session?.email ?? '')}`;
@@ -44,28 +42,23 @@ const PERSONAL_INFO_STEP = {
 
 type AdditionalData = AccountData['additionalData'];
 
-function hasOwnerName(additionalData: AdditionalData, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): boolean {
-    return (!!additionalData?.firstName && !!additionalData?.lastName) || (!!privatePersonalDetails?.legalFirstName && !!privatePersonalDetails?.legalLastName);
+function hasOwnerName(additionalData: AdditionalData): boolean {
+    return !!additionalData?.firstName && !!additionalData?.lastName;
 }
 
-function hasOwnerAddress(additionalData: AdditionalData, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): boolean {
-    if (!!additionalData?.addressStreet && !!additionalData?.addressCity && !!additionalData?.addressState && !!additionalData?.addressZipCode) {
-        return true;
-    }
-    const currentAddress = getCurrentAddress(privatePersonalDetails);
-    return !!(currentAddress?.street ?? currentAddress?.addressLine1) && !!currentAddress?.city && !!currentAddress?.state && !!(currentAddress?.zip ?? currentAddress?.zipPostCode);
+function hasOwnerAddress(additionalData: AdditionalData): boolean {
+    return !!additionalData?.addressStreet && !!additionalData?.addressCity && !!additionalData?.addressState && !!additionalData?.addressZipCode;
 }
 
-function hasOwnerPhone(additionalData: AdditionalData, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): boolean {
-    return !!additionalData?.companyPhone || !!privatePersonalDetails?.phoneNumber;
+function hasOwnerPhone(additionalData: AdditionalData): boolean {
+    return !!additionalData?.companyPhone;
 }
 
 /**
- * Check if a US personal bank account in OPEN state is missing required personal information.
- * Checks both additionalData on the bank account and privatePersonalDetails (user profile),
- * because some fields (e.g. name) are only stored in the user's profile, not on additionalData.
+ * Check if a US personal bank account in OPEN state is missing required personal information on its own additionalData.
+ * Matches OldDot parity: the badge and update flow are driven by the bank account record only, not the user's profile.
  */
-function isPersonalBankAccountMissingInfo(accountData: AccountData | undefined, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): boolean {
+function isPersonalBankAccountMissingInfo(accountData: AccountData | undefined): boolean {
     if (accountData?.type !== CONST.BANK_ACCOUNT.TYPE.PERSONAL) {
         return false;
     }
@@ -83,14 +76,13 @@ function isPersonalBankAccountMissingInfo(accountData: AccountData | undefined, 
 
     const {additionalData} = accountData;
 
-    return !hasOwnerName(additionalData, privatePersonalDetails) || !hasOwnerAddress(additionalData, privatePersonalDetails) || !hasOwnerPhone(additionalData, privatePersonalDetails);
+    return !hasOwnerName(additionalData) || !hasOwnerAddress(additionalData) || !hasOwnerPhone(additionalData);
 }
 
 /**
- * Returns step numbers that already have data and can be skipped in the update flow.
- * Checks both additionalData and privatePersonalDetails, matching isPersonalBankAccountMissingInfo logic.
+ * Returns step numbers that already have data on the bank account and can be skipped in the update flow.
  */
-function getCompletedStepsForBankAccount(bankAccountList: OnyxEntry<OnyxTypes.BankAccountList>, bankAccountID: number, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): number[] {
+function getCompletedStepsForBankAccount(bankAccountList: OnyxEntry<OnyxTypes.BankAccountList>, bankAccountID: number): number[] {
     const bankAccount = bankAccountList?.[String(bankAccountID)];
     if (!bankAccount) {
         return [];
@@ -99,21 +91,21 @@ function getCompletedStepsForBankAccount(bankAccountList: OnyxEntry<OnyxTypes.Ba
     const {additionalData} = bankAccount.accountData ?? {};
     const completedSteps: number[] = [];
 
-    if (hasOwnerName(additionalData, privatePersonalDetails)) {
+    if (hasOwnerName(additionalData)) {
         completedSteps.push(PERSONAL_INFO_STEP.NAME);
     }
-    if (hasOwnerAddress(additionalData, privatePersonalDetails)) {
+    if (hasOwnerAddress(additionalData)) {
         completedSteps.push(PERSONAL_INFO_STEP.ADDRESS);
     }
-    if (hasOwnerPhone(additionalData, privatePersonalDetails)) {
+    if (hasOwnerPhone(additionalData)) {
         completedSteps.push(PERSONAL_INFO_STEP.PHONE);
     }
 
     return completedSteps;
 }
 
-function hasPersonalBankAccountMissingInfo(bankAccountList: OnyxEntry<OnyxTypes.BankAccountList>, privatePersonalDetails?: OnyxEntry<PrivatePersonalDetails>): boolean {
-    return Object.values(bankAccountList ?? {}).some((bankAccount) => isPersonalBankAccountMissingInfo(bankAccount?.accountData, privatePersonalDetails));
+function hasPersonalBankAccountMissingInfo(bankAccountList: OnyxEntry<OnyxTypes.BankAccountList>): boolean {
+    return Object.values(bankAccountList ?? {}).some((bankAccount) => isPersonalBankAccountMissingInfo(bankAccount?.accountData));
 }
 
 export {
