@@ -67,7 +67,6 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const personalDetails = usePersonalDetails();
-    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const listRef = useRef<SelectionListWithSectionsHandle>(null);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
@@ -119,7 +118,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                 return undefined;
             }
             let reportForContextualSearch = recentReports.find((option) => option.reportID === contextualReportID);
-            const reportForContextualSearchReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportForContextualSearch?.reportID}`];
+            const reportForContextualSearchReport = reportForContextualSearch ? contextualReport : undefined;
             const reportAction = getReportAction(reportForContextualSearchReport?.parentReportID, reportForContextualSearchReport?.parentReportActionID);
             const shouldParserToHTML = reportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT;
             if (!reportForContextualSearch) {
@@ -193,7 +192,6 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             personalDetails,
             contextualReportNVP,
             contextualReportPolicy,
-            reports,
         ],
     );
 
