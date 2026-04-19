@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {View} from 'react-native';
+import {OnyxCollection} from 'react-native-onyx';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -31,6 +32,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
+import type * as OnyxTypes from '@src/types/onyx';
 import type {TransactionGroupListExpandedProps, TransactionListItemType} from './types';
 
 function TransactionGroupListExpanded<TItem extends ListItem>({
@@ -68,11 +70,31 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [visibleColumns] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: columnsSelector});
     const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
 
     const transactionsSnapshotMetadata = transactionsSnapshot?.search;
 
     const visibleTransactions = isExpenseReportType ? transactions.slice(0, transactionsVisibleLimit) : transactions;
+
+    const neededReportIDs = useMemo(() => {
+        const ids = new Set<string>();
+        for (const t of visibleTransactions) {
+            if (t.reportID) ids.add(`${ONYXKEYS.COLLECTION.REPORT}${t.reportID}`);
+            if (t.reportAction?.childReportID) ids.add(`${ONYXKEYS.COLLECTION.REPORT}${t.reportAction.childReportID}`);
+        }
+        return ids;
+    }, [visibleTransactions]);
+
+    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
+        selector: (allReports) => {
+            const result: OnyxCollection<OnyxTypes.Report> = {};
+            for (const key of Object.keys(allReports ?? {})) {
+                if (neededReportIDs.has(key)) {
+                    result[key] = allReports?.[key];
+                }
+            }
+            return result;
+        },
+    });
 
     const isLastTransaction = (index: number) => {
         return index === visibleTransactions.length - 1;
