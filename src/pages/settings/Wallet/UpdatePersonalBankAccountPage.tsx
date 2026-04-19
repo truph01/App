@@ -120,25 +120,7 @@ function UpdatePersonalBankAccountPage() {
     };
 
     const submitPersonalInfo = () => {
-        // eslint-disable-next-line no-console
-        console.log(
-            '[DEBUG-RETRY] submitPersonalInfo called',
-            JSON.stringify({
-                bankAccountID: personalBankAccount?.bankAccountID,
-                isLoading: personalBankAccount?.isLoading,
-                errors: personalBankAccount?.errors,
-                shouldShowSuccess: personalBankAccount?.shouldShowSuccess,
-            }),
-        );
         if (!personalBankAccount?.bankAccountID || personalBankAccount?.isLoading) {
-            // eslint-disable-next-line no-console
-            console.log(
-                '[DEBUG-RETRY] submitPersonalInfo BLOCKED',
-                JSON.stringify({
-                    noBankAccountID: !personalBankAccount?.bankAccountID,
-                    isLoading: personalBankAccount?.isLoading,
-                }),
-            );
             return;
         }
 
@@ -228,15 +210,6 @@ function UpdatePersonalBankAccountPage() {
     };
 
     const handleNextPage = () => {
-        // eslint-disable-next-line no-console
-        console.log(
-            '[DEBUG-RETRY] handleNextPage called',
-            JSON.stringify({
-                currentPageName,
-                isLoading: personalBankAccount?.isLoading,
-                errors: personalBankAccount?.errors,
-            }),
-        );
         clearPersonalBankAccountErrors();
         nextPage();
     };
