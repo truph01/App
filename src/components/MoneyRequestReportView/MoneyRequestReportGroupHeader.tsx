@@ -4,7 +4,9 @@ import Checkbox from '@components/Checkbox';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useResponsiveLayoutOnWideRHP from '@hooks/useResponsiveLayoutOnWideRHP';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {convertToDisplayString} from '@libs/CurrencyUtils';
 import {getCommaSeparatedTagNameWithSanitizedColons} from '@libs/PolicyUtils';
@@ -63,8 +65,12 @@ function MoneyRequestReportGroupHeader({
     pendingAction,
 }: MoneyRequestReportGroupHeaderProps) {
     const styles = useThemeStyles();
+    const theme = useTheme();
     const {translate} = useLocalize();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isMediumScreenWidth} = useResponsiveLayout();
     const {shouldUseNarrowLayout} = useResponsiveLayoutOnWideRHP();
+    const isDesktopTableLayout = !shouldUseNarrowLayout && !isMediumScreenWidth;
 
     const cleanedGroupName = isGroupedByTag && group.groupName ? getCommaSeparatedTagNameWithSanitizedColons(group.groupName) : group.groupName;
     const displayName = cleanedGroupName || translate(isGroupedByTag ? 'reportLayout.noTag' : 'reportLayout.uncategorized');
@@ -89,9 +95,23 @@ function MoneyRequestReportGroupHeader({
         onToggleSelection?.(groupKey);
     }, [onToggleSelection, groupKey]);
 
+    const desktopGroupHeaderStyle = useMemo(
+        () =>
+            isDesktopTableLayout
+                ? [
+                      styles.searchTableRowHeight,
+                      styles.justifyContentCenter,
+                      styles.highlightBG,
+                      {paddingVertical: variables.tableGroupRowPaddingVertical, paddingHorizontal: 12},
+                      {borderBottomWidth: 1, borderColor: isSelected ? theme.buttonHoveredBG : theme.border},
+                  ]
+                : [styles.reportLayoutGroupHeader, conditionalHeight],
+        [isDesktopTableLayout, styles, theme, isSelected, conditionalHeight],
+    );
+
     return (
         <OfflineWithFeedback pendingAction={pendingAction}>
-            <View style={[styles.reportLayoutGroupHeader, conditionalHeight]}>
+            <View style={desktopGroupHeaderStyle}>
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}>
                     {shouldShowCheckbox && (
                         <Checkbox
