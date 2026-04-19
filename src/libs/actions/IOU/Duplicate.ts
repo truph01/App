@@ -813,7 +813,8 @@ type DuplicateReportParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
-    c;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 };
 
 function duplicateReport({
