@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {View} from 'react-native';
-import {OnyxCollection} from 'react-native-onyx';
+import type {OnyxCollection} from 'react-native-onyx';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -77,19 +77,23 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
 
     const neededReportIDs = useMemo(() => {
         const ids = new Set<string>();
-        for (const t of visibleTransactions) {
-            if (t.reportID) ids.add(`${ONYXKEYS.COLLECTION.REPORT}${t.reportID}`);
-            if (t.reportAction?.childReportID) ids.add(`${ONYXKEYS.COLLECTION.REPORT}${t.reportAction.childReportID}`);
+        for (const transaction of visibleTransactions) {
+            if (transaction.reportID) {
+                ids.add(`${ONYXKEYS.COLLECTION.REPORT}${transaction.reportID}`);
+            }
+            if (transaction.reportAction?.childReportID) {
+                ids.add(`${ONYXKEYS.COLLECTION.REPORT}${transaction.reportAction.childReportID}`);
+            }
         }
         return ids;
     }, [visibleTransactions]);
 
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
-        selector: (allReports) => {
+        selector: (reports) => {
             const result: OnyxCollection<OnyxTypes.Report> = {};
-            for (const key of Object.keys(allReports ?? {})) {
+            for (const key of Object.keys(reports ?? {})) {
                 if (neededReportIDs.has(key)) {
-                    result[key] = allReports?.[key];
+                    result[key] = reports?.[key];
                 }
             }
             return result;
