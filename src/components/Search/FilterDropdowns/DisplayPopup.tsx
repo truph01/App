@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -10,6 +10,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import Accessibility from '@libs/Accessibility';
 import {close} from '@libs/actions/Modal';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildFilterQueryWithSortDefaults} from '@libs/SearchQueryUtils';
@@ -20,6 +21,7 @@ import ROUTES from '@src/ROUTES';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {SearchResults} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
+import type {ModalAccessibilityTargetRef} from './DropdownButton';
 import GroupByPopup from './GroupByPopup';
 import GroupCurrencyPopup from './GroupCurrencyPopup';
 import SingleSelectPopup from './SingleSelectPopup';
@@ -32,14 +34,19 @@ type DisplayPopupProps = {
     searchResults: OnyxEntry<SearchResults>;
     closeOverlay: () => void;
     onSort: () => void;
+    modalAccessibilityTargetRef?: ModalAccessibilityTargetRef;
 };
 
-function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayPopupProps) {
+function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort, modalAccessibilityTargetRef}: DisplayPopupProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const {shouldUseNarrowLayout, isLargeScreenWidth} = useResponsiveLayout();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {shouldUseNarrowLayout, isLargeScreenWidth, isSmallScreenWidth} = useResponsiveLayout();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Columns']);
     const [searchAdvancedFilters = getEmptyObject<SearchAdvancedFiltersForm>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
+    const firstDisplayItemRef = useRef<View | null>(null);
+    const backButtonRef = useRef<View | null>(null);
+    const hasInitializedDisplayPopupRef = useRef(false);
     const [selectedDisplayFilter, setSelectedDisplayFilter] = useState<
         | typeof CONST.SEARCH.SYNTAX_ROOT_KEYS.LIMIT
         | typeof CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY
@@ -55,6 +62,32 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
     const viewOptions = getViewOptions(translate);
     const view = viewOptions.find((option) => option.value === queryJSON.view) ?? viewOptions.at(0) ?? null;
     const shouldShowColumnsButton = isLargeScreenWidth && (queryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE || queryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT);
+
+    const handleFirstDisplayItemRef = useCallback<ModalAccessibilityTargetRef>(
+        (node) => {
+            firstDisplayItemRef.current = node as View | null;
+            modalAccessibilityTargetRef?.(node);
+        },
+        [modalAccessibilityTargetRef],
+    );
+
+    useEffect(() => {
+        if (!isSmallScreenWidth) {
+            return;
+        }
+
+        if (!hasInitializedDisplayPopupRef.current) {
+            hasInitializedDisplayPopupRef.current = true;
+            return;
+        }
+
+        const focusTargetRef = selectedDisplayFilter ? backButtonRef : firstDisplayItemRef;
+        const animationFrame = requestAnimationFrame(() => {
+            Accessibility.moveAccessibilityFocus(focusTargetRef);
+        });
+
+        return () => cancelAnimationFrame(animationFrame);
+    }, [isSmallScreenWidth, selectedDisplayFilter]);
 
     const limitValue = searchAdvancedFilters[CONST.SEARCH.SYNTAX_ROOT_KEYS.LIMIT];
 
@@ -74,6 +107,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
         return (
             <View style={[!shouldUseNarrowLayout && styles.pv4]}>
                 <MenuItemWithTopDescription
+                    ref={handleFirstDisplayItemRef}
                     shouldShowRightIcon
                     description={translate('search.display.sortBy')}
                     title={`${translate(getSearchColumnTranslationKey(sortByValue))} ${CONST.DOT_SEPARATOR} ${translate(`search.filters.sortOrder.${sortOrderValue}`)}`}
@@ -250,6 +284,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
     return (
         <View style={[!shouldUseNarrowLayout && styles.pv4]}>
             <HeaderWithBackButton
+                backButtonRef={backButtonRef}
                 shouldDisplayHelpButton={false}
                 style={[styles.h10, styles.pv1, styles.mb2]}
                 subtitle={subtitle[selectedDisplayFilter]}

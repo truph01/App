@@ -31,12 +31,13 @@ function SearchDisplayDropdownButton({queryJSON, searchResults, onSort}: SearchD
         return null;
     }
 
-    const displayPopup = ({closeOverlay}: {closeOverlay: () => void}) => (
+    const displayPopup: DropdownButtonProps['PopoverComponent'] = ({closeOverlay, modalAccessibilityTargetRef}) => (
         <DisplayPopup
             queryJSON={queryJSON}
             searchResults={searchResults}
             closeOverlay={closeOverlay}
             onSort={onSort}
+            modalAccessibilityTargetRef={modalAccessibilityTargetRef}
         />
     );
 
@@ -66,6 +67,7 @@ function SearchDisplayDropdownButton({queryJSON, searchResults, onSort}: SearchD
             value={null}
             PopoverComponent={displayPopup}
             ButtonComponent={shouldUseNarrowLayout || isMediumScreenWidth ? displayIconButton : undefined}
+            shouldDelayBottomDockedDismissAccessibility
         />
     );
 }

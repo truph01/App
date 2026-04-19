@@ -22,12 +22,14 @@ import type WithSentryLabel from '@src/types/utils/SentryLabel';
 
 type ModalHeadingNode = ComponentProps<typeof Text> extends {ref?: Ref<infer T>} ? T | null : never;
 type ModalHeadingRef = (node: ModalHeadingNode) => void;
+type ModalAccessibilityTargetRef = (node: unknown) => void;
 
 type PopoverComponentProps = {
     isExpanded: boolean;
     closeOverlay: () => void;
     setPopoverWidth?: (width: number | undefined) => void;
     modalHeadingRef?: ModalHeadingRef;
+    modalAccessibilityTargetRef?: ModalAccessibilityTargetRef;
 };
 
 type DropdownButtonProps = WithSentryLabel & {
@@ -66,7 +68,6 @@ type DropdownButtonProps = WithSentryLabel & {
     shouldDelayBottomDockedDismissAccessibility?: boolean;
 };
 
-const PADDING_MODAL = 8;
 const BOTTOM_DOCKED_DISMISS_ACCESSIBILITY_DELAY = 2500;
 const ANCHOR_ORIGIN = {
     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
@@ -96,7 +97,7 @@ function DropdownButton({
     const {windowHeight} = useWindowDimensions();
     const triggerRef = useRef<View | null>(null);
     const anchorRef = useRef<View | null>(null);
-    const modalAccessibilityHeadingElementRef = useRef<ModalHeadingNode>(null);
+    const modalAccessibilityTargetElementRef = useRef<unknown>(null);
     const [isOverlayVisible, setIsOverlayVisible] = useState(false);
     const [customPopoverWidth, setCustomPopoverWidth] = useState<number | undefined>(undefined);
     const {calculatePopoverPosition} = usePopoverPosition();
@@ -110,14 +111,18 @@ function DropdownButton({
     const shouldUseFilterModalAccessibility = shouldDelayBottomDockedDismissAccessibility && isSmallScreenWidth;
 
     const handleModalHeadingRef = useCallback<ModalHeadingRef>((node) => {
-        modalAccessibilityHeadingElementRef.current = node;
+        modalAccessibilityTargetElementRef.current = node;
+    }, []);
+
+    const handleModalAccessibilityTargetRef = useCallback<ModalAccessibilityTargetRef>((node) => {
+        modalAccessibilityTargetElementRef.current = node;
     }, []);
 
     const {handleModalShow, initialFocus, shouldEnableBottomDockedDismissAccessibility} = useBottomDockedDismissAccessibility({
         isVisible: isOverlayVisible,
         shouldActivate: shouldUseFilterModalAccessibility,
         animationDelayMs: 0,
-        focusTargetRef: modalAccessibilityHeadingElementRef,
+        focusTargetRef: modalAccessibilityTargetElementRef,
         webFocusMode: 'initialFocus',
         dismissAccessibilityMode: 'timer',
         dismissAccessibilityPlatforms: 'native',
@@ -236,11 +241,12 @@ function DropdownButton({
                     isExpanded={isOverlayVisible}
                     setPopoverWidth={setCustomPopoverWidth}
                     modalHeadingRef={shouldUseFilterModalAccessibility ? handleModalHeadingRef : undefined}
+                    modalAccessibilityTargetRef={shouldUseFilterModalAccessibility ? handleModalAccessibilityTargetRef : undefined}
                 />
             </PopoverWithMeasuredContent>
         </View>
     );
 }
 
-export type {PopoverComponentProps, DropdownButtonProps, ModalHeadingRef};
+export type {PopoverComponentProps, DropdownButtonProps, ModalAccessibilityTargetRef, ModalHeadingRef};
 export default withViewportOffsetTop(DropdownButton);
