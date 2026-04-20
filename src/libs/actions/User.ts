@@ -1053,6 +1053,7 @@ function generateStatementPDF(period: string) {
 
 /**
  * Sets a contact method / secondary login as the user's "Default" contact method.
+ * This uses no offline support (Pattern C) — state is only updated after the server confirms success.
  * @param skipNavigation - When true, do not navigate (caller handles navigation, e.g. via useEffect when primaryContactMethod updates).
  */
 function setContactMethodAsDefault(
@@ -1062,9 +1063,30 @@ function setContactMethodAsDefault(
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
     backTo?: string,
     skipNavigation?: boolean,
+    validateCode?: string,
 ) {
     const oldDefaultContactMethod = currentEmail;
-    const optimisticData: Array<
+
+    // Pattern C: only set a pending indicator optimistically, no actual data changes
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.LOGIN_LIST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.LOGIN_LIST,
+            value: {
+                [newDefaultContactMethod]: {
+                    pendingFields: {
+                        defaultLogin: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                    },
+                    errorFields: {
+                        defaultLogin: null,
+                    },
+                },
+            },
+        },
+    ];
+
+    // Pattern C: apply all actual data changes only after server confirms success
+    const successData: Array<
         OnyxUpdate<typeof ONYXKEYS.ACCOUNT | typeof ONYXKEYS.SESSION | typeof ONYXKEYS.LOGIN_LIST | typeof ONYXKEYS.PERSONAL_DETAILS_LIST | typeof ONYXKEYS.COLLECTION.POLICY>
     > = [
         {
@@ -1087,9 +1109,6 @@ function setContactMethodAsDefault(
             value: {
                 [newDefaultContactMethod]: {
                     pendingFields: {
-                        defaultLogin: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
-                    },
-                    errorFields: {
                         defaultLogin: null,
                     },
                 },
@@ -1106,36 +1125,8 @@ function setContactMethodAsDefault(
             },
         },
     ];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.LOGIN_LIST>> = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.LOGIN_LIST,
-            value: {
-                [newDefaultContactMethod]: {
-                    pendingFields: {
-                        defaultLogin: null,
-                    },
-                },
-            },
-        },
-    ];
-    const failureData: Array<
-        OnyxUpdate<typeof ONYXKEYS.ACCOUNT | typeof ONYXKEYS.SESSION | typeof ONYXKEYS.LOGIN_LIST | typeof ONYXKEYS.PERSONAL_DETAILS_LIST | typeof ONYXKEYS.COLLECTION.POLICY>
-    > = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.ACCOUNT,
-            value: {
-                primaryLogin: oldDefaultContactMethod,
-            },
-        },
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.SESSION,
-            value: {
-                email: oldDefaultContactMethod,
-            },
-        },
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.LOGIN_LIST>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.LOGIN_LIST,
@@ -1150,13 +1141,6 @@ function setContactMethodAsDefault(
                 },
             },
         },
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.PERSONAL_DETAILS_LIST,
-            value: {
-                [currentUserAccountID]: {...currentUserPersonalDetails},
-            },
-        },
     ];
 
     for (const policy of Object.values(policies ?? {})) {
@@ -1164,51 +1148,36 @@ function setContactMethodAsDefault(
             continue;
         }
 
-        let optimisticPolicyDataValue;
-        let failurePolicyDataValue;
+        let successPolicyDataValue;
 
         if (policy.employeeList) {
             const currentEmployee = policy.employeeList[oldDefaultContactMethod];
-            optimisticPolicyDataValue = {
+            successPolicyDataValue = {
                 employeeList: {
                     [oldDefaultContactMethod]: null,
                     [newDefaultContactMethod]: currentEmployee,
                 },
             };
-            failurePolicyDataValue = {
-                employeeList: {
-                    [oldDefaultContactMethod]: currentEmployee,
-                    [newDefaultContactMethod]: null,
-                },
-            };
         }
 
         if (policy.ownerAccountID === currentUserAccountID) {
-            optimisticPolicyDataValue = {
-                ...optimisticPolicyDataValue,
+            successPolicyDataValue = {
+                ...successPolicyDataValue,
                 owner: newDefaultContactMethod,
-            };
-            failurePolicyDataValue = {
-                ...failurePolicyDataValue,
-                owner: policy.owner,
             };
         }
 
-        if (optimisticPolicyDataValue && failurePolicyDataValue) {
-            optimisticData.push({
+        if (successPolicyDataValue) {
+            successData.push({
                 onyxMethod: Onyx.METHOD.MERGE,
                 key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
-                value: optimisticPolicyDataValue,
-            });
-            failureData.push({
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
-                value: failurePolicyDataValue,
+                value: successPolicyDataValue,
             });
         }
     }
     const parameters: SetContactMethodAsDefaultParams = {
         partnerUserID: newDefaultContactMethod,
+        validateCode,
     };
 
     API.write(WRITE_COMMANDS.SET_CONTACT_METHOD_AS_DEFAULT, parameters, {
