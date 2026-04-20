@@ -596,6 +596,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const isPendingAddOrDelete =
         isOffline && data?.some((member) => member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
     const shouldShowSearchBar = data.length > CONST.SEARCH_ITEM_LIMIT;
+    const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     const shouldShowRoleFilter = data.length > 0;
     const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && filteredData.length === 0;
 
@@ -900,12 +901,17 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                                     inputValue={inputValue}
                                     onChangeText={setInputValue}
                                     label={translate('workspace.people.findMember')}
-                                    shouldShowEmptyState={inputValue.length > 0 && filteredData.length === 0}
+                                    shouldShowEmptyState={false}
                                     style={[styles.flex1, styles.mh0, styles.mb0]}
                                 />
                             </View>
                         )}
                     </View>
+                    {shouldShowEmptySearchMessage && (
+                        <View style={[styles.ph5, styles.pb5]}>
+                            <Text style={[styles.textNormal, styles.colorMuted]}>{translate('common.noResultsFoundMatching', inputValue)}</Text>
+                        </View>
+                    )}
                 </View>
             )}
         </>
