@@ -294,10 +294,9 @@ const DYNAMIC_ROUTES = {
         entryScreens: [SCREENS.SETTINGS_TAGS.SETTINGS_TAG_SETTINGS],
     },
     SETTINGS_TAG_LIST_VIEW: {
-        path: 'tag-list',
+        path: 'tag-list/:orderWeight',
         entryScreens: [SCREENS.SETTINGS_TAGS.SETTINGS_TAGS_ROOT],
-        getRoute: (orderWeight: number) => `tag-list?orderWeight=${orderWeight}`,
-        queryParams: ['orderWeight'],
+        getRoute: (orderWeight: number) => `tag-list/${orderWeight}`,
     },
     DETAILS_CONSTANT_PICKER: {
         path: 'constant-picker',
