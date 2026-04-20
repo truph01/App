@@ -90,9 +90,9 @@ function VideoPlayerControls({
     };
 
     const enterFullScreenMode = useCallback(() => {
-        updateCurrentURLAndReportID(url, report);
+        updateCurrentURLAndReportID(url, reportID ? {...report, reportID} : undefined);
         videoViewRef.current?.enterFullscreen();
-    }, [report, updateCurrentURLAndReportID, url, videoViewRef]);
+    }, [report, reportID, updateCurrentURLAndReportID, url, videoViewRef]);
 
     const seekPosition = useCallback(
         (newPosition: number) => {

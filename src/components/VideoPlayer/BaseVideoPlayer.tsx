@@ -174,7 +174,7 @@ function BaseVideoPlayer({
 
     const togglePlayCurrentVideo = useCallback(() => {
         if (!isCurrentlyURLSet) {
-            updateCurrentURLAndReportID(url, report);
+            updateCurrentURLAndReportID(url, {...report, reportID});
             return;
         }
 
@@ -196,7 +196,7 @@ function BaseVideoPlayer({
 
         allowSharedAutoPlayRef.current = true;
         playVideo();
-    }, [isCurrentlyURLSet, isLoading, isEnded, currentTime, duration, playVideo, updateCurrentURLAndReportID, url, report, pauseVideo, replayVideo]);
+    }, [isCurrentlyURLSet, isLoading, isEnded, currentTime, duration, playVideo, updateCurrentURLAndReportID, url, report, reportID, pauseVideo, replayVideo]);
 
     const hideControl = useCallback(() => {
         if (isEnded || isSeeking) {
@@ -498,8 +498,8 @@ function BaseVideoPlayer({
         if (!shouldPlay) {
             return;
         }
-        updateCurrentURLAndReportID(url, report);
-    }, [report, shouldPlay, updateCurrentURLAndReportID, url]);
+        updateCurrentURLAndReportID(url, {...report, reportID});
+    }, [report, reportID, shouldPlay, updateCurrentURLAndReportID, url]);
 
     // ensure that video loads after page refresh on iOS Safari
     useEffect(() => {
