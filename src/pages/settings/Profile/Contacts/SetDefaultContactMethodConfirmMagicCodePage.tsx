@@ -23,7 +23,6 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const primaryContactMethod = getContactMethod(account?.primaryLogin, session?.email);
 
@@ -47,7 +46,7 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
             descriptionPrimary={translate('contacts.enterMagicCode', primaryContactMethod)}
             validateCodeActionErrorField="defaultLogin"
             validateError={defaultLoginError}
-            handleSubmitForm={(validateCode) => setContactMethodAsDefault(currentUserPersonalDetails, allPolicies, contactMethod, formatPhoneNumber, backTo, true, validateCode)}
+            handleSubmitForm={(validateCode) => setContactMethodAsDefault(currentUserPersonalDetails, contactMethod, formatPhoneNumber, backTo, true, validateCode)}
             clearError={() => {
                 clearContactMethodErrors(contactMethod, 'defaultLogin');
             }}

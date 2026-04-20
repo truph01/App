@@ -50,7 +50,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {ExpenseRuleForm, MerchantRuleForm, SpendRuleForm} from '@src/types/form';
-import type {AppReview, BlockedFromConcierge, CustomStatusDraft, ExpenseRule, Policy, ReportAttributesDerivedValue} from '@src/types/onyx';
+import type {AppReview, BlockedFromConcierge, CustomStatusDraft, ExpenseRule, ReportAttributesDerivedValue} from '@src/types/onyx';
 import type Login from '@src/types/onyx/Login';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {AnyOnyxServerUpdate, OnyxServerUpdate, OnyxUpdateEvent} from '@src/types/onyx/OnyxUpdatesFromServer';
@@ -1058,15 +1058,12 @@ function generateStatementPDF(period: string) {
  */
 function setContactMethodAsDefault(
     currentUserPersonalDetails: OnyxEntry<OnyxPersonalDetails>,
-    policies: OnyxCollection<Policy>,
     newDefaultContactMethod: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
     backTo?: string,
     skipNavigation?: boolean,
     validateCode?: string,
 ) {
-    const oldDefaultContactMethod = currentEmail;
-
     // Pattern C: only set a pending indicator optimistically, no actual data changes
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.LOGIN_LIST>> = [
         {
@@ -1086,9 +1083,7 @@ function setContactMethodAsDefault(
     ];
 
     // Pattern C: apply all actual data changes only after server confirms success
-    const successData: Array<
-        OnyxUpdate<typeof ONYXKEYS.ACCOUNT | typeof ONYXKEYS.SESSION | typeof ONYXKEYS.LOGIN_LIST | typeof ONYXKEYS.PERSONAL_DETAILS_LIST | typeof ONYXKEYS.COLLECTION.POLICY>
-    > = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.ACCOUNT | typeof ONYXKEYS.SESSION | typeof ONYXKEYS.LOGIN_LIST | typeof ONYXKEYS.PERSONAL_DETAILS_LIST>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.ACCOUNT,
@@ -1143,38 +1138,6 @@ function setContactMethodAsDefault(
         },
     ];
 
-    for (const policy of Object.values(policies ?? {})) {
-        if (!policy) {
-            continue;
-        }
-
-        let successPolicyDataValue;
-
-        if (policy.employeeList) {
-            const currentEmployee = policy.employeeList[oldDefaultContactMethod];
-            successPolicyDataValue = {
-                employeeList: {
-                    [oldDefaultContactMethod]: null,
-                    [newDefaultContactMethod]: currentEmployee,
-                },
-            };
-        }
-
-        if (policy.ownerAccountID === currentUserAccountID) {
-            successPolicyDataValue = {
-                ...successPolicyDataValue,
-                owner: newDefaultContactMethod,
-            };
-        }
-
-        if (successPolicyDataValue) {
-            successData.push({
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
-                value: successPolicyDataValue,
-            });
-        }
-    }
     const parameters: SetContactMethodAsDefaultParams = {
         partnerUserID: newDefaultContactMethod,
         validateCode,
