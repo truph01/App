@@ -2533,11 +2533,10 @@ function getValidOptions(
 
         const filteringFunction = (report: SearchOption<Report>) => {
             if (excludeHidden) {
-                if (report.isThread) {
-                    if (report.notificationPreference === CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN) {
-                        return false;
-                    }
-                } else {
+                if (report.isThread && report.notificationPreference === CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN) {
+                    return false;
+                }
+                if (!report.isThread) {
                     const participant = report.item?.participants?.[currentUserAccountID];
                     if (participant && isHiddenForCurrentUser(participant.notificationPreference)) {
                         return false;
