@@ -7544,10 +7544,11 @@ ${amount} para ${merchant} - ${date}`,
             completed: 'Completadas',
             card: {
                 expensify: 'Expensify',
+                travelInvoicing: 'Facturación de viajes',
                 individualCards: 'Tarjetas individuales',
                 closedCards: 'Tarjetas cerradas',
                 cardFeeds: 'Flujos de tarjetas',
-                cardFeedName: ({cardFeedBankName, cardFeedLabel, country}) => `Todo ${cardFeedBankName}${country ? ` (${country})` : ''}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
+                cardFeedName: ({cardFeedBankName, cardFeedLabel}) => `Todo ${cardFeedBankName}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
                 cardFeedNameCSV: ({cardFeedLabel}) => `Todas las Tarjetas Importadas desde CSV${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
             },
             amount: {

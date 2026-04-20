@@ -239,11 +239,11 @@ function getWorkspaceCardFeedData(
     const companyCardBank = isPlaid && cardName ? cardName : getBankName(bank);
 
     const country = bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(representativeCard.nameValuePairs?.feedCountry) : '';
-    const cardFeedBankName = bank === CONST.EXPENSIFY_CARD.BANK ? translate('search.filters.card.expensify') : companyCardBank;
+    const cardFeedBankName = getCardFeedBankDisplayName(bank, country, companyCardBank, translate);
     const fullCardName =
         cardFeedBankName === CONST.COMPANY_CARDS.CARD_TYPE.CSV
             ? translate('search.filters.card.cardFeedNameCSV', {cardFeedLabel})
-            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel, country});
+            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel});
 
     return {
         cardName: fullCardName,
@@ -257,12 +257,12 @@ function getWorkspaceCardFeedData(
 function getDomainCardFeedData(domainFeed: DomainFeedData, policies: OnyxCollection<Policy>, repeatingBanks: string[], translate: LocaleContextProps['translate']): CardFeedData {
     const {domainName, bank, country} = domainFeed;
     const isBankRepeating = repeatingBanks.includes(bank);
-    const cardFeedBankName = bank === CONST.EXPENSIFY_CARD.BANK ? translate('search.filters.card.expensify') : getBankName(bank);
+    const cardFeedBankName = getCardFeedBankDisplayName(bank, country, getBankName(bank), translate);
     const cardFeedLabel = isBankRepeating ? getDescriptionForPolicyDomainCard(domainName, policies) : undefined;
     const cardName =
         cardFeedBankName === CONST.COMPANY_CARDS.CARD_TYPE.CSV
             ? translate('search.filters.card.cardFeedNameCSV', {cardFeedLabel})
-            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel, country});
+            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel});
     return {
         cardName,
         bank,
@@ -512,6 +512,16 @@ function getFeedCountryForDisplay(feedCountry: string | undefined): string {
         default:
             return '';
     }
+}
+
+function getCardFeedBankDisplayName(bank: string, country: string | undefined, companyCardBankName: string, translate: LocaleContextProps['translate']): string {
+    if (bank !== CONST.EXPENSIFY_CARD.BANK) {
+        return companyCardBankName;
+    }
+    if (country === CONST.TRAVEL.PROGRAM_TRAVEL_US) {
+        return translate('search.filters.card.travelInvoicing');
+    }
+    return translate('search.filters.card.expensify');
 }
 
 function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined): CardFeedsForDisplay {

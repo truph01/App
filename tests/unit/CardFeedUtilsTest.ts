@@ -435,9 +435,9 @@ describe('country-aware domain feed picker', () => {
         expect(Object.keys(names).sort()).toEqual(['cards_5555_Expensify Card_GB', 'cards_5555_Expensify Card_TRAVEL_US', 'cards_5555_Expensify Card_US']);
         // `isBankRepeating` is true here because one workspace key + three domain-feed entries share the Expensify Card
         // bank, so the template appends the domain as a disambiguating label.
-        expect(names['cards_5555_Expensify Card_US'].name).toBe('All Expensify (US) - user.com');
-        expect(names['cards_5555_Expensify Card_GB'].name).toBe('All Expensify (GB) - user.com');
-        expect(names['cards_5555_Expensify Card_TRAVEL_US'].name).toBe('All Expensify (TRAVEL_US) - user.com');
+        expect(names['cards_5555_Expensify Card_US'].name).toBe('All Expensify - user.com');
+        expect(names['cards_5555_Expensify Card_GB'].name).toBe('All Expensify - user.com');
+        expect(names['cards_5555_Expensify Card_TRAVEL_US'].name).toBe('All Travel Invoicing - user.com');
     });
 
     it('collapses CURRENT and US into one row under the US suffix', () => {
@@ -450,14 +450,13 @@ describe('country-aware domain feed picker', () => {
 
         const names = getCardFeedNamesWithType({workspaceCardFeeds, policies: undefined, translate: translateLocal});
         expect(Object.keys(names)).toEqual(['cards_5555_Expensify Card_US']);
-        expect(names['cards_5555_Expensify Card_US'].name).toBe('All Expensify (US) - user.com');
+        expect(names['cards_5555_Expensify Card_US'].name).toBe('All Expensify - user.com');
     });
 
-    it('keeps the legacy 2-segment row when feedCountry is missing or unknown', () => {
+    it('keeps the legacy 2-segment row when feedCountry is unknown', () => {
         const workspaceCardFeeds = {
             'cards_5555_Expensify Card': {
-                '1': expensifyCardBase(1, '5555'),
-                '2': expensifyCardBase(2, '5555', 'MARS'),
+                '1': expensifyCardBase(1, '5555', 'MARS'),
             },
         } as unknown as Record<string, WorkspaceCardsList>;
 

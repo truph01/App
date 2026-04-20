@@ -7684,11 +7684,12 @@ const translations = {
             },
             card: {
                 expensify: 'Expensify',
+                travelInvoicing: 'Travel invoicing',
                 individualCards: 'Individual cards',
                 closedCards: 'Closed cards',
                 cardFeeds: 'Card feeds',
-                cardFeedName: ({cardFeedBankName, cardFeedLabel, country}: {cardFeedBankName: string; cardFeedLabel?: string; country?: string}) =>
-                    `All ${cardFeedBankName}${country ? ` (${country})` : ''}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
+                cardFeedName: ({cardFeedBankName, cardFeedLabel}: {cardFeedBankName: string; cardFeedLabel?: string}) =>
+                    `All ${cardFeedBankName}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
                 cardFeedNameCSV: ({cardFeedLabel}: {cardFeedLabel?: string}) => `All CSV Imported Cards${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
             },
             reportField: (name: string, value: string) => `${name} is ${value}`,
