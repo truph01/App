@@ -28,3 +28,21 @@ npm root -g
 ```
 
 > **Do not proceed without `agent-device` installed.** All device interaction depends on it.
+
+## Flows
+
+Repeatable steps (sign-in, onboarding, etc.) are captured as `.ad` recordings under [`flows/`](flows/README.md). See the index for what's available and what each one assumes.
+
+**Run a flow only on explicit developer intent** (e.g. "sign in", "get past onboarding"). Do not try to match flows against the current snapshot - pick by what the developer asked for.
+
+```bash
+agent-device replay .claude/skills/agent-device/flows/<name>.ad
+```
+
+If replay fails because selectors drifted, heal the recording in place and commit the update:
+
+```bash
+agent-device replay -u .claude/skills/agent-device/flows/<name>.ad
+```
+
+> To skip onboarding entirely (avoid running `complete-onboarding.ad` at all), set `SKIP_ONBOARDING=true` in `.env` and rebuild the app.
