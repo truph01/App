@@ -201,8 +201,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
         ],
         [icons.Gear, policyID, translate],
     );
-
-<<<<<<< HEAD
+    
     const getHeaderButtons = () => {
         const headerButtonsRowStyle = [styles.flexRow, styles.gap2, !shouldShowSelector && shouldUseNarrowLayout && styles.mb3, shouldShowSelector && shouldChangeLayout && styles.mt3];
 
