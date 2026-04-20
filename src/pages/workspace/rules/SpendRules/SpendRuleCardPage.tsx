@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
@@ -133,12 +133,16 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
         };
     });
 
+    const hasLoadedCardSettingsRef = useRef(false);
     useEffect(() => {
         // We already load the card settings in when the section is mounted, so we don't load it again here.
         // We only need to load it if the user is navigated directly to this page and the card settings are not already loaded.
-        if (!expensifyCardSettings || expensifyCardSettings?.isLoading || expensifyCardSettings?.hasOnceLoaded) {
+        // We use a ref to track this because SetExpensifyCardRule returns onyxMethod: set, which replaces the entire
+        // expensifyCardSettings object and wipes hasOnceLoaded, causing an unnecessary reload.
+        if (hasLoadedCardSettingsRef.current || !expensifyCardSettings || expensifyCardSettings?.isLoading || expensifyCardSettings?.hasOnceLoaded) {
             return;
         }
+        hasLoadedCardSettingsRef.current = true;
         openPolicyExpensifyCardsPage(policyID, defaultFundID);
     }, [defaultFundID, expensifyCardSettings, policyID]);
 
