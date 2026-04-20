@@ -31,10 +31,10 @@ import {getDescriptionForPolicyDomainCard} from './PolicyUtils';
 import type {OptionData} from './ReportUtils';
 
 type CardFilterItem = Partial<OptionData> & AdditionalCardProps & {isCardFeed?: boolean; correspondingCards?: string[]; cardFeedKey: string; plaidUrl?: string; keyForList: string};
-type DomainFeedData = {bank: CardFeedWithNumber; domainName: string; correspondingCardIDs: string[]; fundID?: string};
+type DomainFeedData = {bank: CardFeedWithNumber; domainName: string; correspondingCardIDs: string[]; fundID?: string; country?: string};
 type ItemsGroupedBySelection = {selected: CardFilterItem[]; unselected: CardFilterItem[]};
 type CardFeedNamesWithType = Record<string, {name: string; type: 'domain' | 'workspace'}>;
-type CardFeedData = {cardName: string; bank: CardFeedWithNumber; label?: string; type: 'domain' | 'workspace'};
+type CardFeedData = {cardName: string; bank: CardFeedWithNumber; label?: string; type: 'domain' | 'workspace'; country?: string};
 type GetCardFeedData = {
     workspaceCardFeeds: Record<string, WorkspaceCardsList | undefined> | undefined;
     translate: LocaleContextProps['translate'];
@@ -78,7 +78,8 @@ function getCardFeedKey(workspaceCardFeeds: Record<string, WorkspaceCardsList | 
         return;
     }
     const {fundID, bank} = representativeCard;
-    return createCardFeedKey(fundID, bank);
+    const country = bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(representativeCard.nameValuePairs?.feedCountry) : '';
+    return createCardFeedKey(fundID, bank, country);
 }
 
 /**
@@ -186,16 +187,21 @@ function generateDomainFeedData(cardList: CardList | undefined): Record<string, 
         (domainFeedData, currentCard) => {
             // Cards in cardList can also be domain cards, we use them to compute domain feed
             if (!currentCard?.domainName?.match(CONST.REGEX.EXPENSIFY_POLICY_DOMAIN_NAME) && !isCardHiddenFromSearch(currentCard) && currentCard.fundID) {
-                if (domainFeedData[`${currentCard.fundID}_${currentCard.bank}`]) {
-                    domainFeedData[`${currentCard.fundID}_${currentCard.bank}`].correspondingCardIDs.push(currentCard.cardID.toString());
+                // Expensify Card feeds are split per country so the picker shows one entry per program (US/GB/TRAVEL_US).
+                // Non-Expensify feeds keep the legacy 2-segment key.
+                const country = currentCard.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(currentCard.nameValuePairs?.feedCountry) : '';
+                const key = createCardFeedKey(currentCard.fundID, currentCard.bank, country);
+                if (domainFeedData[key]) {
+                    domainFeedData[key].correspondingCardIDs.push(currentCard.cardID.toString());
                 } else {
                     // if the cards belongs to the same domain, every card of it should have the same fundID
                     // eslint-disable-next-line no-param-reassign
-                    domainFeedData[`${currentCard.fundID}_${currentCard.bank}`] = {
+                    domainFeedData[key] = {
                         fundID: currentCard.fundID,
                         domainName: currentCard.domainName,
                         bank: currentCard?.bank,
                         correspondingCardIDs: [currentCard.cardID?.toString()],
+                        ...(country ? {country} : {}),
                     };
                 }
             }
@@ -232,42 +238,49 @@ function getWorkspaceCardFeedData(
     const isPlaid = !!getPlaidInstitutionId(bank);
     const companyCardBank = isPlaid && cardName ? cardName : getBankName(bank);
 
+    const country = bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(representativeCard.nameValuePairs?.feedCountry) : '';
     const cardFeedBankName = bank === CONST.EXPENSIFY_CARD.BANK ? translate('search.filters.card.expensify') : companyCardBank;
     const fullCardName =
         cardFeedBankName === CONST.COMPANY_CARDS.CARD_TYPE.CSV
             ? translate('search.filters.card.cardFeedNameCSV', {cardFeedLabel})
-            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel});
+            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel, country});
 
     return {
         cardName: fullCardName,
         bank,
         label: cardFeedLabel,
         type: 'workspace',
+        ...(country ? {country} : {}),
     };
 }
 
 function getDomainCardFeedData(domainFeed: DomainFeedData, policies: OnyxCollection<Policy>, repeatingBanks: string[], translate: LocaleContextProps['translate']): CardFeedData {
-    const {domainName, bank} = domainFeed;
+    const {domainName, bank, country} = domainFeed;
     const isBankRepeating = repeatingBanks.includes(bank);
     const cardFeedBankName = bank === CONST.EXPENSIFY_CARD.BANK ? translate('search.filters.card.expensify') : getBankName(bank);
     const cardFeedLabel = isBankRepeating ? getDescriptionForPolicyDomainCard(domainName, policies) : undefined;
     const cardName =
         cardFeedBankName === CONST.COMPANY_CARDS.CARD_TYPE.CSV
             ? translate('search.filters.card.cardFeedNameCSV', {cardFeedLabel})
-            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel});
+            : translate('search.filters.card.cardFeedName', {cardFeedBankName, cardFeedLabel, country});
     return {
         cardName,
         bank,
         label: cardFeedLabel,
         type: 'domain',
+        ...(country ? {country} : {}),
     };
 }
 
 function filterOutDomainCards(workspaceCardFeeds: Record<string, WorkspaceCardsList | undefined> | undefined) {
     const domainFeedData = getDomainFeedData(workspaceCardFeeds);
+    // Expensify Card domain keys are now `<fundID>_<bank>_<country>`, so a plain `<fundID>_<bank>`
+    // reconstruction misses them. Strip the country segment off the domain key when checking
+    // membership so workspace feeds still get deduplicated against their domain counterpart.
+    const domainKeysWithoutCountry = new Set(Object.values(domainFeedData).map((domainFeed) => `${domainFeed.fundID}_${domainFeed.bank}`));
     return Object.entries(workspaceCardFeeds ?? {}).filter(([, workspaceFeed]) => {
         const domainFeed = Object.values(workspaceFeed ?? {}).at(0) ?? {};
-        if (`${domainFeed.fundID}_${domainFeed.bank}` in domainFeedData) {
+        if (domainKeysWithoutCountry.has(`${domainFeed.fundID}_${domainFeed.bank}`)) {
             return false;
         }
         return !isEmptyObject(workspaceFeed);
@@ -287,7 +300,7 @@ function getCardFeedsData({workspaceCardFeeds, policies, translate}: GetCardFeed
     }
 
     for (const domainFeed of Object.values(domainFeedData)) {
-        const cardFeedKey = createCardFeedKey(`cards_${domainFeed.fundID}`, domainFeed.bank);
+        const cardFeedKey = createCardFeedKey(`cards_${domainFeed.fundID}`, domainFeed.bank, domainFeed.country);
         cardFeedData[cardFeedKey] = getDomainCardFeedData(domainFeed, policies, repeatingBanks, translate);
     }
 
@@ -306,9 +319,12 @@ function getCardFeedNamesWithType(params: GetCardFeedData) {
     }, {});
 }
 
-function createCardFeedKey(fundID: string | undefined, bank: string) {
+function createCardFeedKey(fundID: string | undefined, bank: string, country?: string) {
     if (!fundID) {
         return bank;
+    }
+    if (country) {
+        return `${fundID}_${bank}_${country}`;
     }
     return `${fundID}_${bank}`;
 }
@@ -365,16 +381,16 @@ function buildCardFeedsData(
     const repeatingBanks = getRepeatingBanks(Object.keys(workspaceCardFeeds), domainFeedsData);
 
     for (const domainFeed of Object.values(domainFeedsData)) {
-        const {domainName, bank, correspondingCardIDs} = domainFeed;
+        const {domainName, bank, correspondingCardIDs, country} = domainFeed;
 
-        const cardFeedKey = createCardFeedKey(domainFeed.fundID, bank);
+        const cardFeedKey = createCardFeedKey(domainFeed.fundID, bank, country);
         const {cardName} = getDomainCardFeedData(domainFeed, policies, repeatingBanks, translate);
 
         const feedItem = createCardFeedItem({
             cardName,
             bank,
             correspondingCardIDs,
-            keyForList: `${domainName}-${bank}`,
+            keyForList: country ? `${domainName}-${bank}-${country}` : `${domainName}-${bank}`,
             cardFeedKey,
             selectedCards,
             illustrations,
@@ -421,9 +437,19 @@ function buildCardFeedsData(
 
 function getSelectedCardsFromFeeds(cards: CardList | undefined, workspaceCardFeeds?: Record<string, WorkspaceCardsList | undefined>, selectedFeeds?: string[]): string[] {
     const domainFeedsData = generateDomainFeedData(cards);
-    const domainFeedCards = Object.fromEntries(
-        Object.values(domainFeedsData).map((domainFeedData) => [createCardFeedKey(domainFeedData.fundID, domainFeedData.bank), domainFeedData.correspondingCardIDs]),
-    );
+    const domainFeedCards: Record<string, string[]> = {};
+    // Buckets keyed by the 2-segment `<fundID>_<bank>` let a legacy saved filter resolve to every
+    // country bucket for that fundID. Populated only for Expensify Card feeds where the canonical
+    // key is now 3-segment.
+    const domainFeedCardsByFundBank: Record<string, string[]> = {};
+    for (const domainFeedData of Object.values(domainFeedsData)) {
+        const key = createCardFeedKey(domainFeedData.fundID, domainFeedData.bank, domainFeedData.country);
+        domainFeedCards[key] = domainFeedData.correspondingCardIDs;
+        if (domainFeedData.country) {
+            const legacyKey = `${domainFeedData.fundID}_${domainFeedData.bank}`;
+            (domainFeedCardsByFundBank[legacyKey] ||= []).push(...domainFeedData.correspondingCardIDs);
+        }
+    }
 
     if (!workspaceCardFeeds || !selectedFeeds) {
         return [];
@@ -432,7 +458,18 @@ function getSelectedCardsFromFeeds(cards: CardList | undefined, workspaceCardFee
     const selectedCards = selectedFeeds.flatMap((cardFeedKey) => {
         const workspaceCardFeed = workspaceCardFeeds[getWorkspaceCardFeedKey(cardFeedKey)];
         if (!workspaceCardFeed) {
-            if (!cards || !domainFeedCards[cardFeedKey] || Object.keys(domainFeedCards).length === 0) {
+            if (!cards || Object.keys(domainFeedCards).length === 0) {
+                return [];
+            }
+
+            // Legacy 2-segment selection (e.g. saved filter predating the country split) — union
+            // every country bucket on the same `<fundID>_<bank>`.
+            const legacyBucket = domainFeedCardsByFundBank[cardFeedKey];
+            if (legacyBucket && !domainFeedCards[cardFeedKey]) {
+                return legacyBucket.filter((cardNumber) => cards[cardNumber].state !== CONST.EXPENSIFY_CARD.STATE.STATE_NOT_ISSUED);
+            }
+
+            if (!domainFeedCards[cardFeedKey]) {
                 return [];
             }
 
@@ -456,10 +493,27 @@ const generateSelectedCards = (
 };
 
 /**
- * Given a card list, return a map of Expensify Card feeds keyed by "${fundID}_${BANK}".
- * This is extracted from getCardFeedsForDisplay so it can be called independently
- * (e.g. from selectors that only need Expensify Card feeds).
+ * Maps a stored `feedCountry` value to the wire-level country segment used in the Search feed
+ * filter token. Pre-2024 `CURRENT` collapses to `US` so users see one "US" picker entry covering
+ * both legacy and 2025 Expensify Card programs; Auth expands `US` back to `IN ('US','CURRENT')`.
+ * Returns an empty string when the card has no feedCountry or carries an unrecognised value —
+ * those entries keep the legacy 2-segment token, which Auth still parses without a country
+ * predicate (matches all Expensify Cards on the fundID regardless of program).
  */
+function getFeedCountryForDisplay(feedCountry: string | undefined): string {
+    switch (feedCountry) {
+        case CONST.EXPENSIFY_CARD.CARD_PROGRAM.CURRENT:
+        case CONST.COUNTRY.US:
+            return CONST.COUNTRY.US;
+        case CONST.COUNTRY.GB:
+            return CONST.COUNTRY.GB;
+        case CONST.TRAVEL.PROGRAM_TRAVEL_US:
+            return CONST.TRAVEL.PROGRAM_TRAVEL_US;
+        default:
+            return '';
+    }
+}
+
 function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined): CardFeedsForDisplay {
     const result = {} as CardFeedsForDisplay;
 
@@ -468,7 +522,8 @@ function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined): CardFe
             continue;
         }
 
-        const id = `${card.fundID}_${CONST.EXPENSIFY_CARD.BANK}`;
+        const country = getFeedCountryForDisplay(card.nameValuePairs?.feedCountry);
+        const id = country ? `${card.fundID}_${CONST.EXPENSIFY_CARD.BANK}_${country}` : `${card.fundID}_${CONST.EXPENSIFY_CARD.BANK}`;
 
         if (result[id]) {
             continue;
@@ -479,6 +534,7 @@ function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined): CardFe
             feed: CONST.EXPENSIFY_CARD.BANK,
             fundID: card.fundID,
             name: CONST.EXPENSIFY_CARD.BANK,
+            ...(country ? {country} : {}),
         };
     }
 
@@ -684,4 +740,5 @@ export {
     getCombinedCardFeedsFromAllFeeds,
     getCardFeedStatus,
     getWorkspaceCardFeedsStatus,
+    getFeedCountryForDisplay,
 };

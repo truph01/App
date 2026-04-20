@@ -17,7 +17,7 @@ import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import type {WorkspaceListItem} from '@hooks/useWorkspaceList';
-import {createCardFeedKey, getCardFeedKey, getCardFeedNamesWithType, getWorkspaceCardFeedKey} from '@libs/CardFeedUtils';
+import {createCardFeedKey, getCardFeedKey, getCardFeedNamesWithType, getFeedCountryForDisplay, getWorkspaceCardFeedKey} from '@libs/CardFeedUtils';
 import {getCardDescription} from '@libs/CardUtils';
 import {convertToDisplayStringWithoutCurrency} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -259,7 +259,8 @@ function getFilterCardDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, 
     const cardIdsFilter = filters[CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID] ?? [];
     const feedFilter = filters[CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED] ?? [];
     const workspaceCardFeeds = Object.entries(cards ?? {}).reduce<Record<string, WorkspaceCardsList>>((workspaceCardsFeed, [cardID, card]) => {
-        const feedKey = `${createCardFeedKey(card.fundID, card.bank)}`;
+        const country = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
+        const feedKey = `${createCardFeedKey(card.fundID, card.bank, country)}`;
         const workspaceFeedKey = getWorkspaceCardFeedKey(feedKey);
         /* eslint-disable no-param-reassign */
         workspaceCardsFeed[workspaceFeedKey] ??= {};
@@ -275,7 +276,10 @@ function getFilterCardDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, 
     });
 
     const cardNames = Object.values(cards ?? {})
-        .filter((card) => cardIdsFilter.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank)))
+        .filter((card) => {
+            const country = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
+            return cardIdsFilter.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank, country));
+        })
         .map((card) => getCardDescription(card, translate));
 
     const feedNames = Object.keys(cardFeedNamesWithType)
