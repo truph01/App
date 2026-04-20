@@ -4692,7 +4692,7 @@ describe('actions/Report', () => {
             TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.OPEN_REPORT, 1);
 
             const openReportCall = TestHelper.getFetchMockCalls(WRITE_COMMANDS.OPEN_REPORT).at(0);
-            const body = (openReportCall?.[1] as RequestInit)?.body;
+            const body = (openReportCall?.at(1) as RequestInit)?.body;
             const params = body instanceof FormData ? Object.fromEntries(body) : {};
             const guidedSetupData = JSON.parse((params.guidedSetupData as string) ?? '[]') as Array<{type: string; task?: string; completedTaskReportActionID?: string}>;
             const viewTourTask = guidedSetupData.find((item) => item.type === 'task' && item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
