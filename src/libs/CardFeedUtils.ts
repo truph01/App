@@ -494,14 +494,14 @@ const generateSelectedCards = (
 
 /**
  * Maps a stored `feedCountry` value to the wire-level country segment used in the Search feed
- * filter token. Pre-2024 `CURRENT` collapses to `US` so users see one "US" picker entry covering
- * both legacy and 2025 Expensify Card programs; Auth expands `US` back to `IN ('US','CURRENT')`.
- * Returns an empty string when the card has no feedCountry or carries an unrecognised value —
- * those entries keep the legacy 2-segment token, which Auth still parses without a country
- * predicate (matches all Expensify Cards on the fundID regardless of program).
+ * filter token. Pre-2024 `CURRENT` and missing `feedCountry` both collapse to `US` to match
+ * Auth's `getFeedCountrySelector`, which defaults absent values to `CURRENT`; Auth then expands
+ * `US` back to `IN ('US','CURRENT')`. Unrecognised values return an empty string, keeping the
+ * legacy 2-segment token that Auth parses without a country predicate.
  */
 function getFeedCountryForDisplay(feedCountry: string | undefined): string {
     switch (feedCountry) {
+        case undefined:
         case CONST.EXPENSIFY_CARD.CARD_PROGRAM.CURRENT:
         case CONST.COUNTRY.US:
             return CONST.COUNTRY.US;
