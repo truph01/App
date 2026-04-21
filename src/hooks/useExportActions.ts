@@ -205,8 +205,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
     };
 
     for (const template of exportTemplates) {
-        const isStandardTemplate =
-            template.templateName === CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT || template.templateName === CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT;
+        const isStandardTemplate = template.templateName === CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT || template.templateName === CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT;
         exportSubmenuOptions[template.name] = {
             text: template.name,
             icon: isStandardTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil,
