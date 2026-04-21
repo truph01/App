@@ -901,6 +901,12 @@ const translations: TranslationDeepObject<typeof en> = {
                 title: 'No pudimos cobrar a la tarjeta registrada.',
                 subtitle: 'Suscripción',
             },
+            unlockBankAccount: {
+                workspaceTitle: 'Tu cuenta bancaria empresarial ha sido bloqueada',
+                personalTitle: 'Tu cuenta bancaria ha sido bloqueada',
+                workspaceSubtitle: ({policyName}: {policyName: string}) => policyName,
+                personalSubtitle: 'Monedero',
+            },
         },
         freeTrialSection: {
             title: ({days}: {days: number}) => `Prueba gratuita: ${days} ${days === 1 ? 'día' : 'días'} restantes!`,
