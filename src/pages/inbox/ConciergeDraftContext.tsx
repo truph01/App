@@ -1,5 +1,5 @@
+import {getReportChatType} from '@selectors/Report';
 import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import type {ValueOf} from 'type-fest';
 import useOnyx from '@hooks/useOnyx';
 import {getReportChannelName} from '@libs/actions/Report';
 import Log from '@libs/Log';
@@ -32,7 +32,8 @@ const defaultActions: ConciergeDraftActions = {
 const ConciergeDraftStateContext = createContext<ConciergeDraftState>(defaultState);
 const ConciergeDraftActionsContext = createContext<ConciergeDraftActions>(defaultActions);
 
-function ConciergeDraftProvider({reportID, chatType, children}: React.PropsWithChildren<{reportID: string | undefined; chatType: ValueOf<typeof CONST.REPORT.CHAT_TYPE> | undefined}>) {
+function ConciergeDraftProvider({reportID, children}: React.PropsWithChildren<{reportID: string | undefined}>) {
+    const [chatType] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {selector: getReportChatType});
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const isConciergeChat = reportID === conciergeReportID;
     const isAdmin = chatType === CONST.REPORT.CHAT_TYPE.POLICY_ADMINS;
