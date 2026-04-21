@@ -2800,8 +2800,8 @@ function getSearchOptions({
     personalDetails,
     allPolicyTags,
     sortedActions,
+    conciergeReportID,
 }: SearchOptionsConfig): Options {
-    // TODO: We'll pass the conciergeReportID eventually. Refactor issue: https://github.com/Expensify/App/issues/66411
     const optionList = getValidOptions(options, policyCollection, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, undefined, {
         betas,
         includeRecentReports,
@@ -3030,7 +3030,7 @@ function formatSectionsFromSearchTerm(
     // This will add them to the list of options, deduping them if they already exist in the other lists
     const selectedParticipantsWithoutDetails = selectedOptions.filter((participant) => {
         const accountID = participant.accountID ?? null;
-        const isPartOfSearchTerm = getPersonalDetailSearchTerms(participant, currentUserAccountID).join(' ').toLowerCase().includes(cleanSearchTerm);
+        const isPartOfSearchTerm = doesPersonalDetailMatchSearchTerm(participant, currentUserAccountID, cleanSearchTerm);
         const isReportInRecentReports = filteredRecentReports.some((report) => report.accountID === accountID) || filteredWorkspaceChats.some((report) => report.accountID === accountID);
         const isReportInPersonalDetails = filteredPersonalDetails.some((personalDetail) => personalDetail.accountID === accountID);
 
@@ -3450,7 +3450,6 @@ export {
     formatSectionsFromSearchTerm,
     getAlternateText,
     getFilteredRecentAttendees,
-    getCurrentUserSearchTerms,
     getEmptyOptions,
     getHeaderMessage,
     getHeaderMessageForNonUserList,
@@ -3462,7 +3461,6 @@ export {
     getLastMessageTextForReport,
     getManagerMcTestParticipant,
     getParticipantsOption,
-    getPersonalDetailSearchTerms,
     getPersonalDetailsForAccountIDs,
     getPolicyExpenseReportOption,
     getReportDisplayOption,
