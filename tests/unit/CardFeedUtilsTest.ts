@@ -263,11 +263,11 @@ describe('getFeedInfo', () => {
 
 describe('getExpensifyCardFeedsForDisplay', () => {
     it('returns empty object when allCards is undefined', () => {
-        expect(getExpensifyCardFeedsForDisplay(undefined)).toEqual({});
+        expect(getExpensifyCardFeedsForDisplay(undefined, undefined)).toEqual({});
     });
 
     it('returns empty object when allCards is empty', () => {
-        expect(getExpensifyCardFeedsForDisplay({})).toEqual({});
+        expect(getExpensifyCardFeedsForDisplay({}, undefined)).toEqual({});
     });
 
     it('returns empty object when no cards have Expensify Card bank', () => {
@@ -276,7 +276,7 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '2': {bank: 'stripe', fundID: '6666'},
         } as unknown as CardList;
 
-        expect(getExpensifyCardFeedsForDisplay(allCards)).toEqual({});
+        expect(getExpensifyCardFeedsForDisplay(allCards, undefined)).toEqual({});
     });
 
     it('returns empty object when Expensify Cards have no fundID', () => {
@@ -285,7 +285,7 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '2': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: ''},
         } as unknown as CardList;
 
-        expect(getExpensifyCardFeedsForDisplay(allCards)).toEqual({});
+        expect(getExpensifyCardFeedsForDisplay(allCards, undefined)).toEqual({});
     });
 
     it('returns a single feed entry for one Expensify Card with fundID', () => {
@@ -293,7 +293,7 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '1': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555'},
         } as unknown as CardList;
 
-        expect(getExpensifyCardFeedsForDisplay(allCards)).toEqual({
+        expect(getExpensifyCardFeedsForDisplay(allCards, undefined)).toEqual({
             '5555_Expensify Card': {id: '5555_Expensify Card', fundID: '5555', feed: CONST.EXPENSIFY_CARD.BANK, name: CONST.EXPENSIFY_CARD.BANK},
         });
     });
@@ -305,7 +305,7 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '3': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555'},
         } as unknown as CardList;
 
-        const result = getExpensifyCardFeedsForDisplay(allCards);
+        const result = getExpensifyCardFeedsForDisplay(allCards, undefined);
         expect(Object.keys(result)).toHaveLength(1);
         expect(result['5555_Expensify Card']).toEqual({id: '5555_Expensify Card', fundID: '5555', feed: CONST.EXPENSIFY_CARD.BANK, name: CONST.EXPENSIFY_CARD.BANK});
     });
@@ -316,7 +316,7 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '2': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '6666'},
         } as unknown as CardList;
 
-        const result = getExpensifyCardFeedsForDisplay(allCards);
+        const result = getExpensifyCardFeedsForDisplay(allCards, undefined);
         expect(Object.keys(result)).toHaveLength(2);
         expect(result['5555_Expensify Card']).toEqual({id: '5555_Expensify Card', fundID: '5555', feed: CONST.EXPENSIFY_CARD.BANK, name: CONST.EXPENSIFY_CARD.BANK});
         expect(result['6666_Expensify Card']).toEqual({id: '6666_Expensify Card', fundID: '6666', feed: CONST.EXPENSIFY_CARD.BANK, name: CONST.EXPENSIFY_CARD.BANK});
@@ -329,7 +329,7 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '3': {bank: 'stripe', fundID: '7777'},
         } as unknown as CardList;
 
-        const result = getExpensifyCardFeedsForDisplay(allCards);
+        const result = getExpensifyCardFeedsForDisplay(allCards, undefined);
         expect(Object.keys(result)).toHaveLength(1);
         expect(result['6666_Expensify Card']).toBeDefined();
     });
@@ -341,13 +341,13 @@ describe('getExpensifyCardFeedsForDisplay', () => {
             '3': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '8888'},
         } as unknown as CardList;
 
-        const result = getExpensifyCardFeedsForDisplay(allCards);
+        const result = getExpensifyCardFeedsForDisplay(allCards, undefined);
         expect(Object.keys(result)).toHaveLength(1);
         expect(result['8888_Expensify Card']).toBeDefined();
     });
 
     it('produces the same Expensify Card entries as getCardFeedsForDisplay', () => {
-        const result = getExpensifyCardFeedsForDisplay(cardListMock);
+        const result = getExpensifyCardFeedsForDisplay(cardListMock, undefined);
         const fullResult = getCardFeedsForDisplay({}, cardListMock, translateLocal);
 
         expect(result).toEqual(fullResult);
