@@ -11,11 +11,9 @@ import {convertSecondsToTime} from '@components/VideoPlayer/utils';
 import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useThemeStyles from '@hooks/useThemeStyles';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import ProgressBar from './ProgressBar';
 import VolumeButton from './VolumeButton';
 
@@ -81,7 +79,7 @@ function VideoPlayerControls({
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {updateCurrentURLAndReportID} = usePlaybackActionsContext();
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
+    const report = useReportOrReportDraft(reportID);
     const [shouldShowTime, setShouldShowTime] = useState(false);
     const iconSpacing = small ? styles.mr3 : styles.mr4;
 

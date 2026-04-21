@@ -10,18 +10,16 @@ import {usePlaybackActionsContext, usePlaybackStateContext} from '@components/Vi
 import useCheckIfRouteHasRemainedUnchanged from '@hooks/useCheckIfRouteHasRemainedUnchanged';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useThumbnailDimensions from '@hooks/useThumbnailDimensions';
-import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import getPlatform from '@libs/getPlatform';
 import Navigation from '@navigation/Navigation';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Dimensions} from '@src/types/utils/Layout';
 import VideoPlayerThumbnail from './VideoPlayerThumbnail';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 
 type VideoPlayerPreviewProps = {
     /** Url to a video. */
@@ -57,7 +55,7 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
     const {translate} = useLocalize();
     const {currentlyPlayingURL, currentRouteReportID} = usePlaybackStateContext();
     const {updateCurrentURLAndReportID} = usePlaybackActionsContext();
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
+    const report = useReportOrReportDraft(reportID);
 
     /* This needs to be isSmallScreenWidth because we want to be able to play video in chat (not in attachment modal) when preview is inside an RHP */
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
