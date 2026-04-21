@@ -15,8 +15,8 @@ function useFilterCardValue(): string {
     const cardIdsFilter = searchAdvancedFiltersForm?.[CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID] ?? [];
     const feedFilter = searchAdvancedFiltersForm?.[CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED] ?? [];
     const workspaceCardFeeds = Object.entries(searchCards ?? {}).reduce<Record<string, WorkspaceCardsList>>((acc, [cardID, card]) => {
-        const country = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
-        const feedKey = `${createCardFeedKey(card.fundID, card.bank, country)}`;
+        const feedCountry = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
+        const feedKey = `${createCardFeedKey(card.fundID, card.bank, feedCountry)}`;
         const workspaceFeedKey = getWorkspaceCardFeedKey(feedKey);
         if (!acc[workspaceFeedKey]) {
             acc[workspaceFeedKey] = {};
@@ -34,8 +34,8 @@ function useFilterCardValue(): string {
 
     const cardNames = Object.values(searchCards ?? {})
         .filter((card) => {
-            const country = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
-            return cardIdsFilter.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank, country));
+            const feedCountry = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
+            return cardIdsFilter.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank, feedCountry));
         })
         .map((card) => getCardDescription(card, translate));
 
