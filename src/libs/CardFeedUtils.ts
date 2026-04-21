@@ -187,10 +187,8 @@ function generateDomainFeedData(cardList: CardList | undefined): Record<string, 
         (domainFeedData, currentCard) => {
             // Cards in cardList can also be domain cards, we use them to compute domain feed
             if (!currentCard?.domainName?.match(CONST.REGEX.EXPENSIFY_POLICY_DOMAIN_NAME) && !isCardHiddenFromSearch(currentCard) && currentCard.fundID) {
-                // Expensify Card feeds are split per country so the picker shows one entry per program (US/GB/TRAVEL_US).
-                // Non-Expensify feeds keep the legacy 2-segment key.
-                const country = currentCard.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(currentCard.nameValuePairs?.feedCountry) : '';
-                const key = createCardFeedKey(currentCard.fundID, currentCard.bank, country);
+                const feedCountry = currentCard.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(currentCard.nameValuePairs?.feedCountry) : '';
+                const key = createCardFeedKey(currentCard.fundID, currentCard.bank, feedCountry);
                 if (domainFeedData[key]) {
                     domainFeedData[key].correspondingCardIDs.push(currentCard.cardID.toString());
                 } else {
@@ -201,7 +199,7 @@ function generateDomainFeedData(cardList: CardList | undefined): Record<string, 
                         domainName: currentCard.domainName,
                         bank: currentCard?.bank,
                         correspondingCardIDs: [currentCard.cardID?.toString()],
-                        ...(country ? {country} : {}),
+                        ...(feedCountry ? {country: feedCountry} : {}),
                     };
                 }
             }
@@ -319,12 +317,12 @@ function getCardFeedNamesWithType(params: GetCardFeedData) {
     }, {});
 }
 
-function createCardFeedKey(fundID: string | undefined, bank: string, country?: string) {
+function createCardFeedKey(fundID: string | undefined, bank: string, feedCountry?: string) {
     if (!fundID) {
         return bank;
     }
-    if (country) {
-        return `${fundID}_${bank}_${country}`;
+    if (feedCountry) {
+        return `${fundID}_${bank}_${feedCountry}`;
     }
     return `${fundID}_${bank}`;
 }
@@ -494,24 +492,12 @@ const generateSelectedCards = (
 
 /**
  * Maps a stored `feedCountry` value to the wire-level country segment used in the Search feed
- * filter token. Pre-2024 `CURRENT` and missing `feedCountry` both collapse to `US` to match
- * Auth's `getFeedCountrySelector`, which defaults absent values to `CURRENT`; Auth then expands
- * `US` back to `IN ('US','CURRENT')`. Unrecognised values return an empty string, keeping the
- * legacy 2-segment token that Auth parses without a country predicate.
+ * filter token. Only Travel Invoicing carries a feed country segment — it has its own Onyx key and its
+ * own search feed. Every other Expensify Card program (US/GB/CURRENT) shares the 2-segment token
+ * so the token and the Onyx key always line up.
  */
 function getFeedCountryForDisplay(feedCountry: string | undefined): string {
-    switch (feedCountry) {
-        case undefined:
-        case CONST.EXPENSIFY_CARD.CARD_PROGRAM.CURRENT:
-        case CONST.COUNTRY.US:
-            return CONST.COUNTRY.US;
-        case CONST.COUNTRY.GB:
-            return CONST.COUNTRY.GB;
-        case CONST.TRAVEL.PROGRAM_TRAVEL_US:
-            return CONST.TRAVEL.PROGRAM_TRAVEL_US;
-        default:
-            return '';
-    }
+    return feedCountry === CONST.TRAVEL.PROGRAM_TRAVEL_US ? CONST.TRAVEL.PROGRAM_TRAVEL_US : '';
 }
 
 function getCardFeedBankDisplayName(bank: string, country: string | undefined, companyCardBankName: string, translate: LocaleContextProps['translate']): string {
@@ -524,7 +510,7 @@ function getCardFeedBankDisplayName(bank: string, country: string | undefined, c
     return translate('search.filters.card.expensify');
 }
 
-function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined): CardFeedsForDisplay {
+function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined, translate: LocaleContextProps['translate'] | undefined): CardFeedsForDisplay {
     const result = {} as CardFeedsForDisplay;
 
     for (const card of Object.values(allCards ?? {})) {
@@ -539,11 +525,16 @@ function getExpensifyCardFeedsForDisplay(allCards: CardList | undefined): CardFe
             continue;
         }
 
+        // Travel Invoicing lives on its own feed but shares the `Expensify Card` bank. Use the
+        // translated label so the Feed dropdown shows "Travel Invoicing" for travel cards and
+        // "Expensify Card" for everything else.
+        const name = translate && country === CONST.TRAVEL.PROGRAM_TRAVEL_US ? translate('search.filters.card.travelInvoicing') : CONST.EXPENSIFY_CARD.BANK;
+
         result[id] = {
             id,
             feed: CONST.EXPENSIFY_CARD.BANK,
             fundID: card.fundID,
-            name: CONST.EXPENSIFY_CARD.BANK,
+            name,
             ...(country ? {country} : {}),
         };
     }
@@ -588,7 +579,7 @@ function getCardFeedsForDisplay(
         }
     }
 
-    Object.assign(cardFeedsForDisplay, getExpensifyCardFeedsForDisplay(allCards));
+    Object.assign(cardFeedsForDisplay, getExpensifyCardFeedsForDisplay(allCards, translate));
 
     return cardFeedsForDisplay;
 }
