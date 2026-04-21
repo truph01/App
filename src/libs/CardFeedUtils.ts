@@ -437,7 +437,10 @@ function buildCardFeedsData(
 function getSelectedCardsFromFeeds(cards: CardList | undefined, workspaceCardFeeds?: Record<string, WorkspaceCardsList | undefined>, selectedFeeds?: string[]): string[] {
     const domainFeedsData = generateDomainFeedData(cards);
     const domainFeedCards = Object.fromEntries(
-        Object.values(domainFeedsData).map((domainFeedData) => [createCardFeedKey(domainFeedData.fundID, domainFeedData.bank), domainFeedData.correspondingCardIDs]),
+        Object.values(domainFeedsData).map((domainFeedData) => [
+            createCardFeedKey(domainFeedData.fundID, domainFeedData.bank, domainFeedData.feedCountry),
+            domainFeedData.correspondingCardIDs,
+        ]),
     );
 
     if (!workspaceCardFeeds || !selectedFeeds) {
