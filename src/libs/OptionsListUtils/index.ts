@@ -188,6 +188,7 @@ import type {
 } from '@src/types/onyx';
 import type {Attendee, Participant} from '@src/types/onyx/IOU';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import {doesPersonalDetailMatchSearchTerm, getCurrentUserSearchTerms, getPersonalDetailSearchTerms} from './searchMatchUtils';
 import type {
     FilterUserToInviteConfig,
     GetOptionsConfig,
@@ -2683,10 +2684,12 @@ function getValidOptions(
             if (personalDetailLoginsToExclude[personalDetail.login]) {
                 return false;
             }
-            const personalDetailSearchTerms = getPersonalDetailSearchTerms(personalDetail, currentUserAccountID);
-            const searchText = deburr(`${personalDetailSearchTerms.join(' ')} ${personalDetail.text ?? ''}`.toLocaleLowerCase());
-
-            return searchTerms.every((term) => searchText.includes(term));
+            return searchTerms.every((term) =>
+                doesPersonalDetailMatchSearchTerm(personalDetail, currentUserAccountID, term, {
+                    useLocaleLowerCase: true,
+                    transformSearchText: (concatenatedSearchTerms) => deburr(`${concatenatedSearchTerms} ${(personalDetail.text ?? '').toLocaleLowerCase()}`),
+                }),
+            );
         };
 
         // when we expect that function return eg. 50 elements and we already found 40 recent reports, we should adjust the max personal details number.
@@ -3053,18 +3056,6 @@ function formatSectionsFromSearchTerm(
                 : selectedParticipantsWithoutDetails,
         },
     };
-}
-
-function getPersonalDetailSearchTerms(item: Partial<SearchOptionData>, currentUserAccountID: number) {
-    if (item.accountID === currentUserAccountID) {
-        return getCurrentUserSearchTerms(item);
-    }
-    return [item.participantsList?.[0]?.displayName ?? item.displayName ?? '', item.login ?? '', item.login?.replace(CONST.EMAIL_SEARCH_REGEX, '') ?? ''];
-}
-
-function getCurrentUserSearchTerms(item: Partial<SearchOptionData>) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    return [item.text ?? item.displayName ?? '', item.login ?? '', item.login?.replace(CONST.EMAIL_SEARCH_REGEX, '') ?? '', translateLocal('common.you'), translateLocal('common.me')];
 }
 
 /**
