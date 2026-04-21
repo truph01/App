@@ -1,6 +1,6 @@
 type SetContactMethodAsDefaultParams = {
     partnerUserID: string;
-    validateCode?: string;
+    validateCode: string;
 };
 
 export default SetContactMethodAsDefaultParams;

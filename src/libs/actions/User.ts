@@ -1060,9 +1060,9 @@ function setContactMethodAsDefault(
     currentUserPersonalDetails: OnyxEntry<OnyxPersonalDetails>,
     newDefaultContactMethod: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
-    backTo?: string,
-    skipNavigation?: boolean,
-    validateCode?: string,
+    backTo: string | undefined,
+    skipNavigation: boolean,
+    validateCode: string,
 ) {
     // Pattern C: only set a pending indicator optimistically, no actual data changes
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.LOGIN_LIST>> = [
