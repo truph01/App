@@ -272,13 +272,14 @@ function getDomainCardFeedData(domainFeed: DomainFeedData, policies: OnyxCollect
 
 function filterOutDomainCards(workspaceCardFeeds: Record<string, WorkspaceCardsList | undefined> | undefined) {
     const domainFeedData = getDomainFeedData(workspaceCardFeeds);
-    // Expensify Card domain keys are now `<fundID>_<bank>_<country>`, so a plain `<fundID>_<bank>`
-    // reconstruction misses them. Strip the country segment off the domain key when checking
-    // membership so workspace feeds still get deduplicated against their domain counterpart.
-    const domainKeysWithoutCountry = new Set(Object.values(domainFeedData).map((domainFeed) => `${domainFeed.fundID}_${domainFeed.bank}`));
     return Object.entries(workspaceCardFeeds ?? {}).filter(([, workspaceFeed]) => {
-        const domainFeed = Object.values(workspaceFeed ?? {}).at(0) ?? {};
-        if (domainKeysWithoutCountry.has(`${domainFeed.fundID}_${domainFeed.bank}`)) {
+        const firstCard = Object.values(workspaceFeed ?? {}).find(isCard);
+        if (!firstCard) {
+            return !isEmptyObject(workspaceFeed);
+        }
+        const feedCountry = firstCard.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(firstCard.nameValuePairs?.feedCountry) : '';
+        const workspaceKey = createCardFeedKey(firstCard.fundID, firstCard.bank, feedCountry);
+        if (workspaceKey in domainFeedData) {
             return false;
         }
         return !isEmptyObject(workspaceFeed);

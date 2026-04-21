@@ -449,4 +449,22 @@ describe('country-aware domain feed picker', () => {
         const selected = getSelectedCardsFromFeeds(cardList, {}, ['5555_Expensify Card']);
         expect(selected.sort()).toEqual(['1', '2']);
     });
+
+    it('keeps the travel workspace feed visible when the only domain entry is a regular Expensify Card', () => {
+        const workspaceCardFeeds = {
+            'cards_5555_Expensify Card': {
+                '1': {...expensifyCardBase(1, '5555', CONST.COUNTRY.US), domainName: 'user.com'},
+                '2': {...expensifyCardBase(2, '5555', CONST.COUNTRY.US), domainName: 'expensify-policy1234567891011121.exfy'},
+            },
+            'cards_5555_Expensify Card_TRAVEL_US': {
+                '3': {...expensifyCardBase(3, '5555', CONST.TRAVEL.PROGRAM_TRAVEL_US), domainName: 'expensify-policy1234567891011121.exfy'},
+            },
+        } as unknown as Record<string, WorkspaceCardsList>;
+
+        const names = getCardFeedNamesWithType({workspaceCardFeeds, policies: undefined, translate: translateLocal});
+        expect(Object.keys(names)).toContain('cards_5555_Expensify Card_TRAVEL_US');
+        expect(names['cards_5555_Expensify Card_TRAVEL_US'].type).toBe('workspace');
+        expect(Object.keys(names)).toContain('cards_5555_Expensify Card');
+        expect(names['cards_5555_Expensify Card'].type).toBe('domain');
+    });
 });
