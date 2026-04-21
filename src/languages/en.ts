@@ -9099,6 +9099,7 @@ const translations = {
                 other: 'Close accounts',
             }),
             moveToGroup: 'Move to group',
+            securityGroup: 'Security group',
             chooseWhereToMove: ({count}: {count: number}) => `Choose where to move ${count} ${count === 1 ? 'member' : 'members'}.`,
             error: {
                 addMember: 'Unable to add this member. Please try again.',
