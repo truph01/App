@@ -356,46 +356,25 @@ describe('getExpensifyCardFeedsForDisplay', () => {
     it('appends country segment to the token for US-program Expensify Cards', () => {
         const allCards = {
             '1': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.COUNTRY.US}},
+            '2': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.COUNTRY.GB}},
+            '3': {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.EXPENSIFY_CARD.CARD_PROGRAM.CURRENT}},
         } as unknown as CardList;
 
-        const result = getExpensifyCardFeedsForDisplay(allCards);
-        expect(result).toEqual({
-            '5555_Expensify Card_US': {id: '5555_Expensify Card_US', fundID: '5555', feed: CONST.EXPENSIFY_CARD.BANK, name: CONST.EXPENSIFY_CARD.BANK, country: CONST.COUNTRY.US},
-        });
+        const result = getExpensifyCardFeedsForDisplay(allCards, translateLocal);
+        expect(Object.keys(result)).toEqual(['5555_Expensify Card']);
+        expect(result['5555_Expensify Card'].country).toBeUndefined();
+        expect(result['5555_Expensify Card'].name).toBe(CONST.EXPENSIFY_CARD.BANK);
     });
 
-    it('collapses CURRENT feedCountry to the US wire value so pre-2024 and 2025 programs share one picker entry', () => {
+    it('emits a separate Travel Invoicing entry when a travel card is present', () => {
         const allCards = {
-            current: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.EXPENSIFY_CARD.CARD_PROGRAM.CURRENT}},
-            us2025: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.COUNTRY.US}},
-        } as unknown as CardList;
-
-        const result = getExpensifyCardFeedsForDisplay(allCards);
-        expect(Object.keys(result)).toEqual(['5555_Expensify Card_US']);
-    });
-
-    it('emits separate picker entries for different countries on the same fundID', () => {
-        const allCards = {
-            us: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.COUNTRY.US}},
-            gb: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.COUNTRY.GB}},
+            regular: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.COUNTRY.US}},
             travel: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555', nameValuePairs: {feedCountry: CONST.TRAVEL.PROGRAM_TRAVEL_US}},
         } as unknown as CardList;
 
-        const result = getExpensifyCardFeedsForDisplay(allCards);
-        expect(Object.keys(result).sort()).toEqual(['5555_Expensify Card_GB', '5555_Expensify Card_TRAVEL_US', '5555_Expensify Card_US'].sort());
-        expect(result['5555_Expensify Card_GB'].country).toBe(CONST.COUNTRY.GB);
+        const result = getExpensifyCardFeedsForDisplay(allCards, translateLocal);
+        expect(Object.keys(result).sort()).toEqual(['5555_Expensify Card', '5555_Expensify Card_TRAVEL_US']);
         expect(result['5555_Expensify Card_TRAVEL_US'].country).toBe(CONST.TRAVEL.PROGRAM_TRAVEL_US);
-    });
-
-    it('falls back to the legacy 2-segment token when feedCountry is missing or unknown', () => {
-        const allCards = {
-            noCountry: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '5555'},
-            unknown: {bank: CONST.EXPENSIFY_CARD.BANK, fundID: '6666', nameValuePairs: {feedCountry: 'MARS'}},
-        } as unknown as CardList;
-
-        const result = getExpensifyCardFeedsForDisplay(allCards);
-        expect(Object.keys(result).sort()).toEqual(['5555_Expensify Card', '6666_Expensify Card']);
-        expect(result['5555_Expensify Card'].country).toBeUndefined();
     });
 });
 
@@ -405,7 +384,7 @@ describe('country-aware domain feed picker', () => {
         return waitForBatchedUpdates();
     });
 
-    const expensifyCardBase = (cardID: number, fundID: string, country?: string) => ({
+    const expensifyCardBase = (cardID: number, fundID: string, feedCountry?: string) => ({
         accountID: cardID,
         lastUpdated: '2024-11-29',
         bank: CONST.EXPENSIFY_CARD.BANK,
@@ -419,64 +398,38 @@ describe('country-aware domain feed picker', () => {
         lastScrapeResult: 200,
         scrapeMinDate: '',
         state: 3,
-        ...(country ? {nameValuePairs: {feedCountry: country}} : {}),
+        ...(feedCountry ? {nameValuePairs: {feedCountry}} : {}),
     });
 
-    it('splits Expensify Card rows by country in getCardFeedNamesWithType', () => {
+    it('feed names are different for Expensify Cards and Travel invoicing', () => {
         const workspaceCardFeeds = {
             'cards_5555_Expensify Card': {
                 '1': expensifyCardBase(1, '5555', CONST.COUNTRY.US),
                 '2': expensifyCardBase(2, '5555', CONST.COUNTRY.GB),
+            },
+            'cards_5555_Expensify Card_TRAVEL_US': {
                 '3': expensifyCardBase(3, '5555', CONST.TRAVEL.PROGRAM_TRAVEL_US),
             },
         } as unknown as Record<string, WorkspaceCardsList>;
 
         const names = getCardFeedNamesWithType({workspaceCardFeeds, policies: undefined, translate: translateLocal});
-        expect(Object.keys(names).sort()).toEqual(['cards_5555_Expensify Card_GB', 'cards_5555_Expensify Card_TRAVEL_US', 'cards_5555_Expensify Card_US']);
-        // `isBankRepeating` is true here because one workspace key + three domain-feed entries share the Expensify Card
-        // bank, so the template appends the domain as a disambiguating label.
-        expect(names['cards_5555_Expensify Card_US'].name).toBe('All Expensify - user.com');
-        expect(names['cards_5555_Expensify Card_GB'].name).toBe('All Expensify - user.com');
+        expect(Object.keys(names).sort()).toEqual(['cards_5555_Expensify Card', 'cards_5555_Expensify Card_TRAVEL_US']);
+        expect(names['cards_5555_Expensify Card'].name).toBe('All Expensify - user.com');
         expect(names['cards_5555_Expensify Card_TRAVEL_US'].name).toBe('All Travel Invoicing - user.com');
     });
 
-    it('collapses CURRENT and US into one row under the US suffix', () => {
-        const workspaceCardFeeds = {
-            'cards_5555_Expensify Card': {
-                '1': expensifyCardBase(1, '5555', CONST.EXPENSIFY_CARD.CARD_PROGRAM.CURRENT),
-                '2': expensifyCardBase(2, '5555', CONST.COUNTRY.US),
-            },
-        } as unknown as Record<string, WorkspaceCardsList>;
-
-        const names = getCardFeedNamesWithType({workspaceCardFeeds, policies: undefined, translate: translateLocal});
-        expect(Object.keys(names)).toEqual(['cards_5555_Expensify Card_US']);
-        expect(names['cards_5555_Expensify Card_US'].name).toBe('All Expensify - user.com');
-    });
-
-    it('keeps the legacy 2-segment row when feedCountry is unknown', () => {
-        const workspaceCardFeeds = {
-            'cards_5555_Expensify Card': {
-                '1': expensifyCardBase(1, '5555', 'MARS'),
-            },
-        } as unknown as Record<string, WorkspaceCardsList>;
-
-        const names = getCardFeedNamesWithType({workspaceCardFeeds, policies: undefined, translate: translateLocal});
-        expect(Object.keys(names)).toEqual(['cards_5555_Expensify Card']);
-        expect(names['cards_5555_Expensify Card'].name).toBe('All Expensify - user.com');
-    });
-
-    it("resolves a 3-segment selection to only that country's cards", () => {
+    it('resolves a travel selection to only travel cards', () => {
         const cardList = {
             '1': expensifyCardBase(1, '5555', CONST.COUNTRY.US),
-            '2': expensifyCardBase(2, '5555', CONST.COUNTRY.GB),
-            '3': expensifyCardBase(3, '5555', CONST.COUNTRY.US),
+            '2': expensifyCardBase(2, '5555', CONST.TRAVEL.PROGRAM_TRAVEL_US),
+            '3': expensifyCardBase(3, '5555', CONST.TRAVEL.PROGRAM_TRAVEL_US),
         } as unknown as CardList;
 
-        const selected = getSelectedCardsFromFeeds(cardList, {}, ['5555_Expensify Card_US']);
-        expect(selected.sort()).toEqual(['1', '3']);
+        const selected = getSelectedCardsFromFeeds(cardList, {}, ['5555_Expensify Card_TRAVEL_US']);
+        expect(selected.sort()).toEqual(['2', '3']);
     });
 
-    it('resolves a legacy 2-segment selection to every country bucket for the fundID', () => {
+    it('resolves a 2-segment Expensify selection to every non-travel card for the fundID', () => {
         const cardList = {
             '1': expensifyCardBase(1, '5555', CONST.COUNTRY.US),
             '2': expensifyCardBase(2, '5555', CONST.COUNTRY.GB),
@@ -484,7 +437,7 @@ describe('country-aware domain feed picker', () => {
         } as unknown as CardList;
 
         const selected = getSelectedCardsFromFeeds(cardList, {}, ['5555_Expensify Card']);
-        expect(selected.sort()).toEqual(['1', '2', '3']);
+        expect(selected.sort()).toEqual(['1', '2']);
     });
 
     it('still resolves a 2-segment selection when cards carry no feedCountry', () => {
