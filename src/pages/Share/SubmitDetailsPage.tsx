@@ -69,7 +69,7 @@ function SubmitDetailsPage({
     const report: OnyxEntry<ReportType> = useReportOrReportDraft(reportOrAccountID);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`);
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_TRANSACTION_ID}`);
-    const transactionReport = getReportOrDraftReport(transaction?.reportID);
+    const transactionReport = useReportOrReportDraft(transaction?.reportID);
     const iouType = isSelfDM(report) ? CONST.IOU.TYPE.TRACK : CONST.IOU.TYPE.SUBMIT;
     // Self-DM's FAKE policyID can't load real policy data — usePolicyForTransaction resolves the active workspace instead.
     const {policy} = usePolicyForTransaction({
