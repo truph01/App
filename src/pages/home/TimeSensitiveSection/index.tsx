@@ -82,8 +82,7 @@ function TimeSensitiveSection() {
     });
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
-    const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
-    const {lockedBankAccounts} = useTimeSensitiveLockedBankAccount(adminPolicies, bankAccountList);
+    const {lockedBankAccounts} = useTimeSensitiveLockedBankAccount(adminPolicies);
 
     // Get card feed errors for company card connections (Release 4)
     const cardFeedErrors = useCardFeedErrors();

@@ -1,5 +1,8 @@
+import useOnyx from '@hooks/useOnyx';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {BankAccountList, Policy} from '@src/types/onyx';
+import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 type LockedBankAccount = {
     /** The ID of the locked bank account */
@@ -9,7 +12,8 @@ type LockedBankAccount = {
     policyName?: string;
 };
 
-function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined, bankAccountList: BankAccountList | undefined) {
+function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) {
+    const [bankAccountList = getEmptyObject<BankAccountList>()] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
     const lockedBankAccounts: LockedBankAccount[] = [];
     const workspaceLockedBankAccountIDs = new Set<number>();
 
@@ -20,7 +24,7 @@ function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined, 
         }
     }
 
-    for (const account of Object.values(bankAccountList ?? {})) {
+    for (const account of Object.values(bankAccountList)) {
         const {bankAccountID, state} = account.accountData ?? {};
         if (state === CONST.BANK_ACCOUNT.STATE.LOCKED && bankAccountID && !workspaceLockedBankAccountIDs.has(bankAccountID)) {
             lockedBankAccounts.push({bankAccountID});
