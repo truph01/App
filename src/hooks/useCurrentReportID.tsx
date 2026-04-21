@@ -5,7 +5,7 @@ import NAVIGATORS from '@src/NAVIGATORS';
 
 type CurrentReportIDStateContextType = {
     currentReportID: string | undefined;
-    currentRHPReportID: string | undefined;
+    currentRHPReportID?: string | undefined;
 };
 
 type CurrentReportIDActionsContextType = {
