@@ -1,13 +1,14 @@
+import {hasSeenTourSelector} from '@selectors/Onboarding';
 import React from 'react';
 import BaseWidgetItem from '@components/BaseWidgetItem';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {pressLockedBankAccount} from '@libs/actions/BankAccounts';
-import Navigation from '@libs/Navigation/Navigation';
+import {navigateToConciergeChat} from '@libs/actions/Report';
 import colors from '@styles/theme/colors';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
 
 type UnlockBankAccountProps = {
     /** The ID of the locked bank account */
@@ -19,8 +20,12 @@ type UnlockBankAccountProps = {
 
 function UnlockBankAccount({bankAccountID, policyName}: UnlockBankAccountProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Bank']);
+    const icons = useMemoizedLazyExpensifyIcons(['BankLock']);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [betas] = useOnyx(ONYXKEYS.BETAS);
+    const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
+    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
     const title = policyName ? translate('homePage.timeSensitiveSection.unlockBankAccount.workspaceTitle') : translate('homePage.timeSensitiveSection.unlockBankAccount.personalTitle');
 
@@ -30,14 +35,12 @@ function UnlockBankAccount({bankAccountID, policyName}: UnlockBankAccountProps) 
 
     const handleCtaPress = () => {
         pressLockedBankAccount(bankAccountID, translate, conciergeReportID);
-        if (conciergeReportID) {
-            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(conciergeReportID));
-        }
+        navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas);
     };
 
     return (
         <BaseWidgetItem
-            icon={icons.Bank}
+            icon={icons.BankLock}
             iconBackgroundColor={colors.tangerine100}
             iconFill={colors.tangerine500}
             title={title}

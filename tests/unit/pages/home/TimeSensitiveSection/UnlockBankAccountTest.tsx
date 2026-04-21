@@ -1,21 +1,19 @@
 import {fireEvent, render, screen} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
-import Navigation from '@libs/Navigation/Navigation';
+import * as BankAccountsActions from '@libs/actions/BankAccounts';
+import * as ReportActions from '@libs/actions/Report';
 import OnyxListItemProvider from '@src/components/OnyxListItemProvider';
 import CONST from '@src/CONST';
-import * as BankAccountsActions from '@src/libs/actions/BankAccounts';
 import ONYXKEYS from '@src/ONYXKEYS';
 import TimeSensitiveSection from '@src/pages/home/TimeSensitiveSection';
 import waitForBatchedUpdates from '../../../../utils/waitForBatchedUpdates';
-
-jest.mock('@libs/Navigation/Navigation');
 
 jest.mock('@hooks/useLocalize', () => jest.fn(() => ({translate: jest.fn((key: string) => key)})));
 
 jest.mock('@hooks/useLazyAsset', () => ({
     useMemoizedLazyExpensifyIcons: jest.fn(() => ({
         EnvelopeOpenStar: () => null,
-        Bank: () => null,
+        BankLock: () => null,
     })),
 }));
 
@@ -43,12 +41,16 @@ jest.mock('@hooks/useCardFeedErrors', () =>
     })),
 );
 
-jest.mock('@hooks/useCurrentUserPersonalDetails', () => jest.fn(() => ({login: 'admin@example.com'})));
+jest.mock('@hooks/useCurrentUserPersonalDetails', () => jest.fn(() => ({login: 'admin@example.com', accountID: 12345})));
 
 jest.mock('@hooks/useResponsiveLayout', () => jest.fn(() => ({shouldUseNarrowLayout: false})));
 
-jest.mock('@src/libs/actions/BankAccounts', () => ({
+jest.mock('@libs/actions/BankAccounts', () => ({
     pressLockedBankAccount: jest.fn(),
+}));
+
+jest.mock('@libs/actions/Report', () => ({
+    navigateToConciergeChat: jest.fn(),
 }));
 
 const ADMIN_ACCOUNT_ID = 12345;
@@ -235,6 +237,6 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
         fireEvent.press(cta);
 
         expect(BankAccountsActions.pressLockedBankAccount).toHaveBeenCalledWith(LOCKED_BANK_ACCOUNT_ID, expect.any(Function), CONCIERGE_REPORT_ID);
-        expect(Navigation.navigate).toHaveBeenCalled();
+        expect(ReportActions.navigateToConciergeChat).toHaveBeenCalledWith(CONCIERGE_REPORT_ID, undefined, ADMIN_ACCOUNT_ID, false, undefined);
     });
 });
