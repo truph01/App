@@ -2802,7 +2802,7 @@ function getSearchOptions({
     sortedActions,
     conciergeReportID,
 }: SearchOptionsConfig): Options {
-    const optionList = getValidOptions(options, policyCollection, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, undefined, {
+    const optionList = getValidOptions(options, policyCollection, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
         betas,
         includeRecentReports,
         includeMultipleParticipantReports: true,
