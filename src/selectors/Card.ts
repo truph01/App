@@ -78,7 +78,7 @@ const getBankLinkedPersonalCards = (cards: OnyxEntry<CardList>): CardList => {
  */
 const defaultExpensifyCardSelector = (allCards: OnyxEntry<NonPersonalAndWorkspaceCardListDerivedValue>) => {
     const cards = Object.values(getExpensifyCardFeedsForDisplay(allCards ?? undefined, undefined));
-    return cards.find((feed) => feed.country !== CONST.TRAVEL.PROGRAM_TRAVEL_US) ?? cards.at(0);
+    return cards.find((feed) => feed.country !== CONST.TRAVEL.PROGRAM_TRAVEL_US);
 };
 
 /**
