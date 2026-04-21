@@ -1,6 +1,6 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
-import {getTagArrayFromName} from '@libs/TransactionUtils';
+import {getTagArrayFromName, isDistanceRequest, isPerDiemRequest} from '@libs/TransactionUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, ReportActions, SearchResults, Transaction} from '@src/types/onyx';
 
@@ -61,6 +61,14 @@ function getTransactionEditContext(
 }
 
 /**
+ * Distance and per-diem transactions have a system-derived merchant that cannot be user-edited
+ * regardless of whether the transaction is reported or unreported.
+ */
+function hasCustomUnitMerchantInSelection(selectedTransactionContexts: Array<{transaction: Transaction}>): boolean {
+    return selectedTransactionContexts.some(({transaction}) => isDistanceRequest(transaction) || isPerDiemRequest(transaction));
+}
+
+/**
  * After a hard refresh, transaction/report/reportAction data may only exist in the search snapshot,
  * not in the main Onyx collections. These helpers fill gaps from the snapshot so bulk edit can work.
  */
@@ -113,4 +121,4 @@ function withSnapshotReports(onyxReports: OnyxCollection<Report> | undefined, sn
     return merged;
 }
 
-export {getCommonDependentTag, getTransactionEditContext, withSnapshotTransactions, withSnapshotReportActions, withSnapshotReports};
+export {getCommonDependentTag, getTransactionEditContext, hasCustomUnitMerchantInSelection, withSnapshotTransactions, withSnapshotReportActions, withSnapshotReports};
