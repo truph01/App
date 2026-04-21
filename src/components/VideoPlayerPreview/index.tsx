@@ -10,6 +10,7 @@ import {usePlaybackActionsContext, usePlaybackStateContext} from '@components/Vi
 import useCheckIfRouteHasRemainedUnchanged from '@hooks/useCheckIfRouteHasRemainedUnchanged';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useThumbnailDimensions from '@hooks/useThumbnailDimensions';
@@ -19,7 +20,6 @@ import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Dimensions} from '@src/types/utils/Layout';
 import VideoPlayerThumbnail from './VideoPlayerThumbnail';
-import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 
 type VideoPlayerPreviewProps = {
     /** Url to a video. */
