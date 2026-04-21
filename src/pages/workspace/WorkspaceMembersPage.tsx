@@ -608,7 +608,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             closeOverlay={closeOverlay}
             onChange={handleRoleFilterChange}
             defaultValue={roleFilterOptions.at(0)?.value}
-            selectionListStyle={{listItemWrapperStyle: {minHeight: 40}}}
+            selectionListStyle={{listItemWrapperStyle: styles.mnh40}}
         />
     );
 
