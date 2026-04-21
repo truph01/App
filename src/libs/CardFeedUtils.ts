@@ -442,8 +442,6 @@ function getSelectedCardsFromFeeds(cards: CardList | undefined, workspaceCardFee
     if (!workspaceCardFeeds || !selectedFeeds) {
         return [];
     }
-  
-    const domainFeedsData = generateDomainFeedData(cards);
 
     const selectedCards = selectedFeeds.flatMap((cardFeedKey) => {
         const workspaceCardFeed = workspaceCardFeeds[getWorkspaceCardFeedKey(cardFeedKey)];
