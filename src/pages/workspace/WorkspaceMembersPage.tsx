@@ -23,6 +23,7 @@ import Text from '@components/Text';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDebouncedAccessibilityAnnouncement from '@hooks/useDebouncedAccessibilityAnnouncement';
 import useFilteredSelection from '@hooks/useFilteredSelection';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -599,6 +600,12 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     const shouldShowRoleFilter = data.length > 0;
     const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && filteredData.length === 0;
+    const noResultsMessage = translate('common.noResultsFoundMatching', inputValue);
+
+    // SearchBar's built-in empty state also controls screen-reader announcements.
+    // We render a custom no-results message in this page, so we announce it manually
+    // to preserve the same accessibility behavior without using SearchBar's default layout.
+    useDebouncedAccessibilityAnnouncement(noResultsMessage, shouldShowEmptySearchMessage, inputValue);
 
     const rolePopoverComponent = ({closeOverlay}: PopoverComponentProps) => (
         <SingleSelectPopup
@@ -909,7 +916,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     </View>
                     {shouldShowEmptySearchMessage && (
                         <View style={[styles.ph5, styles.pb5]}>
-                            <Text style={[styles.textNormal, styles.colorMuted]}>{translate('common.noResultsFoundMatching', inputValue)}</Text>
+                            <Text style={[styles.textNormal, styles.colorMuted]}>{noResultsMessage}</Text>
                         </View>
                     )}
                 </View>
