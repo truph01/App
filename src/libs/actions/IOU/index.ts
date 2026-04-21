@@ -995,15 +995,13 @@ function setMoneyRequestCategory(transactionID: string, category: string, policy
         return;
     }
     if (!policy) {
-        setMoneyRequestTaxRate(transactionID, '');
-        setMoneyRequestTaxAmount(transactionID, null);
+        setMoneyRequestTaxRateValues(transactionID, {taxCode: '', taxAmount: null, taxValue: null});
         return;
     }
     const transaction = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`];
-    const {categoryTaxCode, categoryTaxAmount} = getCategoryTaxCodeAndAmount(category, transaction, policy);
+    const {categoryTaxCode, categoryTaxAmount, categoryTaxValue} = getCategoryTaxCodeAndAmount(category, transaction, policy);
     if (categoryTaxCode && categoryTaxAmount !== undefined) {
-        setMoneyRequestTaxRate(transactionID, categoryTaxCode);
-        setMoneyRequestTaxAmount(transactionID, categoryTaxAmount);
+        setMoneyRequestTaxRateValues(transactionID, {taxCode: categoryTaxCode, taxAmount: categoryTaxAmount, taxValue: categoryTaxValue ?? null});
     }
 }
 
