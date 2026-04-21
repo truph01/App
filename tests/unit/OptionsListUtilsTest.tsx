@@ -24,7 +24,6 @@ import {
     filterWorkspaceChats,
     formatMemberForList,
     formatSectionsFromSearchTerm,
-    getAlternateText,
     getFilteredRecentAttendees,
     getIOUReportIDOfLastAction,
     getLastActorDisplayName,
@@ -4303,87 +4302,6 @@ describe('OptionsListUtils', () => {
                 expect(formattedMessage).toBe('$1.00 for A A A');
             });
         });
-        describe('sortedActions parameter', () => {
-            it('should use sortedActions parameter instead of deprecated module variable for REPORT_PREVIEW', async () => {
-                const iouReport: Report = {
-                    ...createRandomReport(10, undefined),
-                    type: CONST.REPORT.TYPE.IOU,
-                    isWaitingOnBankAccount: false,
-                    currency: CONST.CURRENCY.USD,
-                    total: 200,
-                    unheldTotal: 200,
-                };
-                const report: Report = {
-                    ...createRandomReport(11, undefined),
-                    isOwnPolicyExpenseChat: false,
-                };
-                const reportPreviewAction: ReportAction = {
-                    ...createRandomReportAction(1),
-                    actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
-                    childMoneyRequestCount: 1,
-                    message: [{type: 'COMMENT', text: ''}],
-                    originalMessage: {
-                        linkedReportID: iouReport.reportID,
-                    },
-                    shouldShow: true,
-                };
-                const iouAction: ReportAction = {
-                    ...createRandomReportAction(2),
-                    reportID: iouReport.reportID,
-                    actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
-                    message: [{type: 'COMMENT', text: ''}],
-                    originalMessage: {
-                        IOUTransactionID: 'txn1',
-                        type: 'create',
-                    },
-                    shouldShow: true,
-                };
-                const transaction: Transaction = {
-                    ...createRandomTransaction(0),
-                    amount: 200,
-                    currency: CONST.CURRENCY.USD,
-                    merchant: '',
-                    modifiedMerchant: '',
-                    comment: {comment: 'test'},
-                };
-
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`, iouReport);
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`, report);
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.reportID}`, {
-                    [reportPreviewAction.reportActionID]: reportPreviewAction,
-                });
-                await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
-                await waitForBatchedUpdates();
-
-                const sortedActions: Record<string, ReportAction[]> = {
-                    [iouReport.reportID]: [iouAction],
-                };
-
-                const result = getLastMessageTextForReport({
-                    translate: translateLocal,
-                    report,
-                    lastActorDetails: null,
-                    sortedActions,
-                });
-
-                expect(typeof result).toBe('string');
-            });
-
-            it('should handle undefined sortedActions gracefully', () => {
-                const report: Report = {
-                    ...createRandomReport(12, undefined),
-                };
-
-                const result = getLastMessageTextForReport({
-                    translate: translateLocal,
-                    report,
-                    lastActorDetails: null,
-                    sortedActions: undefined,
-                });
-
-                expect(typeof result).toBe('string');
-            });
-        });
         it('MOVED_TRANSACTION action', async () => {
             const mockIsSearchTopmostFullScreenRoute = jest.mocked(isSearchTopmostFullScreenRoute);
             mockIsSearchTopmostFullScreenRoute.mockReturnValue(false);
@@ -7033,26 +6951,6 @@ describe('OptionsListUtils', () => {
             expect(options.personalDetails).toBeDefined();
         });
 
-        it('getSearchOptions should forward sortedActions to getValidOptions', () => {
-            const sortedActions = {};
-            const options = getSearchOptions({
-                options: OPTIONS,
-                draftComments: {},
-                nvpDismissedProductTraining,
-                loginList,
-                policyCollection: {},
-                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
-                currentUserEmail: CURRENT_USER_EMAIL,
-                personalDetails: PERSONAL_DETAILS,
-                sortedActions,
-                conciergeReportID: undefined,
-            });
-
-            expect(options).toBeDefined();
-            expect(options.recentReports).toBeDefined();
-            expect(options.personalDetails).toBeDefined();
-        });
-
         it('getUserToInviteOption should use reports parameter correctly', () => {
             // Given a valid email search value and reports collection
             const result = getUserToInviteOption({
@@ -7304,41 +7202,6 @@ describe('OptionsListUtils', () => {
 
             expect(result).toBeDefined();
             expect(result.reportID).toBe('1');
-        });
-    });
-
-    describe('getAlternateText', () => {
-        it('should forward sortedActions to getLastMessageTextForReport without errors', () => {
-            const option: OptionData = {
-                reportID: '1',
-                lastMessageText: '',
-                isMoneyRequestReport: false,
-                isThread: false,
-                isChatRoom: false,
-                isSelected: false,
-                keyForList: 'option-1',
-            };
-
-            const sortedActions: Record<string, ReportAction[]> = {};
-            const result = getAlternateText(option, {}, {isReportArchived: false, conciergeReportID: undefined, sortedActions});
-
-            expect(typeof result).toBe('string');
-        });
-
-        it('should work when sortedActions is undefined', () => {
-            const option: OptionData = {
-                reportID: '1',
-                lastMessageText: '',
-                isMoneyRequestReport: false,
-                isThread: false,
-                isChatRoom: false,
-                isSelected: false,
-                keyForList: 'option-1',
-            };
-
-            const result = getAlternateText(option, {}, {isReportArchived: false, conciergeReportID: undefined});
-
-            expect(typeof result).toBe('string');
         });
     });
 
@@ -8137,81 +8000,7 @@ describe('OptionsListUtils', () => {
     });
 
     describe('getSearchOptions with sortedActions', () => {
-        it('should forward sortedActions through getSearchOptions without errors', async () => {
-            const reportID = 'search-sorted-1';
-            const iouReportID = 'search-iou-1';
-
-            const report: Report = {
-                ...createRegularChat(Number(reportID), [1]),
-                reportID,
-                reportName: 'Search Sorted Test',
-                lastVisibleActionCreated: '2025-06-15 10:00:00.000',
-                lastActorAccountID: 1,
-                lastMessageText: 'Test',
-            };
-
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, report);
-            await waitForBatchedUpdates();
-
-            const reportPreviewAction: ReportAction = {
-                ...createRandomReportAction(1),
-                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
-                originalMessage: {linkedReportID: iouReportID},
-            } as ReportAction;
-
-            const iouAction: ReportAction = {
-                ...createRandomReportAction(2),
-                actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
-                lastModified: '2025-06-15 10:30:00.000',
-            } as ReportAction;
-
-            const inputOption: SearchOption<Report> = {
-                item: report,
-                reportID,
-                text: 'Search Sorted Test',
-                isUnread: false,
-                participantsList: [],
-                keyForList: reportID,
-                isChatRoom: true,
-                policyID: '123',
-                lastMessageText: 'Test',
-                lastVisibleActionCreated: report.lastVisibleActionCreated,
-                notificationPreference: 'always',
-                accountID: 0,
-                login: '',
-                alternateText: '',
-                subtitle: '',
-                firstName: '',
-                lastName: '',
-                icons: [],
-                isSelected: false,
-                isDisabled: false,
-                brickRoadIndicator: null,
-                isBold: false,
-            };
-
-            const sortedActions = {
-                [reportID]: [reportPreviewAction],
-                [iouReportID]: [iouAction],
-            };
-
-            const results = getSearchOptions({
-                options: {reports: [inputOption], personalDetails: []},
-                draftComments: {},
-                nvpDismissedProductTraining,
-                betas: [CONST.BETAS.ALL],
-                loginList,
-                policyCollection: allPolicies,
-                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
-                currentUserEmail: CURRENT_USER_EMAIL,
-                sortedActions,
-                conciergeReportID: undefined,
-            });
-
-            expect(results.recentReports.length).toBe(1);
-        });
-
-        it('should handle undefined sortedActions via getSearchOptions', async () => {
+        it('should not have lastIOUCreationDate when sortedActions is undefined', async () => {
             const reportID = 'search-sorted-2';
 
             const report: Report = {
