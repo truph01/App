@@ -14,13 +14,13 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {hasSynchronizationErrorMessage, isConnectionInProgress} from '@libs/actions/connections';
 import {isCurrentUserValidated} from '@libs/UserUtils';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
 import type {ConnectionName, PolicyConnectionName} from '@src/types/onyx/Policy';
 import useTimeSensitiveAddPaymentCard from './hooks/useTimeSensitiveAddPaymentCard';
 import useTimeSensitiveBilling from './hooks/useTimeSensitiveBilling';
 import useTimeSensitiveCards from './hooks/useTimeSensitiveCards';
+import useTimeSensitiveLockedBankAccount from './hooks/useTimeSensitiveLockedBankAccount';
 import ActivateCard from './items/ActivateCard';
 import AddPaymentCard from './items/AddPaymentCard';
 import AddShippingAddress from './items/AddShippingAddress';
@@ -59,14 +59,6 @@ type BrokenPersonalCardConnection = {
     cardID: string;
 };
 
-type LockedBankAccount = {
-    /** The ID of the locked bank account */
-    bankAccountID: number;
-
-    /** The policy name — undefined means personal account */
-    policyName?: string;
-};
-
 function TimeSensitiveSection() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -91,6 +83,7 @@ function TimeSensitiveSection() {
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
+    const {lockedBankAccounts} = useTimeSensitiveLockedBankAccount(adminPolicies, bankAccountList);
 
     // Get card feed errors for company card connections (Release 4)
     const cardFeedErrors = useCardFeedErrors();
@@ -151,22 +144,6 @@ function TimeSensitiveSection() {
             brokenPersonalCardConnections.push({
                 cardID: String(card.cardID),
             });
-        }
-    }
-
-    // Find locked bank accounts — workspace VBAs (admin policies with locked achAccount) and personal accounts
-    const lockedBankAccounts: LockedBankAccount[] = [];
-    const workspaceLockedBankAccountIDs = new Set<number>();
-    for (const policy of adminPolicies ?? []) {
-        if (policy.achAccount?.state === CONST.BANK_ACCOUNT.STATE.LOCKED && policy.achAccount.bankAccountID) {
-            lockedBankAccounts.push({bankAccountID: policy.achAccount.bankAccountID, policyName: policy.name});
-            workspaceLockedBankAccountIDs.add(policy.achAccount.bankAccountID);
-        }
-    }
-    for (const account of Object.values(bankAccountList ?? {})) {
-        const {bankAccountID, state} = account.accountData ?? {};
-        if (state === CONST.BANK_ACCOUNT.STATE.LOCKED && bankAccountID && !workspaceLockedBankAccountIDs.has(bankAccountID)) {
-            lockedBankAccounts.push({bankAccountID});
         }
     }
 
