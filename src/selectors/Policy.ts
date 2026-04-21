@@ -146,11 +146,31 @@ function getReusablePoliciesConnectedToQBD(policies: OnyxCollection<Policy>, cur
     });
 }
 
+function getReusablePoliciesConnectedToNetSuite(policies: OnyxCollection<Policy>, currentPolicyID?: string) {
+    return adminPoliciesConnectedToNetSuiteSelector(policies).filter((policy) => {
+        if (policy.id === currentPolicyID) {
+            return false;
+        }
+
+        return !isConnectionUnverified(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE) && !hasSynchronizationErrorMessage(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE, false);
+    });
+}
+
+function getReusablePoliciesConnectedToSageIntacct(policies: OnyxCollection<Policy>, currentPolicyID?: string) {
+    return adminPoliciesConnectedToSageIntacctSelector(policies).filter((policy) => {
+        if (policy.id === currentPolicyID) {
+            return false;
+        }
+
+        return !isConnectionUnverified(policy, CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT) && !hasSynchronizationErrorMessage(policy, CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT, false);
+    });
+}
+
 const reusablePoliciesConnectedToQBDSelector = (policies: OnyxCollection<Policy>, currentPolicyID?: string) => getReusablePoliciesConnectedToQBD(policies, currentPolicyID);
 
-const hasPoliciesConnectedToSageIntacctSelector = (policies: OnyxCollection<Policy>) => !!adminPoliciesConnectedToSageIntacctSelector(policies).length;
+const reusablePoliciesConnectedToNetSuiteSelector = (policies: OnyxCollection<Policy>, currentPolicyID?: string) => getReusablePoliciesConnectedToNetSuite(policies, currentPolicyID);
 
-const hasPoliciesConnectedToNetSuiteSelector = (policies: OnyxCollection<Policy>) => !!adminPoliciesConnectedToNetSuiteSelector(policies).length;
+const reusablePoliciesConnectedToSageIntacctSelector = (policies: OnyxCollection<Policy>, currentPolicyID?: string) => getReusablePoliciesConnectedToSageIntacct(policies, currentPolicyID);
 
 const hasPoliciesConnectedToQBDSelector = (policies: OnyxCollection<Policy>) => !!adminPoliciesConnectedToQBDSelector(policies).length;
 
@@ -200,8 +220,8 @@ export {
     adminPoliciesConnectedToNetSuiteSelector,
     adminPoliciesConnectedToQBDSelector,
     reusablePoliciesConnectedToQBDSelector,
-    hasPoliciesConnectedToSageIntacctSelector,
-    hasPoliciesConnectedToNetSuiteSelector,
+    reusablePoliciesConnectedToNetSuiteSelector,
+    reusablePoliciesConnectedToSageIntacctSelector,
     hasPoliciesConnectedToQBDSelector,
     hasReusablePoliciesConnectedToQBDSelector,
     lastWorkspaceNumberSelector,
