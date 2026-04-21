@@ -21,6 +21,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePaginatedReportActions from '@hooks/usePaginatedReportActions';
 import useReportIsArchived from '@hooks/useReportIsArchived';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useRestoreInputFocus from '@hooks/useRestoreInputFocus';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -192,7 +193,7 @@ function BaseReportActionContextMenu({
     const unapprovedOriginalID = isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.CREATED_REPORT_FOR_UNAPPROVED_TRANSACTIONS)
         ? getOriginalMessage(reportAction)?.originalID
         : undefined;
-    const [originalReportOfUnapprovedTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(unapprovedOriginalID)}`);
+    const originalReportOfUnapprovedTransaction = useReportOrReportDraft(unapprovedOriginalID);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${getNonEmptyStringOnyxID(reportID)}`);
     const [harvestReport] = useOnyx(
