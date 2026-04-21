@@ -435,39 +435,20 @@ function buildCardFeedsData(
 
 function getSelectedCardsFromFeeds(cards: CardList | undefined, workspaceCardFeeds?: Record<string, WorkspaceCardsList | undefined>, selectedFeeds?: string[]): string[] {
     const domainFeedsData = generateDomainFeedData(cards);
-    const domainFeedCards: Record<string, string[]> = {};
-    // Buckets keyed by the 2-segment `<fundID>_<bank>` let a legacy saved filter resolve to every
-    // country bucket for that fundID. Populated only for Expensify Card feeds where the canonical
-    // key is now 3-segment.
-    const domainFeedCardsByFundBank: Record<string, string[]> = {};
-    for (const domainFeedData of Object.values(domainFeedsData)) {
-        const key = createCardFeedKey(domainFeedData.fundID, domainFeedData.bank, domainFeedData.country);
-        domainFeedCards[key] = domainFeedData.correspondingCardIDs;
-        if (domainFeedData.country) {
-            const legacyKey = `${domainFeedData.fundID}_${domainFeedData.bank}`;
-            (domainFeedCardsByFundBank[legacyKey] ||= []).push(...domainFeedData.correspondingCardIDs);
-        }
-    }
+    const domainFeedCards = Object.fromEntries(
+        Object.values(domainFeedsData).map((domainFeedData) => [createCardFeedKey(domainFeedData.fundID, domainFeedData.bank), domainFeedData.correspondingCardIDs]),
+    );
 
     if (!workspaceCardFeeds || !selectedFeeds) {
         return [];
     }
+  
+    const domainFeedsData = generateDomainFeedData(cards);
 
     const selectedCards = selectedFeeds.flatMap((cardFeedKey) => {
         const workspaceCardFeed = workspaceCardFeeds[getWorkspaceCardFeedKey(cardFeedKey)];
         if (!workspaceCardFeed) {
-            if (!cards || Object.keys(domainFeedCards).length === 0) {
-                return [];
-            }
-
-            // Legacy 2-segment selection (e.g. saved filter predating the country split) — union
-            // every country bucket on the same `<fundID>_<bank>`.
-            const legacyBucket = domainFeedCardsByFundBank[cardFeedKey];
-            if (legacyBucket && !domainFeedCards[cardFeedKey]) {
-                return legacyBucket.filter((cardNumber) => cards[cardNumber].state !== CONST.EXPENSIFY_CARD.STATE.STATE_NOT_ISSUED);
-            }
-
-            if (!domainFeedCards[cardFeedKey]) {
+            if (!cards || !domainFeedCards[cardFeedKey] || Object.keys(domainFeedCards).length === 0) {
                 return [];
             }
 
