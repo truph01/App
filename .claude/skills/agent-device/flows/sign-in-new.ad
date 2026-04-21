@@ -1,0 +1,10 @@
+# @desc   Sign in with the shared agent-device test account; new-account branch (lands on Welcome/Join). Chain a flow with @pre text="Welcome" to continue into onboarding.
+# @pre    role="textfield" label="Phone or email"
+# @pre    role="button" label="Continue"
+# @post   text="Welcome"
+# @post   role="button" label="Join"
+# @param  email=agent-device-testing@gmail.com
+# @param  account_state=new
+# @tag    auth
+fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "agent-device-testing@gmail.com"
+press "role=\"button\" label=\"Continue\" || label=\"Continue\""

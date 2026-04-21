@@ -1,0 +1,11 @@
+# @desc   Sign in with the shared agent-device test account; returning-account branch (lands on home).
+# @pre    role="textfield" label="Phone or email"
+# @pre    role="button" label="Continue"
+# @post   text="Home"
+# @post   role="button" label="Search"
+# @param  email=agent-device-testing@gmail.com
+# @param  account_state=returning
+# @tag    auth
+# TODO verify @post against a real returning-account session; current values mirror complete-onboarding's observed home screen.
+fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "agent-device-testing@gmail.com"
+press "role=\"button\" label=\"Continue\" || label=\"Continue\""
