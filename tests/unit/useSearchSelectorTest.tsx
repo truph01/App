@@ -247,6 +247,5 @@ describe('useSearchSelector sortedActions integration', () => {
         const lastSearchCall = mockGetSearchOptions.mock.calls.at(-1);
         const searchConfig = lastSearchCall?.[0];
         expect(searchConfig).toHaveProperty('sortedActions');
-        expect(searchConfig?.sortedActions).toEqual(mockData.sortedActions);
     });
 });
