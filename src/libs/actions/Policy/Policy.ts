@@ -3137,7 +3137,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const isTravelOptionSelected = parts?.travel;
     const isCodingRulesOptionSelected = parts?.codingRules;
 
-    const outputCurrency = isOverviewOptionSelected ? policy?.outputCurrency : localCurrency;
+    const outputCurrency = (isOverviewOptionSelected && policy?.outputCurrency) ? policy?.outputCurrency : localCurrency;
 
     const policyMemberAccountIDs = isMemberOptionSelected ? Object.values(getMemberAccountIDsForWorkspace(policy?.employeeList, false, false)) : [];
     const {customUnitID: distanceCustomUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(outputCurrency);
@@ -3963,7 +3963,8 @@ function createWorkspaceFromIOUPayment(
     const policyID = generatePolicyID();
     const workspaceName = generateDefaultWorkspaceName(currentUserEmail, lastWorkspaceNumber, localeTranslate);
     const employeeAccountID = iouReport?.ownerAccountID;
-    const {customUnits, customUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(iouReport?.currency ?? currentUserLocalCurrency);
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- Disabling this line for safeness as nullish coalescing works only if the value is undefined or null
+    const {customUnits, customUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(iouReport?.currency || currentUserLocalCurrency);
     const oldPersonalPolicyID = iouReport?.policyID;
     const iouReportID = iouReport?.reportID;
 
