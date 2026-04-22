@@ -188,7 +188,7 @@ type UberReceiptPartner = {
     errorFields?: OnyxCommon.ErrorFields;
 };
 
-/** Mapping of receipt partner name to its data shape */
+/** Receipt partner data keyed by partner name */
 type ReceiptPartnerDataByName = {
     /** uber partner */
     [CONST.POLICY.RECEIPT_PARTNERS.NAME.UBER]: UberReceiptPartner;
