@@ -4908,11 +4908,12 @@ function flagComment(reportAction: OnyxEntry<ReportAction>, severity: string, or
         },
     ];
 
-    if (shouldHideMessage) {
+    // Onyx.MERGE with a originalReport null value would delete the originalReport entry, so we skip the rollback entirely
+    if (shouldHideMessage && originalReport) {
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`,
-            value: originalReport ?? null,
+            value: originalReport,
         });
     }
 
@@ -6825,11 +6826,14 @@ function buildOptimisticChangePolicyData(
                 lastVisibleActionCreated,
             },
         });
-        failureData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT}${oldWorkspaceChatReportID}`,
-            value: parentReport ?? null,
-        });
+        // Onyx.MERGE with a null value would delete the oldWorkspaceChatReport entry, so we skip the rollback entirely
+        if (parentReport) {
+            failureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${oldWorkspaceChatReportID}`,
+                value: parentReport,
+            });
+        }
     }
 
     // 3. Optimistically create a new REPORT_PREVIEW reportAction with the newReportPreviewActionID

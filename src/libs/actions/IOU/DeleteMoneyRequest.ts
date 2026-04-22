@@ -851,20 +851,21 @@ function deleteMoneyRequest({
             };
         }
     }
-    failureData.push({
-        onyxMethod: Onyx.METHOD.MERGE,
-        key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport?.reportID}`,
-        value: {
-            ...originalReportActionsUpdate,
-            [reportAction.reportActionID]: {
-                ...reportAction,
-                pendingAction: null,
-                errors: getMicroSecondOnyxErrorWithTranslationKey('iou.error.genericDeleteFailureMessage', errorKey),
-            },
-        },
-    });
 
     if (iouReport?.reportID) {
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`,
+            value: {
+                ...originalReportActionsUpdate,
+                [reportAction.reportActionID]: {
+                    ...reportAction,
+                    pendingAction: null,
+                    errors: getMicroSecondOnyxErrorWithTranslationKey('iou.error.genericDeleteFailureMessage', errorKey),
+                },
+            },
+        });
+
         failureData.push(
             shouldDeleteIOUReport
                 ? {
