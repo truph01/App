@@ -58,6 +58,4 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
     );
 }
 
-SetDefaultContactMethodConfirmMagicCodePage.displayName = 'SetDefaultContactMethodConfirmMagicCodePage';
-
 export default SetDefaultContactMethodConfirmMagicCodePage;
