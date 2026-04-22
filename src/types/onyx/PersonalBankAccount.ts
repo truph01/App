@@ -1,3 +1,4 @@
+import type {TranslationPaths} from '@src/languages/types';
 import type {Route} from '@src/ROUTES';
 import type * as OnyxCommon from './OnyxCommon';
 
@@ -34,7 +35,7 @@ type PersonalBankAccount = {
     bankAccountID?: number;
 
     /** API error stored separately from `errors` to avoid blocking FormProvider resubmission */
-    updateError?: string;
+    updateError?: TranslationPaths | null;
 };
 
 export default PersonalBankAccount;

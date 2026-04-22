@@ -151,7 +151,7 @@ function clearPersonalBankAccountSetupType() {
 }
 
 function clearPersonalBankAccountErrors() {
-    Onyx.merge(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {errors: null, updateError: undefined});
+    Onyx.merge(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {errors: null, updateError: null});
 }
 
 type PersonalBankAccountUpdateData = Pick<
@@ -230,7 +230,7 @@ function updatePersonalBankAccountInfo(bankAccountID: number, accountData: Perso
                 value: {
                     isLoading: false,
                     errors: null,
-                    updateError: undefined,
+                    updateError: null,
                     shouldShowSuccess: true,
                 },
             },

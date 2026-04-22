@@ -18,7 +18,6 @@ import Navigation from '@navigation/Navigation';
 import {clearPersonalBankAccount, clearPersonalBankAccountErrors, updatePersonalBankAccountInfo} from '@userActions/BankAccounts';
 import {clearDraftValues} from '@userActions/FormActions';
 import CONST from '@src/CONST';
-import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {BankAccountList} from '@src/types/onyx';
@@ -255,7 +254,7 @@ function UpdatePersonalBankAccountPage() {
             {!!personalBankAccount?.updateError && (
                 <DotIndicatorMessage
                     style={[styles.mh5, styles.mb3]}
-                    messages={{error: translate(personalBankAccount.updateError as TranslationPaths)}}
+                    messages={{error: translate(personalBankAccount.updateError)}}
                     type="error"
                 />
             )}
