@@ -172,6 +172,28 @@ function ReportFooter() {
         );
     }
 
+    // No specific fallback matched but the user can't write (e.g. backend returned a non-empty
+    // permissions array without "write"). Show a neutral banner so the user isn't left with an
+    // empty footer and no explanation. Mobile keyboard-dismiss hides the composer with
+    // canPerformWriteAction=true, which stays on the null return.
+    if (shouldHideComposer) {
+        return (
+            <View style={[styles.chatFooter, styles.mt4, shouldUseNarrowLayout && styles.mb5]}>
+                <Banner
+                    containerStyles={[styles.chatFooterBanner]}
+                    text={translate('readOnlyConversation')}
+                    icon={expensifyIcons.Lightbulb}
+                    shouldShowIcon
+                />
+                {!shouldUseNarrowLayout && (
+                    <View style={styles.offlineIndicatorContainer}>
+                        <OfflineIndicator containerStyles={[styles.chatItemComposeSecondaryRow]} />
+                    </View>
+                )}
+            </View>
+        );
+    }
+
     return null;
 }
 
