@@ -89,7 +89,7 @@ type PlaybackActionsContextValues = {
      * @param url The new video URL.
      * @param report The new report.
      */
-    updateCurrentURLAndReportID: (url: string | undefined, report: OnyxEntry<Report>) => void;
+    updateCurrentURLAndReportID: (url: string | undefined, report: OnyxEntry<Report>, reportID: string | undefined) => void;
 
     /**
      * Updates shared video player elements across different parts of the UI.

@@ -165,7 +165,7 @@ function AttachmentView({
             return;
         }
         const videoSource = isVideo && typeof source === 'string' ? source : undefined;
-        updateCurrentURLAndReportID(videoSource, reportID ? {...report, reportID} : undefined);
+        updateCurrentURLAndReportID(videoSource, report, reportID);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- currentlyPlayingURL and playVideo are intentionally excluded to prevent a feedback loop
     }, [file, isFocused, isInFocusedModal, isUsedInAttachmentModal, isVideo, report, reportID, source, updateCurrentURLAndReportID]);
 

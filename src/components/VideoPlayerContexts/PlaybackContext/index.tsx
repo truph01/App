@@ -32,8 +32,7 @@ function PlaybackContextProvider({children}: ChildrenProps) {
     const video = usePlaybackContextVideoRefs(resetContextProperties);
 
     const updateCurrentURLAndReportID: PlaybackActionsContextValues['updateCurrentURLAndReportID'] = useCallback(
-        (url, report) => {
-            const reportID = report?.reportID;
+        (url, report, reportID) => {
             if (!reportID) {
                 return;
             }

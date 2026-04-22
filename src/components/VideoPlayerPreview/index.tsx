@@ -105,7 +105,7 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
     };
 
     const handleOnPress = () => {
-        updateCurrentURLAndReportID(videoUrl, reportID ? {...report, reportID} : undefined);
+        updateCurrentURLAndReportID(videoUrl, report, reportID);
         if (isSmallScreenWidth) {
             onShowModalPress();
         }

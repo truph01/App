@@ -88,7 +88,7 @@ function VideoPlayerControls({
     };
 
     const enterFullScreenMode = useCallback(() => {
-        updateCurrentURLAndReportID(url, reportID ? {...report, reportID} : undefined);
+        updateCurrentURLAndReportID(url, report, reportID);
         videoViewRef.current?.enterFullscreen();
     }, [report, reportID, updateCurrentURLAndReportID, url, videoViewRef]);
 

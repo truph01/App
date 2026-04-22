@@ -172,7 +172,7 @@ function BaseVideoPlayer({
 
     const togglePlayCurrentVideo = useCallback(() => {
         if (!isCurrentlyURLSet) {
-            updateCurrentURLAndReportID(url, {...report, reportID});
+            updateCurrentURLAndReportID(url, report, reportID);
             return;
         }
 
@@ -496,7 +496,7 @@ function BaseVideoPlayer({
         if (!shouldPlay) {
             return;
         }
-        updateCurrentURLAndReportID(url, {...report, reportID});
+        updateCurrentURLAndReportID(url, report, reportID);
     }, [report, reportID, shouldPlay, updateCurrentURLAndReportID, url]);
 
     // ensure that video loads after page refresh on iOS Safari
