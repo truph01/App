@@ -35,7 +35,7 @@ function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) 
     }
 
     for (const account of Object.values(bankAccountList)) {
-        const {bankAccountID, state} = account.accountData ?? {};
+        const {bankAccountID, state} = account?.accountData ?? {};
         if (state === CONST.BANK_ACCOUNT.STATE.LOCKED && bankAccountID && !workspaceLockedBankAccountIDs.has(bankAccountID)) {
             lockedBankAccounts.push({bankAccountID});
         }
