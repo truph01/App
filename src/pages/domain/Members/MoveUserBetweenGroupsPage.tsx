@@ -8,8 +8,10 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem} from '@components/SelectionList/ListItem/types';
+import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useThemeStyles from '@hooks/useThemeStyles';
 import {changeDomainSecurityGroup} from '@libs/actions/Domain';
 import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import Navigation from '@navigation/Navigation';
@@ -26,10 +28,11 @@ type SecurityGroupItem = ListItem & {
     value: string;
 };
 
-type MemberChangeGroupPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_CHANGE_GROUP>;
+type MoveUserBetweenGroupsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.MEMBER_MOVE_TO_GROUP>;
 
-function MemberChangeGroupPage({route}: MemberChangeGroupPageProps) {
+function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
     const {domainAccountID, accountID} = route.params;
+    const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
@@ -40,6 +43,7 @@ function MemberChangeGroupPage({route}: MemberChangeGroupPageProps) {
     const [userSecurityGroup] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: securityGroupSelector,
     });
+    const memberLogin = getLoginByAccountID(accountID);
 
     const currentGroupId = userSecurityGroup?.key.replace(CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, '');
 
@@ -55,17 +59,12 @@ function MemberChangeGroupPage({route}: MemberChangeGroupPageProps) {
     };
 
     const handleSave = () => {
-        if (!selectedGroupId || !domainName || !userSecurityGroup) {
+        if (!selectedGroupId || !domainName || !userSecurityGroup || !memberLogin) {
             return;
         }
 
         if (selectedGroupId === currentGroupId) {
             Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
-            return;
-        }
-
-        const memberLogin = getLoginByAccountID(accountID);
-        if (!memberLogin) {
             return;
         }
 
@@ -78,15 +77,17 @@ function MemberChangeGroupPage({route}: MemberChangeGroupPageProps) {
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
                 shouldEnableMaxHeight
-                testID="MemberChangeGroupPage"
+                testID="MoveUserBetweenGroupsPage"
                 includeSafeAreaPaddingBottom
             >
                 <HeaderWithBackButton
-                    title={translate('domain.members.securityGroup')}
+                    title={translate('domain.members.moveToGroup')}
                     onBackButtonPress={() => {
                         Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
                     }}
                 />
+                <Text style={[styles.ph5, styles.pb3, styles.textSupporting]}>{translate('domain.members.chooseWhereToMoveName', {name: getLoginByAccountID(accountID) ?? ''})}</Text>
+
                 <SelectionList<SecurityGroupItem>
                     data={data}
                     onSelectRow={handleSelectRow}
@@ -108,4 +109,4 @@ function MemberChangeGroupPage({route}: MemberChangeGroupPageProps) {
     );
 }
 
-export default MemberChangeGroupPage;
+export default MoveUserBetweenGroupsPage;

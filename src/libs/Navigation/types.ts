@@ -1602,7 +1602,7 @@ type SettingsNavigatorParamList = {
     [SCREENS.DOMAIN.MEMBERS_MOVE_TO_GROUP]: {
         domainAccountID: number;
     };
-    [SCREENS.DOMAIN.MEMBER_CHANGE_GROUP]: {
+    [SCREENS.DOMAIN.MEMBER_MOVE_TO_GROUP]: {
         domainAccountID: number;
         accountID: number;
     };

@@ -144,16 +144,16 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 avatarButton={avatarButton}
             >
                 <OfflineWithFeedback
+                    errorRowStyles={styles.mh5}
                     pendingAction={domainPendingActions?.member?.[memberLogin]?.changeDomainSecurityGroup}
                     errors={getLatestError(domainErrors?.memberErrors?.[memberLogin]?.changeDomainSecurityGroupErrors)}
                     onClose={() => clearChangeDomainSecurityGroupError(domainAccountID, memberLogin)}
                 >
                     <MenuItemWithTopDescription
-                        description={translate('domain.members.securityGroup')}
+                        description={translate('domain.members.domainGroup')}
                         title={userSecurityGroup?.securityGroup?.name ?? ''}
-                        onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_CHANGE_GROUP.getRoute(domainAccountID, accountID))}
+                        onPress={() => Navigation.navigate(ROUTES.DOMAIN_MEMBER_MOVE_TO_GROUP.getRoute(domainAccountID, accountID))}
                         shouldShowRightIcon
-                        brickRoadIndicator={domainErrors?.memberErrors?.[memberLogin]?.changeDomainSecurityGroupErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                     />
                 </OfflineWithFeedback>
                 <VacationDelegateMenuItem
