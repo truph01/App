@@ -97,7 +97,7 @@ function ReportAttachmentModalContent({route, navigation}: AttachmentModalScreen
             });
             Navigation.navigate(routeToNavigate);
         },
-        [reportID, reportActionID, type, accountID, hashKey],
+        [reportID, type, accountID, hashKey],
     );
 
     const onDownloadAttachment = useDownloadAttachment({
