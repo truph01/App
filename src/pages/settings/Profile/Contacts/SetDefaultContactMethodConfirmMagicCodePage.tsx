@@ -48,6 +48,7 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
             validateCodeActionErrorField="defaultLogin"
             validateError={defaultLoginError}
             handleSubmitForm={(validateCode) => setContactMethodAsDefault(currentUserPersonalDetails, contactMethod, formatPhoneNumber, backTo, true, validateCode)}
+            isLoading={!!loginData?.pendingFields?.defaultLogin}
             clearError={() => {
                 clearContactMethodErrors(contactMethod, 'defaultLogin');
             }}
