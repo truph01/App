@@ -259,7 +259,7 @@ function getFilterCardDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, 
     const cardIdsFilter = filters[CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID] ?? [];
     const feedFilter = filters[CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED] ?? [];
     const workspaceCardFeeds = Object.entries(cards ?? {}).reduce<Record<string, WorkspaceCardsList>>((workspaceCardsFeed, [cardID, card]) => {
-        const feedCountry = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
+        const feedCountry = getFeedCountryForDisplay(card);
         const feedKey = `${createCardFeedKey(card.fundID, card.bank, feedCountry)}`;
         const workspaceFeedKey = getWorkspaceCardFeedKey(feedKey);
         /* eslint-disable no-param-reassign */
@@ -277,7 +277,7 @@ function getFilterCardDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, 
 
     const cardNames = Object.values(cards ?? {})
         .filter((card) => {
-            const feedCountry = card.bank === CONST.EXPENSIFY_CARD.BANK ? getFeedCountryForDisplay(card.nameValuePairs?.feedCountry) : '';
+            const feedCountry = getFeedCountryForDisplay(card);
             return cardIdsFilter.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank, feedCountry));
         })
         .map((card) => getCardDescription(card, translate));
