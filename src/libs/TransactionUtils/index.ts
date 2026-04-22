@@ -1292,30 +1292,25 @@ function getTagArrayFromName(tagName: string): string[] {
  */
 function getExchangeRate(transaction: TransactionWithOptionalSearchFields, reportCurrency?: string) {
     const fromCurrency = getCurrency(transaction);
-    const toCurrency = transaction.groupCurrency ?? reportCurrency ?? fromCurrency;
 
-    // convertedAmount is only present on report layout data (from Onyx), not in search API results.
-    // When present, use it to check if a conversion actually happened (amount !== convertedAmount).
-    // When absent (search page), trust the groupExchangeRate with the currency check.
-    const hasConvertedAmountData = transaction.convertedAmount != null;
-    const wasActuallyConverted = hasConvertedAmountData && transaction.convertedAmount !== transaction.amount;
+    // On the report view, "unconverted" means the transaction currency matches the report currency.
+    // groupCurrency reflects the user's default workspace and is unrelated to the report being viewed,
+    // so we must gate on reportCurrency here to match Expensify Classic behavior.
+    if (reportCurrency && fromCurrency === reportCurrency) {
+        return '';
+    }
 
-    // groupExchangeRate: search page rate (from→groupCurrency).
-    // On the search page (no convertedAmount), trust the currency check alone.
-    // On the report layout (has convertedAmount from Onyx merge), also require wasActuallyConverted.
+    // groupExchangeRate: search-page rate (fromCurrency → groupCurrency).
     if (transaction.groupExchangeRate != null && transaction.groupCurrency && fromCurrency !== transaction.groupCurrency) {
-        if (!hasConvertedAmountData || wasActuallyConverted) {
-            const groupRate = Number(transaction.groupExchangeRate);
-            if (groupRate !== 1) {
-                return `${transaction.groupExchangeRate} ${fromCurrency}/${toCurrency}`;
-            }
+        const groupRate = Number(transaction.groupExchangeRate);
+        if (groupRate !== 1) {
+            return `${transaction.groupExchangeRate} ${fromCurrency}/${transaction.groupCurrency}`;
         }
     }
 
-    // currencyConversionRate: report layout rate (from→report currency).
-    // Always requires wasActuallyConverted since the backend sets rates for same-currency expenses.
-    const conversionToCurrency = reportCurrency ?? (transaction.currency !== fromCurrency ? transaction.currency : toCurrency);
-    if (wasActuallyConverted && transaction.currencyConversionRate != null && fromCurrency !== conversionToCurrency) {
+    // currencyConversionRate: report-layout rate (fromCurrency → reportCurrency).
+    const conversionToCurrency = reportCurrency ?? (transaction.currency !== fromCurrency ? transaction.currency : (transaction.groupCurrency ?? fromCurrency));
+    if (transaction.currencyConversionRate != null && fromCurrency !== conversionToCurrency) {
         const conversionRate = Number(transaction.currencyConversionRate);
         if (conversionRate !== 1) {
             return `${transaction.currencyConversionRate} ${fromCurrency}/${conversionToCurrency}`;

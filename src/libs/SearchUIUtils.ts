@@ -5403,8 +5403,7 @@ function getColumnsToShow({
             }
             // Expense report view: show TOTAL column (converted amount in workspace currency).
             // Search page: show ORIGINAL_AMOUNT column (transaction's original amount).
-            const hasConversion = hasExchangeRate || (transaction.convertedAmount != null && transaction.convertedAmount !== transaction.amount);
-            if (hasConversion) {
+            if (hasExchangeRate) {
                 if (isExpenseReportView) {
                     columns[CONST.SEARCH.TABLE_COLUMNS.TOTAL] = true;
                 } else {

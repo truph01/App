@@ -2942,16 +2942,20 @@ describe('TransactionUtils', () => {
             expect(TransactionUtils.getExchangeRate(transaction, 'USD')).toBe('0.0 UZS/USD');
         });
 
-        it('returns empty string when currencyConversionRate is set but convertedAmount equals amount (no actual conversion)', () => {
+        it('shows currencyConversionRate when modified currency differs from report currency even if convertedAmount rounds to amount', () => {
+            // Repro: user modified an expense from USD to NZ$16.95. The NZD→USD conversion
+            // (1695 * 0.5897 ≈ 999.5) rounds back to the original 1000 cents, so `convertedAmount`
+            // and `amount` happen to match even though a real conversion occurred.
             const transaction = generateTransaction({
-                currency: 'JPY',
-                currencyConversionRate: '0.0062',
+                currency: 'USD',
+                modifiedCurrency: 'NZD',
+                modifiedAmount: -1695,
                 amount: -1000,
                 convertedAmount: -1000,
+                currencyConversionRate: '0.5897',
             });
 
-            // Same amount — no conversion actually happened, even though the backend set a rate.
-            expect(TransactionUtils.getExchangeRate(transaction, 'USD')).toBe('');
+            expect(TransactionUtils.getExchangeRate(transaction, 'USD')).toBe('0.5897 NZD/USD');
         });
 
         it('returns empty string when currencyConversionRate is set but fromCurrency equals reportCurrency', () => {
@@ -2962,6 +2966,20 @@ describe('TransactionUtils', () => {
 
             // Same currency — no meaningful conversion to show.
             expect(TransactionUtils.getExchangeRate(transaction, 'USD')).toBe('');
+        });
+
+        it('returns empty string on report view when fromCurrency equals reportCurrency even if groupCurrency differs', () => {
+            // Repro: expense in a workspace whose currency (EUR) differs from the user's default workspace currency (USD).
+            // Transaction is unconverted relative to the report, but groupExchangeRate targets groupCurrency (USD).
+            const transaction = generateTransaction({
+                currency: 'EUR',
+                amount: -1000,
+                convertedAmount: -1000,
+                groupCurrency: 'USD',
+                groupExchangeRate: 1.1,
+            });
+
+            expect(TransactionUtils.getExchangeRate(transaction, 'EUR')).toBe('');
         });
     });
 });
