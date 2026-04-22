@@ -5001,7 +5001,7 @@ const staticStyles = (theme: ThemeColors) =>
             height: 34,
             width: 202,
         },
-        searchPageInputNarrowTouchableWrapper: {height: variables.componentSizeLarge},
+        searchPageInputNarrowTouchableWrapper: {height: 32},
 
         walletStaticIllustration: {
             width: 262,
