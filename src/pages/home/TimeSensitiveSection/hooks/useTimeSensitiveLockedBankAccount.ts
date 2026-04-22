@@ -1,3 +1,4 @@
+import {primaryLoginSelector} from '@selectors/Account';
 import useOnyx from '@hooks/useOnyx';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -14,14 +15,23 @@ type LockedBankAccount = {
 
 function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) {
     const [bankAccountList = getEmptyObject<BankAccountList>()] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
+    const [primaryLogin] = useOnyx(ONYXKEYS.ACCOUNT, {selector: primaryLoginSelector});
     const lockedBankAccounts: LockedBankAccount[] = [];
     const workspaceLockedBankAccountIDs = new Set<number>();
 
     for (const policy of adminPolicies ?? []) {
-        if (policy.achAccount?.state === CONST.BANK_ACCOUNT.STATE.LOCKED && policy.achAccount.bankAccountID) {
-            lockedBankAccounts.push({bankAccountID: policy.achAccount.bankAccountID, policyName: policy.name});
-            workspaceLockedBankAccountIDs.add(policy.achAccount.bankAccountID);
+        const achAccount = policy.achAccount;
+        if (achAccount?.state !== CONST.BANK_ACCOUNT.STATE.LOCKED || !achAccount.bankAccountID) {
+            continue;
         }
+
+        workspaceLockedBankAccountIDs.add(achAccount.bankAccountID);
+        const isCurrentUserReimburser = !!primaryLogin && achAccount.reimburser === primaryLogin;
+        if (!isCurrentUserReimburser) {
+            continue;
+        }
+
+        lockedBankAccounts.push({bankAccountID: achAccount.bankAccountID, policyName: policy.name});
     }
 
     for (const account of Object.values(bankAccountList)) {
