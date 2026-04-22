@@ -239,7 +239,7 @@ function TimeSensitiveSection() {
                 {/* Priority 7: Locked bank accounts */}
                 {lockedBankAccounts.map((lockedBankAccount) => (
                     <UnlockBankAccount
-                        key={`locked-bank-account-${lockedBankAccount.bankAccountID}`}
+                        key={lockedBankAccount.key}
                         bankAccountID={lockedBankAccount.bankAccountID}
                         policyName={lockedBankAccount.policyName}
                     />

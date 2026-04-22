@@ -6,6 +6,9 @@ import type {BankAccountList, Policy} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 type LockedBankAccount = {
+    /** Stable key used to render this account widget */
+    key: string;
+
     /** The ID of the locked bank account */
     bankAccountID: number;
 
@@ -31,7 +34,11 @@ function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) 
             continue;
         }
 
-        lockedBankAccounts.push({bankAccountID: achAccount.bankAccountID, policyName: policy.name});
+        lockedBankAccounts.push({
+            key: `workspace-${policy.id}-${achAccount.bankAccountID}`,
+            bankAccountID: achAccount.bankAccountID,
+            policyName: policy.name,
+        });
     }
 
     for (const account of Object.values(bankAccountList)) {
@@ -43,7 +50,10 @@ function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) 
         }
 
         if (state === CONST.BANK_ACCOUNT.STATE.LOCKED && bankAccountID && !workspaceLockedBankAccountIDs.has(bankAccountID)) {
-            lockedBankAccounts.push({bankAccountID});
+            lockedBankAccounts.push({
+                key: `personal-${bankAccountID}`,
+                bankAccountID,
+            });
         }
     }
 

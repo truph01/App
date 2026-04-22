@@ -232,6 +232,59 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
         expect(widgets).toHaveLength(2);
     });
 
+    it('does not log duplicate key warnings when multiple workspaces share a locked bankAccountID', async () => {
+        const SECOND_POLICY_ID = 'policy_2';
+        const duplicateKeyWarningMessage = 'Encountered two children with the same key';
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        try {
+            await Onyx.set(ONYXKEYS.SESSION, {email: 'admin@example.com', accountID: ADMIN_ACCOUNT_ID});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, {
+                id: POLICY_ID,
+                name: 'Workspace One',
+                role: CONST.POLICY.ROLE.ADMIN,
+                type: CONST.POLICY.TYPE.TEAM,
+                isPolicyExpenseChatEnabled: true,
+                achAccount: {
+                    bankAccountID: LOCKED_BANK_ACCOUNT_ID,
+                    accountNumber: 'XXXXXXXX1234',
+                    routingNumber: '123456789',
+                    addressName: 'Test Bank',
+                    bankName: 'Test Bank',
+                    reimburser: 'admin@example.com',
+                    state: CONST.BANK_ACCOUNT.STATE.LOCKED,
+                },
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${SECOND_POLICY_ID}`, {
+                id: SECOND_POLICY_ID,
+                name: 'Workspace Two',
+                role: CONST.POLICY.ROLE.ADMIN,
+                type: CONST.POLICY.TYPE.TEAM,
+                isPolicyExpenseChatEnabled: true,
+                achAccount: {
+                    bankAccountID: LOCKED_BANK_ACCOUNT_ID,
+                    accountNumber: 'XXXXXXXX5678',
+                    routingNumber: '987654321',
+                    addressName: 'Another Bank',
+                    bankName: 'Another Bank',
+                    reimburser: 'admin@example.com',
+                    state: CONST.BANK_ACCOUNT.STATE.LOCKED,
+                },
+            });
+            await waitForBatchedUpdates();
+
+            renderTimeSensitiveSection();
+
+            const widgets = screen.getAllByText('homePage.timeSensitiveSection.unlockBankAccount.workspaceTitle');
+            expect(widgets).toHaveLength(2);
+
+            const duplicateKeyWarnings = consoleErrorSpy.mock.calls.flat().filter((arg) => typeof arg === 'string' && arg.includes(duplicateKeyWarningMessage));
+            expect(duplicateKeyWarnings).toHaveLength(0);
+        } finally {
+            consoleErrorSpy.mockRestore();
+        }
+    });
+
     it('calls pressLockedBankAccount and navigates to Concierge when CTA is pressed', async () => {
         await Onyx.set(ONYXKEYS.SESSION, {email: 'admin@example.com', accountID: ADMIN_ACCOUNT_ID});
         await Onyx.set(ONYXKEYS.CONCIERGE_REPORT_ID, CONCIERGE_REPORT_ID);
