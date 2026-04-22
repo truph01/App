@@ -188,14 +188,21 @@ type UberReceiptPartner = {
     errorFields?: OnyxCommon.ErrorFields;
 };
 
-/** Policy Receipt partners */
-type ReceiptPartners = OnyxCommon.OnyxValueWithOfflineFeedback<{
-    /** Whether receipt partners are enabled */
-    enabled?: boolean;
-
+/** Mapping of receipt partner name to its payload shape */
+type ReceiptPartnerPayloads = {
     /** uber partner */
-    [CONST.POLICY.RECEIPT_PARTNERS.NAME.UBER]: OnyxCommon.OnyxValueWithOfflineFeedback<UberReceiptPartner>;
-}>;
+    [CONST.POLICY.RECEIPT_PARTNERS.NAME.UBER]: UberReceiptPartner;
+};
+
+/** Policy Receipt partners */
+type ReceiptPartners = OnyxCommon.OnyxValueWithOfflineFeedback<
+    {
+        /** Whether receipt partners are enabled */
+        enabled?: boolean;
+    } & {
+        [K in keyof ReceiptPartnerPayloads]?: OnyxCommon.OnyxValueWithOfflineFeedback<ReceiptPartnerPayloads[K]>;
+    }
+>;
 
 /** Policy disabled fields */
 type DisabledFields = {

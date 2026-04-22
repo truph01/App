@@ -331,7 +331,7 @@ function WorkspaceReceiptPartnersPage({route}: WorkspaceReceiptPartnersPageProps
                                             <OfflineWithFeedback pendingAction={integrations?.uber?.pendingFields?.centralBillingAccountEmail}>
                                                 <MenuItemWithTopDescription
                                                     description={translate('workspace.receiptPartners.uber.centralBillingAccount')}
-                                                    title={integrations.uber.centralBillingAccountEmail}
+                                                    title={integrations?.uber?.centralBillingAccountEmail}
                                                     shouldShowRightIcon
                                                     style={[styles.sectionMenuItemTopDescription, styles.mt5]}
                                                     onPress={() =>
