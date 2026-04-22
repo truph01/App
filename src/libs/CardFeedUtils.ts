@@ -77,9 +77,14 @@ function getCardFeedKey(workspaceCardFeeds: Record<string, WorkspaceCardsList | 
     if (!representativeCard) {
         return;
     }
-    const {fundID, bank} = representativeCard;
-    const feedCountry = getFeedCountryForDisplay(representativeCard);
-    return createCardFeedKey(fundID, bank, feedCountry);
+    // Auth emits `cards_<fundID>_<bank>` for every feed, and only Travel Invoicing (Expensify Card
+    // with feedCountry TRAVEL_US) gets the 3-segment `cards_<fundID>_Expensify Card_TRAVEL_US`
+    // (see Auth/auth/lib/Card.cpp `buildCardsCollectionKey`). Stripping the `cards_` prefix returns
+    // the exact token that `getWorkspaceCardFeedKey` re-prefixes to look the bucket back up, so the
+    // round-trip holds for every bank.
+    return workspaceFeedKey.startsWith(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST)
+        ? workspaceFeedKey.slice(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST.length)
+        : workspaceFeedKey;
 }
 
 /**
