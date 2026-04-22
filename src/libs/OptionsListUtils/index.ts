@@ -190,6 +190,7 @@ import type {
 } from '@src/types/onyx';
 import type {Attendee, Participant} from '@src/types/onyx/IOU';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import {doesPersonalDetailMatchSearchTerm, getCurrentUserSearchTerms, getPersonalDetailSearchTerms} from './searchMatchUtils';
 import type {
     FilterUserToInviteConfig,
     GetOptionsConfig,
@@ -2279,10 +2280,9 @@ function prepareReportOptionsForDisplay(
     currentUserAccountID: number,
     config: GetValidReportsConfig,
     conciergeReportID: string | undefined,
+    sortedActions: Record<string, ReportAction[]> | undefined,
     visibleReportActionsData: VisibleReportActionsDerivedValue = {},
     reportAttributesDerived?: ReportAttributesDerivedValue['reports'],
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    sortedActions: Record<string, ReportAction[]> = deprecatedAllSortedReportActions,
     policyTags?: OnyxCollection<PolicyTagLists>,
 ): Array<SearchOption<Report>> {
     const {
@@ -2336,7 +2336,7 @@ function prepareReportOptionsForDisplay(
             const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`];
             const oneTransactionThreadReportID =
                 report.type === CONST.REPORT.TYPE.IOU || report.type === CONST.REPORT.TYPE.EXPENSE || report.type === CONST.REPORT.TYPE.INVOICE
-                    ? getOneTransactionThreadReportID(report, chatReport, sortedActions[report.reportID])
+                    ? getOneTransactionThreadReportID(report, chatReport, sortedActions?.[report.reportID])
                     : undefined;
             const oneTransactionThreadReport = oneTransactionThreadReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`] : undefined;
 
@@ -2346,11 +2346,11 @@ function prepareReportOptionsForDisplay(
         let lastIOUCreationDate;
         // Add a field to sort the recent reports by the time of last IOU request for create actions
         if (preferRecentExpenseReports) {
-            const reportPreviewAction = sortedActions[option.reportID]?.find((reportAction) => isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW));
+            const reportPreviewAction = sortedActions?.[option.reportID]?.find((reportAction) => isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW));
 
             if (reportPreviewAction) {
                 const iouReportID = getIOUReportIDFromReportActionPreview(reportPreviewAction);
-                const iouReportActions = iouReportID ? (sortedActions[iouReportID] ?? []) : [];
+                const iouReportActions = iouReportID ? (sortedActions?.[iouReportID] ?? []) : [];
                 const lastIOUAction = iouReportActions.find((iouAction) => iouAction.actionName === CONST.REPORT.ACTIONS.TYPE.IOU);
                 if (lastIOUAction) {
                     lastIOUCreationDate = lastIOUAction.lastModified;
@@ -2577,9 +2577,9 @@ function getValidOptions(
                     personalDetails,
                 },
                 conciergeReportID,
+                sortedActions,
                 visibleReportActionsData,
                 reportAttributesDerived,
-                sortedActions,
                 allPolicyTags,
             ).at(0);
         }
@@ -2601,9 +2601,9 @@ function getValidOptions(
                 personalDetails,
             },
             conciergeReportID,
+            sortedActions,
             visibleReportActionsData,
             reportAttributesDerived,
-            sortedActions,
             allPolicyTags,
         );
 
@@ -2621,9 +2621,9 @@ function getValidOptions(
                 personalDetails,
             },
             conciergeReportID,
+            sortedActions,
             visibleReportActionsData,
             reportAttributesDerived,
-            sortedActions,
             allPolicyTags,
         );
     } else if (recentAttendees && recentAttendees?.length > 0) {
@@ -2672,10 +2672,12 @@ function getValidOptions(
             if (personalDetailLoginsToExclude[personalDetail.login]) {
                 return false;
             }
-            const personalDetailSearchTerms = getPersonalDetailSearchTerms(personalDetail, currentUserAccountID);
-            const searchText = deburr(`${personalDetailSearchTerms.join(' ')} ${personalDetail.text ?? ''}`.toLocaleLowerCase());
-
-            return searchTerms.every((term) => searchText.includes(term));
+            return searchTerms.every((term) =>
+                doesPersonalDetailMatchSearchTerm(personalDetail, currentUserAccountID, term, {
+                    useLocaleLowerCase: true,
+                    transformSearchText: (concatenatedSearchTerms) => deburr(`${concatenatedSearchTerms} ${(personalDetail.text ?? '').toLocaleLowerCase()}`),
+                }),
+            );
         };
 
         // when we expect that function return eg. 50 elements and we already found 40 recent reports, we should adjust the max personal details number.
@@ -2755,6 +2757,8 @@ type SearchOptionsConfig = {
     personalDetails?: OnyxEntry<PersonalDetailsList>;
     reportAttributesDerived?: ReportAttributesDerivedValue['reports'];
     allPolicyTags?: OnyxCollection<PolicyTagLists>;
+    sortedActions: Record<string, ReportAction[]> | undefined;
+    conciergeReportID: string | undefined;
 };
 
 /**
@@ -2783,9 +2787,10 @@ function getSearchOptions({
     reportAttributesDerived,
     personalDetails,
     allPolicyTags,
+    sortedActions,
+    conciergeReportID,
 }: SearchOptionsConfig): Options {
-    // TODO: We'll pass the conciergeReportID eventually. Refactor issue: https://github.com/Expensify/App/issues/66411
-    const optionList = getValidOptions(options, policyCollection, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, undefined, {
+    const optionList = getValidOptions(options, policyCollection, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
         betas,
         includeRecentReports,
         includeMultipleParticipantReports: true,
@@ -2810,6 +2815,7 @@ function getSearchOptions({
         visibleReportActionsData,
         reportAttributesDerived,
         allPolicyTags,
+        sortedActions,
     });
 
     return optionList;
@@ -2863,6 +2869,7 @@ function getFilteredRecentAttendees(
     // Deduplicate recentAttendees: use email for regular users, displayName for name-only attendees
     const seenAttendees = new Set<string>();
     const deduplicatedRecentAttendees = recentAttendees.filter((attendee) => {
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         const key = attendee.email || attendee.displayName || '';
         if (seenAttendees.has(key)) {
             return false;
@@ -3012,7 +3019,7 @@ function formatSectionsFromSearchTerm(
     // This will add them to the list of options, deduping them if they already exist in the other lists
     const selectedParticipantsWithoutDetails = selectedOptions.filter((participant) => {
         const accountID = participant.accountID ?? null;
-        const isPartOfSearchTerm = getPersonalDetailSearchTerms(participant, currentUserAccountID).join(' ').toLowerCase().includes(cleanSearchTerm);
+        const isPartOfSearchTerm = doesPersonalDetailMatchSearchTerm(participant, currentUserAccountID, cleanSearchTerm);
         const isReportInRecentReports = filteredRecentReports.some((report) => report.accountID === accountID) || filteredWorkspaceChats.some((report) => report.accountID === accountID);
         const isReportInPersonalDetails = filteredPersonalDetails.some((personalDetail) => personalDetail.accountID === accountID);
 
@@ -3038,18 +3045,6 @@ function formatSectionsFromSearchTerm(
                 : selectedParticipantsWithoutDetails,
         },
     };
-}
-
-function getPersonalDetailSearchTerms(item: Partial<SearchOptionData>, currentUserAccountID: number) {
-    if (item.accountID === currentUserAccountID) {
-        return getCurrentUserSearchTerms(item);
-    }
-    return [item.participantsList?.[0]?.displayName ?? item.displayName ?? '', item.login ?? '', item.login?.replace(CONST.EMAIL_SEARCH_REGEX, '') ?? ''];
-}
-
-function getCurrentUserSearchTerms(item: Partial<SearchOptionData>) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    return [item.text ?? item.displayName ?? '', item.login ?? '', item.login?.replace(CONST.EMAIL_SEARCH_REGEX, '') ?? '', translateLocal('common.you'), translateLocal('common.me')];
 }
 
 /**
@@ -3433,18 +3428,14 @@ export {
     createFilteredOptionList,
     createOption,
     filterAndOrderOptions,
-    filterOptions,
     filterReports,
     filterSelectedOptions,
     filterSelfDMChat,
-    filterUserToInvite,
     filterWorkspaceChats,
-    filteredPersonalDetailsOfRecentReports,
     formatMemberForList,
     formatSectionsFromSearchTerm,
     getAlternateText,
     getFilteredRecentAttendees,
-    getCurrentUserSearchTerms,
     getEmptyOptions,
     getHeaderMessage,
     getHeaderMessageForNonUserList,
@@ -3456,7 +3447,6 @@ export {
     getLastMessageTextForReport,
     getManagerMcTestParticipant,
     getParticipantsOption,
-    getPersonalDetailSearchTerms,
     getPersonalDetailsForAccountIDs,
     getPolicyExpenseReportOption,
     getReportDisplayOption,
@@ -3472,13 +3462,9 @@ export {
     isDisablingOrDeletingLastEnabledTag,
     isMakingLastRequiredTagListOptional,
     isPersonalDetailsReady,
-    isSearchStringMatch,
     isSearchStringMatchUserDetails,
     optionsOrderBy,
     orderOptions,
-    orderPersonalDetailsOptions,
-    orderReportOptions,
-    orderReportOptionsWithSearch,
     orderWorkspaceOptions,
     processReport,
     recentReportComparator,
