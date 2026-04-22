@@ -18,7 +18,7 @@ import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useDefaultFundID from '@hooks/useDefaultFundID';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
+
 import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {updateExpensifyCardLimitType} from '@libs/actions/Card';
@@ -51,7 +51,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
     const styles = useThemeStyles();
 
     const formRef = useRef<FormRef | null>(null);
-    const {isBetaEnabled} = usePermissions();
+
     const policy = usePolicy(policyID);
     const defaultFundID = useDefaultFundID(policyID);
     const [cardsList] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${defaultFundID}_${CONST.EXPENSIFY_CARD.BANK}`, {selector: filterInactiveCards});
@@ -210,7 +210,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
             });
         }
         return options;
-    }, [areApprovalsConfigured, translate, typeSelected, shouldShowFixedOption, card?.nameValuePairs?.isVirtual, isBetaEnabled]);
+    }, [areApprovalsConfigured, translate, typeSelected, shouldShowFixedOption, card?.nameValuePairs?.isVirtual]);
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_LIMIT_TYPE_FORM>) => {
         if (!expirationToggle) {
