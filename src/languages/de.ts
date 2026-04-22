@@ -969,6 +969,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             validateAccount: {title: 'Bestätigen Sie Ihr Konto, um Expensify weiter zu verwenden', subtitle: 'Konto', cta: 'Bestätigen'},
             fixFailedBilling: {title: 'Wir konnten Ihre hinterlegte Karte nicht belasten', subtitle: 'Abonnement'},
+            unlockBankAccount: {workspaceTitle: 'Ihr Geschäftskonto wurde gesperrt', personalTitle: 'Ihr Bankkonto wurde gesperrt', personalSubtitle: 'Geldbörse'},
         },
         assignedCards: 'Ihre Expensify Karten',
         assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} verbleibend`,
