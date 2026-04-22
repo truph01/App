@@ -1,0 +1,25 @@
+# @desc   Open Create Expense from the FAB, enter an amount on the Manual tab, fill the Merchant field, and submit. Exercises the full submit-chain Sentry spans end-to-end. Assumes a workspace where Category is not required.
+# @pre    role="button" label="Open actions menu"
+# @post   text="Reports"
+# @post   role="button" label="Expenses"
+# @param  amount=22
+# @param  merchant=Test Coffee
+# @tag    iou
+# @tag    navigation
+# @tag    perf
+# @span   ManualCreateExpenseSubmit
+# @span   ManualSubmitToDestinationVisible
+# @span   ManualCreateExpenseServerResponse
+# @span   ManualConfirmationMount
+# @span   ManualConfirmationListReady
+# @span   ManualConfirmationReceiptLoad
+# @span   ManualGeolocationWait
+press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
+press "role=\"button\" label=\"Create expense\" || label=\"Create expense\""
+press "role=\"group\" label=\"Manual\" || label=\"Manual\""
+fill "role=\"text-field\" editable=true || editable=true" "22"
+press "role=\"button\" label=\"Next\" || label=\"Next\""
+press "role=\"button\" label=\"Merchant\" || label=\"Merchant\""
+fill "role=\"text-field\" label=\"Merchant,\" editable=true || label=\"Merchant,\" editable=true" "Test Coffee"
+press "role=\"button\" label=\"Save\" || label=\"Save\""
+find "Create" "click"

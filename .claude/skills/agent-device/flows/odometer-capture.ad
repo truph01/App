@@ -1,0 +1,11 @@
+# @desc   Open Create Expense, switch to Track Distance, capture start and end odometer photos. Navigation-only flow; no telemetry spans are emitted. Requires a policy with Distance IOU enabled and camera permission granted.
+# @pre    text="Inbox"
+# @pre    role="button" label="Open actions menu"
+# @post   role="button" label="Back"
+# @tag    iou
+# @tag    distance
+find "Inbox" "click"
+press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
+press "role=\"button\" label=\"Track distance\" || label=\"Track distance\""
+press "role=\"button\" label=\"shutter\" || label=\"shutter\""
+press "role=\"button\" label=\"shutter\" || label=\"shutter\""

@@ -1,0 +1,10 @@
+# @desc   Tap Submit/Confirm on the IOU confirmation page. Triggers ManualCreateExpenseSubmit, ManualSubmitToDestinationVisible, and ManualCreateExpenseServerResponse. If the device has location permission granted, ManualGeolocationWait fires as a child of Submit. Requires being on the confirmation page already (chain after a Create Expense flow).
+# @pre    role="button" label="Confirm"
+# @post   role="button" label="Open actions menu"
+# @tag    iou
+# @tag    perf
+# @span   ManualCreateExpenseSubmit
+# @span   ManualSubmitToDestinationVisible
+# @span   ManualCreateExpenseServerResponse
+# @span   ManualGeolocationWait
+press "role=\"button\" label=\"Confirm\" || role=\"button\" label=\"Submit\" || label=\"Confirm\" || label=\"Submit\""
