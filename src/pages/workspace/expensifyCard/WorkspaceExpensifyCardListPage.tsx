@@ -216,8 +216,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                         isSplitButton={false}
                         shouldAlwaysShowDropdownMenu
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_EXPENSIFY_CARD.BULK_ACTIONS_DROPDOWN}
-                        style={shouldChangeLayout && styles.flex1}
-                        wrapperStyle={styles.flexGrow1}
+                        wrapperStyle={[styles.flexGrow1, shouldChangeLayout && styles.flexShrink1]}
                     />
                 </View>
             );
