@@ -3,7 +3,7 @@ import ValidateCodeActionContent from '@components/ValidateCodeActionModal/Valid
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import {clearContactMethodErrors, requestValidateCodeAction, setContactMethodAsDefault} from '@libs/actions/User';
+import {clearContactMethodErrors, requestValidateCodeAction, resetValidateActionCodeSent, setContactMethodAsDefault} from '@libs/actions/User';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -51,6 +51,7 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
                 clearContactMethodErrors(contactMethod, 'defaultLogin');
             }}
             onClose={() => {
+                resetValidateActionCodeSent();
                 Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHOD_DETAILS.getRoute(contactMethod, backTo));
             }}
         />
