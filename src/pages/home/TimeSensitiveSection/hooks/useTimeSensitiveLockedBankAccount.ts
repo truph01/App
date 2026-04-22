@@ -41,7 +41,7 @@ function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) 
         });
     }
 
-    for (const account of Object.values(bankAccountList)) {
+    for (const account of Object.values(bankAccountList ?? {})) {
         const {bankAccountID, state, type} = account?.accountData ?? {};
         const isPersonalAccount = type === undefined || type === CONST.BANK_ACCOUNT.TYPE.PERSONAL;
 
