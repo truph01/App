@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import type {View} from 'react-native';
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import CONST from '@src/CONST';

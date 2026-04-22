@@ -3,6 +3,7 @@ import lodashPick from 'lodash/pick';
 import React, {memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
 import type {Ref} from 'react';
 import type {GestureResponderEvent} from 'react-native';
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
 import Button from '@components/Button';
