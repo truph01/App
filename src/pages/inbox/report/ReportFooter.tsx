@@ -172,11 +172,13 @@ function ReportFooter() {
         );
     }
 
-    // No specific fallback matched but the user can't write (e.g. backend returned a non-empty
-    // permissions array without "write"). Show a neutral banner so the user isn't left with an
-    // empty footer and no explanation. Mobile keyboard-dismiss hides the composer with
-    // canPerformWriteAction=true, which stays on the null return.
-    if (shouldHideComposer) {
+    // Permissions-based lockout: the report's permissions array is non-empty and excludes both
+    // "write" and "auditor" (e.g. "read" only via Report::inviteToRoom, donor-matching shares,
+    // anonymous access to public rooms). Render a neutral banner so the user isn't left with an
+    // empty footer. Other reasons the composer is hidden (creation errorFields, money-request
+    // pending deletion, mobile keyboard dismiss) fall through to null so their more specific
+    // indicators keep priority.
+    if (!canWriteInReport) {
         return (
             <View style={[styles.chatFooter, styles.mt4, shouldUseNarrowLayout && styles.mb5]}>
                 <Banner
