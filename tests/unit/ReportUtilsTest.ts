@@ -14564,6 +14564,7 @@ describe('ReportUtils', () => {
                 transaction: undefined,
                 currentUserAccountID,
                 currentUserEmail,
+                currentUserLocalCurrency: '',
             });
 
             expect(Navigation.navigate).not.toHaveBeenCalled();
@@ -14604,6 +14605,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should navigate to the restricted action page
@@ -14640,6 +14642,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should navigate to the restricted action page
@@ -14680,6 +14683,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should navigate to the category step
@@ -14722,6 +14726,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should automatically pick the available policy and navigate to the category step
@@ -14751,6 +14756,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should navigate to the upgrade page because no policies were found to categorize with
@@ -14801,6 +14807,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should navigate to the upgrade page because it's ambiguous which policy to use
@@ -14847,6 +14854,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should log a warning and not navigate
@@ -14893,6 +14901,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should NOT navigate to restricted action page, but to category step
@@ -14931,6 +14940,7 @@ describe('ReportUtils', () => {
                     transaction,
                     currentUserAccountID,
                     currentUserEmail,
+                    currentUserLocalCurrency: '',
                 });
 
                 // Then it should navigate to restricted action page

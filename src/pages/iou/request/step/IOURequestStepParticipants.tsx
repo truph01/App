@@ -344,6 +344,10 @@ function IOURequestStepParticipants({
                     generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
                     currentUserPersonalDetails.accountID,
                     email,
+                    '',
+                    false,
+                    undefined,
+                    currentUserPersonalDetails.localCurrencyCode ?? '',
                 );
                 for (const transaction of draftTransactions) {
                     setMoneyRequestParticipants(transaction.transactionID, [

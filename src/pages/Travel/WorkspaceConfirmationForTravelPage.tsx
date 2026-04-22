@@ -38,7 +38,7 @@ function WorkspaceConfirmationForTravelPage({route}: WorkspaceConfirmationForTra
             '',
             false,
             params.policyID,
-            params.currency,
+            params.currency || (currentUserPersonalDetails.localCurrencyCode ?? ''),
             params.avatarFile as File,
         );
         createWorkspace({

@@ -166,6 +166,7 @@ function ChatActionableButtons({action, report, originalReport, reportID, origin
                 transaction: trackExpenseTransaction,
                 currentUserAccountID: personalDetail.accountID,
                 currentUserEmail: personalDetail.email ?? '',
+                currentUserLocalCurrency: personalDetail.localCurrencyCode ?? '',
             };
             const TRACK_EXPENSE_ACTIONS = {
                 submit: CONST.IOU.ACTION.SUBMIT,

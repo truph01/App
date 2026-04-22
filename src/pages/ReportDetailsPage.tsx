@@ -476,6 +476,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                         transaction: iouTransaction,
                         currentUserAccountID: currentUserPersonalDetails.accountID,
                         currentUserEmail: currentUserPersonalDetails.email ?? '',
+                        currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? '',
                     });
                 },
             });
@@ -500,6 +501,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             transaction: iouTransaction,
                             currentUserAccountID: currentUserPersonalDetails.accountID,
                             currentUserEmail: currentUserPersonalDetails.email ?? '',
+                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? '',
                         });
                     },
                 });
@@ -523,6 +525,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             transaction: iouTransaction,
                             currentUserAccountID: currentUserPersonalDetails.accountID,
                             currentUserEmail: currentUserPersonalDetails.email ?? '',
+                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? '',
                         });
                     },
                 });
