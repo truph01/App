@@ -74,6 +74,7 @@ import {
     getReportActionMessage as getReportActionMessageFromActionsUtils,
     getReportActionMessageText,
     getReportActionText,
+    getRequireCompanyCardsEnabledMessage,
     getSettlementAccountLockedMessage,
     getSubmitsToUpdateMessage,
     getTravelUpdateMessage,
@@ -569,6 +570,9 @@ function computeReportNameBasedOnReportAction(
     }
     if (isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_IS_ATTENDEE_TRACKING_ENABLED)) {
         return getWorkspaceAttendeeTrackingUpdateMessage(translate, parentReportAction);
+    }
+    if (isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_REQUIRE_COMPANY_CARDS_ENABLED)) {
+        return getRequireCompanyCardsEnabledMessage(translate, parentReportAction);
     }
     if (isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_AUTO_PAY_APPROVED_REPORTS_ENABLED)) {
         return getAutoPayApprovedReportsEnabledMessage(translate, parentReportAction);
