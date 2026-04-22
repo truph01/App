@@ -969,7 +969,12 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             validateAccount: {title: 'Zweryfikuj swoje konto, aby dalej korzystać z Expensify', subtitle: 'Konto', cta: 'Zatwierdź'},
             fixFailedBilling: {title: 'Nie mogliśmy obciążyć zapisanej karty', subtitle: 'Subskrypcja'},
-            unlockBankAccount: {workspaceTitle: 'Twoje firmowe konto bankowe zostało zablokowane', personalTitle: 'Twoje konto bankowe zostało zablokowane', personalSubtitle: 'Portfel'},
+            unlockBankAccount: {
+                workspaceTitle: 'Twoje firmowe konto bankowe zostało zablokowane',
+                personalTitle: 'Twoje konto bankowe zostało zablokowane',
+                workspaceSubtitle: ({policyName}: {policyName: string}) => policyName,
+                personalSubtitle: 'Portfel',
+            },
         },
         assignedCards: 'Twoje Karty Expensify',
         assignedCardsRemaining: ({amount}: {amount: string}) => `Pozostało ${amount}`,

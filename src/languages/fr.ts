@@ -975,6 +975,7 @@ const translations: TranslationDeepObject<typeof en> = {
             unlockBankAccount: {
                 workspaceTitle: 'Votre compte bancaire professionnel a été verrouillé',
                 personalTitle: 'Votre compte bancaire a été verrouillé',
+                workspaceSubtitle: ({policyName}: {policyName: string}) => policyName,
                 personalSubtitle: 'Portefeuille',
             },
         },

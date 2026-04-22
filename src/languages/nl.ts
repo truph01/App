@@ -968,7 +968,12 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             validateAccount: {title: 'Valideer je account om Expensify te blijven gebruiken', subtitle: 'Account', cta: 'Valideren'},
             fixFailedBilling: {title: 'We konden je kaart in ons bestand niet belasten', subtitle: 'Abonnement'},
-            unlockBankAccount: {workspaceTitle: 'Je zakelijke bankrekening is geblokkeerd', personalTitle: 'Je bankrekening is vergrendeld', personalSubtitle: 'Portemonnee'},
+            unlockBankAccount: {
+                workspaceTitle: 'Je zakelijke bankrekening is geblokkeerd',
+                personalTitle: 'Je bankrekening is vergrendeld',
+                workspaceSubtitle: ({policyName}: {policyName: string}) => policyName,
+                personalSubtitle: 'Portemonnee',
+            },
         },
         assignedCards: 'Je Expensify Kaarten',
         assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} resterend`,

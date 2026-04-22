@@ -967,7 +967,12 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             validateAccount: {title: 'Valide sua conta para continuar usando o Expensify', subtitle: 'Conta', cta: 'Validar'},
             fixFailedBilling: {title: 'Não foi possível cobrar o cartão cadastrado', subtitle: 'Assinatura'},
-            unlockBankAccount: {workspaceTitle: 'Sua conta bancária comercial foi bloqueada', personalTitle: 'Sua conta bancária foi bloqueada', personalSubtitle: 'Carteira'},
+            unlockBankAccount: {
+                workspaceTitle: 'Sua conta bancária comercial foi bloqueada',
+                personalTitle: 'Sua conta bancária foi bloqueada',
+                workspaceSubtitle: ({policyName}: {policyName: string}) => policyName,
+                personalSubtitle: 'Carteira',
+            },
         },
         assignedCards: 'Seus Cartões Expensify',
         assignedCardsRemaining: ({amount}: {amount: string}) => `${amount} restante`,

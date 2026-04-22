@@ -935,7 +935,12 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             validateAccount: {title: '验证您的账户以继续使用 Expensify', subtitle: '账户', cta: '验证'},
             fixFailedBilling: {title: '我们无法向您档案中的银行卡收费', subtitle: '订阅'},
-            unlockBankAccount: {workspaceTitle: '您的企业银行账户已被锁定', personalTitle: '您的银行账户已被锁定', personalSubtitle: '钱包'},
+            unlockBankAccount: {
+                workspaceTitle: '您的企业银行账户已被锁定',
+                personalTitle: '您的银行账户已被锁定',
+                workspaceSubtitle: ({policyName}: {policyName: string}) => policyName,
+                personalSubtitle: '钱包',
+            },
         },
         assignedCards: '你的 Expensify 卡',
         assignedCardsRemaining: ({amount}: {amount: string}) => `剩余 ${amount}`,
