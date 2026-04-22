@@ -73,6 +73,7 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
 
     beforeEach(async () => {
         await Onyx.clear();
+        await Onyx.set(ONYXKEYS.ACCOUNT, {primaryLogin: 'admin@example.com'});
         await waitForBatchedUpdates();
     });
 
@@ -110,6 +111,7 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
                 accountData: {
                     bankAccountID: LOCKED_BANK_ACCOUNT_ID,
                     state: CONST.BANK_ACCOUNT.STATE.LOCKED,
+                    type: CONST.BANK_ACCOUNT.TYPE.PERSONAL,
                 },
             },
         });
@@ -118,6 +120,26 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
         renderTimeSensitiveSection();
 
         expect(screen.getByText('homePage.timeSensitiveSection.unlockBankAccount.personalTitle')).toBeTruthy();
+    });
+
+    it('does NOT render personal UnlockBankAccount for locked business bank accounts', async () => {
+        await Onyx.set(ONYXKEYS.SESSION, {email: 'admin@example.com', accountID: ADMIN_ACCOUNT_ID});
+        await Onyx.set(ONYXKEYS.BANK_ACCOUNT_LIST, {
+            [`bankAccount-${LOCKED_BANK_ACCOUNT_ID}`]: {
+                bankCurrency: 'USD',
+                bankCountry: 'US',
+                accountData: {
+                    bankAccountID: LOCKED_BANK_ACCOUNT_ID,
+                    state: CONST.BANK_ACCOUNT.STATE.LOCKED,
+                    type: CONST.BANK_ACCOUNT.TYPE.BUSINESS,
+                },
+            },
+        });
+        await waitForBatchedUpdates();
+
+        renderTimeSensitiveSection();
+
+        expect(screen.queryByText('homePage.timeSensitiveSection.unlockBankAccount.personalTitle')).toBeNull();
     });
 
     it('does NOT render UnlockBankAccount when bank account state is OPEN', async () => {
