@@ -202,8 +202,8 @@ function WalletPage() {
             resetPersonalBankAccountForUpdate(
                 accountData.bankAccountID,
                 {
-                    legalFirstName: additionalData?.firstName,
-                    legalLastName: additionalData?.lastName,
+                    legalFirstName: additionalData?.firstName ?? additionalData?.legalFirstName,
+                    legalLastName: additionalData?.lastName ?? additionalData?.legalLastName,
                     addressStreet: street1,
                     addressStreet2: street2 ?? '',
                     addressCity: additionalData?.addressCity,

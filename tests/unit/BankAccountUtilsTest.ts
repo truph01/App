@@ -140,6 +140,75 @@ describe('BankAccountUtils', () => {
         it('returns false when all info is present', () => {
             expect(isPersonalBankAccountMissingInfo(completeAccountData)).toBe(false);
         });
+
+        describe('NewDot legalFirstName/legalLastName naming convention', () => {
+            it('returns false when legalFirstName/legalLastName are set (NewDot) and firstName/lastName are missing', () => {
+                const accountData = {
+                    ...completeAccountData,
+                    additionalData: {
+                        ...completeAccountData.additionalData,
+                        firstName: undefined,
+                        lastName: undefined,
+                        legalFirstName: 'John',
+                        legalLastName: 'Doe',
+                    },
+                } as AccountData;
+                expect(isPersonalBankAccountMissingInfo(accountData)).toBe(false);
+            });
+
+            it('returns true when only legalFirstName is set (lastName missing from both conventions)', () => {
+                const accountData = {
+                    ...completeAccountData,
+                    additionalData: {
+                        ...completeAccountData.additionalData,
+                        firstName: undefined,
+                        lastName: undefined,
+                        legalFirstName: 'John',
+                    },
+                } as AccountData;
+                expect(isPersonalBankAccountMissingInfo(accountData)).toBe(true);
+            });
+
+            it('returns true when only legalLastName is set (firstName missing from both conventions)', () => {
+                const accountData = {
+                    ...completeAccountData,
+                    additionalData: {
+                        ...completeAccountData.additionalData,
+                        firstName: undefined,
+                        lastName: undefined,
+                        legalLastName: 'Doe',
+                    },
+                } as AccountData;
+                expect(isPersonalBankAccountMissingInfo(accountData)).toBe(true);
+            });
+
+            it('returns true when firstName + legalLastName cross-convention (no complete pair)', () => {
+                const accountData = {
+                    ...completeAccountData,
+                    additionalData: {
+                        ...completeAccountData.additionalData,
+                        firstName: 'John',
+                        lastName: undefined,
+                        legalLastName: 'Doe',
+                    },
+                } as AccountData;
+                expect(isPersonalBankAccountMissingInfo(accountData)).toBe(true);
+            });
+
+            it('returns false when both naming conventions have complete pairs', () => {
+                const accountData = {
+                    ...completeAccountData,
+                    additionalData: {
+                        ...completeAccountData.additionalData,
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        legalFirstName: 'John',
+                        legalLastName: 'Doe',
+                    },
+                } as AccountData;
+                expect(isPersonalBankAccountMissingInfo(accountData)).toBe(false);
+            });
+        });
     });
 
     describe('getLastFourDigits', () => {
@@ -282,6 +351,30 @@ describe('BankAccountUtils', () => {
         it('returns false for undefined bank account list', () => {
             expect(hasPersonalBankAccountMissingInfo(undefined)).toBe(false);
         });
+
+        it('returns false when account uses NewDot legalFirstName/legalLastName naming', () => {
+            const bankAccountList = {
+                accountOne: {
+                    accountData: {
+                        type: CONST.BANK_ACCOUNT.TYPE.PERSONAL,
+                        state: CONST.BANK_ACCOUNT.STATE.OPEN,
+                        additionalData: {
+                            country: CONST.COUNTRY.US,
+                            legalFirstName: 'John',
+                            legalLastName: 'Doe',
+                            addressStreet: '123 Main St',
+                            addressCity: 'New York',
+                            addressState: 'NY',
+                            addressZipCode: '10001',
+                            companyPhone: '+15551234567',
+                        },
+                    },
+                    bankCurrency: 'USD',
+                    bankCountry: 'US',
+                },
+            } as unknown as BankAccountList;
+            expect(hasPersonalBankAccountMissingInfo(bankAccountList)).toBe(false);
+        });
     });
 
     describe('getCompletedStepsForBankAccount', () => {
@@ -372,6 +465,20 @@ describe('BankAccountUtils', () => {
                     bankCurrency: 'USD',
                     bankCountry: 'US',
                 },
+            } as unknown as BankAccountList;
+            expect(getCompletedStepsForBankAccount(bankAccountList, bankAccountID)).toEqual([]);
+        });
+
+        it('includes NAME step when only NewDot legalFirstName/legalLastName are present', () => {
+            const bankAccountList = {
+                [bankAccountKey]: {accountData: {additionalData: {legalFirstName: 'John', legalLastName: 'Doe'}}, bankCurrency: 'USD', bankCountry: 'US'},
+            } as unknown as BankAccountList;
+            expect(getCompletedStepsForBankAccount(bankAccountList, bankAccountID)).toEqual([PERSONAL_INFO_STEP.NAME]);
+        });
+
+        it('does not include NAME when only legalFirstName is present (legalLastName missing)', () => {
+            const bankAccountList = {
+                [bankAccountKey]: {accountData: {additionalData: {legalFirstName: 'John'}}, bankCurrency: 'USD', bankCountry: 'US'},
             } as unknown as BankAccountList;
             expect(getCompletedStepsForBankAccount(bankAccountList, bankAccountID)).toEqual([]);
         });

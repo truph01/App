@@ -127,8 +127,8 @@ function UpdatePersonalBankAccountPage() {
         const existingData = bankAccountList?.[String(personalBankAccount.bankAccountID)]?.accountData?.additionalData;
         const currentAddress = getCurrentAddress(privatePersonalDetails);
 
-        const legalFirstName = personalBankAccountDraft?.legalFirstName ?? privatePersonalDetails?.legalFirstName ?? existingData?.firstName ?? '';
-        const legalLastName = personalBankAccountDraft?.legalLastName ?? privatePersonalDetails?.legalLastName ?? existingData?.lastName ?? '';
+        const legalFirstName = personalBankAccountDraft?.legalFirstName ?? privatePersonalDetails?.legalFirstName ?? existingData?.firstName ?? existingData?.legalFirstName ?? '';
+        const legalLastName = personalBankAccountDraft?.legalLastName ?? privatePersonalDetails?.legalLastName ?? existingData?.lastName ?? existingData?.legalLastName ?? '';
 
         // Use a single complete source to avoid mixing partial data across sources.
         let addressStreet: string;
