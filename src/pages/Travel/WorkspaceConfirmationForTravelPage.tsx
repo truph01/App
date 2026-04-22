@@ -10,6 +10,7 @@ import useOnyx from '@hooks/useOnyx';
 import {createDraftWorkspace, createWorkspace} from '@libs/actions/Policy/Policy';
 import Navigation from '@libs/Navigation/Navigation';
 import type {TravelNavigatorParamList} from '@libs/Navigation/types';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -38,7 +39,7 @@ function WorkspaceConfirmationForTravelPage({route}: WorkspaceConfirmationForTra
             '',
             false,
             params.policyID,
-            params.currency || (currentUserPersonalDetails.localCurrencyCode ?? ''),
+            params.currency || (currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD),
             params.avatarFile as File,
         );
         createWorkspace({

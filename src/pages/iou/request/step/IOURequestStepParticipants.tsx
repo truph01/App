@@ -347,7 +347,7 @@ function IOURequestStepParticipants({
                     '',
                     false,
                     undefined,
-                    currentUserPersonalDetails.localCurrencyCode ?? '',
+                    currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
                 );
                 for (const transaction of draftTransactions) {
                     setMoneyRequestParticipants(transaction.transactionID, [
@@ -414,6 +414,7 @@ function IOURequestStepParticipants({
             policyForMovingExpenses,
             currentUserPersonalDetails.email,
             currentUserPersonalDetails.accountID,
+            currentUserPersonalDetails.localCurrencyCode,
             introSelected,
             translate,
             backTo,

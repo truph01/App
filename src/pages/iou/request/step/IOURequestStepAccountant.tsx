@@ -9,6 +9,7 @@ import {generateDefaultWorkspaceName} from '@libs/actions/Policy/Policy';
 import Navigation from '@libs/Navigation/Navigation';
 import {createDraftWorkspaceAndNavigateToConfirmationScreen} from '@libs/ReportUtils';
 import MoneyRequestAccountantSelector from '@pages/iou/request/MoneyRequestAccountantSelector';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -56,7 +57,7 @@ function IOURequestStepAccountant({
                 generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
                 accountID,
                 email,
-                localCurrencyCode ?? '',
+                localCurrencyCode ?? CONST.CURRENCY.USD,
             );
             return;
         }

@@ -476,7 +476,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                         transaction: iouTransaction,
                         currentUserAccountID: currentUserPersonalDetails.accountID,
                         currentUserEmail: currentUserPersonalDetails.email ?? '',
-                        currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? '',
+                        currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
                     });
                 },
             });
@@ -501,7 +501,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             transaction: iouTransaction,
                             currentUserAccountID: currentUserPersonalDetails.accountID,
                             currentUserEmail: currentUserPersonalDetails.email ?? '',
-                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? '',
+                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
                         });
                     },
                 });
@@ -525,7 +525,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             transaction: iouTransaction,
                             currentUserAccountID: currentUserPersonalDetails.accountID,
                             currentUserEmail: currentUserPersonalDetails.email ?? '',
-                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? '',
+                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
                         });
                     },
                 });
@@ -641,6 +641,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
         moneyRequestReport?.reportID,
         currentUserPersonalDetails.accountID,
         currentUserPersonalDetails.email,
+        currentUserPersonalDetails.localCurrencyCode,
         isTaskActionable,
         isRootGroupChat,
         leaveChat,
