@@ -292,7 +292,7 @@ function clearPersonalBankAccount() {
     clearPersonalBankAccountSetupType();
 }
 
-/** Atomically resets personal bank account state and seeds draft values using Onyx.set to avoid set/merge races. */
+/** Resets state and seeds drafts via Onyx.set to avoid set/merge races. */
 function resetPersonalBankAccountForUpdate(bankAccountID: number, personalBankAccountDraft?: Partial<PersonalBankAccountForm>, homeAddressDraft?: Record<string, string | undefined>) {
     clearPlaid();
     Onyx.set(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {bankAccountID});

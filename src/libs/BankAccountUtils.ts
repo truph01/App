@@ -31,9 +31,6 @@ function hasPartiallySetupBankAccount(bankAccountList: OnyxEntry<OnyxTypes.BankA
     return Object.values(bankAccountList ?? {}).some((bankAccount) => isBankAccountPartiallySetup(bankAccount?.accountData?.state));
 }
 
-/**
- * Step numbers for the personal bank account update flow.
- */
 const PERSONAL_INFO_STEP = {
     NAME: 1,
     ADDRESS: 2,
@@ -43,7 +40,8 @@ const PERSONAL_INFO_STEP = {
 type AdditionalData = AccountData['additionalData'];
 
 function hasOwnerName(additionalData: AdditionalData): boolean {
-    return !!additionalData?.firstName && !!additionalData?.lastName;
+    // OldDot stores firstName/lastName, NewDot stores legalFirstName/legalLastName — both are valid.
+    return (!!additionalData?.firstName && !!additionalData?.lastName) || (!!additionalData?.legalFirstName && !!additionalData?.legalLastName);
 }
 
 function hasOwnerAddress(additionalData: AdditionalData): boolean {
@@ -54,10 +52,6 @@ function hasOwnerPhone(additionalData: AdditionalData): boolean {
     return !!additionalData?.companyPhone;
 }
 
-/**
- * Check if a US personal bank account in OPEN state is missing required personal information on its own additionalData.
- * Matches OldDot parity: the badge and update flow are driven by the bank account record only, not the user's profile.
- */
 function isPersonalBankAccountMissingInfo(accountData: AccountData | undefined): boolean {
     if (accountData?.type !== CONST.BANK_ACCOUNT.TYPE.PERSONAL) {
         return false;
@@ -67,8 +61,7 @@ function isPersonalBankAccountMissingInfo(accountData: AccountData | undefined):
         return false;
     }
 
-    // additionalData.country is optional — legacy US accounts may omit it.
-    // Mirror BankAccount.getCountry() which defaults to US when absent.
+    // Defaults to US when absent — legacy US accounts may omit country, matching BankAccount.getCountry().
     const country = accountData.additionalData?.country ?? CONST.COUNTRY.US;
     if (country !== CONST.COUNTRY.US) {
         return false;
@@ -79,9 +72,6 @@ function isPersonalBankAccountMissingInfo(accountData: AccountData | undefined):
     return !hasOwnerName(additionalData) || !hasOwnerAddress(additionalData) || !hasOwnerPhone(additionalData);
 }
 
-/**
- * Returns step numbers that already have data on the bank account and can be skipped in the update flow.
- */
 function getCompletedStepsForBankAccount(bankAccountList: OnyxEntry<OnyxTypes.BankAccountList>, bankAccountID: number): number[] {
     const bankAccount = bankAccountList?.[String(bankAccountID)];
     if (!bankAccount) {

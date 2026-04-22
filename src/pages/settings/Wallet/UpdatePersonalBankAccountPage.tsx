@@ -130,7 +130,7 @@ function UpdatePersonalBankAccountPage() {
         const legalFirstName = personalBankAccountDraft?.legalFirstName ?? privatePersonalDetails?.legalFirstName ?? existingData?.firstName ?? '';
         const legalLastName = personalBankAccountDraft?.legalLastName ?? privatePersonalDetails?.legalLastName ?? existingData?.lastName ?? '';
 
-        // Address: prefer user-edited draft, then pick a single complete source to avoid mixing partial data from different sources.
+        // Use a single complete source to avoid mixing partial data across sources.
         let addressStreet: string;
         let addressStreet2: string;
         let addressCity: string;
@@ -138,14 +138,12 @@ function UpdatePersonalBankAccountPage() {
         let addressZipCode: string;
 
         if (homeAddressDraft?.addressLine1) {
-            // User edited the address step — use draft values
             addressStreet = homeAddressDraft.addressLine1;
             addressStreet2 = homeAddressDraft.addressLine2 ?? '';
             addressCity = homeAddressDraft.city ?? '';
             addressState = homeAddressDraft.state ?? '';
             addressZipCode = homeAddressDraft.zipPostCode ?? '';
         } else if (existingData?.addressStreet && existingData?.addressCity && existingData?.addressState && existingData?.addressZipCode) {
-            // Bank account additionalData has complete address
             const [street1, street2] = getStreetLines(existingData.addressStreet);
             addressStreet = street1 ?? '';
             addressStreet2 = street2 ?? '';
@@ -153,7 +151,6 @@ function UpdatePersonalBankAccountPage() {
             addressState = existingData.addressState;
             addressZipCode = existingData.addressZipCode;
         } else if (currentAddress) {
-            // Fall back to profile address as a whole
             const [street1, street2] = getStreetLines(currentAddress.street ?? currentAddress.addressLine1);
             addressStreet = street1 ?? '';
             addressStreet2 = street2 ?? currentAddress.street2 ?? currentAddress.addressLine2 ?? '';

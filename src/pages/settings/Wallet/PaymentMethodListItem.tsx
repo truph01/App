@@ -159,7 +159,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
         badgeIcon = icons.DotIndicator;
     }
 
-    // Subline pills (below title, next to description)
+    // Card state pills (below title, next to description)
     const descriptionAddon = useMemo(() => {
         if (isNeedingAction && shouldShowDefaultBadge) {
             return (

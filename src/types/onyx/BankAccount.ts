@@ -39,11 +39,17 @@ type BankAccountAdditionalData = {
         achAuthorizationForm?: FileObject[];
     };
 
-    /** First name of the bank account owner */
+    /** First name of the bank account owner (OldDot field name) */
     firstName?: string;
 
-    /** Last name of the bank account owner */
+    /** Last name of the bank account owner (OldDot field name) */
     lastName?: string;
+
+    /** Legal first name of the bank account owner (NewDot field name) */
+    legalFirstName?: string;
+
+    /** Legal last name of the bank account owner (NewDot field name) */
+    legalLastName?: string;
 
     /** City of the bank account owner's address */
     addressCity?: string;

@@ -33,7 +33,7 @@ type PersonalBankAccount = {
     /** The bank account ID being updated in the personal info update flow */
     bankAccountID?: number;
 
-    /** Error from UpdatePersonalBankAccountInfo API — stored separately from `errors` to avoid blocking FormProvider resubmission */
+    /** API error stored separately from `errors` to avoid blocking FormProvider resubmission */
     updateError?: string;
 };
 
