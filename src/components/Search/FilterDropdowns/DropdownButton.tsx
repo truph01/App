@@ -98,6 +98,7 @@ function DropdownButton({
     const triggerRef = useRef<View | null>(null);
     const anchorRef = useRef<View | null>(null);
     const modalAccessibilityTargetElementRef = useRef<unknown>(null);
+    const [activePopoverComponent, setActivePopoverComponent] = useState(() => PopoverComponent);
     const [isOverlayVisible, setIsOverlayVisible] = useState(false);
     const [customPopoverWidth, setCustomPopoverWidth] = useState<number | undefined>(undefined);
     const {calculatePopoverPosition} = usePopoverPosition();
@@ -146,11 +147,12 @@ function DropdownButton({
      * Calculate popover position and toggle overlay
      */
     const calculatePopoverPositionAndToggleOverlay = useCallback(() => {
+        setActivePopoverComponent(() => PopoverComponent);
         calculatePopoverPosition(anchorRef, ANCHOR_ORIGIN).then((pos) => {
             setPopoverTriggerPosition({...pos, vertical: pos.vertical});
             toggleOverlay();
         });
-    }, [calculatePopoverPosition, toggleOverlay]);
+    }, [PopoverComponent, calculatePopoverPosition, toggleOverlay]);
     /**
      * When no items are selected, render the label, otherwise, render the
      * list of selected items as well
@@ -172,6 +174,7 @@ function DropdownButton({
         }
         return {width: actualPopoverWidth};
     }, [isSmallScreenWidth, styles, actualPopoverWidth]);
+    const ActivePopoverComponent = activePopoverComponent;
 
     return (
         <View
@@ -236,7 +239,7 @@ function DropdownButton({
                 shouldDisplayBelowModals
                 shouldWrapModalChildrenInScrollViewIfBottomDockedInLandscapeMode={false}
             >
-                <PopoverComponent
+                <ActivePopoverComponent
                     closeOverlay={toggleOverlay}
                     isExpanded={isOverlayVisible}
                     setPopoverWidth={setCustomPopoverWidth}
