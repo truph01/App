@@ -36,6 +36,7 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
             return;
         }
 
+        resetValidateActionCodeSent();
         Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.getRoute(backTo));
     }, [session?.email, contactMethod, loginData?.pendingFields?.defaultLogin, backTo]);
 
