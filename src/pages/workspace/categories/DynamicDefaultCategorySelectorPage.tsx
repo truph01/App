@@ -40,7 +40,6 @@ function DynamicDefaultCategorySelectorPage({route}: DynamicDefaultCategorySelec
     return (
         <ScreenWrapper
             style={styles.pb0}
-            includePaddingTop={false}
             enableEdgeToEdgeBottomSafeAreaPadding
             shouldEnableKeyboardAvoidingView={false}
             testID="DynamicDefaultCategorySelectorPage"

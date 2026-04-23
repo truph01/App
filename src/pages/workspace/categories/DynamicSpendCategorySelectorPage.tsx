@@ -40,7 +40,6 @@ function DynamicSpendCategorySelectorPage({route}: DynamicSpendCategorySelectorP
     return (
         <ScreenWrapper
             style={styles.pb0}
-            includePaddingTop={false}
             enableEdgeToEdgeBottomSafeAreaPadding
             shouldEnableKeyboardAvoidingView={false}
             testID="DynamicSpendCategorySelectorPage"
