@@ -9,8 +9,7 @@ function ConnectToGustoFlow({policyID}: ConnectToGustoFlowProps) {
 
     useEffect(() => {
         openLink(getGustoSetupLink(policyID), environmentURL);
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- This flow should only open the external Gusto setup link once when it mounts.
-    }, []);
+    }, [environmentURL, policyID]);
 
     return null;
 }

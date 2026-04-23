@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {WebView} from 'react-native-webview';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -17,7 +17,7 @@ function ConnectToGustoFlow({policyID}: ConnectToGustoFlowProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const webViewRef = useRef<WebView>(null);
-    const [isWebViewOpen, setIsWebViewOpen] = useState(false);
+    const [isWebViewOpen, setIsWebViewOpen] = useState(true);
     const [session] = useOnyx(ONYXKEYS.SESSION);
 
     const renderLoading = useCallback(
@@ -33,12 +33,6 @@ function ConnectToGustoFlow({policyID}: ConnectToGustoFlowProps) {
     );
 
     const authToken = session?.authToken ?? null;
-
-    useEffect(() => {
-        setIsWebViewOpen(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- This flow should only open the native Gusto webview once when it mounts.
-    }, []);
-
     return (
         <Modal
             onClose={() => setIsWebViewOpen(false)}
