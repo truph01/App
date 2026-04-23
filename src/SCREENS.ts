@@ -429,7 +429,6 @@ const SCREENS = {
         SETTINGS_CATEGORIES_SETTINGS: 'Settings_Categories_Settings',
         SETTINGS_CATEGORY_CREATE: 'Settings_Category_Create',
         DYNAMIC_SETTINGS_CATEGORY_EDIT: 'Dynamic_Settings_Category_Edit',
-        SETTINGS_SPEND_CATEGORY_SELECTOR: 'Settings_Spend_Category_Selector',
         SETTINGS_CATEGORIES_ROOT: 'Settings_Categories',
         SETTINGS_CATEGORIES_IMPORT: 'Settings_Categories_Import',
         SETTINGS_CATEGORIES_IMPORTED: 'Settings_Categories_Imported',

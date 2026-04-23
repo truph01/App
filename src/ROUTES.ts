@@ -295,7 +295,7 @@ const DYNAMIC_ROUTES = {
     },
     SPEND_CATEGORY_SELECTOR: {
         path: 'spend-category-selector/:groupID',
-        entryScreens: [SCREENS.WORKSPACE.CATEGORIES_SETTINGS],
+        entryScreens: [SCREENS.WORKSPACE.CATEGORIES_SETTINGS, SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS],
         getRoute: (groupID: string) => `spend-category-selector/${groupID}` as const,
     },
     DEFAULT_CATEGORY_SELECTOR: {
@@ -1526,12 +1526,6 @@ const ROUTES = {
 
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
         getRoute: (policyID: string, backTo = '') => getUrlWithBackToParam(`settings/${policyID}/categories/new`, backTo),
-    },
-    SETTINGS_SPEND_CATEGORY_SELECTOR: {
-        route: 'settings/:policyID/categories/spend-category-selector/:groupID',
-        getRoute: (policyID: string, groupID: string, backTo = '') =>
-            // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-            getUrlWithBackToParam(`settings/${policyID}/categories/spend-category-selector/${groupID}` as const, backTo),
     },
     SETTINGS_CATEGORIES_IMPORT: {
         route: 'settings/:policyID/categories/import',

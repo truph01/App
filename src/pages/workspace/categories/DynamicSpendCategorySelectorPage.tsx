@@ -14,9 +14,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-type DynamicSpendCategorySelectorPageProps =
-    | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_SPEND_CATEGORY_SELECTOR>
-    | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.SETTINGS_SPEND_CATEGORY_SELECTOR>;
+type DynamicSpendCategorySelectorPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_SPEND_CATEGORY_SELECTOR>;
 
 function DynamicSpendCategorySelectorPage({route}: DynamicSpendCategorySelectorPageProps) {
     const {policyID, groupID} = route.params;

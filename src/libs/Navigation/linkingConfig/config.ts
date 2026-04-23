@@ -1480,9 +1480,6 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                             path: ROUTES.SETTINGS_CATEGORY_CREATE.route,
                         },
                         [SCREENS.SETTINGS_CATEGORIES.DYNAMIC_SETTINGS_CATEGORY_EDIT]: DYNAMIC_ROUTES.SETTINGS_CATEGORY_EDIT.path,
-                        [SCREENS.SETTINGS_CATEGORIES.SETTINGS_SPEND_CATEGORY_SELECTOR]: {
-                            path: ROUTES.SETTINGS_SPEND_CATEGORY_SELECTOR.route,
-                        },
                         [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_IMPORT]: {
                             path: ROUTES.SETTINGS_CATEGORIES_IMPORT.route,
                         },

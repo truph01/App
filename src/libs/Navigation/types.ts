@@ -442,10 +442,6 @@ type SettingsNavigatorParamList = {
         policyID: string;
         groupID: string;
     };
-    [SCREENS.SETTINGS_CATEGORIES.SETTINGS_SPEND_CATEGORY_SELECTOR]: {
-        policyID: string;
-        groupID: string;
-    };
     [SCREENS.WORKSPACE.DYNAMIC_DEFAULT_CATEGORY_SELECTOR]: {
         policyID: string;
         customUnitID: string;

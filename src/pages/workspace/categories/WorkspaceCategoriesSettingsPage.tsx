@@ -73,11 +73,7 @@ function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSet
             return;
         }
 
-        Navigation.navigate(
-            isQuickSettingsFlow
-                ? ROUTES.SETTINGS_SPEND_CATEGORY_SELECTOR.getRoute(policyID, item.groupID, backTo)
-                : createDynamicRoute(DYNAMIC_ROUTES.SPEND_CATEGORY_SELECTOR.getRoute(item.groupID)),
-        );
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.SPEND_CATEGORY_SELECTOR.getRoute(item.groupID)));
     };
 
     const selectionListHeaderContent = (
