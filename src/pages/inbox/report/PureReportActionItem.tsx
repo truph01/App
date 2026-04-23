@@ -913,7 +913,12 @@ function PureReportActionItem({
                 />
             );
         } else if (isSimpleMessageAction(action)) {
-            children = <SimpleMessageContent action={action} />;
+            children = (
+                <SimpleMessageContent
+                    action={action}
+                    report={report}
+                />
+            );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.FORWARDED)) {
             const wasAutoForwarded = getOriginalMessage(action)?.automaticAction ?? false;
             if (wasAutoForwarded) {
@@ -925,15 +930,6 @@ function PureReportActionItem({
             } else {
                 children = <ReportActionItemBasicMessage message={translate('iou.forwarded')} />;
             }
-        } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.REIMBURSED)) {
-            children = <ReportActionItemBasicMessage message={getReimbursedMessage(translate, action, report, currentUserAccountID)} />;
-        } else if (isSimpleMessageAction(action)) {
-            children = (
-                <SimpleMessageContent
-                    action={action}
-                    report={report}
-                />
-            );
         } else if (isHandledPolicyChangeLogAction(action)) {
             children = (
                 <PolicyChangeLogContent
