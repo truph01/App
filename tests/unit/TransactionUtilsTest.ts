@@ -1829,6 +1829,7 @@ describe('TransactionUtils', () => {
     describe('getTaxRateTitle', () => {
         const policy: Policy = {
             ...createRandomPolicy(0),
+            tax: {trackingEnabled: true},
             taxRates: CONST.DEFAULT_TAX,
         };
 
