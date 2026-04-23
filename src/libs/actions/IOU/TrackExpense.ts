@@ -2752,16 +2752,11 @@ function deleteTrackExpense({
 }
 
 export {
-    addTrackedExpenseToPolicy,
-    buildOnyxDataForTrackExpense,
-    categorizeTrackedExpense,
     convertBulkTrackedExpensesToIOU,
-    convertTrackedExpenseToRequest,
     deleteTrackExpense,
     getDeleteTrackExpenseInformation,
     getNavigationUrlAfterTrackExpenseDelete,
     getTrackExpenseInformation,
-    shareTrackedExpense,
     trackExpense,
     requestMoney,
 };
