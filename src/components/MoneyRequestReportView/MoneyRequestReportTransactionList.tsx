@@ -21,6 +21,7 @@ import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelec
 import Text from '@components/Text';
 import {useWideRHPActions} from '@components/WideRHPContextProvider';
 import useCopySelectionHelper from '@hooks/useCopySelectionHelper';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useHandleSelectionMode from '@hooks/useHandleSelectionMode';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -39,7 +40,6 @@ import {setOptimisticTransactionThread} from '@libs/actions/Report';
 import {getReportLayoutGroupBy, setReportLayoutGroupBy} from '@libs/actions/ReportLayout';
 import {clearActiveTransactionIDs, setActiveTransactionIDs} from '@libs/actions/TransactionThreadNavigation';
 import {resolveTransactionCardFields} from '@libs/CardUtils';
-import {convertToDisplayString} from '@libs/CurrencyUtils';
 import {hasNonReimbursableTransactions, isBillableEnabledOnPolicy} from '@libs/MoneyRequestReportUtils';
 import {navigationRef} from '@libs/Navigation/Navigation';
 import {isPolicyTaxEnabled} from '@libs/PolicyUtils';
@@ -136,6 +136,7 @@ function MoneyRequestReportTransactionList({
     isLoadingInitialReportActions = false,
 }: MoneyRequestReportTransactionListProps) {
     useCopySelectionHelper();
+    const {convertToDisplayString} = useCurrencyListActions();
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();

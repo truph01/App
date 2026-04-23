@@ -2560,6 +2560,7 @@ const CONST = {
         SUGGESTER_INNER_PADDING: 8,
         SUGGESTION_ROW_HEIGHT: 40,
         SMALL_CONTAINER_HEIGHT_FACTOR: 2.5,
+        SMALL_CONTAINER_HEIGHT_FACTOR_LANDSCAPE_MODE: 1.5,
         MAX_AMOUNT_OF_SUGGESTIONS: 20,
         MAX_AMOUNT_OF_VISIBLE_SUGGESTIONS_IN_CONTAINER: 5,
         HERE_TEXT: '@here',
@@ -2811,6 +2812,8 @@ const CONST = {
         REIMBURSABLE_EXPENSES_EXPORT_DESTINATION: 'reimbursableExpensesExportDestination',
         NON_REIMBURSABLE_EXPENSES_EXPORT_DESTINATION: 'nonreimbursableExpensesExportDestination',
         DEFAULT_VENDOR: 'defaultVendor',
+        TRAVEL_INVOICING_VENDOR: 'travelInvoicingVendorID',
+        TRAVEL_INVOICING_PAYABLE_ACCOUNT: 'travelInvoicingPayableAccountID',
         REIMBURSABLE_PAYABLE_ACCOUNT: 'reimbursablePayableAccount',
         PAYABLE_ACCT: 'payableAcct',
         JOURNAL_POSTING_PREFERENCE: 'journalPostingPreference',
@@ -3605,6 +3608,7 @@ const CONST = {
             IS_TRAVEL_ENABLED: 'isTravelEnabled',
             REQUIRE_COMPANY_CARDS_ENABLED: 'requireCompanyCardsEnabled',
             IS_TIME_TRACKING_ENABLED: 'isTimeTrackingEnabled',
+            IS_HR_ENABLED: 'isHREnabled',
         },
         DEFAULT_CATEGORIES: {
             ADVERTISING: 'Advertising',
@@ -3734,6 +3738,7 @@ const CONST = {
                 STARTING_IMPORT_QBO: 'startingImportQBO',
                 STARTING_IMPORT_XERO: 'startingImportXero',
                 STARTING_IMPORT_QBD: 'startingImportQBD',
+                STARTING_IMPORT_GUSTO: 'startingImportGusto',
                 QBO_IMPORT_MAIN: 'quickbooksOnlineImportMain',
                 QBO_IMPORT_CUSTOMERS: 'quickbooksOnlineImportCustomers',
                 QBO_IMPORT_EMPLOYEES: 'quickbooksOnlineImportEmployees',
@@ -3799,6 +3804,10 @@ const CONST = {
                 SAGE_INTACCT_SYNC_IMPORT_EMPLOYEES: 'intacctImportEmployees',
                 SAGE_INTACCT_SYNC_IMPORT_DIMENSIONS: 'intacctImportDimensions',
                 SAGE_INTACCT_SYNC_IMPORT_SYNC_REIMBURSED_REPORTS: 'intacctImportSyncBillPayments',
+                GUSTO_SYNC_LOAD_COMPANY: 'gustoSyncLoadCompany',
+                GUSTO_SYNC_IMPORT_EMPLOYEES: 'gustoSyncImportEmployees',
+                GUSTO_SYNC_BUILD_APPROVAL_CHAINS: 'gustoSyncBuildApprovalChains',
+                GUSTO_SYNC_FINALIZE: 'gustoSyncFinalize',
             },
             SYNC_STAGE_TIMEOUT_MINUTES: 20,
         },
@@ -3931,6 +3940,7 @@ const CONST = {
             AMEX_DIRECT: 'oauth.americanexpressfdx.com',
             AMEX_FILE_DOWNLOAD: 'americanexpressfd.us',
             CSV: 'ccupload',
+            CSV_CLASSIC: 'csv',
             MOCK_BANK: 'oauth.mockbank.com',
             UPLOAD: 'upload',
         },
@@ -7540,6 +7550,7 @@ const CONST = {
             DUPLICATE: 'duplicate',
             UNDELETE: 'undelete',
         },
+        BULK_DUPLICATE_LIMIT: 50,
         TRANSACTION_TYPE: {
             CASH: 'cash',
             CARD: 'card',
@@ -8110,7 +8121,6 @@ const CONST = {
         SEARCH_KEYS: {
             EXPENSES: 'expenses',
             REPORTS: 'reports',
-            CHATS: 'chats',
             SUBMIT: 'submit',
             APPROVE: 'approve',
             PAY: 'pay',
@@ -8118,7 +8128,6 @@ const CONST = {
             STATEMENTS: 'statements',
             UNAPPROVED_CASH: 'unapprovedCash',
             UNAPPROVED_CARD: 'unapprovedCard',
-            EXPENSIFY_CARD: 'expensifyCard',
             RECONCILIATION: 'reconciliation',
             TOP_SPENDERS: 'topSpenders',
             TOP_CATEGORIES: 'topCategories',
@@ -8762,6 +8771,9 @@ const CONST = {
     },
 
     SENTRY_LABEL: {
+        BILLING_BANNER: {
+            RIGHT_ICON: 'BillingBanner-RightIcon',
+        },
         NAVIGATION_TAB_BAR: {
             EXPENSIFY_LOGO: 'NavigationTabBar-ExpensifyLogo',
             INBOX: 'NavigationTabBar-Inbox',
@@ -9256,6 +9268,7 @@ const CONST = {
                 MEMBERS: 'WorkspaceInitial-Members',
                 REPORTS: 'WorkspaceInitial-Reports',
                 ACCOUNTING: 'WorkspaceInitial-Accounting',
+                HR: 'WorkspaceInitial-HR',
                 RECEIPT_PARTNERS: 'WorkspaceInitial-ReceiptPartners',
                 CATEGORIES: 'WorkspaceInitial-Categories',
                 TAGS: 'WorkspaceInitial-Tags',
