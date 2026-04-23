@@ -1,5 +1,6 @@
 # @desc   From the Inbox tab, open the first chat/report in the LHN. Triggers the ManualOpenReport Sentry span (LHN row press -> report screen mounted with composer visible). Assumes the user is signed in with at least one chat in the Inbox.
 # @pre    text="Inbox"
+# @pre    text="Navigates to a chat"
 # @post   role="textview" label="Write something..."
 # @tag    chat
 # @tag    navigation
