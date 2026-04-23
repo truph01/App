@@ -37,13 +37,13 @@ type IouReportActionMessageProps = {
     style?: StyleProp<ViewStyle & TextStyle>;
 
     /** Whether or not the message is hidden by moderation */
-    isHidden: boolean;
+    isHidden?: boolean;
 
     /** The ID of the report */
     reportID: string | undefined;
 };
 
-function IouReportActionMessage({action, displayAsGroup, reportID, style, isHidden}: IouReportActionMessageProps) {
+function IouReportActionMessage({action, displayAsGroup, reportID, style, isHidden = false}: IouReportActionMessageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
