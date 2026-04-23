@@ -203,7 +203,7 @@ function SearchStaticList({
                                     participantTo={item.to}
                                     avatarSize={CONST.AVATAR_SIZE.SMALL_SUBSCRIPT}
                                     style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}
-                                    infoCellsTextStyle={{lineHeight: 14}}
+                                    infoCellsTextStyle={{lineHeight: variables.lineHeightSmall}}
                                     infoCellsAvatarStyle={styles.pr1}
                                     fromRecipientStyle={!shouldShowToRecipient ? styles.mw100 : undefined}
                                     shouldUseArrowIcon={false}

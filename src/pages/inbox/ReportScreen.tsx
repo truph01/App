@@ -2,7 +2,7 @@ import {PortalHost} from '@gorhom/portal';
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useState} from 'react';
 import type {ViewStyle} from 'react-native';
-import {InteractionManager, View} from 'react-native';
+import {View} from 'react-native';
 import ScreenWrapper from '@components/ScreenWrapper';
 import WideRHPOverlayWrapper from '@components/WideRHPOverlayWrapper';
 import useActionListContextValue from '@hooks/useActionListContextValue';
@@ -98,17 +98,15 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     // Empty deps: the callback identity is stable but useFocusEffect runs it on every
     // focus gain (not just mount). On narrow layout, the modal dismiss/restore cycle
     // always triggers a new focus event. On wide layout, the fast-path handlers use
-    // InteractionManager.runAfterInteractions as a fallback since the ReportScreen may
-    // already be focused. The 5s safety timeout in deferredLayoutWrite also covers
-    // edge cases where neither focus nor InteractionManager fires.
+    // TransitionTracker as a fallback since the ReportScreen may already be focused.
+    // The 5s safety timeout in deferredLayoutWrite also covers edge cases.
     useFocusEffect(
         useCallback(() => {
             if (!hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL)) {
                 return;
             }
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            const handle = InteractionManager.runAfterInteractions(() => {
-                flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+            const handle = TransitionTracker.runAfterTransitions({
+                callback: () => flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL),
             });
             return () => handle.cancel();
         }, []),

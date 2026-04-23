@@ -1,5 +1,4 @@
 import {fastMerge} from 'expensify-common';
-import {InteractionManager} from 'react-native';
 import type {OnyxCollection, OnyxEntry, OnyxInputValue, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import ReceiptGeneric from '@assets/images/receipt-generic.png';
@@ -23,6 +22,7 @@ import {formatPhoneNumber} from '@libs/LocalePhoneNumber';
 import Log from '@libs/Log';
 import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopmostSplitNavigator';
 import Navigation from '@libs/Navigation/Navigation';
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
@@ -1824,10 +1824,9 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         }
     }
 
-    // InteractionManager defers past the synchronous multi-scan batch loop,
+    // Defer draft cleanup until the navigation transition (e.g. RHP dismiss) completes,
     // so running cleanup from every call (including intermediates) is safe.
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    InteractionManager.runAfterInteractions(() => removeDraftTransactionsByIDs(draftTransactionIDs));
+    TransitionTracker.runAfterTransitions({callback: () => removeDraftTransactionsByIDs(draftTransactionIDs)});
 
     if (shouldHandleNavigation) {
         const trackReport = Navigation.getReportRouteByID(linkedTrackedExpenseReportAction?.childReportID);
@@ -2625,8 +2624,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
     }
 
     // See comment in requestMoney above.
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    InteractionManager.runAfterInteractions(() => removeDraftTransactionsByIDs(draftTransactionIDs));
+    TransitionTracker.runAfterTransitions({callback: () => removeDraftTransactionsByIDs(draftTransactionIDs)});
 
     if (!params.isRetry) {
         highlightTransactionOnSearchRouteIfNeeded(isFromGlobalCreate, transaction?.transactionID, CONST.SEARCH.DATA_TYPES.EXPENSE);

@@ -169,7 +169,15 @@ function hasDeferredWrite(key: string): boolean {
  * or the channel was registered without a watch key.
  */
 function getOptimisticWatchKey(key: string): OnyxKey | undefined {
-    return channels.get(key)?.optimisticWatchKey ?? flushedWatchKeys.get(key);
+    const channelKey = channels.get(key)?.optimisticWatchKey;
+    if (channelKey) {
+        return channelKey;
+    }
+    const flushedKey = flushedWatchKeys.get(key);
+    if (flushedKey) {
+        flushedWatchKeys.delete(key);
+    }
+    return flushedKey;
 }
 
 // Flush every pending deferred write when the app moves to background so
@@ -200,28 +208,23 @@ AppState.addEventListener('change', (nextState) => {
 function deferOrExecuteWrite(apiWrite: () => void, options: {shouldDeferForSearch: boolean; isRetry?: boolean; optimisticWatchKey?: OnyxKey; onDeferred?: () => void}) {
     const {shouldDeferForSearch, isRetry = false, optimisticWatchKey, onDeferred} = options;
 
-    if (shouldDeferForSearch) {
-        onDeferred?.();
-        registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH, apiWrite, {optimisticWatchKey});
-        return;
-    }
-
     // Retries skip deferral to avoid infinite loops (retry -> defer -> flush -> retry).
     // The trade-off is that a retry's optimistic data may be applied mid-animation,
     // but this is acceptable: retries are rare and the alternative is a stuck write.
-    if (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL)) {
+
+    // Determine the target channel. shouldDeferForSearch is the explicit flag;
+    // we also check for a reserved SEARCH channel (created by handleSearchDismiss
+    // before createTransaction) so it doesn't linger unused.
+    const shouldDeferToSearch = shouldDeferForSearch || (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH));
+    if (shouldDeferToSearch) {
         onDeferred?.();
-        registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL, apiWrite, {optimisticWatchKey});
+        registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH, apiWrite, {optimisticWatchKey});
         return;
     }
 
-    // handleSearchDismiss reserves the SEARCH channel before calling
-    // createTransaction(..., false, false). shouldDeferForSearch is false
-    // (gated by shouldHandleNavigation) but the channel is waiting for a
-    // write - honor it so the reserved channel doesn't linger unused.
-    if (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH)) {
+    if (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL)) {
         onDeferred?.();
-        registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH, apiWrite, {optimisticWatchKey});
+        registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL, apiWrite, {optimisticWatchKey});
         return;
     }
 
