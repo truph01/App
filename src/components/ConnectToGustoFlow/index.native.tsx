@@ -8,10 +8,10 @@ import Modal from '@components/Modal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getGustoSetupLink} from '@libs/actions/connections/Gusto';
+import getGustoSetupLink from '@libs/actions/connections/Gusto';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {ConnectToGustoFlowProps} from './types';
+import type ConnectToGustoFlowProps from './types';
 
 function ConnectToGustoFlow({policyID}: ConnectToGustoFlowProps) {
     const {translate} = useLocalize();
@@ -36,7 +36,7 @@ function ConnectToGustoFlow({policyID}: ConnectToGustoFlowProps) {
 
     useEffect(() => {
         setIsWebViewOpen(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- This flow should only open the native Gusto webview once when it mounts.
     }, []);
 
     return (

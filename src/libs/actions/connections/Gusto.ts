@@ -11,4 +11,4 @@ function getGustoSetupLink(policyID: string) {
     return commandURL + new URLSearchParams(params).toString();
 }
 
-export {getGustoSetupLink};
+export default getGustoSetupLink;
