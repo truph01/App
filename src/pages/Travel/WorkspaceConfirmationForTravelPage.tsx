@@ -31,17 +31,15 @@ function WorkspaceConfirmationForTravelPage({route}: WorkspaceConfirmationForTra
     };
 
     const onSubmit = (params: WorkspaceConfirmationSubmitFunctionParams) => {
-        createDraftWorkspace(
+        createDraftWorkspace({
             introSelected,
-            params.name,
-            currentUserPersonalDetails.accountID,
-            currentUserPersonalDetails.email ?? '',
-            '',
-            false,
-            params.policyID,
-            params.currency || (currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD),
-            params.avatarFile as File,
-        );
+            workspaceName: params.name,
+            currentUserAccountID: currentUserPersonalDetails.accountID,
+            currentUserEmail: currentUserPersonalDetails.email ?? '',
+            policyID: params.policyID,
+            currency: params.currency || (currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD),
+            file: params.avatarFile as File,
+        });
         createWorkspace({
             policyName: params.name,
             policyID: params.policyID,

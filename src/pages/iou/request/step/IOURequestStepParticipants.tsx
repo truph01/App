@@ -339,16 +339,13 @@ function IOURequestStepParticipants({
             if ((isCategorizing || isShareAction) && numberOfParticipants.current === 0) {
                 const email = currentUserPersonalDetails.email ?? '';
                 const lastWorkspaceNumber = lastWorkspaceNumberSelector(allPolicies, email);
-                const {expenseChatReportID, policyID, policyName} = createDraftWorkspace(
+                const {expenseChatReportID, policyID, policyName} = createDraftWorkspace({
                     introSelected,
-                    generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
-                    currentUserPersonalDetails.accountID,
-                    email,
-                    '',
-                    false,
-                    undefined,
-                    currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
-                );
+                    workspaceName: generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
+                    currentUserAccountID: currentUserPersonalDetails.accountID,
+                    currentUserEmail: email,
+                    currency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
+                });
                 for (const transaction of draftTransactions) {
                     setMoneyRequestParticipants(transaction.transactionID, [
                         {

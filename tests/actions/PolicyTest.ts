@@ -1924,16 +1924,16 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             const policyID = Policy.generatePolicyID();
-            const params = Policy.createDraftWorkspace(
-                {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
-                WORKSPACE_NAME,
-                ESH_ACCOUNT_ID,
-                ESH_EMAIL,
-                ESH_EMAIL,
-                true,
+            const params = Policy.createDraftWorkspace({
+                introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
+                workspaceName: WORKSPACE_NAME,
+                currentUserAccountID: ESH_ACCOUNT_ID,
+                currentUserEmail: ESH_EMAIL,
+                policyOwnerEmail: ESH_EMAIL,
+                makeMeAdmin: true,
                 policyID,
-                CONST.CURRENCY.USD,
-            );
+                currency: CONST.CURRENCY.USD,
+            });
             await waitForBatchedUpdates();
 
             const draft = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${policyID}`);
@@ -1961,7 +1961,15 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
 
             const policyID = Policy.generatePolicyID();
-            Policy.createDraftWorkspace({choice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE}, WORKSPACE_NAME, ESH_ACCOUNT_ID, ESH_EMAIL, ESH_EMAIL, false, policyID, CONST.CURRENCY.EUR);
+            Policy.createDraftWorkspace({
+                introSelected: {choice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE},
+                workspaceName: WORKSPACE_NAME,
+                currentUserAccountID: ESH_ACCOUNT_ID,
+                currentUserEmail: ESH_EMAIL,
+                policyOwnerEmail: ESH_EMAIL,
+                policyID,
+                currency: CONST.CURRENCY.EUR,
+            });
             await waitForBatchedUpdates();
 
             const draft = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${policyID}`);
@@ -1982,7 +1990,14 @@ describe('actions/Policy', () => {
             const customEmail = 'custom@example.com';
             const policyID = Policy.generatePolicyID();
 
-            Policy.createDraftWorkspace({choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM}, WORKSPACE_NAME, customAccountID, customEmail, customEmail, false, policyID);
+            Policy.createDraftWorkspace({
+                introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
+                workspaceName: WORKSPACE_NAME,
+                currentUserAccountID: customAccountID,
+                currentUserEmail: customEmail,
+                policyOwnerEmail: customEmail,
+                policyID,
+            });
             await waitForBatchedUpdates();
 
             const draft = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${policyID}`);
@@ -2014,7 +2029,15 @@ describe('actions/Policy', () => {
 
             const policyID = Policy.generatePolicyID();
             // Pass explicit GBP currency — this should win over the session user's EUR localCurrencyCode
-            Policy.createDraftWorkspace({choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM}, WORKSPACE_NAME, ESH_ACCOUNT_ID, ESH_EMAIL, ESH_EMAIL, false, policyID, 'GBP');
+            Policy.createDraftWorkspace({
+                introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
+                workspaceName: WORKSPACE_NAME,
+                currentUserAccountID: ESH_ACCOUNT_ID,
+                currentUserEmail: ESH_EMAIL,
+                policyOwnerEmail: ESH_EMAIL,
+                policyID,
+                currency: 'GBP',
+            });
             await waitForBatchedUpdates();
 
             const draft = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${policyID}`);

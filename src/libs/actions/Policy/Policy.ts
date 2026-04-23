@@ -2983,17 +2983,29 @@ function createWorkspace(options: CreateWorkspaceDataOptions): CreateWorkspacePa
 /**
  * Creates a draft workspace for various money request flows
  */
-function createDraftWorkspace(
-    introSelected: OnyxEntry<IntroSelected>,
-    workspaceName: string,
-    currentUserAccountID: number,
-    currentUserEmail: string,
+type CreateDraftWorkspaceParams = {
+    introSelected: OnyxEntry<IntroSelected>;
+    workspaceName: string;
+    currentUserAccountID: number;
+    currentUserEmail: string;
+    policyOwnerEmail?: string;
+    makeMeAdmin?: boolean;
+    policyID?: string;
+    currency?: string;
+    file?: File;
+};
+
+function createDraftWorkspace({
+    introSelected,
+    workspaceName,
+    currentUserAccountID,
+    currentUserEmail,
     policyOwnerEmail = '',
     makeMeAdmin = false,
     policyID = generatePolicyID(),
     currency = '',
-    file?: File,
-): CreateWorkspaceParams {
+    file,
+}: CreateDraftWorkspaceParams): CreateWorkspaceParams {
     const {customUnits, customUnitID, customUnitRateID, outputCurrency} = buildOptimisticDistanceRateCustomUnits(currency);
 
     const {expenseChatData, adminsChatReportID, adminsCreatedReportActionID, expenseChatReportID, expenseCreatedReportActionID} = ReportUtils.buildOptimisticWorkspaceChats(
@@ -3137,7 +3149,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const isTravelOptionSelected = parts?.travel;
     const isCodingRulesOptionSelected = parts?.codingRules;
 
-    const outputCurrency = (isOverviewOptionSelected && policy?.outputCurrency) ? policy?.outputCurrency : localCurrency;
+    const outputCurrency = isOverviewOptionSelected && policy?.outputCurrency ? policy?.outputCurrency : localCurrency;
 
     const policyMemberAccountIDs = isMemberOptionSelected ? Object.values(getMemberAccountIDsForWorkspace(policy?.employeeList, false, false)) : [];
     const {customUnitID: distanceCustomUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(outputCurrency);

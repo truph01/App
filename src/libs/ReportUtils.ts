@@ -11390,16 +11390,13 @@ function createDraftWorkspaceAndNavigateToConfirmationScreen(
     currentUserLocalCurrency: string,
 ): void {
     const isCategorizing = actionName === CONST.IOU.ACTION.CATEGORIZE;
-    const {expenseChatReportID, policyID, policyName} = createDraftWorkspace(
+    const {expenseChatReportID, policyID, policyName} = createDraftWorkspace({
         introSelected,
         workspaceName,
         currentUserAccountID,
         currentUserEmail,
-        '',
-        false,
-        undefined,
-        currentUserLocalCurrency,
-    );
+        currency: currentUserLocalCurrency,
+    });
     setMoneyRequestParticipants(transactionID, [
         {
             selected: true,
