@@ -26,7 +26,11 @@ function DynamicDefaultCategorySelectorPage({route}: DynamicDefaultCategorySelec
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.DEFAULT_CATEGORY_SELECTOR.path);
 
     const onCategorySelected = (selectedCategory: ListItem) => {
-        if (!selectedCategory.searchText || currentCategory === selectedCategory.searchText) {
+        if (!selectedCategory.searchText) {
+            return;
+        }
+        if (currentCategory === selectedCategory.searchText) {
+            Navigation.goBack(backPath);
             return;
         }
         setPolicyCustomUnitDefaultCategory(policyID, customUnitID, currentCategory, selectedCategory.searchText);

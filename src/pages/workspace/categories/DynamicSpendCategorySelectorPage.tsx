@@ -28,7 +28,11 @@ function DynamicSpendCategorySelectorPage({route}: DynamicSpendCategorySelectorP
     const currentCategory = policy?.mccGroup?.[groupID]?.category ?? '';
 
     const onCategorySelected = (selectedCategory: ListItem) => {
-        if (!selectedCategory.keyForList || currentCategory === selectedCategory.keyForList) {
+        if (!selectedCategory.keyForList) {
+            return;
+        }
+        if (currentCategory === selectedCategory.keyForList) {
+            Navigation.goBack(backPath);
             return;
         }
         setWorkspaceDefaultSpendCategory(policyID, groupID, selectedCategory.keyForList, policy?.mccGroup);
