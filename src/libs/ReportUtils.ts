@@ -10799,11 +10799,20 @@ function getAllHeldTransactions(iouReportID?: string): Transaction[] {
 
 /**
  * Check if Report has any held expenses
+ * 
+ * @deprecated Use `hasHeldExpensesNew` instead.
  */
 function hasHeldExpenses(iouReportID?: string, allReportTransactions?: Transaction[]): boolean {
     const iouReportTransactions = getReportTransactions(iouReportID);
     const transactions = allReportTransactions ?? iouReportTransactions;
     return transactions.some((transaction) => isOnHoldTransactionUtils(transaction));
+}
+
+/**
+ * Check if Report has any held expenses
+ */
+function hasHeldExpensesNew(allReportTransactions: Transaction[]): boolean {
+    return allReportTransactions.some((transaction) => isOnHoldTransactionUtils(transaction));
 }
 
 /**
@@ -13731,6 +13740,7 @@ export {
     getTransactionSortValue,
     isSortableColumnName,
     getLinkedIOUTransaction,
+    hasHeldExpensesNew,
 };
 
 export type {
