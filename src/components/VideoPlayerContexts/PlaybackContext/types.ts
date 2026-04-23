@@ -86,8 +86,11 @@ type PlaybackStateContextValues = {
 type PlaybackActionsContextValues = {
     /**
      * Updates the currently tracked video URL and associated report.
+     * `report` and `reportID` are separate params because `report` comes from Onyx and may be undefined or lack a
+     * `reportID` field, while `reportID` is always available from route params or component props.
      * @param url The new video URL.
-     * @param report The new report.
+     * @param report The Onyx report object (may be undefined).
+     * @param reportID The report ID from route params or props.
      */
     updateCurrentURLAndReportID: (url: string | undefined, report: OnyxEntry<Report>, reportID: string | undefined) => void;
 
