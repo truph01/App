@@ -5263,8 +5263,8 @@ function getColumnsToShow({
               [CONST.SEARCH.TABLE_COLUMNS.EXCHANGE_RATE]: false,
               [CONST.SEARCH.TABLE_COLUMNS.REIMBURSABLE]: shouldShowReimbursableColumn,
               [CONST.SEARCH.TABLE_COLUMNS.BILLABLE]: shouldShowBillableColumn,
-              [CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT]: true,
-              [CONST.SEARCH.TABLE_COLUMNS.TOTAL]: false,
+              [CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT]: false,
+              [CONST.SEARCH.TABLE_COLUMNS.TOTAL]: true,
               [CONST.SEARCH.TABLE_COLUMNS.COMMENTS]: shouldShowCommentsColumn,
           }
         : {
@@ -5401,11 +5401,12 @@ function getColumnsToShow({
             if (hasExchangeRate) {
                 columns[CONST.SEARCH.TABLE_COLUMNS.EXCHANGE_RATE] = true;
             }
-            // Expense report view: show TOTAL column (converted amount in workspace currency).
+            // Expense report view: TOTAL (workspace currency) is always shown; add AMOUNT
+            // (transaction's own currency) when a conversion exists so both are visible.
             // Search page: show ORIGINAL_AMOUNT column (transaction's original amount).
             if (hasExchangeRate) {
                 if (isExpenseReportView) {
-                    columns[CONST.SEARCH.TABLE_COLUMNS.TOTAL] = true;
+                    columns[CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT] = true;
                 } else {
                     columns[CONST.SEARCH.TABLE_COLUMNS.ORIGINAL_AMOUNT] = true;
                 }
@@ -5492,7 +5493,10 @@ function getColumnsToShow({
             CONST.SEARCH.TABLE_COLUMNS.TYPE,
             CONST.SEARCH.TABLE_COLUMNS.DATE,
             CONST.SEARCH.TABLE_COLUMNS.STATUS,
-            CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
+            // TOTAL_AMOUNT (Amount) is data-driven in expense report view: shown only when a
+            // conversion exists. In search view, TOTAL_AMOUNT is always-true via the default
+            // columns map, so we don't need to list it here as non-data for either surface.
+            CONST.SEARCH.TABLE_COLUMNS.TOTAL,
             CONST.SEARCH.TABLE_COLUMNS.COMMENTS,
             CONST.SEARCH.TABLE_COLUMNS.REIMBURSABLE,
             CONST.SEARCH.TABLE_COLUMNS.BILLABLE,

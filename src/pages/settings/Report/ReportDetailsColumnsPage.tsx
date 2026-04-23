@@ -27,7 +27,6 @@ const REPORT_DETAILS_DEFAULT_COLUMNS: SearchCustomColumnIds[] = [
     CONST.SEARCH.TABLE_COLUMNS.MERCHANT,
     CONST.SEARCH.TABLE_COLUMNS.CATEGORY,
     CONST.SEARCH.TABLE_COLUMNS.TAG,
-    CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
     CONST.SEARCH.TABLE_COLUMNS.TOTAL,
 ];
 
@@ -75,7 +74,7 @@ function ReportDetailsColumnsPage() {
         return visibleColumns.filter((col) => allTypeCustomColumns.includes(col as SearchCustomColumnIds)) as SearchCustomColumnIds[];
     }, [reportDetailsColumns, reportTransactions, currentUserDetails?.accountID, report, policy, allTypeCustomColumns]);
 
-    const requiredColumns = new Set<SearchCustomColumnIds>([CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT]);
+    const requiredColumns = new Set<SearchCustomColumnIds>([CONST.SEARCH.TABLE_COLUMNS.TOTAL]);
 
     const handleSave = (selectedColumnIds: SearchCustomColumnIds[]) => {
         // Skip saving if columns haven't changed from the effective state, to avoid
