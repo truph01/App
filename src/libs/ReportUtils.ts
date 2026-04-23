@@ -10799,8 +10799,8 @@ function getAllHeldTransactions(iouReportID?: string): Transaction[] {
 
 /**
  * Check if Report has any held expenses
- * 
- * @deprecated Use `hasHeldExpensesNew` instead.
+ *
+ * @warning Use `hasHeldExpensesNew` instead.
  */
 function hasHeldExpenses(iouReportID?: string, allReportTransactions?: Transaction[]): boolean {
     const iouReportTransactions = getReportTransactions(iouReportID);

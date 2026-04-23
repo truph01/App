@@ -13,7 +13,7 @@ import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useReportTransactionsCollection from '@hooks/useReportTransactionsCollection';
 import {getTotalAmountForIOUReportPreviewButton} from '@libs/MoneyRequestReportUtils';
-import {hasHeldExpenses as hasHeldExpensesReportUtils, hasUpdatedTotal, hasViolations as hasViolationsReportUtils, isInvoiceReport as isInvoiceReportUtils} from '@libs/ReportUtils';
+import {hasHeldExpensesNew as hasHeldExpensesReportUtils, hasUpdatedTotal, hasViolations as hasViolationsReportUtils, isInvoiceReport as isInvoiceReportUtils} from '@libs/ReportUtils';
 import {payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
 import {approveMoneyRequest, canIOUBePaid as canIOUBePaidIOUActions} from '@userActions/IOU/ReportWorkflow';
 import CONST from '@src/CONST';
@@ -100,7 +100,7 @@ function PayActionButton({
     const confirmApproval = () => {
         if (isDelegateAccessRestricted) {
             showDelegateNoAccessModal();
-        } else if (hasHeldExpensesReportUtils(iouReport?.reportID)) {
+        } else if (hasHeldExpensesReportUtils(transactions)) {
             onHoldMenuOpen(CONST.IOU.REPORT_ACTION_TYPE.APPROVE, undefined, shouldShowPayButton);
         } else {
             approveMoneyRequest({
@@ -129,7 +129,7 @@ function PayActionButton({
         }
         if (isDelegateAccessRestricted) {
             showDelegateNoAccessModal();
-        } else if (hasHeldExpensesReportUtils(iouReport?.reportID)) {
+        } else if (hasHeldExpensesReportUtils(transactions)) {
             onHoldMenuOpen(CONST.IOU.REPORT_ACTION_TYPE.PAY, type, shouldShowPayButton);
         } else if (chatReport && iouReport) {
             if (isInvoiceReportUtils(iouReport)) {
