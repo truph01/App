@@ -372,3 +372,5 @@ export {
     setConnectionError,
     shouldUseUpdateNetSuiteTokens,
 };
+
+export {connectPolicyToGusto} from './Gusto';
