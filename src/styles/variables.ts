@@ -339,11 +339,11 @@ export default {
     inlineImagePreviewMinSize: 64,
     inlineImagePreviewMaxSize: 148,
 
-    minimalTopBarOffset: -112,
-    minimalTopBarWithFiltersOffset: -156,
+    minimalTopBarOffset: -118,
+    minimalTopBarWithFiltersOffset: -162,
     searchHeaderDefaultOffset: 0,
-    searchListContentMarginTop: 112,
-    searchListContentWithFiltersMarginTop: 156,
+    searchListContentMarginTop: 118,
+    searchListContentWithFiltersMarginTop: 162,
     searchTopBarZIndex: 9,
 
     scrollToNewTransactionOffset: 300,
