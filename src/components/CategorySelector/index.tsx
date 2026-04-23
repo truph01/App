@@ -1,20 +1,14 @@
 import React from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
-import {View} from 'react-native';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
-import type {ListItem} from '@components/SelectionList/types';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
+import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
-import CategorySelectorModal from './CategorySelectorModal';
+import {DYNAMIC_ROUTES} from '@src/ROUTES';
 
 type CategorySelectorProps = {
-    /** The ID of the associated policy */
-    policyID: string;
-
-    /** Function to call when the user selects a category */
-    setNewCategory: (value: ListItem) => void;
-
     /** Currently selected category */
     defaultValue?: string;
 
@@ -27,48 +21,31 @@ type CategorySelectorProps = {
     /** Whether item is focused or active */
     focused?: boolean;
 
-    /** Whether category item picker is visible */
-    isPickerVisible: boolean;
-
-    /** Callback to show category picker */
-    showPickerModal: () => void;
-
-    /** Callback to hide category picker */
-    hidePickerModal: () => void;
+    /** The custom unit ID to update when selecting a category */
+    customUnitID: string;
 };
 
-function CategorySelector({defaultValue = '', wrapperStyle, label, setNewCategory, policyID, focused, isPickerVisible, showPickerModal, hidePickerModal}: CategorySelectorProps) {
+function CategorySelector({defaultValue = '', wrapperStyle, label, focused, customUnitID}: CategorySelectorProps) {
     const styles = useThemeStyles();
-
-    const updateCategoryInput = (categoryItem: ListItem) => {
-        setNewCategory(categoryItem);
-        hidePickerModal();
-    };
 
     const decodedCategoryName = getDecodedCategoryName(defaultValue);
     const descStyle = decodedCategoryName.length === 0 ? styles.textNormal : null;
 
+    const onPress = () => {
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.DEFAULT_CATEGORY_SELECTOR.getRoute(customUnitID)));
+    };
+
     return (
-        <View>
-            <MenuItemWithTopDescription
-                shouldShowRightIcon
-                title={decodedCategoryName}
-                description={label}
-                descriptionTextStyle={descStyle}
-                onPress={showPickerModal}
-                wrapperStyle={wrapperStyle}
-                focused={focused}
-                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.RULES.CATEGORY_SELECTOR}
-            />
-            <CategorySelectorModal
-                policyID={policyID}
-                isVisible={isPickerVisible}
-                currentCategory={defaultValue}
-                onClose={hidePickerModal}
-                onCategorySelected={updateCategoryInput}
-                label={label}
-            />
-        </View>
+        <MenuItemWithTopDescription
+            shouldShowRightIcon
+            title={decodedCategoryName}
+            description={label}
+            descriptionTextStyle={descStyle}
+            onPress={onPress}
+            wrapperStyle={wrapperStyle}
+            focused={focused}
+            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.RULES.CATEGORY_SELECTOR}
+        />
     );
 }
 
