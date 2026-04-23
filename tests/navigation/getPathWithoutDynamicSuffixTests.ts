@@ -72,4 +72,32 @@ describe('getPathWithoutDynamicSuffix', () => {
 
         expect(result).toBe('');
     });
+
+    describe('actualSuffix shorter than registered pattern (optional absent)', () => {
+        it('strips only the actualSuffix length when trailing optional is absent', () => {
+            // Registered pattern is 'opt-page/:id?', actual is just 'opt-page'.
+            const result = getPathWithoutDynamicSuffix('/r/123/opt-page', 'opt-page', 'opt-page/:id?');
+
+            expect(result).toBe('/r/123');
+        });
+
+        it('strips actualSuffix when middle optional is absent', () => {
+            // Registered pattern is 'wrap/:p?/end' (3 segs max), actual is 'wrap/end' (2 segs).
+            const result = getPathWithoutDynamicSuffix('/r/123/wrap/end', 'wrap/end', 'wrap/:p?/end');
+
+            expect(result).toBe('/r/123');
+        });
+
+        it('preserves query params when stripping shorter actualSuffix', () => {
+            const result = getPathWithoutDynamicSuffix('/r/123/opt-page?baseParam=1', 'opt-page', 'opt-page/:id?');
+
+            expect(result).toBe('/r/123?baseParam=1');
+        });
+
+        it('preserves query params when stripping full optional present-form', () => {
+            const result = getPathWithoutDynamicSuffix('/r/123/opt-page/789?baseParam=1', 'opt-page/789', 'opt-page/:id?');
+
+            expect(result).toBe('/r/123?baseParam=1');
+        });
+    });
 });

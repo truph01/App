@@ -750,11 +750,59 @@ KEYBOARD_SHORTCUTS: {
 > and makes it harder to reason about which screens can trigger a given flow.
 > When in doubt, prefer an explicit list.
 
-### Current limitations (work in progress)
+### Optional path parameters
 
-- **Optional path parameters:** Suffixes must not include optional path params (e.g. `a/:reportID?`). Required path parameters (e.g. `flag/:reportActionID`) and query parameters are supported - see [Dynamic routes with query parameters](#dynamic-routes-with-query-parameters).
+Dynamic route suffixes may declare optional path parameters by appending `?` to the parameter name.
+An optional parameter can be present or absent in the URL; when absent, the corresponding key is
+omitted from the navigation state's `params` (it is **not** set to `undefined`).
 
-If you try to use dynamic routes with optional path parameters now, you will either fail to navigate to the page at all or end up on a non-existent page, and the navigation will be broken.
+Optionals can appear anywhere in the suffix:
+
+- **Trailing optional:** `member-details/:accountID?` matches both `member-details` and `member-details/123`.
+- **Middle optional:** `wrap/:p?/end` matches both `wrap/end` and `wrap/x/end`.
+- **Multiple optionals:** `a/:p1?/b/:p2?` matches `a/b`, `a/x/b`, `a/b/y`, and `a/x/b/y`.
+
+#### Configuration example
+
+```ts
+DYNAMIC_ROUTES: {
+    MEMBER_DETAILS: {
+        path: 'member-details/:accountID?',
+        entryScreens: [SCREENS.WORKSPACE.MEMBERS],
+        getRoute: (accountID?: string) => (accountID ? `member-details/${accountID}` : 'member-details'),
+    },
+},
+```
+
+#### Precedence rules
+
+When several registered suffixes could match the same URL, the matcher uses a deterministic order:
+
+1. **Longest match wins.** The algorithm iterates path sub-suffixes from longest to shortest and
+   returns the first hit. A 3-segment match (e.g. `wrap/x/end`) beats a 2-segment one (`x/end`)
+   even if both are registered.
+2. **Static beats parametric at the same length.** If both an exact static path and a parametric
+   pattern would match the same candidate length, the static one wins.
+3. **Parametric: first match wins.** Among parametric patterns of the same shape, the first one
+   in `DYNAMIC_ROUTES` registration order wins.
+
+#### Shadow conflicts
+
+A pair of registered suffixes is said to **shadow** each other if there exists any concrete URL
+that both would match. For example, `a/:p?` and `a` both match the URL `a` (the optional being
+absent), so they shadow each other.
+
+A registration-time validator (run on module load) detects every shadow pair across all
+combinations of optional presence/absence:
+
+- **In dev/test (`NODE_ENV !== 'production'`):** the validator throws with a list of conflicts,
+  failing the app at startup. Fix the conflict by tightening one of the patterns or merging them.
+- **In production:** the validator emits `Log.alert` instead of throwing so the app keeps
+  running, but the conflict still needs to be fixed in source.
+
+> [!CAUTION]
+> Designing two patterns that can match the same URL is almost always a bug. Either consolidate
+> them into a single suffix or differentiate them with additional static segments.
 
 ### Multi-segment dynamic routes
 

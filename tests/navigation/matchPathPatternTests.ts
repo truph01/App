@@ -80,4 +80,66 @@ describe('matchPathPattern', () => {
     it('should handle leading/trailing slashes in candidate', () => {
         expect(matchPathPattern('/flag/123/', 'flag/:id')).toEqual({params: {id: '123'}});
     });
+
+    describe('optional path params', () => {
+        it('matches a trailing optional param when present', () => {
+            expect(matchPathPattern('member-details/123', 'member-details/:accountID?')).toEqual({params: {accountID: '123'}});
+        });
+
+        it('matches a trailing optional param when absent', () => {
+            expect(matchPathPattern('member-details', 'member-details/:accountID?')).toEqual({params: {}});
+        });
+
+        it('returns undefined when trailing optional pattern has too many segments', () => {
+            expect(matchPathPattern('member-details/123/extra', 'member-details/:accountID?')).toBeUndefined();
+        });
+
+        it('matches a middle optional param when present', () => {
+            expect(matchPathPattern('c/x/d', 'c/:p?/d')).toEqual({params: {p: 'x'}});
+        });
+
+        it('matches a middle optional param when absent', () => {
+            expect(matchPathPattern('c/d', 'c/:p?/d')).toEqual({params: {}});
+        });
+
+        it('returns undefined when middle optional pattern misses required suffix', () => {
+            expect(matchPathPattern('c/x', 'c/:p?/d')).toBeUndefined();
+        });
+
+        it('matches a required + trailing optional combo when optional is absent', () => {
+            expect(matchPathPattern('flag/123', 'flag/:reportID/:reportActionID?')).toEqual({params: {reportID: '123'}});
+        });
+
+        it('matches a required + trailing optional combo when optional is present', () => {
+            expect(matchPathPattern('flag/123/abc', 'flag/:reportID/:reportActionID?')).toEqual({params: {reportID: '123', reportActionID: 'abc'}});
+        });
+
+        it('matches multiple trailing optionals — none present', () => {
+            expect(matchPathPattern('a', 'a/:p1?/:p2?')).toEqual({params: {}});
+        });
+
+        it('matches multiple trailing optionals — one present', () => {
+            expect(matchPathPattern('a/x', 'a/:p1?/:p2?')).toEqual({params: {p1: 'x'}});
+        });
+
+        it('matches multiple trailing optionals — both present', () => {
+            expect(matchPathPattern('a/x/y', 'a/:p1?/:p2?')).toEqual({params: {p1: 'x', p2: 'y'}});
+        });
+
+        it('matches mixed optionals when middle present, trailing absent', () => {
+            expect(matchPathPattern('a/x/b', 'a/:p1?/b/:p2?')).toEqual({params: {p1: 'x'}});
+        });
+
+        it('matches mixed optionals when middle absent, trailing present', () => {
+            expect(matchPathPattern('a/b/y', 'a/:p1?/b/:p2?')).toEqual({params: {p2: 'y'}});
+        });
+
+        it('matches mixed optionals when both absent', () => {
+            expect(matchPathPattern('a/b', 'a/:p1?/b/:p2?')).toEqual({params: {}});
+        });
+
+        it('decodes URI-encoded values inside optional params', () => {
+            expect(matchPathPattern('member-details/hello%20world', 'member-details/:accountID?')).toEqual({params: {accountID: 'hello world'}});
+        });
+    });
 });
