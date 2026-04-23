@@ -10,6 +10,8 @@ let unreadTotalCount = 0;
 let currentPageTitle = '';
 let shouldShowBranchNameInTitle = false;
 
+// This module runs outside of React's component lifecycle (it manages the browser tab title directly),
+// so we use Onyx.connectWithoutView instead of the useOnyx hook, which requires a React component context.
 Onyx.connectWithoutView({
     key: ONYXKEYS.SHOULD_SHOW_BRANCH_NAME_IN_TITLE,
     callback: (value) => {
