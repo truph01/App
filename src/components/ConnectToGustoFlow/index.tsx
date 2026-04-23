@@ -1,13 +1,14 @@
 import {useEffect} from 'react';
 import useEnvironment from '@hooks/useEnvironment';
-import connectPolicyToGusto from '@libs/actions/connections/Gusto';
+import {getGustoSetupLink} from '@libs/actions/connections/Gusto';
+import {openLink} from '@userActions/Link';
 import type {ConnectToGustoFlowProps} from './types';
 
 function ConnectToGustoFlow({policyID}: ConnectToGustoFlowProps) {
     const {environmentURL} = useEnvironment();
 
     useEffect(() => {
-        connectPolicyToGusto(policyID, environmentURL);
+        openLink(getGustoSetupLink(policyID), environmentURL);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
