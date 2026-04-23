@@ -133,7 +133,7 @@ function selectSecurityGroupForAccount(accountID: number) {
 
             const [key, group] = entry;
 
-            if (group.shared && accountIDStr in group.shared) {
+            if (group.shared?.[accountIDStr] != null) {
                 return {
                     key,
                     securityGroup: group,
