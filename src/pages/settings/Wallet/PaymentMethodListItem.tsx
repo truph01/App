@@ -119,7 +119,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
 
     const threeDotsMenuRef = useRef<{hidePopoverMenu: () => void; isPopupMenuVisible: boolean; onThreeDotsPress: () => void}>(null);
     const isInLockedState = isBusinessBankAccountLocked(item);
-    const showThreeDotsMenu = item.shouldShowThreeDotsMenu !== false && !!threeDotsMenuItems;
+    const showThreeDotsMenu = item.shouldShowThreeDotsMenu !== false && !!threeDotsMenuItems && !isInLockedState;
     const isNeedingAction = isAccountNeedingAction(item);
 
     // Check if this is a Chase personal bank account connected via Plaid

@@ -49,8 +49,6 @@ import {setBankAccountSubStep} from './ReimbursementAccount';
 
 export {
     goToWithdrawalAccountSetupStep,
-    setBankAccountFormValidationErrors,
-    resetReimbursementAccount,
     resetUSDBankAccount,
     resetNonUSDBankAccount,
     hideBankAccountErrors,

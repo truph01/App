@@ -886,6 +886,7 @@ const CONST = {
         PAY_INVOICE_VIA_EXPENSIFY: 'payInvoiceViaExpensify',
         SUGGESTED_FOLLOWUPS: 'suggestedFollowups',
         GUSTO: 'gustoNewDot',
+        BULK_DUPLICATE_REPORT: 'bulkDuplicateReport',
         BULK_EDIT: 'bulkEdit',
         NEW_MANUAL_EXPENSE_FLOW: 'newManualExpenseFlow',
         BULK_SUBMIT_APPROVE_PAY: 'bulkSubmitApprovePay',
@@ -7562,6 +7563,7 @@ const CONST = {
             CHANGE_REPORT: 'changeReport',
             SPLIT: 'split',
             DUPLICATE: 'duplicate',
+            DUPLICATE_REPORT: 'duplicateReport',
             UNDELETE: 'undelete',
         },
         BULK_DUPLICATE_LIMIT: 50,
@@ -9660,6 +9662,7 @@ const CONST = {
         AUTH_IMAGES: 'auth-images',
     },
 
+    MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO: 0.9,
     MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO_LANDSCAPE_MODE: 0.75,
 
     MAP_VIEW_LAYERS: {
