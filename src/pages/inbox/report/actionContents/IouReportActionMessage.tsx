@@ -5,30 +5,28 @@ import {View} from 'react-native';
 import Button from '@components/Button';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
 import {
-    getMemberChangeMessageFragment,
+    getLinkedTransactionID,
     getOriginalMessage,
     getReportActionMessage,
     getReportActionMessageFragments,
-    getUpdateRoomDescriptionFragment,
+    isActionOfType,
     isAddCommentAction,
     isApprovedOrSubmittedReportAction as isApprovedOrSubmittedReportActionUtils,
-    isMemberChangeAction,
-    isMoneyRequestAction,
-    isReimbursementDirectionInformationRequiredAction,
     isThreadParentMessage,
 } from '@libs/ReportActionsUtils';
-import {getReportName} from '@libs/ReportUtils';
+import {getIOUReportActionDisplayMessage, hasMissingInvoiceBankAccount, isSettled} from '@libs/ReportUtils';
+import ReportActionItemFragment from '@pages/inbox/report/ReportActionItemFragment';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {ReportAction} from '@src/types/onyx';
-import IouReportActionMessage from './actionContents/IouReportActionMessage';
-import TextCommentFragment from './comment/TextCommentFragment';
-import ReportActionItemFragment from './ReportActionItemFragment';
 
-type ReportActionItemMessageProps = {
+type IouReportActionMessageProps = {
     /** The report action */
     action: ReportAction;
 
@@ -39,99 +37,31 @@ type ReportActionItemMessageProps = {
     style?: StyleProp<ViewStyle & TextStyle>;
 
     /** Whether or not the message is hidden by moderation */
-    isHidden?: boolean;
+    isHidden: boolean;
 
     /** The ID of the report */
     reportID: string | undefined;
 };
 
-function ReportActionItemMessage({action, displayAsGroup, reportID, style, isHidden = false}: ReportActionItemMessageProps) {
+function IouReportActionMessage({action, displayAsGroup, reportID, style, isHidden}: IouReportActionMessageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
+    const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(getLinkedTransactionID(action))}`);
+    const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
 
-    if (isMoneyRequestAction(action)) {
-        return (
-            <IouReportActionMessage
-                action={action}
-                displayAsGroup={displayAsGroup}
-                reportID={reportID}
-                style={style}
-                isHidden={isHidden}
-            />
-        );
-    }
-
-    if (isMemberChangeAction(action)) {
-        // This will be fixed: https://github.com/Expensify/App/issues/76852
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        const fragment = getMemberChangeMessageFragment(translate, action, getReportName);
-
-        return (
-            <View style={[styles.chatItemMessage, style]}>
-                <TextCommentFragment
-                    fragment={fragment}
-                    displayAsGroup={displayAsGroup}
-                    style={style}
-                    source=""
-                    styleAsDeleted={false}
-                />
-            </View>
-        );
-    }
-
-    if (action.actionName === CONST.REPORT.ACTIONS.TYPE.ROOM_CHANGE_LOG.UPDATE_ROOM_DESCRIPTION) {
-        const fragment = getUpdateRoomDescriptionFragment(translate, action);
-        return (
-            <View style={[styles.chatItemMessage, style]}>
-                <TextCommentFragment
-                    fragment={fragment}
-                    displayAsGroup={displayAsGroup}
-                    style={style}
-                    source=""
-                    styleAsDeleted={false}
-                />
-            </View>
-        );
-    }
-
-    const handleEnterSignerInfoPress = (policyID: string | undefined, bankAccountID: string | undefined, isCompleted: boolean) => {
-        if (!policyID || !bankAccountID) {
-            return;
-        }
-
-        Navigation.navigate(ROUTES.BANK_ACCOUNT_ENTER_SIGNER_INFO.getRoute(policyID, bankAccountID, isCompleted));
-    };
-
-    if (isReimbursementDirectionInformationRequiredAction(action)) {
-        const {bankAccountLastFour, currency, policyID, bankAccountID, completed} =
-            getOriginalMessage<typeof CONST.REPORT.ACTIONS.TYPE.REIMBURSEMENT_DIRECTOR_INFORMATION_REQUIRED>(action) ?? {};
-
-        return (
-            <View style={[styles.chatItemMessage, style]}>
-                <Text>{translate('signerInfoStep.isConnecting', bankAccountLastFour, currency)}</Text>
-                <Button
-                    style={[styles.mt2, styles.alignSelfStart]}
-                    success
-                    isDisabled={completed}
-                    text={translate(completed ? 'signerInfoStep.thisStep' : 'signerInfoStep.enterSignerInfo')}
-                    onPress={() => handleEnterSignerInfoPress(policyID, bankAccountID, !!completed)}
-                    sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_MESSAGE_ENTER_SIGNER_INFO}
-                />
-            </View>
-        );
+    let iouMessage: string | undefined;
+    const originalMessage = isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.IOU) ? getOriginalMessage(action) : null;
+    const iouReportID = originalMessage?.IOUReportID;
+    if (iouReportID) {
+        iouMessage = getIOUReportActionDisplayMessage(translate, action, transaction, report, bankAccountList);
     }
 
     const isApprovedOrSubmittedReportAction = isApprovedOrSubmittedReportActionUtils(action);
-
     const isHoldReportAction = [CONST.REPORT.ACTIONS.TYPE.HOLD, CONST.REPORT.ACTIONS.TYPE.UNHOLD].some((type) => type === action.actionName);
 
     const fragments = getReportActionMessageFragments(translate, action);
 
-    /**
-     * Get the ReportActionItemFragments
-     * @param shouldWrapInText determines whether the fragments are wrapped in a Text component
-     * @returns report action item fragments
-     */
     const renderReportActionItemFragments = (shouldWrapInText: boolean): ReactElement | ReactElement[] => {
         const reportActionItemFragments = fragments.map((fragment, index) => (
             <ReportActionItemFragment
@@ -139,6 +69,7 @@ function ReportActionItemMessage({action, displayAsGroup, reportID, style, isHid
                 key={`actionFragment-${action.reportActionID}-${index}`}
                 reportActionID={action.reportActionID}
                 fragment={fragment}
+                iouMessage={iouMessage}
                 isThreadParentMessage={isThreadParentMessage(action, reportID)}
                 pendingAction={action.pendingAction}
                 actionName={action.actionName}
@@ -162,10 +93,31 @@ function ReportActionItemMessage({action, displayAsGroup, reportID, style, isHid
         return shouldWrapInText ? <Text style={styles.ltr}>{reportActionItemFragments}</Text> : reportActionItemFragments;
     };
 
+    const openWorkspaceInvoicesPage = () => {
+        const policyID = report?.policyID;
+        if (!policyID) {
+            return;
+        }
+        Navigation.navigate(ROUTES.WORKSPACE_INVOICES.getRoute(policyID));
+    };
+
+    const shouldShowAddBankAccountButton = action.actionName === CONST.REPORT.ACTIONS.TYPE.IOU && hasMissingInvoiceBankAccount(reportID) && !isSettled(reportID);
+
     return (
         <View style={[styles.chatItemMessage, style]}>
             {!isHidden ? (
-                renderReportActionItemFragments(isApprovedOrSubmittedReportAction)
+                <>
+                    {renderReportActionItemFragments(isApprovedOrSubmittedReportAction)}
+                    {shouldShowAddBankAccountButton && (
+                        <Button
+                            style={[styles.mt2, styles.alignSelfStart]}
+                            success
+                            text={translate('bankAccount.addBankAccount')}
+                            onPress={openWorkspaceInvoicesPage}
+                            sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_MESSAGE_ADD_BANK_ACCOUNT}
+                        />
+                    )}
+                </>
             ) : (
                 <Text style={[styles.textLabelSupporting, styles.lh20]}>{translate('moderation.flaggedContent')}</Text>
             )}
@@ -173,4 +125,4 @@ function ReportActionItemMessage({action, displayAsGroup, reportID, style, isHid
     );
 }
 
-export default ReportActionItemMessage;
+export default IouReportActionMessage;
