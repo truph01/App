@@ -6,15 +6,7 @@ import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactions from '@hooks/useReportTransactions';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
-import {
-    chatIncludesChronosWithID,
-    getIndicatedMissingPaymentMethod,
-    getTransactionsWithReceipts,
-    isArchivedNonExpenseReport,
-    isChatThread,
-    isClosedExpenseReportWithNoExpenses,
-    isCurrentUserTheOnlyParticipant,
-} from '@libs/ReportUtils';
+import {chatIncludesChronosWithID, getTransactionsWithReceipts, isArchivedNonExpenseReport, isClosedExpenseReportWithNoExpenses, isCurrentUserTheOnlyParticipant} from '@libs/ReportUtils';
 import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
 import {deleteReportActionDraft, resolveActionableMentionWhisper, resolveActionableReportMentionWhisper} from '@userActions/Report';
 import {clearError} from '@userActions/Transaction';
@@ -30,12 +22,6 @@ type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'lin
     /** Draft message for the report action */
     draftMessage?: string;
 
-    /** User wallet tierName */
-    userWalletTierName: string | undefined;
-
-    /** Whether the user is validated */
-    isUserValidated: boolean | undefined;
-
     /** Personal details list */
     personalDetails: OnyxEntry<PersonalDetailsList>;
 
@@ -50,8 +36,6 @@ function ReportActionItem({
     action,
     report,
     draftMessage,
-    userWalletTierName,
-    isUserValidated,
     personalDetails,
     userBillingFundID,
     linkedTransactionRouteError: linkedTransactionRouteErrorProp,
@@ -77,7 +61,6 @@ function ReportActionItem({
     const [iouReportOfLinkedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportOfLinkedReportID}`);
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
-    const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
     const transactionID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUTransactionID;
@@ -90,9 +73,6 @@ function ReportActionItem({
     );
 
     const [linkedTransactionRouteError] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {selector: getLinkedTransactionRouteError});
-
-    const targetReport = isChatThread(report) ? parentReport : report;
-    const missingPaymentMethod = getIndicatedMissingPaymentMethod(userWalletTierName, targetReport?.reportID, action, bankAccountList);
 
     return (
         <PureReportActionItem
@@ -110,7 +90,6 @@ function ReportActionItem({
             linkedReport={linkedReport}
             iouReportOfLinkedReport={iouReportOfLinkedReport}
             linkedTransactionRouteError={linkedTransactionRouteError}
-            isUserValidated={isUserValidated}
             parentReport={parentReport}
             personalDetails={personalDetails}
             originalReportID={originalReportID}
@@ -122,13 +101,11 @@ function ReportActionItem({
             resolveActionableMentionWhisper={resolveActionableMentionWhisper}
             isClosedExpenseReportWithNoExpenses={isClosedExpenseReportWithNoExpenses(iouReport, transactionsOnIOUReport)}
             isCurrentUserTheOnlyParticipant={isCurrentUserTheOnlyParticipant}
-            missingPaymentMethod={missingPaymentMethod}
             getTransactionsWithReceipts={getTransactionsWithReceipts}
             clearError={clearError}
             clearAllRelatedReportActionErrors={clearAllRelatedReportActionErrors}
             userBillingFundID={userBillingFundID}
             isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
-            bankAccountList={bankAccountList}
             reportMetadata={reportMetadata}
         />
     );
