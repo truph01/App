@@ -143,8 +143,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
             return;
         }
         setSelectedCardIDs((prev) => {
-            const allSelected = prev.length === selectableCardIDs.length && selectableCardIDs.every((id) => prev.includes(id));
-            if (allSelected) {
+            if (prev.length > 0) {
                 return [];
             }
             return [...selectableCardIDs];
