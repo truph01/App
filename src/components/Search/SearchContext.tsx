@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/core';
 import type {NavigationState} from '@react-navigation/routers';
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 // We need direct access to useOnyx from react-native-onyx to avoid circular dependencies in SearchContext
 // eslint-disable-next-line no-restricted-imports
 import {useOnyx} from 'react-native-onyx';
@@ -18,7 +18,6 @@ import {hasValidModifiedAmount} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
-import type SearchResults from '@src/types/onyx/SearchResults';
 import type {SearchResultsInfo} from '@src/types/onyx/SearchResults';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {SearchActionsContextValue, SearchContextData, SearchStateContextValue, SelectedTransactions} from './types';
@@ -100,7 +99,7 @@ function SearchContextProvider({children}: SearchContextProps) {
     const queryParam = useRootNavigationState((state) => selectSearchQueryParam(state ?? navigation.getState()));
     const rawQueryParam = useRootNavigationState((state) => selectSearchRawQueryParam(state ?? navigation.getState()));
     const definedQueryParam = usePreviousDefined(queryParam) ?? buildSearchQueryString();
-    const currentSearchQueryJSON = buildSearchQueryJSON(definedQueryParam, rawQueryParam);
+    const currentSearchQueryJSON = useMemo(() => buildSearchQueryJSON(definedQueryParam, rawQueryParam), [definedQueryParam, rawQueryParam]);
 
     const areTransactionsEmpty = useRef(true);
     const [lastSearchType, setLastSearchType] = useState<string>();
@@ -119,33 +118,38 @@ function SearchContextProvider({children}: SearchContextProps) {
     const {defaultCardFeed} = useCardFeedsForDisplay();
     const {accountID} = useCurrentUserPersonalDetails();
     const defaultCardFeedID = defaultCardFeed?.id;
-    const suggestedSearches = getSuggestedSearches(accountID, defaultCardFeedID);
+    const suggestedSearches = useMemo(() => getSuggestedSearches(accountID, defaultCardFeedID), [accountID, defaultCardFeedID]);
 
-    const currentSearchKey = Object.values(suggestedSearches).find((search) => search.similarSearchHash === currentSimilarSearchHash)?.key;
+    const currentSearchKey = useMemo(() => {
+        return Object.values(suggestedSearches).find((search) => search.similarSearchHash === currentSimilarSearchHash)?.key;
+    }, [currentSimilarSearchHash, suggestedSearches]);
 
     const shouldUseLiveData = !!currentSearchKey && isTodoSearch(currentRecentSearchHash, suggestedSearches);
 
-    // If viewing a to-do search, use live data from useTodos, otherwise return the snapshot data.
+    // If viewing a to-do search, use live data from useTodos, otherwise return the snapshot data
     // We do this so that we can show the counters for the to-do search results without visiting the specific to-do page, e.g. show `Approve [3]` while viewing the `Submit` to-do search.
-    let currentSearchResults: SearchResults | undefined;
-    if (shouldUseLiveData) {
-        const liveData = todoSearchResultsData[currentSearchKey as keyof typeof todoSearchResultsData];
-        const searchInfo: SearchResultsInfo = {
-            ...(snapshotSearchResults?.search ?? defaultSearchInfo),
-            count: liveData.metadata.count,
-            total: liveData.metadata.total,
-            currency: liveData.metadata.currency,
-        };
-        const hasResults = Object.keys(liveData.data).length > 0;
-        currentSearchResults = {
-            search: {...searchInfo, isLoading: false, hasResults},
-            data: liveData.data,
-        };
-    } else {
-        currentSearchResults = snapshotSearchResults ?? undefined;
-    }
+    const currentSearchResults = useMemo(() => {
+        if (shouldUseLiveData) {
+            const liveData = todoSearchResultsData[currentSearchKey as keyof typeof todoSearchResultsData];
+            const searchInfo: SearchResultsInfo = {
+                ...(snapshotSearchResults?.search ?? defaultSearchInfo),
+                count: liveData.metadata.count,
+                total: liveData.metadata.total,
+                currency: liveData.metadata.currency,
+            };
+            const hasResults = Object.keys(liveData.data).length > 0;
+            // For to-do searches, always return a valid SearchResults object (even with empty data)
+            // This ensures we show the empty state instead of loading/blocking views
+            return {
+                search: {...searchInfo, isLoading: false, hasResults},
+                data: liveData.data,
+            };
+        }
 
-    const setSelectedTransactions: SearchActionsContextValue['setSelectedTransactions'] = (transactionIDs, data = []) => {
+        return snapshotSearchResults ?? undefined;
+    }, [currentSearchKey, shouldUseLiveData, snapshotSearchResults, todoSearchResultsData]);
+
+    const setSelectedTransactions: SearchActionsContextValue['setSelectedTransactions'] = useCallback((transactionIDs, data = []) => {
         if (transactionIDs instanceof Array) {
             if (!transactionIDs.length && areTransactionsEmpty.current) {
                 areTransactionsEmpty.current = true;
@@ -231,7 +235,7 @@ function SearchContextProvider({children}: SearchContextProps) {
             selectedTransactions: transactionIDs,
             shouldTurnOffSelectionMode: false,
         }));
-    };
+    }, []);
 
     const currentSearchHashRef = useRef(currentSearchHash);
     useEffect(() => {
@@ -251,33 +255,38 @@ function SearchContextProvider({children}: SearchContextProps) {
         });
     };
 
-    const clearSelectedTransactions: SearchActionsContextValue['clearSelectedTransactions'] = (searchHashOrClearIDsFlag, shouldTurnOffSelectionMode = false) => {
-        if (typeof searchHashOrClearIDsFlag === 'boolean') {
-            setSelectedTransactions([]);
-            return;
-        }
-
-        if (searchHashOrClearIDsFlag === currentSearchHashRef.current) {
-            return;
-        }
-
-        setSearchContextData((prevState) => {
-            if (prevState.selectedReports.length === 0 && isEmptyObject(prevState.selectedTransactions) && !prevState.shouldTurnOffSelectionMode) {
-                return prevState;
+    const clearSelectedTransactions: SearchActionsContextValue['clearSelectedTransactions'] = useCallback(
+        (searchHashOrClearIDsFlag, shouldTurnOffSelectionMode = false) => {
+            if (typeof searchHashOrClearIDsFlag === 'boolean') {
+                setSelectedTransactions([]);
+                return;
             }
-            return {
-                ...prevState,
-                shouldTurnOffSelectionMode,
-                selectedTransactions: {},
-                selectedReports: [],
-            };
-        });
 
-        setShouldShowSelectAllMatchingItems(false);
-        selectAllMatchingItems(false);
-    };
+            if (searchHashOrClearIDsFlag === currentSearchHashRef.current) {
+                return;
+            }
 
-    const removeTransaction: SearchActionsContextValue['removeTransaction'] = (transactionID) => {
+            setSearchContextData((prevState) => {
+                if (prevState.selectedReports.length === 0 && isEmptyObject(prevState.selectedTransactions) && !prevState.shouldTurnOffSelectionMode) {
+                    return prevState;
+                }
+                return {
+                    ...prevState,
+                    shouldTurnOffSelectionMode,
+                    selectedTransactions: {},
+                    selectedReports: [],
+                };
+            });
+
+            setShouldShowSelectAllMatchingItems(false);
+            selectAllMatchingItems(false);
+        },
+        // currentSearchHash is read via currentSearchHashRef to keep this callback stable.
+        // setShouldShowSelectAllMatchingItems and selectAllMatchingItems are stable useState setters.
+        [setSelectedTransactions],
+    );
+
+    const removeTransaction: SearchActionsContextValue['removeTransaction'] = useCallback((transactionID) => {
         if (!transactionID) {
             return;
         }
@@ -306,42 +315,64 @@ function SearchContextProvider({children}: SearchContextProps) {
             }
             return newState;
         });
-    };
+    }, []);
 
-    const setShouldResetSearchQuery = (shouldReset: boolean) => {
+    const setShouldResetSearchQuery = useCallback((shouldReset: boolean) => {
         setSearchContextData((prevState) => ({
             ...prevState,
             shouldResetSearchQuery: shouldReset,
         }));
-    };
+    }, []);
 
-    const searchStateContextValue: SearchStateContextValue = {
-        ...searchContextData,
-        suggestedSearches,
-        currentSearchKey,
-        currentSearchHash,
-        currentSimilarSearchHash,
-        currentSearchResults,
-        shouldUseLiveData,
-        shouldShowFiltersBarLoading,
-        lastSearchType,
-        shouldShowSelectAllMatchingItems,
-        areAllMatchingItemsSelected,
-        currentSearchQueryJSON,
-        hasSelectedTransactions: searchContextData.selectedTransactionIDs.length > 0 || Object.values(searchContextData.selectedTransactions).some((t) => t.isSelected),
-    };
+    const searchStateContextValue: SearchStateContextValue = useMemo(
+        () => ({
+            ...searchContextData,
+            suggestedSearches,
+            currentSearchKey,
+            currentSearchHash,
+            currentSimilarSearchHash,
+            currentSearchResults,
+            shouldUseLiveData,
+            shouldShowFiltersBarLoading,
+            lastSearchType,
+            shouldShowSelectAllMatchingItems,
+            areAllMatchingItemsSelected,
+            currentSearchQueryJSON,
+            hasSelectedTransactions: searchContextData.selectedTransactionIDs.length > 0 || Object.values(searchContextData.selectedTransactions).some((t) => t.isSelected),
+        }),
+        [
+            searchContextData,
+            suggestedSearches,
+            currentSearchKey,
+            currentSearchHash,
+            currentSimilarSearchHash,
+            currentSearchResults,
+            shouldUseLiveData,
+            shouldShowFiltersBarLoading,
+            lastSearchType,
+            shouldShowSelectAllMatchingItems,
+            areAllMatchingItemsSelected,
+            currentSearchQueryJSON,
+        ],
+    );
 
-    const searchActionsContextValue: SearchActionsContextValue = {
-        removeTransaction,
-        setSelectedTransactions,
-        setCurrentSelectedTransactionReportID,
-        clearSelectedTransactions,
-        setShouldShowFiltersBarLoading,
-        setLastSearchType,
-        setShouldShowSelectAllMatchingItems,
-        selectAllMatchingItems,
-        setShouldResetSearchQuery,
-    };
+    const searchActionsContextValue: SearchActionsContextValue = useMemo(
+        () => ({
+            removeTransaction,
+            setSelectedTransactions,
+            setCurrentSelectedTransactionReportID,
+            clearSelectedTransactions,
+            setShouldShowFiltersBarLoading,
+            setLastSearchType,
+            setShouldShowSelectAllMatchingItems,
+            selectAllMatchingItems,
+            setShouldResetSearchQuery,
+        }),
+        // shouldShowFiltersBarLoading, setLastSearchType, setShouldShowSelectAllMatchingItems,
+        // and selectAllMatchingItems are stable useState setters — excluded from deps intentionally.
+        // setCurrentSelectedTransactionReportID only uses setSearchContextData (stable setter).
+        [removeTransaction, setSelectedTransactions, clearSelectedTransactions, setShouldResetSearchQuery],
+    );
 
     return (
         <SearchStateContext value={searchStateContextValue}>
