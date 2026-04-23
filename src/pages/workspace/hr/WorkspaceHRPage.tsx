@@ -37,7 +37,7 @@ function WorkspaceHRPage({
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const policy = usePolicy(policyID);
-    const [connectFlowKey, setConnectFlowKey] = useState(0);
+    const [activeGustoFlowKey, setActiveGustoFlowKey] = useState(0);
     const icons = useMemoizedLazyExpensifyIcons(['GustoSquare']);
     const illustrations = useMemoizedLazyIllustrations(['NewUser']);
     const isConnected = isGustoConnected(policy);
@@ -68,9 +68,9 @@ function WorkspaceHRPage({
                 shouldShowOfflineIndicatorInWideScreen
                 offlineIndicatorStyle={styles.mtAuto}
             >
-                {connectFlowKey > 0 && (
+                {activeGustoFlowKey > 0 && (
                     <ConnectToGustoFlow
-                        key={connectFlowKey}
+                        key={activeGustoFlowKey}
                         policyID={policyID}
                     />
                 )}
@@ -100,7 +100,7 @@ function WorkspaceHRPage({
                                         <Button
                                             small
                                             text={translate('workspace.hr.gusto.connect')}
-                                            onPress={() => setConnectFlowKey((currentKey) => currentKey + 1)}
+                                            onPress={() => setActiveGustoFlowKey((currentKey) => currentKey + 1)}
                                         />
                                     ) : undefined
                                 }
