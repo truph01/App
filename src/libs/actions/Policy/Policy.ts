@@ -221,6 +221,7 @@ type CreateWorkspaceDataOptions = Omit<BuildPolicyDataOptions, 'isSelfTourViewed
 };
 
 type DuplicatePolicyDataOptions = {
+    currentUserAccountID: number;
     policyName: string;
     policyID?: string;
     targetPolicyID?: string;
@@ -3121,7 +3122,7 @@ function createDraftWorkspace({
 }
 
 function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOptions) {
-    const {policyName = '', policyID = generatePolicyID(), file, welcomeNote, parts, targetPolicyID = generatePolicyID(), policyCategories, localCurrency} = options;
+    const {policyName = '', policyID = generatePolicyID(), file, welcomeNote, parts, targetPolicyID = generatePolicyID(), policyCategories, localCurrency, currentUserAccountID} = options;
 
     const {
         adminsChatReportID,
@@ -3155,7 +3156,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const {customUnitID: distanceCustomUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(outputCurrency);
     const perDiemCustomUnitID = generateCustomUnitID();
 
-    const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(targetPolicyID, [...policyMemberAccountIDs]);
+    const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(targetPolicyID, [...policyMemberAccountIDs], currentUserAccountID);
     const announceRoomChat = optimisticAnnounceChat.announceChatData;
 
     const defaultOptimisticCategoriesData = buildOptimisticPolicyCategories(targetPolicyID, Object.values(CONST.POLICY.DEFAULT_CATEGORIES));
@@ -7115,7 +7116,6 @@ function setWorkspaceConfirmationCurrency(currency: string) {
 export {
     leaveWorkspace,
     addBillingCardAndRequestPolicyOwnerChange,
-    hasActiveChatEnabledPolicies,
     deleteWorkspace,
     updateAddress,
     updateLastAccessedWorkspace,
