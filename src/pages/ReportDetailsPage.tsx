@@ -454,6 +454,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
             const actionReportID = getOriginalReportID(report.reportID, parentReportAction, reportActionsForOriginalReportID);
             const whisperAction = getTrackExpenseActionableWhisper(iouTransactionID, moneyRequestReport?.reportID);
             const actionableWhisperReportActionID = whisperAction?.reportActionID;
+            const currentUserLocalCurrency = currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD;
             items.push({
                 key: CONST.REPORT_DETAILS_MENU_ITEM.TRACK.SUBMIT,
                 translationKey: 'actionableMentionTrackExpense.submit',
@@ -476,7 +477,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                         transaction: iouTransaction,
                         currentUserAccountID: currentUserPersonalDetails.accountID,
                         currentUserEmail: currentUserPersonalDetails.email ?? '',
-                        currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
+                        currentUserLocalCurrency,
                     });
                 },
             });
@@ -501,7 +502,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             transaction: iouTransaction,
                             currentUserAccountID: currentUserPersonalDetails.accountID,
                             currentUserEmail: currentUserPersonalDetails.email ?? '',
-                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
+                            currentUserLocalCurrency,
                         });
                     },
                 });
@@ -525,7 +526,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
                             transaction: iouTransaction,
                             currentUserAccountID: currentUserPersonalDetails.accountID,
                             currentUserEmail: currentUserPersonalDetails.email ?? '',
-                            currentUserLocalCurrency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
+                            currentUserLocalCurrency,
                         });
                     },
                 });
