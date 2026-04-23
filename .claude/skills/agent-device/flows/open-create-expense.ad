@@ -5,7 +5,7 @@
 # @tag    iou
 # @tag    navigation
 # @tag    perf
-# @span   ManualOpenCreateExpense
+# @tag    sentry-ManualOpenCreateExpense
 find "Inbox" "click"
 press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
 press "role=\"button\" label=\"Create expense\" || label=\"Create expense\""

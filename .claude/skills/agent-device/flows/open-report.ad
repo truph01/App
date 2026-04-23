@@ -4,6 +4,6 @@
 # @tag    chat
 # @tag    navigation
 # @tag    perf
-# @span   ManualOpenReport
+# @tag    sentry-ManualOpenReport
 find "Inbox" "click"
 find "Navigates to a chat" "click"

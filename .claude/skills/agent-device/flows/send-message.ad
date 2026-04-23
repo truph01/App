@@ -5,7 +5,7 @@
 # @tag    chat
 # @tag    navigation
 # @tag    perf
-# @span   ManualSendMessage
+# @tag    sentry-ManualSendMessage
 find "Inbox" "click"
 find "Navigates to a chat" "click"
 fill "id=\"composer\" || role=\"textview\" label=\"Write something...\" editable=true || label=\"Write something...\" editable=true" "Hello from agent-device ManualSendMessage flow"

@@ -4,6 +4,6 @@
 # @post   text="Inbox"
 # @tag    navigation
 # @tag    perf
-# @span   ManualNavigateToInboxTab
+# @tag    sentry-ManualNavigateToInboxTab
 press "role=\"button\" label=\"Home\" || label=\"Home\""
 press "role=\"button\" label=\"Inbox\" || label=\"Inbox\""

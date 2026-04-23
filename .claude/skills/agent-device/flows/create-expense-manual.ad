@@ -7,13 +7,13 @@
 # @tag    iou
 # @tag    navigation
 # @tag    perf
-# @span   ManualCreateExpenseSubmit
-# @span   ManualSubmitToDestinationVisible
-# @span   ManualCreateExpenseServerResponse
-# @span   ManualConfirmationMount
-# @span   ManualConfirmationListReady
-# @span   ManualConfirmationReceiptLoad
-# @span   ManualGeolocationWait
+# @tag    sentry-ManualCreateExpenseSubmit
+# @tag    sentry-ManualSubmitToDestinationVisible
+# @tag    sentry-ManualCreateExpenseServerResponse
+# @tag    sentry-ManualConfirmationMount
+# @tag    sentry-ManualConfirmationListReady
+# @tag    sentry-ManualConfirmationReceiptLoad
+# @tag    sentry-ManualGeolocationWait
 press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
 press "role=\"button\" label=\"Create expense\" || label=\"Create expense\""
 press "role=\"group\" label=\"Manual\" || label=\"Manual\""

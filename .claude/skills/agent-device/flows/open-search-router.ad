@@ -6,6 +6,6 @@
 # @tag    navigation
 # @tag    perf
 # @tag    search
-# @span   ManualOpenSearchRouter
+# @tag    sentry-ManualOpenSearchRouter
 press "role=\"button\" label=\"Inbox\" || label=\"Inbox\""
 press "role=\"button\" label=\"Search\" || label=\"Search\""

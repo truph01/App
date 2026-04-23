@@ -3,8 +3,8 @@
 # @post   role="button" label="Open actions menu"
 # @tag    iou
 # @tag    perf
-# @span   ManualCreateExpenseSubmit
-# @span   ManualSubmitToDestinationVisible
-# @span   ManualCreateExpenseServerResponse
-# @span   ManualGeolocationWait
+# @tag    sentry-ManualCreateExpenseSubmit
+# @tag    sentry-ManualSubmitToDestinationVisible
+# @tag    sentry-ManualCreateExpenseServerResponse
+# @tag    sentry-ManualGeolocationWait
 press "role=\"button\" label=\"Confirm\" || role=\"button\" label=\"Submit\" || label=\"Confirm\" || label=\"Submit\""

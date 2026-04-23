@@ -4,6 +4,6 @@
 # @post   text="Reports"
 # @tag    navigation
 # @tag    perf
-# @span   ManualNavigateToReports
+# @tag    sentry-ManualNavigateToReports
 press "role=\"button\" label=\"Home\" || label=\"Home\""
 press "role=\"button\" label=\"Reports\" || label=\"Reports\""

@@ -6,7 +6,7 @@
 # @tag    iou
 # @tag    scan
 # @tag    perf
-# @span   ManualCameraInit
+# @tag    sentry-ManualCameraInit
 find "Inbox" "click"
 press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
 press "role=\"button\" label=\"Create expense\" || label=\"Create expense\""
