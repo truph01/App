@@ -173,11 +173,7 @@ function getOptimisticWatchKey(key: string): OnyxKey | undefined {
     if (channelKey) {
         return channelKey;
     }
-    const flushedKey = flushedWatchKeys.get(key);
-    if (flushedKey) {
-        flushedWatchKeys.delete(key);
-    }
-    return flushedKey;
+    return flushedWatchKeys.get(key);
 }
 
 // Flush every pending deferred write when the app moves to background so
