@@ -1893,6 +1893,22 @@ describe('TransactionUtils', () => {
             expect(result).toBe('Tax exempt (0%) • Default');
         });
 
+        it('should return empty string when trackingEnabled is false and transaction has no taxCode', () => {
+            const policyWithTrackingDisabled: Policy = {
+                ...createRandomPolicy(0),
+                tax: {trackingEnabled: false},
+                taxRates: CONST.DEFAULT_TAX,
+            };
+            const transaction = generateTransaction({
+                taxCode: undefined,
+                taxValue: undefined,
+            });
+
+            const result = TransactionUtils.getTaxRateTitle(policyWithTrackingDisabled, transaction, false, undefined);
+
+            expect(result).toBe('');
+        });
+
         it('should return empty string when policy is undefined', () => {
             const transaction = generateTransaction({
                 taxCode: 'id_TAX_RATE_1',
