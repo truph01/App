@@ -34,4 +34,4 @@ function connectPolicyToGusto(policyID: string) {
     API.read(READ_COMMANDS.CONNECT_POLICY_TO_GUSTO, parameters, getGustoSyncProgressOnyxData(policyID));
 }
 
-export {connectPolicyToGusto};
+export default connectPolicyToGusto;
