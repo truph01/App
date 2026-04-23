@@ -82,9 +82,7 @@ function getCardFeedKey(workspaceCardFeeds: Record<string, WorkspaceCardsList | 
     // (see Auth/auth/lib/Card.cpp `buildCardsCollectionKey`). Stripping the `cards_` prefix returns
     // the exact token that `getWorkspaceCardFeedKey` re-prefixes to look the bucket back up, so the
     // round-trip holds for every bank.
-    return workspaceFeedKey.startsWith(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST)
-        ? workspaceFeedKey.slice(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST.length)
-        : workspaceFeedKey;
+    return workspaceFeedKey.startsWith(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST) ? workspaceFeedKey.slice(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST.length) : workspaceFeedKey;
 }
 
 /**
@@ -323,7 +321,7 @@ function getCardFeedNamesWithType(params: GetCardFeedData) {
     }, {});
 }
 
-function createCardFeedKey(fundID: string | undefined, bank: string, feedCountry?: string) {
+function createCardFeedKey(fundID: string | undefined, bank: string, feedCountry: string | undefined) {
     if (!fundID) {
         return bank;
     }
