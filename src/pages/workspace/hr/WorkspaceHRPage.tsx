@@ -1,6 +1,7 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
+import ConnectToGustoFlow from '@components/ConnectToGustoFlow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -10,14 +11,11 @@ import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
-import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
-import {isConnectionInProgress} from '@libs/actions/connections';
-import connectPolicyToGusto from '@libs/actions/connections/Gusto';
 import {openPolicyHRPage} from '@libs/actions/PolicyConnections';
 import Navigation from '@libs/Navigation/Navigation';
 import {isGustoConnected} from '@libs/PolicyUtils';
@@ -25,7 +23,6 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 
 type WorkspaceHRPageProps = PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.HR>;
@@ -40,11 +37,10 @@ function WorkspaceHRPage({
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const policy = usePolicy(policyID);
-    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
+    const [connectFlowKey, setConnectFlowKey] = useState(0);
     const icons = useMemoizedLazyExpensifyIcons(['GustoSquare']);
     const illustrations = useMemoizedLazyIllustrations(['NewUser']);
     const isConnected = isGustoConnected(policy);
-    const isConnectingToGusto = connectionSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO && isConnectionInProgress(connectionSyncProgress, policy);
 
     useWorkspaceDocumentTitle(undefined, 'workspace.common.hr');
 
@@ -72,6 +68,12 @@ function WorkspaceHRPage({
                 shouldShowOfflineIndicatorInWideScreen
                 offlineIndicatorStyle={styles.mtAuto}
             >
+                {connectFlowKey > 0 && (
+                    <ConnectToGustoFlow
+                        key={connectFlowKey}
+                        policyID={policyID}
+                    />
+                )}
                 <HeaderWithBackButton
                     icon={illustrations.NewUser}
                     title={translate('workspace.common.hr')}
@@ -98,8 +100,7 @@ function WorkspaceHRPage({
                                         <Button
                                             small
                                             text={translate('workspace.hr.gusto.connect')}
-                                            onPress={() => connectPolicyToGusto(policyID)}
-                                            isLoading={isConnectingToGusto}
+                                            onPress={() => setConnectFlowKey((currentKey) => currentKey + 1)}
                                         />
                                     ) : undefined
                                 }
