@@ -208,23 +208,26 @@ AppState.addEventListener('change', (nextState) => {
 function deferOrExecuteWrite(apiWrite: () => void, options: {shouldDeferForSearch: boolean; isRetry?: boolean; optimisticWatchKey?: OnyxKey; onDeferred?: () => void}) {
     const {shouldDeferForSearch, isRetry = false, optimisticWatchKey, onDeferred} = options;
 
-    // Retries skip deferral to avoid infinite loops (retry -> defer -> flush -> retry).
-    // The trade-off is that a retry's optimistic data may be applied mid-animation,
-    // but this is acceptable: retries are rare and the alternative is a stuck write.
-
-    // Determine the target channel. shouldDeferForSearch is the explicit flag;
-    // we also check for a reserved SEARCH channel (created by handleSearchDismiss
-    // before createTransaction) so it doesn't linger unused.
-    const shouldDeferToSearch = shouldDeferForSearch || (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH));
-    if (shouldDeferToSearch) {
+    if (shouldDeferForSearch) {
         onDeferred?.();
         registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH, apiWrite, {optimisticWatchKey});
         return;
     }
 
+    // Retries skip deferral to avoid infinite loops (retry -> defer -> flush -> retry).
+    // The trade-off is that a retry's optimistic data may be applied mid-animation,
+    // but this is acceptable: retries are rare and the alternative is a stuck write.
     if (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL)) {
         onDeferred?.();
         registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL, apiWrite, {optimisticWatchKey});
+        return;
+    }
+
+    // Fallback: a reserved SEARCH channel (created by handleSearchDismiss before
+    // createTransaction) that wasn't matched by the explicit shouldDeferForSearch flag.
+    if (!isRetry && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH)) {
+        onDeferred?.();
+        registerDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH, apiWrite, {optimisticWatchKey});
         return;
     }
 
