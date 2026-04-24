@@ -9111,7 +9111,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             defaultGroupPrompt: (currentName: string, newName: string) =>
                 `Weet je zeker dat je ${newName} de standaardgroep wilt maken? Nieuwe leden worden uitgenodigd voor deze groep in plaats van de vorige standaardgroep (${currentName}). `,
             makeDefault: 'Standaard maken',
-            nevermind: 'Laat maar',
+            neverMind: 'Laat maar',
         },
     },
     proactiveAppReview: {

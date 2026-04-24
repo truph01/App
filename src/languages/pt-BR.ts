@@ -9100,7 +9100,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             defaultGroupPrompt: (currentName: string, newName: string) =>
                 `Tem certeza de que deseja tornar ${newName} o grupo padrão? Novos membros serão convidados para este grupo em vez do grupo padrão anterior (${currentName}). `,
             makeDefault: 'Tornar padrão',
-            nevermind: 'Deixa pra lá',
+            neverMind: 'Deixa pra lá',
         },
     },
     proactiveAppReview: {

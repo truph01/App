@@ -9024,7 +9024,7 @@ ${reportName}
             defaultGroupPrompt: (currentName: string, newName: string) =>
                 `本当に ${newName} をデフォルトグループに設定しますか？新しいメンバーは、以前のデフォルトグループ (${currentName}) ではなく、このグループに招待されます。`,
             makeDefault: 'デフォルトに設定',
-            nevermind: 'やめておく',
+            neverMind: 'やめておく',
         },
     },
     proactiveAppReview: {

@@ -9374,7 +9374,7 @@ ${amount} para ${merchant} - ${date}`,
             defaultGroupPrompt: (currentName, newName) =>
                 `¿Estás seguro de que quieres establecer ${newName} como el grupo predeterminado? Los nuevos miembros serán invitados a este grupo en lugar del grupo predeterminado anterior (${currentName}). `,
             makeDefault: 'Establecer como predeterminado',
-            nevermind: 'No importa',
+            neverMind: 'No importa',
         },
     },
     gps: {

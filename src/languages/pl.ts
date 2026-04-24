@@ -9092,7 +9092,7 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             defaultGroupPrompt: (currentName: string, newName: string) =>
                 `Czy na pewno chcesz ustawić ${newName} jako grupę domyślną? Nowi członkowie będą zapraszani do tej grupy zamiast do poprzedniej grupy domyślnej (${currentName}). `,
             makeDefault: 'Ustaw jako domyślną',
-            nevermind: 'Nieważne',
+            neverMind: 'Nieważne',
         },
     },
     proactiveAppReview: {

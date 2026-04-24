@@ -9171,7 +9171,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             defaultGroupPrompt: (currentName: string, newName: string) =>
                 `Êtes-vous sûr de vouloir faire de ${newName} le groupe par défaut ? Les nouveaux membres seront invités à ce groupe au lieu du groupe par défaut précédent (${currentName}). `,
             makeDefault: 'Définir par défaut',
-            nevermind: 'Peu importe',
+            neverMind: 'Peu importe',
         },
     },
     proactiveAppReview: {

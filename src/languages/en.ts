@@ -9143,7 +9143,7 @@ const translations = {
             defaultGroupPrompt: (currentName: string, newName: string) =>
                 `Are you sure you want to make ${newName} the default group? New members will be invited to this group instead of the previous default group (${currentName}). `,
             makeDefault: 'Make default',
-            nevermind: 'Nevermind',
+            neverMind: 'Never mind',
         },
     },
 };
