@@ -1824,9 +1824,13 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         }
     }
 
-    // Defer draft cleanup until the navigation transition (e.g. RHP dismiss) completes,
-    // so running cleanup from every call (including intermediates) is safe.
-    TransitionTracker.runAfterTransitions({callback: () => removeDraftTransactionsByIDs(draftTransactionIDs)});
+    // queueMicrotask defers past the synchronous multi-scan batch loop so that
+    // every iteration can read its draft before any cleanup runs.  Without it,
+    // TransitionTracker.runAfterTransitions fires synchronously when no transition
+    // is active (the dismiss already completed), removing drafts mid-loop.
+    queueMicrotask(() => {
+        TransitionTracker.runAfterTransitions({callback: () => removeDraftTransactionsByIDs(draftTransactionIDs)});
+    });
 
     if (shouldHandleNavigation) {
         const trackReport = Navigation.getReportRouteByID(linkedTrackedExpenseReportAction?.childReportID);
@@ -2624,7 +2628,9 @@ function trackExpense(params: CreateTrackExpenseParams) {
     }
 
     // See comment in requestMoney above.
-    TransitionTracker.runAfterTransitions({callback: () => removeDraftTransactionsByIDs(draftTransactionIDs)});
+    queueMicrotask(() => {
+        TransitionTracker.runAfterTransitions({callback: () => removeDraftTransactionsByIDs(draftTransactionIDs)});
+    });
 
     if (!params.isRetry) {
         highlightTransactionOnSearchRouteIfNeeded(isFromGlobalCreate, transaction?.transactionID, CONST.SEARCH.DATA_TYPES.EXPENSE);
