@@ -586,21 +586,21 @@ function TransactionItemRow({
                     </View>
                 );
             case CONST.SEARCH.TABLE_COLUMNS.TOTAL: {
-                // getConvertedAmount flips the stored opposite-sign value to the display convention, so an expense
-                // with a negative Amount renders Total as negative too (matching Classic).
-                const convertedAmount = getConvertedAmount(transactionItem, isExpenseReport(transactionItem.report ?? report), false, true);
-                // convertedAmount is expressed in the report's output currency. Prefer the report currency, then the
-                // policy output currency. Fall back to the transaction's own currency only when neither is available
-                // (e.g. self-DM or unreported contexts) — in that case no conversion happened so the currencies match.
-                const convertedCurrency = report?.currency ?? policy?.outputCurrency ?? getCurrency(transactionItem);
+                const isFromExpenseReport = isExpenseReport(transactionItem.report ?? report);
+                const hasConvertedAmount = transactionItem.convertedAmount != null;
+                // Offline expenses don't have a BE-computed convertedAmount yet — fall back to the unconverted
+                // amount in the transaction's own currency so users don't see a misleading $0.00 placeholder.
+                const totalAmount = hasConvertedAmount ? getConvertedAmount(transactionItem, isFromExpenseReport, false, true) : getAmount(transactionItem, isFromExpenseReport, false, true);
+                // When converted, display in the report's output currency; otherwise use the transaction's own currency.
+                const totalCurrency = hasConvertedAmount ? (report?.currency ?? policy?.outputCurrency ?? getCurrency(transactionItem)) : getCurrency(transactionItem);
                 return (
                     <View
                         key={column}
                         style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide})]}
                     >
                         <AmountCell
-                            total={convertedAmount}
-                            currency={convertedCurrency}
+                            total={totalAmount}
+                            currency={totalCurrency}
                         />
                     </View>
                 );
