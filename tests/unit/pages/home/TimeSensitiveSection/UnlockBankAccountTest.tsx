@@ -1,7 +1,7 @@
 import {fireEvent, render, screen} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
-import * as BankAccountsActions from '@libs/actions/BankAccounts';
-import * as ReportActions from '@libs/actions/Report';
+import {pressLockedBankAccount} from '@libs/actions/BankAccounts';
+import {navigateToConciergeChat} from '@libs/actions/Report';
 import OnyxListItemProvider from '@src/components/OnyxListItemProvider';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -311,7 +311,7 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
         const cta = screen.getByText('homePage.timeSensitiveSection.ctaFix');
         fireEvent.press(cta);
 
-        expect(BankAccountsActions.pressLockedBankAccount).toHaveBeenCalledWith(LOCKED_BANK_ACCOUNT_ID, expect.any(Function), CONCIERGE_REPORT_ID);
-        expect(ReportActions.navigateToConciergeChat).toHaveBeenCalledWith(CONCIERGE_REPORT_ID, undefined, ADMIN_ACCOUNT_ID, false, undefined);
+        expect(pressLockedBankAccount).toHaveBeenCalledWith(LOCKED_BANK_ACCOUNT_ID, expect.any(Function), CONCIERGE_REPORT_ID);
+        expect(navigateToConciergeChat).toHaveBeenCalledWith(CONCIERGE_REPORT_ID, undefined, ADMIN_ACCOUNT_ID, false, undefined);
     });
 });
