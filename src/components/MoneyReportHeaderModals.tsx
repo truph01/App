@@ -8,7 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViolationsForReport';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import getPlatform from '@libs/getPlatform';
-import {getNonHeldAndFullAmount, hasHeldExpensesNew as hasHeldExpensesReportUtils} from '@libs/ReportUtils';
+import {getNonHeldAndFullAmount, hasHeldExpensesFromTransactions as hasHeldExpensesReportUtils} from '@libs/ReportUtils';
 import {canIOUBePaid as canIOUBePaidAction} from '@userActions/IOU/ReportWorkflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';

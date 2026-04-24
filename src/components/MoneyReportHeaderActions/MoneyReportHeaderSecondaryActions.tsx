@@ -42,7 +42,7 @@ import {sortPoliciesByName} from '@libs/PolicyUtils';
 import {getFilteredReportActionsForReportView, hasRequestFromCurrentAccount} from '@libs/ReportActionsUtils';
 import {getSecondaryReportActions} from '@libs/ReportSecondaryActionUtils';
 import {
-    hasHeldExpensesNew as hasHeldExpensesReportUtils,
+    hasHeldExpensesFromTransactions as hasHeldExpensesReportUtils,
     hasViolations as hasViolationsReportUtils,
     isAllowedToApproveExpenseReport,
     isInvoiceReport as isInvoiceReportUtil,

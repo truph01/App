@@ -10827,7 +10827,7 @@ function getAllHeldTransactions(iouReportID?: string): Transaction[] {
 /**
  * Check if Report has any held expenses
  *
- * @warning Use `hasHeldExpensesNew` instead.
+ * @warning Use `hasHeldExpensesFromTransactions` instead.
  */
 function hasHeldExpenses(iouReportID?: string, allReportTransactions?: Transaction[]): boolean {
     const iouReportTransactions = getReportTransactions(iouReportID);
@@ -10838,7 +10838,7 @@ function hasHeldExpenses(iouReportID?: string, allReportTransactions?: Transacti
 /**
  * Check if Report has any held expenses
  */
-function hasHeldExpensesNew(allReportTransactions: Transaction[]): boolean {
+function hasHeldExpensesFromTransactions(allReportTransactions: Transaction[]): boolean {
     return allReportTransactions.some((transaction) => isOnHoldTransactionUtils(transaction));
 }
 
@@ -13767,7 +13767,7 @@ export {
     getTransactionSortValue,
     isSortableColumnName,
     getLinkedIOUTransaction,
-    hasHeldExpensesNew,
+    hasHeldExpensesFromTransactions,
 };
 
 export type {

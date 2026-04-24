@@ -13,7 +13,12 @@ import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useReportTransactionsCollection from '@hooks/useReportTransactionsCollection';
 import {getTotalAmountForIOUReportPreviewButton} from '@libs/MoneyRequestReportUtils';
-import {hasHeldExpensesNew as hasHeldExpensesReportUtils, hasUpdatedTotal, hasViolations as hasViolationsReportUtils, isInvoiceReport as isInvoiceReportUtils} from '@libs/ReportUtils';
+import {
+    hasHeldExpensesFromTransactions as hasHeldExpensesReportUtils,
+    hasUpdatedTotal,
+    hasViolations as hasViolationsReportUtils,
+    isInvoiceReport as isInvoiceReportUtils,
+} from '@libs/ReportUtils';
 import {payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
 import {approveMoneyRequest, canIOUBePaid as canIOUBePaidIOUActions} from '@userActions/IOU/ReportWorkflow';
 import CONST from '@src/CONST';

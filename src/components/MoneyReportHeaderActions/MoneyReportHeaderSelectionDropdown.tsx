@@ -44,7 +44,13 @@ import {handleUnvalidatedAccount, selectPaymentType} from '@libs/PaymentUtils';
 import {sortPoliciesByName} from '@libs/PolicyUtils';
 import {hasRequestFromCurrentAccount} from '@libs/ReportActionsUtils';
 import {getSecondaryReportActions} from '@libs/ReportSecondaryActionUtils';
-import {hasHeldExpensesNew, hasUpdatedTotal, hasViolations as hasViolationsReportUtils, isInvoiceReport as isInvoiceReportUtil, isIOUReport as isIOUReportUtil} from '@libs/ReportUtils';
+import {
+    hasHeldExpensesFromTransactions,
+    hasUpdatedTotal,
+    hasViolations as hasViolationsReportUtils,
+    isInvoiceReport as isInvoiceReportUtil,
+    isIOUReport as isIOUReportUtil,
+} from '@libs/ReportUtils';
 import shouldPopoverUseScrollView from '@libs/shouldPopoverUseScrollView';
 import {isTransactionPendingDelete} from '@libs/TransactionUtils';
 import {payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
@@ -125,7 +131,7 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
     const hasViolations = hasViolationsReportUtils(moneyRequestReport?.reportID, allTransactionViolations, accountID, email ?? '');
 
     const isChatReportArchived = useReportIsArchived(chatReport?.reportID);
-    const isAnyTransactionOnHold = hasHeldExpensesNew(transactions);
+    const isAnyTransactionOnHold = hasHeldExpensesFromTransactions(transactions);
 
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();

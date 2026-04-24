@@ -13,7 +13,7 @@ import {getFilteredReportActionsForReportView} from '@libs/ReportActionsUtils';
 import {
     getIntegrationNameFromExportMessage as getIntegrationNameFromExportMessageUtils,
     getNextApproverAccountID,
-    hasHeldExpensesNew as hasHeldExpensesReportUtils,
+    hasHeldExpensesFromTransactions as hasHeldExpensesReportUtils,
     hasViolations as hasViolationsReportUtils,
     isExported as isExportedUtils,
     isReportOwner,
