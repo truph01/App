@@ -1,5 +1,6 @@
 import {useRoute} from '@react-navigation/native';
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
+import type {OnyxCollection} from 'react-native-onyx';
 import ColumnsSettingsList from '@components/ColumnsSettingsList';
 import type {SearchCustomColumnIds} from '@components/Search/types';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -14,6 +15,7 @@ import type {ReportSettingsNavigatorParamList} from '@navigation/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
+import type {Transaction} from '@src/types/onyx';
 import arraysEqual from '@src/utils/arraysEqual';
 
 /**
@@ -36,8 +38,18 @@ function ReportDetailsColumnsPage() {
     const [reportDetailsColumns] = useOnyx(ONYXKEYS.NVP_REPORT_DETAILS_COLUMNS);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
-    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
-    const reportTransactions = Object.values(allTransactions ?? {}).filter((t): t is NonNullable<typeof t> => t != null && t.reportID === reportID);
+    // Selector keeps re-renders scoped to this report's transactions. We intentionally return undefined
+    // while the collection is loading so the caller can distinguish "loading" from "no transactions".
+    const reportTransactionsSelector = useCallback(
+        (transactions: OnyxCollection<Transaction>): Transaction[] | undefined => {
+            if (!transactions) {
+                return undefined;
+            }
+            return Object.values(transactions).filter((transaction): transaction is Transaction => !!transaction && transaction.reportID === reportID);
+        },
+        [reportID],
+    );
+    const [reportTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {selector: reportTransactionsSelector}, [reportTransactionsSelector]);
     const currentUserDetails = useCurrentUserPersonalDetails();
 
     const allTypeCustomColumns = Object.values(CONST.SEARCH.REPORT_DETAILS_CUSTOM_COLUMNS) as SearchCustomColumnIds[];
@@ -45,7 +57,7 @@ function ReportDetailsColumnsPage() {
     // Wait for transactions to load before rendering. ColumnsSettingsList snapshots
     // currentColumns in useState on mount and does not sync prop updates, so we must
     // pass the final value on first render.
-    const isLoading = !allTransactions;
+    const isLoading = !reportTransactions;
 
     // When no custom columns are saved, compute which columns getColumnsToShow would
     // return for this report so data-driven columns (e.g. Exchange rate, Original amount,
@@ -56,7 +68,7 @@ function ReportDetailsColumnsPage() {
             return savedColumns;
         }
 
-        if (!reportTransactions.length) {
+        if (!reportTransactions?.length) {
             return REPORT_DETAILS_DEFAULT_COLUMNS;
         }
 

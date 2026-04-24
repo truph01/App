@@ -33,6 +33,7 @@ import StringUtils from '@libs/StringUtils';
 import {
     getAmount,
     getAttendees,
+    getConvertedAmount,
     getCurrency,
     getDescription,
     getExchangeRate,
@@ -585,7 +586,12 @@ function TransactionItemRow({
                     </View>
                 );
             case CONST.SEARCH.TABLE_COLUMNS.TOTAL: {
-                const convertedAmount = transactionItem.convertedAmount ?? 0;
+                // getConvertedAmount flips the stored opposite-sign value to the display convention, so an expense
+                // with a negative Amount renders Total as negative too (matching Classic).
+                const convertedAmount = getConvertedAmount(transactionItem, isExpenseReport(transactionItem.report ?? report), false, true);
+                // convertedAmount is expressed in the report's output currency. Prefer the report currency, then the
+                // policy output currency. Fall back to the transaction's own currency only when neither is available
+                // (e.g. self-DM or unreported contexts) — in that case no conversion happened so the currencies match.
                 const convertedCurrency = report?.currency ?? policy?.outputCurrency ?? getCurrency(transactionItem);
                 return (
                     <View
@@ -593,7 +599,7 @@ function TransactionItemRow({
                         style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide})]}
                     >
                         <AmountCell
-                            total={Math.abs(convertedAmount)}
+                            total={convertedAmount}
                             currency={convertedCurrency}
                         />
                     </View>

@@ -1318,8 +1318,11 @@ function getExchangeRate(transaction: TransactionWithOptionalSearchFields, repor
     }
 
     // currencyConversionRate: report-layout rate (fromCurrency → reportCurrency).
-    const conversionToCurrency = reportCurrency ?? (transaction.currency !== fromCurrency ? transaction.currency : (transaction.groupCurrency ?? fromCurrency));
-    if (transaction.currencyConversionRate != null && fromCurrency !== conversionToCurrency) {
+    // When no reportCurrency is provided (e.g. search sort), fall back to groupCurrency so we can still
+    // surface a meaningful rate. We intentionally do not use transaction.currency here, since it reflects
+    // the pre-modification currency and is almost never the correct conversion target.
+    const conversionToCurrency = reportCurrency ?? transaction.groupCurrency;
+    if (conversionToCurrency && transaction.currencyConversionRate != null && fromCurrency !== conversionToCurrency) {
         const conversionRate = Number(transaction.currencyConversionRate);
         if (conversionRate !== 1) {
             return `${transaction.currencyConversionRate} ${fromCurrency}/${conversionToCurrency}`;
