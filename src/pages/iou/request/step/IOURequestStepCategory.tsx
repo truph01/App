@@ -20,7 +20,7 @@ import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useRestartOnReceiptFailure from '@hooks/useRestartOnReceiptFailure';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearPendingCategorySelection, getIOURequestPolicyID, setMoneyRequestCategory, setPendingCategorySelection} from '@libs/actions/IOU';
+import {getIOURequestPolicyID, setMoneyRequestCategory} from '@libs/actions/IOU';
 import {setDraftSplitTransaction} from '@libs/actions/IOU/Split';
 import {updateMoneyRequestCategory} from '@libs/actions/IOU/UpdateMoneyRequest';
 import {enablePolicyCategories, getPolicyCategories} from '@libs/actions/Policy/Category';
@@ -92,8 +92,6 @@ function IOURequestStepCategory({
 
     const canCreateCategoryInSitu = isPolicyAdmin(policy) && !getValidConnectedIntegration(policy) && !!policy?.areCategoriesEnabled;
 
-    const [pendingCategorySelection] = useOnyx(ONYXKEYS.PENDING_CATEGORY_SELECTION);
-
     const createCategoryMenuItems = canCreateCategoryInSitu
         ? [
               {
@@ -103,13 +101,7 @@ function IOURequestStepCategory({
                       if (!policyID || !report?.reportID) {
                           return;
                       }
-                      setPendingCategorySelection(transactionID);
-                      Navigation.navigate(
-                          ROUTES.SETTINGS_CATEGORY_CREATE.getRoute(
-                              policyID,
-                              ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute(action, iouType, transactionID, report.reportID, backTo, reportActionID),
-                          ),
-                      );
+                      Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CATEGORY_CREATE.getRoute(action, iouType, transactionID, report.reportID, reportActionID, backTo));
                   },
               },
           ]
@@ -220,22 +212,6 @@ function IOURequestStepCategory({
             transactionID,
         ],
     );
-
-    useEffect(() => {
-        if (pendingCategorySelection?.transactionID !== transactionID || !pendingCategorySelection?.categoryName) {
-            return;
-        }
-        const {categoryName} = pendingCategorySelection;
-        // Skip the update until policyCategories reflects the new category — this effect will re-run when it does.
-        if (!policyCategories?.[categoryName]?.enabled) {
-            return;
-        }
-        clearPendingCategorySelection();
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            updateCategory({searchText: categoryName, keyForList: categoryName, text: categoryName, isSelected: false});
-        });
-    }, [pendingCategorySelection, policyCategories, transactionID, updateCategory]);
 
     return (
         <StepScreenWrapper
