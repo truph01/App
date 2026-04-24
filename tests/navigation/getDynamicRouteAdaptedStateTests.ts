@@ -19,8 +19,6 @@ jest.mock('@libs/Navigation/linkingConfig/config', () => ({
         DynScreenC: {path: 'suffix-c'},
         DynMultiSeg: {path: 'deep/suffix-a'},
         DynCrossStack: {path: 'suffix-cross'},
-        DynOptTrailing: {path: 'opt-page/:id?'},
-        DynOptMiddle: {path: 'wrap/:p?/end'},
     },
     screensWithOnyxTabNavigator: new Set(),
 }));
@@ -32,8 +30,6 @@ jest.mock('@src/ROUTES', () => ({
         SUFFIX_C: {path: 'suffix-c', entryScreens: ['DynScreenB']},
         MULTI_SEG: {path: 'deep/suffix-a', entryScreens: ['StaticScreen']},
         SUFFIX_CROSS: {path: 'suffix-cross', entryScreens: ['DynScreenA']},
-        OPT_TRAILING: {path: 'opt-page/:id?', entryScreens: ['StaticScreen']},
-        OPT_MIDDLE: {path: 'wrap/:p?/end', entryScreens: ['StaticScreen']},
     },
 }));
 
