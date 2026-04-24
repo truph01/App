@@ -5,7 +5,7 @@ import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import {useEditingCellActions} from '.';
+import {useEditingCellActions} from './EditingCellContext';
 
 type EditableCellProps = {
     /** Content to display when not editing */
