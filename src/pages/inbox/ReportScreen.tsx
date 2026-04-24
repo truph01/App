@@ -70,10 +70,10 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
             if (!shouldDeferNonEssentials) {
                 return;
             }
-            let animationFrameId: number;
+            const animationFrameRef = {current: 0};
             const handle = TransitionTracker.runAfterTransitions({
                 callback: () => {
-                    animationFrameId = requestAnimationFrame(() => setShouldDeferNonEssentials(false));
+                    animationFrameRef.current = requestAnimationFrame(() => setShouldDeferNonEssentials(false));
                 },
                 waitForUpcomingTransition: true,
             });
@@ -82,7 +82,7 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
             const safetyTimeout = setTimeout(() => setShouldDeferNonEssentials(false), CONST.MAX_TRANSITION_DURATION_MS * 3);
             return () => {
                 handle.cancel();
-                cancelAnimationFrame(animationFrameId);
+                cancelAnimationFrame(animationFrameRef.current);
                 clearTimeout(safetyTimeout);
             };
         }, [shouldDeferNonEssentials]),
