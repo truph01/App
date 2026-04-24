@@ -79,5 +79,5 @@ function useEditingCellActions(): EditingCellActionsContextType {
 }
 
 export default EditingCellProvider;
-export {EditingCellActionsContext, EditingCellStateContext, useEditingCellActions, useEditingCellState};
+export {useEditingCellActions, useEditingCellState};
 export type {EditingCellActionsContextType, EditingCellStateContextType};
