@@ -163,17 +163,12 @@ function updatePersonalBankAccountInfo(bankAccountID: number, accountData: Perso
     const bankAccountKey = String(bankAccountID);
     const prevData = bankAccountList?.[bankAccountKey]?.accountData?.additionalData;
 
-    type AdditionalDataFields = Pick<
-        BankAccountAdditionalData,
-        'firstName' | 'lastName' | 'legalFirstName' | 'legalLastName' | 'addressStreet' | 'addressCity' | 'addressState' | 'addressZipCode' | 'companyPhone'
-    >;
+    type AdditionalDataFields = Pick<BankAccountAdditionalData, 'firstName' | 'lastName' | 'addressStreet' | 'addressCity' | 'addressState' | 'addressZipCode' | 'companyPhone'>;
 
-    // Write to both OldDot (firstName/lastName) and NewDot (legalFirstName/legalLastName) field names for consistency.
+    // BE stores the update into additionalData.firstName / additionalData.lastName (OldDot field names).
     const additionalDataUpdate: AdditionalDataFields = {
         firstName: accountData.legalFirstName,
         lastName: accountData.legalLastName,
-        legalFirstName: accountData.legalFirstName,
-        legalLastName: accountData.legalLastName,
         addressStreet: formattedStreet,
         addressCity: accountData.addressCity,
         addressState: accountData.addressState,
@@ -266,8 +261,6 @@ function updatePersonalBankAccountInfo(bankAccountID: number, accountData: Perso
                             additionalData: {
                                 firstName: prevData?.firstName ?? null,
                                 lastName: prevData?.lastName ?? null,
-                                legalFirstName: prevData?.legalFirstName ?? null,
-                                legalLastName: prevData?.legalLastName ?? null,
                                 addressStreet: prevData?.addressStreet ?? null,
                                 addressCity: prevData?.addressCity ?? null,
                                 addressState: prevData?.addressState ?? null,

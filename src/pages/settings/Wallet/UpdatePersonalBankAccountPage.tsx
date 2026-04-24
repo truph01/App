@@ -99,7 +99,13 @@ function UpdatePersonalBankAccountPage() {
     const bankAccountID = personalBankAccount?.bankAccountID;
     const isPersonalBankAccountLoaded = personalBankAccountResult.status === 'loaded';
 
-    useEffect(() => clearPersonalBankAccount, []);
+    // Clear PERSONAL_BANK_ACCOUNT (bankAccountID, shouldShowSuccess, updateError) when the page unmounts.
+    useEffect(
+        () => () => {
+            clearPersonalBankAccount();
+        },
+        [],
+    );
 
     useEffect(() => {
         if (!isPersonalBankAccountLoaded || bankAccountID) {
