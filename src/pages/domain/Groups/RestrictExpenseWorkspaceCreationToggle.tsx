@@ -7,7 +7,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
-import HTMLMessagesRow from './HTMLMessagesRow';
 
 type RestrictExpenseWorkspaceCreationToggleProps = {
     domainAccountID: number;
@@ -47,10 +46,8 @@ function RestrictExpenseWorkspaceCreationToggle({domainAccountID, groupID}: Rest
                 }}
                 wrapperStyle={[styles.ph5]}
                 pendingAction={enableRestrictedPolicyCreationPendingAction}
-            />
-            <HTMLMessagesRow
                 errors={enableRestrictedPolicyCreationErrors}
-                onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPolicyCreationErrors')}
+                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPolicyCreationErrors')}
             />
         </View>
     );
