@@ -996,6 +996,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                         shouldShowLoadingPlaceholder={isLoading}
                         onDismissError={dismissError}
                         shouldShowListEmptyContent={false}
+                        shouldShowEmptyStateImmediately={shouldShowRoleFilterEmptyState}
                         showScrollIndicator={false}
                         shouldUseUserSkeletonView
                         shouldHeaderBeInsideList

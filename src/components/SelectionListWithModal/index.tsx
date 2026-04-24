@@ -20,6 +20,8 @@ import {isEmptyValueObject} from '@src/types/utils/EmptyObject';
 type SelectionListWithModalProps<TItem extends ListItem> = SelectionListProps<TItem> & {
     turnOnSelectionModeOnLongPress?: boolean;
     onTurnOnSelectionMode?: (item: TItem | null) => void;
+    /** Show empty results immediately instead of waiting for the debounced list update. */
+    shouldShowEmptyStateImmediately?: boolean;
     ref?: ForwardedRef<SelectionListHandle<TItem>>;
 };
 
@@ -30,6 +32,7 @@ function SelectionListWithModal<TItem extends ListItem>({
     data,
     isSelected,
     selectedItems: selectedItemsProp,
+    shouldShowEmptyStateImmediately = false,
     style: styleProp,
     ref,
     ...rest
@@ -64,7 +67,8 @@ function SelectionListWithModal<TItem extends ListItem>({
         setDataState(filteredData);
     }, [filteredData, setDataState]);
 
-    const displayData = isFiltering ? debouncedData : filteredData;
+    const shouldUseDebouncedData = isFiltering && (!shouldShowEmptyStateImmediately || filteredData.length > 0);
+    const displayData = shouldUseDebouncedData ? debouncedData : filteredData;
 
     const selectedItems = useMemo(
         () =>
