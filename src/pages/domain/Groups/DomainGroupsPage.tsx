@@ -59,7 +59,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     {isDefault && <Badge text={translate('common.default')} />}
                 </View>
             ),
-            pendingAction: pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.name ?? undefined,
+            pendingAction: Object.values(pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`] ?? {}).find(Boolean),
         };
     });
 
