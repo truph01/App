@@ -9113,6 +9113,10 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
         groups: {
             title: 'Groepen',
             memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`}),
+            permissions: 'Groepsmachtigingen',
+            StrictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
+            StrictlyEnforceWorkspaceRulesDescription:
+                'Aan alle werkruimteregels moet worden voldaan voordat een rapport kan worden ingediend. Handmatige uitzonderingen zijn niet toegestaan.',
         },
     },
     proactiveAppReview: {

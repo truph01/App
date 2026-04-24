@@ -9102,6 +9102,9 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
         groups: {
             title: 'Grupos',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`}),
+            permissions: 'Permissões do grupo',
+            StrictlyEnforceWorkspaceRules: 'Aplicar rigorosamente as regras do espaço de trabalho',
+            StrictlyEnforceWorkspaceRulesDescription: 'Todas as regras do espaço de trabalho devem ser atendidas antes de enviar um relatório. Não são permitidas exceções manuais.',
         },
     },
     proactiveAppReview: {

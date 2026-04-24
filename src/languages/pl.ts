@@ -9094,6 +9094,9 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
         groups: {
             title: 'Grupy',
             memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`}),
+            permissions: 'Uprawnienia grupy',
+            StrictlyEnforceWorkspaceRules: 'Ściśle egzekwuj reguły przestrzeni roboczej',
+            StrictlyEnforceWorkspaceRulesDescription: 'Przed przesłaniem raportu muszą zostać spełnione wszystkie reguły przestrzeni roboczej. Ręczne wyjątki są niedozwolone.',
         },
     },
     proactiveAppReview: {

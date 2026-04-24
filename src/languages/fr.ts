@@ -9173,6 +9173,10 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
         groups: {
             title: 'Groupes',
             memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`}),
+            permissions: 'Autorisations du groupe',
+            StrictlyEnforceWorkspaceRules: 'Appliquer strictement les règles de l’espace de travail',
+            StrictlyEnforceWorkspaceRulesDescription:
+                'Toutes les règles de l’espace de travail doivent être respectées avant de soumettre un rapport. Aucune exception manuelle n’est autorisée.',
         },
     },
     proactiveAppReview: {

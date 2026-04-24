@@ -9026,6 +9026,9 @@ ${reportName}
         groups: {
             title: 'グループ',
             memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`}),
+            permissions: 'グループの権限',
+            StrictlyEnforceWorkspaceRules: 'ワークスペースのルールを厳密に適用する',
+            StrictlyEnforceWorkspaceRulesDescription: 'レポートを送信する前にすべてのワークスペースのルールを満たす必要があります。手動による例外は許可されていません。',
         },
     },
     proactiveAppReview: {

@@ -9140,6 +9140,9 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
         groups: {
             title: 'Gruppi',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`}),
+            permissions: 'Autorizzazioni del gruppo',
+            StrictlyEnforceWorkspaceRules: 'Applica rigorosamente le regole dello spazio di lavoro',
+            StrictlyEnforceWorkspaceRulesDescription: 'Tutte le regole dello spazio di lavoro devono essere soddisfatte prima di inviare un rapporto. Non sono consentite eccezioni manuali.',
         },
     },
     proactiveAppReview: {
