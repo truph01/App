@@ -1,6 +1,6 @@
+import {compiledParametricDynamicRoutes} from './compileDynamicRoutePattern';
 import {dynamicRoutePaths} from './isDynamicRouteSuffix';
 import splitPathAndQuery from './splitPathAndQuery';
-import {compiledParametricEntries} from './validateDynamicRoutes';
 
 type DynamicSuffixMatch = {
     /** Registered pattern, e.g. 'flag/:reportID/:reportActionID' or 'page/:id?' */
@@ -49,7 +49,7 @@ function findMatchingDynamicSuffix(path = ''): DynamicSuffixMatch | undefined {
         // Append trailing '/' because compiled regexes expect each segment to end with '/'.
         const normalized = `${candidate}/`;
 
-        for (const {compiled} of compiledParametricEntries) {
+        for (const {compiled} of compiledParametricDynamicRoutes) {
             if (candidateSegmentCount < compiled.minSegments || candidateSegmentCount > compiled.maxSegments) {
                 continue;
             }

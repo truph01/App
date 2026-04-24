@@ -1,4 +1,5 @@
 import StringUtils from '@libs/StringUtils';
+import {DYNAMIC_ROUTES} from '@src/ROUTES';
 
 /**
  * Compiles a dynamic-route suffix pattern (e.g. `flag/:reportID/:reportActionID?`) into a regex.
@@ -81,5 +82,10 @@ function compileDynamicRoutePattern(pattern: string): CompiledPattern {
     return {pattern, regex, paramNames, minSegments, maxSegments};
 }
 
+const compiledParametricDynamicRoutes = Object.entries(DYNAMIC_ROUTES)
+    .filter(([, entry]) => entry.path.includes(':'))
+    .map(([key, entry]) => ({key, compiled: compileDynamicRoutePattern(entry.path)}));
+
 export default compileDynamicRoutePattern;
+export {compiledParametricDynamicRoutes};
 export type {CompiledPattern};

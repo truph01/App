@@ -1,6 +1,6 @@
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {DynamicRouteSuffix} from '@src/ROUTES';
-import {compiledParametricEntries} from './validateDynamicRoutes';
+import {compiledParametricDynamicRoutes} from './compileDynamicRoutePattern';
 
 // A Set of all static dynamic-route paths (e.g. 'country', 'verify-account') for O(1) lookups.
 const dynamicRoutePaths = new Set<string>(Object.values(DYNAMIC_ROUTES).map((r) => r.path));
@@ -23,7 +23,7 @@ function isDynamicRouteSuffix(suffix: string): suffix is DynamicRouteSuffix {
     // Append trailing '/' because compiled regexes expect each segment to end with '/'.
     const normalizedSuffix = `${suffix}/`;
 
-    for (const {compiled} of compiledParametricEntries) {
+    for (const {compiled} of compiledParametricDynamicRoutes) {
         if (segmentCount < compiled.minSegments || segmentCount > compiled.maxSegments) {
             continue;
         }
