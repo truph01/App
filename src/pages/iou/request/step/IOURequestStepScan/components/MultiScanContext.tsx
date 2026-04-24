@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useState} from 'react';
-import {InteractionManager} from 'react-native';
+import {InteractionManager, Platform} from 'react-native';
 import useOnyx from '@hooks/useOnyx';
 import {dismissProductTraining} from '@libs/actions/Welcome';
 import {isMobile} from '@libs/Browser';
@@ -7,6 +7,7 @@ import useScanRouteParams from '@pages/iou/request/step/IOURequestStepScan/hooks
 import {removeDraftTransactionsByIDs, removeTransactionReceipt} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import SCREENS from '@src/SCREENS';
 import {validTransactionDraftIDsSelector} from '@src/selectors/TransactionDraft';
 
 type MultiScanState = {
@@ -47,14 +48,15 @@ type MultiScanProviderProps = {
 };
 
 function MultiScanProvider({children}: MultiScanProviderProps) {
-    const {iouType} = useScanRouteParams();
+    const {iouType, routeName} = useScanRouteParams();
 
     const [isMultiScanEnabled, setIsMultiScanEnabled] = useState(false);
     const [showEducationalPopup, setShowEducationalPopup] = useState(false);
     const [dismissedProductTrainingResult] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
 
-    const canUseMultiScan = iouType !== CONST.IOU.TYPE.SPLIT;
+    const isStartingScan = routeName === SCREENS.MONEY_REQUEST.CREATE;
+    const canUseMultiScan = isStartingScan && iouType !== CONST.IOU.TYPE.SPLIT;
 
     function toggleMultiScan() {
         if (!dismissedProductTrainingResult?.[CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.MULTI_SCAN_EDUCATIONAL_MODAL]) {
@@ -92,11 +94,12 @@ function MultiScanProvider({children}: MultiScanProviderProps) {
 }
 
 /**
- * Platform gate — renders MultiScanProvider on mobile (web + native), passes children through on desktop.
+ * Platform gate — renders MultiScanProvider on mobile (web + native), passes children through on desktop web.
  * Multi-scan is a camera-based mobile interaction; desktop uses file picker with shouldAcceptMultipleFiles instead.
+ * Note: isMobile() only detects mobile web browsers; native platforms need a separate Platform.OS check.
  */
 function MultiScanGate({children}: MultiScanProviderProps) {
-    if (isMobile()) {
+    if (Platform.OS !== 'web' || isMobile()) {
         return <MultiScanProvider>{children}</MultiScanProvider>;
     }
     return children;

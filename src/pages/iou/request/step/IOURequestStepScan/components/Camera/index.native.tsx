@@ -15,6 +15,7 @@ import Icon from '@components/Icon';
 import ImageSVG from '@components/ImageSVG';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import Text from '@components/Text';
+import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -33,6 +34,7 @@ import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan
 import CameraPermission from '@pages/iou/request/step/IOURequestStepScan/CameraPermission';
 import {useMultiScanActions, useMultiScanState} from '@pages/iou/request/step/IOURequestStepScan/components/MultiScanContext';
 import NavigationAwareCamera from '@pages/iou/request/step/IOURequestStepScan/components/NavigationAwareCamera/Camera';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {FileObject} from '@src/types/utils/Attachment';
@@ -51,6 +53,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
+    const isInLandscapeMode = useIsInLandscapeMode();
     const device = useCameraDevice('back', {
         physicalDevices: ['wide-angle-camera', 'ultra-wide-angle-camera'],
     });
@@ -324,11 +327,11 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
     return (
         <View
             style={styles.flex1}
-            onLayout={() => onLayout?.()}
+            onLayout={onLayout}
         >
             <View style={[styles.flex1]}>
                 {cameraPermissionStatus !== RESULTS.GRANTED && (
-                    <View style={[styles.cameraView, styles.permissionView, styles.userSelectNone]}>
+                    <View style={[styles.cameraView, isInLandscapeMode ? styles.permissionViewLandscape : styles.permissionView, styles.userSelectNone]}>
                         <ImageSVG
                             contentFit="contain"
                             src={lazyIllustrations.Hand}
@@ -391,8 +394,8 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
                                     onPress={() => setFlash((prevFlash) => !prevFlash)}
                                 >
                                     <Icon
-                                        height={16}
-                                        width={16}
+                                        height={variables.iconSizeSmall}
+                                        width={variables.iconSizeSmall}
                                         src={lazyIcons.Bolt}
                                         fill={flash ? theme.white : theme.icon}
                                     />
@@ -427,8 +430,8 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
                             }}
                         >
                             <Icon
-                                height={32}
-                                width={32}
+                                height={variables.iconSizeMenuItem}
+                                width={variables.iconSizeMenuItem}
                                 src={lazyIcons.Gallery}
                                 fill={theme.textSupporting}
                             />
@@ -459,8 +462,8 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
                         sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.MULTI_SCAN}
                     >
                         <Icon
-                            height={32}
-                            width={32}
+                            height={variables.iconSizeMenuItem}
+                            width={variables.iconSizeMenuItem}
                             src={lazyIcons.ReceiptMultiple}
                             fill={isMultiScanEnabled ? theme.iconMenu : theme.textSupporting}
                         />
@@ -475,8 +478,8 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
                         onPress={() => setFlash((prevFlash) => !prevFlash)}
                     >
                         <Icon
-                            height={32}
-                            width={32}
+                            height={variables.iconSizeMenuItem}
+                            width={variables.iconSizeMenuItem}
                             src={flash ? lazyIcons.Bolt : lazyIcons.boltSlash}
                             fill={theme.textSupporting}
                         />

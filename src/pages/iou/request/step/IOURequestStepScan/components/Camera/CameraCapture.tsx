@@ -1,9 +1,6 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect, useReducer, useRef, useState} from 'react';
-import type {LayoutRectangle} from 'react-native';
+import React, {useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
 import Animated, {useAnimatedStyle, useSharedValue, withSequence, withTiming} from 'react-native-reanimated';
-import type Webcam from 'react-webcam';
 import ActivityIndicator from '@components/ActivityIndicator';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
@@ -15,54 +12,20 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {isMobileWebKit} from '@libs/Browser';
+import useWebCamera from '@hooks/useWebCamera';
 import {base64ToFile} from '@libs/fileDownload/FileUtils';
 import HapticFeedback from '@libs/HapticFeedback';
 import {cancelSpan, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
+import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {useMultiScanActions, useMultiScanState} from '@pages/iou/request/step/IOURequestStepScan/components/MultiScanContext';
 import NavigationAwareCamera from '@pages/iou/request/step/IOURequestStepScan/components/NavigationAwareCamera/WebCamera';
 import {cropImageToAspectRatio} from '@pages/iou/request/step/IOURequestStepScan/cropImageToAspectRatio';
 import type {ImageObject} from '@pages/iou/request/step/IOURequestStepScan/cropImageToAspectRatio';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {FileObject} from '@src/types/utils/Attachment';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {CameraProps} from './types';
-
-/**
- * Preload camera permission state at module load so first render can use a cached value.
- */
-let cachedPermissionState: PermissionState | undefined;
-
-if (typeof navigator !== 'undefined' && navigator.permissions) {
-    navigator.permissions
-        .query({name: 'camera'})
-        .then((status) => {
-            cachedPermissionState = status.state;
-            if ('addEventListener' in status) {
-                status.addEventListener('change', () => {
-                    cachedPermissionState = status.state;
-                });
-            }
-        })
-        .catch(() => {
-            cachedPermissionState = 'denied';
-        });
-}
-
-function queryCameraPermission(): Promise<PermissionState> {
-    if (cachedPermissionState !== undefined) {
-        return Promise.resolve(cachedPermissionState);
-    }
-
-    if (typeof navigator === 'undefined' || !navigator.permissions) {
-        return Promise.resolve('denied');
-    }
-
-    return navigator.permissions
-        .query({name: 'camera'})
-        .then((status) => status.state)
-        .catch(() => 'denied');
-}
 
 const BLINK_DURATION_MS = 80;
 
@@ -79,17 +42,26 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
     const {isMultiScanEnabled, canUseMultiScan} = useMultiScanState();
     const {toggleMultiScan} = useMultiScanActions();
-    const isTabActive = useIsFocused();
-    const [cameraPermissionState, setCameraPermissionState] = useState<PermissionState | undefined>(() => cachedPermissionState ?? 'prompt');
-    const [isFlashLightOn, toggleFlashlight] = useReducer((state: boolean) => !state, false);
-    const [isTorchAvailable, setIsTorchAvailable] = useState(false);
-    const [isQueriedPermissionState, setIsQueriedPermissionState] = useState(() => cachedPermissionState !== undefined);
-    const [deviceConstraints, setDeviceConstraints] = useState<MediaTrackConstraints>();
-    const videoConstraints = isTabActive ? deviceConstraints : undefined;
-    const cameraRef = useRef<Webcam>(null);
-    const trackRef = useRef<MediaStreamTrack | null>(null);
-    const viewfinderLayout = useRef<LayoutRectangle>(null);
-    const getScreenshotTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const onUnmount = useCallback(() => {
+        cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+        cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
+    }, []);
+
+    const {
+        cameraRef,
+        viewfinderLayout: viewfinderLayoutRef,
+        cameraPermissionState,
+        setCameraPermissionState,
+        isFlashLightOn,
+        toggleFlashlight,
+        isTorchAvailable,
+        isQueriedPermissionState,
+        videoConstraints,
+        requestCameraPermission,
+        setupCameraPermissionsAndCapabilities,
+        capturePhotoWithFlash,
+    } = useWebCamera({onUnmount});
 
     // Blink animation for shutter feedback
     const blinkOpacity = useSharedValue(0);
@@ -100,114 +72,6 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
     const showBlink = () => {
         blinkOpacity.set(withSequence(withTiming(1, {duration: BLINK_DURATION_MS}), withTiming(0, {duration: BLINK_DURATION_MS})));
         HapticFeedback.press();
-    };
-
-    /**
-     * On phones that have ultra-wide lens, react-webcam uses ultra-wide by default.
-     * The last deviceId is of regular lens camera.
-     */
-    const requestCameraPermission = () => {
-        const defaultConstraints = {facingMode: {exact: 'environment'}};
-        navigator.mediaDevices
-            .getUserMedia({video: {facingMode: {exact: 'environment'}, zoom: {ideal: 1}}})
-            .then((stream) => {
-                setCameraPermissionState('granted');
-                for (const track of stream.getTracks()) {
-                    track.stop();
-                }
-                // Only Safari 17+ supports zoom constraint
-                if (isMobileWebKit() && stream.getTracks().length > 0) {
-                    let deviceId;
-                    for (const track of stream.getTracks()) {
-                        const setting = track.getSettings();
-                        if (setting.zoom === 1) {
-                            deviceId = setting.deviceId;
-                            break;
-                        }
-                    }
-                    if (deviceId) {
-                        setDeviceConstraints({deviceId});
-                        return;
-                    }
-                }
-                if (!navigator.mediaDevices.enumerateDevices) {
-                    setDeviceConstraints(defaultConstraints);
-                    return;
-                }
-                navigator.mediaDevices.enumerateDevices().then((devices) => {
-                    let lastBackDeviceId = '';
-                    for (let i = devices.length - 1; i >= 0; i--) {
-                        const device = devices.at(i);
-                        if (device?.kind === 'videoinput') {
-                            lastBackDeviceId = device.deviceId;
-                            break;
-                        }
-                    }
-                    if (!lastBackDeviceId) {
-                        setDeviceConstraints(defaultConstraints);
-                        return;
-                    }
-                    setDeviceConstraints({deviceId: lastBackDeviceId});
-                });
-            })
-            .catch(() => {
-                setDeviceConstraints(defaultConstraints);
-                setCameraPermissionState('denied');
-            });
-    };
-
-    useEffect(() => {
-        if (!isTabActive) {
-            return;
-        }
-        queryCameraPermission()
-            .then((state) => {
-                setCameraPermissionState(state);
-                if (state === 'granted') {
-                    requestCameraPermission();
-                }
-            })
-            .catch(() => {
-                setCameraPermissionState('denied');
-            })
-            .finally(() => {
-                setIsQueriedPermissionState(true);
-            });
-        // Refresh permission state whenever this tab regains focus.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isTabActive]);
-
-    useEffect(
-        () => () => {
-            cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-            cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
-            if (!getScreenshotTimeoutRef.current) {
-                return;
-            }
-            clearTimeout(getScreenshotTimeoutRef.current);
-        },
-        [],
-    );
-
-    const setupCameraPermissionsAndCapabilities = (stream: MediaStream) => {
-        setCameraPermissionState('granted');
-
-        const [track] = stream.getVideoTracks();
-        const capabilities = track.getCapabilities();
-
-        if ('torch' in capabilities && capabilities.torch) {
-            trackRef.current = track;
-        }
-        setIsTorchAvailable('torch' in capabilities && !!capabilities.torch);
-    };
-
-    const clearTorchConstraints = () => {
-        if (!trackRef.current) {
-            return;
-        }
-        trackRef.current.applyConstraints({
-            advanced: [{torch: false}],
-        });
     };
 
     const getScreenshot = () => {
@@ -247,30 +111,16 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
         // while other browsers let the video element overflow and the container crops it from the top.
         // We crop and align the result image the same way.
         const videoHeight = cameraRef.current.video?.getBoundingClientRect?.()?.height ?? NaN;
-        const viewFinderHeight = viewfinderLayout.current?.height ?? NaN;
+        const viewFinderHeight = viewfinderLayoutRef.current?.height ?? NaN;
         const shouldAlignTop = videoHeight > viewFinderHeight;
-        cropImageToAspectRatio(imageObject, viewfinderLayout.current?.width, viewfinderLayout.current?.height, shouldAlignTop).then(({file, source}) => {
+        cropImageToAspectRatio(imageObject, viewfinderLayoutRef.current?.width, viewfinderLayoutRef.current?.height, shouldAlignTop).then(({file, source}) => {
             endSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
             onCapture(file, source);
         });
     };
 
     const capturePhoto = () => {
-        if (trackRef.current && isFlashLightOn) {
-            trackRef.current
-                .applyConstraints({
-                    advanced: [{torch: true}],
-                })
-                .then(() => {
-                    getScreenshotTimeoutRef.current = setTimeout(() => {
-                        getScreenshot();
-                        clearTorchConstraints();
-                    }, CONST.RECEIPT.FLASH_DELAY_MS);
-                });
-            return;
-        }
-
-        getScreenshot();
+        capturePhotoWithFlash(getScreenshot);
     };
 
     const emitPickedFiles = (files: FileObject[]) => {
@@ -282,7 +132,7 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
 
     return (
         <View
-            onLayout={() => onLayout?.()}
+            onLayout={onLayout}
             style={[styles.flex1]}
         >
             <View style={[styles.flex1, styles.justifyContentCenter]}>
@@ -292,7 +142,13 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
                             size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
                             style={[styles.flex1]}
                             color={theme.textSupporting}
-                            reasonAttributes={{context: 'CameraCapture', cameraPermissionState, videoConstraintsReady: !isEmptyObject(videoConstraints)}}
+                            reasonAttributes={
+                                {
+                                    context: 'CameraCapture',
+                                    cameraPermissionState,
+                                    isQueriedPermissionState,
+                                } satisfies SkeletonSpanReasonAttributes
+                            }
                         />
                     )}
                     {cameraPermissionState !== 'granted' && isQueriedPermissionState && (
@@ -324,7 +180,7 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
                     {cameraPermissionState === 'granted' && !isEmptyObject(videoConstraints) && (
                         <View
                             style={styles.flex1}
-                            onLayout={(e) => (viewfinderLayout.current = e.nativeEvent.layout)}
+                            onLayout={(e) => (viewfinderLayoutRef.current = e.nativeEvent.layout)}
                         >
                             <NavigationAwareCamera
                                 onUserMedia={setupCameraPermissionsAndCapabilities}
@@ -353,8 +209,8 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
                                         sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.FLASH}
                                     >
                                         <Icon
-                                            height={16}
-                                            width={16}
+                                            height={variables.iconSizeSmall}
+                                            width={variables.iconSizeSmall}
                                             src={lazyIcons.Bolt}
                                             fill={isFlashLightOn ? theme.white : theme.icon}
                                         />
@@ -387,8 +243,8 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
                                 sentryLabel={shouldAcceptMultipleFiles ? CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.CHOOSE_FILES : CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.CHOOSE_FILE}
                             >
                                 <Icon
-                                    height={32}
-                                    width={32}
+                                    height={variables.iconSizeMenuItem}
+                                    width={variables.iconSizeMenuItem}
                                     src={lazyIcons.Gallery}
                                     fill={theme.textSupporting}
                                 />
@@ -418,8 +274,8 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
                             sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.MULTI_SCAN}
                         >
                             <Icon
-                                height={32}
-                                width={32}
+                                height={variables.iconSizeMenuItem}
+                                width={variables.iconSizeMenuItem}
                                 src={lazyIcons.ReceiptMultiple}
                                 fill={isMultiScanEnabled ? theme.iconMenu : theme.textSupporting}
                             />
@@ -434,8 +290,8 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
                             sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.FLASH}
                         >
                             <Icon
-                                height={32}
-                                width={32}
+                                height={variables.iconSizeMenuItem}
+                                width={variables.iconSizeMenuItem}
                                 src={isFlashLightOn ? lazyIcons.Bolt : lazyIcons.boltSlash}
                                 fill={theme.textSupporting}
                             />

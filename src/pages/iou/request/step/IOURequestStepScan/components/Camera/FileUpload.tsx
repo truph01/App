@@ -20,12 +20,12 @@ import type {CameraProps} from './types';
  * FileUpload — desktop web capture variant.
  * Renders a drag-and-drop zone + file picker button + receipt alternative methods.
  */
-function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout}: CameraProps) {
+function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout, isReplacingReceipt = false, isDraggingOverWrapper}: CameraProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const lazyIllustrations = useMemoizedLazyIllustrations(['ReceiptStack']);
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['SmartScan']);
+    const lazyIcons = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
 
     const panResponderRef = useRef(
         PanResponder.create({
@@ -67,7 +67,7 @@ function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout}: Camer
             style={[styles.flex1, styles.chooseFilesView(false)]}
         >
             <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter]}>
-                {!isDraggingOver && (
+                {!(isDraggingOver ?? isDraggingOverWrapper) && (
                     <View
                         style={[styles.alignItemsCenter, styles.justifyContentCenter]}
                         onLayout={(e) => setUploadViewHeight(e.nativeEvent.layout.height)}
@@ -79,6 +79,7 @@ function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout}: Camer
                         />
                         <View
                             style={[styles.uploadFileViewTextContainer, styles.userSelectNone]}
+                            // PanResponder handlers must be spread onto the View for gesture recognition
                             // eslint-disable-next-line react/jsx-props-no-spreading, react-hooks/refs
                             {...panResponderRef.current.panHandlers}
                         >
@@ -109,9 +110,9 @@ function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout}: Camer
             </View>
             <DragAndDropConsumer onDrop={handleDrop}>
                 <DropZoneUI
-                    icon={lazyIcons.SmartScan}
+                    icon={isReplacingReceipt ? lazyIcons.ReplaceReceipt : lazyIcons.SmartScan}
                     dropStyles={styles.receiptDropOverlay(true)}
-                    dropTitle={translate(shouldAcceptMultipleFiles ? 'dropzone.scanReceipts' : 'quickAction.scanReceipt')}
+                    dropTitle={isReplacingReceipt ? translate('dropzone.replaceReceipt') : translate(shouldAcceptMultipleFiles ? 'dropzone.scanReceipts' : 'quickAction.scanReceipt')}
                     dropTextStyles={styles.receiptDropText}
                     dashedBorderStyles={[styles.dropzoneArea, styles.easeInOpacityTransition, styles.activeDropzoneDashedBorder(theme.receiptDropBorderColorActive, true)]}
                 />

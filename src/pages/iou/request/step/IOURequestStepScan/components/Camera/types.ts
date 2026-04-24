@@ -12,6 +12,12 @@ type CameraProps = {
 
     /** Called to validate user-selected files (drag-and-drop or file picker) */
     onDrop?: (files: FileObject[], items: DataTransferItem[]) => void;
+
+    /** Whether we are replacing an existing receipt (affects drop zone icon/title on desktop) */
+    isReplacingReceipt?: boolean;
+
+    /** Whether a file is being dragged over a parent wrapper (used by desktop for dual drag-over providers) */
+    isDraggingOverWrapper?: boolean;
 };
 
 export default CameraProps;

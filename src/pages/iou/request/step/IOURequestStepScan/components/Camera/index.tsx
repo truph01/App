@@ -13,6 +13,7 @@ function Camera(props: CameraProps) {
     if (isMobile()) {
         return (
             <CameraCapture
+                // Props are forwarded as-is to the platform-specific Camera variant
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...props}
             />
@@ -21,6 +22,7 @@ function Camera(props: CameraProps) {
 
     return (
         <FileUpload
+            // Props are forwarded as-is to the platform-specific Camera variant
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
         />
