@@ -122,14 +122,14 @@ function useChartLabelLayout({
     // Approximate truncated widths for hit-testing: exact for non-truncated labels,
     // at most ellipsisWidth px over for truncated ones — acceptable for bounding boxes.
     const truncatedLabelWidths = labelMaxWidths.map((maxW, i) => Math.min(labelWidths.at(i) ?? 0, maxW));
-    const finalMaxWidth = Math.max(...truncatedLabelWidths);
 
     let skipInterval = 1;
     if (rotation === LABEL_ROTATIONS.VERTICAL) {
-        const verticalWidth = effectiveWidth(finalMaxWidth, lineHeight, rotation);
-        const visibleCount = maxVisibleCount(labelAreaWidth, verticalWidth);
+        const visibleCount = maxVisibleCount(labelAreaWidth, lineHeight);
         skipInterval = visibleCount >= data.length ? 1 : Math.ceil(data.length / Math.max(1, visibleCount));
     }
+
+    const finalMaxWidth = Math.max(...truncatedLabelWidths.filter((_, i) => i % skipInterval === 0));
 
     const lastIndex = data.length - 1;
 

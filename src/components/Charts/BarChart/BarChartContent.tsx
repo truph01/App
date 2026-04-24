@@ -232,7 +232,6 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
                     labelColor={theme.textSupporting}
                     xScale={args.xScale}
                     chartBoundsBottom={args.chartBounds.bottom}
-                    centerRotatedLabels
                 />
                 <ChartYAxisLabels
                     yTicks={args.yTicks}
