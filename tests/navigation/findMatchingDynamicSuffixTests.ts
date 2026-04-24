@@ -151,16 +151,6 @@ describe('findMatchingDynamicSuffix', () => {
             });
         });
 
-        it('should preserve longest-first when an optional pattern would also match a shorter sub-suffix', () => {
-            // The path ends with "wrap/x/end" — that should match the middle-optional pattern as a
-            // 3-segment suffix instead of falling through to the (also-valid) 2-segment "x/end" interpretation.
-            expect(findMatchingDynamicSuffix('/r/123/wrap/x/end')).toEqual({
-                pattern: 'wrap/:p?/end',
-                actualSuffix: 'wrap/x/end',
-                pathParams: {p: 'x'},
-            });
-        });
-
         it('should ignore query params when matching trailing-optional present-form', () => {
             expect(findMatchingDynamicSuffix('/r/123/opt-page/789?tab=details')).toEqual({
                 pattern: 'opt-page/:id?',

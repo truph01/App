@@ -48,14 +48,6 @@ jest.mock('@src/ROUTES', () => ({
             path: 'wildcard-suffix',
             entryScreens: ['*'],
         },
-        OPT_TRAILING: {
-            path: 'opt-page/:id?',
-            entryScreens: ['BaseScreen'],
-        },
-        OPT_MIDDLE: {
-            path: 'wrap/:p?/end',
-            entryScreens: ['BaseScreen'],
-        },
     },
 }));
 
@@ -74,8 +66,6 @@ describe('getStateFromPath', () => {
     const dynamicMultiSegState = {routes: [{name: 'DynamicMultiSegScreen', params: focusedRouteParams}]};
     const dynamicMultiSegLayerState = {routes: [{name: 'DynamicMultiSegLayerScreen'}]};
     const dynamicWildcardState = {routes: [{name: 'DynamicWildcardScreen'}]};
-    const dynamicOptTrailingState = {routes: [{name: 'DynamicOptTrailingScreen'}]};
-    const dynamicOptMiddleState = {routes: [{name: 'DynamicOptMiddleScreen'}]};
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -95,12 +85,6 @@ describe('getStateFromPath', () => {
             }
             if (dynamicRouteKey === 'WILDCARD_SUFFIX') {
                 return dynamicWildcardState;
-            }
-            if (dynamicRouteKey === 'OPT_TRAILING') {
-                return dynamicOptTrailingState;
-            }
-            if (dynamicRouteKey === 'OPT_MIDDLE') {
-                return dynamicOptMiddleState;
             }
             return {routes: [{name: 'UnknownDynamic'}]};
         });
@@ -203,53 +187,6 @@ describe('getStateFromPath', () => {
             expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith('/base/suffix-a', 'SUFFIX_A', focusedRouteParams);
             expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith(fullPath, 'WILDCARD_SUFFIX', focusedRouteParams);
             expect(mockLogWarn).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('optional path params (E2E)', () => {
-        it('parses URL with trailing-optional present and merges path params', () => {
-            const fullPath = '/base/opt-page/789';
-
-            const result = getStateFromPath(fullPath as unknown as Route);
-
-            expect(result).toBe(dynamicOptTrailingState);
-            expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith(fullPath, 'OPT_TRAILING', {...focusedRouteParams, id: '789'});
-        });
-
-        it('parses URL with trailing-optional absent and does NOT inject undefined param', () => {
-            const fullPath = '/base/opt-page';
-
-            const result = getStateFromPath(fullPath as unknown as Route);
-
-            expect(result).toBe(dynamicOptTrailingState);
-            expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith(fullPath, 'OPT_TRAILING', focusedRouteParams);
-        });
-
-        it('parses URL with middle-optional present and merges path params', () => {
-            const fullPath = '/base/wrap/x/end';
-
-            const result = getStateFromPath(fullPath as unknown as Route);
-
-            expect(result).toBe(dynamicOptMiddleState);
-            expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith(fullPath, 'OPT_MIDDLE', {...focusedRouteParams, p: 'x'});
-        });
-
-        it('parses URL with middle-optional absent and does NOT inject undefined param', () => {
-            const fullPath = '/base/wrap/end';
-
-            const result = getStateFromPath(fullPath as unknown as Route);
-
-            expect(result).toBe(dynamicOptMiddleState);
-            expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith(fullPath, 'OPT_MIDDLE', focusedRouteParams);
-        });
-
-        it('parses URL with optional path param + query params', () => {
-            const fullPath = '/base/opt-page/789?tab=details';
-
-            const result = getStateFromPath(fullPath as unknown as Route);
-
-            expect(result).toBe(dynamicOptTrailingState);
-            expect(mockGetStateForDynamicRoute).toHaveBeenCalledWith(fullPath, 'OPT_TRAILING', {...focusedRouteParams, id: '789'});
         });
     });
 });

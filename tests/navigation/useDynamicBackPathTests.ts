@@ -38,9 +38,6 @@ describe('useDynamicBackPath', () => {
     });
 
     for (const {path} of Object.values(DYNAMIC_ROUTES)) {
-        // Patterns with '?' (optional path params) cannot be tested as literal URLs because the
-        // '?' would be parsed as a query-string separator. They are exercised explicitly in the
-        // dedicated "optional path params" describe block below.
         if (path.includes('?')) {
             continue;
         }
