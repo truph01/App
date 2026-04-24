@@ -1,6 +1,7 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
 import {getTagArrayFromName, isDistanceRequest, isPerDiemRequest} from '@libs/TransactionUtils';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, ReportActions, SearchResults, Transaction} from '@src/types/onyx';
 
@@ -69,6 +70,26 @@ function hasCustomUnitMerchantInSelection(selectedTransactionContexts: Array<{tr
 }
 
 /**
+ * Reported expenses check their own workspace policy; unreported (track) expenses fall back to
+ * the bulk-edit workspace policy because they have no report to resolve a per-transaction policy from.
+ */
+function isBulkEditTaxTrackingEnabled(
+    selectedTransactionContexts: Array<{transaction: Transaction; transactionPolicy: OnyxEntry<Policy>}>,
+    bulkEditPolicy: OnyxEntry<Policy>,
+    hasPerDiemOrTimeTransaction: boolean,
+): boolean {
+    if (hasPerDiemOrTimeTransaction) {
+        return false;
+    }
+    return selectedTransactionContexts.every(({transaction, transactionPolicy}) => {
+        if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
+            return !!bulkEditPolicy?.tax?.trackingEnabled;
+        }
+        return !!transactionPolicy?.tax?.trackingEnabled;
+    });
+}
+
+/**
  * After a hard refresh, transaction/report/reportAction data may only exist in the search snapshot,
  * not in the main Onyx collections. These helpers fill gaps from the snapshot so bulk edit can work.
  */
@@ -121,4 +142,12 @@ function withSnapshotReports(onyxReports: OnyxCollection<Report> | undefined, sn
     return merged;
 }
 
-export {getCommonDependentTag, getTransactionEditContext, hasCustomUnitMerchantInSelection, withSnapshotTransactions, withSnapshotReportActions, withSnapshotReports};
+export {
+    getCommonDependentTag,
+    getTransactionEditContext,
+    hasCustomUnitMerchantInSelection,
+    isBulkEditTaxTrackingEnabled,
+    withSnapshotTransactions,
+    withSnapshotReportActions,
+    withSnapshotReports,
+};

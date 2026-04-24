@@ -25,7 +25,14 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
-import {getTransactionEditContext, hasCustomUnitMerchantInSelection, withSnapshotReportActions, withSnapshotReports, withSnapshotTransactions} from './SearchEditMultipleUtils';
+import {
+    getTransactionEditContext,
+    hasCustomUnitMerchantInSelection,
+    isBulkEditTaxTrackingEnabled,
+    withSnapshotReportActions,
+    withSnapshotReports,
+    withSnapshotTransactions,
+} from './SearchEditMultipleUtils';
 
 function SearchEditMultiplePage() {
     const {translate} = useLocalize();
@@ -100,7 +107,7 @@ function SearchEditMultiplePage() {
     const policyTags = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`];
     const policyTagLists = getTagLists(policyTags);
 
-    const isTaxTrackingEnabled = !hasPerDiemOrTimeTransaction && selectedTransactionContexts.every(({transactionPolicy}) => !!transactionPolicy?.tax?.trackingEnabled);
+    const isTaxTrackingEnabled = isBulkEditTaxTrackingEnabled(selectedTransactionContexts, policy, hasPerDiemOrTimeTransaction);
     const areSelectedTransactionsExpenses = selectedTransactionContexts.every(({transaction, report}) => {
         if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
             return true;
