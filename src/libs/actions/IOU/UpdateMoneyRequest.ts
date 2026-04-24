@@ -1635,14 +1635,14 @@ function getUpdateTrackExpenseParams(
 
     // Roll back the snapshot copy of the transaction so the search row reverts to its pre-edit state
     if (hash) {
-        // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
+        // Initializing as an empty typed object to allow dynamic key assignment resolves TypeScript type inference issue
+        const rollbackSnapshotData: NullishDeep<SearchResultDataType> = {};
+        rollbackSnapshotData[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`] = transaction ?? null;
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
             value: {
-                data: {
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]: transaction ?? null,
-                },
+                data: rollbackSnapshotData,
             },
         });
     }
