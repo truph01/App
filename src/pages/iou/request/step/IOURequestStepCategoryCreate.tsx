@@ -91,9 +91,13 @@ function IOURequestStepCategoryCreate({
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
             const categoryName = values.categoryName.trim();
 
+            if (!policyID) {
+                return;
+            }
+
             // 1. Create the category in the workspace (optimistic update, queued API call).
             createPolicyCategory({
-                policyID: policyID ?? '',
+                policyID,
                 categoryName,
                 isSetupCategoriesTaskParentReportArchived: isSetupCategoryTaskParentReportArchived,
                 setupCategoryTaskReport,
