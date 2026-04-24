@@ -1,5 +1,5 @@
 import {useIsFocused} from '@react-navigation/native';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
@@ -123,7 +123,13 @@ function useFormErrorManagement({
         isControlPolicy: policy?.type === CONST.POLICY.TYPE.CORPORATE,
     });
 
+    const formErrorRef = useRef(formError);
     useEffect(() => {
+        formErrorRef.current = formError;
+    }, [formError]);
+
+    useEffect(() => {
+        const currentFormError = formErrorRef.current;
         if (shouldDisplayFieldError && didConfirmSplit) {
             setFormError('iou.error.genericSmartscanFailureMessage');
             return;
@@ -132,7 +138,7 @@ function useFormErrorManagement({
             setFormError('iou.receiptScanningFailed');
             return;
         }
-        if (formError === 'iou.error.invalidMerchant' && isMerchantFieldValid) {
+        if (currentFormError === 'iou.error.invalidMerchant' && isMerchantFieldValid) {
             setFormError('');
             return;
         }
@@ -140,7 +146,7 @@ function useFormErrorManagement({
         // Reset the form error whenever the screen gains or loses focus
         // but preserve violation-related errors since those represent real validation issues
         // that can only be resolved by fixing the underlying issue
-        if (formError && !formError.startsWith(CONST.VIOLATIONS_PREFIX)) {
+        if (currentFormError && !currentFormError.startsWith(CONST.VIOLATIONS_PREFIX)) {
             setFormError('');
             return;
         }
@@ -149,8 +155,7 @@ function useFormErrorManagement({
         if (isViolationFixed) {
             setFormError('');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't want this effect to run if it's just setFormError that changes
-    }, [isFocused, shouldDisplayFieldError, hasSmartScanFailed, didConfirmSplit, isViolationFixed, isMerchantFieldValid]);
+    }, [isFocused, shouldDisplayFieldError, hasSmartScanFailed, didConfirmSplit, isViolationFixed, isMerchantFieldValid, setFormError]);
 
     const errorMessage = useMemo<string | undefined>(() => {
         if (routeError) {
