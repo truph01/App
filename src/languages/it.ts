@@ -9134,6 +9134,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
         groups: {
             title: 'Gruppi',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`}),
+            defaultGroup: 'Gruppo predefinito per i nuovi membri',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Sei sicuro di voler impostare ${newName} come gruppo predefinito? I nuovi membri verranno invitati a questo gruppo invece del precedente gruppo predefinito (${currentName}). `,
+            makeDefault: 'Imposta come predefinito',
+            nevermind: 'Lascia perdere',
         },
     },
     proactiveAppReview: {

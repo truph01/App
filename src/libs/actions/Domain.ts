@@ -2003,7 +2003,7 @@ function setDefaultSecurityGroup(domainAccountID: number, groupID: string, previ
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    defaultSecurityGroupIDErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.groups.error.settings'),
+                    defaultSecurityGroupIDErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.error'),
                 },
             },
         },

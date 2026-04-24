@@ -9144,9 +9144,6 @@ const translations = {
                 `Are you sure you want to make ${newName} the default group? New members will be invited to this group instead of the previous default group (${currentName}). `,
             makeDefault: 'Make default',
             nevermind: 'Nevermind',
-            error: {
-                settings: '<rbr>Couldn’t save this change. Please try again or <concierge-link>contact Concierge</concierge-link> for more support.</rbr>',
-            },
         },
     },
 };

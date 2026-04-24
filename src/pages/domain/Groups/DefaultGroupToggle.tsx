@@ -15,7 +15,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearDomainSecurityGroupSettingError, setDefaultSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
-import HTMLMessagesRow from './HTMLMessagesRow';
 
 type DefaultGroupToggleProps = {
     domainAccountID: number;
@@ -79,10 +78,8 @@ function DefaultGroupToggle({domainAccountID, groupID, groupName}: DefaultGroupT
                 }}
                 pendingAction={defaultSecurityGroupIDPendingAction}
                 wrapperStyle={styles.ph5}
-            />
-            <HTMLMessagesRow
                 errors={defaultSecurityGroupIDErrors}
-                onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'defaultSecurityGroupIDErrors')}
+                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'defaultSecurityGroupIDErrors')}
             />
         </View>
     );

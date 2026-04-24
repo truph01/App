@@ -9144,6 +9144,11 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
         groups: {
             title: 'Gruppen',
             memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`}),
+            defaultGroup: 'Standardgruppe für neue Mitglieder',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Möchtest du ${newName} wirklich zur Standardgruppe machen? Neue Mitglieder werden zu dieser Gruppe anstelle der bisherigen Standardgruppe (${currentName}) eingeladen. `,
+            makeDefault: 'Als Standard festlegen',
+            nevermind: 'Vergiss es',
         },
     },
     proactiveAppReview: {

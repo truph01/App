@@ -9020,6 +9020,11 @@ ${reportName}
         groups: {
             title: 'グループ',
             memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`}),
+            defaultGroup: '新しいメンバーのデフォルトグループ',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `本当に ${newName} をデフォルトグループに設定しますか？新しいメンバーは、以前のデフォルトグループ (${currentName}) ではなく、このグループに招待されます。`,
+            makeDefault: 'デフォルトに設定',
+            nevermind: 'やめておく',
         },
     },
     proactiveAppReview: {
