@@ -13,7 +13,6 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {changeDomainSecurityGroup} from '@libs/actions/Domain';
-import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -22,6 +21,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import {personalDetailsLoginSelector} from '@src/selectors/PersonalDetails';
 import type {Domain} from '@src/types/onyx';
 
 type SecurityGroupItem = ListItem & {
@@ -43,7 +43,7 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
     const [userSecurityGroup] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: securityGroupSelector,
     });
-    const memberLogin = getLoginByAccountID(accountID);
+    const [memberLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: personalDetailsLoginSelector(accountID)});
 
     const currentGroupId = userSecurityGroup?.key.replace(CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, '');
 
@@ -86,7 +86,7 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
                         Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
                     }}
                 />
-                <Text style={[styles.ph5, styles.pb3, styles.textSupporting]}>{translate('domain.members.chooseWhereToMoveName', {name: getLoginByAccountID(accountID) ?? ''})}</Text>
+                <Text style={[styles.ph5, styles.pb3, styles.textSupporting]}>{translate('domain.members.chooseWhereToMoveName', {name: memberLogin ?? ''})}</Text>
 
                 <SelectionList<SecurityGroupItem>
                     data={data}
@@ -101,7 +101,7 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
                         pressOnEnter
                         text={translate('common.save')}
                         onPress={handleSave}
-                        isDisabled={!selectedGroupId || selectedGroupId === currentGroupId}
+                        isDisabled={!selectedGroupId || selectedGroupId === currentGroupId || !memberLogin}
                     />
                 </FixedFooter>
             </ScreenWrapper>
