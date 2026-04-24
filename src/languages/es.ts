@@ -9375,7 +9375,6 @@ ${amount} para ${merchant} - ${date}`,
             permissions: 'Permisos de grupo',
             StrictlyEnforceWorkspaceRules: 'Hacer cumplir estrictamente las reglas del espacio de trabajo',
             StrictlyEnforceWorkspaceRulesDescription: 'Todas las reglas del espacio de trabajo deben cumplirse antes de enviar un informe. No se permiten excepciones manuales.',
-            
         },
     },
     gps: {
