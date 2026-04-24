@@ -9,7 +9,9 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import {setWorkspaceDefaultSpendCategory} from '@userActions/Policy/Policy';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -38,24 +40,30 @@ function DynamicSpendCategorySelectorPage({route}: DynamicSpendCategorySelectorP
     };
 
     return (
-        <ScreenWrapper
-            style={styles.pb0}
-            enableEdgeToEdgeBottomSafeAreaPadding
-            shouldEnableKeyboardAvoidingView={false}
-            testID="DynamicSpendCategorySelectorPage"
+        <AccessOrNotFoundWrapper
+            policyID={policyID}
+            accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.PAID]}
+            featureName={CONST.POLICY.MORE_FEATURES.ARE_CATEGORIES_ENABLED}
         >
-            <HeaderWithBackButton
-                title={label}
-                shouldShowBackButton
-                onBackButtonPress={() => Navigation.goBack(backPath)}
-            />
-            <CategoryPicker
-                policyID={policyID}
-                selectedCategory={currentCategory}
-                onSubmit={onCategorySelected}
-                addBottomSafeAreaPadding
-            />
-        </ScreenWrapper>
+            <ScreenWrapper
+                style={styles.pb0}
+                enableEdgeToEdgeBottomSafeAreaPadding
+                shouldEnableKeyboardAvoidingView={false}
+                testID="DynamicSpendCategorySelectorPage"
+            >
+                <HeaderWithBackButton
+                    title={label}
+                    shouldShowBackButton
+                    onBackButtonPress={() => Navigation.goBack(backPath)}
+                />
+                <CategoryPicker
+                    policyID={policyID}
+                    selectedCategory={currentCategory}
+                    onSubmit={onCategorySelected}
+                    addBottomSafeAreaPadding
+                />
+            </ScreenWrapper>
+        </AccessOrNotFoundWrapper>
     );
 }
 
