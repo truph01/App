@@ -24,6 +24,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useRootNavigationState from '@hooks/useRootNavigationState';
 import useSidePanelActions from '@hooks/useSidePanelActions';
+import useSidePanelState from '@hooks/useSidePanelState';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {scrollToRight} from '@libs/InputUtils';
 import backHistory from '@libs/Navigation/helpers/backHistory';
@@ -76,6 +77,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const listRef = useRef<SelectionListWithSectionsHandle>(null);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'ConciergeAvatar']);
     const {openSidePanel} = useSidePanelActions();
+    const {shouldHideSidePanel: isSidePanelOpen} = useSidePanelState();
 
     // The actual input text that the user sees
     const [textInputValue, , setTextInputValue] = useDebouncedState('', 500);
@@ -328,7 +330,9 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                     if (!conciergeReportID || !conciergeReport || !item.searchQuery) {
                         return;
                     }
-                    openSidePanel();
+                    if (isSidePanelOpen) {
+                        openSidePanel();
+                    }
 
                     addComment({
                         report: conciergeReport,
@@ -373,6 +377,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             setAutocompleteQueryValue,
             currentUserPersonalDetails.timezone,
             openSidePanel,
+            isSidePanelOpen,
         ],
     );
 

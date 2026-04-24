@@ -89,14 +89,6 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     const reportID = (isRHPAdminsRoom || isRHPHomePage) && isUserAdmin && isPolicyActive && adminsChatReportID ? adminsChatReportID : conciergeReportID;
 
     const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
-    const [prevShouldHideSidePanel, setPrevShouldHideSidePanel] = useState(shouldHideSidePanel);
-
-    if (prevShouldHideSidePanel !== shouldHideSidePanel) {
-        setPrevShouldHideSidePanel(shouldHideSidePanel);
-        if (!shouldHideSidePanel) {
-            setSessionStartTime(DateUtils.getDBTime());
-        }
-    }
 
     useEffect(() => {
         sidePanelWidthRef.current = sidePanelWidth;
@@ -135,6 +127,11 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
         focusComposerWithDelay(ReportActionComposeFocusManager.composerRef.current, CONST.SIDE_PANEL_ANIMATED_TRANSITION + CONST.COMPOSER_FOCUS_DELAY)(true);
     };
 
+    const openSidePanel = () => {
+        setSessionStartTime(DateUtils.getDBTime());
+        SidePanelActions.openSidePanel(!isExtraLargeScreenWidth);
+    };
+
     // Because of the React Compiler we don't need to memoize it manually
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     const stateValue = {
@@ -153,7 +150,7 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     // Because of the React Compiler we don't need to memoize it manually
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     const actionsValue = {
-        openSidePanel: () => SidePanelActions.openSidePanel(!isExtraLargeScreenWidth),
+        openSidePanel,
         closeSidePanel,
     };
 
