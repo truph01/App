@@ -1,0 +1,58 @@
+import type {OnyxEntry} from 'react-native-onyx';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
+import {convertToBackendAmount} from '@libs/CurrencyUtils';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
+import {calculateTaxAmount, getDefaultTaxCode, getTaxValue, hasTaxRateWithMatchingValue} from '@libs/TransactionUtils';
+import CONST from '@src/CONST';
+import type * as OnyxTypes from '@src/types/onyx';
+
+type UseTaxAmountParams = {
+    transaction: OnyxEntry<OnyxTypes.Transaction>;
+    policy: OnyxEntry<OnyxTypes.Policy>;
+    policyForMovingExpenses: OnyxEntry<OnyxTypes.Policy> | undefined;
+    isDistanceRequest: boolean;
+    isMovingTransactionFromTrackExpense: boolean;
+    customUnitRateID: string;
+    distance: number;
+    previousTransactionCurrency: string | undefined;
+};
+
+/**
+ * Computes tax-related values for the confirmation flow.
+ *
+ * Resolves the default tax code and value (falling back to the move-expenses policy when
+ * moving a transaction off a track-expense), detects when a user's prior selection should
+ * be preserved across a currency change, and returns the tax amount in the smallest
+ * currency units for persistence.
+ */
+function useTaxAmount({
+    transaction,
+    policy,
+    policyForMovingExpenses,
+    isDistanceRequest,
+    isMovingTransactionFromTrackExpense,
+    customUnitRateID,
+    distance,
+    previousTransactionCurrency,
+}: UseTaxAmountParams) {
+    const {getCurrencyDecimals} = useCurrencyListActions();
+
+    const defaultTaxCode = getDefaultTaxCode(policy, transaction) ?? (isMovingTransactionFromTrackExpense ? (getDefaultTaxCode(policyForMovingExpenses, transaction) ?? '') : '');
+    const defaultTaxValue = getTaxValue(policy, transaction, defaultTaxCode) ?? null;
+    const previousDefaultTaxCode = getDefaultTaxCode(policy, transaction, previousTransactionCurrency);
+    const shouldKeepCurrentTaxSelection = hasTaxRateWithMatchingValue(policy, transaction) && transaction?.taxCode !== previousDefaultTaxCode;
+
+    const taxableAmount = isDistanceRequest ? DistanceRequestUtils.getTaxableAmount(policy, customUnitRateID, distance) : Math.abs(transaction?.amount ?? 0);
+    // First we'll try to get the tax value from the chosen policy and if not found, we'll try to get it from the policy for moving expenses (only if the transaction is moving from track expense)
+    const taxPercentage =
+        getTaxValue(policy, transaction, transaction?.taxCode ?? defaultTaxCode) ??
+        (isMovingTransactionFromTrackExpense ? getTaxValue(policyForMovingExpenses, transaction, transaction?.taxCode ?? defaultTaxCode) : '');
+    const taxDecimals = getCurrencyDecimals(transaction?.currency ?? CONST.CURRENCY.USD);
+    const taxAmount = isMovingTransactionFromTrackExpense && transaction?.taxAmount ? Math.abs(transaction?.taxAmount ?? 0) : calculateTaxAmount(taxPercentage, taxableAmount, taxDecimals);
+
+    const taxAmountInSmallestCurrencyUnits = convertToBackendAmount(Number.parseFloat(taxAmount.toString()));
+
+    return {defaultTaxCode, defaultTaxValue, shouldKeepCurrentTaxSelection, taxAmountInSmallestCurrencyUnits};
+}
+
+export default useTaxAmount;
