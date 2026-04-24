@@ -1,22 +1,15 @@
+import StringUtils from '@libs/StringUtils';
+
 /**
- * Compiles a dynamic-route pattern (e.g. `'flag/:reportID/:reportActionID?'`) into a runtime
- * representation that can be matched against URL path candidates.
- *
- * Supports three segment kinds:
- *   - static literal segment (e.g. `'flag'`)
- *   - required path param (e.g. `':reportID'`)
- *   - optional path param (e.g. `':reportActionID?'`)
- *
- * The resulting regex mirrors how `@react-navigation/core`'s `getStateFromPath` builds patterns:
- * each segment contributes `<literal>\/` or `(?<name>[^/]+)\/`, with optional segments wrapped
- * in `(?:...)?`. The candidate string MUST be normalized with a trailing `/` before matching.
+ * Compiles a dynamic-route suffix pattern (e.g. `flag/:reportID/:reportActionID?`) into a regex.
+ * Used to detect and strip dynamic suffixes from URL paths.
  */
 
 type CompiledPattern = {
     /** Original pattern string, e.g. `'a/:p?/b'`. */
     pattern: string;
 
-    /** Compiled regex anchored to `^...$`; consumers must append a trailing `/` to the candidate before exec. */
+    /** Compiled regex. */
     regex: RegExp;
 
     /** Names of all `:param` and `:param?` placeholders in declaration order. */
@@ -29,12 +22,6 @@ type CompiledPattern = {
     maxSegments: number;
 };
 
-const REGEX_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g;
-
-function escapeRegex(input: string): string {
-    return input.replace(REGEX_SPECIAL_CHARS, '\\$&');
-}
-
 function compileDynamicRoutePattern(pattern: string): CompiledPattern {
     if (!pattern) {
         throw new Error(`[compileDynamicRoutePattern] Pattern must be a non-empty string, got "${pattern}"`);
@@ -42,7 +29,7 @@ function compileDynamicRoutePattern(pattern: string): CompiledPattern {
 
     const segments = pattern.split('/');
 
-    // A pattern like 'a/' would produce an empty trailing segment - reject it for a clearer error.
+    // Reject patterns with empty segments (e.g. 'a//b'), but allow a trailing slash.
     if (segments.some((s, i) => s === '' && i !== segments.length - 1)) {
         throw new Error(`[compileDynamicRoutePattern] Pattern "${pattern}" contains an empty segment`);
     }
@@ -55,7 +42,6 @@ function compileDynamicRoutePattern(pattern: string): CompiledPattern {
 
     for (const segment of segments) {
         if (segment === '') {
-            // Trailing empty segment due to a trailing slash - tolerate by skipping.
             continue;
         }
 
@@ -81,7 +67,7 @@ function compileDynamicRoutePattern(pattern: string): CompiledPattern {
                 maxSegments += 1;
             }
         } else {
-            regexBody += `${escapeRegex(segment)}\\/`;
+            regexBody += `${StringUtils.escapeRegExp(segment)}\\/`;
             minSegments += 1;
             maxSegments += 1;
         }

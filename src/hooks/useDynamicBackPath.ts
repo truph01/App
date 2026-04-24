@@ -7,12 +7,12 @@ import ROUTES from '@src/ROUTES';
 import useRootNavigationState from './useRootNavigationState';
 
 /**
- * Returns the back path for a dynamic route by removing the dynamic suffix from the current URL.
+ * Removes the given dynamic suffix from the end of the current URL to produce a "back" path.
  *
- * Uses the same matching logic as `findMatchingDynamicSuffix` (single source of truth) so static,
- * parametric (required-only), and parametric-with-optional-params suffixes are all handled
- * consistently. The suffix is only removed if the registered pattern actually matches the tail
- * of the current path (so middle-of-path mentions or partial matches are left intact).
+ * Supported suffix types: static (`/edit`), parametric (`/:reportID`),
+ * and parametric with optional params (`/:reportID/:reportActionID?`).
+ *
+ * If the suffix doesn't match the tail of the current path, returns the path as-is.
  *
  * @param dynamicRouteSuffix - The dynamic route pattern to remove from the current URL.
  * @returns The back path for the dynamic route.

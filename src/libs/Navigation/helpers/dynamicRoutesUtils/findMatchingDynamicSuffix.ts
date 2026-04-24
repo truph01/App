@@ -2,7 +2,7 @@ import {compiledParametricEntries, dynamicRoutePaths} from './isDynamicRouteSuff
 import splitPathAndQuery from './splitPathAndQuery';
 
 type DynamicSuffixMatch = {
-    /** Registered pattern, e.g. 'flag/:reportID/:reportActionID' or 'opt-page/:id?' */
+    /** Registered pattern, e.g. 'flag/:reportID/:reportActionID' or 'page/:id?' */
     pattern: string;
     /** Actual URL values, e.g. 'flag/456/abc' or 'opt-page' (when optional is absent) */
     actualSuffix: string;
@@ -19,8 +19,7 @@ type DynamicSuffixMatch = {
  *   2. Parametric patterns are tried in registration order, but pre-filtered by their
  *      `[minSegments, maxSegments]` range so only relevant ones run regex.
  *
- * "Longest first" guarantees that nested suffixes never accidentally truncate to a shorter
- * interpretation when a longer one is valid.
+ * Longer candidates are tried first to prefer the most specific match.
  *
  * @param path - The path to find the matching dynamic suffix for
  * @returns The matching dynamic suffix, or undefined if no matching suffix is found
@@ -33,27 +32,33 @@ function findMatchingDynamicSuffix(path = ''): DynamicSuffixMatch | undefined {
 
     const segments = normalizedPath.split('/').filter(Boolean);
 
+    // Iterate from the full path (longest candidate) down to single-segment suffixes.
+    // This guarantees the longest matching suffix is returned first.
     for (let i = 0; i < segments.length; i++) {
         const candidate = segments.slice(i).join('/');
 
+        // Static match (e.g. 'country', 'verify-account')
         if (dynamicRoutePaths.has(candidate)) {
             return {pattern: candidate, actualSuffix: candidate, pathParams: {}};
         }
 
+        // Try parametric patterns (e.g. 'flag/:reportID/:reportActionID?') against the candidate.
+        // Extract named path params from the match if found.
         const candidateSegmentCount = segments.length - i;
+        // Append trailing '/' because compiled regexes expect each segment to end with '/'.
         const normalized = `${candidate}/`;
 
         for (const {compiled} of compiledParametricEntries) {
             if (candidateSegmentCount < compiled.minSegments || candidateSegmentCount > compiled.maxSegments) {
                 continue;
             }
-            const m = compiled.regex.exec(normalized);
-            if (!m) {
+            const match = compiled.regex.exec(normalized);
+            if (!match) {
                 continue;
             }
             const pathParams: Record<string, string> = {};
             for (const name of compiled.paramNames) {
-                const value = m.groups?.[name];
+                const value = match.groups?.[name];
                 if (value === undefined) {
                     continue;
                 }
