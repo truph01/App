@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import type {ReactNode} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -49,49 +49,43 @@ function ConfirmedRoute({transaction, isSmallerIcon, shouldHaveBorderRadius = tr
 
     const [mapboxAccessToken] = useOnyx(ONYXKEYS.MAPBOX_ACCESS_TOKEN);
 
-    const getMarkerComponent = useCallback(
-        (icon: IconAsset): ReactNode => (
-            <ImageSVG
-                src={icon}
-                width={CONST.MAP_MARKER_SIZE}
-                height={CONST.MAP_MARKER_SIZE}
-                fill={theme.icon}
-            />
-        ),
-        [theme],
+    const getMarkerComponent = (icon: IconAsset): ReactNode => (
+        <ImageSVG
+            src={icon}
+            width={CONST.MAP_MARKER_SIZE}
+            height={CONST.MAP_MARKER_SIZE}
+            fill={theme.icon}
+        />
     );
 
-    const getWaypointMarkers = useCallback(
-        (waypointsData: WaypointCollection): WayPoint[] => {
-            const numberOfWaypoints = Object.keys(waypointsData).length;
-            const lastWaypointIndex = numberOfWaypoints - 1;
+    const getWaypointMarkers = (waypointsData: WaypointCollection): WayPoint[] => {
+        const numberOfWaypoints = Object.keys(waypointsData).length;
+        const lastWaypointIndex = numberOfWaypoints - 1;
 
-            return Object.entries(waypointsData)
-                .map(([key, waypoint]) => {
-                    if (!waypoint?.lat || !waypoint?.lng) {
-                        return;
-                    }
+        return Object.entries(waypointsData)
+            .map(([key, waypoint]) => {
+                if (!waypoint?.lat || !waypoint?.lng) {
+                    return;
+                }
 
-                    const index = getWaypointIndex(key);
-                    let MarkerComponent: IconAsset;
-                    if (index === 0) {
-                        MarkerComponent = expensifyIcons.DotIndicatorUnfilled;
-                    } else if (index === lastWaypointIndex) {
-                        MarkerComponent = expensifyIcons.Location;
-                    } else {
-                        MarkerComponent = expensifyIcons.DotIndicator;
-                    }
+                const index = getWaypointIndex(key);
+                let MarkerComponent: IconAsset;
+                if (index === 0) {
+                    MarkerComponent = expensifyIcons.DotIndicatorUnfilled;
+                } else if (index === lastWaypointIndex) {
+                    MarkerComponent = expensifyIcons.Location;
+                } else {
+                    MarkerComponent = expensifyIcons.DotIndicator;
+                }
 
-                    return {
-                        id: `${waypoint.lng},${waypoint.lat},${index}`,
-                        coordinate: [waypoint.lng, waypoint.lat] as const,
-                        markerComponent: (): ReactNode => getMarkerComponent(MarkerComponent),
-                    };
-                })
-                .filter((waypoint): waypoint is WayPoint => !!waypoint);
-        },
-        [getMarkerComponent, expensifyIcons.DotIndicator, expensifyIcons.DotIndicatorUnfilled, expensifyIcons.Location],
-    );
+                return {
+                    id: `${waypoint.lng},${waypoint.lat},${index}`,
+                    coordinate: [waypoint.lng, waypoint.lat] as const,
+                    markerComponent: (): ReactNode => getMarkerComponent(MarkerComponent),
+                };
+            })
+            .filter((waypoint): waypoint is WayPoint => !!waypoint);
+    };
 
     const waypointMarkers = getWaypointMarkers(waypoints);
 
