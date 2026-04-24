@@ -53,7 +53,7 @@ function DefaultGroupToggle({domainAccountID, groupID, groupName}: DefaultGroupT
             title: translate('domain.groups.defaultGroup'),
             prompt: translate('domain.groups.defaultGroupPrompt', defaultSecurityGroup.name, groupName),
             confirmText: translate('domain.groups.makeDefault'),
-            cancelText: translate('domain.groups.nevermind'),
+            cancelText: translate('domain.groups.neverMind'),
             shouldShowCancelButton: true,
         });
 
