@@ -23,6 +23,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useRootNavigationState from '@hooks/useRootNavigationState';
+import useSidePanelActions from '@hooks/useSidePanelActions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {scrollToRight} from '@libs/InputUtils';
 import backHistory from '@libs/Navigation/helpers/backHistory';
@@ -37,7 +38,7 @@ import {getQueryWithUpdatedValues, sanitizeSearchValue} from '@libs/SearchQueryU
 import StringUtils from '@libs/StringUtils';
 import Navigation from '@navigation/Navigation';
 import variables from '@styles/variables';
-import {navigateToAndOpenReport, searchInServer} from '@userActions/Report';
+import {addComment, navigateToAndOpenReport, searchInServer} from '@userActions/Report';
 import {setSearchContext} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -68,10 +69,13 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
     const personalDetails = usePersonalDetails();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const listRef = useRef<SelectionListWithSectionsHandle>(null);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'ConciergeAvatar']);
+    const {openSidePanel} = useSidePanelActions();
 
     // The actual input text that the user sees
     const [textInputValue, , setTextInputValue] = useDebouncedState('', 500);
@@ -197,15 +201,25 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
         ],
     );
 
-    const searchQueryItem = textInputValue
-        ? {
-              text: textInputValue,
-              singleIcon: expensifyIcons.MagnifyingGlass,
-              searchQuery: textInputValue,
-              itemStyle: styles.activeComponentBG,
-              keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM,
-              searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.SEARCH,
-          }
+    const searchQueryItems = textInputValue
+        ? [
+              {
+                  text: textInputValue,
+                  singleIcon: expensifyIcons.MagnifyingGlass,
+                  searchQuery: textInputValue,
+                  itemStyle: styles.activeComponentBG,
+                  keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM,
+                  searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.SEARCH,
+              },
+              {
+                  text: translate('search.askConcierge', textInputValue),
+                  singleIcon: expensifyIcons.ConciergeAvatar,
+                  searchQuery: textInputValue,
+                  itemStyle: styles.activeComponentBG,
+                  keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE,
+                  searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE,
+              },
+          ]
         : undefined;
 
     const shouldScrollRef = useRef(false);
@@ -307,6 +321,25 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                         setAutocompleteSubstitutions,
                     });
                     setFocusAndScrollToRight();
+                } else if (item.searchItemType === CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE) {
+                    onRouterClose();
+                    setTextInputValue('');
+                    setAutocompleteQueryValue('');
+                    if (!conciergeReportID || !conciergeReport || !item.searchQuery) {
+                        return;
+                    }
+                    openSidePanel();
+
+                    addComment({
+                        report: conciergeReport,
+                        notifyReportID: conciergeReportID,
+                        ancestors: [],
+                        text: item.searchQuery,
+                        timezoneParam: currentUserPersonalDetails.timezone ?? CONST.DEFAULT_TIME_ZONE,
+                        currentUserAccountID,
+                        shouldPlaySound: true,
+                        isInSidePanel: true,
+                    });
                 } else {
                     submitSearch(item.searchQuery, item.keyForList !== CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM);
                 }
@@ -334,13 +367,19 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             betas,
             contextualPoliciesMap,
             contextualReportsMap,
+            conciergeReportID,
+            conciergeReport,
+            setTextInputValue,
+            setAutocompleteQueryValue,
+            currentUserPersonalDetails.timezone,
+            openSidePanel,
         ],
     );
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ESCAPE, () => {
         onRouterClose();
     });
-    const updateAndScrollToFocusedIndex = useCallback(() => listRef.current?.updateAndScrollToFocusedIndex(1, true), []);
+    const updateAndScrollToFocusedIndex = useCallback(() => listRef.current?.updateAndScrollToFocusedIndex(searchQueryItems?.length ?? 1, true), [searchQueryItems?.length]);
 
     const modalWidth = shouldUseNarrowLayout ? styles.w100 : {width: variables.searchRouterPopoverWidth};
 
@@ -386,7 +425,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             <DeferredAutocompleteList
                 autocompleteQueryValue={autocompleteQueryValue || textInputValue}
                 handleSearch={searchInServer}
-                searchQueryItem={searchQueryItem}
+                searchQueryItems={searchQueryItems}
                 getAdditionalSections={getAdditionalSections}
                 onListItemPress={onListItemPress}
                 onHighlightFirstItem={updateAndScrollToFocusedIndex}

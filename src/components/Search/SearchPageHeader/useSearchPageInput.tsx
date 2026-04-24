@@ -193,15 +193,17 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
         }
     }
 
-    const searchQueryItem = textInputValue
-        ? {
-              text: textInputValue,
-              singleIcon: expensifyIcons.MagnifyingGlass,
-              searchQuery: textInputValue,
-              itemStyle: styles.activeComponentBG,
-              keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM,
-              searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.SEARCH,
-          }
+    const searchQueryItems = textInputValue
+        ? [
+              {
+                  text: textInputValue,
+                  singleIcon: expensifyIcons.MagnifyingGlass,
+                  searchQuery: textInputValue,
+                  itemStyle: styles.activeComponentBG,
+                  keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM,
+                  searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.SEARCH,
+              },
+          ]
         : undefined;
 
     return {
@@ -211,7 +213,7 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
         personalAndWorkspaceCards,
         personalDetails,
         reports,
-        searchQueryItem,
+        searchQueryItems,
         selection,
         textInputRef,
         textInputValue,
