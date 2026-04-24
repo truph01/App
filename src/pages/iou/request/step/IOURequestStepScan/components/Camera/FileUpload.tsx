@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {PanResponder, View} from 'react-native';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
@@ -16,6 +16,10 @@ import CONST from '@src/CONST';
 import type {FileObject} from '@src/types/utils/Attachment';
 import type {CameraProps} from './types';
 
+const panResponder = PanResponder.create({
+    onPanResponderTerminationRequest: () => false,
+});
+
 /**
  * FileUpload — desktop web capture variant.
  * Renders a drag-and-drop zone + file picker button + receipt alternative methods.
@@ -26,12 +30,6 @@ function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout, isRepl
     const {translate} = useLocalize();
     const lazyIllustrations = useMemoizedLazyIllustrations(['ReceiptStack']);
     const lazyIcons = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
-
-    const panResponderRef = useRef(
-        PanResponder.create({
-            onPanResponderTerminationRequest: () => false,
-        }),
-    );
 
     const {isDraggingOver} = useDragAndDropState();
 
@@ -80,8 +78,8 @@ function FileUpload({onDrop, shouldAcceptMultipleFiles = false, onLayout, isRepl
                         <View
                             style={[styles.uploadFileViewTextContainer, styles.userSelectNone]}
                             // PanResponder handlers must be spread onto the View for gesture recognition
-                            // eslint-disable-next-line react/jsx-props-no-spreading, react-hooks/refs
-                            {...panResponderRef.current.panHandlers}
+                            // eslint-disable-next-line react/jsx-props-no-spreading
+                            {...panResponder.panHandlers}
                         >
                             <Text style={[styles.textFileUpload, styles.mb2]}>{translate(shouldAcceptMultipleFiles ? 'receipt.uploadMultiple' : 'receipt.upload')}</Text>
                             <Text style={[styles.textLabelSupporting, styles.textAlignCenter, styles.lineHeightLarge]}>

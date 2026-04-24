@@ -1,13 +1,11 @@
-import {useFocusEffect} from '@react-navigation/core';
-import React, {useEffect, useRef, useState} from 'react';
-import {Alert, AppState, StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {Alert, StyleSheet, View} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {GestureDetector} from 'react-native-gesture-handler';
 import {RESULTS} from 'react-native-permissions';
-import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming} from 'react-native-reanimated';
-import type {PhotoFile, Point, Camera as VisionCamera} from 'react-native-vision-camera';
-import {useCameraDevice, useCameraFormat} from 'react-native-vision-camera';
-import {scheduleOnRN} from 'react-native-worklets';
+import Animated, {useAnimatedStyle, useSharedValue, withSequence, withTiming} from 'react-native-reanimated';
+import type {PhotoFile} from 'react-native-vision-camera';
+import {useCameraFormat} from 'react-native-vision-camera';
 import ActivityIndicator from '@components/ActivityIndicator';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
@@ -18,27 +16,20 @@ import Text from '@components/Text';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
+import useNativeCamera from '@hooks/useNativeCamera';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {showCameraPermissionsAlert} from '@libs/fileDownload/FileUtils';
 import getPhotoSource from '@libs/fileDownload/getPhotoSource';
-import getPlatform from '@libs/getPlatform';
-import type Platform from '@libs/getPlatform/types';
 import getReceiptsUploadFolderPath from '@libs/getReceiptsUploadFolderPath';
 import HapticFeedback from '@libs/HapticFeedback';
 import Log from '@libs/Log';
 import {cancelSpan, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
-import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
-import CameraPermission from '@pages/iou/request/step/IOURequestStepScan/CameraPermission';
 import {useMultiScanActions, useMultiScanState} from '@pages/iou/request/step/IOURequestStepScan/components/MultiScanContext';
 import NavigationAwareCamera from '@pages/iou/request/step/IOURequestStepScan/components/NavigationAwareCamera/Camera';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import type {FileObject} from '@src/types/utils/Attachment';
-import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import type {CameraProps} from './types';
 
 const BLINK_DURATION_MS = 80;
@@ -54,33 +45,48 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
     const isInLandscapeMode = useIsInLandscapeMode();
-    const device = useCameraDevice('back', {
-        physicalDevices: ['wide-angle-camera', 'ultra-wide-angle-camera'],
-    });
-    const format = useCameraFormat(device, [{photoAspectRatio: 4 / 3}, {videoResolution: 'max'}, {photoResolution: 'max'}]);
-    // Format dimensions are in landscape orientation, so height/width gives portrait aspect ratio
-    const cameraAspectRatio = format ? format.photoHeight / format.photoWidth : undefined;
-
-    const hasFlash = !!device?.hasFlash;
-    const camera = useRef<VisionCamera>(null);
-    const [flash, setFlash] = useState(false);
     const lazyIllustrations = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
     const {isMultiScanEnabled, canUseMultiScan} = useMultiScanState();
     const {toggleMultiScan} = useMultiScanActions();
-    const platform = getPlatform(true);
-    const [mutedPlatforms = getEmptyObject<Partial<Record<Platform, true>>>()] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS);
-    const isPlatformMuted = mutedPlatforms[platform];
-    const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
-    const [isAttachmentPickerActive, setIsAttachmentPickerActive] = useState(false);
-    const [didCapturePhoto, setDidCapturePhoto] = useState(false);
+
+    // Ref for double-tap protection (doesn't trigger re-render)
+    const isCapturingPhoto = useRef(false);
+
+    const onFocusStart = useCallback(() => {
+        isCapturingPhoto.current = false;
+    }, []);
+
+    const onFocusCleanup = useCallback(() => {
+        cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
+        cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
+    }, []);
+
+    const {
+        camera,
+        device,
+        cameraPermissionStatus,
+        flash,
+        setFlash,
+        hasFlash,
+        didCapturePhoto,
+        setDidCapturePhoto,
+        isAttachmentPickerActive,
+        setIsAttachmentPickerActive,
+        isPlatformMuted,
+        askForPermissions,
+        tapGesture,
+        cameraFocusIndicatorAnimatedStyle,
+        cameraLoadingReasonAttributes,
+    } = useNativeCamera({context: 'Camera', onFocusStart, onFocusCleanup});
+
+    const format = useCameraFormat(device, [{photoAspectRatio: 4 / 3}, {videoResolution: 'max'}, {photoResolution: 'max'}]);
+    // Format dimensions are in landscape orientation, so height/width gives portrait aspect ratio
+    const cameraAspectRatio = format ? format.photoHeight / format.photoWidth : undefined;
 
     // Track camera init telemetry
     const cameraInitSpanStarted = useRef(false);
     const cameraInitialized = useRef(false);
-
-    // Ref for double-tap protection (doesn't trigger re-render)
-    const isCapturingPhoto = useRef(false);
 
     // Blink animation for shutter feedback
     const blinkOpacity = useSharedValue(0);
@@ -88,10 +94,10 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
         opacity: blinkOpacity.get(),
     }));
 
-    const showBlink = () => {
+    const showBlink = useCallback(() => {
         blinkOpacity.set(withSequence(withTiming(1, {duration: BLINK_DURATION_MS}), withTiming(0, {duration: BLINK_DURATION_MS})));
         HapticFeedback.press();
-    };
+    }, [blinkOpacity]);
 
     // Start camera init span when permission is granted and camera is ready
     useEffect(() => {
@@ -126,7 +132,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
         };
     }, []);
 
-    const handleCameraInitialized = () => {
+    const handleCameraInitialized = useCallback(() => {
         if (cameraInitialized.current) {
             return;
         }
@@ -151,86 +157,9 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
             .catch((error: string) => {
                 Log.warn('Error checking if the upload directory exists', error);
             });
-    };
+    }, []);
 
-    const askForPermissions = () => {
-        CameraPermission.requestCameraPermission?.()
-            .then((status: string) => {
-                setCameraPermissionStatus(status);
-
-                if (status === RESULTS.BLOCKED) {
-                    showCameraPermissionsAlert(translate);
-                }
-            })
-            .catch(() => {
-                setCameraPermissionStatus(RESULTS.UNAVAILABLE);
-            });
-    };
-
-    // Focus indicator animation
-    const focusIndicatorOpacity = useSharedValue(0);
-    const focusIndicatorScale = useSharedValue(2);
-    const focusIndicatorPosition = useSharedValue({x: 0, y: 0});
-
-    const cameraFocusIndicatorAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: focusIndicatorOpacity.get(),
-        transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
-    }));
-
-    const focusCamera = (point: Point) => {
-        if (!camera.current) {
-            return;
-        }
-
-        camera.current.focus(point).catch((error: Record<string, unknown>) => {
-            if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
-                return;
-            }
-            Log.warn('Error focusing camera', error);
-        });
-    };
-
-    const tapGesture = Gesture.Tap()
-        .enabled(device?.supportsFocus ?? false)
-        .onStart((ev: {x: number; y: number}) => {
-            const point = {x: ev.x, y: ev.y};
-
-            focusIndicatorOpacity.set(withSequence(withTiming(0.8, {duration: 250}), withDelay(1000, withTiming(0, {duration: 250}))));
-            focusIndicatorScale.set(2);
-            focusIndicatorScale.set(withSpring(1, {damping: 10, stiffness: 200}));
-            focusIndicatorPosition.set(point);
-
-            scheduleOnRN(focusCamera, point);
-        });
-
-    useFocusEffect(() => {
-        setDidCapturePhoto(false);
-        isCapturingPhoto.current = false;
-        const refreshCameraPermissionStatus = () => {
-            CameraPermission?.getCameraPermissionStatus?.()
-                .then(setCameraPermissionStatus)
-                .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
-        };
-
-        refreshCameraPermissionStatus();
-
-        // Refresh permission status when app gains focus
-        const subscription = AppState.addEventListener('change', (appState) => {
-            if (appState !== 'active') {
-                return;
-            }
-
-            refreshCameraPermissionStatus();
-        });
-
-        return () => {
-            subscription.remove();
-            cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
-            cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-        };
-    });
-
-    const capturePhoto = () => {
+    const capturePhoto = useCallback(() => {
         if (!isMultiScanEnabled) {
             startSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION, {
                 name: CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION,
@@ -304,19 +233,13 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
                 showCameraAlert();
                 Log.warn('Error taking photo', error);
             });
-    };
+    }, [askForPermissions, camera, cameraPermissionStatus, flash, hasFlash, isMultiScanEnabled, isPlatformMuted, onCapture, setDidCapturePhoto, showBlink, translate]);
 
     const emitPickedFiles = (files: FileObject[]) => {
         for (const file of files) {
             const source = file.uri ?? '';
             onCapture(file, source);
         }
-    };
-
-    const cameraLoadingReasonAttributes: SkeletonSpanReasonAttributes = {
-        context: 'Camera',
-        cameraPermissionGranted: cameraPermissionStatus === RESULTS.GRANTED,
-        deviceAvailable: device != null,
     };
 
     // Wait for camera permission status to render
@@ -365,7 +288,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout}: Camera
                 {cameraPermissionStatus === RESULTS.GRANTED && device != null && (
                     <View style={[styles.cameraView, styles.alignItemsCenter]}>
                         <GestureDetector gesture={tapGesture}>
-                            <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
+                            <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio, isInLandscapeMode)}>
                                 <NavigationAwareCamera
                                     ref={camera}
                                     device={device}
