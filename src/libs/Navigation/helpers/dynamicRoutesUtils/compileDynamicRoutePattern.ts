@@ -82,10 +82,15 @@ function compileDynamicRoutePattern(pattern: string): CompiledPattern {
     return {pattern, regex, paramNames, minSegments, maxSegments};
 }
 
-const compiledParametricDynamicRoutes = Object.entries(DYNAMIC_ROUTES)
+type CompiledEntry = {key: string; compiled: CompiledPattern};
+
+const compiledParametricDynamicRoutes: CompiledEntry[] = Object.entries(DYNAMIC_ROUTES)
     .filter(([, entry]) => entry.path.includes(':'))
     .map(([key, entry]) => ({key, compiled: compileDynamicRoutePattern(entry.path)}));
 
+const compiledStrictParametricDynamicRoutes = compiledParametricDynamicRoutes.filter(({compiled}) => compiled.minSegments === compiled.maxSegments);
+const compiledOptionalParametricDynamicRoutes = compiledParametricDynamicRoutes.filter(({compiled}) => compiled.minSegments < compiled.maxSegments);
+
 export default compileDynamicRoutePattern;
-export {compiledParametricDynamicRoutes};
-export type {CompiledPattern};
+export {compiledStrictParametricDynamicRoutes, compiledOptionalParametricDynamicRoutes};
+export type {CompiledEntry};

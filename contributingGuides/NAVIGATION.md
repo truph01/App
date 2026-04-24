@@ -776,15 +776,23 @@ DYNAMIC_ROUTES: {
 
 #### Precedence rules
 
-When several registered suffixes could match the same URL, the matcher uses a deterministic order:
+When several registered suffixes could match the same URL, the matcher uses a deterministic
+three-phase order. Each phase exhausts all sub-suffix lengths (longest to shortest) before the
+next phase begins:
 
-1. **Longest match wins.** The algorithm iterates path sub-suffixes from longest to shortest and
-   returns the first hit. A 3-segment match (e.g. `wrap/x/end`) beats a 2-segment one (`x/end`)
-   even if both are registered.
-2. **Static beats parametric at the same length.** If both an exact static path and a parametric
-   pattern would match the same candidate length, the static one wins.
-3. **Parametric: first match wins.** Among parametric patterns of the same shape, the first one
-   in `DYNAMIC_ROUTES` registration order wins.
+1. **Static beats everything.** All sub-suffix lengths are checked for an exact static match
+   first. A short static match (e.g. single-segment `country`) always beats a longer parametric
+   match (e.g. `flag/123/abc`).
+2. **Strict parametric beats optional parametric.** After statics, all sub-suffix lengths are
+   checked for strict parametric patterns (no optional params, e.g. `flag/:reportID/:reportActionID`).
+   Only after those are exhausted does the matcher try optional parametric patterns
+   (e.g. `page/:id?`).
+3. **Longest match wins within each phase.** Within a single phase the algorithm iterates from
+   the longest candidate to the shortest, so a 3-segment match beats a 2-segment one when both
+   are registered.
+4. **Among patterns of the same kind: first registered wins.** If multiple patterns of the same
+   type (strict or optional) could match the same candidate, the one declared first in
+   `DYNAMIC_ROUTES` wins.
 
 #### Shadow conflicts
 
