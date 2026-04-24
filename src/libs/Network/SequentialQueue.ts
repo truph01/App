@@ -450,10 +450,6 @@ function isPaused(): boolean {
     return isQueuePaused;
 }
 
-function getShouldFailAllRequests(): boolean {
-    return shouldFailAllRequests;
-}
-
 // Flush the queue when the persisted requests are initialized
 onPersistedRequestsInitialization(flush);
 
@@ -609,11 +605,9 @@ function resetQueue(): void {
 export {
     flush,
     getCurrentRequest,
-    getShouldFailAllRequests,
     isPaused,
     isRunning,
     pause,
-    process,
     push,
     resetQueue,
     sequentialQueueRequestThrottle,
