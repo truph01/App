@@ -7,7 +7,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
-import HTMLMessagesRow from './HTMLMessagesRow';
 
 type StrictlyEnforceWorkspaceRulesToggleProps = {
     domainAccountID: number;
@@ -47,10 +46,8 @@ function StrictlyEnforceWorkspaceRulesToggle({domainAccountID, groupID}: Strictl
                 }}
                 wrapperStyle={[styles.ph5]}
                 pendingAction={enableStrictPolicyRulesPendingAction}
-            />
-            <HTMLMessagesRow
                 errors={enableStrictPolicyRulesErrors}
-                onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableStrictPolicyRulesErrors')}
+                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableStrictPolicyRulesErrors')}
             />
         </View>
     );
