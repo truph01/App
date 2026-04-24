@@ -1,5 +1,6 @@
-import {compiledParametricEntries, dynamicRoutePaths} from './isDynamicRouteSuffix';
+import {dynamicRoutePaths} from './isDynamicRouteSuffix';
 import splitPathAndQuery from './splitPathAndQuery';
+import {compiledParametricEntries} from './validateDynamicRoutes';
 
 type DynamicSuffixMatch = {
     /** Registered pattern, e.g. 'flag/:reportID/:reportActionID' or 'page/:id?' */

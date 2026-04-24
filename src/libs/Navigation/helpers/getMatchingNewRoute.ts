@@ -1,5 +1,5 @@
-import oldRoutes from '@navigation/linkingConfig/OldRoutes';
 import StringUtils from '@libs/StringUtils';
+import oldRoutes from '@navigation/linkingConfig/OldRoutes';
 
 /**
  * Converts an OldRoutes pattern string into a RegExp.

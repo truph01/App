@@ -30,7 +30,7 @@ function useDynamicBackPath(dynamicRouteSuffix: DynamicRouteSuffix): Route {
         return ROUTES.HOME;
     }
 
-    const pathWithoutLeadingSlash = path.replace(/^\/+/, '');
+    const pathWithoutLeadingSlash = path.replaceAll(/^\/+/g, '');
     const match = findMatchingDynamicSuffix(pathWithoutLeadingSlash);
     if (match && match.pattern === dynamicRouteSuffix) {
         return getPathWithoutDynamicSuffix(pathWithoutLeadingSlash, match.actualSuffix, match.pattern);

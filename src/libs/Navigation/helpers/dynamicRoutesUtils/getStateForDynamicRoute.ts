@@ -71,9 +71,10 @@ function getStateForDynamicRoute(path: string, dynamicRouteName: keyof typeof DY
         // Filter out undefined values so absent optional path params don't surface as
         // explicit `{key: undefined}` entries in the navigation state.
         if (currentIndex === routes.length - 1) {
-            const merged = parentRouteParams || params ? {...(parentRouteParams ?? {}), ...(params ?? {})} : undefined;
-            const cleaned = merged ? Object.fromEntries(Object.entries(merged).filter(([, v]) => v !== undefined)) : undefined;
-            const paramsSpread = cleaned && Object.keys(cleaned).length > 0 ? {params: cleaned} : {};
+            const mergedParams = {...(parentRouteParams ?? {}), ...(params ?? {})};
+            const cleanedParams = Object.fromEntries(Object.entries(mergedParams).filter(([, v]) => v !== undefined));
+            const paramsSpread = cleanedParams && Object.keys(cleanedParams).length > 0 ? {params: cleanedParams} : {};
+
             return {
                 name: currentRoute ?? '',
                 path,
