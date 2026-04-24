@@ -1,17 +1,20 @@
+import passthroughPolicyTagListSelector from '@selectors/PolicyTagList';
 import {useCallback, useMemo, useState} from 'react';
 import type {PermissionStatus} from 'react-native-permissions';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
 import type {GetOptionsConfig, Option, Options, SearchOption} from '@libs/OptionsListUtils';
-import {getEmptyOptions, getPersonalDetailSearchTerms, getSearchOptions, getSearchValueForPhoneOrEmail, getValidOptions} from '@libs/OptionsListUtils';
+import {getEmptyOptions, getSearchOptions, getSearchValueForPhoneOrEmail, getValidOptions} from '@libs/OptionsListUtils';
+import {getPersonalDetailSearchTerms} from '@libs/OptionsListUtils/searchMatchUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {PersonalDetails} from '@src/types/onyx';
+import type * as OnyxTypes from '@src/types/onyx';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useDebounce from './useDebounce';
 import useDebouncedState from './useDebouncedState';
 import useOnyx from './useOnyx';
+import useSortedActions from './useSortedActions';
 
 type SearchSelectorContext = (typeof CONST.SEARCH_SELECTOR)[keyof Pick<
     typeof CONST.SEARCH_SELECTOR,
@@ -69,7 +72,7 @@ type UseSearchSelectorConfig = {
     shouldInitialize?: boolean;
 
     /** Additional contact options to merge (used by platform-specific implementations) */
-    contactOptions?: Array<SearchOption<PersonalDetails>>;
+    contactOptions?: Array<SearchOption<OnyxTypes.PersonalDetails>>;
 
     /** Whether to filter with recent attendees */
     recentAttendees?: Array<Partial<OptionData>>;
@@ -83,7 +86,7 @@ type ContactState = {
     permissionStatus: PermissionStatus;
 
     /** Contact options from device */
-    contactOptions: Array<SearchOption<PersonalDetails>>;
+    contactOptions: Array<SearchOption<OnyxTypes.PersonalDetails>>;
 
     /** Whether to show import UI */
     showImportUI: boolean;
@@ -193,11 +196,13 @@ function useSearchSelectorBase({
     const [draftComments] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT);
     const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
     const [visibleReportActionsData] = useOnyx(ONYXKEYS.DERIVED.VISIBLE_REPORT_ACTIONS);
+    const sortedActions = useSortedActions();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
     const currentUserEmail = currentUserPersonalDetails.email ?? '';
     const personalDetails = usePersonalDetails();
-    const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
+    const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
     const onListEndReached = useDebounce(
         useCallback(() => {
@@ -235,9 +240,11 @@ function useSearchSelectorBase({
                     currentUserAccountID,
                     currentUserEmail,
                     personalDetails,
+                    sortedActions,
+                    conciergeReportID,
                 });
             case CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_MEMBER_INVITE:
-                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, {
+                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
                     betas: betas ?? [],
                     includeP2P: true,
                     includeSelectedOptions: false,
@@ -255,10 +262,10 @@ function useSearchSelectorBase({
                     countryCode,
                     reportAttributesDerived: reportAttributesDerived?.reports,
                     allPolicyTags,
+                    sortedActions,
                 });
             case CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_GENERAL:
-                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, {
-                    ...getValidOptionsConfig,
+                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
                     betas: betas ?? [],
                     searchString: computedSearchTerm,
                     searchInputValue: trimmedSearchInput,
@@ -277,9 +284,11 @@ function useSearchSelectorBase({
                     countryCode,
                     reportAttributesDerived: reportAttributesDerived?.reports,
                     allPolicyTags,
+                    sortedActions,
+                    ...getValidOptionsConfig,
                 });
             case CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_SHARE_DESTINATION:
-                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, {
+                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
                     betas,
                     selectedOptions,
                     includeMultipleParticipantReports: true,
@@ -300,10 +309,10 @@ function useSearchSelectorBase({
                     countryCode,
                     reportAttributesDerived: reportAttributesDerived?.reports,
                     allPolicyTags,
+                    sortedActions,
                 });
             case CONST.SEARCH_SELECTOR.SEARCH_CONTEXT_ATTENDEES:
-                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, {
-                    ...getValidOptionsConfig,
+                return getValidOptions(optionsWithContacts, allPolicies, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
                     betas: betas ?? [],
                     includeP2P: true,
                     includeSelectedOptions: false,
@@ -322,6 +331,8 @@ function useSearchSelectorBase({
                     countryCode,
                     reportAttributesDerived: reportAttributesDerived?.reports,
                     allPolicyTags,
+                    sortedActions,
+                    ...getValidOptionsConfig,
                 });
             default:
                 return getEmptyOptions();
@@ -341,6 +352,7 @@ function useSearchSelectorBase({
         loginList,
         currentUserAccountID,
         currentUserEmail,
+        conciergeReportID,
         personalDetails,
         excludeLogins,
         excludeFromSuggestionsOnly,
@@ -356,6 +368,7 @@ function useSearchSelectorBase({
         selectedOptions,
         visibleReportActionsData,
         allPolicyTags,
+        sortedActions,
     ]);
 
     const isOptionSelected = useMemo(() => {

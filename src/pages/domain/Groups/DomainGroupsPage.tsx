@@ -20,6 +20,7 @@ import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {DomainSplitNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -44,6 +45,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
 
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
     const [defaultGroupID] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: defaultSecurityGroupIDSelector});
+    const [pendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
 
     const data = groups.map((group) => {
         const isDefault = group.id === defaultGroupID;
@@ -57,6 +59,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     {isDefault && <Badge text={translate('common.default')} />}
                 </View>
             ),
+            pendingAction: pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.name ?? undefined,
         };
     });
 
@@ -71,6 +74,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                 leftHeaderText={translate('common.name')}
                 rightHeaderText={translate('common.members')}
                 shouldDivideEqualWidth
+                shouldShowRightCaret
             />
         );
     };
@@ -96,6 +100,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     onSelectRow={(item: GroupOption) => Navigation.navigate(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, item.groupID))}
                     customListHeader={getCustomListHeader()}
                     shouldShowRightCaret
+                    addBottomSafeAreaPadding
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
