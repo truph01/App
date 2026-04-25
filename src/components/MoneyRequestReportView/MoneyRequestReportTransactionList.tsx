@@ -557,9 +557,8 @@ function MoneyRequestReportTransactionList({
     const isDesktopTableLayout = !shouldUseNarrowLayout && !isMediumScreenWidth;
 
     const allTransactions = shouldShowGroupedTransactions ? groupedTransactions.flatMap((group) => group.transactions) : resolvedTransactions;
-    const nonDeletedTransactions = allTransactions.filter((t) => !isTransactionPendingDelete(t));
-    const firstNonGroupedTransactionID = shouldShowGroupedTransactions ? undefined : nonDeletedTransactions.at(0)?.transactionID;
-    const lastTransactionID = nonDeletedTransactions.at(-1)?.transactionID;
+    const firstNonGroupedTransactionID = shouldShowGroupedTransactions ? undefined : allTransactions.at(0)?.transactionID;
+    const lastTransactionID = allTransactions.at(-1)?.transactionID;
 
     const renderTransactionItem = (transaction: TransactionWithOptionalHighlight) => (
         <MoneyRequestReportTransactionItem
