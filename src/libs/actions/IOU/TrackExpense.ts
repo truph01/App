@@ -115,7 +115,6 @@ import {
     getReportPreviewAction,
     getSearchOnyxUpdate,
     getTransactionWithPreservedLocalReceiptSource,
-    getUserAccountID,
     handleNavigateAfterExpenseCreate,
     highlightTransactionOnSearchRouteIfNeeded,
 } from './index';
