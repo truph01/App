@@ -1,4 +1,6 @@
 import React, {useEffect, useMemo} from 'react';
+import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
+import ScreenWrapper from '@components/ScreenWrapper';
 import ValidateCodeActionContent from '@components/ValidateCodeActionModal/ValidateCodeActionContent';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
@@ -39,6 +41,19 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
         resetValidateActionCodeSent();
         Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.getRoute(backTo));
     }, [session?.email, contactMethod, loginData?.pendingFields?.defaultLogin, backTo]);
+
+    if (!contactMethod || !loginData) {
+        return (
+            <ScreenWrapper testID="SetDefaultContactMethodConfirmMagicCodePage">
+                <FullPageNotFoundView
+                    shouldShow
+                    linkTranslationKey="contacts.goBackContactMethods"
+                    onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.getRoute(backTo))}
+                    onLinkPress={() => Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.getRoute(backTo))}
+                />
+            </ScreenWrapper>
+        );
+    }
 
     return (
         <ValidateCodeActionContent
