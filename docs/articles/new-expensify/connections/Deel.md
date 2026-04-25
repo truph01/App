@@ -1,49 +1,90 @@
 ---
 title: Integrate Deel and Expensify
 description: Learn how to integrate Expensify with Deel to automate expense syncing for employee reimbursements.
-keywords: [Expensify Classic, Deel, integration, expense syncing, reimbursements, approval workflow]
+keywords: [New Expensify, integrate Deel Expensify, Expensify Deel integration, expense syncing Deel, reimbursements Deel Expensify, approval workflow Deel]
+internalScope: Audience is Workspace Admins and Deel Organization Managers. Covers integrating Expensify with Deel and understanding how the sync works. Does not cover employee or contractor usage within Deel.
 ---
 
+# Integrate Deel and Expensify
 
-Expensify’s API helps connect your account to third-party tools like NetSuite, Xero, and even internal systems like Workday. This guide includes tips, usage examples, and common troubleshooting questions — many sourced from customers who’ve done it before.
+Expensify’s API allows you to integrate with tools like Deel to automate expense syncing and reimbursements.
 
----
+This integration enables Expensify to act as the source of truth for employee expenses, while Deel handles reimbursement processing. The setup is self-serve and typically managed by your internal team.
 
-# Getting Started
+To begin, review Expensify's [Integration Server Documentation](https://integrations.expensify.com/Integration-Server/doc/#introduction) to understand how Expensify’s API works and how to authenticate your account.
 
-To start using the API, review our full [Integration Server Manual](https://integrations.expensify.com/Integration-Server/doc/#introduction).
-
-**Note:** The API is a self-serve tool. Your internal team will need to manage setup and maintenance. While Concierge can assist with basic troubleshooting, hands-on support may vary by team or account manager.
-
-This guide explains how business clients can integrate Expensify with Deel to automate expense synchronization. This one-way sync ensures that Expensify serves as the definitive source for all employee expenses.
-
-If you are an employee or contractor using Expensify within your company, please refer to:
+If you are an employee or contractor using Expensify within your company, refer to:
 
 - [Employee Guide to Using Expensify with Deel](https://help.letsdeel.com/hc/en-gb/articles/7123572847761-Employee-s-Guide-to-Using-Expensify-With-Deel)
 - [Contractor Guide to Using Expensify with Deel](https://help.letsdeel.com/hc/en-gb/articles/9640208314897-How-Contractors-Can-Use-Expensify-With-Deel)
 
 ---
 
-# How the Integration Works
+## Who can integrate Deel and Expensify
 
-By connecting Expensify to Deel, you can leverage Expensify’s approval workflows to ensure timely employee reimbursements via Deel. The integration links user profiles and expense workspaces between Expensify and Deel, allowing Deel to scan for approved expenses from matched users in designated workspaces. These approved expenses are then imported into Deel for reimbursement processing.
+- Workspace Admins in Expensify
+- Organization Manager permissions  in Deel
 
-## Key Details:
-- **One-Way Sync**: Expenses approved in Expensify sync to Deel. Expenses logged in Deel will NOT sync back to Expensify.
-- **Approval Workflow**: Only approved expenses in Expensify are eligible for syncing to Deel.
-- **Sync Timing**: Expense syncing is not immediate. For more details, refer to [How Does Expense Syncing Work?](https://help.letsdeel.com/hc/en-gb/articles/5871319525521-How-To-Set-Up-The-Expensify-Integration-On-Deel-For-EOR-Employees-And-Contractors#h_01G25AWSW0KHWBA63C1AZ6X9E9).
-
-## Prerequisites
-Before setting up the integration, ensure you meet the following requirements:
-
-- **Deel Organization Manager permissions** (admin-level access)
-- **Expensify Admin permissions** for the workspaces you want to integrate
-- **A paid Expensify subscription** to approve and sync expenses
-
-**Note:** Expensify Admin permissions can be complex. For more details, refer to [Expensify’s Introduction to Integration](https://integrations.expensify.com/Integration-Server/doc/#introduction).
+**Prerequisites:**
+- Deel Organization Manager permissions  
+- Expensify Admin permissions for the selected Workspaces  
 
 ---
 
-# Next Steps
-For a step-by-step setup guide, refer to the [official Deel integration guide](https://help.letsdeel.com/hc/en-gb/articles/5871319525521-How-To-Set-Up-The-Expensify-Integration-On-Deel-For-EOR-Employees-And-Contractors).
+## How to integrate Deel and Expensify
 
+The integration is configured using Expensify’s API and completed within Deel. For a step-by-step guide, refer to Deel's setup guide: [How To Set Up The Expensify Integration On Deel For EOR Employees And Contractors](https://help.letsdeel.com/hc/en-gb/articles/5871319525521-How-To-Set-Up-The-Expensify-Integration-On-Deel-For-EOR-Employees-And-Contractors).
+
+---
+
+## How the Deel integration with Expensify works
+
+By connecting Expensify to Deel, you can use Expensify’s approval workflows to control which expenses are eligible for reimbursement.
+
+- Deel scans for approved expenses from matched users in selected Workspaces  
+- Only approved expenses in Expensify are eligible for syncing  
+- Expenses are imported into Deel for reimbursement processing  
+
+Key details:
+
+- **One-way sync:** Expenses approved in Expensify sync to Deel. Expenses created in Deel do not sync back to Expensify.  
+- **Approval workflow:** Only approved expenses are synced  
+- **Sync timing:** Expense syncing is not immediate and depends on Deel processing  
+
+---
+
+## What happens after you integrate Deel and Expensify
+
+- Deel continuously scans the connected Expensify Workspaces  
+- Approved expenses are synced to Deel  
+- Expenses are processed in Deel for reimbursement  
+- Expensify remains the system of record for expense data  
+- Sync timing may vary and is not immediate  
+
+---
+
+# FAQ
+
+## Can expenses sync from Deel back to Expensify?
+
+No. This is a one-way integration. Expenses only sync from Expensify to Deel.
+
+## Why aren’t my expenses syncing?
+
+Common reasons include:
+- The expense is not approved in Expensify  
+- The user is not mapped between Deel and Expensify  
+- The Workspace is not connected  
+- The integration setup is incomplete  
+
+## Do employees or contractors need to do anything?
+
+Employees and contractors submit expenses in Expensify as usual. Admins manage the integration and approval workflow.
+
+## Does Expensify support the integration setup?
+
+Expensify can help with basic troubleshooting, but your internal team is responsible for setting up and maintaining the API integration.
+
+## Where can I learn more about the Deel setup process?
+
+Review Deel’s official guide for setting up the Expensify integration and managing expense syncing: [How To Set Up The Expensify Integration On Deel For EOR Employees And Contractors](https://help.letsdeel.com/hc/en-gb/articles/5871319525521-How-To-Set-Up-The-Expensify-Integration-On-Deel-For-EOR-Employees-And-Contractors).
