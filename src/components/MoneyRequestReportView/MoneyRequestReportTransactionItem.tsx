@@ -131,7 +131,10 @@ function MoneyRequestReportTransactionItem({
     });
 
     return (
-        <OfflineWithFeedback pendingAction={pendingAction}>
+        <OfflineWithFeedback
+            pendingAction={pendingAction}
+            style={isDesktopTableLayout && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden]}
+        >
             <PressableWithFeedback
                 key={transaction.transactionID}
                 onPress={() => {
