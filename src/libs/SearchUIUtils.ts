@@ -224,7 +224,9 @@ type TransactionQuarterGroupSorting = ColumnSortMapping<TransactionQuarterGroupL
 function isPayActionSearch(queryJSON: SearchQueryJSON | undefined): boolean {
     return (
         queryJSON?.flatFilters.some(
-            (filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.ACTION && filter.filters.some((queryFilter) => queryFilter.value.toString() === CONST.SEARCH.ACTION_FILTERS.PAY),
+            (filter) =>
+                filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.ACTION &&
+                filter.filters.some((queryFilter) => queryFilter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO && queryFilter.value.toString() === CONST.SEARCH.ACTION_FILTERS.PAY),
         ) ?? false
     );
 }
