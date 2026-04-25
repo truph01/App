@@ -8888,7 +8888,7 @@ describe('ReportUtils', () => {
 
             // When the reason is retrieved
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(report?.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(report, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(report, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             // There should be some kind of a reason (any reason is fine)
             expect(result).toHaveProperty('reason');
@@ -8912,7 +8912,7 @@ describe('ReportUtils', () => {
 
             // When the reason is retrieved
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(report?.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(report, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(report, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             expect(result).toHaveProperty('reason', CONST.REQUIRES_ATTENTION_REASONS.HAS_UNRESOLVED_CARD_FRAUD_ALERT);
         });
@@ -8930,7 +8930,7 @@ describe('ReportUtils', () => {
 
             // When the reason is retrieved
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(report?.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(report, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(report, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             // Then the result is null
             expect(result).toBe(null);
@@ -8971,7 +8971,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(expenseReport?.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(expenseReport, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(expenseReport, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             // Should return IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION (from getActionTypeForAssigneeToComplete)
             // AND include actionBadge (APPROVE) since it's a processing expense report the user can approve
@@ -8996,7 +8996,7 @@ describe('ReportUtils', () => {
 
             // When the reason is retrieved
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(adminReport?.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(adminReport, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(adminReport, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             // Then the result is null
             expect(result).toBe(null);
@@ -9027,7 +9027,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(workspaceChat.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
             expect(result?.reportAction?.reportActionID).toBe(cardMissingAddressAction.reportActionID);
@@ -9075,7 +9075,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(workspaceChat.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
             // Should skip the completed task and return the incomplete one
@@ -9122,7 +9122,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(workspaceChat.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
             // Should return the earliest created incomplete task
@@ -9173,7 +9173,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(workspaceChat.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
             // All tasks completed, so no matching reportAction
@@ -9222,7 +9222,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             const {result: isReportArchived} = renderHook(() => useReportIsArchived(workspaceChat.reportID));
-            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, undefined, isReportArchived.current);
+            const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, currentUserEmail, currentUserAccountID, undefined, isReportArchived.current);
 
             expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
             // Should only return the task where childManagerAccountID matches the current user
@@ -12528,7 +12528,7 @@ describe('ReportUtils', () => {
 
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
 
-            const reasonForAttention = getReasonAndReportActionThatRequiresAttention(expenseReport, undefined, false);
+            const reasonForAttention = getReasonAndReportActionThatRequiresAttention(expenseReport, currentUserEmail, currentUserAccountID, undefined, false);
             expect(reasonForAttention?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.HAS_CHILD_REPORT_AWAITING_ACTION);
 
             const requiresAttention = requiresAttentionFromCurrentUser(expenseReport, undefined, false);
@@ -12571,7 +12571,7 @@ describe('ReportUtils', () => {
 
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
 
-            const reasonForAttention = getReasonAndReportActionThatRequiresAttention(expenseReport, undefined, false);
+            const reasonForAttention = getReasonAndReportActionThatRequiresAttention(expenseReport, currentUserEmail, currentUserAccountID, undefined, false);
             expect(reasonForAttention?.reason).toBe(undefined);
 
             const requiresAttention = requiresAttentionFromCurrentUser(expenseReport, undefined, false);
@@ -13333,7 +13333,7 @@ describe('ReportUtils', () => {
 
         await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
 
-        const reasonForAttention = getReasonAndReportActionThatRequiresAttention(expenseReport, undefined, false);
+        const reasonForAttention = getReasonAndReportActionThatRequiresAttention(expenseReport, currentUserEmail, currentUserAccountID, undefined, false);
         expect(reasonForAttention?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.HAS_CHILD_REPORT_AWAITING_ACTION);
     });
 
