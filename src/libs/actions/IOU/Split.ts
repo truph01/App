@@ -1850,6 +1850,7 @@ function updateSplitTransactions({
             undeletedTransaction?.transactionID,
             currentReportAction,
             undefined,
+            currentUserPersonalDetails.accountID,
             undefined,
             undefined,
             undefined,
