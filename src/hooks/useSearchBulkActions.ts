@@ -1311,6 +1311,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                             selectedTransactions[transactionID].reportAction?.childReportID,
                             policies?.[`${ONYXKEYS.COLLECTION.POLICY}${selectedTransactions[transactionID].policyID}`],
                             isOffline,
+                            currentUserPersonalDetails?.email ?? '',
+                            currentUserPersonalDetails?.accountID,
                         );
                     }
                     // eslint-disable-next-line @typescript-eslint/no-deprecated
@@ -1507,7 +1509,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         theme.icon,
         styles.colorMuted,
         styles.fontWeightNormal,
-        styles.textWrap,
         userBillingGracePeriodEnds,
         ownerBillingGracePeriodEnd,
         currentSearchKey,
@@ -1515,7 +1516,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         amountOwed,
         allTransactions,
         isBetaEnabled,
-        shouldShowBusinessBankAccountOptions,
     ]);
 
     const handleOfflineModalClose = useCallback(() => {

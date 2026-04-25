@@ -341,12 +341,10 @@ function putTransactionsOnHold(transactionsID: string[], comment: string, report
 /**
  * Remove expense from HOLD
  */
-function unholdRequest(transactionID: string, reportID: string, policy: OnyxEntry<OnyxTypes.Policy>, isOffline: boolean) {
+function unholdRequest(transactionID: string, reportID: string, policy: OnyxEntry<OnyxTypes.Policy>, isOffline: boolean, currentUserLogin: string, currentUserAccountID: number) {
     const allTransactions = getAllTransactions();
     const allTransactionViolations = getAllTransactionViolations();
     const allReports = getAllReports();
-    const userAccountID = getUserAccountID();
-    const currentUserEmail = getCurrentUserEmail();
 
     const createdReportAction = buildOptimisticUnHoldReportAction();
     const transactionViolations = allTransactionViolations[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`];
@@ -471,16 +469,16 @@ function unholdRequest(transactionID: string, reportID: string, policy: OnyxEntr
             policy,
             predictedNextStatus: iouReport.statusNum ?? CONST.REPORT.STATUS_NUM.OPEN,
             shouldFixViolations: updatedTransactionViolations.length > 0,
-            currentUserAccountIDParam: userAccountID,
-            currentUserEmailParam: currentUserEmail,
+            currentUserAccountIDParam: currentUserAccountID,
+            currentUserEmailParam: currentUserLogin,
         });
         const optimisticNextStep = buildOptimisticNextStep({
             report: iouReport,
             policy,
             predictedNextStatus: iouReport.statusNum ?? CONST.REPORT.STATUS_NUM.OPEN,
             shouldFixViolations: updatedTransactionViolations.length > 0,
-            currentUserAccountIDParam: userAccountID,
-            currentUserEmailParam: currentUserEmail,
+            currentUserAccountIDParam: currentUserAccountID,
+            currentUserEmailParam: currentUserLogin,
         });
 
         optimisticData.push({
