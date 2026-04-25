@@ -109,7 +109,6 @@ import {
     getAllTransactionDrafts,
     getAllTransactions,
     getAllTransactionViolations,
-    getCurrentUserEmail,
     getMoneyRequestInformation,
     getMoneyRequestPolicyTags,
     getReceiptError,
@@ -1910,7 +1909,7 @@ function convertBulkTrackedExpensesToIOU({
         return;
     }
 
-    const participantAccountIDs = getReportRecipientAccountIDs(iouReport, getUserAccountID());
+    const participantAccountIDs = getReportRecipientAccountIDs(iouReport, currentUserAccountIDParam);
     const payerAccountID = participantAccountIDs.at(0);
 
     if (!payerAccountID) {
@@ -1966,8 +1965,8 @@ function convertBulkTrackedExpensesToIOU({
         }
 
         const participantParams = {
-            payeeAccountID: getUserAccountID(),
-            payeeEmail: getCurrentUserEmail(),
+            payeeAccountID: currentUserAccountIDParam,
+            payeeEmail: currentUserEmailParam,
             participant: {
                 accountID: payerAccountID,
                 login: payerEmail,
