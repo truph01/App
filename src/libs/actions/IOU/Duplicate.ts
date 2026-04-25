@@ -1074,7 +1074,6 @@ type BulkDuplicateReportsParams = {
     defaultExpensePolicy: OnyxEntry<OnyxTypes.Policy>;
     activePolicyExpenseChat: OnyxEntry<OnyxTypes.Report>;
     ownerPersonalDetails: CurrentUserPersonalDetails;
-    currentUserLogin: string;
     isASAPSubmitBetaEnabled: boolean;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
@@ -1085,6 +1084,8 @@ type BulkDuplicateReportsParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 };
 
 function bulkDuplicateReports({
@@ -1097,7 +1098,6 @@ function bulkDuplicateReports({
     defaultExpensePolicy,
     activePolicyExpenseChat,
     ownerPersonalDetails,
-    currentUserLogin,
     isASAPSubmitBetaEnabled,
     betas,
     personalDetails,
@@ -1108,6 +1108,8 @@ function bulkDuplicateReports({
     transactionViolations,
     translate,
     recentWaypoints,
+    currentUserLogin,
+    currentUserAccountID,
 }: BulkDuplicateReportsParams) {
     const allTransactionsMap = getAllTransactions();
     const transactionsByReportID = new Map<string, OnyxTypes.Transaction[]>();
@@ -1181,8 +1183,8 @@ function bulkDuplicateReports({
             translate,
             recentWaypoints,
             shouldPlaySound: false,
-            currentUserAccountID: getUserAccountID(),
-            currentUserLogin: getCurrentUserEmail(),
+            currentUserAccountID,
+            currentUserLogin,
         });
     }
 
