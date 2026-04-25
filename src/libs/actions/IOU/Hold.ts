@@ -36,7 +36,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import {getAllReports, getAllTransactions, getAllTransactionViolations, getCurrentUserEmail, getUserAccountID} from '.';
+import {getAllReports, getAllTransactions, getAllTransactionViolations} from '.';
 
 /**
  * Put expense on HOLD
