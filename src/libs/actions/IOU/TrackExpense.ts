@@ -1167,6 +1167,7 @@ const getConvertTrackedExpenseInformation = (
     transactionThreadReportID: string | undefined,
     resolution: IOUAction,
     isLinkedTrackedExpenseReportArchived: boolean | undefined,
+    currentUserAccountID: number,
 ) => {
     const optimisticData: Array<
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>
@@ -1186,6 +1187,7 @@ const getConvertTrackedExpenseInformation = (
         transactionID,
         linkedTrackedExpenseReportAction,
         isLinkedTrackedExpenseReportArchived,
+        currentUserAccountID,
         false,
         true,
         actionableWhisperReportActionID,
@@ -1404,6 +1406,7 @@ type ConvertTrackedExpenseToRequestParams = {
     };
     onyxData: OnyxData<BuildOnyxDataForMoneyRequestKeys>;
     workspaceParams?: ConvertTrackedWorkspaceParams;
+    currentUserAccountID: number;
 };
 
 function addTrackedExpenseToPolicy(parameters: AddTrackedExpenseToPolicyParam, onyxData: OnyxData<BuildOnyxDataForMoneyRequestKeys>) {
@@ -1411,7 +1414,7 @@ function addTrackedExpenseToPolicy(parameters: AddTrackedExpenseToPolicyParam, o
 }
 
 function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrackedExpenseToRequestParams) {
-    const {payerParams, transactionParams, chatParams, iouParams, onyxData, workspaceParams} = convertTrackedExpenseParams;
+    const {payerParams, transactionParams, chatParams, iouParams, onyxData, workspaceParams, currentUserAccountID} = convertTrackedExpenseParams;
     const {accountID: payerAccountID, email: payerEmail} = payerParams;
     const {
         transactionID,
@@ -1448,6 +1451,7 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         transactionThreadReportID,
         CONST.IOU.ACTION.SUBMIT,
         isLinkedTrackedExpenseReportArchived,
+        currentUserAccountID,
     );
     optimisticData?.push(...(convertTrackedExpenseInformation.optimisticData ?? []));
     successData?.push(...(convertTrackedExpenseInformation.successData ?? []));
@@ -1757,6 +1761,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
                     },
                     onyxData,
                     workspaceParams,
+                    currentUserAccountID: currentUserAccountIDParam,
                 });
             };
             break;
@@ -2061,6 +2066,7 @@ function convertBulkTrackedExpensesToIOU({
                 reportActionID: iouAction.reportActionID,
             },
             onyxData,
+            currentUserAccountID: currentUserAccountIDParam,
         };
 
         convertTrackedExpenseToRequest(convertParams);
@@ -2094,6 +2100,7 @@ function categorizeTrackedExpense(trackedExpenseParams: TrackedExpenseParams) {
         transactionThreadReportID,
         CONST.IOU.ACTION.CATEGORIZE,
         isLinkedTrackedExpenseReportArchived,
+        currentUserAccountID,
     );
 
     optimisticData?.push(...moveTransactionOptimisticData);
@@ -2176,6 +2183,7 @@ function shareTrackedExpense(trackedExpenseParams: TrackedExpenseParams) {
         transactionThreadReportID,
         CONST.IOU.ACTION.SHARE,
         isLinkedTrackedExpenseReportArchived,
+        currentUserAccountID,
     );
 
     onyxData.optimisticData?.push(...(convertTrackedExpenseInformation.optimisticData ?? []));
