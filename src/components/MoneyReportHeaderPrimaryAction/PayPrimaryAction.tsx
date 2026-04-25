@@ -122,6 +122,7 @@ function PayPrimaryAction({reportID, chatReportID}: PayPrimaryActionProps) {
                 introSelected,
                 iouReportCurrentNextStepDeprecated: nextStep,
                 currentUserAccountID: accountID,
+                currentUserLogin: email ?? '',
                 activePolicy,
                 policy,
                 betas,

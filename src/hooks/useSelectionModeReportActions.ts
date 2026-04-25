@@ -378,6 +378,7 @@ function useSelectionModeReportActions({
                 introSelected,
                 iouReportCurrentNextStepDeprecated: nextStep,
                 currentUserAccountID,
+                currentUserLogin: currentUserEmail ?? '',
                 activePolicy,
                 policy,
                 betas,
