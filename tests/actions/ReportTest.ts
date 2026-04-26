@@ -7217,5 +7217,76 @@ describe('actions/Report', () => {
             // Invitee should NOT be added
             expect(updatedReport?.participants?.[INVITEE_ACCOUNT_ID]).toBeUndefined();
         });
+
+        it('should remove optimistically added participants on failure rollback', async () => {
+            const mockFetch = TestHelper.getGlobalFetchMock() as MockFetch;
+            global.fetch = mockFetch;
+
+            const REPORT_ID = '3';
+            const WHISPER_ACTION_ID = '3001';
+            const EXISTING_PARTICIPANT_ID = 100;
+            const INVITEE_ACCOUNT_ID = 200;
+
+            const report: OnyxTypes.Report = {
+                ...createRandomReport(3, undefined),
+                reportID: REPORT_ID,
+                participants: {
+                    [EXISTING_PARTICIPANT_ID]: {
+                        notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+                        role: CONST.REPORT.ROLE.ADMIN,
+                    },
+                },
+                lastMessageText: 'Hello',
+                lastVisibleActionCreated: '2024-11-19 08:04:13.728',
+                lastActorAccountID: EXISTING_PARTICIPANT_ID,
+            };
+
+            const whisperAction = {
+                reportActionID: WHISPER_ACTION_ID,
+                reportID: REPORT_ID,
+                actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_MENTION_WHISPER,
+                created: '2024-11-19 08:04:13.730',
+                message: [{html: 'Mentioned @user1', text: 'Mentioned @user1', type: 'COMMENT'}],
+                originalMessage: {
+                    inviteeAccountIDs: [INVITEE_ACCOUNT_ID],
+                    inviteeEmails: ['user1@example.com'],
+                    whisperedTo: [EXISTING_PARTICIPANT_ID],
+                },
+            } as unknown as OnyxTypes.ReportAction;
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+            await Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {
+                [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`]: {
+                    [WHISPER_ACTION_ID]: whisperAction,
+                },
+            });
+            await waitForBatchedUpdates();
+
+            // Pause fetch so we can verify optimistic state, then trigger failure
+            mockFetch.pause!();
+            Report.resolveActionableMentionWhisper(report, whisperAction, CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE, false);
+            await waitForBatchedUpdates();
+
+            // Verify the invitee was optimistically added
+            let updatedReport = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}` as const);
+            expect(updatedReport?.participants?.[INVITEE_ACCOUNT_ID]).toBeDefined();
+
+            // Now make the request fail and resume
+            mockFetch.fail!();
+            mockFetch.resume!();
+            await waitForBatchedUpdates();
+            await waitForNetworkPromises();
+            await waitForBatchedUpdates();
+
+            // After failure, the invitee should be removed from participants
+            updatedReport = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}` as const);
+            expect(updatedReport?.participants?.[INVITEE_ACCOUNT_ID]).toBeFalsy();
+
+            // Existing participant should still be there
+            expect(updatedReport?.participants?.[EXISTING_PARTICIPANT_ID]).toMatchObject({
+                notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+                role: CONST.REPORT.ROLE.ADMIN,
+            });
+        });
     });
 });

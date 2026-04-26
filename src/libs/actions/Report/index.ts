@@ -5414,7 +5414,17 @@ function resolveActionableMentionWhisper(
         );
 
         participantsOptimisticData = {participants: participantsAfterInvitation};
-        participantsFailureData = {participants: report.participants ?? {}};
+
+        // Onyx.METHOD.MERGE does a deep merge, so simply restoring the original participants
+        // won't remove keys that were added optimistically. We must explicitly null out each
+        // invitee's entry so Onyx deletes them on failure rollback.
+        const participantsRollback: Record<number, ReportParticipant | null> = {...report.participants};
+        inviteeAccountIDs.forEach((accountID) => {
+            if (!(accountID in (report.participants ?? {}))) {
+                participantsRollback[accountID] = null;
+            }
+        });
+        participantsFailureData = {participants: participantsRollback as Participants};
     }
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
