@@ -557,7 +557,6 @@ function MoneyRequestReportTransactionList({
     const isDesktopTableLayout = !shouldUseNarrowLayout && !isMediumScreenWidth;
 
     const allTransactions = shouldShowGroupedTransactions ? groupedTransactions.flatMap((group) => group.transactions) : resolvedTransactions;
-    const firstNonGroupedTransactionID = shouldShowGroupedTransactions ? undefined : allTransactions.at(0)?.transactionID;
     const lastTransactionID = showPendingExpensePlaceholder ? undefined : allTransactions.at(-1)?.transactionID;
 
     const renderTransactionItem = (transaction: TransactionWithOptionalHighlight) => (
@@ -579,7 +578,6 @@ function MoneyRequestReportTransactionList({
             scrollToNewTransaction={transaction.transactionID === newTransactions?.at(0)?.transactionID ? scrollToNewTransaction : undefined}
             onArrowRightPress={handleArrowRightPress}
             nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards ?? {}}
-            isFirstItem={transaction.transactionID === firstNonGroupedTransactionID}
             isLastItem={transaction.transactionID === lastTransactionID}
         />
     );

@@ -73,9 +73,6 @@ type MoneyRequestReportTransactionItemProps = {
 
     /** Whether this is the last item in the list */
     isLastItem?: boolean;
-
-    /** Whether this is the first item in the list (or first in group) */
-    isFirstItem?: boolean;
 };
 
 function MoneyRequestReportTransactionItem({
@@ -96,7 +93,6 @@ function MoneyRequestReportTransactionItem({
     shouldBeHighlighted,
     nonPersonalAndWorkspaceCards,
     isLastItem = false,
-    isFirstItem = false,
 }: MoneyRequestReportTransactionItemProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -155,12 +151,7 @@ function MoneyRequestReportTransactionItem({
                 }}
                 disabled={isTransactionPendingDelete(transaction)}
                 ref={viewRef}
-                wrapperStyle={[
-                    animatedHighlightStyle,
-                    styles.userSelectNone,
-                    isDesktopTableLayout && isFirstItem && styles.searchTableTopRadius,
-                    isDesktopTableLayout && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-                ]}
+                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone]}
             >
                 {({hovered}) => (
                     <TransactionItemRow
