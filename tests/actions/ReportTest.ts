@@ -4932,8 +4932,12 @@ describe('actions/Report', () => {
 
             const openReportCall = TestHelper.getFetchMockCalls(WRITE_COMMANDS.OPEN_REPORT).at(0);
             const body = (openReportCall?.at(1) as RequestInit)?.body;
-            const params = body instanceof FormData ? Object.fromEntries(body) : {};
-            const guidedSetupData = JSON.parse((params.guidedSetupData as string) ?? '[]') as Array<{type: string; task?: string; completedTaskReportActionID?: string}>;
+            const guidedSetupDataParam = body instanceof FormData ? body.get('guidedSetupData') : null;
+            const guidedSetupData = JSON.parse(typeof guidedSetupDataParam === 'string' ? guidedSetupDataParam : '[]') as Array<{
+                type: string;
+                task?: string;
+                completedTaskReportActionID?: string;
+            }>;
             const viewTourTask = guidedSetupData.find((item) => item.type === 'task' && item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
             expect(viewTourTask).toBeDefined();
             if (expectation === 'defined') {
@@ -5128,7 +5132,12 @@ describe('actions/Report', () => {
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.REPORT_WITH_ID.getRoute(MOCK_NEW_THREAD_REPORT_ID));
         });
 
-        it('should pass isSelfTourViewed=true through to createChildReport when creating a new explain thread', async () => {
+        it.each<[boolean, 'defined' | 'undefined']>([
+            [true, 'defined'],
+            [false, 'undefined'],
+        ])('should pass isSelfTourViewed=%s through to createChildReport so viewTour.completedTaskReportActionID is %s', async (isSelfTourViewed, expectation) => {
+            const CONCIERGE_REPORT_ID = '123456';
+            const introSelected: OnyxTypes.IntroSelected = {choice: CONST.ONBOARDING_CHOICES.SUBMIT, isInviteOnboardingComplete: false};
             const PARENT_REPORT = createRandomReport(1, undefined);
             const REPORT_ACTION: OnyxTypes.ReportAction = {
                 ...createRandomReportAction(REPORT_ACTION_ID),
@@ -5138,33 +5147,39 @@ describe('actions/Report', () => {
 
             await TestHelper.signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
             await TestHelper.setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${CONCIERGE_REPORT_ID}`, {
+                reportID: CONCIERGE_REPORT_ID,
+                type: CONST.REPORT.TYPE.CHAT,
+                participants: {
+                    [TEST_USER_ACCOUNT_ID]: {notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS},
+                    [CONST.ACCOUNT_ID.CONCIERGE]: {notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS},
+                },
+            });
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {hasCompletedGuidedSetupFlow: false});
             Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${PARENT_REPORT_ID}`, PARENT_REPORT);
             await waitForBatchedUpdates();
 
-            Report.explain(undefined, PARENT_REPORT, REPORT_ACTION, TestHelper.translateLocal, TEST_USER_ACCOUNT_ID, INTRO_SELECTED, undefined, true, CONST.DEFAULT_TIME_ZONE);
+            Report.explain(undefined, PARENT_REPORT, REPORT_ACTION, TestHelper.translateLocal, TEST_USER_ACCOUNT_ID, introSelected, undefined, isSelfTourViewed, CONST.DEFAULT_TIME_ZONE);
             await waitForBatchedUpdates();
 
             TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.OPEN_REPORT, 1);
-            expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.REPORT_WITH_ID.getRoute(MOCK_NEW_THREAD_REPORT_ID));
-        });
 
-        it('should pass isSelfTourViewed=false through to createChildReport when creating a new explain thread', async () => {
-            const PARENT_REPORT = createRandomReport(1, undefined);
-            const REPORT_ACTION: OnyxTypes.ReportAction = {
-                ...createRandomReportAction(REPORT_ACTION_ID),
-                reportActionID: '1',
-                actorAccountID: TEST_USER_ACCOUNT_ID,
-            };
+            const openReportCall = TestHelper.getFetchMockCalls(WRITE_COMMANDS.OPEN_REPORT).at(0);
+            const body = (openReportCall?.at(1) as RequestInit)?.body;
+            const guidedSetupDataParam = body instanceof FormData ? body.get('guidedSetupData') : null;
+            const guidedSetupData = JSON.parse(typeof guidedSetupDataParam === 'string' ? guidedSetupDataParam : '[]') as Array<{
+                type: string;
+                task?: string;
+                completedTaskReportActionID?: string;
+            }>;
+            const viewTourTask = guidedSetupData.find((item) => item.type === 'task' && item.task === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR);
+            expect(viewTourTask).toBeDefined();
+            if (expectation === 'defined') {
+                expect(viewTourTask?.completedTaskReportActionID).toBeDefined();
+            } else {
+                expect(viewTourTask?.completedTaskReportActionID).toBeUndefined();
+            }
 
-            await TestHelper.signInWithTestUser(TEST_USER_ACCOUNT_ID, TEST_USER_LOGIN);
-            await TestHelper.setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID);
-            Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${PARENT_REPORT_ID}`, PARENT_REPORT);
-            await waitForBatchedUpdates();
-
-            Report.explain(undefined, PARENT_REPORT, REPORT_ACTION, TestHelper.translateLocal, TEST_USER_ACCOUNT_ID, INTRO_SELECTED, undefined, false, CONST.DEFAULT_TIME_ZONE);
-            await waitForBatchedUpdates();
-
-            TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.OPEN_REPORT, 1);
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.REPORT_WITH_ID.getRoute(MOCK_NEW_THREAD_REPORT_ID));
         });
 
