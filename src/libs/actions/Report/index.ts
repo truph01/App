@@ -5357,6 +5357,7 @@ function resolveActionableMentionWhisper(
     reportAction: OnyxEntry<ReportAction>,
     resolution: ValueOf<typeof CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION> | ValueOf<typeof CONST.REPORT.ACTIONABLE_MENTION_INVITE_TO_SUBMIT_EXPENSE_CONFIRM_WHISPER>,
     isReportArchived: boolean | undefined,
+    parentReport?: OnyxEntry<Report>,
 ) {
     const reportID = report?.reportID;
     if (!reportAction || !reportID) {
@@ -5432,6 +5433,41 @@ function resolveActionableMentionWhisper(
         participantsFailureData = {participants: participantsRollback as Participants};
     }
 
+    // When the action belongs to a child report (e.g. a one-transaction thread), also update
+    // the parent report's participants so the members list the user is viewing updates immediately.
+    let parentParticipantsOptimisticData: Pick<Report, 'participants'> | undefined;
+    let parentParticipantsFailureData: Pick<Report, 'participants'> | undefined;
+
+    if (isInviteResolution && inviteeAccountIDs.length > 0 && parentReport?.reportID && parentReport.reportID !== reportID) {
+        const parentDefaultNotificationPreference = getDefaultNotificationPreferenceForReport(parentReport);
+        const parentParticipantsAfterInvitation = inviteeAccountIDs.reduce(
+            (reportParticipants: Participants, accountID: number) => {
+                if (accountID in (parentReport.participants ?? {})) {
+                    return reportParticipants;
+                }
+                const participant: ReportParticipant = {
+                    notificationPreference: parentDefaultNotificationPreference,
+                    role: CONST.REPORT.ROLE.MEMBER,
+                };
+                // eslint-disable-next-line no-param-reassign
+                reportParticipants[accountID] = participant;
+                return reportParticipants;
+            },
+            {...parentReport.participants},
+        );
+
+        parentParticipantsOptimisticData = {participants: parentParticipantsAfterInvitation};
+
+        const parentParticipantsRollback: Record<number, ReportParticipant | null> = {...parentReport.participants};
+        for (const accountID of inviteeAccountIDs) {
+            if (accountID in (parentReport.participants ?? {})) {
+                continue;
+            }
+            parentParticipantsRollback[accountID] = null;
+        }
+        parentParticipantsFailureData = {participants: parentParticipantsRollback as Participants};
+    }
+
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -5455,6 +5491,14 @@ function resolveActionableMentionWhisper(
         },
     ];
 
+    if (parentParticipantsOptimisticData && parentReport?.reportID) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${parentReport.reportID}`,
+            value: parentParticipantsOptimisticData,
+        });
+    }
+
     const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -5477,6 +5521,14 @@ function resolveActionableMentionWhisper(
             },
         },
     ];
+
+    if (parentParticipantsFailureData && parentReport?.reportID) {
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${parentReport.reportID}`,
+            value: parentParticipantsFailureData,
+        });
+    }
 
     const parameters: ResolveActionableMentionWhisperParams = {
         reportActionID: reportAction.reportActionID,
