@@ -5419,11 +5419,12 @@ function resolveActionableMentionWhisper(
         // won't remove keys that were added optimistically. We must explicitly null out each
         // invitee's entry so Onyx deletes them on failure rollback.
         const participantsRollback: Record<number, ReportParticipant | null> = {...report.participants};
-        inviteeAccountIDs.forEach((accountID) => {
-            if (!(accountID in (report.participants ?? {}))) {
-                participantsRollback[accountID] = null;
+        for (const accountID of inviteeAccountIDs) {
+            if (accountID in (report.participants ?? {})) {
+                continue;
             }
-        });
+            participantsRollback[accountID] = null;
+        }
         participantsFailureData = {participants: participantsRollback as Participants};
     }
 

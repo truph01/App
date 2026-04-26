@@ -7263,7 +7263,7 @@ describe('actions/Report', () => {
             await waitForBatchedUpdates();
 
             // Pause fetch so we can verify optimistic state, then trigger failure
-            mockFetch.pause!();
+            mockFetch.pause();
             Report.resolveActionableMentionWhisper(report, whisperAction, CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE, false);
             await waitForBatchedUpdates();
 
@@ -7272,8 +7272,8 @@ describe('actions/Report', () => {
             expect(updatedReport?.participants?.[INVITEE_ACCOUNT_ID]).toBeDefined();
 
             // Now make the request fail and resume
-            mockFetch.fail!();
-            mockFetch.resume!();
+            mockFetch.fail();
+            mockFetch.resume();
             await waitForBatchedUpdates();
             await waitForNetworkPromises();
             await waitForBatchedUpdates();
