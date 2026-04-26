@@ -5414,7 +5414,7 @@ function resolveActionableMentionWhisper(
         );
 
         participantsOptimisticData = {participants: participantsAfterInvitation};
-        participantsFailureData = {participants: report.participants};
+        participantsFailureData = {participants: report.participants ?? {}};
     }
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
