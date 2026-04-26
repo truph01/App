@@ -7218,6 +7218,73 @@ describe('actions/Report', () => {
             expect(updatedReport?.participants?.[INVITEE_ACCOUNT_ID]).toBeUndefined();
         });
 
+        it('should preserve existing participant settings when invitee is already in participants', async () => {
+            global.fetch = TestHelper.getGlobalFetchMock();
+
+            const REPORT_ID = '4';
+            const WHISPER_ACTION_ID = '4001';
+            const EXISTING_ADMIN_ID = 100;
+            const ALREADY_ADDED_USER_ID = 200;
+            const NEW_INVITEE_ID = 300;
+
+            const report: OnyxTypes.Report = {
+                ...createRandomReport(4, undefined),
+                reportID: REPORT_ID,
+                participants: {
+                    [EXISTING_ADMIN_ID]: {
+                        notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+                        role: CONST.REPORT.ROLE.ADMIN,
+                    },
+                    [ALREADY_ADDED_USER_ID]: {
+                        notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.DAILY,
+                        role: CONST.REPORT.ROLE.ADMIN,
+                    },
+                },
+                lastMessageText: 'Hello',
+                lastVisibleActionCreated: '2024-11-19 08:04:13.728',
+                lastActorAccountID: EXISTING_ADMIN_ID,
+            };
+
+            // Stale whisper that includes an already-added user alongside a new one
+            const whisperAction = {
+                reportActionID: WHISPER_ACTION_ID,
+                reportID: REPORT_ID,
+                actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_MENTION_WHISPER,
+                created: '2024-11-19 08:04:13.730',
+                message: [{html: 'Mentioned @user1 and @user2', text: 'Mentioned @user1 and @user2', type: 'COMMENT'}],
+                originalMessage: {
+                    inviteeAccountIDs: [ALREADY_ADDED_USER_ID, NEW_INVITEE_ID],
+                    inviteeEmails: ['user1@example.com', 'user2@example.com'],
+                    whisperedTo: [EXISTING_ADMIN_ID],
+                },
+            } as unknown as OnyxTypes.ReportAction;
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+            await Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {
+                [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`]: {
+                    [WHISPER_ACTION_ID]: whisperAction,
+                },
+            });
+            await waitForBatchedUpdates();
+
+            Report.resolveActionableMentionWhisper(report, whisperAction, CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE, false);
+            await waitForBatchedUpdates();
+
+            const updatedReport = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}` as const);
+
+            // Already-added user's settings must NOT be overwritten
+            expect(updatedReport?.participants?.[ALREADY_ADDED_USER_ID]).toMatchObject({
+                notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.DAILY,
+                role: CONST.REPORT.ROLE.ADMIN,
+            });
+
+            // New invitee should be added with default settings
+            expect(updatedReport?.participants?.[NEW_INVITEE_ID]).toMatchObject({
+                notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+                role: CONST.REPORT.ROLE.MEMBER,
+            });
+        });
+
         it('should remove optimistically added participants on failure rollback', async () => {
             const mockFetch = TestHelper.getGlobalFetchMock() as MockFetch;
             global.fetch = mockFetch;

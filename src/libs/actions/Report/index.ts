@@ -5402,6 +5402,10 @@ function resolveActionableMentionWhisper(
         const defaultNotificationPreference = getDefaultNotificationPreferenceForReport(report);
         const participantsAfterInvitation = inviteeAccountIDs.reduce(
             (reportParticipants: Participants, accountID: number) => {
+                // Skip IDs that already exist in participants to avoid overwriting their settings
+                if (accountID in (report.participants ?? {})) {
+                    return reportParticipants;
+                }
                 const participant: ReportParticipant = {
                     notificationPreference: defaultNotificationPreference,
                     role: CONST.REPORT.ROLE.MEMBER,
