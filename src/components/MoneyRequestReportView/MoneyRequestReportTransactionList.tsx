@@ -639,10 +639,7 @@ function MoneyRequestReportTransactionList({
                     !isDesktopTableLayout && styles.pl5,
                     styles.pr16,
                     styles.alignItemsCenter,
-                    isDesktopTableLayout && styles.highlightBG,
-                    isDesktopTableLayout && styles.searchTableTopRadius,
-                    isDesktopTableLayout && styles.mh5,
-                    isDesktopTableLayout && styles.borderBottom,
+                    isDesktopTableLayout && [styles.highlightBG, styles.searchTableTopRadius, styles.mh5, styles.borderBottom],
                 ]}
             >
                 <View style={[styles.dFlex, styles.flexRow, styles.pv2, styles.pr4, StyleUtils.getPaddingLeft(variables.w12)]}>

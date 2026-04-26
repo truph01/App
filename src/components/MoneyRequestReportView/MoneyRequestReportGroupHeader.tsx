@@ -103,8 +103,10 @@ function MoneyRequestReportGroupHeader({
                       styles.searchTableRowHeight,
                       styles.justifyContentCenter,
                       styles.highlightBG,
-                      {paddingVertical: variables.tableGroupRowPaddingVertical, paddingHorizontal: 12},
-                      {borderBottomWidth: 1, borderColor: isSelected ? theme.buttonHoveredBG : theme.border},
+                      {paddingVertical: variables.tableGroupRowPaddingVertical},
+                      styles.ph3,
+                      styles.borderBottom,
+                      isSelected && {borderColor: theme.buttonHoveredBG},
                   ]
                 : [styles.reportLayoutGroupHeader, conditionalHeight],
         [isDesktopTableLayout, styles, theme, isSelected, conditionalHeight],
