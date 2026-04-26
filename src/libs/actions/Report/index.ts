@@ -5389,6 +5389,34 @@ function resolveActionableMentionWhisper(
         lastActorAccountID: report.lastActorAccountID,
     };
 
+    // When the resolution is 'invited', optimistically add the invited users to report.participants
+    // so the members list updates immediately without waiting for the server response.
+    const isInviteResolution = resolution === CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE;
+    const originalMessage = ReportActionsUtils.getOriginalMessage(reportAction as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_MENTION_WHISPER>);
+    const inviteeAccountIDs = isInviteResolution ? (originalMessage?.inviteeAccountIDs ?? []) : [];
+
+    let participantsOptimisticData: Pick<Report, 'participants'> | undefined;
+    let participantsFailureData: Pick<Report, 'participants'> | undefined;
+
+    if (isInviteResolution && inviteeAccountIDs.length > 0 && report) {
+        const defaultNotificationPreference = getDefaultNotificationPreferenceForReport(report);
+        const participantsAfterInvitation = inviteeAccountIDs.reduce(
+            (reportParticipants: Participants, accountID: number) => {
+                const participant: ReportParticipant = {
+                    notificationPreference: defaultNotificationPreference,
+                    role: CONST.REPORT.ROLE.MEMBER,
+                };
+                // eslint-disable-next-line no-param-reassign
+                reportParticipants[accountID] = participant;
+                return reportParticipants;
+            },
+            {...report.participants},
+        );
+
+        participantsOptimisticData = {participants: participantsAfterInvitation};
+        participantsFailureData = {participants: report.participants};
+    }
+
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -5405,7 +5433,10 @@ function resolveActionableMentionWhisper(
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
-            value: reportUpdateDataWithPreviousLastMessage,
+            value: {
+                ...reportUpdateDataWithPreviousLastMessage,
+                ...participantsOptimisticData,
+            },
         },
     ];
 
@@ -5425,7 +5456,10 @@ function resolveActionableMentionWhisper(
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
-            value: reportUpdateDataWithCurrentLastMessage, // revert back to the current report last message data in case of failure
+            value: {
+                ...reportUpdateDataWithCurrentLastMessage, // revert back to the current report last message data in case of failure
+                ...participantsFailureData,
+            },
         },
     ];
 
