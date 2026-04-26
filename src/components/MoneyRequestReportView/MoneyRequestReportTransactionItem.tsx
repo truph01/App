@@ -101,7 +101,7 @@ function MoneyRequestReportTransactionItem({
     const {isSmallScreenWidth, isMediumScreenWidth} = useResponsiveLayout();
     const {shouldUseNarrowLayout} = useResponsiveLayoutOnWideRHP();
     const theme = useTheme();
-    const isDesktopTableLayout = !shouldUseNarrowLayout && !isMediumScreenWidth;
+    const isDesktopTableLayout = !shouldUseNarrowLayout;
     const isPendingDelete = isTransactionPendingDelete(transaction);
     const pendingAction = getTransactionPendingAction(transaction);
     // Filter violations based on user visibility and dismissal state at the row level.

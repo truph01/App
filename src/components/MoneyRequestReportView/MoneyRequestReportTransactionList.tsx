@@ -554,7 +554,7 @@ function MoneyRequestReportTransactionList({
         [groupByOptions, reportLayoutGroupBy, styles, windowHeight, isInLandscapeMode],
     );
 
-    const isDesktopTableLayout = !shouldUseNarrowLayout && !isMediumScreenWidth;
+    const isDesktopTableLayout = !shouldUseNarrowLayout;
 
     const allTransactions = shouldShowGroupedTransactions ? groupedTransactions.flatMap((group) => group.transactions) : resolvedTransactions;
     const lastTransactionID = showPendingExpensePlaceholder ? undefined : allTransactions.at(-1)?.transactionID;
