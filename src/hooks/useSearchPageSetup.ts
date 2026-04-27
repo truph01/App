@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {openSearch, search} from '@libs/actions/Search';
@@ -53,41 +53,15 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
-    }, [hash, isOffline, shouldUseLiveData, queryJSON]);
+    }, [hash, isOffline, shouldUseLiveData, queryJSON, currentSearchKey, shouldCalculateTotals, currentSearchResults]);
 
-    // Keep refs for values that should be read inside the focus callback but must NOT
-    // appear in its dependency array — same reasoning as the useEffect above (line 46).
-    const currentSearchResultsRef = useRef(currentSearchResults);
-    const currentSearchKeyRef = useRef(currentSearchKey);
-    const shouldCalculateTotalsRef = useRef(shouldCalculateTotals);
-    useEffect(() => {
-        currentSearchResultsRef.current = currentSearchResults;
-        currentSearchKeyRef.current = currentSearchKey;
-        shouldCalculateTotalsRef.current = shouldCalculateTotals;
-    }, [currentSearchResults, currentSearchKey, shouldCalculateTotals]);
-
-    // Re-fire search when the tab regains focus if data was cleared (e.g. after "Clear cache and restart").
-    // The TabNavigator keeps this screen mounted with freezeOnBlur, so the useEffect above won't re-run
-    // when the screen unfreezes because its deps haven't changed — this useFocusEffect fills that gap.
-    const fireSearchOnFocus = useCallback(() => {
-        if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
+    useFocusEffect(() => {
+        openSearch();
+        if (!queryJSON) {
             return;
         }
-        if (isSearchDataLoaded(currentSearchResultsRef.current, queryJSON) || currentSearchResultsRef.current?.search?.isLoading) {
-            return;
-        }
-        const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        search({
-            queryJSON,
-            searchKey: currentSearchKeyRef.current,
-            offset: 0,
-            shouldCalculateTotals: shouldCalculateTotalsRef.current,
-            isLoading: false,
-            skipWaitForWrites: shouldSkipWaitForWrites,
-        });
-    }, [queryJSON, hash, shouldUseLiveData, isOffline]);
-
-    useFocusEffect(fireSearchOnFocus);
+        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true})
+    });
 
     useEffect(() => {
         openSearch();
