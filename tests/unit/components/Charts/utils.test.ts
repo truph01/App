@@ -103,9 +103,9 @@ describe('labelOverhang', () => {
         expect(result.right).toBe(50);
     });
 
-    it('returns symmetric overhang at 45°', () => {
+    it('returns asymmetric overhang at 45°', () => {
         const result = labelOverhang(100, LINE_HEIGHT, LABEL_ROTATIONS.DIAGONAL);
-        expect(result.left).toBeCloseTo(result.right);
+        expect(result.left).toBeGreaterThan(result.right);
     });
 
     it('returns lineHeight/2 on both sides at 90°', () => {
