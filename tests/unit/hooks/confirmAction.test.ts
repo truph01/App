@@ -1,5 +1,5 @@
 import buildConfirmAction from '@components/MoneyRequestConfirmationList/confirmAction';
-import type * as PolicyModule from '@userActions/Policy/Policy';
+import type {hasInvoicingDetails} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import type {Participant} from '@src/types/onyx/IOU';
 
@@ -77,7 +77,7 @@ describe('buildConfirmAction', () => {
     });
 
     it('navigates to company-info step for invoice with no invoicing details', () => {
-        const policyMock = jest.requireMock<typeof PolicyModule>('@userActions/Policy/Policy');
+        const policyMock = jest.requireMock<{hasInvoicingDetails: typeof hasInvoicingDetails}>('@userActions/Policy/Policy');
         (policyMock.hasInvoicingDetails as jest.Mock).mockReturnValueOnce(false);
         const params = makeBase({iouType: CONST.IOU.TYPE.INVOICE});
         buildConfirmAction(params)({paymentType: undefined});
@@ -87,7 +87,7 @@ describe('buildConfirmAction', () => {
     });
 
     it('does not navigate to company-info step when routeError is set', () => {
-        const policyMock = jest.requireMock<typeof PolicyModule>('@userActions/Policy/Policy');
+        const policyMock = jest.requireMock<{hasInvoicingDetails: typeof hasInvoicingDetails}>('@userActions/Policy/Policy');
         (policyMock.hasInvoicingDetails as jest.Mock).mockReturnValueOnce(false);
         const params = makeBase({iouType: CONST.IOU.TYPE.INVOICE, routeError: 'route error'});
         buildConfirmAction(params)({paymentType: undefined});
