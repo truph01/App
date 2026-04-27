@@ -6929,6 +6929,8 @@ const translations = {
                 merchants: 'Merchants',
                 noAvailableCards: 'All cards already have a rule',
                 noAvailableCardsSubtitle: 'Edit an existing card rule to make changes',
+                noCardsIssuedTitle: 'No Expensify Cards issued',
+                noCardsIssuedSubtitle: 'Issue Expensify Cards to create spend rules',
                 max: 'Max',
                 categoryOptions: {
                     [CONST.SPEND_RULES.CATEGORIES.AIRLINES]: 'Airlines',
@@ -7569,8 +7571,8 @@ const translations = {
     search: {
         tabs: {
             expenseReports: 'Expense reports',
-            reports: 'All reports',
-            expenses: 'All expenses',
+            reports: 'Reports',
+            expenses: 'Expenses',
             submit: 'Drafts',
             approve: 'Needs approval',
             pay: 'Ready to pay',

@@ -6683,6 +6683,8 @@ ${reportName}
                 merchants: '商家',
                 noAvailableCards: '所有卡片已具有规则',
                 noAvailableCardsSubtitle: '编辑现有的卡片规则以进行更改',
+                noCardsIssuedTitle: '尚未发放 Expensify 卡',
+                noCardsIssuedSubtitle: '发放 Expensify 卡以创建支出规则',
                 max: '最大',
                 categoryOptions: {
                     [CONST.SPEND_RULES.CATEGORIES.AIRLINES]: '航空公司',
@@ -7564,8 +7566,8 @@ ${reportName}
         spendOverTime: '随时间支出',
         tabs: {
             expenseReports: '报销报告',
-            reports: '所有报表',
-            expenses: '所有报销',
+            reports: '报表',
+            expenses: '报销费用',
             submit: '草稿',
             approve: '待审批',
             pay: '准备付款',
