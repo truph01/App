@@ -45,7 +45,9 @@ function CategoryFlagAmountsOverPage({
     const decodedCategoryName = getDecodedCategoryName(categoryName);
 
     useEffect(() => {
-        clearDraftValues(ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER_FORM);
+        return () => {
+            clearDraftValues(ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER_FORM);
+        };
     }, []);
 
     const {inputCallbackRef} = useAutoFocusInput();
