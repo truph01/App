@@ -18,6 +18,9 @@ type CameraProps = {
 
     /** Whether a file is being dragged over a parent wrapper (used by desktop for dual drag-over providers) */
     isDraggingOverWrapper?: boolean;
+
+    /** Called when the native camera finishes initializing (useful for preloading subsequent screens) */
+    onCameraInitialized?: () => void;
 };
 
 export default CameraProps;
