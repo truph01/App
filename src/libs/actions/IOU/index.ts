@@ -2601,9 +2601,9 @@ function getSearchOnyxUpdate({
             const isOptimisticToAccountData = isOptimisticPersonalDetail(toAccountID);
             const successData = [];
             if (isOptimisticToAccountData) {
-                // The optimistic personal detail is removed on the API's success data but we can't change the managerID of the transaction in the snapshot.
-                // So we need to add the optimistic personal detail back to the snapshot in success data to prevent the flickering.
-                // After that, it will be cleared via Search API.
+                // The optimistic personal detail is cleared from PERSONAL_DETAILS_LIST on API success, but the snapshot's report still references
+                // that optimistic accountID via report.managerID. Re-merging the personal detail into the snapshot in successData prevents the
+                // "To" column from briefly going blank before Search API delivers the real data.
                 // See https://github.com/Expensify/App/issues/61310 for more information.
                 successData.push({
                     onyxMethod: Onyx.METHOD.MERGE,
