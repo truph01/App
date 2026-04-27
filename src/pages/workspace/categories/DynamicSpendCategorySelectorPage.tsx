@@ -6,6 +6,7 @@ import type {ListItem} from '@components/SelectionList/types';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -23,7 +24,7 @@ function DynamicSpendCategorySelectorPage({route}: DynamicSpendCategorySelectorP
     const styles = useThemeStyles();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.SPEND_CATEGORY_SELECTOR.path);
 
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(policyID)}`);
     const label = groupID.charAt(0).toUpperCase() + groupID.slice(1);
     const currentCategory = policy?.mccGroup?.[groupID]?.category ?? '';
 

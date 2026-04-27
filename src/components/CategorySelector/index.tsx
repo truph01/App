@@ -8,7 +8,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 
-type CategorySelectorProps = {
+type CustomUnitDefaultCategorySelectorProps = {
     /** Currently selected category */
     defaultValue?: string;
 
@@ -25,7 +25,7 @@ type CategorySelectorProps = {
     customUnitID: string;
 };
 
-function CategorySelector({defaultValue = '', wrapperStyle, label, focused, customUnitID}: CategorySelectorProps) {
+function CustomUnitDefaultCategorySelector({defaultValue = '', wrapperStyle, label, focused, customUnitID}: CustomUnitDefaultCategorySelectorProps) {
     const styles = useThemeStyles();
 
     const decodedCategoryName = getDecodedCategoryName(defaultValue);
@@ -49,4 +49,4 @@ function CategorySelector({defaultValue = '', wrapperStyle, label, focused, cust
     );
 }
 
-export default CategorySelector;
+export default CustomUnitDefaultCategorySelector;

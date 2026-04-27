@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
-import CategorySelector from '@components/CategorySelector';
+import CustomUnitDefaultCategorySelector from '@components/CategorySelector';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -73,7 +73,7 @@ function WorkspacePerDiemSettingsPage({route}: WorkspacePerDiemSettingsPageProps
                                 errorRowStyles={styles.mh5}
                                 onClose={() => clearErrorFields('defaultCategory')}
                             >
-                                <CategorySelector
+                                <CustomUnitDefaultCategorySelector
                                     label={translate('workspace.common.defaultCategory')}
                                     defaultValue={defaultCategory}
                                     wrapperStyle={[styles.ph5, styles.mt3]}

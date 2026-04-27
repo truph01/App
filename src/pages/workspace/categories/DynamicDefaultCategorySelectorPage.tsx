@@ -7,6 +7,7 @@ import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -23,7 +24,7 @@ function DynamicDefaultCategorySelectorPage({route}: DynamicDefaultCategorySelec
     const {policyID, customUnitID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(policyID)}`);
     const currentCategory = policy?.customUnits?.[customUnitID]?.defaultCategory ?? '';
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.DEFAULT_CATEGORY_SELECTOR.path);
 
