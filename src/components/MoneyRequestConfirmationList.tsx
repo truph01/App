@@ -1,5 +1,5 @@
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
-import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -230,7 +230,7 @@ function MoneyRequestConfirmationList({
     const iouCurrencyCode = getCurrency(transaction);
     const iouMerchant = getMerchant(transaction);
     const iouCategory = getCategory(transaction);
-    const iouAttendees = useMemo(() => getAttendees(transaction, currentUserPersonalDetails), [transaction, currentUserPersonalDetails]);
+    const iouAttendees = getAttendees(transaction, currentUserPersonalDetails);
 
     const isTypeRequest = iouType === CONST.IOU.TYPE.SUBMIT;
     const isTypeSend = iouType === CONST.IOU.TYPE.PAY;
@@ -305,7 +305,7 @@ function MoneyRequestConfirmationList({
 
     const routeError = Object.values(transaction?.errorFields?.route ?? {}).at(0);
     const isTypeSplit = iouType === CONST.IOU.TYPE.SPLIT;
-    const shouldShowReadOnlySplits = useMemo(() => isPolicyExpenseChat || isReadOnly || isScanRequest, [isPolicyExpenseChat, isReadOnly, isScanRequest]);
+    const shouldShowReadOnlySplits = isPolicyExpenseChat || isReadOnly || isScanRequest;
 
     const {formError, setFormError, clearFormErrors, shouldDisplayFieldError, isMerchantEmpty, isMerchantRequired, errorMessage} = useFormErrorManagement({
         transaction,
@@ -330,10 +330,7 @@ function MoneyRequestConfirmationList({
 
     const isCategoryRequired = !!policy?.requiresCategory && !isTypeInvoice;
 
-    const isDescriptionRequired = useMemo(
-        () => isCategoryDescriptionRequired(policyCategories, iouCategory, policy?.areRulesEnabled),
-        [iouCategory, policyCategories, policy?.areRulesEnabled],
-    );
+    const isDescriptionRequired = isCategoryDescriptionRequired(policyCategories, iouCategory, policy?.areRulesEnabled);
 
     // If completing a split expense fails, set didConfirm to false to allow the user to edit the fields again
     if (isEditingSplitBill && didConfirm) {
@@ -360,8 +357,8 @@ function MoneyRequestConfirmationList({
         isNewManualExpenseFlowEnabled,
     });
 
-    const selectedParticipants = useMemo(() => selectedParticipantsProp.filter((participant) => participant.selected), [selectedParticipantsProp]);
-    const payeePersonalDetails = useMemo(() => payeePersonalDetailsProp ?? currentUserPersonalDetails, [payeePersonalDetailsProp, currentUserPersonalDetails]);
+    const selectedParticipants = selectedParticipantsProp.filter((participant) => participant.selected);
+    const payeePersonalDetails = payeePersonalDetailsProp ?? currentUserPersonalDetails;
 
     const {splitParticipants, getSplitSectionHeader} = useSplitParticipants({
         isTypeSplit,
@@ -456,14 +453,30 @@ function MoneyRequestConfirmationList({
         }, []),
     );
 
-    const isCompactMode = useMemo(() => !showMoreFields && isScanRequest && !isInLandscapeMode, [isScanRequest, showMoreFields, isInLandscapeMode]);
-    const selectionListStyle = useMemo(
-        () => ({
-            containerStyle: [styles.flexBasisAuto],
-            contentContainerStyle: isCompactMode ? [styles.flexGrow1] : undefined,
-            listFooterContentStyle: isCompactMode ? [styles.flex1, styles.mv3] : [styles.mv3],
-        }),
-        [isCompactMode, styles.flexBasisAuto, styles.flexGrow1, styles.mv3, styles.flex1],
+    const isCompactMode = !showMoreFields && isScanRequest && !isInLandscapeMode;
+    const selectionListStyle = {
+        containerStyle: [styles.flexBasisAuto],
+        contentContainerStyle: isCompactMode ? [styles.flexGrow1] : undefined,
+        listFooterContentStyle: isCompactMode ? [styles.flex1, styles.mv3] : [styles.mv3],
+    };
+
+    const footerContent = isReadOnly ? undefined : (
+        <ConfirmationFooterContent
+            iouType={iouType}
+            confirm={confirm}
+            iouCurrencyCode={iouCurrencyCode}
+            policyID={policyID}
+            reportID={reportID}
+            isConfirmed={isConfirmed}
+            isConfirming={isConfirming}
+            isLoadingReceipt={isLoadingReceipt}
+            splitOrRequestOptions={splitOrRequestOptions}
+            errorMessage={errorMessage}
+            expensesNumber={expensesNumber}
+            showRemoveExpenseConfirmModal={showRemoveExpenseConfirmModal}
+            shouldShowProductTrainingTooltip={shouldShowProductTrainingTooltip}
+            renderProductTrainingTooltip={renderProductTrainingTooltip}
+        />
     );
 
     const listFooterContent = (
@@ -594,25 +607,7 @@ function MoneyRequestConfirmationList({
                     shouldSingleExecuteRowSelect
                     shouldPreventDefaultFocusOnSelectRow
                     shouldShowListEmptyContent={false}
-                    footerContent={
-                        <ConfirmationFooterContent
-                            isReadOnly={isReadOnly}
-                            iouType={iouType}
-                            confirm={confirm}
-                            iouCurrencyCode={iouCurrencyCode}
-                            policyID={policyID}
-                            reportID={reportID}
-                            isConfirmed={isConfirmed}
-                            isConfirming={isConfirming}
-                            isLoadingReceipt={isLoadingReceipt}
-                            splitOrRequestOptions={splitOrRequestOptions}
-                            errorMessage={errorMessage}
-                            expensesNumber={expensesNumber}
-                            showRemoveExpenseConfirmModal={showRemoveExpenseConfirmModal}
-                            shouldShowProductTrainingTooltip={shouldShowProductTrainingTooltip}
-                            renderProductTrainingTooltip={renderProductTrainingTooltip}
-                        />
-                    }
+                    footerContent={footerContent}
                     listFooterContent={listFooterContent}
                     style={selectionListStyle}
                     disableKeyboardShortcuts
@@ -622,4 +617,4 @@ function MoneyRequestConfirmationList({
     );
 }
 
-export default memo(MoneyRequestConfirmationList);
+export default MoneyRequestConfirmationList;

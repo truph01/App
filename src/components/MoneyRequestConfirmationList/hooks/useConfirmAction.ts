@@ -1,4 +1,3 @@
-import {useCallback} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {PaymentActionParams} from '@components/SettlementButton/types';
 import Log from '@libs/Log';
@@ -53,66 +52,48 @@ function useConfirmAction({
     onConfirm,
     onSendMoney,
 }: UseConfirmActionParams) {
-    return useCallback(
-        ({paymentType: paymentMethod}: PaymentActionParams) => {
-            // Routing short-circuit: invoices without company info go to the company info step before we validate anything.
-            if (iouType === CONST.IOU.TYPE.INVOICE && !hasInvoicingDetails(policy) && transactionID && !routeError) {
-                Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_COMPANY_INFO.getRoute(iouType, transactionID, reportID, Navigation.getActiveRoute()));
-                return;
-            }
+    return ({paymentType: paymentMethod}: PaymentActionParams) => {
+        // Routing short-circuit: invoices without company info go to the company info step before we validate anything.
+        if (iouType === CONST.IOU.TYPE.INVOICE && !hasInvoicingDetails(policy) && transactionID && !routeError) {
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_COMPANY_INFO.getRoute(iouType, transactionID, reportID, Navigation.getActiveRoute()));
+            return;
+        }
 
-            const result = validate(paymentMethod);
-            if (!result) {
-                return;
-            }
+        const result = validate(paymentMethod);
+        if (!result) {
+            return;
+        }
 
-            if (result.errorKey) {
-                if (result.shouldSetDidConfirmSplit) {
-                    setDidConfirmSplit(true);
-                }
-                setFormError(result.errorKey);
-                return;
+        if (result.errorKey) {
+            if (result.shouldSetDidConfirmSplit) {
+                setDidConfirmSplit(true);
             }
+            setFormError(result.errorKey);
+            return;
+        }
 
-            if (iouType !== CONST.IOU.TYPE.PAY) {
-                if (formError) {
-                    return;
-                }
-                onConfirm?.(selectedParticipants);
-                return;
-            }
-
-            // PAY branch side effects.
-            if (!paymentMethod) {
-                return;
-            }
-            if (isDelegateAccessRestricted) {
-                showDelegateNoAccessModal();
-                return;
-            }
+        if (iouType !== CONST.IOU.TYPE.PAY) {
             if (formError) {
                 return;
             }
-            Log.info(`[IOU] Sending money via: ${paymentMethod}`);
-            onSendMoney?.(paymentMethod);
-        },
-        [
-            iouType,
-            policy,
-            transactionID,
-            routeError,
-            reportID,
-            validate,
-            setFormError,
-            setDidConfirmSplit,
-            formError,
-            onConfirm,
-            selectedParticipants,
-            isDelegateAccessRestricted,
-            showDelegateNoAccessModal,
-            onSendMoney,
-        ],
-    );
+            onConfirm?.(selectedParticipants);
+            return;
+        }
+
+        // PAY branch side effects.
+        if (!paymentMethod) {
+            return;
+        }
+        if (isDelegateAccessRestricted) {
+            showDelegateNoAccessModal();
+            return;
+        }
+        if (formError) {
+            return;
+        }
+        Log.info(`[IOU] Sending money via: ${paymentMethod}`);
+        onSendMoney?.(paymentMethod);
+    };
 }
 
 export default useConfirmAction;

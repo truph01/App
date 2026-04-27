@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
@@ -15,7 +15,6 @@ import ROUTES from '@src/ROUTES';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 
 type ConfirmationFooterContentProps = {
-    isReadOnly: boolean;
     iouType: IOUType;
     confirm: (params: PaymentActionParams) => void;
     iouCurrencyCode: string;
@@ -33,7 +32,6 @@ type ConfirmationFooterContentProps = {
 };
 
 function ConfirmationFooterContent({
-    isReadOnly,
     iouType,
     confirm,
     iouCurrencyCode,
@@ -51,10 +49,6 @@ function ConfirmationFooterContent({
 }: ConfirmationFooterContentProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-
-    if (isReadOnly) {
-        return null;
-    }
 
     const shouldShowSettlementButton = iouType === CONST.IOU.TYPE.PAY;
 
@@ -137,5 +131,5 @@ function ConfirmationFooterContent({
 
 ConfirmationFooterContent.displayName = 'ConfirmationFooterContent';
 
-export default memo(ConfirmationFooterContent);
+export default ConfirmationFooterContent;
 export type {ConfirmationFooterContentProps};

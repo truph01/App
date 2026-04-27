@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React from 'react';
 import {Keyboard, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import MoneyRequestAmountInput from '@components/MoneyRequestAmountInput';
@@ -32,17 +32,14 @@ function useSplitParticipants({isTypeSplit, shouldShowReadOnlySplits, payeePerso
     const {convertToDisplayString, getCurrencySymbol} = useCurrencyListActions();
 
     const transactionID = transaction?.transactionID;
-    const onSplitShareChange = useCallback(
-        (accountID: number, value: number) => {
-            if (!transactionID) {
-                return;
-            }
-            setIndividualShare(transactionID, accountID, convertToBackendAmount(value));
-        },
-        [transactionID],
-    );
+    const onSplitShareChange = (accountID: number, value: number) => {
+        if (!transactionID) {
+            return;
+        }
+        setIndividualShare(transactionID, accountID, convertToBackendAmount(value));
+    };
 
-    const splitParticipants = useMemo(() => {
+    const buildSplitParticipants = () => {
         if (!isTypeSplit) {
             return [];
         }
@@ -106,29 +103,9 @@ function useSplitParticipants({isTypeSplit, shouldShowReadOnlySplits, payeePerso
                 />
             ),
         }));
-    }, [
-        isTypeSplit,
-        payeePersonalDetails,
-        shouldShowReadOnlySplits,
-        iouCurrencyCode,
-        iouAmount,
-        selectedParticipants,
-        styles.flexWrap,
-        styles.pl2,
-        styles.pr1,
-        styles.h100,
-        styles.textLabel,
-        styles.pv0,
-        styles.lineHeightUndefined,
-        styles.optionRowAmountInput,
-        styles.textInputContainer,
-        styles.ml3,
-        transaction?.comment?.splits,
-        transaction?.splitShares,
-        onSplitShareChange,
-        getCurrencySymbol,
-        convertToDisplayString,
-    ]);
+    };
+
+    const splitParticipants = buildSplitParticipants();
 
     const isSplitModified = !!transaction?.splitShares && Object.keys(transaction.splitShares).some((key) => transaction.splitShares?.[Number(key) ?? -1]?.isModified);
 

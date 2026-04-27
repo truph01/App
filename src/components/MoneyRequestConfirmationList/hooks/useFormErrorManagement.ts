@@ -1,5 +1,5 @@
 import {useIsFocused} from '@react-navigation/native';
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
@@ -72,28 +72,21 @@ function useFormErrorManagement({
     const [formError, debouncedFormError, setFormError] = useDebouncedState<TranslationPaths | ''>('');
 
     // Clear the form error if it's set to one among the list passed as an argument
-    const clearFormErrors = useCallback(
-        (errors: string[]) => {
-            if (!errors.includes(formError)) {
-                return;
-            }
-
-            setFormError('');
-        },
-        [formError, setFormError],
-    );
-
-    const shouldDisplayFieldError: boolean = useMemo(() => {
-        if (!isEditingSplitBill) {
-            return false;
+    const clearFormErrors = (errors: string[]) => {
+        if (!errors.includes(formError)) {
+            return;
         }
 
-        return (!!hasSmartScanFailed && hasMissingSmartscanFields(transaction, transactionReport)) || (didConfirmSplit && areRequiredFieldsEmpty(transaction, transactionReport));
-    }, [isEditingSplitBill, hasSmartScanFailed, transaction, didConfirmSplit, transactionReport]);
+        setFormError('');
+    };
 
-    const isMerchantEmpty = useMemo(() => !iouMerchant || isMerchantMissing(transaction), [transaction, iouMerchant]);
+    const shouldDisplayFieldError: boolean =
+        !!isEditingSplitBill &&
+        ((!!hasSmartScanFailed && hasMissingSmartscanFields(transaction, transactionReport)) || (didConfirmSplit && areRequiredFieldsEmpty(transaction, transactionReport)));
+
+    const isMerchantEmpty = !iouMerchant || isMerchantMissing(transaction);
     const isMerchantRequired = isPolicyExpenseChat && (!isScanRequest || !!isEditingSplitBill) && shouldShowMerchant;
-    const isMerchantFieldValid = useMemo(() => {
+    const isMerchantFieldValid = (() => {
         const merchantValue = iouMerchant ?? '';
         const trimmedMerchant = merchantValue.trim();
         const {isValid} = isValidInputLength(merchantValue, CONST.MERCHANT_NAME_MAX_BYTES);
@@ -107,7 +100,7 @@ function useFormErrorManagement({
         }
 
         return !isInvalidMerchantValue(trimmedMerchant);
-    }, [iouMerchant, isMerchantRequired]);
+    })();
 
     const isViolationFixed = getIsViolationFixed(formError, {
         category: iouCategory,
@@ -123,6 +116,10 @@ function useFormErrorManagement({
         isControlPolicy: policy?.type === CONST.POLICY.TYPE.CORPORATE,
     });
 
+    // Mirror formError into a ref so the effect below can read the current value without listing
+    // formError as a dependency. We don't want this effect to re-run just because formError changed —
+    // it should only react to focus / validation-state changes. (setFormError is stable across
+    // renders because useDebouncedState memoizes its setter.)
     const formErrorRef = useRef(formError);
     useEffect(() => {
         formErrorRef.current = formError;
@@ -157,18 +154,20 @@ function useFormErrorManagement({
         }
     }, [isFocused, shouldDisplayFieldError, hasSmartScanFailed, didConfirmSplit, isViolationFixed, isMerchantFieldValid, setFormError]);
 
-    const errorMessage = useMemo<string | undefined>(() => {
+    const computeErrorMessage = (): string | undefined => {
         if (routeError) {
             return routeError;
         }
         if (isTypeSplit && !shouldShowReadOnlySplits) {
             return debouncedFormError ? translate(debouncedFormError) : undefined;
         }
+        // Don't show error at the bottom of the form for missing attendees — the field surfaces it inline.
         if (formError === 'violations.missingAttendees') {
             return undefined;
         }
         return formError ? translate(formError) : undefined;
-    }, [routeError, isTypeSplit, shouldShowReadOnlySplits, debouncedFormError, formError, translate]);
+    };
+    const errorMessage = computeErrorMessage();
 
     return {
         formError,

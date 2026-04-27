@@ -1,4 +1,3 @@
-import {useMemo} from 'react';
 import useOnyx from '@hooks/useOnyx';
 import {getTagLists} from '@libs/PolicyUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -11,7 +10,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
  */
 function usePolicyTagsForConfirmation(policyID: string | undefined) {
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
-    const policyTagLists = useMemo(() => getTagLists(policyTags), [policyTags]);
+    const policyTagLists = getTagLists(policyTags);
     return {policyTags, policyTagLists};
 }
 

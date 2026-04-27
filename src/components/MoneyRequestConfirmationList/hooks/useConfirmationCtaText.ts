@@ -1,4 +1,3 @@
-import {useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
 import useLocalize from '@hooks/useLocalize';
@@ -46,62 +45,45 @@ function useConfirmationCtaText({
 }: UseConfirmationCtaTextParams): Array<DropdownOption<string>> {
     const {translate} = useLocalize();
 
-    return useMemo(() => {
-        let text;
-        if (expensesNumber > 1) {
-            text = translate('iou.createExpenses', expensesNumber);
-        } else if (isTypeInvoice) {
-            if (hasInvoicingDetails(policy)) {
-                text = translate('iou.sendInvoice', formattedAmount);
-            } else {
-                text = translate('common.next');
-            }
-        } else if (isTypeTrackExpense) {
-            text = translate('iou.createExpense');
-            if (iouAmount !== 0 && !isNewManualExpenseFlowEnabled) {
-                text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
-            }
-        } else if (isTypeSplit && iouAmount === 0) {
-            text = translate('iou.splitExpense');
-        } else if ((receiptPath && isTypeRequest) || isDistanceRequestWithPendingRoute || isPerDiemRequest) {
-            text = translate('iou.createExpense');
-            if (iouAmount !== 0 && !isNewManualExpenseFlowEnabled) {
-                text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
-            }
-        } else if (isTypeSplit) {
-            text = translate('iou.splitAmount', formattedAmount);
-            if (isNewManualExpenseFlowEnabled) {
-                text = translate('iou.splitExpense');
-            }
-        } else if (iouAmount === 0) {
-            text = translate('iou.createExpense');
-        } else if (isNewManualExpenseFlowEnabled) {
-            text = translate('iou.createExpense');
+    let text;
+    if (expensesNumber > 1) {
+        text = translate('iou.createExpenses', expensesNumber);
+    } else if (isTypeInvoice) {
+        if (hasInvoicingDetails(policy)) {
+            text = translate('iou.sendInvoice', formattedAmount);
         } else {
+            text = translate('common.next');
+        }
+    } else if (isTypeTrackExpense) {
+        text = translate('iou.createExpense');
+        if (iouAmount !== 0 && !isNewManualExpenseFlowEnabled) {
             text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
         }
-        return [
-            {
-                text: text[0].toUpperCase() + text.slice(1),
-                value: iouType,
-            },
-        ];
-    }, [
-        isTypeInvoice,
-        isTypeTrackExpense,
-        isTypeSplit,
-        expensesNumber,
-        iouAmount,
-        receiptPath,
-        isTypeRequest,
-        isDistanceRequestWithPendingRoute,
-        isPerDiemRequest,
-        iouType,
-        policy,
-        translate,
-        formattedAmount,
-        isNewManualExpenseFlowEnabled,
-    ]);
+    } else if (isTypeSplit && iouAmount === 0) {
+        text = translate('iou.splitExpense');
+    } else if ((receiptPath && isTypeRequest) || isDistanceRequestWithPendingRoute || isPerDiemRequest) {
+        text = translate('iou.createExpense');
+        if (iouAmount !== 0 && !isNewManualExpenseFlowEnabled) {
+            text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
+        }
+    } else if (isTypeSplit) {
+        text = translate('iou.splitAmount', formattedAmount);
+        if (isNewManualExpenseFlowEnabled) {
+            text = translate('iou.splitExpense');
+        }
+    } else if (iouAmount === 0) {
+        text = translate('iou.createExpense');
+    } else if (isNewManualExpenseFlowEnabled) {
+        text = translate('iou.createExpense');
+    } else {
+        text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
+    }
+    return [
+        {
+            text: text[0].toUpperCase() + text.slice(1),
+            value: iouType,
+        },
+    ];
 }
 
 export default useConfirmationCtaText;

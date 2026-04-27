@@ -1,4 +1,3 @@
-import {useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
@@ -50,7 +49,7 @@ function useConfirmationAmount({
     const {translate} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
 
-    const isScanRequest = useMemo(() => isScanRequestUtil(transaction), [transaction]);
+    const isScanRequest = isScanRequestUtil(transaction);
 
     const subRates = transaction?.comment?.customUnit?.subRates ?? [];
     const shouldCalculatePerDiemAmount = isPerDiemRequest && (iouAmount === 0 || JSON.stringify(prevSubRates) !== JSON.stringify(subRates) || prevCurrency !== currency);
