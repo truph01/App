@@ -7,5 +7,7 @@
 # @param  account_state=returning
 # @tag    auth
 # TODO verify @post against a real returning-account session; current values mirror complete-onboarding's observed home screen.
-fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "agent-device-testing@gmail.com"
+env EMAIL=agent-device-testing@gmail.com
+
+fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "${EMAIL}"
 press "role=\"button\" label=\"Continue\" || label=\"Continue\""

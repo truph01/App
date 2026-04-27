@@ -20,6 +20,19 @@ Each flow starts with `# @key value` comment lines. The `.ad` parser treats `#` 
 
 Selector syntax matches the flow body: `id="..."`, `role="..." label="..."`, `text="..."`, with `||` inside a single value for fallbacks.
 
+## Parametrization
+
+Body literals can be lifted into named variables via `env` directives + `${VAR}` interpolation (`agent-device` v0.13.0+). This decouples a flow's *intent* (declared in `@param`) from its *interpolated values* (declared in `env`), so values can be overridden at runtime without editing the file.
+
+| Construct                  | Where                | Purpose                                          |
+| -------------------------- | -------------------- | ------------------------------------------------ |
+| `env KEY=VALUE`            | Header (after `# @`) | File-level default. Quote values with spaces or `||` chains: `env KEY="a || b"`. |
+| `${KEY}`                   | Body                 | Interpolation point. Resolves at replay time.    |
+| `${KEY:-fallback}`         | Body                 | Use `fallback` if `KEY` is unset.                |
+| `\${KEY}`                  | Body                 | Literal `${KEY}` (escape).                       |
+
+Resolution precedence (high to low): CLI `-e KEY=VALUE` (repeatable) > shell `AD_KEY=...` (auto-imported, prefix stripped) > file `env` > built-ins (`AD_PLATFORM`, `AD_SESSION`, `AD_FILENAME`, `AD_DEVICE`, `AD_ARTIFACTS`). Unresolved `${X}` errors with `file:line`.
+
 ### Example
 
 ```
@@ -31,8 +44,17 @@ Selector syntax matches the flow body: `id="..."`, `role="..." label="..."`, `te
 # @param  email=agent-device-testing@gmail.com
 # @param  account_state=new
 # @tag    auth
-fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "agent-device-testing@gmail.com"
+env EMAIL=agent-device-testing@gmail.com
+
+fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "${EMAIL}"
 press "role=\"button\" label=\"Continue\" || label=\"Continue\""
+```
+
+Override at runtime without editing the file:
+
+```bash
+agent-device replay <flow>.ad -e EMAIL=other@example.com
+AD_EMAIL=other@example.com agent-device replay <flow>.ad
 ```
 
 ## Agent decision loop
@@ -66,6 +88,7 @@ Headers are authoritative. The table above is a quick scan only.
 - **Durable selectors.** Prefer `id=...` first, then `role=... label=...`, with `||` fallbacks. Avoid `@eN` refs.
 - **Every flow declares `@desc`, `@pre`, `@post`.** `@param` and `@tag` when applicable.
 - **Peers share `@pre` and differ on `@param`/`@post`.** One flow per narrow outcome is better than a mega-flow with conditional branches.
+- **`@param` and `env` go together for substituted values.** If a `@param` value is interpolated into the body, declare a matching `env` default with the same literal and reference it as `${VAR}`. `@param` keeps the routing/filtering hint for the agent decision loop; `env` is the runtime-overridable source of truth. Routing-only params (e.g. `account_state=new`) need no `env`.
 
 ## Recording a new flow
 
@@ -89,4 +112,4 @@ Heal selector drift in place:
 agent-device replay -u .claude/skills/agent-device/flows/<name>.ad
 ```
 
-Re-verify `@pre`/`@post` still hold, then commit.
+Re-verify `@pre`/`@post` still hold, then commit. Note: `replay -u` is rejected when the script declares `env` directives (rewrite would drop them); strip the `env` block manually before healing, then re-add it.

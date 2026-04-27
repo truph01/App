@@ -6,7 +6,9 @@
 # @tag    navigation
 # @tag    perf
 # @span   ManualSendMessage
+env MESSAGE="Hello from agent-device ManualSendMessage flow"
+
 find "Inbox" "click"
 find "Navigates to a chat" "click"
-fill "id=\"composer\" || role=\"textview\" label=\"Write something...\" editable=true || label=\"Write something...\" editable=true" "Hello from agent-device ManualSendMessage flow"
+fill "id=\"composer\" || role=\"textview\" label=\"Write something...\" editable=true || label=\"Write something...\" editable=true" "${MESSAGE}"
 press "role=\"button\" label=\"Send\" || label=\"Send\""

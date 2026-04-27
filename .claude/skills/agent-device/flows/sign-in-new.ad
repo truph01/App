@@ -6,5 +6,7 @@
 # @param  email=agent-device-testing@gmail.com
 # @param  account_state=new
 # @tag    auth
-fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "agent-device-testing@gmail.com"
+env EMAIL=agent-device-testing@gmail.com
+
+fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "${EMAIL}"
 press "role=\"button\" label=\"Continue\" || label=\"Continue\""

@@ -14,12 +14,15 @@
 # @span   ManualConfirmationListReady
 # @span   ManualConfirmationReceiptLoad
 # @span   ManualGeolocationWait
+env AMOUNT=22
+env MERCHANT="Test Coffee"
+
 press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
 press "role=\"button\" label=\"Create expense\" || label=\"Create expense\""
 press "role=\"group\" label=\"Manual\" || label=\"Manual\""
-fill "role=\"text-field\" editable=true || editable=true" "22"
+fill "role=\"text-field\" editable=true || editable=true" "${AMOUNT}"
 press "role=\"button\" label=\"Next\" || label=\"Next\""
 press "role=\"button\" label=\"Merchant\" || label=\"Merchant\""
-fill "role=\"text-field\" label=\"Merchant,\" editable=true || label=\"Merchant,\" editable=true" "Test Coffee"
+fill "role=\"text-field\" label=\"Merchant,\" editable=true || label=\"Merchant,\" editable=true" "${MERCHANT}"
 press "role=\"button\" label=\"Save\" || label=\"Save\""
 find "Create" "click"
