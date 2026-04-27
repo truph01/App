@@ -23,7 +23,7 @@ function isDynamicRouteSuffix(suffix: string): suffix is DynamicRouteSuffix {
 
     const segmentCount = suffix.split('/').filter(Boolean).length;
     // Append trailing '/' because compiled regexes expect each segment to end with '/'.
-    const normalizedSuffix = `${suffix}/`;
+    const normalizedSuffix = suffix.endsWith('/') ? suffix : `${suffix}/`;
 
     // Strict parametric match (no optional params)
     for (const {compiled} of compiledStrictParametricDynamicRoutes) {

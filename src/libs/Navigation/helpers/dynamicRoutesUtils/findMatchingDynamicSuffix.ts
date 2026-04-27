@@ -19,7 +19,7 @@ type DynamicSuffixMatch = {
  * @private - Internal helper. Do not export or use outside this file.
  */
 function tryMatchParametric(candidate: string, candidateSegmentCount: number, patterns: CompiledEntry[]): DynamicSuffixMatch | undefined {
-    const normalized = `${candidate}/`;
+    const normalized = candidate.endsWith('/') ? candidate : `${candidate}/`;
 
     for (const {compiled} of patterns) {
         if (candidateSegmentCount < compiled.minSegments || candidateSegmentCount > compiled.maxSegments) {
