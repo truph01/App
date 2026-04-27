@@ -117,7 +117,6 @@ function TravelTerms({route}: TravelTermsPageProps) {
 
                 // Handle general API failure
                 if (response?.jsonCode !== 200) {
-                    cleanupTravelProvisioningSession();
                     return Promise.reject(new Error('Request failed'));
                 }
 
