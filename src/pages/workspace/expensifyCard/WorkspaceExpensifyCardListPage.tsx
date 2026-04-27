@@ -115,14 +115,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
 
     const [selectedCardIDs, setSelectedCardIDs] = useState<number[]>([]);
 
-    // Serialized so this stays referentially stable when useSearchResults returns a new array with the same cards.
-    const selectableCardIDsKey = filteredSortedCards.map((card) => card.cardID).join(',');
-    const selectableCardIDs = useMemo(() => {
-        if (selectableCardIDsKey.length === 0) {
-            return [];
-        }
-        return selectableCardIDsKey.split(',').map(Number);
-    }, [selectableCardIDsKey]);
+    const selectableCardIDs = filteredSortedCards.map((card) => card.cardID);
 
     useEffect(() => {
         setSelectedCardIDs((prev) => {
@@ -134,11 +127,11 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
         });
     }, [selectableCardIDs]);
 
-    const toggleCardSelection = useCallback((cardID: number) => {
+    const toggleCardSelection = (cardID: number) => {
         setSelectedCardIDs((prev) => (prev.includes(cardID) ? prev.filter((id) => id !== cardID) : [...prev, cardID]));
-    }, []);
+    };
 
-    const toggleSelectAll = useCallback(() => {
+    const toggleSelectAll = () => {
         if (selectableCardIDs.length === 0) {
             return;
         }
@@ -148,31 +141,28 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
             }
             return [...selectableCardIDs];
         });
-    }, [selectableCardIDs]);
+    };
 
     const isSelectAllChecked = selectedCardIDs.length > 0 && selectedCardIDs.length === selectableCardIDs.length;
     const isSelectAllIndeterminate = selectedCardIDs.length > 0 && selectedCardIDs.length < selectableCardIDs.length;
 
-    const bulkExportOptions = useMemo<Array<DropdownOption<'EXPORT_CSV'>>>(
-        () => [
-            {
-                icon: icons.Export,
-                text: translate('workspace.expensifyCard.exportAsCSV'),
-                value: 'EXPORT_CSV',
-                onSelected: () => {
-                    const selectedCards = filteredSortedCards.filter((card) => selectedCardIDs.includes(card.cardID));
-                    exportExpensifyCardListToCSV({
-                        policyID,
-                        cards: selectedCards,
-                        personalDetailsList: personalDetails,
-                        settlementCurrency,
-                        translate,
-                    });
-                },
+    const bulkExportOptions: Array<DropdownOption<'EXPORT_CSV'>> = [
+        {
+            icon: icons.Export,
+            text: translate('workspace.expensifyCard.exportAsCSV'),
+            value: 'EXPORT_CSV',
+            onSelected: () => {
+                const selectedCards = filteredSortedCards.filter((card) => selectedCardIDs.includes(card.cardID));
+                exportExpensifyCardListToCSV({
+                    policyID,
+                    cards: selectedCards,
+                    personalDetailsList: personalDetails,
+                    settlementCurrency,
+                    translate,
+                });
             },
-        ],
-        [icons.Export, translate, filteredSortedCards, selectedCardIDs, policyID, personalDetails, settlementCurrency],
-    );
+        },
+    ];
 
     const handleIssueCardPress = () => {
         clearIssueNewCardFormData();
