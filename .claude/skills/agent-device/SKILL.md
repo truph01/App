@@ -8,13 +8,11 @@ allowed-tools: Bash(agent-device *) Bash(npm root *)
 
 ## Pre-flight
 
-`agent-device` CLI version check (need v0.13.0+ for flow parametrization): !`V=$(agent-device --version 2>/dev/null || true); [ -z "$V" ] && echo "NOT_INSTALLED" || echo "$V" | awk -F. -v v="$V" '{ if ($1+0 > 0 || ($1+0 == 0 && $2+0 >= 13)) print "OK (" v ")"; else print "TOO_OLD (" v ", need v0.13.0+)" }'`
+`agent-device` version check: !`R=0.13.0; V=$(agent-device --version 2>/dev/null); [ -n "$V" ] && [ "$(printf '%s\n%s\n' "$R" "$V" | sort -V | head -1)" = "$R" ] && echo "OK ($V)" || echo "FAIL (need v$R+, got: ${V:-not installed})"`
 
 Canonical skill reference path (read these files directly for device automation guidance - bootstrap, exploration, verification, debugging): !`echo "$(npm root -g)/agent-device/skills/agent-device"`
 
-> If the version check above shows `NOT_INSTALLED` or a command-not-found error, **STOP** and instruct the developer to install: `npm install -g agent-device@latest`.
-> If it shows `TOO_OLD`, **STOP** and instruct the developer to upgrade: `npm install -g agent-device@latest`. Flows in `flows/` use `env`/`${VAR}` parametrization, which requires v0.13.0+.
-> All device interaction depends on it.
+> If the version check above shows `FAIL`, **STOP** and instruct the developer: `npm install -g agent-device@latest`.
 
 ## Dev prerequisites
 
