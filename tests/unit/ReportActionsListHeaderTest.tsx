@@ -1,20 +1,21 @@
 import {render, screen} from '@testing-library/react-native';
 import React from 'react';
-import {View} from 'react-native';
 import ReportActionsListHeader from '@pages/inbox/report/ReportActionsListHeader';
 
 const CONCIERGE_REPORT_ID = '7000';
 const OTHER_REPORT_ID = '42';
 
 const mockUseIsInSidePanel = jest.fn<boolean, []>();
-const mockUseOnyx = jest.fn();
+const mockUseOnyx = jest.fn<unknown[], [string]>();
 
 jest.mock('@hooks/useIsInSidePanel', () => ({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: () => mockUseIsInSidePanel(),
 }));
 
 jest.mock('@hooks/useOnyx', () => ({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: (key: string) => mockUseOnyx(key),
 }));
@@ -23,6 +24,7 @@ jest.mock('@pages/home/report/ConciergeThinkingMessage', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
     const {View: MockView} = require('react-native');
     return {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         __esModule: true,
         default: () => <MockView testID="ConciergeThinkingMessage" />,
     };
@@ -30,17 +32,11 @@ jest.mock('@pages/home/report/ConciergeThinkingMessage', () => {
 
 jest.mock('@pages/inbox/report/ListBoundaryLoader', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
-    const {View: MockView, Pressable} = require('react-native');
+    const {View: MockView} = require('react-native');
     return {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         __esModule: true,
-        default: ({onRetry}: {onRetry: () => void}) => (
-            <Pressable
-                testID="ListBoundaryLoader"
-                onPress={onRetry}
-            >
-                <MockView />
-            </Pressable>
-        ),
+        default: () => <MockView testID="ListBoundaryLoader" />,
     };
 });
 
