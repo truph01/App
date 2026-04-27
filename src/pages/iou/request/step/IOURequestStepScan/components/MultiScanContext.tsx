@@ -1,8 +1,7 @@
 import React, {createContext, useContext, useState} from 'react';
-import {InteractionManager, Platform} from 'react-native';
+import {InteractionManager} from 'react-native';
 import useOnyx from '@hooks/useOnyx';
 import {dismissProductTraining} from '@libs/actions/Welcome';
-import {isMobile} from '@libs/Browser';
 import useScanRouteParams from '@pages/iou/request/step/IOURequestStepScan/hooks/useScanRouteParams';
 import {removeDraftTransactionsByIDs, removeTransactionReceipt} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
@@ -93,17 +92,5 @@ function MultiScanProvider({children}: MultiScanProviderProps) {
     );
 }
 
-/**
- * Platform gate — renders MultiScanProvider on mobile (web + native), passes children through on desktop web.
- * Multi-scan is a camera-based mobile interaction; desktop uses file picker with shouldAcceptMultipleFiles instead.
- * Note: isMobile() only detects mobile web browsers; native platforms need a separate Platform.OS check.
- */
-function MultiScanGate({children}: MultiScanProviderProps) {
-    if (Platform.OS !== 'web' || isMobile()) {
-        return <MultiScanProvider>{children}</MultiScanProvider>;
-    }
-    return children;
-}
-
-export {MultiScanGate, MultiScanProvider, useMultiScanState, useMultiScanActions};
+export {MultiScanProvider, useMultiScanState, useMultiScanActions};
 export type {MultiScanState, MultiScanActions};
