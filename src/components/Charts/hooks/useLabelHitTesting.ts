@@ -21,14 +21,14 @@ type LabelHitGeometry = {
     /** Per-label: labelWidth / 2 — half-extent for 0° and 90° hit bounds */
     halfWidths: number[];
 
-    /** Per-label: rightUpperCorner.x = targetX + cornerAnchorDX[i] */
-    cornerAnchorDX: number[];
+    /** rightUpperCorner.x = targetX + cornerAnchorDX */
+    cornerAnchorDX: number;
 
-    /** Per-label: rightUpperCorner.y = labelY + cornerAnchorDY[i] */
-    cornerAnchorDY: number[];
+    /** rightUpperCorner.y = labelY + cornerAnchorDY */
+    cornerAnchorDY: number;
 
-    /** Per-label: yMin90 = labelY + yMin90Offsets[i] */
-    yMin90Offsets: number[];
+    /** yMin90 = labelY + yMin90Offset */
+    yMin90Offset: number;
 
     /** Per-label: yMax90 = labelY + yMax90Offsets[i] */
     yMax90Offsets: number[];
@@ -76,9 +76,9 @@ function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotat
             iconSin: variables.iconSizeExtraSmall * sinA,
             labelSins: truncatedLabelWidths.map((w) => w * sinA),
             halfWidths: truncatedLabelWidths.map((w) => w / 2),
-            cornerAnchorDX: truncatedLabelWidths.map(() => -iconThirdSin),
-            cornerAnchorDY: truncatedLabelWidths.map(() => iconThirdSin),
-            yMin90Offsets: truncatedLabelWidths.map(() => padding),
+            cornerAnchorDX: -iconThirdSin,
+            cornerAnchorDY: iconThirdSin,
+            yMin90Offset: padding,
             yMax90Offsets: truncatedLabelWidths.map((w) => w + padding),
         };
     }
@@ -94,7 +94,7 @@ function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotat
             return false;
         }
 
-        const {labelYOffset, iconSin, labelSins, halfWidths, cornerAnchorDX, cornerAnchorDY, yMin90Offsets, yMax90Offsets} = labelHitGeometry;
+        const {labelYOffset, iconSin, labelSins, halfWidths, cornerAnchorDX, cornerAnchorDY, yMin90Offset, yMax90Offsets} = labelHitGeometry;
         const padding = variables.iconSizeExtraSmall / 2;
         const halfWidth = halfWidths.at(activeIndex) ?? 0;
         const labelY = args.chartBottom + labelYOffset;
@@ -102,9 +102,7 @@ function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotat
         let corners45: Array<{x: number; y: number}> | undefined;
         if (angleRad > 0 && angleRad < DIAGONAL_ANGLE_RADIAN_THRESHOLD) {
             const labelSin = labelSins.at(activeIndex) ?? 0;
-            const anchorDX = cornerAnchorDX.at(activeIndex) ?? 0;
-            const anchorDY = cornerAnchorDY.at(activeIndex) ?? 0;
-            const rightUpperCorner = {x: args.targetX + anchorDX, y: labelY + anchorDY};
+            const rightUpperCorner = {x: args.targetX + cornerAnchorDX, y: labelY + cornerAnchorDY};
             const rightLowerCorner = {x: rightUpperCorner.x + iconSin, y: rightUpperCorner.y + iconSin};
             const leftUpperCorner = {x: rightUpperCorner.x - labelSin, y: rightUpperCorner.y + labelSin};
             const leftLowerCorner = {x: rightLowerCorner.x - labelSin, y: rightLowerCorner.y + labelSin};
@@ -120,7 +118,7 @@ function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotat
             halfWidth,
             padding,
             corners45,
-            yMin90: labelY + (yMin90Offsets.at(activeIndex) ?? 0),
+            yMin90: labelY + yMin90Offset,
             yMax90: labelY + (yMax90Offsets.at(activeIndex) ?? 0),
         });
     };

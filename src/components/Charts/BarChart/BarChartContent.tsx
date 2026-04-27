@@ -124,7 +124,6 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
         const domainWidth = bounds.right - bounds.left;
         const calculatedBarWidth = ((1 - BAR_INNER_PADDING) * domainWidth) / data.length;
         barWidth.set(calculatedBarWidth);
-        chartBottom.set(bounds.bottom);
         yZero.set(0);
         setBarAreaWidth(domainWidth);
         setBoundsLeft(bounds.left);
@@ -192,6 +191,10 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
         if (!fontMgr || xAxisLabelHeight === undefined) {
             return null;
         }
+
+        const chartBoundsBottom = args.yScale(Math.min(...args.yTicks));
+        chartBottom.set(chartBoundsBottom);
+
         return (
             <>
                 <ChartXAxisLabels
@@ -207,7 +210,7 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
                     fontMgr={fontMgr}
                     labelColor={theme.textSupporting}
                     xScale={args.xScale}
-                    chartBoundsBottom={args.yScale(Math.min(...args.yTicks))}
+                    chartBoundsBottom={chartBoundsBottom}
                 />
                 <ChartYAxisLabels
                     yTicks={args.yTicks}

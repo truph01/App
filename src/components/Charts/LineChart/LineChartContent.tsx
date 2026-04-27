@@ -143,7 +143,6 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
         setPlotAreaWidth(bounds.right - bounds.left);
         setBoundsLeft(bounds.left);
         setBoundsRight(bounds.right);
-        chartBottom.set(bounds.bottom);
     };
 
     const checkIsOverDot = (args: HitTestArgs) => {
@@ -175,6 +174,8 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
     }));
 
     const renderOutside = (args: CartesianChartRenderArg<{x: number; y: number}, 'y'>) => {
+        const chartBoundsBottom = args.yScale(Math.min(...args.yTicks));
+        chartBottom.set(chartBoundsBottom);
         return (
             <>
                 <LeftFrameLine
@@ -202,7 +203,7 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
                         fontMgr={fontMgr}
                         labelColor={theme.textSupporting}
                         xScale={args.xScale}
-                        chartBoundsBottom={args.yScale(Math.min(...args.yTicks))}
+                        chartBoundsBottom={chartBoundsBottom}
                     />
                 )}
                 {!!fontMgr && (
