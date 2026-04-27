@@ -621,6 +621,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     const shouldShowRoleFilter = data.length > 0;
     const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && filteredData.length === 0;
+    const shouldShowCompactFilterSearchRow = shouldUseNarrowLayout && shouldShowSearchBar;
     const noResultsMessage = translate('common.noResultsFoundMatching', inputValue);
 
     // SearchBar's built-in empty state also controls screen-reader announcements.
@@ -646,7 +647,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             value={null}
             PopoverComponent={rolePopoverComponent}
             innerStyles={[styles.gap2, shouldUseNarrowLayout && styles.mw100]}
-            wrapperStyle={shouldUseNarrowLayout && styles.w100}
+            wrapperStyle={shouldUseNarrowLayout ? styles.flexGrow0 : undefined}
             labelStyle={styles.fontSizeLabel}
             caretWrapperStyle={styles.gap2}
             medium
@@ -915,11 +916,11 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             )}
             {(shouldShowRoleFilter || shouldShowSearchBar) && (
                 <View style={styles.flexColumn}>
-                    <View style={[styles.mh5, styles.gap3, styles.mb5, shouldUseNarrowLayout ? styles.flexColumn : styles.flexRow]}>
+                    <View style={[styles.mh5, styles.gap3, styles.mb5, shouldShowCompactFilterSearchRow && styles.alignItemsCenter, shouldUseNarrowLayout && !shouldShowCompactFilterSearchRow ? styles.flexColumn : styles.flexRow]}>
                         {!!roleFilterDropdown && (
                             <View
                                 style={[
-                                    shouldUseNarrowLayout && styles.w100,
+                                    shouldUseNarrowLayout && styles.flexGrow0,
                                     shouldShowSearchBar && !shouldUseNarrowLayout && styles.h13,
                                     shouldShowSearchBar && !shouldUseNarrowLayout && styles.justifyContentCenter,
                                 ]}
@@ -928,7 +929,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                             </View>
                         )}
                         {shouldShowSearchBar && (
-                            <View style={[shouldUseNarrowLayout && styles.w100]}>
+                            <View style={[shouldShowCompactFilterSearchRow && styles.flex1, shouldShowCompactFilterSearchRow && styles.mnw0, shouldUseNarrowLayout && !shouldShowCompactFilterSearchRow && styles.w100]}>
                                 <SearchBar
                                     inputValue={inputValue}
                                     onChangeText={setInputValue}
