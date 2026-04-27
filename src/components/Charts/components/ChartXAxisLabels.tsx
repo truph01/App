@@ -5,7 +5,6 @@ import {AXIS_LABEL_GAP, GLYPH_PADDING, MAX_X_AXIS_LABEL_WIDTH} from '@components
 import useChartParagraphs from '@components/Charts/hooks/useChartParagraphs';
 import type {LabelRotation} from '@components/Charts/types';
 import {getFontLineMetrics, rotatedLabelCenterCorrection, rotatedLabelYOffset, truncateLabel} from '@components/Charts/utils';
-import variables from '@styles/variables';
 
 type ChartXAxisLabelsProps = {
     /** Original (non-truncated) label strings from the data. */
@@ -79,8 +78,6 @@ function ChartXAxisLabels({
 
     const paragraphs = useChartParagraphs(truncatedLabels, fontMgr, fontSize, labelColor, MAX_X_AXIS_LABEL_WIDTH);
 
-    const renderedWidths = truncatedLabels.map((_, i) => paragraphs?.at(i)?.width ?? 0);
-
     // Derive ascent/descent from the first available paragraph's line metrics.
     const {ascent, descent} = getFontLineMetrics(fontMgr, fontSize);
 
@@ -106,7 +103,7 @@ function ChartXAxisLabels({
                     key={`x-label-${label}-${tickX}`}
                     paragraph={paraData.para}
                     x={tickX - renderWidth / 2}
-                    y={labelY - variables.iconSizeExtraSmall}
+                    y={labelY - ascent}
                     width={renderWidth + GLYPH_PADDING}
                 />
             );

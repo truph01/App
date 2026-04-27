@@ -231,7 +231,7 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
                     fontMgr={fontMgr}
                     labelColor={theme.textSupporting}
                     xScale={args.xScale}
-                    chartBoundsBottom={args.chartBounds.bottom}
+                    chartBoundsBottom={data.some((p) => p.total < 0) ? args.chartBounds.bottom : args.yScale(0)}
                 />
                 <ChartYAxisLabels
                     yTicks={args.yTicks}
@@ -257,7 +257,7 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
         fontMgr,
         variables.iconSizeExtraSmall,
     );
-    const chartPadding = {...CHART_PADDING, bottom: labelSpace + CHART_PADDING.bottom + variables.iconSizeExtraSmall, left: yAxisLabelWidth + GLYPH_PADDING};
+    const chartPadding = {...CHART_PADDING, bottom: labelSpace + CHART_PADDING.bottom, left: yAxisLabelWidth + GLYPH_PADDING};
 
     if (isLoading || !fontMgr) {
         const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'BarChartContent', isLoading, isFontLoading: !fontMgr};

@@ -139,7 +139,6 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
         labelAreaWidth: plotAreaWidth,
         firstTickLeftSpace: boundsLeft + domainPadding.left * paddingScale,
         lastTickRightSpace: chartWidth > 0 ? chartWidth - boundsRight + domainPadding.right * paddingScale : 0,
-        allowTightDiagonalPacking: true,
         measurements,
     });
 
@@ -224,7 +223,7 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
                         fontMgr={fontMgr}
                         labelColor={theme.textSupporting}
                         xScale={args.xScale}
-                        chartBoundsBottom={args.chartBounds.bottom}
+                        chartBoundsBottom={data.some((p) => p.total < 0) ? args.chartBounds.bottom : args.yScale(0)}
                     />
                 )}
                 {!!fontMgr && (
@@ -253,7 +252,7 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
         fontMgr,
         variables.iconSizeExtraSmall,
     );
-    const chartPadding = {...CHART_PADDING, bottom: labelSpace + CHART_PADDING.bottom + variables.iconSizeExtraSmall, left: yAxisLabelWidth + GLYPH_PADDING};
+    const chartPadding = {...CHART_PADDING, bottom: labelSpace + CHART_PADDING.bottom, left: yAxisLabelWidth + GLYPH_PADDING};
 
     if (isLoading || !fontMgr) {
         const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'LineChartContent', isLoading, isFontLoading: !fontMgr};
