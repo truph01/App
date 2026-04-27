@@ -1060,7 +1060,7 @@ function MenuItem({
                                                     <Badge
                                                         text={badgeText}
                                                         icon={badgeIcon}
-                                                        badgeStyles={[badgeStyle, focused && !isBadgeSuccess && styles.badgeDefaultActive]}
+                                                        badgeStyles={[badgeStyle, focused && !isBadgeSuccess && styles.badgeDefaultActive, !!rightComponent && styles.mr2]}
                                                         success={isBadgeSuccess}
                                                         isStrong={isBadgeStrong}
                                                         isCondensed={isBadgeCondensed}
@@ -1111,7 +1111,7 @@ function MenuItem({
                                                                 height={variables.iconSizeSmall}
                                                             />
                                                         )}
-                                                        <Text style={styles.rightLabelMenuItem}>{rightLabel}</Text>
+                                                        <Text style={[styles.rightLabelMenuItem, !!rightComponent && styles.mr2]}>{rightLabel}</Text>
                                                     </View>
                                                 )}
                                                 {shouldShowRightIcon && (
