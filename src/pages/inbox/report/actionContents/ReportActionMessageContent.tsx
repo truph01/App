@@ -1,4 +1,4 @@
-import type {ReactElement, ReactNode} from 'react';
+import type {ReactElement} from 'react';
 import React from 'react';
 import type {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {View} from 'react-native';
@@ -35,12 +35,9 @@ type ReportActionMessageContentProps = {
 
     /** Optional IOU display message passed into each fragment */
     iouMessage?: string;
-
-    /** Optional content rendered below the fragments (for example an Add Bank Account button) */
-    children?: ReactNode;
 };
 
-function ReportActionMessageContent({action, displayAsGroup, reportID, style, isHidden = false, iouMessage, children}: ReportActionMessageContentProps) {
+function ReportActionMessageContent({action, displayAsGroup, reportID, style, isHidden = false, iouMessage}: ReportActionMessageContentProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const isApprovedOrSubmittedReportAction = isApprovedOrSubmittedReportActionUtils(action);
@@ -81,10 +78,7 @@ function ReportActionMessageContent({action, displayAsGroup, reportID, style, is
     return (
         <View style={[styles.chatItemMessage, style]}>
             {!isHidden ? (
-                <>
-                    {renderReportActionItemFragments(isApprovedOrSubmittedReportAction)}
-                    {children}
-                </>
+                renderReportActionItemFragments(isApprovedOrSubmittedReportAction)
             ) : (
                 <Text style={[styles.textLabelSupporting, styles.lh20]}>{translate('moderation.flaggedContent')}</Text>
             )}
