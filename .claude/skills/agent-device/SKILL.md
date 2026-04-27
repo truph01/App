@@ -10,9 +10,9 @@ allowed-tools: Bash(agent-device *) Bash(npm root *)
 
 `agent-device` version check: !`R=0.13.0; V=$(agent-device --version 2>/dev/null); [ -n "$V" ] && [ "$(printf '%s\n%s\n' "$R" "$V" | sort -V | head -1)" = "$R" ] && echo "OK ($V)" || echo "FAIL (need v$R+, got: ${V:-not installed})"`
 
-Canonical skill reference path (read these files directly for device automation guidance - bootstrap, exploration, verification, debugging): !`echo "$(npm root -g)/agent-device/skills/agent-device"`
-
 > If the version check above shows `FAIL`, **STOP** and instruct the developer: `npm install -g agent-device@latest`.
+
+Canonical skill reference path (read these files directly for device automation guidance - bootstrap, exploration, verification, debugging): !`echo "$(npm root -g)/agent-device/skills/agent-device"`
 
 ## Dev prerequisites
 
@@ -36,7 +36,3 @@ Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` sn
 7. Verify each `@post` with `is exists`. On success, re-enter the loop for the next step. On failure, try the peer flow or proceed manually.
 
 See [`flows/README.md`](flows/README.md) for the full header spec and authoring rules.
-
-## Misc
-
-- To skip onboarding, set `SKIP_ONBOARDING=true` in `.env`.
