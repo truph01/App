@@ -104,7 +104,7 @@ type UseFormErrorManagementResult = {
 /**
  * Owns the form-error state for the Money Request confirmation flow.
  *
- * Holds a debounced form-error string, exposes setters/clearers used by the
+ * Holds a debounced form-error string, exposes setters and clearing helpers used by the
  * controllers, and derives merchant validity, the violation-fixed flag, and the user-
  * visible error message. `shouldDisplayFieldError` is gated on edit-split-bill mode so
  * field-level errors only render in that flow. `errorMessage` prefers `routeError`,
