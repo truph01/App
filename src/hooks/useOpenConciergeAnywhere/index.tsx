@@ -1,16 +1,19 @@
 import useSidePanelActions from '@hooks/useSidePanelActions';
 import useSidePanelState from '@hooks/useSidePanelState';
 
-function useOpenConcierge() {
-    const {shouldHideSidePanel: isSidePanelOpen} = useSidePanelState();
+/**
+ * Returns a callback that opens the Concierge side panel on web.
+ */
+function useOpenConciergeAnywhere() {
+    const {shouldHideSidePanel} = useSidePanelState();
     const {openSidePanel} = useSidePanelActions();
 
     return () => {
-        if (isSidePanelOpen) {
+        if (!shouldHideSidePanel) {
             return;
         }
         openSidePanel();
     };
 }
 
-export default useOpenConcierge;
+export default useOpenConciergeAnywhere;

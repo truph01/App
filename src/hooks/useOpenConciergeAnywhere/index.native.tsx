@@ -4,7 +4,10 @@ import useOnyx from '@hooks/useOnyx';
 import {navigateToConciergeChat} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 
-function useOpenConcierge() {
+/**
+ * Returns a callback that navigates to the Concierge chat on native.
+ */
+function useOpenConciergeAnywhere() {
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
@@ -16,4 +19,4 @@ function useOpenConcierge() {
     };
 }
 
-export default useOpenConcierge;
+export default useOpenConciergeAnywhere;

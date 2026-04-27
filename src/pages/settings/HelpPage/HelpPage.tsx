@@ -10,7 +10,7 @@ import useIsPaidPolicyAdmin from '@hooks/useIsPaidPolicyAdmin';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useOpenConcierge from '@hooks/useOpenConcierge';
+import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {openHelpPage} from '@libs/actions/Help';
@@ -39,7 +39,7 @@ function HelpPage() {
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
-    const openConcierge = useOpenConcierge();
+    const openConciergeAnywhere = useOpenConciergeAnywhere();
 
     const menuItems = [
         {
@@ -48,7 +48,7 @@ function HelpPage() {
             description: translate('initialSettingsPage.helpPage.conciergeChatDescription'),
             icon: icons.ConciergeAvatar,
             iconType: CONST.ICON_TYPE_AVATAR,
-            onPress: openConcierge,
+            onPress: openConciergeAnywhere,
             shouldShowRightIcon: true,
             wrapperStyle: [styles.sectionMenuItemTopDescription],
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_HELP.CONCIERGE_CHAT,

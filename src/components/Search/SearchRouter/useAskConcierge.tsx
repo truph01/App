@@ -1,18 +1,22 @@
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
-import useOpenConcierge from '@hooks/useOpenConcierge';
+import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import {addComment} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
+/**
+ * Returns a callback that opens Concierge (side panel on web, chat on native)
+ * and sends the provided search query as a message.
+ */
 function useAskConcierge() {
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
     const {timezone, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
-    const openConcierge = useOpenConcierge();
+    const openConciergeAnywhere = useOpenConciergeAnywhere();
 
     return (searchQuery: string) => {
-        openConcierge();
+        openConciergeAnywhere();
         if (!conciergeReport || !conciergeReportID) {
             return;
         }
