@@ -621,7 +621,6 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     const shouldShowRoleFilter = data.length > 0;
     const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && filteredData.length === 0;
-    const shouldShowCompactFilterSearchRow = shouldUseNarrowLayout && shouldShowSearchBar;
     const noResultsMessage = translate('common.noResultsFoundMatching', inputValue);
 
     // SearchBar's built-in empty state also controls screen-reader announcements.
@@ -916,28 +915,16 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             )}
             {(shouldShowRoleFilter || shouldShowSearchBar) && (
                 <View style={styles.flexColumn}>
-                    <View style={[styles.mh5, styles.gap3, styles.mb5, styles.flexRow, shouldShowCompactFilterSearchRow && styles.alignItemsCenter]}>
-                        {!!roleFilterDropdown && (
-                            <View
-                                style={[
-                                    shouldUseNarrowLayout && styles.flexGrow0,
-                                    shouldShowSearchBar && !shouldUseNarrowLayout && styles.h13,
-                                    shouldShowSearchBar && !shouldUseNarrowLayout && styles.justifyContentCenter,
-                                ]}
-                            >
-                                {roleFilterDropdown}
-                            </View>
-                        )}
+                    <View style={[styles.mh5, styles.gap3, styles.mb5, styles.flexRow, styles.alignItemsCenter]}>
+                        {!!roleFilterDropdown && roleFilterDropdown}
                         {shouldShowSearchBar && (
-                            <View style={[shouldShowCompactFilterSearchRow && styles.flex1, shouldShowCompactFilterSearchRow && styles.mnw0, shouldUseNarrowLayout && !shouldShowCompactFilterSearchRow && styles.w100]}>
-                                <SearchBar
-                                    inputValue={inputValue}
-                                    onChangeText={setInputValue}
-                                    label={translate('workspace.people.findMember')}
-                                    shouldShowEmptyState={false}
-                                    style={[styles.flex1, styles.mh0, styles.mb0]}
-                                />
-                            </View>
+                            <SearchBar
+                                inputValue={inputValue}
+                                onChangeText={setInputValue}
+                                label={translate('workspace.people.findMember')}
+                                shouldShowEmptyState={false}
+                                style={[styles.flex1, styles.mh0, styles.mb0]}
+                            />
                         )}
                     </View>
                     {shouldShowEmptySearchMessage && (
