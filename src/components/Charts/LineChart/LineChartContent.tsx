@@ -223,7 +223,7 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
                         fontMgr={fontMgr}
                         labelColor={theme.textSupporting}
                         xScale={args.xScale}
-                        chartBoundsBottom={data.some((p) => p.total < 0) ? args.chartBounds.bottom : args.yScale(0)}
+                        chartBoundsBottom={args.yScale(Math.min(...args.yTicks))}
                     />
                 )}
                 {!!fontMgr && (
