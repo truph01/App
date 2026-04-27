@@ -47,6 +47,7 @@ function ReportActionMessageContent({action, displayAsGroup, reportID, style, is
     const renderReportActionItemFragments = (shouldWrapInText: boolean): ReactElement | ReactElement[] => {
         const reportActionItemFragments = fragments.map((fragment, index) => (
             <ReportActionItemFragment
+                // Message fragments don't have stable unique IDs, so index is the best available key
                 /* eslint-disable-next-line react/no-array-index-key */
                 key={`actionFragment-${action.reportActionID}-${index}`}
                 reportActionID={action.reportActionID}
