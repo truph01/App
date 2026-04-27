@@ -10,7 +10,7 @@ import ChartTooltipLayer from '@components/Charts/components/ChartTooltipLayer';
 import ChartXAxisLabels from '@components/Charts/components/ChartXAxisLabels';
 import ChartYAxisLabels from '@components/Charts/components/ChartYAxisLabels';
 import {AXIS_LABEL_GAP, CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, GLYPH_PADDING, X_AXIS_LINE_WIDTH, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
-import type {ComputeGeometryFn, HitTestArgs} from '@components/Charts/hooks';
+import type {HitTestArgs} from '@components/Charts/hooks';
 import {
     useChartFontManager,
     useChartInteractions,
@@ -22,7 +22,7 @@ import {
     useYAxisLabelWidth,
 } from '@components/Charts/hooks';
 import type {CartesianChartProps, ChartDataPoint} from '@components/Charts/types';
-import {calculateMinDomainPadding, DEFAULT_CHART_COLOR, getAdditionalOffset, getChartColor, rotatedLabelYOffset} from '@components/Charts/utils';
+import {calculateMinDomainPadding, DEFAULT_CHART_COLOR, getChartColor} from '@components/Charts/utils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
@@ -35,29 +35,6 @@ const BAR_INNER_PADDING = 0.3;
  * We need bottom: 1 for proper display of the bottom label
  */
 const BASE_DOMAIN_PADDING = {top: 32, bottom: 1, left: 0, right: 0};
-
-/**
- * Bar chart geometry for label hit-testing.
- * Labels are center-anchored: the 45° parallelogram's upper-right corner is offset
- * by (halfLabelWidth * sinA) right and up, so the box straddles the tick symmetrically.
- */
-const computeBarLabelGeometry: ComputeGeometryFn = ({ascent, descent, sinA, angleRad, labelWidths, padding}) => {
-    const maxLabelWidth = labelWidths.length > 0 ? Math.max(...labelWidths) : 0;
-    const centeredUpwardOffset = angleRad > 0 ? (maxLabelWidth / 2) * sinA : 0;
-    const halfLabelSins = labelWidths.map((w) => (w / 2) * sinA - variables.iconSizeExtraSmall / 3);
-    const halfWidths = labelWidths.map((w) => w / 2);
-    const additionalOffset = getAdditionalOffset(angleRad);
-    return {
-        labelYOffset: AXIS_LABEL_GAP + rotatedLabelYOffset(ascent, descent, angleRad) + centeredUpwardOffset - additionalOffset,
-        iconSin: variables.iconSizeExtraSmall * sinA,
-        labelSins: labelWidths.map((w) => w * sinA),
-        halfWidths,
-        cornerAnchorDX: halfLabelSins,
-        cornerAnchorDY: halfLabelSins.map((v) => -v),
-        yMin90Offsets: halfWidths.map((hw) => -hw + padding),
-        yMax90Offsets: halfWidths.map((hw) => hw + padding),
-    };
-};
 
 type BarChartProps = CartesianChartProps & {
     /** Callback when a bar is pressed */
@@ -141,7 +118,6 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
         labelRotation,
         labelSkipInterval,
         chartBottom,
-        computeGeometry: computeBarLabelGeometry,
     });
 
     const handleChartBoundsChange = (bounds: ChartBounds) => {

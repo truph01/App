@@ -12,7 +12,7 @@ import ChartYAxisLabels from '@components/Charts/components/ChartYAxisLabels';
 import LeftFrameLine from '@components/Charts/components/LeftFrameLine';
 import ScatterPoints from '@components/Charts/components/ScatterPoints';
 import {AXIS_LABEL_GAP, CHART_CONTENT_MIN_HEIGHT, CHART_PADDING, GLYPH_PADDING, X_AXIS_LINE_WIDTH, Y_AXIS_LINE_WIDTH, Y_AXIS_TICK_COUNT} from '@components/Charts/constants';
-import type {ComputeGeometryFn, HitTestArgs} from '@components/Charts/hooks';
+import type {HitTestArgs} from '@components/Charts/hooks';
 import {
     useChartFontManager,
     useChartInteractions,
@@ -24,7 +24,7 @@ import {
     useYAxisLabelWidth,
 } from '@components/Charts/hooks';
 import type {CartesianChartProps, ChartDataPoint} from '@components/Charts/types';
-import {calculateMinDomainPadding, DEFAULT_CHART_COLOR, getAdditionalOffset, rotatedLabelYOffset} from '@components/Charts/utils';
+import {calculateMinDomainPadding, DEFAULT_CHART_COLOR} from '@components/Charts/utils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
@@ -41,26 +41,6 @@ const MIN_SAFE_PADDING = DOT_RADIUS + DOT_HOVER_EXTRA_RADIUS;
 
 /** Base domain padding applied to all sides */
 const BASE_DOMAIN_PADDING = {top: 16, bottom: 16, left: 0, right: 0};
-
-/**
- * Line chart geometry for label hit-testing.
- * Labels are start-anchored at the tick: the 45° parallelogram's upper-right corner is
- * offset by (iconSize/3 * sinA) left and down, placing the box just below the axis line.
- */
-const computeLineLabelGeometry: ComputeGeometryFn = ({ascent, descent, sinA, angleRad, labelWidths, padding}) => {
-    const iconThirdSin = (variables.iconSizeExtraSmall / 3) * sinA;
-    const additionalOffset = getAdditionalOffset(angleRad);
-    return {
-        labelYOffset: AXIS_LABEL_GAP + rotatedLabelYOffset(ascent, descent, angleRad) - additionalOffset,
-        iconSin: variables.iconSizeExtraSmall * sinA,
-        labelSins: labelWidths.map((w) => w * sinA),
-        halfWidths: labelWidths.map((w) => w / 2),
-        cornerAnchorDX: labelWidths.map(() => -iconThirdSin),
-        cornerAnchorDY: labelWidths.map(() => iconThirdSin),
-        yMin90Offsets: labelWidths.map(() => padding),
-        yMax90Offsets: labelWidths.map((w) => w + padding),
-    };
-};
 
 type LineChartProps = CartesianChartProps & {
     /** Callback when a data point is pressed */
@@ -157,7 +137,6 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
         labelRotation,
         labelSkipInterval,
         chartBottom,
-        computeGeometry: computeLineLabelGeometry,
     });
 
     const handleChartBoundsChange = (bounds: ChartBounds) => {

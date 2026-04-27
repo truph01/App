@@ -2,9 +2,9 @@ import type {SkTypefaceFontProvider} from '@shopify/react-native-skia';
 import type {SharedValue} from 'react-native-reanimated';
 import {useSharedValue} from 'react-native-reanimated';
 import type {Scale} from 'victory-native';
-import {DIAGONAL_ANGLE_RADIAN_THRESHOLD} from '@components/Charts/constants';
+import {AXIS_LABEL_GAP, DIAGONAL_ANGLE_RADIAN_THRESHOLD} from '@components/Charts/constants';
 import type {LabelRotation} from '@components/Charts/types';
-import {getFontLineMetrics, isCursorOverChartLabel} from '@components/Charts/utils';
+import {getAdditionalOffset, getFontLineMetrics, isCursorOverChartLabel, rotatedLabelYOffset} from '@components/Charts/utils';
 import variables from '@styles/variables';
 import type {HitTestArgs} from './useChartInteractions';
 
@@ -34,28 +34,6 @@ type LabelHitGeometry = {
     yMax90Offsets: number[];
 };
 
-type ComputeGeometryInput = {
-    /** The ascent of the font */
-    ascent: number;
-
-    /** The descent of the font */
-    descent: number;
-
-    /** The sine of the angle */
-    sinA: number;
-
-    /** The angle in radians */
-    angleRad: number;
-
-    /** The widths of the labels */
-    labelWidths: number[];
-
-    /** The padding of the labels */
-    padding: number;
-};
-
-type ComputeGeometryFn = (input: ComputeGeometryInput) => LabelHitGeometry;
-
 type UseLabelHitTestingParams = {
     fontMgr: SkTypefaceFontProvider | null | undefined;
     fontSize: number;
@@ -64,13 +42,6 @@ type UseLabelHitTestingParams = {
     labelRotation: LabelRotation;
     labelSkipInterval: number;
     chartBottom: SharedValue<number>;
-
-    /**
-     * Chart-specific geometry factory.
-     * Receives font metrics, trig values, and per-label widths; returns the
-     * normalized geometry shape. Typically a module-level constant.
-     */
-    computeGeometry: ComputeGeometryFn;
 };
 
 /**
@@ -78,31 +49,38 @@ type UseLabelHitTestingParams = {
  *
  * Encapsulates angle conversion, pre-computed hit geometry, and the
  * isCursorOverLabel / findLabelCursorX worklets — all of which are identical
- * between bar and line chart except for how the hit geometry is computed.
+ * between bar and line charts.
  *
  * Label widths are accepted as a pre-computed array (from useChartLabelLayout)
  * so no Skia measurement happens here.
  *
- * Chart-specific geometry (45° corner anchor offsets, 90° vertical bounds) is supplied
- * via the `computeGeometry` callback, typically a module-level constant.
+ * Labels are right-aligned at the tick: the 45° parallelogram's upper-right corner is
+ * offset by (iconSize/3 * sinA) left and down, placing the box just below the axis line.
  */
-function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotation, labelSkipInterval, chartBottom, computeGeometry}: UseLabelHitTestingParams) {
+function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotation, labelSkipInterval, chartBottom}: UseLabelHitTestingParams) {
     const tickXPositions = useSharedValue<number[]>([]);
 
     const angleRad = (Math.abs(labelRotation) * Math.PI) / 180;
 
     const fontMetrics = fontMgr ? getFontLineMetrics(fontMgr, fontSize) : null;
 
-    /**
-     * Geometry for label hit-testing. The `computeGeometry` callback supplies the
-     * chart-specific differences (bar vs. line anchor offsets).
-     */
     let labelHitGeometry: LabelHitGeometry | null = null;
     if (fontMetrics) {
         const {ascent, descent} = fontMetrics;
         const sinA = Math.sin(angleRad);
         const padding = variables.iconSizeExtraSmall / 2;
-        labelHitGeometry = computeGeometry({ascent, descent, sinA, angleRad, labelWidths: truncatedLabelWidths, padding});
+        const iconThirdSin = (variables.iconSizeExtraSmall / 3) * sinA;
+        const additionalOffset = getAdditionalOffset(angleRad);
+        labelHitGeometry = {
+            labelYOffset: AXIS_LABEL_GAP + rotatedLabelYOffset(ascent, descent, angleRad) - additionalOffset,
+            iconSin: variables.iconSizeExtraSmall * sinA,
+            labelSins: truncatedLabelWidths.map((w) => w * sinA),
+            halfWidths: truncatedLabelWidths.map((w) => w / 2),
+            cornerAnchorDX: truncatedLabelWidths.map(() => -iconThirdSin),
+            cornerAnchorDY: truncatedLabelWidths.map(() => iconThirdSin),
+            yMin90Offsets: truncatedLabelWidths.map(() => padding),
+            yMax90Offsets: truncatedLabelWidths.map((w) => w + padding),
+        };
     }
 
     /**
@@ -183,4 +161,3 @@ function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotat
 }
 
 export default useLabelHitTesting;
-export type {ComputeGeometryFn, ComputeGeometryInput, LabelHitGeometry};
