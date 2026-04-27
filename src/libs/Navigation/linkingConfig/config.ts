@@ -990,9 +990,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.PAY_AND_DOWNGRADE]: {
                             path: ROUTES.WORKSPACE_PAY_AND_DOWNGRADE.route,
                         },
-                        [SCREENS.WORKSPACE.CATEGORIES_SETTINGS]: {
-                            path: ROUTES.WORKSPACE_CATEGORIES_SETTINGS.route,
-                        },
+                        [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_SETTINGS]: DYNAMIC_ROUTES.WORKSPACE_CATEGORIES_SETTINGS.path,
                         [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_IMPORT]: DYNAMIC_ROUTES.WORKSPACE_CATEGORIES_IMPORT.path,
                         [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_IMPORTED]: DYNAMIC_ROUTES.WORKSPACE_CATEGORIES_IMPORTED.path,
                         [SCREENS.WORKSPACE.WORKFLOWS_PAYER]: {
@@ -1016,9 +1014,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.OWNER_CHANGE_CHECK]: {
                             path: ROUTES.WORKSPACE_OWNER_CHANGE_CHECK.route,
                         },
-                        [SCREENS.WORKSPACE.CATEGORY_CREATE]: {
-                            path: ROUTES.WORKSPACE_CATEGORY_CREATE.route,
-                        },
+                        [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_CREATE]: DYNAMIC_ROUTES.WORKSPACE_CATEGORY_CREATE.path,
                         [SCREENS.WORKSPACE.CATEGORY_EDIT]: {
                             path: ROUTES.WORKSPACE_CATEGORY_EDIT.route,
                         },

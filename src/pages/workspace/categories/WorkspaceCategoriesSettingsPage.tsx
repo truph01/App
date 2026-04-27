@@ -29,12 +29,12 @@ import KeyboardUtils from '@src/utils/keyboard';
 
 type WorkspaceCategoriesSettingsPageProps = WithPolicyConnectionsProps &
     (
-        | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.CATEGORIES_SETTINGS>
+        | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_SETTINGS>
         | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS>
     );
 
 function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSettingsPageProps) {
-    const {policyID, backTo} = route.params;
+    const {policyID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const policyData = usePolicyData(policyID);
@@ -44,6 +44,7 @@ function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSet
     const [categoryID, setCategoryID] = useState<string>();
     const [groupID, setGroupID] = useState<string>();
     const isQuickSettingsFlow = route.name === SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS;
+    const backTo = isQuickSettingsFlow && 'backTo' in route.params ? route.params.backTo : undefined;
     const toggleSubtitle = isConnectedToAccounting && currentConnectionName ? translate('workspace.categories.needCategoryForExportToIntegration', currentConnectionName) : undefined;
 
     const updateWorkspaceRequiresCategory = useCallback(
