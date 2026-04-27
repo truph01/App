@@ -7,22 +7,23 @@
 # @tag    iou
 # @tag    navigation
 # @tag    perf
-# @span   ManualCreateExpenseSubmit
-# @span   ManualSubmitToDestinationVisible
-# @span   ManualCreateExpenseServerResponse
-# @span   ManualConfirmationMount
-# @span   ManualConfirmationListReady
-# @span   ManualConfirmationReceiptLoad
-# @span   ManualGeolocationWait
+# @tag    sentry-ManualCreateExpenseSubmit
+# @tag    sentry-ManualSubmitToDestinationVisible
+# @tag    sentry-ManualCreateExpenseServerResponse
+# @tag    sentry-ManualConfirmationMount
+# @tag    sentry-ManualConfirmationListReady
+# @tag    sentry-ManualConfirmationReceiptLoad
+# @tag    sentry-ManualGeolocationWait
 env AMOUNT=22
 env MERCHANT="Test Coffee"
 
-press "role=\"button\" label=\"Open actions menu\" || label=\"Open actions menu\""
+press "role=\"button\" label=\"Open actions menu\""
 press "role=\"button\" label=\"Create expense\" || label=\"Create expense\""
-press "role=\"group\" label=\"Manual\" || label=\"Manual\""
-fill "role=\"text-field\" editable=true || editable=true" "${AMOUNT}"
+press "label=\"Manual\""
+is exists "role=\"button\" label=\"Flip\""
+fill "editable=true" "${AMOUNT}"
 press "role=\"button\" label=\"Next\" || label=\"Next\""
 press "role=\"button\" label=\"Merchant\" || label=\"Merchant\""
 fill "role=\"text-field\" label=\"Merchant,\" editable=true || label=\"Merchant,\" editable=true" "${MERCHANT}"
 press "role=\"button\" label=\"Save\" || label=\"Save\""
-find "Create" "click"
+press "label=\"Create PLN 22.00 expense\" || label=\"Create expense\""
