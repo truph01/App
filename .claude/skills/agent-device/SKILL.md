@@ -27,4 +27,4 @@ Skip these only when the developer explicitly targets a non-dev build (e.g., sta
 
 ## Flows
 
-Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` snippets under [`flows/`](flows/README.md). Before manually tapping through a screen, follow the **Agent decision loop** in [`flows/README.md`](flows/README.md) - it covers discovery, `@pre`/`@param` filtering, replay, and `@post` verification.
+Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` snippets under [`flows/`](flows/README.md). Before manually tapping through a screen, follow the **Agent decision loop** in [`flows/README.md`](flows/README.md) - it covers discovery, `@pre` filtering, replay, and `@post` verification.

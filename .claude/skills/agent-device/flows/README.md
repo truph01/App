@@ -1,6 +1,6 @@
 # Flows
 
-Composable `.ad` snippets - one screen of work, callable as a unit. Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@param`, `@tag`) via `# @`-prefixed comment headers, so an agent can pick the right one from a snapshot.
+Composable `.ad` snippets - one screen of work, callable as a unit. Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@tag`) via `# @`-prefixed comment headers, so an agent can pick the right one from a snapshot.
 
 ## Agent decision loop
 
@@ -9,11 +9,10 @@ Before manually navigating, use this human-in-the-loop loop:
 1. `agent-device snapshot -i` - see current state.
 2. `grep -H '^# @' .claude/skills/agent-device/flows/*.ad` - full catalog in one read.
 3. For each candidate flow, run `agent-device is exists "<selector>"` per `@pre`. Keep flows where every `@pre` passes.
-4. Filter by `@param` against the user's stated intent (email, account_state, ...). Mismatch = skip.
-5. Rank survivors by goal closeness (`@post` overlap with the requested destination) and present top candidates to the user with a short "why this flow" note.
-6. Wait for user selection before replaying. **Auto-run is allowed only when there is exactly one survivor and its `@param` exactly matches an explicit user request** (for example, "sign me in as returning user").
-7. `agent-device replay <path>`.
-8. Verify each `@post` with `is exists`. On success, re-enter the loop only if the user's stated goal is not complete; otherwise stop and report completion. On failure, propose peer flow/manual fallback options and ask before continuing.
+4. Rank survivors by goal closeness (`@post` overlap with the requested destination) and present top candidates to the user with a short "why this flow" note.
+5. Wait for user selection before replaying. **Auto-run is allowed only when there is exactly one survivor and it is an unambiguous match for an explicit user request.**
+6. `agent-device replay <path>`.
+7. Verify each `@post` with `is exists`. On success, re-enter the loop only if the user's stated goal is not complete; otherwise stop and report completion. On failure, propose peer flow/manual fallback options and ask before continuing.
 
 ## Metadata header spec
 
@@ -24,14 +23,13 @@ Each flow starts with `# @key value` comment lines. The `.ad` parser treats `#` 
 | `@desc`  | 1           | One-line human summary.                                                                          |
 | `@pre`   | 1..N        | Selector that must resolve in the current snapshot. Multiple lines are ANDed.                    |
 | `@post`  | 1..N        | Selector expected after replay. Multiple lines are ANDed. Used for chaining + success.           |
-| `@param` | 0..N        | `name=value` baked-in constant. Value may be literal, wildcard (`*@x.com`), or regex (`/^.+$/`). |
 | `@tag`   | 0..N        | Free-form category (`auth`, `onboarding`, ...) or scoped (`sentry-<spanName>`).                  |
 
 Selector syntax matches the body: `id="..."`, `role="..." label="..."`, `text="..."`, `||` for fallbacks.
 
 ## Parametrization (`agent-device` v0.13.0+)
 
-Lift body literals to named variables. Decouples a flow's *intent* (`@param`) from its *interpolated values* (`env`).
+Lift body literals to named variables via `env` + `${VAR}` interpolation so values can be overridden at runtime without editing the file.
 
 | Construct          | Where                | Purpose                                                                          |
 | ------------------ | -------------------- | -------------------------------------------------------------------------------- |
@@ -53,9 +51,9 @@ agent-device replay <flow>.ad -e EMAIL=other@example.com
 - **No `open`, no `close`, no `context` header.** Caller owns lifecycle.
 - **No fixed `wait` calls.** `fill`/`press` resolve selectors with retry. Only add `wait <selector>` for real post-action blocks.
 - **Durable selectors.** Prefer `id=...` first, then `role=... label=...`, with `||` fallbacks. Avoid `@eN` refs.
-- **Every flow declares `@desc`, `@pre`, `@post`.** `@param` and `@tag` when applicable.
-- **Peers share `@pre` and differ on `@param`/`@post`.** One flow per narrow outcome is better than a mega-flow with conditional branches.
-- **`@param` and `env` go together for substituted values.** If a `@param` value is interpolated into the body, declare a matching `env` default with the same literal and reference it as `${VAR}`. `@param` is the routing hint; `env` is the runtime-overridable source of truth. Routing-only params (e.g. `account_state=new`) need no `env`.
+- **Every flow declares `@desc`, `@pre`, `@post`.** `@tag` when applicable.
+- **Peers share `@pre` and differ on `@post`.** One flow per narrow outcome is better than a mega-flow with conditional branches.
+- **Use `env` for substituted values.** If a literal is interpolated into the body, declare a matching `env` default and reference it as `${VAR}`.
 
 ## Recording a new flow
 
@@ -68,7 +66,7 @@ agent-device replay <flow>.ad -e EMAIL=other@example.com
 4. `agent-device close` - flushes the `.ad`.
 5. Edit the generated file:
    - Delete the `context` line, leading `open ... --relaunch`, trailing `close`, and eyeballing `wait`s.
-   - Add `@desc`, `@pre`, `@post`, `@param`, `@tag` headers.
+   - Add `@desc`, `@pre`, `@post`, `@tag` headers.
 6. Verify: pre-check from a matching state, replay, post-check.
 
 ## Maintenance

@@ -2,9 +2,6 @@
 # @pre    text="What’s your work email?"
 # @post   text="Home"
 # @post   role="button" label="Search"
-# @param  purpose=something_else
-# @param  first_name=Agent
-# @param  last_name=Device
 # @tag    onboarding
 env FIRST_NAME=Agent
 env LAST_NAME=Device
