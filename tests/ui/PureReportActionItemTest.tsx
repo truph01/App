@@ -112,7 +112,6 @@ describe('PureReportActionItem', () => {
                                 taskReport={undefined}
                                 linkedReport={undefined}
                                 iouReportOfLinkedReport={undefined}
-                                betas={undefined}
                             />
                         </PortalProvider>
                     </ScreenWrapper>
@@ -404,7 +403,6 @@ describe('PureReportActionItem', () => {
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
                                     reportMetadata={reportMetadata}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -458,7 +456,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -516,7 +513,6 @@ describe('PureReportActionItem', () => {
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
                                     reportMetadata={reportMetadata}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -566,7 +562,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -640,7 +635,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -701,7 +695,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -789,7 +782,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1104,7 +1096,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1288,7 +1279,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1385,7 +1375,6 @@ describe('PureReportActionItem', () => {
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
                                     isClosedExpenseReportWithNoExpenses
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1425,7 +1414,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1467,7 +1455,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1521,7 +1508,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1562,7 +1548,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1607,7 +1592,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1650,7 +1634,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1692,7 +1675,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1737,7 +1719,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1783,7 +1764,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1874,7 +1854,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1916,7 +1895,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -2500,7 +2478,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -2555,7 +2532,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                     reportNameValuePairsOrigin="harvest"
                                     reportNameValuePairsOriginalID="origReport123"
                                 />
@@ -2609,7 +2585,6 @@ describe('PureReportActionItem', () => {
                                     taskReport={undefined}
                                     linkedReport={undefined}
                                     iouReportOfLinkedReport={undefined}
-                                    betas={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
