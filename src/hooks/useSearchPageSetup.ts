@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {openSearch, search} from '@libs/actions/Search';
@@ -26,18 +26,6 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
     const hash = queryJSON?.hash;
     const shouldCalculateTotals = useSearchShouldCalculateTotals(currentSearchKey, hash, true);
 
-    // Refs for values that should be read inside fireSearchIfNeeded but not trigger re-creation.
-    // search() should fire once per query change, not re-trigger on every Onyx data update.
-    const currentSearchResultsRef = useRef(currentSearchResults);
-    const currentSearchKeyRef = useRef(currentSearchKey);
-    const shouldCalculateTotalsRef = useRef(shouldCalculateTotals);
-
-    useEffect(() => {
-        currentSearchResultsRef.current = currentSearchResults;
-        currentSearchKeyRef.current = currentSearchKey;
-        shouldCalculateTotalsRef.current = shouldCalculateTotals;
-    }, [currentSearchResults, currentSearchKey, shouldCalculateTotals]);
-
     // Clear selected transactions when navigating to a different search query
     const clearOnHashChange = useCallback(() => {
         if (hash === undefined) {
@@ -54,30 +42,34 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
 
     // Fire search() when the query changes (hash). This runs at the page level so the
     // API request starts in parallel with the skeleton, before Search mounts its 14+ useOnyx hooks.
-    const fireSearchIfNeeded = useCallback(() => {
+    // currentSearchResults is intentionally read but not in deps — search should fire once per
+    // query change, not re-trigger on every data update from Onyx.
+    useEffect(() => {
         if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
             return;
         }
-        if (isSearchDataLoaded(currentSearchResultsRef.current, queryJSON) || currentSearchResultsRef.current?.search?.isLoading) {
+        if (isSearchDataLoaded(currentSearchResults, queryJSON) || currentSearchResults?.search?.isLoading) {
             return;
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        search({
-            queryJSON,
-            searchKey: currentSearchKeyRef.current,
-            offset: 0,
-            shouldCalculateTotals: shouldCalculateTotalsRef.current,
-            isLoading: false,
-            skipWaitForWrites: shouldSkipWaitForWrites,
-        });
+        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
     }, [hash, isOffline, shouldUseLiveData, queryJSON]);
-
-    useEffect(fireSearchIfNeeded, [fireSearchIfNeeded]);
 
     // Re-fire search when the tab regains focus if data was cleared (e.g. after "Clear cache and restart").
     // The TabNavigator keeps this screen mounted with freezeOnBlur, so the useEffect above won't re-run
     // when the screen unfreezes because its deps haven't changed — this useFocusEffect fills that gap.
-    useFocusEffect(fireSearchIfNeeded);
+    const fireSearchOnFocus = useCallback(() => {
+        if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
+            return;
+        }
+        if (isSearchDataLoaded(currentSearchResults, queryJSON) || currentSearchResults?.search?.isLoading) {
+            return;
+        }
+        const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
+    }, [queryJSON, hash, shouldUseLiveData, isOffline, currentSearchResults, currentSearchKey, shouldCalculateTotals]);
+
+    useFocusEffect(fireSearchOnFocus);
 
     useEffect(() => {
         openSearch();
