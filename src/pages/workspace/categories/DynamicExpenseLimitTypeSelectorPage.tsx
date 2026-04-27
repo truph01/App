@@ -23,15 +23,16 @@ type DynamicExpenseLimitTypeSelectorPageProps = PlatformStackScreenProps<Setting
 
 function DynamicExpenseLimitTypeSelectorPage({
     route: {
-        params: {policyID},
+        params: {policyID, categoryName},
     },
 }: DynamicExpenseLimitTypeSelectorPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.EXPENSE_LIMIT_TYPE_SELECTOR.path);
     const [formDraft] = useOnyx(ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER_FORM_DRAFT);
+    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
 
-    const currentExpenseLimitType = formDraft?.expenseLimitType ?? CONST.POLICY.EXPENSE_LIMIT_TYPES.EXPENSE;
+    const currentExpenseLimitType = formDraft?.expenseLimitType ?? policyCategories?.[categoryName]?.expenseLimitType ?? CONST.POLICY.EXPENSE_LIMIT_TYPES.EXPENSE;
 
     const expenseLimitTypes = Object.values(CONST.POLICY.EXPENSE_LIMIT_TYPES).map((value) => ({
         value,
