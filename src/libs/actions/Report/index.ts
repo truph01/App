@@ -5420,17 +5420,18 @@ function resolveActionableMentionWhisper(
 
         participantsOptimisticData = {participants: participantsAfterInvitation};
 
-        // Onyx.METHOD.MERGE does a deep merge, so simply restoring the original participants
-        // won't remove keys that were added optimistically. We must explicitly null out each
-        // invitee's entry so Onyx deletes them on failure rollback.
-        const participantsRollback: Record<number, ReportParticipant | null> = {...report.participants};
+        // On failure, only null out the newly added invitee keys so Onyx removes them.
+        // We intentionally avoid spreading the full report.participants snapshot here because
+        // other participant changes (removals, role/preference updates) may happen while the
+        // request is in flight, and merging a stale snapshot would overwrite those changes.
+        const participantsRollback: Record<number, null> = {};
         for (const accountID of inviteeAccountIDs) {
             if (accountID in (report.participants ?? {})) {
                 continue;
             }
             participantsRollback[accountID] = null;
         }
-        participantsFailureData = {participants: participantsRollback as Participants};
+        participantsFailureData = {participants: participantsRollback as unknown as Participants};
     }
 
     // When the action belongs to a child report (e.g. a one-transaction thread), also update
@@ -5458,14 +5459,14 @@ function resolveActionableMentionWhisper(
 
         parentParticipantsOptimisticData = {participants: parentParticipantsAfterInvitation};
 
-        const parentParticipantsRollback: Record<number, ReportParticipant | null> = {...parentReport.participants};
+        const parentParticipantsRollback: Record<number, null> = {};
         for (const accountID of inviteeAccountIDs) {
             if (accountID in (parentReport.participants ?? {})) {
                 continue;
             }
             parentParticipantsRollback[accountID] = null;
         }
-        parentParticipantsFailureData = {participants: parentParticipantsRollback as Participants};
+        parentParticipantsFailureData = {participants: parentParticipantsRollback as unknown as Participants};
     }
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
