@@ -309,7 +309,7 @@ const DYNAMIC_ROUTES = {
         entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
     },
     WORKSPACE_CATEGORY_CREATE: {
-        path: 'new',
+        path: 'category-new',
         entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
     },
     WORKSPACE_INVITE: {
