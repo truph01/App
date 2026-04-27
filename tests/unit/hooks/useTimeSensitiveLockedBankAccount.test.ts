@@ -177,7 +177,7 @@ describe('useTimeSensitiveLockedBankAccount', () => {
         expect(result.current.lockedBankAccounts.at(0)?.policyName).toBeDefined();
     });
 
-    it('adds bankAccountID to the dedupe Set even when non-reimburser admin — personal widget is suppressed', async () => {
+    it('shows the personal widget when a non-reimburser admin has the same bankAccountID as a workspace account', async () => {
         await Onyx.merge(ONYXKEYS.ACCOUNT, {primaryLogin: PRIMARY_LOGIN});
 
         const bankAccountList: BankAccountList = {
@@ -201,10 +201,11 @@ describe('useTimeSensitiveLockedBankAccount', () => {
 
         const {result} = renderHook(() => useTimeSensitiveLockedBankAccount([policy]));
 
-        // Current behavior: dedupe Set is populated before reimburser check,
-        // so neither workspace nor personal widget renders.
-        // This test pins the current behavior so a fix shows up as an intentional change.
-        expect(result.current.lockedBankAccounts).toHaveLength(0);
+        // Option A fix: workspaceLockedBankAccountIDs.add(...) only runs after the reimburser check,
+        // so no workspace widget is shown but the personal widget is NOT suppressed.
+        expect(result.current.lockedBankAccounts).toHaveLength(1);
+        expect(result.current.lockedBankAccounts.at(0)?.policyName).toBeUndefined();
+        expect(result.current.lockedBankAccounts.at(0)?.key).toBe('personal-100');
     });
 
     it('handles null/undefined BANK_ACCOUNT_LIST without throwing', async () => {

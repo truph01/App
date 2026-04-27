@@ -28,12 +28,12 @@ function useTimeSensitiveLockedBankAccount(adminPolicies: Policy[] | undefined) 
             continue;
         }
 
-        workspaceLockedBankAccountIDs.add(achAccount.bankAccountID);
         const isCurrentUserReimburser = !!primaryLogin && achAccount.reimburser === primaryLogin;
         if (!isCurrentUserReimburser) {
             continue;
         }
 
+        workspaceLockedBankAccountIDs.add(achAccount.bankAccountID);
         lockedBankAccounts.push({
             key: `workspace-${policy.id}-${achAccount.bankAccountID}`,
             bankAccountID: achAccount.bankAccountID,
