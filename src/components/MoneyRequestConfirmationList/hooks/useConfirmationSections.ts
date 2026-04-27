@@ -11,12 +11,25 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 type MoneyRequestConfirmationListItem = (Participant & {keyForList: string}) | OptionData;
 
 type UseConfirmationSectionsParams = {
+    /** Whether the current IOU type is split */
     isTypeSplit: boolean;
+
+    /** Whether the "to" section should be hidden (used when adding directly to a report) */
     shouldHideToSection: boolean;
+
+    /** Whether participant rows should be interactive (allow editing the recipient) */
     canEditParticipant: boolean;
+
+    /** Payee participant (current user) */
     payeePersonalDetails: OnyxEntry<OnyxTypes.PersonalDetails> | CurrentUserPersonalDetails;
+
+    /** Pre-built split participant rows (from {@link useSplitParticipants}) */
     splitParticipants: MoneyRequestConfirmationListItem[];
+
+    /** Other participants the IOU is split between or sent to */
     selectedParticipants: Participant[];
+
+    /** Render-prop returning the split section header */
     getSplitSectionHeader: () => ReactElement;
 };
 

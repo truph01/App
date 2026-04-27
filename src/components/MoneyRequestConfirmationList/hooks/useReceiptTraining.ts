@@ -7,7 +7,10 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 
 type UseReceiptTrainingParams = {
+    /** Transaction whose receipt we're inspecting for product-training flags */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Participants from props, used to detect a Manager McTest recipient */
     selectedParticipantsProp: Participant[];
 };
 

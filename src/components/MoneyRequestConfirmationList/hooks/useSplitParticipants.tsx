@@ -17,15 +17,40 @@ import type {Participant} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 
 type UseSplitParticipantsParams = {
+    /** Whether the current IOU type is split */
     isTypeSplit: boolean;
+
+    /** Whether the split rows should be rendered as read-only (no editable inputs) */
     shouldShowReadOnlySplits: boolean;
+
+    /** The payee participant (current user) for the split */
     payeePersonalDetails: OnyxEntry<OnyxTypes.PersonalDetails> | CurrentUserPersonalDetails;
+
+    /** Other participants the IOU is split between */
     selectedParticipants: Participant[];
+
+    /** Transaction holding the per-participant split amounts */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Total IOU amount used to compute per-participant fallbacks */
     iouAmount: number;
+
+    /** Currency the IOU is being created in */
     iouCurrencyCode: string | undefined;
 };
 
+/**
+ * Builds the row data for the split-participants section of the Money Request
+ * confirmation flow.
+ *
+ * For read-only splits each row renders the per-participant amount as a Text element
+ * (computed from `transaction.comment.splits` or evenly divided across participants).
+ * For editable splits each row renders a {@link MoneyRequestAmountInput} that writes
+ * back to `transaction.splitShares` via {@link setIndividualShare}.
+ *
+ * Also exposes a `getSplitSectionHeader` callback that renders the section title and a
+ * Reset link (visible only when shares have been manually modified).
+ */
 function useSplitParticipants({isTypeSplit, shouldShowReadOnlySplits, payeePersonalDetails, selectedParticipants, transaction, iouAmount, iouCurrencyCode}: UseSplitParticipantsParams) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();

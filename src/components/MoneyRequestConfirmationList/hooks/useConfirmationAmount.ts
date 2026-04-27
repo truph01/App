@@ -9,18 +9,43 @@ import type * as OnyxTypes from '@src/types/onyx';
 type SubRates = NonNullable<NonNullable<NonNullable<OnyxTypes.Transaction['comment']>['customUnit']>['subRates']>;
 
 type UseConfirmationAmountParams = {
+    /** Transaction whose amount we're computing */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Total IOU amount entered by the user */
     iouAmount: number;
+
+    /** Currency the IOU is being created in */
     iouCurrencyCode: string | undefined;
+
+    /** Currently selected attendees, used to compute the per-attendee amount */
     iouAttendees: ReturnType<typeof getAttendees>;
+
+    /** Whether the transaction is a distance request */
     isDistanceRequest: boolean;
+
+    /** Whether the distance request route is still pending */
     isDistanceRequestWithPendingRoute: boolean;
+
+    /** Whether the distance amount needs to be (re)calculated this render */
     shouldCalculateDistanceAmount: boolean;
+
+    /** Pre-computed distance amount in the smallest currency unit */
     distanceRequestAmount: number;
+
+    /** Currency reported by the active mileage rate */
     distanceCurrency: string | undefined;
+
+    /** Whether the transaction is a per-diem request */
     isPerDiemRequest: boolean;
+
+    /** Currency the transaction had on the previous render, used to detect changes */
     prevCurrency: string | undefined;
+
+    /** Currency the transaction has on the current render */
     currency: string | undefined;
+
+    /** Per-diem sub-rates from the previous render, used to detect rate changes */
     prevSubRates: SubRates;
 };
 

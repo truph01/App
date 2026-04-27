@@ -14,39 +14,102 @@ import type {Attendee} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 
 type UseFormErrorManagementParams = {
+    /** Transaction being confirmed */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Report the IOU is being created on */
     transactionReport: OnyxEntry<OnyxTypes.Report>;
+
+    /** Current merchant value entered for the IOU */
     iouMerchant: string | undefined;
+
+    /** Currently selected category */
     iouCategory: string;
+
+    /** Currently selected attendees */
     iouAttendees: Attendee[];
+
+    /** Policy the IOU belongs to */
     policy: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Policy tag lists, used for tag validation */
     policyTags: OnyxEntry<OnyxTypes.PolicyTagLists>;
+
+    /** Policy categories, used for category validation */
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
+
+    /** Personal details of the current user */
     currentUserPersonalDetails: CurrentUserPersonalDetails;
+
+    /** Whether we are editing an existing split bill */
     isEditingSplitBill: boolean | undefined;
+
+    /** Whether this is a policy-expense chat (drives merchant requirement) */
     isPolicyExpenseChat: boolean;
+
+    /** Whether the IOU was started from a SmartScan flow */
     isScanRequest: boolean;
+
+    /** Whether the merchant field should be visible in the UI */
     shouldShowMerchant: boolean;
+
+    /** Whether SmartScan failed to read the receipt */
     hasSmartScanFailed: boolean | undefined;
+
+    /** Whether the user has already confirmed the split */
     didConfirmSplit: boolean;
+
+    /** Truthy when the route to the confirmation page has a known error */
     routeError: string | null | undefined;
+
+    /** Whether the current IOU type is split */
     isTypeSplit: boolean;
+
+    /** Whether splits are rendered read-only (suppresses some field errors) */
     shouldShowReadOnlySplits: boolean;
 };
 
 type UseFormErrorManagementResult = {
+    /** Current form-level error key, or '' when no error is set */
     formError: TranslationPaths | '';
+
+    /** Debounced version of `formError`, used for the visible message */
     debouncedFormError: TranslationPaths | '';
+
+    /** Setter for the form-level error key */
     setFormError: (value: TranslationPaths | '') => void;
+
+    /** Clears the current form error if it matches one of the provided keys */
     clearFormErrors: (errors: string[]) => void;
+
+    /** Whether per-field errors should be shown (only true when editing a split bill) */
     shouldDisplayFieldError: boolean;
+
+    /** Whether the merchant field is currently empty / partial */
     isMerchantEmpty: boolean;
+
+    /** Whether the merchant field is required for this flow */
     isMerchantRequired: boolean;
+
+    /** Whether the current merchant value passes validation */
     isMerchantFieldValid: boolean;
+
+    /** Whether a previously surfaced violation has been resolved */
     isViolationFixed: boolean;
+
+    /** User-visible error message derived from `routeError` and `debouncedFormError` */
     errorMessage: string | undefined;
 };
 
+/**
+ * Owns the form-error state for the Money Request confirmation flow.
+ *
+ * Holds a debounced form-error string, exposes setters/clearers used by the
+ * controllers, and derives merchant validity, the violation-fixed flag, and the user-
+ * visible error message. `shouldDisplayFieldError` is gated on edit-split-bill mode so
+ * field-level errors only render in that flow. `errorMessage` prefers `routeError`,
+ * then suppresses the missingAttendees violation when attendees aren't applicable.
+ */
 function useFormErrorManagement({
     transaction,
     transactionReport,

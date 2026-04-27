@@ -12,19 +12,46 @@ import type {Participant} from '@src/types/onyx/IOU';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 
 type BuildConfirmActionParams = {
+    /** IOU type being confirmed (submit / split / track / pay / invoice) */
     iouType: IOUType;
+
+    /** Policy the IOU belongs to, used to detect missing invoice company info */
     policy: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Transaction being confirmed, when one exists */
     transactionID: string | undefined;
+
+    /** Report the IOU is being created on */
     reportID: string;
+
+    /** Truthy when the route to the confirmation page has a known error */
     routeError: boolean | string | null | undefined;
+
+    /** Current form-level error key, or '' when no error is set */
     formError: TranslationPaths | '';
+
+    /** Participants selected for this IOU */
     selectedParticipants: Participant[];
+
+    /** Whether the current user is a delegate without permission to pay */
     isDelegateAccessRestricted: boolean;
+
+    /** Pure validator that returns the first failing translation key, or null on success */
     validate: (paymentType?: PaymentMethodType) => {errorKey: TranslationPaths; shouldSetDidConfirmSplit?: boolean} | {errorKey: null} | null;
+
+    /** Setter for the form-level error key */
     setFormError: (error: TranslationPaths | '') => void;
+
+    /** Setter for the "user already confirmed split" flag */
     setDidConfirmSplit: (value: boolean) => void;
+
+    /** Shows the modal that explains delegate-no-access restrictions */
     showDelegateNoAccessModal: () => void;
+
+    /** Caller-provided confirm handler for non-pay flows */
     onConfirm?: (selectedParticipants: Participant[]) => void;
+
+    /** Caller-provided send-money handler for pay flows */
     onSendMoney?: (paymentMethod: PaymentMethodType | undefined) => void;
 };
 

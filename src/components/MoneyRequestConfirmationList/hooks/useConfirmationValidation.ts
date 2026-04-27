@@ -20,31 +20,82 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 type ValidationResult = {errorKey: TranslationPaths; shouldSetDidConfirmSplit?: boolean} | {errorKey: null};
 
 type UseConfirmationValidationParams = {
+    /** Transaction being validated */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Report the IOU is being created on */
     transactionReport: OnyxEntry<OnyxTypes.Report>;
+
+    /** Transaction ID, used to scope tag/violation lookups */
     transactionID: string | undefined;
+
+    /** IOU type being confirmed (submit / split / track / pay / invoice) */
     iouType: IOUType;
+
+    /** Total IOU amount being validated */
     iouAmount: number;
+
+    /** Current merchant value entered for the IOU */
     iouMerchant: string | undefined;
+
+    /** Currently selected category */
     iouCategory: string;
+
+    /** Currency the IOU is being created in */
     iouCurrencyCode: string;
+
+    /** Currently selected attendees */
     iouAttendees: Attendee[];
+
+    /** Policy the IOU belongs to */
     policy: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Policy tag lists, used for tag validation */
     policyTags: OnyxEntry<OnyxTypes.PolicyTagLists>;
+
+    /** Pre-resolved tag lists for the policy (output of getTagLists) */
     policyTagLists: ReturnType<typeof getTagListsFn>;
+
+    /** Policy categories, used for category validation */
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
+
+    /** Participants selected for this IOU */
     selectedParticipants: Participant[];
+
+    /** Personal details of the current user */
     currentUserPersonalDetails: CurrentUserPersonalDetails;
+
+    /** Whether we are editing an existing split bill */
     isEditingSplitBill: boolean | undefined;
+
+    /** Whether the merchant field is required for this flow */
     isMerchantRequired: boolean | undefined;
+
+    /** Whether the merchant field is currently empty / partial */
     isMerchantEmpty: boolean;
+
+    /** Whether per-field errors should be shown */
     shouldDisplayFieldError: boolean;
+
+    /** Whether the tax section is enabled for this policy */
     shouldShowTax: boolean;
+
+    /** Whether the transaction is a distance request */
     isDistanceRequest: boolean;
+
+    /** Whether the distance request route is still pending */
     isDistanceRequestWithPendingRoute: boolean;
+
+    /** Whether the transaction is a per-diem request */
     isPerDiemRequest: boolean;
+
+    /** Whether the transaction is a time-tracking request */
     isTimeRequest: boolean;
+
+    /** Whether the new manual expense flow beta is enabled */
     isNewManualExpenseFlowEnabled: boolean;
+
+    /** Truthy when the route to the confirmation page has a known error */
     routeError: boolean | string | null | undefined;
 };
 

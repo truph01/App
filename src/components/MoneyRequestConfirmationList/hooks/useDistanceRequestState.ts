@@ -11,16 +11,40 @@ const mileageRateSelector = (policy: OnyxEntry<OnyxTypes.Policy>) => DistanceReq
 const policyDraftSelector = (draft: OnyxEntry<OnyxTypes.Policy>) => draft && ({customUnits: draft.customUnits} as OnyxEntry<OnyxTypes.Policy>);
 
 type UseDistanceRequestStateParams = {
+    /** Transaction being confirmed */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Policy the IOU belongs to */
     policy: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Policy ID, used to subscribe to the right policy / policy-draft Onyx keys */
     policyID: string | undefined;
+
+    /** Destination policy when moving an expense off a track-expense */
     policyForMovingExpenses: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Whether we're moving a transaction off a track-expense flow */
     isMovingTransactionFromTrackExpense: boolean;
+
+    /** Whether the transaction is a distance request */
     isDistanceRequest: boolean;
+
+    /** Current IOU amount, used to decide whether to seed the calculated amount */
     iouAmount: number;
+
+    /** Currency the IOU is being created in, used as a fallback when the rate has none */
     iouCurrencyCode: string;
 };
 
+/**
+ * Resolves the distance-request state for the Money Request confirmation flow.
+ *
+ * Subscribes (via narrow Onyx selectors) to the policy / policy-draft custom units to
+ * derive the default mileage rate, computes the distance, calculated amount, and
+ * active currency, and reports whether the route is still pending. Returns
+ * `shouldCalculateDistanceAmount`, which becomes true on first mount with a zero
+ * `iouAmount` so consumers can persist the calculated amount once.
+ */
 function useDistanceRequestState({
     transaction,
     policy,

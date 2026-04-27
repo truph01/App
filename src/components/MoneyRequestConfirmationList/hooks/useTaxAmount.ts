@@ -7,13 +7,28 @@ import CONST from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 
 type UseTaxAmountParams = {
+    /** Transaction whose tax we're computing */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** Policy that owns the active tax rates */
     policy: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Destination policy when moving an expense off a track-expense */
     policyForMovingExpenses: OnyxEntry<OnyxTypes.Policy> | undefined;
+
+    /** Whether the transaction is a distance request */
     isDistanceRequest: boolean;
+
+    /** Whether we're moving a transaction off a track-expense flow */
     isMovingTransactionFromTrackExpense: boolean;
+
+    /** ID of the selected mileage custom-unit rate (drives distance taxable amount) */
     customUnitRateID: string;
+
+    /** Distance value used to compute the taxable amount for distance requests */
     distance: number;
+
+    /** Currency the transaction had on the previous render, used to detect currency changes */
     previousTransactionCurrency: string | undefined;
 };
 

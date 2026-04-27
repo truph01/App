@@ -15,19 +15,46 @@ import ROUTES from '@src/ROUTES';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 
 type ConfirmationFooterContentProps = {
+    /** IOU type currently being confirmed (submit / split / track / pay / invoice) */
     iouType: IOUType;
+
+    /** Click handler invoked when the user taps the primary confirmation button */
     confirm: (params: PaymentActionParams) => void;
+
+    /** Currency the IOU is being created in, used by the Pay settlement button */
     iouCurrencyCode: string;
+
+    /** Policy the IOU belongs to, when applicable */
     policyID: string | undefined;
+
+    /** Report the IOU is being created on */
     reportID: string;
+
+    /** Whether the confirmation has already been submitted (locks the button) */
     isConfirmed: boolean | undefined;
+
+    /** Whether a confirmation request is currently in flight */
     isConfirming: boolean | undefined;
+
+    /** Whether a SmartScan receipt is still being processed */
     isLoadingReceipt: boolean;
+
+    /** Dropdown options for the primary CTA (e.g. Submit / Submit & Close) */
     splitOrRequestOptions: Array<DropdownOption<string>>;
+
+    /** Inline error message displayed above the button, if any */
     errorMessage: string | undefined;
+
+    /** Number of expenses that will be created on confirm (drives bulk copy) */
     expensesNumber: number;
+
+    /** Optional callback to show a confirm-modal before removing an expense */
     showRemoveExpenseConfirmModal: (() => void) | undefined;
+
+    /** Whether the product-training tooltip should anchor to the button */
     shouldShowProductTrainingTooltip: boolean;
+
+    /** Renders the product-training tooltip content */
     renderProductTrainingTooltip: () => React.ReactElement;
 };
 
@@ -128,8 +155,6 @@ function ConfirmationFooterContent({
         </>
     );
 }
-
-ConfirmationFooterContent.displayName = 'ConfirmationFooterContent';
 
 export default ConfirmationFooterContent;
 export type {ConfirmationFooterContentProps};
