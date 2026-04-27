@@ -305,7 +305,7 @@ const DYNAMIC_ROUTES = {
         entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
     },
     WORKSPACE_CATEGORIES_SETTINGS: {
-        path: 'settings',
+        path: 'categories-settings',
         entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
     },
     WORKSPACE_CATEGORY_CREATE: {
