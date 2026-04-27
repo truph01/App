@@ -1,4 +1,5 @@
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useOnyx from '@hooks/useOnyx';
 import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import {addComment} from '@userActions/Report';
@@ -14,6 +15,7 @@ function useAskConcierge() {
     const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
     const {timezone, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const openConciergeAnywhere = useOpenConciergeAnywhere();
+    const delegateAccountID = useDelegateAccountID();
 
     return (searchQuery: string) => {
         openConciergeAnywhere();
@@ -29,6 +31,7 @@ function useAskConcierge() {
             currentUserAccountID,
             shouldPlaySound: true,
             isInSidePanel: true,
+            delegateAccountID,
         });
     };
 }
