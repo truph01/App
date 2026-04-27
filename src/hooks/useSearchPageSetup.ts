@@ -60,7 +60,7 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         if (!queryJSON) {
             return;
         }
-        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true})
+        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
     });
 
     useEffect(() => {
