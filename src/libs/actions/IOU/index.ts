@@ -64,7 +64,7 @@ import {startSpan} from '@libs/telemetry/activeSpans';
 import {
     buildOptimisticTransaction,
     getAmount,
-    getCategoryTaxCodeAndAmount,
+    getCategoryTaxDetails,
     getCurrency,
     getDistanceInMeters,
     isDistanceRequest as isDistanceRequestTransactionUtils,
@@ -905,9 +905,9 @@ function setMoneyRequestCategory(transactionID: string, category: string, policy
         return;
     }
     const transaction = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`];
-    const {categoryTaxCode, categoryTaxAmount, categoryTaxValue} = getCategoryTaxCodeAndAmount(category, transaction, policy);
+    const {categoryTaxCode, categoryTaxAmount, categoryTaxValue} = getCategoryTaxDetails(category, transaction, policy);
     if (categoryTaxCode && categoryTaxAmount !== undefined) {
-        setMoneyRequestTaxRateValues(transactionID, {taxCode: categoryTaxCode, taxAmount: categoryTaxAmount, taxValue: categoryTaxValue ?? null});
+        setMoneyRequestTaxRateValues(transactionID, {taxCode: categoryTaxCode, taxAmount: categoryTaxAmount, taxValue: categoryTaxValue ? categoryTaxValue : null});
     }
 }
 

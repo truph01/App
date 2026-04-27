@@ -192,7 +192,7 @@ describe('TransactionUtils', () => {
         });
     });
 
-    describe('getCategoryTaxCodeAndAmount', () => {
+    describe('getCategoryTaxDetails', () => {
         it('should return the associated tax when the category matches the tax expense rules', () => {
             // Given a policy with tax expense rules associated with a category
             const category = 'Advertising';
@@ -204,7 +204,7 @@ describe('TransactionUtils', () => {
             const transaction = generateTransaction();
 
             // When retrieving the tax from the associated category
-            const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxCodeAndAmount(category, transaction, fakePolicy);
+            const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxDetails(category, transaction, fakePolicy);
 
             // Then it should return the associated tax code and amount
             expect(categoryTaxCode).toBe('id_TAX_RATE_1');
@@ -223,7 +223,7 @@ describe('TransactionUtils', () => {
             const transaction = generateTransaction();
 
             // When retrieving the tax from a category that is not associated with the tax expense rules
-            const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxCodeAndAmount(selectedCategory, transaction, fakePolicy);
+            const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxDetails(selectedCategory, transaction, fakePolicy);
 
             // Then it should return the default tax code and amount
             expect(categoryTaxCode).toBe('id_TAX_EXEMPT');
@@ -254,7 +254,7 @@ describe('TransactionUtils', () => {
             const transaction = generateTransaction();
 
             // When retrieving the tax from a category that is not associated with the tax expense rules
-            const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxCodeAndAmount(selectedCategory, transaction, fakePolicy);
+            const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxDetails(selectedCategory, transaction, fakePolicy);
 
             // Then it should return the default tax code and amount
             expect(categoryTaxCode).toBe('id_TAX_RATE_2');
@@ -276,7 +276,7 @@ describe('TransactionUtils', () => {
                 };
 
                 // When retrieving the tax from the associated category
-                const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxCodeAndAmount(category, transaction, fakePolicy);
+                const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxDetails(category, transaction, fakePolicy);
 
                 // Then it should return undefined for both the tax code and the tax amount
                 expect(categoryTaxCode).toBe(undefined);
@@ -294,7 +294,7 @@ describe('TransactionUtils', () => {
                 const transaction = generateTransaction();
 
                 // When retrieving the tax from a category
-                const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxCodeAndAmount(category, transaction, fakePolicy);
+                const {categoryTaxCode, categoryTaxAmount} = TransactionUtils.getCategoryTaxDetails(category, transaction, fakePolicy);
 
                 // Then it should return undefined for both the tax code and the tax amount
                 expect(categoryTaxCode).toBe(undefined);
