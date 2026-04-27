@@ -15,7 +15,6 @@ import type {GroupedTransactions} from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
 // Height constants
-const DESKTOP_HEIGHT = 28;
 const MOBILE_HEIGHT_WITH_CHECKBOX = 20;
 const MOBILE_HEIGHT_WITHOUT_CHECKBOX = 16;
 
@@ -78,16 +77,16 @@ function MoneyRequestReportGroupHeader({
     const shouldShowCheckbox = isSelectionModeEnabled || !shouldUseNarrowLayout;
 
     const conditionalHeight = useMemo(
-        () => (shouldUseNarrowLayout ? {height: shouldShowCheckbox ? MOBILE_HEIGHT_WITH_CHECKBOX : MOBILE_HEIGHT_WITHOUT_CHECKBOX} : {height: DESKTOP_HEIGHT, minHeight: DESKTOP_HEIGHT}),
+        () => (shouldUseNarrowLayout ? {height: shouldShowCheckbox ? MOBILE_HEIGHT_WITH_CHECKBOX : MOBILE_HEIGHT_WITHOUT_CHECKBOX} : {minHeight: variables.tableGroupRowHeight}),
         [shouldUseNarrowLayout, shouldShowCheckbox],
     );
 
     const textStyle = useMemo(
         () =>
             shouldUseNarrowLayout
-                ? {fontSize: variables.fontSizeLabel, lineHeight: shouldShowCheckbox ? MOBILE_HEIGHT_WITH_CHECKBOX : MOBILE_HEIGHT_WITHOUT_CHECKBOX}
-                : {fontSize: variables.fontSizeNormal, lineHeight: DESKTOP_HEIGHT},
-        [shouldUseNarrowLayout, shouldShowCheckbox],
+                ? [styles.textBold, {fontSize: variables.fontSizeLabel, lineHeight: shouldShowCheckbox ? MOBILE_HEIGHT_WITH_CHECKBOX : MOBILE_HEIGHT_WITHOUT_CHECKBOX}]
+                : [styles.labelStrong],
+        [shouldUseNarrowLayout, shouldShowCheckbox, styles],
     );
 
     const handleToggleSelection = useCallback(() => {
@@ -98,10 +97,10 @@ function MoneyRequestReportGroupHeader({
         () =>
             isDesktopTableLayout
                 ? [
-                      styles.searchTableRowHeight,
+                      {minHeight: variables.tableGroupRowHeight},
                       styles.justifyContentCenter,
                       styles.highlightBG,
-                      {paddingVertical: variables.tableGroupRowPaddingVertical},
+                      styles.pv2,
                       styles.ph3,
                       styles.borderBottom,
                       isSelected && {borderColor: theme.buttonHoveredBG},
@@ -126,13 +125,13 @@ function MoneyRequestReportGroupHeader({
                         />
                     )}
                     <Text
-                        style={[styles.textBold, textStyle, styles.flexShrink1, shouldShowCheckbox && styles.ml2]}
+                        style={[textStyle, styles.flexShrink1, shouldShowCheckbox && styles.ml2]}
                         numberOfLines={1}
                     >
                         {displayName}
                     </Text>
-                    <Text style={[styles.textBold, textStyle, styles.mh1]}>{CONST.DOT_SEPARATOR}</Text>
-                    <Text style={[styles.textBold, textStyle]}>{formattedAmount}</Text>
+                    <Text style={[textStyle, styles.mh1]}>{CONST.DOT_SEPARATOR}</Text>
+                    <Text style={[textStyle]}>{formattedAmount}</Text>
                 </View>
             </View>
         </OfflineWithFeedback>
