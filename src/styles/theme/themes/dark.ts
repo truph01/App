@@ -199,7 +199,7 @@ const darkTheme = {
         },
         unreported: {
             backgroundColor: colors.productDark400,
-            textColor: colors.productDark800,
+            textColor: colors.productDark900,
         },
     },
 
