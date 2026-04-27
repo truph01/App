@@ -1,85 +1,52 @@
 # Flows
 
-Composable `.ad` snippets for in-app navigation. A flow drops into an **already-open session** and advances state - it does not launch or close the app. Every flow declares machine-matchable metadata so an agent can pick the right one from a snapshot.
+Composable `.ad` snippets - one screen of work, callable as a unit. Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@param`, `@tag`) via `# @`-prefixed comment headers, so an agent can pick the right one from a snapshot.
 
-```bash
-agent-device replay .claude/skills/agent-device/flows/<name>.ad
-```
+## Agent decision loop
+
+Before manually navigating, use this human-in-the-loop loop:
+
+1. `agent-device snapshot -i` - see current state.
+2. `grep -H '^# @' .claude/skills/agent-device/flows/*.ad` - full catalog in one read.
+3. For each candidate flow, run `agent-device is exists "<selector>"` per `@pre`. Keep flows where every `@pre` passes.
+4. Filter by `@param` against the user's stated intent (email, account_state, ...). Mismatch = skip.
+5. Rank survivors by goal closeness (`@post` overlap with the requested destination) and present top candidates to the user with a short "why this flow" note.
+6. Wait for user selection before replaying. **Auto-run is allowed only when there is exactly one survivor and its `@param` exactly matches an explicit user request** (for example, "sign me in as returning user").
+7. `agent-device replay <path>`.
+8. Verify each `@post` with `is exists`. On success, re-enter the loop only if the user's stated goal is not complete; otherwise stop and report completion. On failure, propose peer flow/manual fallback options and ask before continuing.
 
 ## Metadata header spec
 
 Each flow starts with `# @key value` comment lines. The `.ad` parser treats `#` lines as no-ops, so headers cost nothing at replay time.
 
-| Field     | Cardinality | Value                                                                                   |
-| --------- | ----------- | --------------------------------------------------------------------------------------- |
-| `@desc`   | 1           | One-line human summary.                                                                 |
-| `@pre`    | 1..N        | Selector that must resolve in the current snapshot. Multiple lines are ANDed.           |
-| `@post`   | 1..N        | Selector expected after replay. Multiple lines are ANDed. Used for chaining + success.  |
-| `@param`  | 0..N        | `name=value` baked-in constant. Value may be literal, wildcard (`*@x.com`), or regex (`/^.+$/`). |
-| `@tag`    | 0..N        | Free-form category (`auth`, `onboarding`, `reports`, ...).                              |
+| Field    | Cardinality | Value                                                                                            |
+| -------- | ----------- | ------------------------------------------------------------------------------------------------ |
+| `@desc`  | 1           | One-line human summary.                                                                          |
+| `@pre`   | 1..N        | Selector that must resolve in the current snapshot. Multiple lines are ANDed.                    |
+| `@post`  | 1..N        | Selector expected after replay. Multiple lines are ANDed. Used for chaining + success.           |
+| `@param` | 0..N        | `name=value` baked-in constant. Value may be literal, wildcard (`*@x.com`), or regex (`/^.+$/`). |
+| `@tag`   | 0..N        | Free-form category (`auth`, `onboarding`, ...) or scoped (`sentry-<spanName>`).                  |
 
-Selector syntax matches the flow body: `id="..."`, `role="..." label="..."`, `text="..."`, with `||` inside a single value for fallbacks.
+Selector syntax matches the body: `id="..."`, `role="..." label="..."`, `text="..."`, `||` for fallbacks.
 
-## Parametrization
+## Parametrization (`agent-device` v0.13.0+)
 
-Body literals can be lifted into named variables via `env` directives + `${VAR}` interpolation (`agent-device` v0.13.0+). This decouples a flow's *intent* (declared in `@param`) from its *interpolated values* (declared in `env`), so values can be overridden at runtime without editing the file.
+Lift body literals to named variables. Decouples a flow's *intent* (`@param`) from its *interpolated values* (`env`).
 
-| Construct                  | Where                | Purpose                                          |
-| -------------------------- | -------------------- | ------------------------------------------------ |
-| `env KEY=VALUE`            | Header (after `# @`) | File-level default. Quote values with spaces or `||` chains: `env KEY="a || b"`. |
-| `${KEY}`                   | Body                 | Interpolation point. Resolves at replay time.    |
-| `${KEY:-fallback}`         | Body                 | Use `fallback` if `KEY` is unset.                |
-| `\${KEY}`                  | Body                 | Literal `${KEY}` (escape).                       |
+| Construct          | Where                | Purpose                                                                          |
+| ------------------ | -------------------- | -------------------------------------------------------------------------------- |
+| `env KEY=VALUE`    | Header (after `# @`) | File-level default. Quote values with spaces or `||` chains: `env KEY="a || b"`. |
+| `${KEY}`           | Body                 | Interpolation point. Resolves at replay time.                                    |
+| `${KEY:-fallback}` | Body                 | Use `fallback` if `KEY` is unset.                                                |
+| `\${KEY}`          | Body                 | Literal `${KEY}` (escape).                                                       |
 
 Resolution precedence (high to low): CLI `-e KEY=VALUE` (repeatable) > shell `AD_KEY=...` (auto-imported, prefix stripped) > file `env` > built-ins (`AD_PLATFORM`, `AD_SESSION`, `AD_FILENAME`, `AD_DEVICE`, `AD_ARTIFACTS`). Unresolved `${X}` errors with `file:line`.
-
-### Example
-
-```
-# @desc   Sign in with the shared agent-device test account; new-account branch.
-# @pre    role="textfield" label="Phone or email"
-# @pre    role="button" label="Continue"
-# @post   text="Welcome"
-# @post   role="button" label="Join"
-# @param  email=agent-device-testing@gmail.com
-# @param  account_state=new
-# @tag    auth
-env EMAIL=agent-device-testing@gmail.com
-
-fill "id=\"username\" || role=\"textfield\" label=\"Phone or email\" editable=true || label=\"Phone or email\" editable=true" "${EMAIL}"
-press "role=\"button\" label=\"Continue\" || label=\"Continue\""
-```
 
 Override at runtime without editing the file:
 
 ```bash
 agent-device replay <flow>.ad -e EMAIL=other@example.com
-AD_EMAIL=other@example.com agent-device replay <flow>.ad
 ```
-
-## Agent decision loop
-
-Before manually navigating, check the catalog. For each step of an in-app task:
-
-1. `agent-device snapshot -i` to see current state.
-2. Discover catalog: `grep -H '^# @' .claude/skills/agent-device/flows/*.ad`.
-3. Filter by `@pre`: for each flow, run `agent-device is exists '<selector>'` per `@pre`; keep flows where every pre passes.
-4. Filter by `@param`: compare each `@param` against the user's stated intent. Mismatch (wrong email, wrong account_state, ...) disqualifies the flow. Wildcards and regex values match as usual.
-5. Of the survivors, prefer one whose `@post` moves closer to the goal. Peer flows sharing the same `@pre` (e.g. `sign-in-new` vs `sign-in-returning`) differ only by `@param` and `@post`; try the param-matching one, fall back to the peer if the post-check fails.
-6. `agent-device replay <path>`.
-7. Run `agent-device is exists` per `@post`; if all pass, re-enter the loop for the next step. If any fails, either try the peer flow or proceed manually.
-
-## Index
-
-| Flow                      | `@param`                                  | Lands on                                  |
-| ------------------------- | ----------------------------------------- | ----------------------------------------- |
-| `sign-in-new.ad`          | `account_state=new`                       | Welcome / Join screen.                    |
-| `sign-in-returning.ad`    | `account_state=returning`                 | Home.                                     |
-| `complete-onboarding.ad`  | `purpose=something_else`, `first_name=Agent`, `last_name=Device` | Home.            |
-
-Headers are authoritative. The table above is a quick scan only.
-
-**Known gap:** between `sign-in-new.ad` (lands at Welcome/Join) and `complete-onboarding.ad` (starts at onboarding step 1, "What's your work email?") there is one manual tap on the Join button. Chain as: `sign-in-new.ad` -> manual `press 'role="button" label="Join"'` -> `complete-onboarding.ad`. Add a `join-new-account.ad` one-press flow if this becomes routine.
 
 ## Authoring rules
 
@@ -88,7 +55,7 @@ Headers are authoritative. The table above is a quick scan only.
 - **Durable selectors.** Prefer `id=...` first, then `role=... label=...`, with `||` fallbacks. Avoid `@eN` refs.
 - **Every flow declares `@desc`, `@pre`, `@post`.** `@param` and `@tag` when applicable.
 - **Peers share `@pre` and differ on `@param`/`@post`.** One flow per narrow outcome is better than a mega-flow with conditional branches.
-- **`@param` and `env` go together for substituted values.** If a `@param` value is interpolated into the body, declare a matching `env` default with the same literal and reference it as `${VAR}`. `@param` keeps the routing/filtering hint for the agent decision loop; `env` is the runtime-overridable source of truth. Routing-only params (e.g. `account_state=new`) need no `env`.
+- **`@param` and `env` go together for substituted values.** If a `@param` value is interpolated into the body, declare a matching `env` default with the same literal and reference it as `${VAR}`. `@param` is the routing hint; `env` is the runtime-overridable source of truth. Routing-only params (e.g. `account_state=new`) need no `env`.
 
 ## Recording a new flow
 

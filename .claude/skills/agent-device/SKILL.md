@@ -8,6 +8,8 @@ allowed-tools: Bash(agent-device *) Bash(npm root *)
 
 ## Pre-flight
 
+<!-- The line below compares the installed `agent-device --version` to the required minimum 0.13.0 -->
+
 `agent-device` version check: !`R=0.13.0; V=$(agent-device --version 2>/dev/null); [ -n "$V" ] && [ "$(printf '%s\n%s\n' "$R" "$V" | sort -V | head -1)" = "$R" ] && echo "OK ($V)" || echo "FAIL (need v$R+, got: ${V:-not installed})"`
 
 > If the version check above shows `FAIL`, **STOP** and instruct the developer: `npm install -g agent-device@latest`.
@@ -25,14 +27,4 @@ Skip these only when the developer explicitly targets a non-dev build (e.g., sta
 
 ## Flows
 
-Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` snippets under [`flows/`](flows/README.md). Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@param`, `@tag`) via `# @`-prefixed comment headers. Before manually tapping through a screen, check the catalog:
-
-1. `agent-device snapshot -i` - see current state.
-2. `grep -H '^# @' .claude/skills/agent-device/flows/*.ad` - full catalog in one read.
-3. For each candidate flow, run `agent-device is exists '<selector>'` per `@pre`. Keep only flows where every `@pre` passes.
-4. Filter by `@param` against the user's stated intent (email, account_state, ...). Mismatch = skip.
-5. Prefer a survivor whose `@post` moves closer to the user's goal. For peer flows that share `@pre` (e.g. `sign-in-new` vs `sign-in-returning`), pick the one whose `@param` matches user context; fall back to the peer if the post-check fails.
-6. `agent-device replay <path>`.
-7. Verify each `@post` with `is exists`. On success, re-enter the loop for the next step. On failure, try the peer flow or proceed manually.
-
-See [`flows/README.md`](flows/README.md) for the full header spec and authoring rules.
+Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` snippets under [`flows/`](flows/README.md). Before manually tapping through a screen, follow the **Agent decision loop** in [`flows/README.md`](flows/README.md) - it covers discovery, `@pre`/`@param` filtering, replay, and `@post` verification.
