@@ -110,8 +110,6 @@ describe('PureReportActionItem', () => {
                                 index={0}
                                 isFirstVisibleReportAction={false}
                                 taskReport={undefined}
-                                linkedReport={undefined}
-                                iouReportOfLinkedReport={undefined}
                             />
                         </PortalProvider>
                     </ScreenWrapper>
@@ -400,8 +398,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                     reportMetadata={reportMetadata}
                                 />
                             </PortalProvider>
@@ -454,8 +450,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -510,8 +504,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                     reportMetadata={reportMetadata}
                                 />
                             </PortalProvider>
@@ -560,8 +552,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -633,8 +623,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -693,8 +681,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -780,8 +766,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1094,8 +1078,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1277,8 +1259,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1372,8 +1352,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                     isClosedExpenseReportWithNoExpenses
                                 />
                             </PortalProvider>
@@ -1412,8 +1390,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1453,8 +1429,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1506,8 +1480,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1546,8 +1518,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1590,8 +1560,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1632,8 +1600,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1673,8 +1639,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1717,8 +1681,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1762,8 +1724,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1852,8 +1812,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -1893,8 +1851,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -2476,8 +2432,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -2495,6 +2449,23 @@ describe('PureReportActionItem', () => {
             await waitForBatchedUpdatesWithAct();
 
             expect(screen.getByLabelText(translateLocal('iou.viewDetails'))).toBeOnTheScreen();
+        });
+
+        it('isTripPreview renders TripRoomPreview with live reportName from Onyx', async () => {
+            await act(async () => {
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}tripReportLive`, {
+                    reportID: 'tripReportLive',
+                    reportName: 'Paris Trip 2026',
+                    currency: 'USD',
+                });
+            });
+            await waitForBatchedUpdatesWithAct();
+
+            const action = createReportAction(CONST.REPORT.ACTIONS.TYPE.TRIP_PREVIEW, {linkedReportID: 'tripReportLive'});
+            renderItemWithAction(action);
+            await waitForBatchedUpdatesWithAct();
+
+            expect(screen.getByText('Paris Trip 2026')).toBeOnTheScreen();
         });
 
         it('isCreatedTaskReportAction renders TaskPreview', async () => {
@@ -2530,8 +2501,6 @@ describe('PureReportActionItem', () => {
                                     index={0}
                                     isFirstVisibleReportAction={false}
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                     reportNameValuePairsOrigin="harvest"
                                     reportNameValuePairsOriginalID="origReport123"
                                 />
@@ -2583,8 +2552,6 @@ describe('PureReportActionItem', () => {
                                     isFirstVisibleReportAction={false}
                                     isThreadReportParentAction
                                     taskReport={undefined}
-                                    linkedReport={undefined}
-                                    iouReportOfLinkedReport={undefined}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>

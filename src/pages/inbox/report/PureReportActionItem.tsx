@@ -54,7 +54,6 @@ import {getLatestErrorMessageField, isReceiptError} from '@libs/ErrorUtils';
 import focusComposerWithDelay from '@libs/focusComposerWithDelay';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isReportMessageAttachment} from '@libs/isReportMessageAttachment';
-import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {ReportsSplitNavigatorParamList} from '@libs/Navigation/types';
 import Permissions from '@libs/Permissions';
@@ -119,7 +118,6 @@ import {hideEmojiPicker, isActive} from '@userActions/EmojiPickerAction';
 import {expandURLPreview} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
@@ -216,12 +214,6 @@ type PureReportActionItemProps = {
 
     /** The task report associated with this action, if any */
     taskReport: OnyxEntry<OnyxTypes.Report>;
-
-    /** The linked report associated with this action, if any */
-    linkedReport: OnyxEntry<OnyxTypes.Report>;
-
-    /** The iou report associated with the linked report, if any */
-    iouReportOfLinkedReport: OnyxEntry<OnyxTypes.Report>;
 
     /** Linked transaction route error */
     linkedTransactionRouteError?: Errors;
@@ -333,8 +325,6 @@ function PureReportActionItem({
     draftMessage,
     iouReport,
     taskReport,
-    linkedReport,
-    iouReportOfLinkedReport,
     linkedTransactionRouteError,
     parentReport,
     personalDetails,
@@ -711,8 +701,6 @@ function PureReportActionItem({
             children = (
                 <TripRoomPreview
                     action={action}
-                    chatReport={linkedReport}
-                    iouReport={iouReportOfLinkedReport}
                     isHovered={hovered}
                     contextMenuAnchor={popoverAnchorRef.current}
                     containerStyles={displayAsGroup ? [] : [styles.mt2]}

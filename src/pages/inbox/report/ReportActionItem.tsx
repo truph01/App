@@ -15,7 +15,7 @@ import type {PersonalDetailsList, Transaction} from '@src/types/onyx';
 import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
 
-type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'linkedReport' | 'iouReportOfLinkedReport' | 'personalPolicyID'> & {
+type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'personalPolicyID'> & {
     /** Whether to show the draft message or not */
     shouldShowDraftMessage?: boolean;
 
@@ -53,10 +53,6 @@ function ReportActionItem({
 
     const taskReportID = originalMessage && 'taskReportID' in originalMessage ? originalMessage.taskReportID : undefined;
     const [taskReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${taskReportID}`);
-    const linkedReportID = originalMessage && 'linkedReportID' in originalMessage ? originalMessage.linkedReportID : undefined;
-    const [linkedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${linkedReportID}`);
-    const iouReportOfLinkedReportID = linkedReport && 'iouReportID' in linkedReport ? linkedReport.iouReportID : undefined;
-    const [iouReportOfLinkedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportOfLinkedReportID}`);
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
@@ -83,8 +79,6 @@ function ReportActionItem({
             draftMessage={draftMessage}
             iouReport={iouReport}
             taskReport={taskReport}
-            linkedReport={linkedReport}
-            iouReportOfLinkedReport={iouReportOfLinkedReport}
             linkedTransactionRouteError={linkedTransactionRouteError}
             parentReport={parentReport}
             personalDetails={personalDetails}
