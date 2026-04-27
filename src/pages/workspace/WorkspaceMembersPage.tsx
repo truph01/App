@@ -916,7 +916,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             )}
             {(shouldShowRoleFilter || shouldShowSearchBar) && (
                 <View style={styles.flexColumn}>
-                    <View style={[styles.mh5, styles.gap3, styles.mb5, shouldShowCompactFilterSearchRow && styles.alignItemsCenter, shouldUseNarrowLayout && !shouldShowCompactFilterSearchRow ? styles.flexColumn : styles.flexRow]}>
+                    <View style={[styles.mh5, styles.gap3, styles.mb5, styles.flexRow, shouldShowCompactFilterSearchRow && styles.alignItemsCenter]}>
                         {!!roleFilterDropdown && (
                             <View
                                 style={[
