@@ -46,7 +46,6 @@ function DebugReportActionPage({
     const [reportAction] = useOnyx(
         `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`,
         {
-            canEvict: false,
             selector: getReportActionSelector,
         },
         [getReportActionSelector],
