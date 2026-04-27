@@ -1,6 +1,6 @@
 # Flows
 
-Composable `.ad` snippets - one screen of work, callable as a unit. Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@tag`) via `# @`-prefixed comment headers, so an agent can pick the right one from a snapshot.
+Composable `.ad` snippets - bounded units of work. A flow may span one or multiple screens as long as it represents a coherent, reusable action with clear start (`@pre`) and completion (`@post`) checkpoints. Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@tag`) via `# @`-prefixed comment headers, so an agent can pick the right one from a snapshot.
 
 ## Agent decision loop
 
@@ -52,6 +52,7 @@ agent-device replay <flow>.ad -e EMAIL=other@example.com
 - **No fixed `wait` calls.** `fill`/`press` resolve selectors with retry. Only add `wait <selector>` for real post-action blocks.
 - **Durable selectors.** Prefer `id=...` first, then `role=... label=...`, with `||` fallbacks. Avoid `@eN` refs.
 - **Every flow declares `@desc`, `@pre`, `@post`.** `@tag` when applicable.
+- **Keep scope coherent, not artificially tiny.** Flows can span multiple screens when that sequence is the reusable intent (for example "create and submit manual expense").
 - **Peers share `@pre` and differ on `@post`.** One flow per narrow outcome is better than a mega-flow with conditional branches.
 - **Use `env` for substituted values.** If a literal is interpolated into the body, declare a matching `env` default and reference it as `${VAR}`.
 
