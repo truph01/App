@@ -44,7 +44,7 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
     // API request starts in parallel with the skeleton, before Search mounts its 14+ useOnyx hooks.
     // currentSearchResults is intentionally read but not in deps — search should fire once per
     // query change, not re-trigger on every data update from Onyx.
-    useEffect(() => {
+    const fireSearchIfNeeded = useCallback(() => {
         if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
             return;
         }
@@ -53,7 +53,15 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
+        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     }, [hash, isOffline, shouldUseLiveData, queryJSON]);
+
+    useEffect(fireSearchIfNeeded, [fireSearchIfNeeded]);
+
+    // Re-fire search when the tab regains focus if data was cleared (e.g. after "Clear cache and restart").
+    // The TabNavigator keeps this screen mounted with freezeOnBlur, so the useEffect above won't re-run
+    // when the screen unfreezes because its deps haven't changed — this useFocusEffect fills that gap.
+    useFocusEffect(fireSearchIfNeeded);
 
     useEffect(() => {
         openSearch();
