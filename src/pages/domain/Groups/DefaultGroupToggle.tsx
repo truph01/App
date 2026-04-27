@@ -1,10 +1,4 @@
-import {
-    defaultSecurityGroupIDSelector,
-    domainNameSelector,
-    domainSecurityGroupSettingErrorsSelector,
-    domainSecurityGroupSettingPendingActionSelector,
-    selectGroupByID,
-} from '@selectors/Domain';
+import {defaultSecurityGroupIDSelector, domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
@@ -26,9 +20,6 @@ function DefaultGroupToggle({domainAccountID, groupID, groupName}: DefaultGroupT
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
-        selector: domainNameSelector,
-    });
     const [defaultSecurityGroupID] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: defaultSecurityGroupIDSelector,
     });
