@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import SelectionList from '@components/SelectionList';
 import UserSelectionListItem from '@components/SelectionList/ListItem/UserSelectionListItem';
@@ -14,7 +15,6 @@ import useWindowDimensions from '@hooks/useWindowDimensions';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
 import {getParticipantsOption} from '@libs/OptionsListUtils';
 import type {OptionData} from '@libs/ReportUtils';
-import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import BasePopup from './BasePopup';
@@ -22,7 +22,7 @@ import type {ModalHeadingRef} from './DropdownButton';
 
 type UserSelectPopupProps = {
     /** The popup label */
-    label?: string;
+    label: string;
 
     /** The currently selected users */
     value: string[];
@@ -50,7 +50,8 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
     const {translate} = useLocalize();
     const personalDetails = usePersonalDetails();
     const {windowHeight} = useWindowDimensions();
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
     const shouldFocusInputOnScreenFocus = canFocusInputOnScreenFocus();
@@ -164,16 +165,6 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
     }, [debouncedSearchTerm, selectedOptionsForDisplay.length, availableOptions.personalDetails.length, availableOptions.recentReports.length]);
 
     const shouldShowSearchInput = isSearchable ?? totalOptionsCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
-    const headingHeightOffset = shouldUseNarrowLayout && !!label ? variables.lineHeightLarge + 16 : 0;
-    const popoverHeightStyle = styles.getCommonSelectionListPopoverHeight(
-        listData.length || 1,
-        variables.optionRowHeightCompact,
-        windowHeight,
-        shouldUseNarrowLayout,
-        isInLandscapeMode,
-        shouldShowSearchInput,
-    );
-
     const textInputOptions = useMemo(
         () =>
             shouldShowSearchInput
@@ -195,26 +186,32 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_USER}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_USER}
-            style={[
-                popoverHeightStyle,
-                headingHeightOffset > 0 && {
-                    height: popoverHeightStyle.height + headingHeightOffset,
-                },
-            ]}
             modalHeadingRef={modalHeadingRef}
         >
-            <SelectionList
-                data={listData}
-                ref={selectionListRef}
-                textInputOptions={textInputOptions}
-                canSelectMultiple
-                ListItem={UserSelectionListItem}
-                onSelectRow={selectUser}
-                isLoadingNewOptions={isLoadingNewOptions}
-                shouldShowLoadingPlaceholder={!areOptionsInitialized}
-                onEndReached={onListEndReached}
-                style={{contentContainerStyle: [styles.pb0]}}
-            />
+            <View
+                style={[
+                    styles.getSelectionListPopoverHeight({
+                        itemCount: listData.length || 1,
+                        windowHeight,
+                        isInLandscapeMode,
+                        hasTitle: isSmallScreenWidth,
+                        isSearchable: shouldShowSearchInput,
+                    }),
+                ]}
+            >
+                <SelectionList
+                    data={listData}
+                    ref={selectionListRef}
+                    textInputOptions={textInputOptions}
+                    canSelectMultiple
+                    ListItem={UserSelectionListItem}
+                    onSelectRow={selectUser}
+                    isLoadingNewOptions={isLoadingNewOptions}
+                    shouldShowLoadingPlaceholder={!areOptionsInitialized}
+                    onEndReached={onListEndReached}
+                    style={{contentContainerStyle: [styles.pb0]}}
+                />
+            </View>
         </BasePopup>
     );
 }

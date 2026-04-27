@@ -115,6 +115,8 @@ function MultiSelectPopup<T extends string>({label, loading, value, items, close
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'MultiSelectPopupDataLoading'};
 
+    const hasTitle = isSmallScreenWidth && !!label;
+
     return (
         <BasePopup
             label={label}
@@ -124,7 +126,7 @@ function MultiSelectPopup<T extends string>({label, loading, value, items, close
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_MULTI_SELECT}
             modalHeadingRef={modalHeadingRef}
         >
-            <View style={[styles.getSelectionListPopoverHeight(listData.length || 1, windowHeight, isSearchable ?? false, isInLandscapeMode, isSmallScreenWidth)]}>
+            <View style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle, isSearchable})]}>
                 {!!loading && (
                     <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter]}>
                         <ActivityIndicator

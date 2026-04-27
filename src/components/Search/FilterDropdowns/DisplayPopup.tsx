@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
+import type {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import ScrollView from '@components/ScrollView';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -41,7 +41,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort, modalAcce
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {shouldUseNarrowLayout, isLargeScreenWidth, isSmallScreenWidth} = useResponsiveLayout();
+    const {isLargeScreenWidth, isSmallScreenWidth} = useResponsiveLayout();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Columns']);
     const [searchAdvancedFilters = getEmptyObject<SearchAdvancedFiltersForm>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const firstDisplayItemRef = useRef<View | null>(null);
@@ -105,7 +105,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort, modalAcce
         const viewValue = searchAdvancedFilters[CONST.SEARCH.SYNTAX_ROOT_KEYS.VIEW];
 
         return (
-            <View style={[!shouldUseNarrowLayout && styles.pv4]}>
+            <ScrollView contentContainerStyle={[styles.pv4]}>
                 <MenuItemWithTopDescription
                     ref={handleFirstDisplayItemRef}
                     shouldShowRightIcon
@@ -161,7 +161,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort, modalAcce
                         sentryLabel={CONST.SENTRY_LABEL.SEARCH.COLUMNS_BUTTON}
                     />
                 )}
-            </View>
+            </ScrollView>
         );
     }
 
@@ -196,46 +196,35 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort, modalAcce
         setSelectedDisplayFilter(null);
     };
 
-    const subtitle = {
-        [CONST.SEARCH.SYNTAX_ROOT_KEYS.SORT_BY]: translate('search.display.sortBy'),
-        [CONST.SEARCH.SYNTAX_ROOT_KEYS.SORT_ORDER]: translate('search.display.sortOrder'),
-        [CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY]: translate('search.display.groupBy'),
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.GROUP_CURRENCY]: translate('common.groupCurrency'),
-        [CONST.SEARCH.SYNTAX_ROOT_KEYS.VIEW]: translate('search.view.label'),
-        [CONST.SEARCH.SYNTAX_ROOT_KEYS.LIMIT]: translate('search.display.limitResults'),
-    };
-
-    let subPopup: React.JSX.Element | null = null;
-
     switch (selectedDisplayFilter) {
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.SORT_BY:
-            subPopup = (
+            return (
                 <SortByPopup
                     searchResults={searchResults}
                     queryJSON={queryJSON}
                     groupBy={groupBy}
                     onSort={onSort}
                     onSortOrderPress={() => setSelectedDisplayFilter(CONST.SEARCH.SYNTAX_ROOT_KEYS.SORT_ORDER)}
+                    onBackButtonPress={goBack}
                     closeOverlay={closeOverlay}
                 />
             );
-            break;
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.SORT_ORDER:
-            subPopup = (
+            return (
                 <SortOrderPopup
                     queryJSON={queryJSON}
                     onSort={onSort}
+                    onBackButtonPress={goBack}
                     closeOverlay={closeOverlay}
                 />
             );
-            break;
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY:
-            subPopup = (
+            return (
                 <GroupByPopup
-                    style={styles.p0}
                     sections={groupBySections}
                     value={groupBy}
                     closeOverlay={closeOverlay}
+                    onBackButtonPress={goBack}
                     onChange={(item) => {
                         const newValue = item?.value;
                         if (!newValue) {
@@ -246,53 +235,39 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort, modalAcce
                     }}
                 />
             );
-            break;
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.GROUP_CURRENCY:
-            subPopup = (
+            return (
                 <GroupCurrencyPopup
                     onChange={(item) => updateFilterForm({groupCurrency: item?.value})}
+                    onBackButtonPress={goBack}
                     closeOverlay={closeOverlay}
                 />
             );
-            break;
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.VIEW:
-            subPopup = (
+            return (
                 <SingleSelectPopup
-                    style={styles.p0}
                     items={viewOptions}
                     value={view}
+                    label={translate('search.view.label')}
+                    onBackButtonPress={goBack}
                     closeOverlay={closeOverlay}
                     onChange={(item) => updateFilterForm({view: item?.value ?? CONST.SEARCH.VIEW.TABLE})}
                 />
             );
-            break;
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.LIMIT:
-            subPopup = (
+            return (
                 <TextInputPopup
-                    style={styles.pv0}
                     placeholder={translate('search.filters.limit')}
                     defaultValue={limitValue}
+                    label={translate('search.display.limitResults')}
+                    onBackButtonPress={goBack}
                     closeOverlay={closeOverlay}
                     onChange={(value) => updateFilterForm({limit: value})}
                 />
             );
-            break;
         default:
-            break;
+            return null;
     }
-
-    return (
-        <View style={[!shouldUseNarrowLayout && styles.pv4]}>
-            <HeaderWithBackButton
-                backButtonRef={backButtonRef}
-                shouldDisplayHelpButton={false}
-                style={[styles.h10, styles.pv1, styles.mb2]}
-                subtitle={subtitle[selectedDisplayFilter]}
-                onBackButtonPress={goBack}
-            />
-            {subPopup}
-        </View>
-    );
 }
 
 export default DisplayPopup;
