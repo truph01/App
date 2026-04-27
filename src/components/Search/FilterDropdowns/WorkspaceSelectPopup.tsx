@@ -6,7 +6,6 @@ import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
-import type {ModalHeadingRef} from './DropdownButton';
 import type {MultiSelectItem} from './MultiSelectPopup';
 import MultiSelectPopup from './MultiSelectPopup';
 
@@ -14,14 +13,13 @@ type WorkspaceSelectPopupProps = {
     policyIDQuery: string[] | undefined;
     updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
     closeOverlay: () => void;
-    modalHeadingRef?: ModalHeadingRef;
 };
 
 function filterPolicyIDSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) {
     return searchAdvancedFiltersForm?.policyID;
 }
 
-function WorkspaceSelectPopup({policyIDQuery, updateFilterForm, closeOverlay, modalHeadingRef}: WorkspaceSelectPopupProps) {
+function WorkspaceSelectPopup({policyIDQuery, updateFilterForm, closeOverlay}: WorkspaceSelectPopupProps) {
     const {translate} = useLocalize();
     const {workspaces, shouldShowWorkspaceSearchInput} = useAdvancedSearchFilters();
     const [policyID] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
@@ -44,7 +42,6 @@ function WorkspaceSelectPopup({policyIDQuery, updateFilterForm, closeOverlay, mo
     return (
         <MultiSelectPopup
             label={translate('workspace.common.workspace')}
-            modalHeadingRef={modalHeadingRef}
             items={workspaceOptions}
             value={selectedWorkspaceOptions}
             closeOverlay={closeOverlay}

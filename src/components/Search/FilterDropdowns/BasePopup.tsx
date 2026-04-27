@@ -6,7 +6,6 @@ import Text from '@components/Text';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import ActionButtons from './ActionButtons';
-import type {ModalHeadingRef} from './DropdownButton';
 
 type BasePopupProps = React.PropsWithChildren & {
     label?: string;
@@ -16,10 +15,9 @@ type BasePopupProps = React.PropsWithChildren & {
     onApply: () => void;
     onReset: () => void;
     onBackButtonPress?: () => void;
-    modalHeadingRef?: ModalHeadingRef;
 };
 
-function BasePopup({children, label, applySentryLabel, resetSentryLabel, style, onApply, onReset, onBackButtonPress, modalHeadingRef}: BasePopupProps) {
+function BasePopup({children, label, applySentryLabel, resetSentryLabel, style, onApply, onReset, onBackButtonPress}: BasePopupProps) {
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
     const styles = useThemeStyles();
@@ -34,16 +32,7 @@ function BasePopup({children, label, applySentryLabel, resetSentryLabel, style, 
                     onBackButtonPress={onBackButtonPress}
                 />
             ) : (
-                isSmallScreenWidth &&
-                !!label && (
-                    <Text
-                        ref={modalHeadingRef}
-                        tabIndex={-1}
-                        style={[styles.textLabel, styles.textSupporting, styles.ph5, styles.pv1, styles.mb2]}
-                    >
-                        {label}
-                    </Text>
-                )
+                isSmallScreenWidth && !!label && <Text style={[styles.textLabel, styles.textSupporting, styles.ph5, styles.pv1, styles.mb2]}>{label}</Text>
             )}
             {children}
             <ActionButtons

@@ -19,7 +19,7 @@ type DatePickerFilterPopupProps = PopoverComponentProps & {
     updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
 };
 
-function DatePickerFilterPopup({closeOverlay, setPopoverWidth, filterKey, value, translationKey, updateFilterForm, modalHeadingRef}: DatePickerFilterPopupProps) {
+function DatePickerFilterPopup({closeOverlay, setPopoverWidth, filterKey, value, translationKey, updateFilterForm}: DatePickerFilterPopupProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {windowHeight} = useWindowDimensions();
@@ -40,7 +40,6 @@ function DatePickerFilterPopup({closeOverlay, setPopoverWidth, filterKey, value,
             closeOverlay={closeOverlay}
             setPopoverWidth={setPopoverWidth}
             presets={getDatePresets(filterKey, true)}
-            modalHeadingRef={modalHeadingRef}
             style={[styles.getPopoverMaxHeight(windowHeight, isInLandscapeMode)]}
         />
     );

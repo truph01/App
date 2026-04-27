@@ -148,9 +148,6 @@ type ReanimatedModalProps = ViewProps &
          */
         shouldReturnFocus?: boolean;
 
-        /** Whether bottom-docked dismiss controls should be exposed to accessibility. */
-        shouldEnableBottomDockedDismissAccessibility?: boolean;
-
         /** Whether to ignore the back handler during transition */
         shouldIgnoreBackHandlerDuringTransition?: boolean;
     };
@@ -179,9 +176,6 @@ type BackdropProps = {
 
     /** Shows backdrop content */
     isBackdropVisible: boolean;
-
-    /** Whether bottom-docked dismiss controls should be exposed to accessibility. */
-    shouldEnableBottomDockedDismissAccessibility?: boolean;
 };
 
 type ContainerProps = {

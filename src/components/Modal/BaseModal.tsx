@@ -20,7 +20,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import ComposerFocusManager from '@libs/ComposerFocusManager';
 import {canUseTouchScreen as canUseTouchScreenCheck} from '@libs/DeviceCapabilities';
-import getPlatform from '@libs/getPlatform';
 import NarrowPaneContext from '@libs/Navigation/AppNavigator/Navigators/NarrowPaneContext';
 import Overlay from '@libs/Navigation/AppNavigator/Navigators/Overlay';
 import Navigation from '@libs/Navigation/Navigation';
@@ -74,7 +73,6 @@ function BaseModal({
     forwardedFSClass = CONST.FULLSTORY.CLASS.UNMASK,
     ref,
     shouldDisplayBelowModals = false,
-    shouldEnableBottomDockedDismissAccessibility,
     shouldWrapModalChildrenInScrollViewIfBottomDockedInLandscapeMode = true,
 }: BaseModalProps) {
     // When the `enableEdgeToEdgeBottomSafeAreaPadding` prop is explicitly set, we enable edge-to-edge mode.
@@ -93,8 +91,6 @@ function BaseModal({
     const sidePanelAnimatedStyle = shouldApplySidePanelOffset && !isSmallScreenWidth ? {transform: [{translateX: Animated.multiply(sidePanelOffset.current, -1)}]} : undefined;
     const keyboardStateContextValue = useKeyboardState();
 
-    const isWeb = getPlatform() === CONST.PLATFORM.WEB;
-
     const [modalOverlapsWithTopSafeArea, setModalOverlapsWithTopSafeArea] = useState(false);
     const [modalHeight, setModalHeight] = useState(0);
 
@@ -102,6 +98,7 @@ function BaseModal({
 
     const shouldCallHideModalOnUnmount = useRef(false);
     const hideModalCallbackRef = useRef<(callHideCallback: boolean) => void>(undefined);
+    const bottomDockedDismissButtonRef = useRef<View>(null);
 
     const wasVisible = usePrevious(isVisible);
 
@@ -184,7 +181,7 @@ function BaseModal({
         onModalShow();
     }, [onModalShow, shouldSetModalVisibility, type]);
 
-    const handleBackdropPress = (e?: KeyboardEvent | GestureResponderEvent) => {
+    const handleBackdropPress = (e?: GestureResponderEvent | KeyboardEvent) => {
         if (e && 'key' in e && e.key === CONST.KEYBOARD_SHORTCUTS.ENTER.shortcutKey) {
             return;
         }
@@ -269,9 +266,6 @@ function BaseModal({
         ],
     );
 
-    const shouldShowBottomDockedDismissButton = isSmallScreenWidth && type === CONST.MODAL.MODAL_TYPE.BOTTOM_DOCKED && !!(onBackdropPress ?? onClose);
-    const shouldHideBottomDockedDismissFromAccessibility = shouldShowBottomDockedDismissButton && shouldEnableBottomDockedDismissAccessibility === false;
-
     const modalPaddingStyles = useMemo(() => {
         const paddings = StyleUtils.getModalPaddingStyles({
             shouldAddBottomSafeAreaMargin,
@@ -321,6 +315,8 @@ function BaseModal({
     const isBottomDockedModalInLandscapeMode = type === CONST.MODAL.MODAL_TYPE.BOTTOM_DOCKED && isInLandscapeMode;
 
     const shouldWrapChildrenInScrollView = shouldWrapModalChildrenInScrollViewIfBottomDockedInLandscapeMode && isBottomDockedModalInLandscapeMode;
+    const shouldShowBottomDockedDismissButton = isSmallScreenWidth && type === CONST.MODAL.MODAL_TYPE.BOTTOM_DOCKED && !!(onBackdropPress ?? onClose);
+    const modalInitialFocus = shouldShowBottomDockedDismissButton ? () => bottomDockedDismissButtonRef.current : initialFocus;
 
     return (
         <ModalContext.Provider value={modalContextValue}>
@@ -358,7 +354,7 @@ function BaseModal({
                         onSwipeComplete={onClose}
                         swipeDirection={swipeDirection}
                         shouldPreventScrollOnFocus={shouldPreventScrollOnFocus}
-                        initialFocus={initialFocus}
+                        initialFocus={modalInitialFocus}
                         swipeThreshold={swipeThreshold}
                         isVisible={isVisible}
                         backdropColor={theme.overlay}
@@ -383,7 +379,6 @@ function BaseModal({
                         type={type}
                         shouldIgnoreBackHandlerDuringTransition={shouldIgnoreBackHandlerDuringTransition}
                         shouldEnableNewFocusManagement={shouldEnableNewFocusManagement}
-                        shouldEnableBottomDockedDismissAccessibility={shouldEnableBottomDockedDismissAccessibility}
                         supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}
                         shouldReturnFocus={shouldReturnFocus}
                     >
@@ -400,35 +395,20 @@ function BaseModal({
                             ref={ref}
                             fsClass={forwardedFSClass}
                         >
-                            {isWeb && shouldShowBottomDockedDismissButton && (
+                            {shouldShowBottomDockedDismissButton && (
                                 <PressableWithoutFeedback
+                                    ref={bottomDockedDismissButtonRef}
                                     onPress={handleBackdropPress}
+                                    role={CONST.ROLE.BUTTON}
                                     accessibilityRole={CONST.ROLE.BUTTON}
                                     accessibilityLabel={translate('common.dismiss')}
-                                    tabIndex={0}
                                     sentryLabel="Modal-DismissDialog"
                                     style={styles.bottomDockedModalDismissButton}
-                                    shouldUseAutoHitSlop
                                 >
                                     <View />
                                 </PressableWithoutFeedback>
                             )}
                             <ColorSchemeWrapper>{shouldWrapChildrenInScrollView ? <ScrollView>{children}</ScrollView> : children}</ColorSchemeWrapper>
-                            {!isWeb && shouldShowBottomDockedDismissButton && (
-                                <PressableWithoutFeedback
-                                    onPress={handleBackdropPress}
-                                    accessible={!shouldHideBottomDockedDismissFromAccessibility}
-                                    accessibilityRole={CONST.ROLE.BUTTON}
-                                    accessibilityLabel={translate('common.dismiss')}
-                                    accessibilityElementsHidden={shouldHideBottomDockedDismissFromAccessibility}
-                                    importantForAccessibility={shouldHideBottomDockedDismissFromAccessibility ? 'no-hide-descendants' : 'auto'}
-                                    sentryLabel="Modal-DismissDialog"
-                                    style={styles.bottomDockedModalDismissButton}
-                                    shouldUseAutoHitSlop
-                                >
-                                    <View />
-                                </PressableWithoutFeedback>
-                            )}
                         </Animated.View>
                         {!keyboardStateContextValue?.isKeyboardActive && <NavigationBar />}
                     </ReanimatedModal>

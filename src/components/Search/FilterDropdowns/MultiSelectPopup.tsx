@@ -15,7 +15,6 @@ import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan
 import CONST from '@src/CONST';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
 import BasePopup from './BasePopup';
-import type {ModalHeadingRef} from './DropdownButton';
 
 type MultiSelectItem<T> = {
     text: string;
@@ -48,12 +47,9 @@ type MultiSelectPopupProps<T> = {
 
     /** Whether the data for the popover is loading */
     loading?: boolean;
-
-    /** Visible heading target for modal initial focus */
-    modalHeadingRef?: ModalHeadingRef;
 };
 
-function MultiSelectPopup<T extends string>({label, loading, value, items, closeOverlay, onChange, isSearchable, searchPlaceholder, modalHeadingRef}: MultiSelectPopupProps<T>) {
+function MultiSelectPopup<T extends string>({label, loading, value, items, closeOverlay, onChange, isSearchable, searchPlaceholder}: MultiSelectPopupProps<T>) {
     const theme = useTheme();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -124,7 +120,6 @@ function MultiSelectPopup<T extends string>({label, loading, value, items, close
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_MULTI_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_MULTI_SELECT}
-            modalHeadingRef={modalHeadingRef}
         >
             <View style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle, isSearchable})]}>
                 {!!loading && (

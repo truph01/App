@@ -1,5 +1,5 @@
 import {willAlertModalBecomeVisibleSelector} from '@selectors/Modal';
-import type {ComponentProps, ComponentType, ReactNode, Ref, RefObject} from 'react';
+import type {ReactNode, RefObject} from 'react';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
 import type {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {View} from 'react-native';
@@ -8,7 +8,6 @@ import CaretWrapper from '@components/CaretWrapper';
 import PopoverWithMeasuredContent from '@components/PopoverWithMeasuredContent';
 import Text from '@components/Text';
 import withViewportOffsetTop from '@components/withViewportOffsetTop';
-import useBottomDockedDismissAccessibility from '@hooks/useBottomDockedDismissAccessibility';
 import useOnyx from '@hooks/useOnyx';
 import usePopoverPosition from '@hooks/usePopoverPosition';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -20,16 +19,10 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
 
-type ModalHeadingNode = ComponentProps<typeof Text> extends {ref?: Ref<infer T>} ? T | null : never;
-type ModalHeadingRef = (node: ModalHeadingNode) => void;
-type ModalAccessibilityTargetRef = (node: unknown) => void;
-
 type PopoverComponentProps = {
     isExpanded: boolean;
     closeOverlay: () => void;
     setPopoverWidth?: (width: number | undefined) => void;
-    modalHeadingRef?: ModalHeadingRef;
-    modalAccessibilityTargetRef?: ModalAccessibilityTargetRef;
 };
 
 type DropdownButtonProps = WithSentryLabel & {
@@ -45,7 +38,7 @@ type DropdownButtonProps = WithSentryLabel & {
     viewportOffsetTop: number;
 
     /** The component to render in the popover */
-    PopoverComponent: ComponentType<PopoverComponentProps>;
+    PopoverComponent: (props: PopoverComponentProps) => ReactNode;
 
     ButtonComponent?: React.ComponentType<{onPress: () => void; ref: RefObject<View | null>}>;
 
@@ -63,12 +56,8 @@ type DropdownButtonProps = WithSentryLabel & {
 
     /** Wrapper style for the outer view */
     wrapperStyle?: StyleProp<ViewStyle>;
-
-    /** Internal opt-in to delay dismiss accessibility for bottom-docked filter popovers */
-    shouldDelayBottomDockedDismissAccessibility?: boolean;
 };
 
-const BOTTOM_DOCKED_DISMISS_ACCESSIBILITY_DELAY = 2500;
 const ANCHOR_ORIGIN = {
     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
@@ -86,7 +75,6 @@ function DropdownButton({
     caretWrapperStyle,
     wrapperStyle,
     sentryLabel,
-    shouldDelayBottomDockedDismissAccessibility = false,
 }: DropdownButtonProps) {
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to distinguish RHL and narrow layout
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -97,8 +85,6 @@ function DropdownButton({
     const {windowHeight} = useWindowDimensions();
     const triggerRef = useRef<View | null>(null);
     const anchorRef = useRef<View | null>(null);
-    const modalAccessibilityTargetElementRef = useRef<unknown>(null);
-    const [activePopoverComponent, setActivePopoverComponent] = useState(() => PopoverComponent);
     const [isOverlayVisible, setIsOverlayVisible] = useState(false);
     const [customPopoverWidth, setCustomPopoverWidth] = useState<number | undefined>(undefined);
     const {calculatePopoverPosition} = usePopoverPosition();
@@ -109,26 +95,6 @@ function DropdownButton({
     });
 
     const [willAlertModalBecomeVisible] = useOnyx(ONYXKEYS.MODAL, {selector: willAlertModalBecomeVisibleSelector});
-    const shouldUseFilterModalAccessibility = shouldDelayBottomDockedDismissAccessibility && isSmallScreenWidth;
-
-    const handleModalHeadingRef = useCallback<ModalHeadingRef>((node) => {
-        modalAccessibilityTargetElementRef.current = node;
-    }, []);
-
-    const handleModalAccessibilityTargetRef = useCallback<ModalAccessibilityTargetRef>((node) => {
-        modalAccessibilityTargetElementRef.current = node;
-    }, []);
-
-    const {handleModalShow, initialFocus, shouldEnableBottomDockedDismissAccessibility} = useBottomDockedDismissAccessibility({
-        isVisible: isOverlayVisible,
-        shouldActivate: shouldUseFilterModalAccessibility,
-        animationDelayMs: 0,
-        focusTargetRef: modalAccessibilityTargetElementRef,
-        webFocusMode: 'initialFocus',
-        dismissAccessibilityMode: 'timer',
-        dismissAccessibilityPlatforms: 'native',
-        dismissAccessibilityDelayMs: BOTTOM_DOCKED_DISMISS_ACCESSIBILITY_DELAY,
-    });
 
     /**
      * Toggle the overlay between open & closed
@@ -147,12 +113,11 @@ function DropdownButton({
      * Calculate popover position and toggle overlay
      */
     const calculatePopoverPositionAndToggleOverlay = useCallback(() => {
-        setActivePopoverComponent(() => PopoverComponent);
         calculatePopoverPosition(anchorRef, ANCHOR_ORIGIN).then((pos) => {
             setPopoverTriggerPosition({...pos, vertical: pos.vertical});
             toggleOverlay();
         });
-    }, [PopoverComponent, calculatePopoverPosition, toggleOverlay]);
+    }, [calculatePopoverPosition, toggleOverlay]);
     /**
      * When no items are selected, render the label, otherwise, render the
      * list of selected items as well
@@ -174,7 +139,10 @@ function DropdownButton({
         }
         return {width: actualPopoverWidth};
     }, [isSmallScreenWidth, styles, actualPopoverWidth]);
-    const ActivePopoverComponent = activePopoverComponent;
+
+    const popoverContent = useMemo(() => {
+        return PopoverComponent({closeOverlay: toggleOverlay, isExpanded: isOverlayVisible, setPopoverWidth: setCustomPopoverWidth});
+    }, [PopoverComponent, toggleOverlay, isOverlayVisible]);
 
     return (
         <View
@@ -217,14 +185,11 @@ function DropdownButton({
                 anchorRef={triggerRef}
                 avoidKeyboard
                 isVisible={isOverlayVisible}
-                onModalShow={handleModalShow}
                 onClose={toggleOverlay}
                 anchorPosition={popoverTriggerPosition}
                 anchorAlignment={ANCHOR_ORIGIN}
                 restoreFocusType={CONST.MODAL.RESTORE_FOCUS_TYPE.DELETE}
                 shouldEnableNewFocusManagement
-                shouldEnableBottomDockedDismissAccessibility={shouldEnableBottomDockedDismissAccessibility}
-                initialFocus={initialFocus}
                 shouldMeasureAnchorPositionFromTop={false}
                 outerStyle={{...StyleUtils.getOuterModalStyle(windowHeight, viewportOffsetTop), ...containerStyles}}
                 // This must be false because we dont want the modal to close if we open the RHP for selections
@@ -239,17 +204,11 @@ function DropdownButton({
                 shouldDisplayBelowModals
                 shouldWrapModalChildrenInScrollViewIfBottomDockedInLandscapeMode={false}
             >
-                <ActivePopoverComponent
-                    closeOverlay={toggleOverlay}
-                    isExpanded={isOverlayVisible}
-                    setPopoverWidth={setCustomPopoverWidth}
-                    modalHeadingRef={shouldUseFilterModalAccessibility ? handleModalHeadingRef : undefined}
-                    modalAccessibilityTargetRef={shouldUseFilterModalAccessibility ? handleModalAccessibilityTargetRef : undefined}
-                />
+                {popoverContent}
             </PopoverWithMeasuredContent>
         </View>
     );
 }
 
-export type {PopoverComponentProps, DropdownButtonProps, ModalAccessibilityTargetRef, ModalHeadingRef};
+export type {PopoverComponentProps, DropdownButtonProps};
 export default withViewportOffsetTop(DropdownButton);

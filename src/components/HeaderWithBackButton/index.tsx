@@ -35,7 +35,6 @@ function HeaderWithBackButton({
     iconHeight,
     iconStyles,
     onBackButtonPress = () => Navigation.goBack(),
-    backButtonRef,
     onCloseButtonPress = () => Navigation.dismissModal(),
     onDownloadButtonPress = () => {},
     onRotateButtonPress = () => {},
@@ -245,7 +244,6 @@ function HeaderWithBackButton({
                 {shouldShowBackButton && (
                     <Tooltip text={translate('common.back')}>
                         <PressableWithoutFeedback
-                            ref={backButtonRef}
                             onPress={() => {
                                 if (Keyboard.isVisible()) {
                                     Keyboard.dismiss();

@@ -114,7 +114,6 @@ function makeDateFilterItem(
                 isExpanded={props.isExpanded}
                 closeOverlay={props.closeOverlay}
                 setPopoverWidth={props.setPopoverWidth}
-                modalHeadingRef={props.modalHeadingRef}
                 filterKey={filterKey}
                 value={value}
                 translationKey={translationKey}
@@ -255,12 +254,11 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
             }
             case FILTER_KEYS.FEED: {
                 return {
-                    PopoverComponent: ({closeOverlay, isExpanded, modalHeadingRef}) => (
+                    PopoverComponent: ({closeOverlay, isExpanded}) => (
                         <FeedFilterPopup
                             isExpanded={isExpanded}
                             updateFilterForm={updateFilterForm}
                             closeOverlay={closeOverlay}
-                            modalHeadingRef={modalHeadingRef}
                         />
                     ),
                     sentryLabel: getFilterSentryLabel(filterKey),
@@ -309,10 +307,9 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                 const formValue = searchAdvancedFiltersForm[filterKey];
                 const items = getSingleSelectFilterOptions(filterKey, translate);
                 const value = items.find((option) => option.value === formValue) ?? null;
-                const singleSelectComponent = ({closeOverlay, modalHeadingRef}: PopoverComponentProps) => (
+                const singleSelectComponent = ({closeOverlay}: PopoverComponentProps) => (
                     <SingleSelectPopup
                         label={translate(label)}
-                        modalHeadingRef={modalHeadingRef}
                         items={items}
                         value={value}
                         closeOverlay={closeOverlay}
@@ -334,10 +331,9 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                 const items = getMultiSelectFilterOptions(filterKey, type, translate);
                 const value = items.filter((item) => formValues.includes(item.value));
 
-                const multiSelectComponent = ({closeOverlay, modalHeadingRef}: PopoverComponentProps) => (
+                const multiSelectComponent = ({closeOverlay}: PopoverComponentProps) => (
                     <MultiSelectFilterPopup
                         closeOverlay={closeOverlay}
-                        modalHeadingRef={modalHeadingRef}
                         translationKey={label}
                         items={items}
                         value={value}
@@ -360,11 +356,10 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
             case FILTER_KEYS.TO:
             case FILTER_KEYS.FROM:
                 return {
-                    PopoverComponent: ({closeOverlay, modalHeadingRef}) => (
+                    PopoverComponent: ({closeOverlay}) => (
                         <UserSelectPopup
                             value={searchAdvancedFiltersForm[filterKey] ?? []}
                             label={translate(label)}
-                            modalHeadingRef={modalHeadingRef}
                             closeOverlay={closeOverlay}
                             onChange={(selectedUsers) => {
                                 const update: Partial<SearchAdvancedFiltersForm> = {};
@@ -377,12 +372,11 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                 };
             case FILTER_KEYS.POLICY_ID:
                 return {
-                    PopoverComponent: ({closeOverlay, modalHeadingRef}) => (
+                    PopoverComponent: ({closeOverlay}) => (
                         <WorkspaceSelectPopup
                             policyIDQuery={queryJSON.policyID}
                             updateFilterForm={updateFilterForm}
                             closeOverlay={closeOverlay}
-                            modalHeadingRef={modalHeadingRef}
                         />
                     ),
                     sentryLabel: getFilterSentryLabel(filterKey),

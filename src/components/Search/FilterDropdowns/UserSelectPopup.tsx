@@ -18,14 +18,13 @@ import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import BasePopup from './BasePopup';
-import type {ModalHeadingRef} from './DropdownButton';
 
 type UserSelectPopupProps = {
-    /** The popup label */
-    label: string;
-
     /** The currently selected users */
     value: string[];
+
+    /** The popup label */
+    label: string;
 
     /** Function to call to close the overlay when changes are applied */
     closeOverlay: () => void;
@@ -39,12 +38,9 @@ type UserSelectPopupProps = {
      * Set to true to always show search, or false to never show search regardless of user count.
      */
     isSearchable?: boolean;
-
-    /** Visible heading target for modal initial focus */
-    modalHeadingRef?: ModalHeadingRef;
 };
 
-function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, modalHeadingRef}: UserSelectPopupProps) {
+function UserSelectPopup({value, label, closeOverlay, onChange, isSearchable}: UserSelectPopupProps) {
     const selectionListRef = useRef<SelectionListHandle<ListItem> | null>(null);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -156,15 +152,11 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
         if (debouncedSearchTerm) {
             return;
         }
-
-        const animationFrame = requestAnimationFrame(() => {
-            setTotalOptionsCount(selectedOptionsForDisplay.length + availableOptions.personalDetails.length + availableOptions.recentReports.length);
-        });
-
-        return () => cancelAnimationFrame(animationFrame);
+        setTotalOptionsCount(selectedOptionsForDisplay.length + availableOptions.personalDetails.length + availableOptions.recentReports.length);
     }, [debouncedSearchTerm, selectedOptionsForDisplay.length, availableOptions.personalDetails.length, availableOptions.recentReports.length]);
 
     const shouldShowSearchInput = isSearchable ?? totalOptionsCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
+
     const textInputOptions = useMemo(
         () =>
             shouldShowSearchInput
@@ -186,7 +178,6 @@ function UserSelectPopup({label, value, closeOverlay, onChange, isSearchable, mo
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_USER}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_USER}
-            modalHeadingRef={modalHeadingRef}
         >
             <View
                 style={[

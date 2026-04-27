@@ -15,7 +15,6 @@ function Backdrop({
     animationInTiming = CONST.MODAL.ANIMATION_TIMING.DEFAULT_IN,
     animationOutTiming = CONST.MODAL.ANIMATION_TIMING.DEFAULT_OUT,
     backdropOpacity = variables.overlayOpacity,
-    shouldEnableBottomDockedDismissAccessibility = true,
 }: BackdropProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -34,22 +33,10 @@ function Backdrop({
     );
 
     if (!customBackdrop) {
-        if (shouldEnableBottomDockedDismissAccessibility) {
-            return (
-                <PressableWithoutFeedback
-                    accessible
-                    accessibilityLabel={translate('modal.backdropLabel')}
-                    onPressIn={onBackdropPress}
-                    sentryLabel={CONST.SENTRY_LABEL.REANIMATED_MODAL.BACKDROP}
-                >
-                    {BackdropOverlay}
-                </PressableWithoutFeedback>
-            );
-        }
-
         return (
             <PressableWithoutFeedback
-                accessible={false}
+                accessible
+                accessibilityLabel={translate('modal.backdropLabel')}
                 onPressIn={onBackdropPress}
                 sentryLabel={CONST.SENTRY_LABEL.REANIMATED_MODAL.BACKDROP}
             >

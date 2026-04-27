@@ -89,7 +89,6 @@ function GroupByPopup({value, sections, style, onBackButtonPress, closeOverlay, 
             label={translate('search.display.groupBy')}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_SINGLE_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_SINGLE_SELECT}
-            style={style}
         >
             <View style={[style, styles.getSelectionListPopoverHeight({itemCount, windowHeight, isInLandscapeMode, hasHeader: true})]}>
                 <SelectionListWithSections

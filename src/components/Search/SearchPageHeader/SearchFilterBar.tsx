@@ -21,7 +21,6 @@ function UserDropdown({label, value, PopoverComponent, sentryLabel}: SearchDropd
             label={label}
             value={users ?? []}
             PopoverComponent={PopoverComponent}
-            shouldDelayBottomDockedDismissAccessibility
             sentryLabel={sentryLabel}
         />
     );
@@ -34,7 +33,6 @@ function WorkspaceDropdown({label, value, PopoverComponent, sentryLabel}: Search
             label={label}
             value={workspaceValue ?? []}
             PopoverComponent={PopoverComponent}
-            shouldDelayBottomDockedDismissAccessibility
             sentryLabel={sentryLabel}
         />
     );
@@ -59,7 +57,6 @@ function CardDropdown({label, PopoverComponent, sentryLabel}: SearchDropdownProp
             label={label}
             value={cardValue}
             PopoverComponent={PopoverComponent}
-            shouldDelayBottomDockedDismissAccessibility
             sentryLabel={sentryLabel}
         />
     );
@@ -72,7 +69,6 @@ function TaxRateDropdown({label, PopoverComponent, sentryLabel}: SearchDropdownP
             label={label}
             value={taxRateValue}
             PopoverComponent={PopoverComponent}
-            shouldDelayBottomDockedDismissAccessibility
             sentryLabel={sentryLabel}
         />
     );
@@ -85,7 +81,6 @@ function ReportDropdown({label, value, PopoverComponent, sentryLabel}: SearchDro
             label={label}
             value={reportValue}
             PopoverComponent={PopoverComponent}
-            shouldDelayBottomDockedDismissAccessibility
             sentryLabel={sentryLabel}
         />
     );
@@ -115,7 +110,6 @@ function SearchFilterBar({item}: {item: SearchFilter & FilterItem}) {
             label={item.label}
             value={item.value}
             PopoverComponent={item.PopoverComponent}
-            shouldDelayBottomDockedDismissAccessibility
             sentryLabel={item.sentryLabel}
         />
     );
