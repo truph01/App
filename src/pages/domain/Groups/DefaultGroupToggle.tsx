@@ -45,7 +45,7 @@ function DefaultGroupToggle({domainAccountID, groupID, groupName}: DefaultGroupT
     const {showConfirmModal} = useConfirmModal();
 
     const onDefaultGroupToggle = async () => {
-        if (!domainName || !defaultSecurityGroup?.name || !groupName) {
+        if (!defaultSecurityGroup?.name || !groupName) {
             return;
         }
 
@@ -67,7 +67,7 @@ function DefaultGroupToggle({domainAccountID, groupID, groupName}: DefaultGroupT
     const isDefault = defaultSecurityGroupID === groupID;
 
     return (
-        <View style={[styles.mv3]}>
+        <View style={styles.mv3}>
             <ToggleSettingOptionRow
                 title={translate('domain.groups.defaultGroup')}
                 switchAccessibilityLabel={translate('domain.groups.defaultGroup')}
