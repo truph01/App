@@ -57,7 +57,6 @@ function DynamicExpenseLimitTypeSelectorPage({
         >
             <ScreenWrapper
                 style={styles.pb0}
-                includePaddingTop={false}
                 enableEdgeToEdgeBottomSafeAreaPadding
                 testID="DynamicExpenseLimitTypeSelectorPage"
             >
