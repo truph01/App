@@ -23,8 +23,6 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useRootNavigationState from '@hooks/useRootNavigationState';
-import useSidePanelActions from '@hooks/useSidePanelActions';
-import useSidePanelState from '@hooks/useSidePanelState';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {scrollToRight} from '@libs/InputUtils';
 import backHistory from '@libs/Navigation/helpers/backHistory';
@@ -39,7 +37,7 @@ import {getQueryWithUpdatedValues, sanitizeSearchValue} from '@libs/SearchQueryU
 import StringUtils from '@libs/StringUtils';
 import Navigation from '@navigation/Navigation';
 import variables from '@styles/variables';
-import {addComment, navigateToAndOpenReport, searchInServer} from '@userActions/Report';
+import {navigateToAndOpenReport, searchInServer} from '@userActions/Report';
 import {setSearchContext} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -50,6 +48,7 @@ import {getQueryWithSubstitutions} from './getQueryWithSubstitutions';
 import {getUpdatedSubstitutionsMap} from './getUpdatedSubstitutionsMap';
 import {getContextualReportData, getContextualSearchAutocompleteKey, getContextualSearchQuery} from './SearchRouterUtils';
 import updateAutocompleteSubstitutionsForSelection from './updateAutocompleteSubstitutionsForSelection';
+import useAskConcierge from './useAskConcierge';
 
 const privateIsArchivedSelector = (nvp: {private_isArchived?: string} | undefined): boolean | undefined => !!nvp?.private_isArchived;
 
@@ -70,14 +69,11 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
     const personalDetails = usePersonalDetails();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const listRef = useRef<SelectionListWithSectionsHandle>(null);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'ConciergeAvatar']);
-    const {openSidePanel} = useSidePanelActions();
-    const {shouldHideSidePanel: isSidePanelOpen} = useSidePanelState();
+    const askConcierge = useAskConcierge();
 
     // The actual input text that the user sees
     const [textInputValue, , setTextInputValue] = useDebouncedState('', 500);
@@ -327,23 +323,10 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                     onRouterClose();
                     setTextInputValue('');
                     setAutocompleteQueryValue('');
-                    if (!conciergeReportID || !conciergeReport || !item.searchQuery) {
+                    if (!item.searchQuery) {
                         return;
                     }
-                    if (isSidePanelOpen) {
-                        openSidePanel();
-                    }
-
-                    addComment({
-                        report: conciergeReport,
-                        notifyReportID: conciergeReportID,
-                        ancestors: [],
-                        text: item.searchQuery,
-                        timezoneParam: currentUserPersonalDetails.timezone ?? CONST.DEFAULT_TIME_ZONE,
-                        currentUserAccountID,
-                        shouldPlaySound: true,
-                        isInSidePanel: true,
-                    });
+                    askConcierge(item.searchQuery);
                 } else {
                     submitSearch(item.searchQuery, item.keyForList !== CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM);
                 }
@@ -371,13 +354,9 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             betas,
             contextualPoliciesMap,
             contextualReportsMap,
-            conciergeReportID,
-            conciergeReport,
             setTextInputValue,
             setAutocompleteQueryValue,
-            currentUserPersonalDetails.timezone,
-            openSidePanel,
-            isSidePanelOpen,
+            askConcierge,
         ],
     );
 
