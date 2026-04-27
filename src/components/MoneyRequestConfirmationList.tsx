@@ -36,11 +36,11 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from './DelegateNoAccessModalProvider';
+import buildConfirmAction from './MoneyRequestConfirmationList/confirmAction';
 import ConfirmationFooterContent from './MoneyRequestConfirmationList/ConfirmationFooterContent';
 import ConfirmationTelemetry from './MoneyRequestConfirmationList/ConfirmationTelemetry';
 import DistanceRequestController from './MoneyRequestConfirmationList/DistanceRequestController';
 import FieldAutoSelector from './MoneyRequestConfirmationList/FieldAutoSelector';
-import useConfirmAction from './MoneyRequestConfirmationList/hooks/useConfirmAction';
 import useConfirmationAmount from './MoneyRequestConfirmationList/hooks/useConfirmationAmount';
 import useConfirmationCtaText from './MoneyRequestConfirmationList/hooks/useConfirmationCtaText';
 import useConfirmationSections from './MoneyRequestConfirmationList/hooks/useConfirmationSections';
@@ -423,7 +423,7 @@ function MoneyRequestConfirmationList({
         routeError,
     });
 
-    const confirm = useConfirmAction({
+    const confirm = buildConfirmAction({
         iouType,
         policy,
         transactionID,

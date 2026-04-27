@@ -11,7 +11,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 
-type UseConfirmActionParams = {
+type BuildConfirmActionParams = {
     iouType: IOUType;
     policy: OnyxEntry<OnyxTypes.Policy>;
     transactionID: string | undefined;
@@ -36,7 +36,7 @@ type UseConfirmActionParams = {
  * delegate-access gating and invoke `onSendMoney` with the chosen payment method.
  * Validation results drive form-error state.
  */
-function useConfirmAction({
+function buildConfirmAction({
     iouType,
     policy,
     transactionID,
@@ -51,7 +51,7 @@ function useConfirmAction({
     showDelegateNoAccessModal,
     onConfirm,
     onSendMoney,
-}: UseConfirmActionParams) {
+}: BuildConfirmActionParams) {
     return ({paymentType: paymentMethod}: PaymentActionParams) => {
         // Routing short-circuit: invoices without company info go to the company info step before we validate anything.
         if (iouType === CONST.IOU.TYPE.INVOICE && !hasInvoicingDetails(policy) && transactionID && !routeError) {
@@ -96,4 +96,4 @@ function useConfirmAction({
     };
 }
 
-export default useConfirmAction;
+export default buildConfirmAction;
