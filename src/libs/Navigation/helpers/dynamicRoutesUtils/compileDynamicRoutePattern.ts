@@ -91,6 +91,5 @@ const compiledParametricDynamicRoutes: CompiledEntry[] = Object.entries(DYNAMIC_
 const compiledStrictParametricDynamicRoutes = compiledParametricDynamicRoutes.filter(({compiled}) => compiled.minSegments === compiled.maxSegments);
 const compiledOptionalParametricDynamicRoutes = compiledParametricDynamicRoutes.filter(({compiled}) => compiled.minSegments < compiled.maxSegments);
 
-export default compileDynamicRoutePattern;
 export {compiledStrictParametricDynamicRoutes, compiledOptionalParametricDynamicRoutes};
 export type {CompiledEntry};

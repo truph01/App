@@ -782,7 +782,7 @@ next phase begins:
 
 1. **Static beats everything.** All sub-suffix lengths are checked for an exact static match
    first. A short static match (e.g. single-segment `country`) always beats a longer parametric
-   match (e.g. `flag/123/abc`).
+   match (e.g. `:reportID/country`).
 2. **Strict parametric beats optional parametric.** After statics, all sub-suffix lengths are
    checked for strict parametric patterns (no optional params, e.g. `flag/:reportID/:reportActionID`).
    Only after those are exhausted does the matcher try optional parametric patterns
@@ -793,24 +793,6 @@ next phase begins:
 4. **Among patterns of the same kind: first registered wins.** If multiple patterns of the same
    type (strict or optional) could match the same candidate, the one declared first in
    `DYNAMIC_ROUTES` wins.
-
-#### Shadow conflicts
-
-A pair of registered suffixes is said to **shadow** each other if there exists any concrete URL
-that both would match. For example, `a/:p?` and `a` both match the URL `a` (the optional being
-absent), so they shadow each other.
-
-A registration-time validator (run on module load) detects every shadow pair across all
-combinations of optional presence/absence:
-
-- **In dev/test (`NODE_ENV !== 'production'`):** the validator throws with a list of conflicts,
-  failing the app at startup. Fix the conflict by tightening one of the patterns or merging them.
-- **In production:** the validator emits `Log.alert` instead of throwing so the app keeps
-  running, but the conflict still needs to be fixed in source.
-
-> [!CAUTION]
-> Designing two patterns that can match the same URL is almost always a bug. Either consolidate
-> them into a single suffix or differentiate them with additional static segments.
 
 ### Multi-segment dynamic routes
 

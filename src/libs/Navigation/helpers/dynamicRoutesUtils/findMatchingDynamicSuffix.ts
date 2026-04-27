@@ -4,9 +4,9 @@ import {dynamicRoutePaths} from './isDynamicRouteSuffix';
 import splitPathAndQuery from './splitPathAndQuery';
 
 type DynamicSuffixMatch = {
-    /** Registered pattern, e.g. 'flag/:reportID/:reportActionID' or 'page/:id?' */
+    /** Registered pattern, e.g. 'flag/:reportID/:reportActionID' */
     pattern: string;
-    /** Actual URL values, e.g. 'flag/456/abc' or 'opt-page' (when optional is absent) */
+    /** Actual URL values, e.g. 'flag/456/abc' */
     actualSuffix: string;
     /** Extracted path params, e.g. {reportID: '456', reportActionID: 'abc'} */
     pathParams: Record<string, string>;
@@ -15,6 +15,8 @@ type DynamicSuffixMatch = {
 /**
  * Tries to match a candidate suffix against a list of compiled parametric patterns.
  * Returns the first match with extracted path params, or undefined.
+ *
+ * @private - Internal helper. Do not export or use outside this file.
  */
 function tryMatchParametric(candidate: string, candidateSegmentCount: number, patterns: CompiledEntry[]): DynamicSuffixMatch | undefined {
     const normalized = `${candidate}/`;
@@ -54,7 +56,7 @@ function tryMatchParametric(candidate: string, candidateSegmentCount: number, pa
  *   2. Strict parametric patterns (no optional params).
  *   3. Optional parametric patterns (has at least one `:param?`).
  *
- * This guarantees that any static match — even a short one — always beats
+ * This guarantees that any static match, even a short one, always beats
  * a parametric match, and any strict-parametric match always beats an
  * optional-parametric match.
  *
@@ -77,7 +79,7 @@ function findMatchingDynamicSuffix(path = ''): DynamicSuffixMatch | undefined {
         }
     }
 
-    // Phase 2: Strict parametric patterns — no optional params (longest to shortest)
+    // Phase 2: Strict parametric patterns - no optional params (longest to shortest)
     for (let i = 0; i < segments.length; i++) {
         const result = tryMatchParametric(segments.slice(i).join('/'), segments.length - i, compiledStrictParametricDynamicRoutes);
         if (result) {
@@ -85,7 +87,7 @@ function findMatchingDynamicSuffix(path = ''): DynamicSuffixMatch | undefined {
         }
     }
 
-    // Phase 3: Optional parametric patterns — has at least one :param? (longest to shortest)
+    // Phase 3: Optional parametric patterns - has at least one :param? (longest to shortest)
     for (let i = 0; i < segments.length; i++) {
         const result = tryMatchParametric(segments.slice(i).join('/'), segments.length - i, compiledOptionalParametricDynamicRoutes);
         if (result) {
