@@ -577,7 +577,7 @@ function IOURequestStepDistanceOdometer({
             });
         },
         getHasUnsavedChanges: () => {
-            if (!isFocused || isEditing || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current) {
+            if (!isFocused || isEditing || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current || (isEditingConfirmation && backupHandledManually.current)) {
                 return false;
             }
             const hasReadingChanges = startReadingRef.current !== initialStartReadingRef.current || endReadingRef.current !== initialEndReadingRef.current;
