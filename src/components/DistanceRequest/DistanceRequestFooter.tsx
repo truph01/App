@@ -69,29 +69,28 @@ function DistanceRequestFooter({waypoints, transaction, navigateToWaypointEditPa
         />
     );
 
-    const waypointMarkers = Object.entries(waypoints ?? {})
-        .map(([key, waypoint]) => {
-            if (!waypoint?.lat || !waypoint?.lng) {
-                return;
-            }
+    const waypointMarkers: WayPoint[] = [];
+    for (const [key, waypoint] of Object.entries(waypoints ?? {})) {
+        if (!waypoint?.lat || !waypoint?.lng) {
+            continue;
+        }
 
-            const index = getWaypointIndex(key);
-            let MarkerComponent: IconAsset;
-            if (index === 0) {
-                MarkerComponent = expensifyIcons.DotIndicatorUnfilled;
-            } else if (index === lastWaypointIndex) {
-                MarkerComponent = expensifyIcons.Location;
-            } else {
-                MarkerComponent = expensifyIcons.DotIndicator;
-            }
+        const index = getWaypointIndex(key);
+        let MarkerComponent: IconAsset;
+        if (index === 0) {
+            MarkerComponent = expensifyIcons.DotIndicatorUnfilled;
+        } else if (index === lastWaypointIndex) {
+            MarkerComponent = expensifyIcons.Location;
+        } else {
+            MarkerComponent = expensifyIcons.DotIndicator;
+        }
 
-            return {
-                id: `${waypoint.lng},${waypoint.lat},${index}`,
-                coordinate: [waypoint.lng, waypoint.lat] as const,
-                markerComponent: (): ReactNode => getMarkerComponent(MarkerComponent),
-            };
-        })
-        .filter((waypoint): waypoint is WayPoint => !!waypoint);
+        waypointMarkers.push({
+            id: `${waypoint.lng},${waypoint.lat},${index}`,
+            coordinate: [waypoint.lng, waypoint.lat] as const,
+            markerComponent: (): ReactNode => getMarkerComponent(MarkerComponent),
+        });
+    }
 
     return (
         <>
