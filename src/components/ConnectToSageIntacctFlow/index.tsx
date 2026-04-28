@@ -1,6 +1,6 @@
 import {useEffect} from 'react';
+import useHasReusablePoliciesConnectedTo from '@hooks/useHasReusablePoliciesConnectedTo';
 import useOnyx from '@hooks/useOnyx';
-import useReusablePoliciesConnectedTo from '@hooks/useReusablePoliciesConnectedTo';
 import {isAuthenticationError} from '@libs/actions/connections';
 import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
@@ -12,7 +12,7 @@ type ConnectToSageIntacctFlowProps = {
 };
 
 function ConnectToSageIntacctFlow({policyID}: ConnectToSageIntacctFlowProps) {
-    const {hasReusablePoliciesConnectedTo: hasReusablePoliciesConnectedToSageIntacct} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT, policyID);
+    const hasReusablePoliciesConnectedToSageIntacct = useHasReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT, policyID);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const shouldGoToEnterCredentials = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT);
 
