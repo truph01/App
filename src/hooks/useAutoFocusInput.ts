@@ -45,11 +45,11 @@ export default function useAutoFocusInput(isMultiline = false): UseAutoFocusInpu
         transitionEndTimeoutRef.current = null;
     }, []);
 
-    const cancelAutoFocus = useCallback(() => {
+    const cancelAutoFocus = () => {
         isAutoFocusCancelledRef.current = true;
         clearTransitionEndTimeout();
         setIsScreenTransitionEnded(false);
-    }, [clearTransitionEndTimeout]);
+    };
 
     useEffect(() => {
         if (
