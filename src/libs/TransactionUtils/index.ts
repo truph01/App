@@ -1047,6 +1047,8 @@ function shouldClearConvertedAmount(transaction: OnyxInputOrEntry<Transaction>, 
     }
 
     const transactionCurrency = getCurrency(transaction);
+    // sourceCurrency is undefined for unreported expenses (e.g. Self DM) since there's no source report.
+    // Fall back to the transaction's own currency so cross-currency detection still works.
     const effectiveSourceCurrency = sourceCurrency ?? transactionCurrency;
 
     return effectiveSourceCurrency !== destinationCurrency && transactionCurrency !== destinationCurrency;
