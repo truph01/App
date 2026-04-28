@@ -159,6 +159,14 @@ function IOURequestStepDistanceOdometer({
     const confirmationRoute = ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, reportID, backToReport);
 
     useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, () => {
+        setStartReading('');
+        setEndReading('');
+        startReadingRef.current = '';
+        endReadingRef.current = '';
+        initialStartReadingRef.current = '';
+        initialEndReadingRef.current = '';
+        initialStartImageRef.current = undefined;
+        initialEndImageRef.current = undefined;
         backupHandledManually.current = true;
     });
 
