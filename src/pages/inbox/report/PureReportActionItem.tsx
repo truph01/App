@@ -212,9 +212,6 @@ type PureReportActionItemProps = {
     /** Linked transaction route error */
     linkedTransactionRouteError?: Errors;
 
-    /** Parent report */
-    parentReport?: OnyxTypes.Report;
-
     /** Personal details list */
     personalDetails?: OnyxTypes.PersonalDetailsList;
 
@@ -316,7 +313,6 @@ function PureReportActionItem({
     draftMessage,
     iouReport,
     linkedTransactionRouteError,
-    parentReport,
     personalDetails,
     originalReportID = '-1',
     originalReport,
@@ -741,7 +737,6 @@ function PureReportActionItem({
                 <ReimbursementQueuedContent
                     action={action}
                     report={report}
-                    parentReport={parentReport}
                     iouReport={iouReport}
                     personalDetails={personalDetails}
                 />
@@ -1066,13 +1061,12 @@ function PureReportActionItem({
                 contextMenuStateValue={contextMenuStateValue}
                 contextMenuActionsValue={contextMenuActionsValue}
                 parentReportAction={parentReportAction}
-                parentReport={parentReport}
                 transactionID={transactionID}
                 draftMessage={draftMessage}
                 shouldHideThreadDividerLine={shouldHideThreadDividerLine}
             />
         );
-    }, [contextMenuStateValue, contextMenuActionsValue, parentReportAction, parentReport, draftMessage, shouldHideThreadDividerLine, parentReportActionForTransactionThread]);
+    }, [contextMenuStateValue, contextMenuActionsValue, parentReportAction, draftMessage, shouldHideThreadDividerLine, parentReportActionForTransactionThread]);
 
     if (action.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED && !isHarvestCreatedExpenseReport) {
         return createdActionContent;
@@ -1303,7 +1297,6 @@ export default memo(PureReportActionItem, (prevProps, nextProps) => {
         prevProps.draftMessage === nextProps.draftMessage &&
         prevProps.iouReport?.reportID === nextProps.iouReport?.reportID &&
         deepEqual(prevProps.linkedTransactionRouteError, nextProps.linkedTransactionRouteError) &&
-        prevProps.parentReport?.reportID === nextProps.parentReport?.reportID &&
         deepEqual(prevProps.personalDetails, nextProps.personalDetails) &&
         prevProps.originalReportID === nextProps.originalReportID &&
         deepEqual(prevProps.originalReport?.participants, nextProps.originalReport?.participants) &&
