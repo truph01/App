@@ -402,7 +402,7 @@ function BaseModal({
                                     role={CONST.ROLE.BUTTON}
                                     accessibilityRole={CONST.ROLE.BUTTON}
                                     accessibilityLabel={translate('common.dismiss')}
-                                    sentryLabel="Modal-DismissDialog"
+                                    sentryLabel={CONST.SENTRY_LABEL.MODAL.DISMISS_DIALOG}
                                     style={styles.bottomDockedModalDismissButton}
                                 >
                                     <View />

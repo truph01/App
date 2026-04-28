@@ -8829,6 +8829,9 @@ const CONST = {
             SEND_BUTTON: 'AttachmentModal-SendButton',
             IMAGE_ZOOM: 'AttachmentModal-ImageZoom',
         },
+        MODAL: {
+            DISMISS_DIALOG: 'Modal-DismissDialog',
+        },
         HEADER: {
             BACK_BUTTON: 'Header-BackButton',
             DOWNLOAD_BUTTON: 'Header-DownloadButton',
