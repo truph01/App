@@ -63,7 +63,10 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
     });
 
     useFocusEffect(() => {
-        if (!queryJSON || isSnapshotDataLoaded || isSnapshotSearchLoading) {
+        if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
+            return;
+        }
+        if (isSnapshotDataLoaded || isSnapshotSearchLoading) {
             return;
         }
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
