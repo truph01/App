@@ -29,7 +29,7 @@ import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import type {AddExistingExpensesParamList} from '@libs/Navigation/types';
 import {canSubmitPerDiemExpenseFromWorkspace, getPerDiemCustomUnit} from '@libs/PolicyUtils';
-import {getTransactionDetails, isIOUReport, isOpenExpenseReport} from '@libs/ReportUtils';
+import {getTransactionDetails, isIOUReport} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import tokenizedSearch from '@libs/tokenizedSearch';
@@ -41,6 +41,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import {openExpenseReportIDsSelector} from '@src/selectors/Report';
 import {validTransactionDraftIDsSelector} from '@src/selectors/TransactionDraft';
 import type Transaction from '@src/types/onyx/Transaction';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
@@ -78,8 +79,8 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const shouldShowUnreportedTransactionsSkeletons = isLoadingUnreportedTransactions && hasMoreUnreportedTransactionsResults && !isOffline;
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
-    const [reportDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT);
+    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: openExpenseReportIDsSelector});
+    const [reportDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT, {selector: openExpenseReportIDsSelector});
     const isInLandscapeMode = useIsInLandscapeMode();
     const initialSkeletonReasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'AddExistingExpense.InitialSkeleton',
@@ -100,8 +101,7 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
             }
             return Object.values(transactions || {}).filter((item) => {
                 const isUnreported = isUnreportedTransaction(item);
-                const itemReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${item?.reportID}`] ?? reportDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_DRAFT}${item?.reportID}`];
-                const isOnOpenExpenseReport = isOpenExpenseReport(itemReport);
+                const isOnOpenExpenseReport = !!(item?.reportID && (allReports?.[item.reportID] ?? reportDrafts?.[item.reportID]));
                 if (!isUnreported && !isOnOpenExpenseReport) {
                     return false;
                 }
