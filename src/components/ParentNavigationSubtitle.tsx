@@ -198,7 +198,7 @@ function ParentNavigationSubtitle({
         // and update its params instead of pushing a new instance. Without this check, repeatedly
         // tapping the subtitle link builds up a [DM, Expense, DM, Expense, …] stack that traps
         // the user after an expense is deleted.
-        if ((currentReportIndex ?? 0) > 0 && focusedNavigatorState?.key) {
+        if ((currentReportIndex ?? 0) > 0 && focusedNavigatorState?.key && currentFocusedNavigator?.name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR) {
             const prevRoute = focusedNavigatorState.routes[(currentReportIndex ?? 0) - 1];
             const prevRouteReportID = prevRoute?.params && 'reportID' in prevRoute.params ? String(prevRoute.params.reportID) : undefined;
 
