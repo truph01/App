@@ -8,6 +8,7 @@
 
 set -euo pipefail
 
+# Disable the wrapper's cache flags when ESLint caching is explicitly disabled.
 use_cache=true
 for arg in "$@"; do
     if [[ "$arg" == "--no-cache" ]]; then
@@ -16,10 +17,12 @@ for arg in "$@"; do
     fi
 done
 
+# Preserve the old default of linting the whole repo when no target is passed.
 if [[ "$#" -eq 0 ]]; then
     set -- .
 fi
 
+# Build ESLint args so cache flags can be conditionally omitted.
 eslint_args=()
 if [[ "$use_cache" == "true" ]]; then
     eslint_args+=(
@@ -34,6 +37,7 @@ eslint_args+=(
     "$@"
 )
 
+# Run ESLint with the repo's default memory ceiling and seatbelt behavior.
 NODE_OPTIONS="${NODE_OPTIONS:---max_old_space_size=8192}" \
 SEATBELT_FROZEN="${SEATBELT_FROZEN:-0}" \
     exec npx eslint "${eslint_args[@]}"
