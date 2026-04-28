@@ -4,6 +4,8 @@
  * Seatbelt baseline dashboard — parses eslint.seatbelt.tsv and emits an HTML report
  * with aggregated tables and optional git history charts (Chart.js via CDN).
  *
+ * Styling uses the same dark palette as src/styles/theme/themes/dark.ts via @styles/theme/colors.
+ *
  * After writing, opens the report in your default browser unless --no-open is used or CI is set.
  * When the history chart is included, Chart.js is downloaded next to the HTML so file:// opens work;
  * tables work offline without Chart.js.
@@ -11,6 +13,7 @@
 import {execSync, spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import colors from '@styles/theme/colors';
 import CLI from './utils/CLI';
 import Git from './utils/Git';
 
@@ -21,6 +24,79 @@ const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd
 
 /** Written beside the HTML so `file://` loads work (remote scripts from disk are unreliable). */
 const CHART_BUNDLE_FILENAME = 'eslint-report.chart.umd.min.js';
+
+/**
+ * Semantic colors aligned with src/styles/theme/themes/dark.ts (dark theme).
+ * Font stacks match src/styles/utils/FontUtils/fontFamily/multiFontFamily (web-safe fallbacks).
+ */
+const REPORT_BODY_FONT = `'Expensify Neue', 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif`;
+const REPORT_MONO_FONT = `'Expensify Mono', ui-monospace, 'Segoe UI Mono', 'Menlo', monospace`;
+
+const REPORT_THEME = {
+    appBG: colors.productDark100,
+    cardBG: colors.productDark200,
+    border: colors.productDark400,
+    borderRow: colors.productDark400,
+    tableHeaderBG: colors.productDark300,
+    tableHeaderHoverBG: colors.productDark400,
+    text: colors.productDark900,
+    textSupporting: colors.productDark800,
+    heading: colors.productDark900,
+    link: colors.blue300,
+    codeBG: colors.productDark300,
+    chartSurface: colors.productDark200,
+    footerBorder: colors.productDark400,
+    accent: colors.green400,
+} as const;
+
+/** Distinct rule trend lines on dark chart surface (from theme palette). */
+const CHART_RULE_PALETTE = [
+    colors.blue300,
+    colors.tangerine300,
+    colors.ice300,
+    colors.pink300,
+    colors.yellow300,
+    colors.green300,
+    colors.blue200,
+    colors.tangerine200,
+    colors.ice400,
+    colors.pink400,
+];
+
+/** Encode #RRGGBB + alpha for Chart.js / CSS. */
+function hexWithAlpha(hex: string, alpha: number): string {
+    const n = hex.replace('#', '');
+    const r = Number.parseInt(n.slice(0, 2), 16);
+    const g = Number.parseInt(n.slice(2, 4), 16);
+    const b = Number.parseInt(n.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+
+type ChartUiPayload = {
+    totalLine: string;
+    totalFill: string;
+    tick: string;
+    grid: string;
+    legend: string;
+    tooltipBg: string;
+    tooltipBorder: string;
+    tooltipText: string;
+    rulePalette: string[];
+};
+
+function buildChartUiPayload(): ChartUiPayload {
+    return {
+        totalLine: colors.green400,
+        totalFill: hexWithAlpha(colors.green400, 0.12),
+        tick: colors.productDark800,
+        grid: hexWithAlpha(colors.productDark700, 0.35),
+        legend: colors.productDark900,
+        tooltipBg: colors.productDark400,
+        tooltipBorder: colors.productDark500,
+        tooltipText: colors.productDark900,
+        rulePalette: [...CHART_RULE_PALETTE],
+    };
+}
 
 /**
  * Download Chart.js UMD next to the report HTML (same directory as output path).
@@ -180,25 +256,12 @@ function escapeHtml(s: string): string {
     return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }
 
-/** Distinct colors for rule lines (Chart.js dataset borderColor). */
-const RULE_LINE_COLORS = [
-    'rgb(220, 53, 69)',
-    'rgb(255, 159, 64)',
-    'rgb(255, 205, 86)',
-    'rgb(75, 192, 192)',
-    'rgb(54, 162, 235)',
-    'rgb(153, 102, 255)',
-    'rgb(201, 203, 207)',
-    'rgb(102, 187, 106)',
-    'rgb(255, 112, 67)',
-    'rgb(126, 87, 194)',
-];
-
 type ChartPayload = {
     labels: string[];
     total: number[];
     /** Keys align with topRules; each entry is counts per commit for that rule */
     ruleSeries: Array<{rule: string; counts: number[]}>;
+    ui: ChartUiPayload;
 };
 
 function buildChartPayload(history: HistorySnapshot[], topRules: string[]): ChartPayload | null {
@@ -214,7 +277,7 @@ function buildChartPayload(history: HistorySnapshot[], topRules: string[]): Char
         rule,
         counts: history.map((h) => h.aggregates.byRule.get(rule) ?? 0),
     }));
-    return {labels, total, ruleSeries};
+    return {labels, total, ruleSeries, ui: buildChartUiPayload()};
 }
 
 function renderHtml(opts: {
@@ -244,27 +307,118 @@ function renderHtml(opts: {
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="dark"/>
+  <meta name="theme-color" content="${REPORT_THEME.appBG}"/>
   <title>ESLint seatbelt baseline</title>
   <style>
-    :root { font-family: system-ui, sans-serif; line-height: 1.4; color: #111; background: #fafafa; }
-    body { margin: 0 auto; max-width: 1200px; padding: 1rem 1.5rem 3rem; }
-    h1 { font-size: 1.35rem; margin-bottom: 0.25rem; }
-    .muted { color: #555; font-size: 0.9rem; }
-    .summary { margin: 1rem 0 1.5rem; padding: 0.75rem 1rem; background: #fff; border: 1px solid #ddd; border-radius: 6px; }
+    :root {
+      color-scheme: dark;
+      line-height: 1.45;
+      font-family: ${REPORT_BODY_FONT};
+      background: ${REPORT_THEME.appBG};
+      color: ${REPORT_THEME.text};
+    }
+    body {
+      margin: 0 auto;
+      max-width: 1200px;
+      padding: 1rem 1.5rem 3rem;
+      background: ${REPORT_THEME.appBG};
+      color: ${REPORT_THEME.text};
+    }
+    h1 {
+      font-size: 1.35rem;
+      margin-bottom: 0.25rem;
+      color: ${REPORT_THEME.heading};
+      font-weight: 600;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: ${REPORT_THEME.heading};
+      font-weight: 600;
+    }
+    .muted { color: ${REPORT_THEME.textSupporting}; font-size: 0.9rem; }
+    code {
+      font-family: ${REPORT_MONO_FONT};
+      background: ${REPORT_THEME.codeBG};
+      padding: 0.12rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+      color: ${REPORT_THEME.text};
+    }
+    .summary {
+      margin: 1rem 0 1.5rem;
+      padding: 0.75rem 1rem;
+      background: ${REPORT_THEME.cardBG};
+      border: 1px solid ${REPORT_THEME.border};
+      border-radius: 8px;
+    }
     .summary dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0; }
-    .summary dt { font-weight: 600; }
+    .summary dt { font-weight: 600; color: ${REPORT_THEME.textSupporting}; }
+    .summary dd { margin: 0; color: ${REPORT_THEME.text}; }
     section { margin-bottom: 2rem; }
-    h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; font-size: 0.9rem; }
-    th, td { padding: 0.45rem 0.65rem; text-align: left; border-bottom: 1px solid #eee; }
-    th { background: #f0f0f0; cursor: pointer; user-select: none; }
-    th:hover { background: #e8e8e8; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: ${REPORT_THEME.cardBG};
+      border: 1px solid ${REPORT_THEME.border};
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.45rem 0.65rem;
+      text-align: left;
+      border-bottom: 1px solid ${REPORT_THEME.borderRow};
+    }
+    th {
+      background: ${REPORT_THEME.tableHeaderBG};
+      cursor: pointer;
+      user-select: none;
+      color: ${REPORT_THEME.text};
+      font-weight: 600;
+    }
+    th:hover { background: ${REPORT_THEME.tableHeaderHoverBG}; }
     td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-    td.path { word-break: break-all; font-size: 0.82rem; }
-    .chart-wrap { position: relative; height: 380px; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 0.5rem; }
-    .chart-controls { margin: 0.5rem 0; display: flex; flex-wrap: wrap; gap: 0.65rem 1rem; align-items: center; font-size: 0.88rem; }
-    .chart-controls label { display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; }
-    footer { margin-top: 2rem; font-size: 0.85rem; color: #666; border-top: 1px solid #ddd; padding-top: 1rem; }
+    td.path {
+      word-break: break-all;
+      font-size: 0.82rem;
+      font-family: ${REPORT_MONO_FONT};
+      color: ${REPORT_THEME.textSupporting};
+    }
+    .chart-wrap {
+      position: relative;
+      height: 380px;
+      background: ${REPORT_THEME.chartSurface};
+      border: 1px solid ${REPORT_THEME.border};
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+    .chart-controls {
+      margin: 0.5rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem 1rem;
+      align-items: center;
+      font-size: 0.88rem;
+      color: ${REPORT_THEME.text};
+    }
+    .chart-controls label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+    .chart-controls input[type="checkbox"] { accent-color: ${REPORT_THEME.accent}; }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: ${REPORT_THEME.textSupporting};
+      border-top: 1px solid ${REPORT_THEME.footerBorder};
+      padding-top: 1rem;
+    }
+    footer a.footer-link { color: ${REPORT_THEME.link}; }
+    footer a.footer-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -311,9 +465,9 @@ function renderHtml(opts: {
   <footer>
     ${
         opts.chartScriptSrc
-            ? `<p>Chart.js is saved beside this report as <code>${escapeHtml(CHART_BUNDLE_FILENAME)}</code> (from ${escapeHtml(
+            ? `<p>Chart.js is saved beside this report as <code>${escapeHtml(CHART_BUNDLE_FILENAME)}</code> (<a class="footer-link" href="${escapeHtml(
                   CHART_JS_CDN,
-              )}) so opening via <code>file://</code> still loads the chart.</p>`
+              )}" target="_blank" rel="noopener noreferrer">pinned bundle</a>) so opening via <code>file://</code> still loads the chart.</p>`
             : ''
     }
     <p class="muted">Rule/file tables sort via the inline script below.</p>
@@ -353,25 +507,26 @@ function renderHtml(opts: {
     });
   });
 
-  if (!payload || typeof Chart === 'undefined') {
+  if (!payload || !payload.ui || typeof Chart === 'undefined') {
     return;
   }
 
+  var ui = payload.ui;
   var labels = payload.labels;
   var datasets = [{
     label: 'Total',
     data: payload.total,
-    borderColor: 'rgb(33, 37, 41)',
-    backgroundColor: 'rgba(33, 37, 41, 0.06)',
+    borderColor: ui.totalLine,
+    backgroundColor: ui.totalFill,
     tension: 0.15,
-    fill: false,
+    fill: true,
     borderWidth: 2,
     pointRadius: 2,
   }];
 
-  var palette = ${JSON.stringify(RULE_LINE_COLORS)};
+  var palette = ui.rulePalette || [];
   (payload.ruleSeries || []).forEach(function (rs, idx) {
-    var c = palette[idx % palette.length];
+    var c = palette.length ? palette[idx % palette.length] : ui.totalLine;
     datasets.push({
       label: rs.rule,
       data: rs.counts,
@@ -413,12 +568,30 @@ function renderHtml(opts: {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: true, position: 'bottom' },
-        tooltip: { enabled: true },
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: { color: ui.legend },
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: ui.tooltipBg,
+          borderColor: ui.tooltipBorder,
+          borderWidth: 1,
+          titleColor: ui.tooltipText,
+          bodyColor: ui.tooltipText,
+        },
       },
       scales: {
-        x: { ticks: { maxRotation: 45, minRotation: 0 } },
-        y: { beginAtZero: true },
+        x: {
+          ticks: { maxRotation: 45, minRotation: 0, color: ui.tick },
+          grid: { color: ui.grid },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: ui.tick },
+          grid: { color: ui.grid },
+        },
       },
     },
   });
