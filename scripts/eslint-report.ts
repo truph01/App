@@ -488,13 +488,13 @@ const renderHtml = (opts: {
     const tbody = table.querySelector('tbody');
     if (!tbody) return;
     const rows = [...tbody.querySelectorAll('tr')];
-    rows.sort((a, b) => {
-      const ca = a.cells[colIndex].textContent.trim();
-      const cb = b.cells[colIndex].textContent.trim();
+    rows.sort((leftRow, rightRow) => {
+      const cellTextLeft = leftRow.cells[colIndex].textContent.trim();
+      const cellTextRight = rightRow.cells[colIndex].textContent.trim();
       if (numeric) {
-        return Number(cb) - Number(ca);
+        return Number(cellTextRight) - Number(cellTextLeft);
       }
-      return ca.localeCompare(cb);
+      return cellTextLeft.localeCompare(cellTextRight);
     });
     for (const row of rows) {
       tbody.appendChild(row);
@@ -502,11 +502,11 @@ const renderHtml = (opts: {
   };
 
   const wireSortHeaders = (selector, tableId) => {
-    const ths = [...document.querySelectorAll(selector)];
-    for (let i = 0; i < ths.length; i++) {
-      const th = ths[i];
-      th.addEventListener('click', () => {
-        sortTable(tableId, i, th.dataset.sort === 'num');
+    const headerCells = [...document.querySelectorAll(selector)];
+    for (let columnIndex = 0; columnIndex < headerCells.length; columnIndex++) {
+      const headerCell = headerCells[columnIndex];
+      headerCell.addEventListener('click', () => {
+        sortTable(tableId, columnIndex, headerCell.dataset.sort === 'num');
       });
     }
   };
@@ -517,27 +517,27 @@ const renderHtml = (opts: {
     return;
   }
 
-  const ui = payload.ui;
+  const chartUi = payload.ui;
   const labels = payload.labels;
   const datasets = [{
     label: 'Total',
     data: payload.total,
-    borderColor: ui.totalLine,
-    backgroundColor: ui.totalFill,
+    borderColor: chartUi.totalLine,
+    backgroundColor: chartUi.totalFill,
     tension: 0.15,
     fill: true,
     borderWidth: 2,
     pointRadius: 2,
   }];
 
-  const palette = ui.rulePalette || [];
+  const palette = chartUi.rulePalette || [];
   const ruleSeriesList = payload.ruleSeries || [];
-  for (const [idx, rs] of ruleSeriesList.entries()) {
-    const c = palette.length ? palette[idx % palette.length] : ui.totalLine;
+  for (const [ruleSeriesIndex, ruleSeriesRow] of ruleSeriesList.entries()) {
+    const borderColor = palette.length ? palette[ruleSeriesIndex % palette.length] : chartUi.totalLine;
     datasets.push({
-      label: rs.rule,
-      data: rs.counts,
-      borderColor: c,
+      label: ruleSeriesRow.rule,
+      data: ruleSeriesRow.counts,
+      borderColor,
       backgroundColor: 'transparent',
       tension: 0.15,
       fill: false,
@@ -549,10 +549,10 @@ const renderHtml = (opts: {
 
   const toggleRoot = document.getElementById('chart-toggles');
 
-  const ctx = document.getElementById('history-chart');
-  if (!ctx) return;
+  const chartCanvas = document.getElementById('history-chart');
+  if (!chartCanvas) return;
 
-  const chart = new Chart(ctx, {
+  const chart = new Chart(chartCanvas, {
     type: 'line',
     data: { labels, datasets },
     options: {
@@ -563,51 +563,51 @@ const renderHtml = (opts: {
         legend: {
           display: true,
           position: 'bottom',
-          labels: { color: ui.legend },
+          labels: { color: chartUi.legend },
         },
         tooltip: {
           enabled: true,
-          backgroundColor: ui.tooltipBg,
-          borderColor: ui.tooltipBorder,
+          backgroundColor: chartUi.tooltipBg,
+          borderColor: chartUi.tooltipBorder,
           borderWidth: 1,
-          titleColor: ui.tooltipText,
-          bodyColor: ui.tooltipText,
+          titleColor: chartUi.tooltipText,
+          bodyColor: chartUi.tooltipText,
         },
       },
       scales: {
         x: {
-          ticks: { maxRotation: 45, minRotation: 0, color: ui.tick },
-          grid: { color: ui.grid },
+          ticks: { maxRotation: 45, minRotation: 0, color: chartUi.tick },
+          grid: { color: chartUi.grid },
         },
         y: {
           beginAtZero: true,
-          ticks: { color: ui.tick },
-          grid: { color: ui.grid },
+          ticks: { color: chartUi.tick },
+          grid: { color: chartUi.grid },
         },
       },
     },
   });
 
   if (toggleRoot) {
-    for (let i = 0; i < datasets.length; i++) {
-      const ds = datasets[i];
-      const lab = document.createElement('label');
-      const inp = document.createElement('input');
-      inp.type = 'checkbox';
-      inp.id = 'eslint-seatbelt-ds-' + i;
-      inp.checked = ds.hidden !== true;
-      inp.dataset.index = String(i);
-      const span = document.createElement('span');
-      span.textContent = ds.label;
-      lab.appendChild(inp);
-      lab.appendChild(span);
-      toggleRoot.appendChild(lab);
+    for (let datasetIndex = 0; datasetIndex < datasets.length; datasetIndex++) {
+      const chartDataset = datasets[datasetIndex];
+      const toggleLabel = document.createElement('label');
+      const visibilityCheckbox = document.createElement('input');
+      visibilityCheckbox.type = 'checkbox';
+      visibilityCheckbox.id = 'eslint-seatbelt-ds-' + datasetIndex;
+      visibilityCheckbox.checked = chartDataset.hidden !== true;
+      visibilityCheckbox.dataset.index = String(datasetIndex);
+      const datasetLabelSpan = document.createElement('span');
+      datasetLabelSpan.textContent = chartDataset.label;
+      toggleLabel.appendChild(visibilityCheckbox);
+      toggleLabel.appendChild(datasetLabelSpan);
+      toggleRoot.appendChild(toggleLabel);
     }
     const checkboxInputs = toggleRoot.querySelectorAll('input[type="checkbox"]');
-    for (const inp of checkboxInputs) {
-      inp.addEventListener('change', () => {
-        const idx = Number(inp.dataset.index);
-        chart.setDatasetVisibility(idx, inp.checked);
+    for (const checkboxInput of checkboxInputs) {
+      checkboxInput.addEventListener('change', () => {
+        const datasetIndexFromDom = Number(checkboxInput.dataset.index);
+        chart.setDatasetVisibility(datasetIndexFromDom, checkboxInput.checked);
         chart.update();
       });
     }
