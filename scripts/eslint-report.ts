@@ -16,6 +16,7 @@ import path from 'node:path';
 import colors from '@styles/theme/colors';
 import CLI from './utils/CLI';
 import Git from './utils/Git';
+import GitUtils from './utils/GitUtils';
 
 const SEATBELT_REL = 'config/eslint/eslint.seatbelt.tsv';
 
@@ -194,15 +195,6 @@ const trySeatbeltAtCommit = (hash: string): string | null => {
         return Git.show(hash, SEATBELT_REL);
     } catch {
         return null;
-    }
-};
-
-/** Requires cwd = App repo root (see runReport chdir). */
-const getGitHeadShort = (): string => {
-    try {
-        return execSync('git rev-parse --short HEAD', {encoding: 'utf8'}).trim();
-    } catch {
-        return 'unknown';
     }
 };
 
@@ -426,14 +418,14 @@ const renderHtml = (opts: {
 </head>
 <body>
   <h1>ESLint seatbelt baseline</h1>
-  <p class="muted">Grandfathered allowances from <code>eslint.seatbelt.tsv</code> — not a live ESLint run.</p>
+  <p class="muted">Aggregates come from parsing <code>eslint.seatbelt.tsv</code>, the source of truth for ESLint findings in this repo. This tool reads that file instead of running ESLint so the report stays fast—refresh or tighten the seatbelt before generating if you want updated counts.</p>
 
   <div class="summary">
     <dl>
       <dt>Generated</dt><dd>${escapeHtml(opts.generatedIso)}</dd>
       <dt>Git HEAD</dt><dd>${escapeHtml(opts.gitHead)}</dd>
-      <dt>Total grandfathered violations</dt><dd>${opts.grandTotal}</dd>
-      <dt>Files with allowances</dt><dd>${opts.uniqueFiles}</dd>
+      <dt>Total violations</dt><dd>${opts.grandTotal}</dd>
+      <dt>Files with findings</dt><dd>${opts.uniqueFiles}</dd>
       <dt>Distinct rules</dt><dd>${opts.uniqueRules}</dd>
     </dl>
   </div>
@@ -703,7 +695,7 @@ const runReport = async (): Promise<void> => {
     let gitHead: string;
     let history: HistorySnapshot[];
     try {
-        gitHead = getGitHeadShort();
+        gitHead = GitUtils.getHeadShort();
         history = buildHistory(projectRoot, seatbeltDir, gitLimit);
     } finally {
         process.chdir(prevCwd);
