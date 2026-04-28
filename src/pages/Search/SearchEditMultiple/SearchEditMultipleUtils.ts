@@ -1,5 +1,6 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
+import {isIOUReport} from '@libs/ReportUtils';
 import {getTagArrayFromName, isDistanceRequest, isPerDiemRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -67,6 +68,19 @@ function getTransactionEditContext(
  */
 function hasCustomUnitMerchantInSelection(selectedTransactionContexts: Array<{transaction: Transaction}>): boolean {
     return selectedTransactionContexts.some(({transaction}) => isDistanceRequest(transaction) || isPerDiemRequest(transaction));
+}
+
+/**
+ * Category/Tag/Tax only apply to expense/invoice reports and unreported (track) expenses.
+ * Returns true only when every selected transaction is eligible.
+ */
+function areAllTransactionsExpenseCompatible(selectedTransactionContexts: Array<{transaction: Transaction; report: OnyxEntry<Report>}>): boolean {
+    return selectedTransactionContexts.every(({transaction, report}) => {
+        if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
+            return true;
+        }
+        return !isIOUReport(report);
+    });
 }
 
 /**
@@ -146,6 +160,7 @@ export {
     getCommonDependentTag,
     getTransactionEditContext,
     hasCustomUnitMerchantInSelection,
+    areAllTransactionsExpenseCompatible,
     isBulkEditTaxTrackingEnabled,
     withSnapshotTransactions,
     withSnapshotReportActions,

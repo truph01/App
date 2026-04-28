@@ -26,6 +26,7 @@ import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
 import {
+    areAllTransactionsExpenseCompatible,
     getTransactionEditContext,
     hasCustomUnitMerchantInSelection,
     isBulkEditTaxTrackingEnabled,
@@ -108,14 +109,9 @@ function SearchEditMultiplePage() {
     const policyTagLists = getTagLists(policyTags);
 
     const isTaxTrackingEnabled = isBulkEditTaxTrackingEnabled(selectedTransactionContexts, policy, hasPerDiemOrTimeTransaction);
-    const areSelectedTransactionsExpenses = selectedTransactionContexts.every(({transaction, report}) => {
-        if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
-            return true;
-        }
-        return !isIOUReport(report);
-    });
+    const areSelectedTransactionsExpenses = areAllTransactionsExpenseCompatible(selectedTransactionContexts);
     const areCategoriesEnabled = areSelectedTransactionsExpenses && !!policy?.areCategoriesEnabled && hasEnabledOptions(policyCategories ?? {});
-    const areTagsEnabled = !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
+    const areTagsEnabled = areSelectedTransactionsExpenses && !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
 
     useEffect(() => {
         return () => {
