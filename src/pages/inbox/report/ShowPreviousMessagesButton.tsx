@@ -8,8 +8,8 @@ import CONST from '@src/CONST';
 import type {ReportAction} from '@src/types/onyx';
 
 type ShowPreviousMessagesButtonProps = {
-    /** The report action being rendered for this list item */
-    reportAction: ReportAction;
+    /** The action type of the report action being rendered for this list item */
+    actionType: ReportAction['actionName'];
 
     /** Whether there are previous messages hidden before the session start */
     hasPreviousMessages: boolean;
@@ -21,12 +21,12 @@ type ShowPreviousMessagesButtonProps = {
     onPress: () => void;
 };
 
-function ShowPreviousMessagesButton({reportAction, hasPreviousMessages, showFullHistory, onPress}: ShowPreviousMessagesButtonProps) {
+function ShowPreviousMessagesButton({actionType, hasPreviousMessages, showFullHistory, onPress}: ShowPreviousMessagesButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['UpArrow']);
 
-    if (reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED) {
+    if (actionType !== CONST.REPORT.ACTIONS.TYPE.CREATED) {
         return null;
     }
     if (!hasPreviousMessages) {

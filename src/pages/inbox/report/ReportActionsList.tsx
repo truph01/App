@@ -745,7 +745,7 @@ function ReportActionsList({
                     />
                     {!!isConciergeSidePanel && !!onShowPreviousMessages && (
                         <ShowPreviousMessagesButton
-                            reportAction={reportAction}
+                            actionType={reportAction.actionName}
                             hasPreviousMessages={!!hasPreviousMessages}
                             showFullHistory={!showHiddenHistory}
                             onPress={onShowPreviousMessages}

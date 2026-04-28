@@ -3,23 +3,14 @@ import React from 'react';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import ShowPreviousMessagesButton from '@pages/inbox/report/ShowPreviousMessagesButton';
 import CONST from '@src/CONST';
-import type {ReportAction} from '@src/types/onyx';
 
 jest.mock('@hooks/useLazyAsset', () => ({
     useMemoizedLazyExpensifyIcons: () => ({UpArrow: 'UpArrow'}),
 }));
 
-function buildAction(actionName: string): ReportAction {
-    return {
-        reportActionID: '1',
-        actionName,
-        created: '2026-04-21 00:00:00',
-    } as unknown as ReportAction;
-}
-
 const renderButton = (overrides: Partial<React.ComponentProps<typeof ShowPreviousMessagesButton>> = {}) => {
     const props = {
-        reportAction: buildAction(CONST.REPORT.ACTIONS.TYPE.CREATED),
+        actionType: CONST.REPORT.ACTIONS.TYPE.CREATED,
         hasPreviousMessages: true,
         showFullHistory: false,
         onPress: jest.fn(),
@@ -28,7 +19,7 @@ const renderButton = (overrides: Partial<React.ComponentProps<typeof ShowPreviou
     render(
         <OnyxListItemProvider>
             <ShowPreviousMessagesButton
-                reportAction={props.reportAction}
+                actionType={props.actionType}
                 hasPreviousMessages={props.hasPreviousMessages}
                 showFullHistory={props.showFullHistory}
                 onPress={props.onPress}
@@ -54,8 +45,8 @@ describe('ShowPreviousMessagesButton', () => {
         expect(onPress).toHaveBeenCalledTimes(1);
     });
 
-    it('renders nothing when the report action is not CREATED', () => {
-        renderButton({reportAction: buildAction(CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT)});
+    it('renders nothing when the action type is not CREATED', () => {
+        renderButton({actionType: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT});
         expect(screen.queryByRole('button')).toBeNull();
     });
 
