@@ -48,6 +48,7 @@
     "lint": "./scripts/lint.sh",
     "lint-changed": "./scripts/lintChanged.sh",
     "lint-watch": "onchange '**/*.{js,jsx,ts,tsx,mjs,cjs}' -- ./scripts/lint.sh {{changed}}",
+    "eslint-report": "ts-node scripts/eslint-report.ts",
     "shellcheck": "./scripts/shellCheck.sh",
     "spell": "cspell --color **/*",
     "spell-changed": "cspell --color --no-must-find-files",
