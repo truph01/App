@@ -405,7 +405,7 @@ function PureReportActionItem({
     const shouldRenderViewBasedOnAction = useTableReportViewActionRenderConditionals(action);
     const [isHidden, setIsHidden] = useState(false);
     const [moderationDecision, setModerationDecision] = useState<OnyxTypes.DecisionName>(CONST.MODERATION.MODERATOR_DECISION_APPROVED);
-    const reactionListRef = useContext(ReactionListContext);
+    const {isActiveReportAction: isActiveReactionListReportAction, hideReactionList} = useContext(ReactionListContext);
     const {updateHiddenAttachments} = useContext(AttachmentModalContext);
     const kycWallRef = useContext(KYCWallContext);
     const composerTextInputRef = useRef<TextInput | HTMLTextAreaElement>(null);
@@ -509,11 +509,11 @@ function PureReportActionItem({
             if (isActive(action.reportActionID)) {
                 hideEmojiPicker(true);
             }
-            if (reactionListRef?.current?.isActiveReportAction(action.reportActionID)) {
-                reactionListRef?.current?.hideReactionList();
+            if (isActiveReactionListReportAction(action.reportActionID)) {
+                hideReactionList();
             }
         },
-        [action.reportActionID, reactionListRef],
+        [action.reportActionID, isActiveReactionListReportAction, hideReactionList],
     );
 
     useEffect(() => {
