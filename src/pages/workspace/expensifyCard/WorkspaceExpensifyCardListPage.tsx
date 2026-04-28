@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 import type {ListRenderItemInfo} from 'react-native';
 import {FlatList, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -107,15 +107,10 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
     const [selectedCardIDs, setSelectedCardIDs] = useState<number[]>([]);
     const selectableCardIDs = filteredSortedCards.map((card) => card.cardID);
 
-    useEffect(() => {
-        setSelectedCardIDs((prev) => {
-            const next = prev.filter((id) => selectableCardIDs.includes(id));
-            if (next.length === prev.length && next.every((id, index) => id === prev.at(index))) {
-                return prev;
-            }
-            return next;
-        });
-    }, [selectableCardIDs]);
+    const prunedSelectedCardIDs = selectedCardIDs.filter((id) => selectableCardIDs.includes(id));
+    if (prunedSelectedCardIDs.length !== selectedCardIDs.length) {
+        setSelectedCardIDs(prunedSelectedCardIDs);
+    }
     const toggleCardSelection = (cardID: number) => {
         setSelectedCardIDs((prev) => (prev.includes(cardID) ? prev.filter((id) => id !== cardID) : [...prev, cardID]));
     };
