@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ValidateCodeActionContent from '@components/ValidateCodeActionModal/ValidateCodeActionContent';
@@ -21,7 +21,7 @@ type SetDefaultContactMethodConfirmMagicCodePageProps = PlatformStackScreenProps
 function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactMethodConfirmMagicCodePageProps) {
     const {translate, formatPhoneNumber} = useLocalize();
     const backTo = route.params?.backTo;
-    const contactMethod = useMemo(() => getDecodedContactMethodFromUriParam(route.params.contactMethod), [route.params.contactMethod]);
+    const contactMethod = getDecodedContactMethodFromUriParam(route.params.contactMethod);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
