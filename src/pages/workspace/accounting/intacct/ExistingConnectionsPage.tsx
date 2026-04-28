@@ -7,7 +7,7 @@ import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useReusablePoliciesConnectedToSageIntacct from '@hooks/useReusablePoliciesConnectedToSageIntacct';
+import useReusablePoliciesConnectedTo from '@hooks/useReusablePoliciesConnectedTo';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {copyExistingPolicyConnection} from '@libs/actions/connections';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
@@ -27,7 +27,7 @@ function ExistingConnectionsPage({route}: ExistingConnectionsPageProps) {
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
-    const {reusablePoliciesConnectedToSageIntacct} = useReusablePoliciesConnectedToSageIntacct(policyID);
+    const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToSageIntacct} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT, policyID);
 
     const menuItems = reusablePoliciesConnectedToSageIntacct.map((policy) => {
         const lastSuccessfulSyncDate = policy.connections?.intacct.lastSync?.successfulDate;
