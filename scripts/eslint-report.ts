@@ -16,7 +16,6 @@ import path from 'node:path';
 import colors from '@styles/theme/colors';
 import CLI from './utils/CLI';
 import Git from './utils/Git';
-import GitUtils from './utils/GitUtils';
 
 const SEATBELT_REL = 'config/eslint/eslint.seatbelt.tsv';
 
@@ -673,7 +672,7 @@ const runReport = async (): Promise<void> => {
     let gitHead: string;
     let history: HistorySnapshot[];
     try {
-        gitHead = GitUtils.getHeadShort();
+        gitHead = Git.getHeadShort();
         history = buildHistory(projectRoot, seatbeltDir, gitLimit);
     } finally {
         process.chdir(prevCwd);
