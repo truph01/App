@@ -39,7 +39,7 @@ function RestrictExpenseWorkspaceCreationToggle({domainAccountID, groupID}: Rest
                 shouldPlaceSubtitleBelowSwitch
                 isActive={isEnabled}
                 onToggle={(enabled) => {
-                    if (!group?.name) {
+                    if (!group) {
                         return;
                     }
                     updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPolicyCreation: enabled}, 'enableRestrictedPolicyCreation');
