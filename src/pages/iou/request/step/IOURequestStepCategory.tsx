@@ -1,5 +1,5 @@
 import lodashIsEmpty from 'lodash/isEmpty';
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {InteractionManager, View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
@@ -138,80 +138,55 @@ function IOURequestStepCategory({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [policyID]);
 
-    const navigateBack = useCallback(() => {
+    const navigateBack = () => {
         Navigation.goBack(backTo);
-    }, [backTo]);
+    };
 
-    const updateCategory = useCallback(
-        (category: ListItem) => {
-            const categorySearchText = category.searchText ?? '';
-            const isSelectedCategory = categorySearchText === categoryForDisplay;
-            const updatedCategory = isSelectedCategory ? '' : categorySearchText;
+    const updateCategory = (category: ListItem) => {
+        const categorySearchText = category.searchText ?? '';
+        const isSelectedCategory = categorySearchText === categoryForDisplay;
+        const updatedCategory = isSelectedCategory ? '' : categorySearchText;
 
-            if (transaction) {
-                // In the split flow, when editing we use SPLIT_TRANSACTION_DRAFT to save draft value
-                if (isEditingSplit) {
-                    setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {category: updatedCategory}, policy);
-                    navigateBack();
-                    return;
-                }
-
-                if (isEditing && report) {
-                    updateMoneyRequestCategory({
-                        transactionID: transaction.transactionID,
-                        transactionThreadReport: report,
-                        parentReport,
-                        parentReportNextStep,
-                        category: updatedCategory,
-                        policy,
-                        policyTagList: policyTags,
-                        policyCategories,
-                        policyRecentlyUsedCategories,
-                        currentUserAccountIDParam,
-                        currentUserEmailParam,
-                        isASAPSubmitBetaEnabled,
-                        hash: currentSearchHash,
-                    });
-                    navigateBack();
-                    return;
-                }
-            }
-
-            setMoneyRequestCategory(transactionID, updatedCategory, policy);
-
-            if (action === CONST.IOU.ACTION.CATEGORIZE && !backTo) {
-                if (report?.reportID) {
-                    Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, report.reportID));
-                }
+        if (transaction) {
+            // In the split flow, when editing we use SPLIT_TRANSACTION_DRAFT to save draft value
+            if (isEditingSplit) {
+                setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {category: updatedCategory}, policy);
+                navigateBack();
                 return;
             }
 
-            navigateBack();
-        },
-        [
-            action,
-            backTo,
-            categoryForDisplay,
-            currentSearchHash,
-            currentUserAccountIDParam,
-            currentUserEmailParam,
-            isASAPSubmitBetaEnabled,
-            isEditing,
-            isEditingSplit,
-            iouType,
-            navigateBack,
-            parentReport,
-            parentReportNextStep,
-            policy,
-            policyCategories,
-            policyRecentlyUsedCategories,
-            policyTags,
-            report,
-            splitDraftTransaction,
-            transaction,
-            transactionID,
-        ],
-    );
+            if (isEditing && report) {
+                updateMoneyRequestCategory({
+                    transactionID: transaction.transactionID,
+                    transactionThreadReport: report,
+                    parentReport,
+                    parentReportNextStep,
+                    category: updatedCategory,
+                    policy,
+                    policyTagList: policyTags,
+                    policyCategories,
+                    policyRecentlyUsedCategories,
+                    currentUserAccountIDParam,
+                    currentUserEmailParam,
+                    isASAPSubmitBetaEnabled,
+                    hash: currentSearchHash,
+                });
+                navigateBack();
+                return;
+            }
+        }
+
+        setMoneyRequestCategory(transactionID, updatedCategory, policy);
+
+        if (action === CONST.IOU.ACTION.CATEGORIZE && !backTo) {
+            if (report?.reportID) {
+                Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, report.reportID));
+            }
+            return;
+        }
+
+        navigateBack();
+    };
 
     return (
         <StepScreenWrapper
