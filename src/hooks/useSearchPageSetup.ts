@@ -26,6 +26,11 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
     const hash = queryJSON?.hash;
     const shouldCalculateTotals = useSearchShouldCalculateTotals(currentSearchKey, hash, true);
 
+    // Derived primitives so effects do not depend on the whole snapshot object (new reference every
+    // Onyx merge) while exhaustive-deps still sees every transition that matters for firing search().
+    const isSnapshotDataLoaded = queryJSON ? isSearchDataLoaded(currentSearchResults, queryJSON) : false;
+    const isSnapshotSearchLoading = !!currentSearchResults?.search?.isLoading;
+
     // Clear selected transactions when navigating to a different search query
     const clearOnHashChange = useCallback(() => {
         if (hash === undefined) {
@@ -42,29 +47,34 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
 
     // Fire search() when the query changes (hash). This runs at the page level so the
     // API request starts in parallel with the skeleton, before Search mounts its 14+ useOnyx hooks.
-    // currentSearchResults is intentionally read but not in deps — search should fire once per
-    // query change, not re-trigger on every data update from Onyx.
     useEffect(() => {
         if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
             return;
         }
-        if (isSearchDataLoaded(currentSearchResults, queryJSON) || currentSearchResults?.search?.isLoading) {
+        if (isSnapshotDataLoaded || isSnapshotSearchLoading) {
             return;
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- currentSearchResults is intentionally read but not in deps to avoid infinite re-triggering; currentSearchKey and shouldCalculateTotals are stable derived values
-    }, [hash, isOffline, shouldUseLiveData, queryJSON]);
+    }, [
+        hash,
+        isOffline,
+        shouldUseLiveData,
+        queryJSON,
+        isSnapshotDataLoaded,
+        isSnapshotSearchLoading,
+        currentSearchKey,
+        shouldCalculateTotals,
+    ]);
 
     useFocusEffect(
         useCallback(() => {
             openSearch();
-            if (!queryJSON || isSearchDataLoaded(currentSearchResults, queryJSON) || currentSearchResults?.search?.isLoading) {
+            if (!queryJSON || isSnapshotDataLoaded || isSnapshotSearchLoading) {
                 return;
             }
             search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
-            // eslint-disable-next-line react-hooks/exhaustive-deps -- currentSearchResults is intentionally read but not in deps to avoid re-triggering on every data update
-        }, [queryJSON, currentSearchKey, shouldCalculateTotals]),
+        }, [queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals]),
     );
 
     useEffect(() => {
