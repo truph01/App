@@ -1049,13 +1049,7 @@ function shouldClearConvertedAmount(transaction: OnyxInputOrEntry<Transaction>, 
     const transactionCurrency = getCurrency(transaction);
     const effectiveSourceCurrency = sourceCurrency ?? transactionCurrency;
 
-    if (effectiveSourceCurrency === destinationCurrency) {
-        return false;
-    }
-
-    const transactionMatchesDestination = transactionCurrency === destinationCurrency;
-
-    return !transactionMatchesDestination;
+    return effectiveSourceCurrency !== destinationCurrency && transactionCurrency !== destinationCurrency;
 }
 
 /**
