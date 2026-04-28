@@ -160,7 +160,9 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     // PUSH so the new RHP lands above the current tab. See https://github.com/Expensify/App/issues/88965.
     const actionPayload = (action as {payload?: {name?: string}}).payload;
     const targetIsRightModal = actionPayload?.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
-    const hasRightModalBelowCurrentTab = targetIsRightModal && currentState.routes.some((route, index) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR && index < currentState.index);
+    const focusIsOnTabNavigator = currentState.routes[currentState.index]?.name === NAVIGATORS.TAB_NAVIGATOR;
+    const hasRightModalBelowCurrentTab =
+        targetIsRightModal && focusIsOnTabNavigator && currentState.routes.some((route, index) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR && index < currentState.index);
 
     if (forceReplace) {
         action.type = CONST.NAVIGATION.ACTION_TYPE.REPLACE;
