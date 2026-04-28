@@ -193,7 +193,12 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     }
 
     // If we deep link to a RHP page, we want to make sure we have the correct full screen route under the overlay.
-    if (shouldCheckFullScreenRouteMatching(action)) {
+    // Bug 89006: skip this when current top is already RHP — pushing a TAB_NAVIGATOR via the additional
+    // dispatch on top of an open RHP creates a buried-RHP-between-TAB_NAVIGATORs corruption (the URL-derived
+    // state ends up adding a Tab(null)+RHP(null) pair instead of switching tabs in the existing
+    // underlying TAB_NAVIGATOR). The underlying tab is already in place from when the current RHP was
+    // first opened, so no fixup is needed here.
+    if (shouldCheckFullScreenRouteMatching(action) && currentState.routes[currentState.index]?.name !== NAVIGATORS.RIGHT_MODAL_NAVIGATOR) {
         const newFocusedRoute = findFocusedRoute(stateFromPath);
         if (newFocusedRoute) {
             // getMatchingFullScreenRoute returns a TAB_NAVIGATOR wrapper; unwrap it to get the
