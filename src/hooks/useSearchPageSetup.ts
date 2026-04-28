@@ -53,15 +53,17 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
-    }, [hash, isOffline, shouldUseLiveData, queryJSON, currentSearchKey, shouldCalculateTotals, currentSearchResults]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- currentSearchResults is intentionally read but not in deps to avoid infinite re-triggering; currentSearchKey and shouldCalculateTotals are stable derived values
+    }, [hash, isOffline, shouldUseLiveData, queryJSON]);
 
     useFocusEffect(
         useCallback(() => {
             openSearch();
-            if (!queryJSON) {
+            if (!queryJSON || isSearchDataLoaded(currentSearchResults, queryJSON) || currentSearchResults?.search?.isLoading) {
                 return;
             }
             search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
+            // eslint-disable-next-line react-hooks/exhaustive-deps -- currentSearchResults is intentionally read but not in deps to avoid re-triggering on every data update
         }, [queryJSON, currentSearchKey, shouldCalculateTotals]),
     );
 
