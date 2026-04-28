@@ -321,13 +321,11 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                     });
                     setFocusAndScrollToRight();
                 } else if (item.searchItemType === CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE) {
-                    if (!item.searchQuery) {
-                        return;
-                    }
+                    const {searchQuery} = item;
+                    backHistory(() => {
+                        askConcierge(searchQuery);
+                    });
                     onRouterClose();
-                    setTextInputValue('');
-                    setAutocompleteQueryValue('');
-                    askConcierge(item.searchQuery);
                 } else {
                     submitSearch(item.searchQuery, item.keyForList !== CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM);
                 }
@@ -355,8 +353,6 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             betas,
             contextualPoliciesMap,
             contextualReportsMap,
-            setTextInputValue,
-            setAutocompleteQueryValue,
             askConcierge,
         ],
     );
