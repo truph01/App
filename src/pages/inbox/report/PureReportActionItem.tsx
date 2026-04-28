@@ -58,7 +58,6 @@ import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNa
 import type {ReportsSplitNavigatorParamList} from '@libs/Navigation/types';
 import Permissions from '@libs/Permissions';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
-import {isPolicyAdmin} from '@libs/PolicyUtils';
 import {
     extractLinksFromMessageHtml,
     getChangedApproverActionMessage,
@@ -154,9 +153,6 @@ import TripSummary from './TripSummary';
 type PureReportActionItemProps = {
     /** Report for this action */
     report: OnyxEntry<OnyxTypes.Report>;
-
-    /** Policy for this action */
-    policy?: OnyxEntry<OnyxTypes.Policy>;
 
     /** The transaction thread report associated with the report for this action, if any */
     transactionThreadReport?: OnyxEntry<OnyxTypes.Report>;
@@ -296,7 +292,6 @@ const isEmptyHTML = <T extends React.JSX.Element>({props: {html}}: T): boolean =
 function PureReportActionItem({
     action,
     report,
-    policy,
     transactionThreadReport,
     linkedReportActionID,
     displayAsGroup,
@@ -759,7 +754,7 @@ function PureReportActionItem({
             children = (
                 <ApprovalFlowContent
                     action={action}
-                    policy={policy}
+                    policyID={report?.policyID}
                     reportID={reportID}
                     originalReport={originalReport}
                 />
@@ -768,7 +763,7 @@ function PureReportActionItem({
             children = (
                 <PaymentContent
                     action={action}
-                    policy={policy}
+                    policyID={report?.policyID}
                 />
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.REIMBURSED)) {
@@ -795,7 +790,7 @@ function PureReportActionItem({
             children = (
                 <PolicyChangeLogContent
                     action={action}
-                    policy={policy}
+                    policyID={report?.policyID}
                 />
             );
         } else if (action.actionName === CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION) {
@@ -844,7 +839,7 @@ function PureReportActionItem({
                     action={action}
                     reportID={reportID}
                     originalReportID={originalReportID}
-                    policy={policy}
+                    policyID={report?.policyID}
                 />
             );
         } else if (isActionableMentionWhisper(action)) {
@@ -853,7 +848,6 @@ function PureReportActionItem({
                     action={action}
                     report={report}
                     originalReport={originalReport}
-                    policy={policy}
                     originalReportID={originalReportID}
                     resolveActionableMentionWhisper={resolveActionableMentionWhisper}
                 />
@@ -882,12 +876,10 @@ function PureReportActionItem({
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.ROOM_CHANGE_LOG.LEAVE_ROOM)) {
             children = <ReportActionItemBasicMessage message={translate('report.actions.type.leftTheChat')} />;
         } else if (isCardIssuedAction(action)) {
-            const shouldNavigateToCardDetails = isPolicyAdmin(policy);
             children = (
                 <IssueCardMessage
                     action={action}
                     policyID={report?.policyID}
-                    shouldNavigateToCardDetails={shouldNavigateToCardDetails}
                 />
             );
         } else if (isCardBrokenConnectionAction(action)) {
