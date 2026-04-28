@@ -11,6 +11,8 @@
 import {execSync, spawnSync} from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import CLI from './utils/CLI';
+import Git from './utils/Git';
 
 const SEATBELT_REL = 'config/eslint/eslint.seatbelt.tsv';
 
@@ -119,31 +121,30 @@ function sortedEntries(map: Map<string, number>): Array<[string, number]> {
     return [...map.entries()].sort((a, b) => b[1] - a[1]);
 }
 
-function tryGitShow(projectRoot: string, hash: string, relPath: string): string | null {
+/**
+ * Read seatbelt TSV at a commit. Uses Git.show (cwd must be the App repo root).
+ */
+function trySeatbeltAtCommit(hash: string): string | null {
     try {
-        return execSync(`git show ${hash}:${relPath}`, {
-            cwd: projectRoot,
-            encoding: 'utf8',
-            maxBuffer: 64 * 1024 * 1024,
-            stdio: ['ignore', 'pipe', 'pipe'],
-        });
+        return Git.show(hash, SEATBELT_REL);
     } catch {
         return null;
     }
 }
 
-function getGitHead(projectRoot: string): string {
+/** Requires cwd = App repo root (see runReport chdir). */
+function getGitHeadShort(): string {
     try {
-        return execSync('git rev-parse --short HEAD', {cwd: projectRoot, encoding: 'utf8'}).trim();
+        return execSync('git rev-parse --short HEAD', {encoding: 'utf8'}).trim();
     } catch {
         return 'unknown';
     }
 }
 
-function listSeatbeltCommits(projectRoot: string, limit: number): GitCommitPoint[] {
+/** Requires cwd = App repo root. Git.ts has no wrapper for git log. */
+function listSeatbeltCommits(limit: number): GitCommitPoint[] {
     try {
         const out = execSync(`git log --reverse --format=%H%x09%cI -n ${limit} -- ${SEATBELT_REL}`, {
-            cwd: projectRoot,
             encoding: 'utf8',
         }).trim();
         if (!out) {
@@ -159,10 +160,10 @@ function listSeatbeltCommits(projectRoot: string, limit: number): GitCommitPoint
 }
 
 function buildHistory(projectRoot: string, seatbeltDir: string, gitLimit: number): HistorySnapshot[] {
-    const commits = listSeatbeltCommits(projectRoot, gitLimit);
+    const commits = listSeatbeltCommits(gitLimit);
     const snapshots: HistorySnapshot[] = [];
     for (const commit of commits) {
-        const content = tryGitShow(projectRoot, commit.hash, SEATBELT_REL);
+        const content = trySeatbeltAtCommit(commit.hash);
         if (content === null) {
             continue;
         }
@@ -452,48 +453,6 @@ function openHtmlReport(absPath: string): void {
     }
 }
 
-function parseArgs(argv: string[]): {
-    output: string;
-    gitLimit: number;
-    topRules: number;
-    openReport: boolean;
-} {
-    let output = path.join('reports', 'eslint-report.html');
-    let gitLimit = 200;
-    let topRules = 10;
-    let openReport = true;
-    for (let i = 2; i < argv.length; i++) {
-        const a = argv.at(i);
-        if (a === '--output' || a === '-o') {
-            i += 1;
-            output = argv.at(i) ?? output;
-        } else if (a === '--git-limit') {
-            i += 1;
-            gitLimit = Number.parseInt(argv.at(i) ?? '', 10) || gitLimit;
-        } else if (a === '--top-rules') {
-            i += 1;
-            topRules = Number.parseInt(argv.at(i) ?? '', 10) || topRules;
-        } else if (a === '--no-open') {
-            openReport = false;
-        } else if (a === '--help' || a === '-h') {
-            // eslint-disable-next-line no-console
-            console.log(`Usage: ts-node scripts/eslint-report.ts [options]
-
-Options:
-  --output, -o <path>   Output HTML (default: reports/eslint-report.html)
-  --git-limit <n>       Max commits for history chart (default: 200)
-  --top-rules <n>       Top N rules for optional trend lines (default: 10)
-  --no-open             Do not open the report in the default browser after writing
-  --help, -h            Show this message
-
-Opens the report in your default browser after generating unless --no-open is passed or CI is set.
-Requires network once to download Chart.js beside the HTML when history data exists (tables always work).`);
-            process.exit(0);
-        }
-    }
-    return {output, gitLimit, topRules, openReport};
-}
-
 function main(): void {
     runReport().catch((error: unknown) => {
         // eslint-disable-next-line no-console
@@ -507,7 +466,49 @@ async function runReport(): Promise<void> {
     const seatbeltPath = path.join(projectRoot, SEATBELT_REL);
     const seatbeltDir = path.dirname(seatbeltPath);
 
-    const {output, gitLimit, topRules, openReport} = parseArgs(process.argv);
+    /* CLI argv uses kebab-case for flags documented in help */
+    /* eslint-disable @typescript-eslint/naming-convention */
+    const cli = new CLI({
+        namedArgs: {
+            output: {
+                description: 'Output HTML path (relative to App repo root unless absolute)',
+                default: path.join('reports', 'eslint-report.html'),
+            },
+            'git-limit': {
+                description: 'Max commits for history chart',
+                default: 200,
+                parse: (val) => {
+                    const n = Number.parseInt(val, 10);
+                    if (!Number.isFinite(n) || n < 1) {
+                        throw new Error('Must be a positive integer');
+                    }
+                    return n;
+                },
+            },
+            'top-rules': {
+                description: 'Top N rules for optional trend lines',
+                default: 10,
+                parse: (val) => {
+                    const n = Number.parseInt(val, 10);
+                    if (!Number.isFinite(n) || n < 0) {
+                        throw new Error('Must be a non-negative integer');
+                    }
+                    return n;
+                },
+            },
+        },
+        flags: {
+            'no-open': {
+                description: 'Do not open the report in the browser after writing (also skipped when CI is set)',
+            },
+        },
+    });
+    /* eslint-enable @typescript-eslint/naming-convention */
+
+    const output = cli.namedArgs.output;
+    const gitLimit = cli.namedArgs['git-limit'];
+    const topRules = cli.namedArgs['top-rules'];
+    const openReport = !cli.flags['no-open'];
 
     if (!fs.existsSync(seatbeltPath)) {
         // eslint-disable-next-line no-console
@@ -521,10 +522,19 @@ async function runReport(): Promise<void> {
 
     const ruleRows = sortedEntries(agg.byRule);
     const fileRows = sortedEntries(agg.byFile);
-    const gitHead = getGitHead(projectRoot);
+
+    const prevCwd = process.cwd();
+    process.chdir(projectRoot);
+    let gitHead: string;
+    let history: HistorySnapshot[];
+    try {
+        gitHead = getGitHeadShort();
+        history = buildHistory(projectRoot, seatbeltDir, gitLimit);
+    } finally {
+        process.chdir(prevCwd);
+    }
 
     const topRuleNames = ruleRows.slice(0, topRules).map(([r]) => r);
-    const history = buildHistory(projectRoot, seatbeltDir, gitLimit);
     let chartPayload = buildChartPayload(history, topRuleNames);
     let chartWarning: string | null = null;
     if (!history.length) {
