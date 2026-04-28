@@ -156,7 +156,6 @@ function parseSeatbeltTsv(content: string): SeatbeltRow[] {
         }
         const parts = trimmed.split('\t');
         if (parts.length !== 3) {
-            // eslint-disable-next-line no-console
             console.warn(`eslint-report: skipping malformed line (${parts.length} columns): ${trimmed.slice(0, 120)}`);
             continue;
         }
@@ -165,7 +164,6 @@ function parseSeatbeltTsv(content: string): SeatbeltRow[] {
         const countStr = parts.at(2) ?? '';
         const count = Number.parseInt(countStr.trim(), 10);
         if (!Number.isFinite(count) || count < 0) {
-            // eslint-disable-next-line no-console
             console.warn(`eslint-report: skipping bad count for ${rawPath}: ${countStr}`);
             continue;
         }
@@ -628,7 +626,6 @@ function openHtmlReport(absPath: string): void {
 
 function main(): void {
     runReport().catch((error: unknown) => {
-        // eslint-disable-next-line no-console
         console.error(error instanceof Error ? error.message : error);
         process.exit(1);
     });
@@ -684,7 +681,6 @@ async function runReport(): Promise<void> {
     const openReport = !cli.flags['no-open'];
 
     if (!fs.existsSync(seatbeltPath)) {
-        // eslint-disable-next-line no-console
         console.error(`eslint-report: seatbelt file not found: ${seatbeltPath}`);
         process.exit(1);
     }
@@ -741,7 +737,6 @@ async function runReport(): Promise<void> {
     });
 
     fs.writeFileSync(outAbs, html, 'utf8');
-    // eslint-disable-next-line no-console
     console.log(`eslint-report: wrote ${outAbs}`);
 
     const shouldOpen = openReport && !process.env.CI;
@@ -749,7 +744,6 @@ async function runReport(): Promise<void> {
         try {
             openHtmlReport(outAbs);
         } catch {
-            // eslint-disable-next-line no-console
             console.warn('eslint-report: could not open report in browser (display unavailable?)');
         }
     }
