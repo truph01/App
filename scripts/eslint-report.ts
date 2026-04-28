@@ -4,7 +4,9 @@
  * Seatbelt baseline dashboard — parses eslint.seatbelt.tsv and emits an HTML report
  * with aggregated tables and optional git history charts (Chart.js via CDN).
  *
- * Offline: charts require network to load Chart.js from CDN; tables always work.
+ * After writing, opens the report in your default browser unless --no-open is used or CI is set.
+ * When the history chart is included, Chart.js is downloaded next to the HTML so file:// opens work;
+ * tables work offline without Chart.js.
  */
 import {execSync, spawnSync} from 'node:child_process';
 import fs from 'node:fs';
@@ -14,6 +16,27 @@ const SEATBELT_REL = 'config/eslint/eslint.seatbelt.tsv';
 
 /** Pinned Chart.js for reproducible reports (UMD build). */
 const CHART_JS_CDN = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js';
+
+/** Written beside the HTML so `file://` loads work (remote scripts from disk are unreliable). */
+const CHART_BUNDLE_FILENAME = 'eslint-report.chart.umd.min.js';
+
+/**
+ * Download Chart.js UMD next to the report HTML (same directory as output path).
+ */
+async function saveChartJsBesideHtml(htmlAbsPath: string): Promise<{ok: true} | {ok: false; message: string}> {
+    const dest = path.join(path.dirname(htmlAbsPath), CHART_BUNDLE_FILENAME);
+    try {
+        const res = await fetch(CHART_JS_CDN);
+        if (!res.ok) {
+            return {ok: false, message: `HTTP ${res.status}`};
+        }
+        fs.writeFileSync(dest, await res.text(), 'utf8');
+        return {ok: true};
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
+        return {ok: false, message};
+    }
+}
 
 type SeatbeltRow = {
     rawPath: string;
@@ -202,10 +225,16 @@ function renderHtml(opts: {
     ruleRows: Array<[string, number]>;
     fileRows: Array<[string, number]>;
     chartPayload: ChartPayload | null;
-    chartJsUrl: string;
+    /** Relative script URL (e.g. ./eslint-report.chart.umd.min.js) when chart is included; omit Chart otherwise. */
+    chartScriptSrc: string | null;
     chartWarning: string | null;
 }): string {
     const chartJson = JSON.stringify(opts.chartPayload);
+    const chartBundles =
+        opts.chartPayload && opts.chartScriptSrc
+            ? `<script type="application/json" id="eslint-report-data">${chartJson}</script>
+  <script src="${escapeHtml(opts.chartScriptSrc)}"></script>`
+            : '';
     const ruleRowsHtml = opts.ruleRows.map(([rule, n]) => `<tr><td>${escapeHtml(rule)}</td><td class="num">${n}</td></tr>`).join('\n');
     const fileRowsHtml = opts.fileRows.map(([file, n]) => `<tr><td class="path">${escapeHtml(file)}</td><td class="num">${n}</td></tr>`).join('\n');
 
@@ -279,11 +308,17 @@ function renderHtml(opts: {
   </section>
 
   <footer>
-    <p>Charts load Chart.js from CDN (${escapeHtml(opts.chartJsUrl)}). Without network access, charts will not render; tables remain available.</p>
+    ${
+        opts.chartScriptSrc
+            ? `<p>Chart.js is saved beside this report as <code>${escapeHtml(CHART_BUNDLE_FILENAME)}</code> (from ${escapeHtml(
+                  CHART_JS_CDN,
+              )}) so opening via <code>file://</code> still loads the chart.</p>`
+            : ''
+    }
+    <p class="muted">Rule/file tables sort via the inline script below.</p>
   </footer>
 
-  <script type="application/json" id="eslint-report-data">${chartJson}</script>
-  <script src="${escapeHtml(opts.chartJsUrl)}"></script>
+  ${chartBundles}
   <script>
 (function () {
   var dataEl = document.getElementById('eslint-report-data');
@@ -355,7 +390,7 @@ function renderHtml(opts: {
       var lab = document.createElement('label');
       var inp = document.createElement('input');
       inp.type = 'checkbox';
-      inp.id = id;
+      inp.id = 'eslint-seatbelt-ds-' + i;
       inp.checked = ds.hidden !== true;
       inp.dataset.index = String(i);
       var span = document.createElement('span');
@@ -402,16 +437,31 @@ function renderHtml(opts: {
 </html>`;
 }
 
+/**
+ * Open an HTML file with the OS default handler (typically your default browser).
+ */
+function openHtmlReport(absPath: string): void {
+    const absolute = path.resolve(absPath);
+    if (process.platform === 'darwin') {
+        spawnSync('open', [absolute], {stdio: 'ignore'});
+    } else if (process.platform === 'win32') {
+        // `start "" <path>` uses the empty window title so paths with spaces work.
+        spawnSync('cmd', ['/c', 'start', '', absolute], {stdio: 'ignore', windowsHide: true});
+    } else {
+        spawnSync('xdg-open', [absolute], {stdio: 'ignore'});
+    }
+}
+
 function parseArgs(argv: string[]): {
     output: string;
     gitLimit: number;
     topRules: number;
-    open: boolean;
+    openReport: boolean;
 } {
     let output = path.join('reports', 'eslint-report.html');
     let gitLimit = 200;
     let topRules = 10;
-    let open = false;
+    let openReport = true;
     for (let i = 2; i < argv.length; i++) {
         const a = argv.at(i);
         if (a === '--output' || a === '-o') {
@@ -423,32 +473,41 @@ function parseArgs(argv: string[]): {
         } else if (a === '--top-rules') {
             i += 1;
             topRules = Number.parseInt(argv.at(i) ?? '', 10) || topRules;
-        } else if (a === '--open') {
-            open = true;
+        } else if (a === '--no-open') {
+            openReport = false;
         } else if (a === '--help' || a === '-h') {
             // eslint-disable-next-line no-console
             console.log(`Usage: ts-node scripts/eslint-report.ts [options]
 
 Options:
   --output, -o <path>   Output HTML (default: reports/eslint-report.html)
-  --git-limit <n>     Max commits for history chart (default: 200)
+  --git-limit <n>       Max commits for history chart (default: 200)
   --top-rules <n>       Top N rules for optional trend lines (default: 10)
-  --open                Open report in default browser (macOS)
+  --no-open             Do not open the report in the default browser after writing
   --help, -h            Show this message
 
-Charts use Chart.js from CDN; offline viewing shows tables only.`);
+Opens the report in your default browser after generating unless --no-open is passed or CI is set.
+Requires network once to download Chart.js beside the HTML when history data exists (tables always work).`);
             process.exit(0);
         }
     }
-    return {output, gitLimit, topRules, open};
+    return {output, gitLimit, topRules, openReport};
 }
 
 function main(): void {
+    runReport().catch((error: unknown) => {
+        // eslint-disable-next-line no-console
+        console.error(error instanceof Error ? error.message : error);
+        process.exit(1);
+    });
+}
+
+async function runReport(): Promise<void> {
     const projectRoot = path.resolve(__dirname, '..');
     const seatbeltPath = path.join(projectRoot, SEATBELT_REL);
     const seatbeltDir = path.dirname(seatbeltPath);
 
-    const {output, gitLimit, topRules, open} = parseArgs(process.argv);
+    const {output, gitLimit, topRules, openReport} = parseArgs(process.argv);
 
     if (!fs.existsSync(seatbeltPath)) {
         // eslint-disable-next-line no-console
@@ -476,6 +535,15 @@ function main(): void {
     const outAbs = path.isAbsolute(output) ? output : path.join(projectRoot, output);
     fs.mkdirSync(path.dirname(outAbs), {recursive: true});
 
+    let chartScriptSrc: string | null = null;
+    if (chartPayload) {
+        const saved = await saveChartJsBesideHtml(outAbs);
+        if (!saved.ok) {
+            throw new Error(`eslint-report: could not download Chart.js: ${saved.message}`);
+        }
+        chartScriptSrc = `./${CHART_BUNDLE_FILENAME}`;
+    }
+
     const html = renderHtml({
         generatedIso: new Date().toISOString(),
         gitHead,
@@ -485,7 +553,7 @@ function main(): void {
         ruleRows,
         fileRows,
         chartPayload,
-        chartJsUrl: CHART_JS_CDN,
+        chartScriptSrc,
         chartWarning,
     });
 
@@ -493,8 +561,14 @@ function main(): void {
     // eslint-disable-next-line no-console
     console.log(`eslint-report: wrote ${outAbs}`);
 
-    if (open && process.platform === 'darwin') {
-        spawnSync('open', [outAbs], {stdio: 'ignore'});
+    const shouldOpen = openReport && !process.env.CI;
+    if (shouldOpen) {
+        try {
+            openHtmlReport(outAbs);
+        } catch {
+            // eslint-disable-next-line no-console
+            console.warn('eslint-report: could not open report in browser (display unavailable?)');
+        }
     }
 }
 
