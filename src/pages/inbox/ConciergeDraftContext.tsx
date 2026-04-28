@@ -1,5 +1,5 @@
 import {getReportChatType} from '@selectors/Report';
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import useOnyx from '@hooks/useOnyx';
 import {getReportChannelName} from '@libs/actions/Report';
 import Log from '@libs/Log';
@@ -56,9 +56,9 @@ function ConciergeDraftProvider({reportID, children}: React.PropsWithChildren<{r
 function ConciergeDraftGate({reportID, children}: React.PropsWithChildren<{reportID: string}>) {
     const [draft, setDraft] = useState<ConciergeDraft | null>(null);
 
-    const clearDraft = useCallback(() => {
+    const clearDraft = () => {
         setDraft(null);
-    }, []);
+    };
 
     useEffect(() => {
         const channelName = getReportChannelName(reportID);
@@ -98,20 +98,14 @@ function ConciergeDraftGate({reportID, children}: React.PropsWithChildren<{repor
         };
     }, [clearDraft, reportID]);
 
-    const stateValue = useMemo<ConciergeDraftState>(
-        () => ({
-            draftReportAction: draft?.reportAction ?? null,
-            hasActiveDraft: !!draft?.reportAction,
-        }),
-        [draft?.reportAction],
-    );
+    const stateValue: ConciergeDraftState = {
+        draftReportAction: draft?.reportAction ?? null,
+        hasActiveDraft: !!draft?.reportAction,
+    };
 
-    const actionsValue = useMemo<ConciergeDraftActions>(
-        () => ({
-            clearDraft,
-        }),
-        [clearDraft],
-    );
+    const actionsValue: ConciergeDraftActions = {
+        clearDraft,
+    };
 
     return (
         <ConciergeDraftActionsContext.Provider value={actionsValue}>

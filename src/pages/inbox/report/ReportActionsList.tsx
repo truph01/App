@@ -230,7 +230,7 @@ function ReportActionsList({
         return getSortedReportActions([...sortedVisibleReportActions, draftReportAction], true);
     }, [draftReportAction, sortedVisibleReportActions]);
     const draftMessageHTML = draftReportAction ? getReportActionMessage(draftReportAction)?.html : undefined;
-    const isSyntheticDraftVisible = !!draftReportAction && !sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID);
+    const isSyntheticDraftVisible = !!draftReportAction && renderedVisibleReportActions !== sortedVisibleReportActions;
     const draftAutoScrollKey = isSyntheticDraftVisible ? `${draftReportAction.reportActionID}:${draftMessageHTML ?? ''}` : '';
     const previousDraftAutoScrollKey = usePrevious(draftAutoScrollKey);
     const topReportAction = renderedVisibleReportActions.at(-1);
@@ -290,12 +290,12 @@ function ReportActionsList({
     }, [reportLastReadTime]);
 
     useEffect(() => {
-        if (!draftReportAction || !sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID)) {
+        if (!draftReportAction || isSyntheticDraftVisible) {
             return;
         }
 
         clearDraft();
-    }, [clearDraft, draftReportAction, sortedVisibleReportActions]);
+    }, [clearDraft, draftReportAction, isSyntheticDraftVisible]);
 
     const prevUnreadMarkerReportActionID = useRef<string | null>(null);
 
