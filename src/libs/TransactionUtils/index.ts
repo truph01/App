@@ -1042,11 +1042,17 @@ function getCurrency(transaction: OnyxInputOrEntry<Transaction>): string {
  * Transactions that match the destination currency can keep their convertedAmount since no conversion is needed.
  */
 function shouldClearConvertedAmount(transaction: OnyxInputOrEntry<Transaction>, sourceCurrency: string | undefined, destinationCurrency: string | undefined): boolean {
-    if (!sourceCurrency || !destinationCurrency || sourceCurrency === destinationCurrency) {
+    if (!destinationCurrency) {
         return false;
     }
 
     const transactionCurrency = getCurrency(transaction);
+    const effectiveSourceCurrency = sourceCurrency ?? transactionCurrency;
+
+    if (effectiveSourceCurrency === destinationCurrency) {
+        return false;
+    }
+
     const transactionMatchesDestination = transactionCurrency === destinationCurrency;
 
     return !transactionMatchesDestination;
