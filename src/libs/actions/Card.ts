@@ -1826,7 +1826,6 @@ function exportExpensifyCardListToCSV({policyID, cards, personalDetailsList, set
     const csvContent = [header, ...rows].join('\r\n');
     const safePolicySegment = policyID.replaceAll(/[^\dA-Za-z-_]/g, '') || 'workspace';
     const fileName = `ExpensifyCards_${safePolicySegment}.csv`;
-
     localFileDownload(fileName, csvContent, translate);
 }
 
