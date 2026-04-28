@@ -27,8 +27,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useReusablePoliciesConnectedToQBD from '@hooks/useReusablePoliciesConnectedToQBD';
-import useReusablePoliciesConnectedToSageIntacct from '@hooks/useReusablePoliciesConnectedToSageIntacct';
+import useReusablePoliciesConnectedTo from '@hooks/useReusablePoliciesConnectedTo';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
@@ -74,8 +73,8 @@ type RouteParams = {
 
 function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
     useWorkspaceDocumentTitle(policy?.name, 'workspace.common.accounting');
-    const {hasReusablePoliciesConnectedToSageIntacct} = useReusablePoliciesConnectedToSageIntacct(policy?.id);
-    const {hasReusablePoliciesConnectedToQBD} = useReusablePoliciesConnectedToQBD(policy?.id);
+    const {hasReusablePoliciesConnectedTo: hasReusablePoliciesConnectedToSageIntacct} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT, policy?.id);
+    const {hasReusablePoliciesConnectedTo: hasReusablePoliciesConnectedToQBD} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.QBD, policy?.id);
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policy?.id}`);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const theme = useTheme();
