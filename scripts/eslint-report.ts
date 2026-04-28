@@ -43,10 +43,8 @@ const REPORT_THEME = {
     text: colors.productDark900,
     textSupporting: colors.productDark800,
     heading: colors.productDark900,
-    link: colors.blue300,
     codeBG: colors.productDark300,
     chartSurface: colors.productDark200,
-    footerBorder: colors.productDark400,
     accent: colors.green400,
 } as const;
 
@@ -405,15 +403,6 @@ const renderHtml = (opts: {
       cursor: pointer;
     }
     .chart-controls input[type="checkbox"] { accent-color: ${REPORT_THEME.accent}; }
-    footer {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: ${REPORT_THEME.textSupporting};
-      border-top: 1px solid ${REPORT_THEME.footerBorder};
-      padding-top: 1rem;
-    }
-    footer a.footer-link { color: ${REPORT_THEME.link}; }
-    footer a.footer-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -456,17 +445,6 @@ const renderHtml = (opts: {
       <tbody>${fileRowsHtml}</tbody>
     </table>
   </section>
-
-  <footer>
-    ${
-        opts.chartScriptSrc
-            ? `<p>Chart.js is saved beside this report as <code>${escapeHtml(CHART_BUNDLE_FILENAME)}</code> (<a class="footer-link" href="${escapeHtml(
-                  CHART_JS_CDN,
-              )}" target="_blank" rel="noopener noreferrer">pinned bundle</a>) so opening via <code>file://</code> still loads the chart.</p>`
-            : ''
-    }
-    <p class="muted">Rule/file tables sort via the inline script below.</p>
-  </footer>
 
   ${chartBundles}
   <script>
