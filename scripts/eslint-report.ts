@@ -2,7 +2,7 @@
 
 /**
  * Seatbelt baseline dashboard — parses eslint.seatbelt.tsv and emits an HTML report
- * with aggregated tables and optional git history charts (Chart.js via CDN).
+ * with aggregated tables and optional git history charts (Chart.js pinned beside the HTML).
  *
  * Styling uses the same dark palette as src/styles/theme/themes/dark.ts via @styles/theme/colors.
  *
@@ -64,13 +64,13 @@ const CHART_RULE_PALETTE = [
 ];
 
 /** Encode #RRGGBB + alpha for Chart.js / CSS. */
-function hexWithAlpha(hex: string, alpha: number): string {
+const hexWithAlpha = (hex: string, alpha: number): string => {
     const n = hex.replace('#', '');
     const r = Number.parseInt(n.slice(0, 2), 16);
     const g = Number.parseInt(n.slice(2, 4), 16);
     const b = Number.parseInt(n.slice(4, 6), 16);
     return `rgba(${r},${g},${b},${alpha})`;
-}
+};
 
 type ChartUiPayload = {
     totalLine: string;
@@ -84,24 +84,22 @@ type ChartUiPayload = {
     rulePalette: string[];
 };
 
-function buildChartUiPayload(): ChartUiPayload {
-    return {
-        totalLine: colors.green400,
-        totalFill: hexWithAlpha(colors.green400, 0.12),
-        tick: colors.productDark800,
-        grid: hexWithAlpha(colors.productDark700, 0.35),
-        legend: colors.productDark900,
-        tooltipBg: colors.productDark400,
-        tooltipBorder: colors.productDark500,
-        tooltipText: colors.productDark900,
-        rulePalette: [...CHART_RULE_PALETTE],
-    };
-}
+const buildChartUiPayload = (): ChartUiPayload => ({
+    totalLine: REPORT_THEME.accent,
+    totalFill: hexWithAlpha(REPORT_THEME.accent, 0.12),
+    tick: colors.productDark800,
+    grid: hexWithAlpha(colors.productDark700, 0.35),
+    legend: colors.productDark900,
+    tooltipBg: colors.productDark400,
+    tooltipBorder: colors.productDark500,
+    tooltipText: colors.productDark900,
+    rulePalette: [...CHART_RULE_PALETTE],
+});
 
 /**
  * Download Chart.js UMD next to the report HTML (same directory as output path).
  */
-async function saveChartJsBesideHtml(htmlAbsPath: string): Promise<{ok: true} | {ok: false; message: string}> {
+const saveChartJsBesideHtml = async (htmlAbsPath: string): Promise<{ok: true} | {ok: false; message: string}> => {
     const dest = path.join(path.dirname(htmlAbsPath), CHART_BUNDLE_FILENAME);
     try {
         const res = await fetch(CHART_JS_CDN);
@@ -114,7 +112,7 @@ async function saveChartJsBesideHtml(htmlAbsPath: string): Promise<{ok: true} | 
         const message = error instanceof Error ? error.message : String(error);
         return {ok: false, message};
     }
-}
+};
 
 type SeatbeltRow = {
     rawPath: string;
@@ -138,18 +136,17 @@ type HistorySnapshot = {
     aggregates: Aggregates;
 };
 
-function stripQuotes(field: string): string {
+const stripQuotes = (field: string): string => {
     const t = field.trim();
     if (t.length >= 2 && t.startsWith('"') && t.endsWith('"')) {
         return t.slice(1, -1);
     }
     return t;
-}
+};
 
-function parseSeatbeltTsv(content: string): SeatbeltRow[] {
+const parseSeatbeltTsv = (content: string): SeatbeltRow[] => {
     const rows: SeatbeltRow[] = [];
-    const lines = content.split(/\r?\n/);
-    for (const line of lines) {
+    for (const line of content.split(/\r?\n/)) {
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('#')) {
             continue;
@@ -170,15 +167,11 @@ function parseSeatbeltTsv(content: string): SeatbeltRow[] {
         rows.push({rawPath, rule, count});
     }
     return rows;
-}
+};
 
-function normalizeFilePath(projectRoot: string, seatbeltDir: string, rawPath: string): string {
-    const abs = path.resolve(seatbeltDir, rawPath);
-    const rel = path.relative(projectRoot, abs);
-    return rel.split(path.sep).join('/');
-}
+const normalizeFilePath = (projectRoot: string, seatbeltDir: string, rawPath: string): string => path.relative(projectRoot, path.resolve(seatbeltDir, rawPath)).split(path.sep).join('/');
 
-function aggregate(rows: SeatbeltRow[], projectRoot: string, seatbeltDir: string): Aggregates {
+const aggregate = (rows: SeatbeltRow[], projectRoot: string, seatbeltDir: string): Aggregates => {
     const byRule = new Map<string, number>();
     const byFile = new Map<string, number>();
     let grandTotal = 0;
@@ -189,34 +182,32 @@ function aggregate(rows: SeatbeltRow[], projectRoot: string, seatbeltDir: string
         byFile.set(fileKey, (byFile.get(fileKey) ?? 0) + row.count);
     }
     return {byRule, byFile, grandTotal};
-}
+};
 
-function sortedEntries(map: Map<string, number>): Array<[string, number]> {
-    return [...map.entries()].sort((a, b) => b[1] - a[1]);
-}
+const sortedEntries = (map: Map<string, number>): Array<[string, number]> => [...map.entries()].sort((a, b) => b[1] - a[1]);
 
 /**
  * Read seatbelt TSV at a commit. Uses Git.show (cwd must be the App repo root).
  */
-function trySeatbeltAtCommit(hash: string): string | null {
+const trySeatbeltAtCommit = (hash: string): string | null => {
     try {
         return Git.show(hash, SEATBELT_REL);
     } catch {
         return null;
     }
-}
+};
 
 /** Requires cwd = App repo root (see runReport chdir). */
-function getGitHeadShort(): string {
+const getGitHeadShort = (): string => {
     try {
         return execSync('git rev-parse --short HEAD', {encoding: 'utf8'}).trim();
     } catch {
         return 'unknown';
     }
-}
+};
 
 /** Requires cwd = App repo root. Git.ts has no wrapper for git log. */
-function listSeatbeltCommits(limit: number): GitCommitPoint[] {
+const listSeatbeltCommits = (limit: number): GitCommitPoint[] => {
     try {
         const out = execSync(`git log --reverse --format=%H%x09%cI -n ${limit} -- ${SEATBELT_REL}`, {
             encoding: 'utf8',
@@ -224,16 +215,18 @@ function listSeatbeltCommits(limit: number): GitCommitPoint[] {
         if (!out) {
             return [];
         }
-        return out.split('\n').map((line) => {
+        const commits: GitCommitPoint[] = [];
+        for (const line of out.split('\n')) {
             const [hash, isoDate] = line.split('\t');
-            return {hash, isoDate};
-        });
+            commits.push({hash, isoDate});
+        }
+        return commits;
     } catch {
         return [];
     }
-}
+};
 
-function buildHistory(projectRoot: string, seatbeltDir: string, gitLimit: number): HistorySnapshot[] {
+const buildHistory = (projectRoot: string, seatbeltDir: string, gitLimit: number): HistorySnapshot[] => {
     const commits = listSeatbeltCommits(gitLimit);
     const snapshots: HistorySnapshot[] = [];
     for (const commit of commits) {
@@ -248,11 +241,9 @@ function buildHistory(projectRoot: string, seatbeltDir: string, gitLimit: number
         });
     }
     return snapshots;
-}
+};
 
-function escapeHtml(s: string): string {
-    return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-}
+const escapeHtml = (s: string): string => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 
 type ChartPayload = {
     labels: string[];
@@ -262,23 +253,32 @@ type ChartPayload = {
     ui: ChartUiPayload;
 };
 
-function buildChartPayload(history: HistorySnapshot[], topRules: string[]): ChartPayload | null {
+const commitDayLabel = (isoDate: string): string => {
+    const d = new Date(isoDate);
+    return Number.isNaN(d.getTime()) ? isoDate.slice(0, 10) : d.toISOString().slice(0, 10);
+};
+
+const buildChartPayload = (history: HistorySnapshot[], topRules: string[]): ChartPayload | null => {
     if (!history.length) {
         return null;
     }
-    const labels = history.map((h) => {
-        const d = new Date(h.commit.isoDate);
-        return Number.isNaN(d.getTime()) ? h.commit.isoDate.slice(0, 10) : d.toISOString().slice(0, 10);
-    });
-    const total = history.map((h) => h.aggregates.grandTotal);
-    const ruleSeries = topRules.map((rule) => ({
-        rule,
-        counts: history.map((h) => h.aggregates.byRule.get(rule) ?? 0),
-    }));
+    const labels: string[] = [];
+    const total: number[] = [];
+    for (const h of history) {
+        labels.push(commitDayLabel(h.commit.isoDate));
+        total.push(h.aggregates.grandTotal);
+    }
+    const ruleSeries: Array<{rule: string; counts: number[]}> = [];
+    for (const rule of topRules) {
+        ruleSeries.push({
+            rule,
+            counts: history.map((h) => h.aggregates.byRule.get(rule) ?? 0),
+        });
+    }
     return {labels, total, ruleSeries, ui: buildChartUiPayload()};
-}
+};
 
-function renderHtml(opts: {
+const renderHtml = (opts: {
     generatedIso: string;
     gitHead: string;
     grandTotal: number;
@@ -290,15 +290,19 @@ function renderHtml(opts: {
     /** Relative script URL (e.g. ./eslint-report.chart.umd.min.js) when chart is included; omit Chart otherwise. */
     chartScriptSrc: string | null;
     chartWarning: string | null;
-}): string {
-    const chartJson = JSON.stringify(opts.chartPayload);
+}): string => {
     const chartBundles =
         opts.chartPayload && opts.chartScriptSrc
-            ? `<script type="application/json" id="eslint-report-data">${chartJson}</script>
+            ? `<script type="application/json" id="eslint-report-data">${JSON.stringify(opts.chartPayload)}</script>
   <script src="${escapeHtml(opts.chartScriptSrc)}"></script>`
             : '';
     const ruleRowsHtml = opts.ruleRows.map(([rule, n]) => `<tr><td>${escapeHtml(rule)}</td><td class="num">${n}</td></tr>`).join('\n');
     const fileRowsHtml = opts.fileRows.map(([file, n]) => `<tr><td class="path">${escapeHtml(file)}</td><td class="num">${n}</td></tr>`).join('\n');
+
+    /** Inline SVG so favicon works when opening the report via file:// (no extra asset files). */
+    const faviconHref = `data:image/svg+xml,${encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="${REPORT_THEME.chartSurface}"/><rect x="6.5" y="17" width="5" height="9" rx="1.25" fill="${REPORT_THEME.accent}"/><rect x="13.5" y="11" width="5" height="15" rx="1.25" fill="${REPORT_THEME.accent}" opacity="0.92"/><rect x="20.5" y="6" width="5" height="20" rx="1.25" fill="${REPORT_THEME.accent}" opacity="0.82"/></svg>`,
+    )}`;
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -307,6 +311,7 @@ function renderHtml(opts: {
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="dark"/>
   <meta name="theme-color" content="${REPORT_THEME.appBG}"/>
+  <link rel="icon" href="${faviconHref}" type="image/svg+xml" sizes="any"/>
   <title>ESLint seatbelt baseline</title>
   <style>
     :root {
@@ -434,7 +439,7 @@ function renderHtml(opts: {
   </div>
 
   <section>
-    <h2>History (${opts.chartPayload ? opts.chartPayload.labels.length : 0} commits)</h2>
+    <h2>History (${opts.chartPayload?.labels.length ?? 0} commits)</h2>
     ${opts.chartWarning ? `<p class="muted">${escapeHtml(opts.chartWarning)}</p>` : ''}
     ${
         opts.chartPayload
@@ -473,45 +478,48 @@ function renderHtml(opts: {
 
   ${chartBundles}
   <script>
-(function () {
-  var dataEl = document.getElementById('eslint-report-data');
-  var payload = dataEl ? JSON.parse(dataEl.textContent || 'null') : null;
+(() => {
+  const dataEl = document.getElementById('eslint-report-data');
+  const payload = dataEl ? JSON.parse(dataEl.textContent || 'null') : null;
 
-  function sortTable(tableId, colIndex, numeric) {
-    var table = document.getElementById(tableId);
+  const sortTable = (tableId, colIndex, numeric) => {
+    const table = document.getElementById(tableId);
     if (!table) return;
-    var tbody = table.querySelector('tbody');
+    const tbody = table.querySelector('tbody');
     if (!tbody) return;
-    var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
-    rows.sort(function (a, b) {
-      var ca = a.cells[colIndex].textContent.trim();
-      var cb = b.cells[colIndex].textContent.trim();
+    const rows = [...tbody.querySelectorAll('tr')];
+    rows.sort((a, b) => {
+      const ca = a.cells[colIndex].textContent.trim();
+      const cb = b.cells[colIndex].textContent.trim();
       if (numeric) {
         return Number(cb) - Number(ca);
       }
       return ca.localeCompare(cb);
     });
-    rows.forEach(function (row) { tbody.appendChild(row); });
-  }
+    for (const row of rows) {
+      tbody.appendChild(row);
+    }
+  };
 
-  document.querySelectorAll('#table-rules thead th').forEach(function (th, i) {
-    th.addEventListener('click', function () {
-      sortTable('table-rules', i, th.dataset.sort === 'num');
-    });
-  });
-  document.querySelectorAll('#table-files thead th').forEach(function (th, i) {
-    th.addEventListener('click', function () {
-      sortTable('table-files', i, th.dataset.sort === 'num');
-    });
-  });
+  const wireSortHeaders = (selector, tableId) => {
+    const ths = [...document.querySelectorAll(selector)];
+    for (let i = 0; i < ths.length; i++) {
+      const th = ths[i];
+      th.addEventListener('click', () => {
+        sortTable(tableId, i, th.dataset.sort === 'num');
+      });
+    }
+  };
+  wireSortHeaders('#table-rules thead th', 'table-rules');
+  wireSortHeaders('#table-files thead th', 'table-files');
 
   if (!payload || !payload.ui || typeof Chart === 'undefined') {
     return;
   }
 
-  var ui = payload.ui;
-  var labels = payload.labels;
-  var datasets = [{
+  const ui = payload.ui;
+  const labels = payload.labels;
+  const datasets = [{
     label: 'Total',
     data: payload.total,
     borderColor: ui.totalLine,
@@ -522,9 +530,10 @@ function renderHtml(opts: {
     pointRadius: 2,
   }];
 
-  var palette = ui.rulePalette || [];
-  (payload.ruleSeries || []).forEach(function (rs, idx) {
-    var c = palette.length ? palette[idx % palette.length] : ui.totalLine;
+  const palette = ui.rulePalette || [];
+  const ruleSeriesList = payload.ruleSeries || [];
+  for (const [idx, rs] of ruleSeriesList.entries()) {
+    const c = palette.length ? palette[idx % palette.length] : ui.totalLine;
     datasets.push({
       label: rs.rule,
       data: rs.counts,
@@ -536,31 +545,16 @@ function renderHtml(opts: {
       pointRadius: 0,
       hidden: true,
     });
-  });
-
-  var toggleRoot = document.getElementById('chart-toggles');
-  if (toggleRoot) {
-    datasets.forEach(function (ds, i) {
-      var lab = document.createElement('label');
-      var inp = document.createElement('input');
-      inp.type = 'checkbox';
-      inp.id = 'eslint-seatbelt-ds-' + i;
-      inp.checked = ds.hidden !== true;
-      inp.dataset.index = String(i);
-      var span = document.createElement('span');
-      span.textContent = ds.label;
-      lab.appendChild(inp);
-      lab.appendChild(span);
-      toggleRoot.appendChild(lab);
-    });
   }
 
-  var ctx = document.getElementById('history-chart');
+  const toggleRoot = document.getElementById('chart-toggles');
+
+  const ctx = document.getElementById('history-chart');
   if (!ctx) return;
 
-  var chart = new Chart(ctx, {
+  const chart = new Chart(ctx, {
     type: 'line',
-    data: { labels: labels, datasets: datasets },
+    data: { labels, datasets },
     options: {
       responsive: true,
       maintainAspectRatio: false,
@@ -595,24 +589,39 @@ function renderHtml(opts: {
   });
 
   if (toggleRoot) {
-    toggleRoot.querySelectorAll('input[type="checkbox"]').forEach(function (inp) {
-      inp.addEventListener('change', function () {
-        var idx = Number(inp.dataset.index);
+    for (let i = 0; i < datasets.length; i++) {
+      const ds = datasets[i];
+      const lab = document.createElement('label');
+      const inp = document.createElement('input');
+      inp.type = 'checkbox';
+      inp.id = 'eslint-seatbelt-ds-' + i;
+      inp.checked = ds.hidden !== true;
+      inp.dataset.index = String(i);
+      const span = document.createElement('span');
+      span.textContent = ds.label;
+      lab.appendChild(inp);
+      lab.appendChild(span);
+      toggleRoot.appendChild(lab);
+    }
+    const checkboxInputs = toggleRoot.querySelectorAll('input[type="checkbox"]');
+    for (const inp of checkboxInputs) {
+      inp.addEventListener('change', () => {
+        const idx = Number(inp.dataset.index);
         chart.setDatasetVisibility(idx, inp.checked);
         chart.update();
       });
-    });
+    }
   }
 })();
   </script>
 </body>
 </html>`;
-}
+};
 
 /**
  * Open an HTML file with the OS default handler (typically your default browser).
  */
-function openHtmlReport(absPath: string): void {
+const openHtmlReport = (absPath: string): void => {
     const absolute = path.resolve(absPath);
     if (process.platform === 'darwin') {
         spawnSync('open', [absolute], {stdio: 'ignore'});
@@ -622,16 +631,25 @@ function openHtmlReport(absPath: string): void {
     } else {
         spawnSync('xdg-open', [absolute], {stdio: 'ignore'});
     }
-}
+};
 
-function main(): void {
-    runReport().catch((error: unknown) => {
-        console.error(error instanceof Error ? error.message : error);
-        process.exit(1);
-    });
-}
+const parsePositiveIntArg = (val: string): number => {
+    const n = Number.parseInt(val, 10);
+    if (!Number.isFinite(n) || n < 1) {
+        throw new Error('Must be a positive integer');
+    }
+    return n;
+};
 
-async function runReport(): Promise<void> {
+const parseNonNegativeIntArg = (val: string): number => {
+    const n = Number.parseInt(val, 10);
+    if (!Number.isFinite(n) || n < 0) {
+        throw new Error('Must be a non-negative integer');
+    }
+    return n;
+};
+
+const runReport = async (): Promise<void> => {
     const projectRoot = path.resolve(__dirname, '..');
     const seatbeltPath = path.join(projectRoot, SEATBELT_REL);
     const seatbeltDir = path.dirname(seatbeltPath);
@@ -647,24 +665,12 @@ async function runReport(): Promise<void> {
             'git-limit': {
                 description: 'Max commits for history chart',
                 default: 200,
-                parse: (val) => {
-                    const n = Number.parseInt(val, 10);
-                    if (!Number.isFinite(n) || n < 1) {
-                        throw new Error('Must be a positive integer');
-                    }
-                    return n;
-                },
+                parse: parsePositiveIntArg,
             },
             'top-rules': {
                 description: 'Top N rules for optional trend lines',
                 default: 10,
-                parse: (val) => {
-                    const n = Number.parseInt(val, 10);
-                    if (!Number.isFinite(n) || n < 0) {
-                        throw new Error('Must be a non-negative integer');
-                    }
-                    return n;
-                },
+                parse: parseNonNegativeIntArg,
             },
         },
         flags: {
@@ -703,7 +709,7 @@ async function runReport(): Promise<void> {
         process.chdir(prevCwd);
     }
 
-    const topRuleNames = ruleRows.slice(0, topRules).map(([r]) => r);
+    const topRuleNames = ruleRows.slice(0, topRules).map(([name]) => name);
     let chartPayload = buildChartPayload(history, topRuleNames);
     let chartWarning: string | null = null;
     if (!history.length) {
@@ -747,6 +753,17 @@ async function runReport(): Promise<void> {
             console.warn('eslint-report: could not open report in browser (display unavailable?)');
         }
     }
-}
+};
 
-main();
+const main = async (): Promise<void> => {
+    try {
+        await runReport();
+    } catch (error: unknown) {
+        console.error(error instanceof Error ? error.message : error);
+        process.exit(1);
+    }
+};
+
+main().catch(() => {
+    process.exit(1);
+});
