@@ -5376,6 +5376,49 @@ function clearNewRoomFormError() {
     });
 }
 
+/**
+ * Builds optimistic and failure rollback data for adding invitees to a report's participants.
+ * Skips IDs that already exist in participants to avoid overwriting their settings.
+ * On failure, only nulls out the newly added keys so Onyx removes them without overwriting
+ * concurrent participant changes.
+ */
+function buildParticipantsInviteData(
+    targetReport: OnyxEntry<Report>,
+    inviteeAccountIDs: number[],
+): {optimistic: Pick<Report, 'participants'>; failure: Pick<Report, 'participants'>} | undefined {
+    if (!targetReport || inviteeAccountIDs.length === 0) {
+        return undefined;
+    }
+
+    const defaultPref = getDefaultNotificationPreferenceForReport(targetReport);
+    const participantsAfterInvitation = inviteeAccountIDs.reduce(
+        (acc: Participants, accountID: number) => {
+            if (accountID in (targetReport.participants ?? {})) {
+                return acc;
+            }
+            // eslint-disable-next-line no-param-reassign -- Mutating the reduce accumulator is intentional
+            acc[accountID] = {
+                notificationPreference: defaultPref,
+                role: CONST.REPORT.ROLE.MEMBER,
+            };
+            return acc;
+        },
+        {...targetReport.participants},
+    );
+
+    const rollback: Record<number, null> = {};
+    for (const accountID of inviteeAccountIDs) {
+        if (!(accountID in (targetReport.participants ?? {}))) {
+            rollback[accountID] = null;
+        }
+    }
+
+    return {
+        optimistic: {participants: participantsAfterInvitation},
+        failure: {participants: rollback as unknown as Participants},
+    };
+}
+
 function resolveActionableMentionWhisper(
     report: OnyxEntry<Report>,
     reportAction: OnyxEntry<ReportAction>,
@@ -5420,78 +5463,15 @@ function resolveActionableMentionWhisper(
     const originalMessage = ReportActionsUtils.getOriginalMessage(reportAction as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_MENTION_WHISPER>);
     const inviteeAccountIDs = isInviteResolution ? (originalMessage?.inviteeAccountIDs ?? []) : [];
 
-    let participantsOptimisticData: Pick<Report, 'participants'> | undefined;
-    let participantsFailureData: Pick<Report, 'participants'> | undefined;
-
-    if (isInviteResolution && inviteeAccountIDs.length > 0 && report) {
-        const defaultNotificationPreference = getDefaultNotificationPreferenceForReport(report);
-        const participantsAfterInvitation = inviteeAccountIDs.reduce(
-            (reportParticipants: Participants, accountID: number) => {
-                // Skip IDs that already exist in participants to avoid overwriting their settings
-                if (accountID in (report.participants ?? {})) {
-                    return reportParticipants;
-                }
-                const participant: ReportParticipant = {
-                    notificationPreference: defaultNotificationPreference,
-                    role: CONST.REPORT.ROLE.MEMBER,
-                };
-                // eslint-disable-next-line no-param-reassign
-                reportParticipants[accountID] = participant;
-                return reportParticipants;
-            },
-            {...report.participants},
-        );
-
-        participantsOptimisticData = {participants: participantsAfterInvitation};
-
-        // On failure, only null out the newly added invitee keys so Onyx removes them.
-        // We intentionally avoid spreading the full report.participants snapshot here because
-        // other participant changes (removals, role/preference updates) may happen while the
-        // request is in flight, and merging a stale snapshot would overwrite those changes.
-        const participantsRollback: Record<number, null> = {};
-        for (const accountID of inviteeAccountIDs) {
-            if (accountID in (report.participants ?? {})) {
-                continue;
-            }
-            participantsRollback[accountID] = null;
-        }
-        participantsFailureData = {participants: participantsRollback as unknown as Participants};
-    }
+    const participantsInviteData = isInviteResolution && report ? buildParticipantsInviteData(report, inviteeAccountIDs) : undefined;
+    const participantsOptimisticData = participantsInviteData?.optimistic;
+    const participantsFailureData = participantsInviteData?.failure;
 
     // When the action belongs to a child report (e.g. a one-transaction thread), also update
     // the parent report's participants so the members list the user is viewing updates immediately.
-    let parentParticipantsOptimisticData: Pick<Report, 'participants'> | undefined;
-    let parentParticipantsFailureData: Pick<Report, 'participants'> | undefined;
-
-    if (isInviteResolution && inviteeAccountIDs.length > 0 && parentReport?.reportID && parentReport.reportID !== reportID) {
-        const parentDefaultNotificationPreference = getDefaultNotificationPreferenceForReport(parentReport);
-        const parentParticipantsAfterInvitation = inviteeAccountIDs.reduce(
-            (reportParticipants: Participants, accountID: number) => {
-                if (accountID in (parentReport.participants ?? {})) {
-                    return reportParticipants;
-                }
-                const participant: ReportParticipant = {
-                    notificationPreference: parentDefaultNotificationPreference,
-                    role: CONST.REPORT.ROLE.MEMBER,
-                };
-                // eslint-disable-next-line no-param-reassign
-                reportParticipants[accountID] = participant;
-                return reportParticipants;
-            },
-            {...parentReport.participants},
-        );
-
-        parentParticipantsOptimisticData = {participants: parentParticipantsAfterInvitation};
-
-        const parentParticipantsRollback: Record<number, null> = {};
-        for (const accountID of inviteeAccountIDs) {
-            if (accountID in (parentReport.participants ?? {})) {
-                continue;
-            }
-            parentParticipantsRollback[accountID] = null;
-        }
-        parentParticipantsFailureData = {participants: parentParticipantsRollback as unknown as Participants};
-    }
+    const parentInviteData = isInviteResolution && parentReport?.reportID && parentReport.reportID !== reportID ? buildParticipantsInviteData(parentReport, inviteeAccountIDs) : undefined;
+    const parentParticipantsOptimisticData = parentInviteData?.optimistic;
+    const parentParticipantsFailureData = parentInviteData?.failure;
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
