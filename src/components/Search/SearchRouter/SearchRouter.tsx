@@ -212,6 +212,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
               {
                   text: translate('search.askConcierge', textInputValue),
                   singleIcon: expensifyIcons.ConciergeAvatar,
+                  shouldIconApplyFill: false,
                   searchQuery: textInputValue,
                   itemStyle: styles.activeComponentBG,
                   keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE,
