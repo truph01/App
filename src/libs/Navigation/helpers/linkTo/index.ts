@@ -153,6 +153,15 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
         return;
     }
 
+    const isDynamicRoute = !!findMatchingDynamicSuffix(normalizedPath);
+
+    // If a RIGHT_MODAL_NAVIGATOR already sits below the focused TAB_NAVIGATOR, NAVIGATE pops back to it
+    // (dropping the tab above) instead of stacking - anchoring the new RHP on the wrong tab.
+    // PUSH so the new RHP lands above the current tab. See https://github.com/Expensify/App/issues/88965.
+    const actionPayload = (action as {payload?: {name?: string}}).payload;
+    const targetIsRightModal = actionPayload?.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
+    const hasRightModalBelowCurrentTab = targetIsRightModal && currentState.routes.some((route, index) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR && index < currentState.index);
+
     if (forceReplace) {
         action.type = CONST.NAVIGATION.ACTION_TYPE.REPLACE;
     }
@@ -166,7 +175,7 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
         !isNavigatingToAttachmentScreen(focusedRouteFromPath?.name) &&
         !isNavigatingToReportWithSameReportID(currentFocusedRoute, focusedRouteFromPath) &&
         !isSwitchingTabsWithinTabNavigator(currentState, stateFromPath) &&
-        !findMatchingDynamicSuffix(normalizedPath)
+        (!isDynamicRoute || hasRightModalBelowCurrentTab)
     ) {
         // We want to PUSH by default to add entries to the browser history.
         action.type = CONST.NAVIGATION.ACTION_TYPE.PUSH;
