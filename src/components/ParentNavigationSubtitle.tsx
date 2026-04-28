@@ -10,6 +10,7 @@ import useRootNavigationState from '@hooks/useRootNavigationState';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {isFullScreenName} from '@libs/Navigation/helpers/isNavigatorName';
 import Navigation from '@libs/Navigation/Navigation';
 import type {RightModalNavigatorParamList} from '@libs/Navigation/types';
 import {getReportAction, isReportActionVisible} from '@libs/ReportActionsUtils';
@@ -107,7 +108,8 @@ function ParentNavigationSubtitle({
         const tabState = tabNavigatorRoute?.state;
 
         // Get the active (focused) tab from the tab navigator as the current full-screen route
-        const fullScreenRoute = tabState ? tabState.routes?.[tabState.index ?? 0] : undefined;
+        // and fall back to the previous root-level full-screen lookup for states without tab nesting.
+        const fullScreenRoute = tabState ? tabState.routes?.[tabState.index ?? 0] : state?.routes?.findLast((route) => isFullScreenName(route.name));
 
         // Find the outermost navigator that currently has an active screen stack
         const lastNavigatorWithRoutes = state?.routes ? state.routes.findLast((route) => route.state?.routes && route.state.routes.length > 0) : undefined;
