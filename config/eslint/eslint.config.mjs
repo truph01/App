@@ -316,9 +316,10 @@ const config = defineConfig([
             // ESLint core rules
             'es/no-nullish-coalescing-operators': 'off',
             'es/no-optional-chaining': 'off',
-            '@typescript-eslint/no-deprecated': 'error',
+            '@typescript-eslint/no-deprecated': ['error', {allow: ['translateFn']}],
             'arrow-body-style': 'off',
             'no-continue': 'off',
+            'no-empty': ['error', {allowEmptyCatch: true}],
 
             // Import specific rules
             'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],

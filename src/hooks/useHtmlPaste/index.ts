@@ -80,7 +80,6 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, isActive
                         bubbles: true,
                     }),
                 );
-                // eslint-disable-next-line no-empty
             } catch (e) {}
             // We only need to set the callback once.
         },

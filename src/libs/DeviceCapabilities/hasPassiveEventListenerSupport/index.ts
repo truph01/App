@@ -11,7 +11,6 @@ export default function hasPassiveEventListenerSupport(): boolean {
         });
         window.addEventListener('testPassive', () => {}, opts);
         window.removeEventListener('testPassive', () => {}, opts);
-        // eslint-disable-next-line no-empty
     } catch (e) {}
     return supportsPassive;
 }
