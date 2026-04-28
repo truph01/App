@@ -483,12 +483,9 @@ function goUp(backToRoute: Route, options?: GoBackOptions) {
         return;
     }
 
-    // Bug 89006: when popping back to a TAB_NAVIGATOR target (e.g. company-cards page from feed-selector
-    // RHP), use POP_TO with the action's full payload instead of plain StackActions.pop. POP_TO restores
-    // the underlying TAB_NAVIGATOR's nested state from the payload, so the active tab matches the back
-    // target. Plain pop leaves the TAB_NAVIGATOR's index untouched, which after intermediate cross-tab
-    // pushes (PR #85234's state-slicing optimization clears it) lands on Home (index 0) instead of the
-    // intended tab.
+    // For TAB_NAVIGATOR targets, use POP_TO so the underlying tab's nested state is restored from the
+    // payload — plain pop can leave the active tab pointing at Home instead of the intended target.
+    // Issue: https://github.com/Expensify/App/issues/89006
     if ((minimalAction.payload as {name?: string} | undefined)?.name === NAVIGATORS.TAB_NAVIGATOR) {
         navigationRef.current.dispatch({...minimalAction, type: CONST.NAVIGATION.ACTION_TYPE.POP_TO, target: targetState.key});
         return;
