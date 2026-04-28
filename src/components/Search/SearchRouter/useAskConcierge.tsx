@@ -2,6 +2,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useOnyx from '@hooks/useOnyx';
 import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {addComment} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -12,7 +13,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
  */
 function useAskConcierge() {
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
+    const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(conciergeReportID)}`);
     const {timezone, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const openConciergeAnywhere = useOpenConciergeAnywhere();
     const delegateAccountID = useDelegateAccountID();

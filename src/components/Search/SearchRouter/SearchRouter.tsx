@@ -321,12 +321,12 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                     });
                     setFocusAndScrollToRight();
                 } else if (item.searchItemType === CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE) {
-                    onRouterClose();
-                    setTextInputValue('');
-                    setAutocompleteQueryValue('');
                     if (!item.searchQuery) {
                         return;
                     }
+                    onRouterClose();
+                    setTextInputValue('');
+                    setAutocompleteQueryValue('');
                     askConcierge(item.searchQuery);
                 } else {
                     submitSearch(item.searchQuery, item.keyForList !== CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM);
