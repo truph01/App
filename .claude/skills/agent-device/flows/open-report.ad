@@ -9,4 +9,4 @@
 env TARGET_CHAT="Navigates to a chat"
 
 find "Inbox" "click"
-press "text=\"${TARGET_CHAT}\" || text=\"Navigates to a chat\""
+find "${TARGET_CHAT}" "click"
