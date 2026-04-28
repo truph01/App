@@ -57,6 +57,7 @@ function BackgroundImage({width}: BackgroundImageProps) {
     return (
         <Reanimated.View style={[styles.signInBackground, StyleUtils.getWidthStyle(width), animatedStyle]}>
             <Image
+                accessibilityIgnoresInvertColors
                 source={MobileBackgroundImage as ImageSourcePropType}
                 onLoadEnd={() => setOpacityAnimation()}
                 pointerEvents="none"

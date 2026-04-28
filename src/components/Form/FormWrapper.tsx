@@ -237,6 +237,7 @@ function FormWrapper({
                     key={`fallback-announce-${errorAnnouncementKey}`}
                     style={styles.hiddenElementOutsideOfWindow}
                     role={CONST.ROLE.ALERT}
+                    accessibilityLiveRegion="assertive"
                 >
                     {fallbackAnnouncementMessage}
                 </Text>
