@@ -35,7 +35,6 @@ jest.mock('@libs/Navigation/Navigation', () => ({
     goBack: jest.fn(),
 }));
 
-// eslint-disable-next-line no-restricted-syntax
 jest.mock('@libs/PolicyUtils', () => ({
     shouldShowPolicy: jest.fn(() => true),
     isPendingDeletePolicy: jest.fn(() => false),
@@ -44,10 +43,8 @@ jest.mock('@libs/PolicyUtils', () => ({
 const fakePolicyID = 'ABCD1234';
 const mockPolicy = {...createRandomPolicy(0), id: fakePolicyID};
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const useRestoreWorkspacesTabOnNavigate = (require('@hooks/useRestoreWorkspacesTabOnNavigate') as {default: () => () => void}).default;
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports, no-restricted-syntax
 const PolicyUtils = require('@libs/PolicyUtils') as {shouldShowPolicy: jest.Mock; isPendingDeletePolicy: jest.Mock};
 
 function setupOnyxForPolicy() {

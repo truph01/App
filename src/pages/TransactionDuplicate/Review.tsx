@@ -165,7 +165,6 @@ function TransactionDuplicateReview() {
         clearDeleteTransactionNavigateBackUrl();
     }, [isDeleteNavigateBackToThisReview, wasTransactionDeleted]);
 
-    // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFound = !isNavigatingBackToDeletedReview && (wasTransactionDeleted || (!isLoadingPage && !transactionID));
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {

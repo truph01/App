@@ -114,7 +114,7 @@ function ReanimatedModal({
             setIsVisibleState(false);
             setIsContainerOpen(false);
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
         [],
     );
 
@@ -232,7 +232,6 @@ function ReanimatedModal({
             <Modal
                 transparent
                 animationType="none"
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 visible={modalVisibility}
                 onRequestClose={onBackButtonPressHandler}
                 statusBarTranslucent={statusBarTranslucent}

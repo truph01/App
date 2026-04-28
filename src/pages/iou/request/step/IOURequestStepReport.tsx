@@ -240,7 +240,6 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
         });
     };
 
-    // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = useShowNotFoundPageInIOUStep(action, iouType, reportActionID, reportOrDraftReport, transaction);
 
     const createReportForPolicy = (shouldDismissEmptyReportsConfirmation?: boolean) => {

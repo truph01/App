@@ -246,10 +246,6 @@ const config = defineConfig([
             },
         },
 
-        linterOptions: {
-            reportUnusedDisableDirectives: 'off',
-        },
-
         files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         rules: {
             '@lwc/lwc/no-async-await': 'off',

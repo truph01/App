@@ -190,7 +190,7 @@ function PlaidConnectionStep({feed, policyID, onExit, title}: PlaidConnectionSte
                         }
                     }}
                     // User prematurely exited the Plaid flow
-                    // eslint-disable-next-line react/jsx-props-no-multi-spaces
+
                     onExit={() => {
                         onExit?.();
                         handleBackButtonPress();

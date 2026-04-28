@@ -1529,7 +1529,6 @@ describe('actions/Report', () => {
     it('should send not DeleteComment request and remove AddAttachment accordingly', async () => {
         global.fetch = TestHelper.getGlobalFetchMock({
             headers: new Headers({
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Content-Type': 'image/jpeg',
             }),
         });
@@ -1605,7 +1604,6 @@ describe('actions/Report', () => {
     it('should send not DeleteComment request and remove AddTextAndAttachment accordingly', async () => {
         global.fetch = TestHelper.getGlobalFetchMock({
             headers: new Headers({
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Content-Type': 'image/jpeg',
             }),
         });
@@ -1689,7 +1687,6 @@ describe('actions/Report', () => {
     it('should post text + attachment as first action then attachment only for remaining attachments when adding multiple attachments with a comment', async () => {
         global.fetch = TestHelper.getGlobalFetchMock({
             headers: new Headers({
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Content-Type': 'image/jpeg',
             }),
         });
@@ -1740,7 +1737,6 @@ describe('actions/Report', () => {
     it('should create attachment only actions when adding multiple attachments without a comment', async () => {
         global.fetch = TestHelper.getGlobalFetchMock({
             headers: new Headers({
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Content-Type': 'image/jpeg',
             }),
         });
@@ -1790,7 +1786,6 @@ describe('actions/Report', () => {
     it('should create attachment only action & not play sound when adding attachment without a comment & shouldPlaySound not passed', async () => {
         global.fetch = TestHelper.getGlobalFetchMock({
             headers: new Headers({
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 'Content-Type': 'image/jpeg',
             }),
         });
@@ -4394,7 +4389,7 @@ describe('actions/Report', () => {
     describe('navigateToConciergeChat', () => {
         const CONCIERGE_REPORT_ID = '123456';
         const TEST_USER_ACCOUNT_ID = 1;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const mockNavigation: {navigate: jest.Mock; dismissModalWithReport: jest.Mock} = jest.requireMock('@libs/Navigation/Navigation');
 
         beforeEach(async () => {
@@ -4644,7 +4639,7 @@ describe('actions/Report', () => {
         const REPORT_ID = '789';
         const TEST_USER_ACCOUNT_ID = 1;
         const INTRO_SELECTED: OnyxTypes.IntroSelected = {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM};
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const mockNavigation: {navigate: jest.Mock; dismissModalWithReport: jest.Mock; goBack: jest.Mock; popToSidebar: jest.Mock} = jest.requireMock('@libs/Navigation/Navigation');
 
         beforeEach(async () => {
@@ -6023,7 +6018,7 @@ describe('actions/Report', () => {
     describe('navigateToMostRecentReport via leaveRoom', () => {
         const ROOM_REPORT_ID = '2001';
         const OTHER_REPORT_ID = '5001';
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const mockNavigation: {goBack: jest.Mock; dismissToSuperWideRHP: jest.Mock; navigate: jest.Mock; getTopmostSuperWideRHPReportID: jest.Mock} =
             jest.requireMock('@libs/Navigation/Navigation');
 
@@ -6097,7 +6092,7 @@ describe('actions/Report', () => {
     describe('navigateToMostRecentReport via leaveGroupChat', () => {
         const GROUP_CHAT_REPORT_ID = '1001';
         const OTHER_REPORT_ID = '5001';
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
         const mockNavigation: {goBack: jest.Mock; navigate: jest.Mock} = jest.requireMock('@libs/Navigation/Navigation');
 
         beforeEach(async () => {
@@ -6169,7 +6164,7 @@ describe('actions/Report', () => {
 
         it('should dismiss modal when workspace member leaves a non-thread workspace room', async () => {
             TestHelper.getGlobalFetchMock();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             const mockNavigation: {dismissModal: jest.Mock; goBack: jest.Mock; navigate: jest.Mock} = jest.requireMock('@libs/Navigation/Navigation');
             mockNavigation.dismissModal.mockClear();
 
@@ -6193,7 +6188,7 @@ describe('actions/Report', () => {
 
         it('should NOT dismiss modal when workspace member leaves a chat thread in workspace room', async () => {
             TestHelper.getGlobalFetchMock();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
             const mockNavigation: {dismissModal: jest.Mock} = jest.requireMock('@libs/Navigation/Navigation');
             mockNavigation.dismissModal.mockClear();
 

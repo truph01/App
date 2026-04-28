@@ -6,7 +6,6 @@ import type en from './en';
 import type {ConciergeBrokenCardConnectionParams, CreatedReportForUnapprovedTransactionsParams, PaidElsewhereParams, UnsupportedFormulaValueErrorParams} from './params';
 import type {TranslationDeepObject} from './types';
 
-/* eslint-disable max-len */
 const translations: TranslationDeepObject<typeof en> = {
     common: {
         count: 'Contar',
@@ -6086,7 +6085,6 @@ ${amount} para ${merchant} - ${date}`,
                         case 'intacctImportTitle':
                             return 'Importando datos desde Sage Intacct';
                         default: {
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                             return `Translation missing for stage: ${stage}`;
                         }
                     }
@@ -6192,7 +6190,6 @@ ${amount} para ${merchant} - ${date}`,
                     case 'jobDone':
                         return 'Esperando a que se carguen los datos importados';
                     default: {
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         return `Translation missing for stage: ${stage}`;
                     }
                 }

@@ -90,7 +90,6 @@ function IOURequestStepDestination({
         focus: destinationSelectionListRef.current?.focusTextInput,
     }));
 
-    // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = isEmptyObject(policy);
 
     const {isOffline} = useNetwork();
@@ -245,8 +244,7 @@ function IOURequestStepDestination({
     );
 }
 
-/* eslint-disable rulesdir/no-negated-variables */
 const IOURequestStepDestinationWithFullTransactionOrNotFound = withFullTransactionOrNotFound(IOURequestStepDestination);
-/* eslint-disable rulesdir/no-negated-variables */
+
 const IOURequestStepDestinationWithWritableReportOrNotFound = withWritableReportOrNotFound(IOURequestStepDestinationWithFullTransactionOrNotFound);
 export default IOURequestStepDestinationWithWritableReportOrNotFound;

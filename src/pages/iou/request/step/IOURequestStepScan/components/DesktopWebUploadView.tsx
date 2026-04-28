@@ -59,7 +59,6 @@ function DesktopWebUploadView({
             return;
         }
         for (const file of files) {
-            // eslint-disable-next-line no-param-reassign
             file.uri = URL.createObjectURL(file);
         }
 
@@ -97,7 +96,7 @@ function DesktopWebUploadView({
                                 />
                                 <View
                                     style={[styles.uploadFileViewTextContainer, styles.userSelectNone]}
-                                    // eslint-disable-next-line react/jsx-props-no-spreading, react-hooks/refs
+                                    // eslint-disable-next-line react/jsx-props-no-spreading
                                     {...panResponder.panHandlers}
                                 >
                                     <Text style={[styles.textFileUpload, styles.mb2]}>{translate(shouldAcceptMultipleFiles ? 'receipt.uploadMultiple' : 'receipt.upload')}</Text>

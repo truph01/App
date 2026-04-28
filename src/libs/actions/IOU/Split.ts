@@ -122,9 +122,7 @@ import {
     getAllTransactions,
     getMoneyRequestInformation,
     getMoneyRequestParticipantsFromReport,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getMoneyRequestPolicyTags,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getPolicyTagsData,
     getReceiptError,
     getReportPreviewAction,
