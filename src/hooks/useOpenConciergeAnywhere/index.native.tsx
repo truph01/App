@@ -5,7 +5,7 @@ import {navigateToConciergeChat} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 /**
- * Returns a callback that navigates to the Concierge chat on native.
+ * Returns a callback that navigates to the Concierge chat on native (opens the side panel on web instead).
  */
 function useOpenConciergeAnywhere() {
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);

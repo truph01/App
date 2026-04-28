@@ -2,7 +2,7 @@ import useSidePanelActions from '@hooks/useSidePanelActions';
 import useSidePanelState from '@hooks/useSidePanelState';
 
 /**
- * Returns a callback that opens the Concierge side panel on web.
+ * Returns a callback that opens the Concierge side panel on web (opens the Concierge chat on native instead).
  */
 function useOpenConciergeAnywhere() {
     const {shouldHideSidePanel} = useSidePanelState();
