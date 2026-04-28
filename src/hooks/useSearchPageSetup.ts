@@ -56,16 +56,7 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
-    }, [
-        hash,
-        isOffline,
-        shouldUseLiveData,
-        queryJSON,
-        isSnapshotDataLoaded,
-        isSnapshotSearchLoading,
-        currentSearchKey,
-        shouldCalculateTotals,
-    ]);
+    }, [hash, isOffline, shouldUseLiveData, queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals]);
 
     useFocusEffect(
         useCallback(() => {
