@@ -161,7 +161,7 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     const actionPayload = (action as {payload?: {name?: string}}).payload;
     const targetIsRightModal = actionPayload?.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
     const focusIsOnTabNavigator = currentState.routes[currentState.index]?.name === NAVIGATORS.TAB_NAVIGATOR;
-    const hasRightModalBelowCurrentTab =
+    const isRhpNavigationFromStackedTab =
         targetIsRightModal && focusIsOnTabNavigator && currentState.routes.some((route, index) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR && index < currentState.index);
 
     if (forceReplace) {
@@ -177,7 +177,7 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
         !isNavigatingToAttachmentScreen(focusedRouteFromPath?.name) &&
         !isNavigatingToReportWithSameReportID(currentFocusedRoute, focusedRouteFromPath) &&
         !isSwitchingTabsWithinTabNavigator(currentState, stateFromPath) &&
-        (!isDynamicRoute || hasRightModalBelowCurrentTab)
+        (!isDynamicRoute || isRhpNavigationFromStackedTab)
     ) {
         // We want to PUSH by default to add entries to the browser history.
         action.type = CONST.NAVIGATION.ACTION_TYPE.PUSH;
