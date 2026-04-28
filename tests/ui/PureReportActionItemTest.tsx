@@ -377,6 +377,7 @@ describe('PureReportActionItem', () => {
 
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}testPolicy`, dewPolicy);
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_METADATA}testReport`, reportMetadata);
             });
             await waitForBatchedUpdatesWithAct();
 
@@ -396,7 +397,6 @@ describe('PureReportActionItem', () => {
                                     shouldDisplayNewMarker={false}
                                     index={0}
                                     isFirstVisibleReportAction={false}
-                                    reportMetadata={reportMetadata}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
@@ -482,6 +482,7 @@ describe('PureReportActionItem', () => {
 
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}testPolicy`, dewPolicy);
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_METADATA}testReport`, reportMetadata);
             });
             await waitForBatchedUpdatesWithAct();
 
@@ -500,7 +501,6 @@ describe('PureReportActionItem', () => {
                                     shouldDisplayNewMarker={false}
                                     index={0}
                                     isFirstVisibleReportAction={false}
-                                    reportMetadata={reportMetadata}
                                 />
                             </PortalProvider>
                         </ScreenWrapper>
