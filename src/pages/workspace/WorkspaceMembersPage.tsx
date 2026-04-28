@@ -24,6 +24,7 @@ import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebouncedAccessibilityAnnouncement from '@hooks/useDebouncedAccessibilityAnnouncement';
+import useDebouncedValue from '@hooks/useDebouncedValue';
 import useFilteredSelection from '@hooks/useFilteredSelection';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -618,9 +619,12 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const isPendingAddOrDelete =
         isOffline && data?.some((member) => member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
     const shouldShowSearchBar = data.length > CONST.SEARCH_ITEM_LIMIT;
-    const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
+    const debouncedFilteredData = useDebouncedValue(filteredData, CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
+    const hasNoFilteredMembers = filteredData.length === 0;
+    const hasNoDebouncedFilteredMembers = debouncedFilteredData?.length === 0;
+    const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && hasNoFilteredMembers;
     const shouldShowRoleFilter = data.length > 0;
-    const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && filteredData.length === 0;
+    const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && hasNoFilteredMembers && hasNoDebouncedFilteredMembers;
     const noResultsMessage = translate('common.noResultsFoundMatching', inputValue);
 
     // SearchBar's built-in empty state also controls screen-reader announcements.
@@ -1002,7 +1006,6 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                         shouldShowLoadingPlaceholder={isLoading}
                         onDismissError={dismissError}
                         shouldShowListEmptyContent={false}
-                        shouldShowEmptyStateImmediately={shouldShowRoleFilterEmptyState}
                         showScrollIndicator={false}
                         shouldUseUserSkeletonView
                         shouldHeaderBeInsideList
