@@ -3,6 +3,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import RenderHTML from '@components/RenderHTML';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {hasDynamicExternalWorkflow} from '@libs/PolicyUtils';
 import {getOriginalMessage, hasPendingDEWApprove, hasPendingDEWSubmit, isActionOfType, isMarkAsClosedAction} from '@libs/ReportActionsUtils';
 import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBasicMessage';
@@ -15,7 +16,6 @@ type ApprovalFlowContentProps = {
     action: OnyxTypes.ReportAction;
     policy: OnyxEntry<OnyxTypes.Policy>;
     reportID: string | undefined;
-    childReport: OnyxEntry<OnyxTypes.Report>;
     originalReport: OnyxEntry<OnyxTypes.Report>;
 };
 
@@ -29,9 +29,10 @@ function isApprovalFlowAction(action: OnyxTypes.ReportAction): boolean {
     );
 }
 
-function ApprovalFlowContent({action, policy, reportID, childReport, originalReport}: ApprovalFlowContentProps) {
+function ApprovalFlowContent({action, policy, reportID, originalReport}: ApprovalFlowContentProps) {
     const {translate} = useLocalize();
     const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`);
+    const [childReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action.childReportID)}`);
     const isDEWPolicy = hasDynamicExternalWorkflow(policy);
     const isPendingAdd = action?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
 

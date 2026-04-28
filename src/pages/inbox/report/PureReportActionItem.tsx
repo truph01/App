@@ -364,7 +364,6 @@ function PureReportActionItem({
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Eye']);
 
-    const [childReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action.childReportID)}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.chatReportID)}`);
 
     const highlightedBackgroundColorIfNeeded = useMemo(
@@ -753,7 +752,6 @@ function PureReportActionItem({
                 <ModifiedExpenseContent
                     action={action}
                     report={report}
-                    childReport={childReport}
                     originalReport={originalReport}
                 />
             );
@@ -763,7 +761,6 @@ function PureReportActionItem({
                     action={action}
                     policy={policy}
                     reportID={reportID}
-                    childReport={childReport}
                     originalReport={originalReport}
                 />
             );
@@ -806,7 +803,6 @@ function PureReportActionItem({
                 <MovedTransactionAction
                     action={action as OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION>}
                     emptyHTML={emptyHTML}
-                    childReport={childReport}
                     originalReport={originalReport}
                 />
             );
@@ -826,7 +822,6 @@ function PureReportActionItem({
             children = (
                 <UnreportedTransactionAction
                     action={action as OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION>}
-                    childReport={childReport}
                     originalReport={originalReport}
                 />
             );
