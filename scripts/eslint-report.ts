@@ -62,7 +62,7 @@ const CHART_RULE_PALETTE = [
 ];
 
 /** Encode #RRGGBB + alpha for Chart.js / CSS. */
-const hexWithAlpha = (hex: string, alpha: number): string => {
+const hexToRGBA = (hex: string, alpha: number): string => {
     const n = hex.replace('#', '');
     const r = Number.parseInt(n.slice(0, 2), 16);
     const g = Number.parseInt(n.slice(2, 4), 16);
@@ -84,9 +84,9 @@ type ChartUiPayload = {
 
 const buildChartUiPayload = (): ChartUiPayload => ({
     totalLine: REPORT_THEME.accent,
-    totalFill: hexWithAlpha(REPORT_THEME.accent, 0.12),
+    totalFill: hexToRGBA(REPORT_THEME.accent, 0.12),
     tick: colors.productDark800,
-    grid: hexWithAlpha(colors.productDark700, 0.35),
+    grid: hexToRGBA(colors.productDark700, 0.35),
     legend: colors.productDark900,
     tooltipBg: colors.productDark400,
     tooltipBorder: colors.productDark500,
