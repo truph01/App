@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import useReusablePoliciesConnectedTo from '@hooks/useReusablePoliciesConnectedTo';
+import useHasReusablePoliciesConnectedTo from '@hooks/useHasReusablePoliciesConnectedTo';
 import Navigation from '@libs/Navigation/Navigation';
 import getQuickbooksDesktopSetupEntryRoute from '@pages/workspace/accounting/qbd/utils';
 import CONST from '@src/CONST';
@@ -7,7 +7,7 @@ import ROUTES from '@src/ROUTES';
 import type {ConnectToQuickbooksDesktopFlowProps} from './types';
 
 function ConnectToQuickbooksDesktopFlow({policyID}: ConnectToQuickbooksDesktopFlowProps) {
-    const {hasReusablePoliciesConnectedTo: hasReusablePoliciesConnectedToQBD} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.QBD, policyID);
+    const hasReusablePoliciesConnectedToQBD = useHasReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.QBD, policyID);
 
     useEffect(() => {
         if (hasReusablePoliciesConnectedToQBD) {
