@@ -1,5 +1,5 @@
-import React, {useMemo} from 'react';
-import type {ColorValue, StyleProp, ViewStyle} from 'react-native';
+import React from 'react';
+import type {ColorValue, ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {shouldOptionShowTooltip} from '@libs/OptionsListUtils';
@@ -15,51 +15,41 @@ type OptionRowAvatarProps = {
     isInFocusMode: boolean;
     subscriptAvatarBorderColor: ColorValue;
     secondaryAvatarBackgroundColor: ColorValue;
-    singleAvatarContainerStyle: StyleProp<ViewStyle>;
+    singleAvatarContainerStyle: ViewStyle[];
 };
 
 function OptionRowAvatar({optionItem, report, isInFocusMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor, singleAvatarContainerStyle}: OptionRowAvatarProps) {
     const personalDetails = usePersonalDetails();
 
-    const delegateAccountID = useMemo(
-        () => getDelegateAccountIDFromReportAction(optionItem?.parentReportAction),
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- getDelegateAccountIDFromReportAction is a stable import; only parentReportAction determines the result
-        [optionItem?.parentReportAction],
-    );
+    const delegateAccountID = getDelegateAccountIDFromReportAction(optionItem?.parentReportAction);
 
     // Match the header's delegate avatar logic: when a delegate exists on the
     // parent report action, the header (useReportActionAvatars) shows the
     // delegate's avatar as primary instead of the report owner's.
     const skipDelegate = report?.type === CONST.REPORT.TYPE.INVOICE || (optionItem?.isTaskReport && !report?.chatReportID);
 
-    const icons = useMemo(() => {
-        let result = optionItem?.icons ?? [];
-        if (!skipDelegate && delegateAccountID && personalDetails && result.length > 0) {
-            const delegateDetails = personalDetails[delegateAccountID];
-            if (delegateDetails) {
-                const updatedIcons = [...result];
-                const firstIcon = updatedIcons.at(0);
-                if (firstIcon) {
-                    updatedIcons[0] = {
-                        ...firstIcon,
-                        source: delegateDetails.avatar ?? '',
-                        name: delegateDetails.displayName ?? '',
-                        id: delegateAccountID,
-                    };
-                }
-                result = updatedIcons;
+    let icons = optionItem?.icons ?? [];
+    if (!skipDelegate && delegateAccountID && personalDetails && icons.length > 0) {
+        const delegateDetails = personalDetails[delegateAccountID];
+        if (delegateDetails) {
+            const updatedIcons = [...icons];
+            const firstDelegateIcon = updatedIcons.at(0);
+            if (firstDelegateIcon) {
+                updatedIcons[0] = {
+                    ...firstDelegateIcon,
+                    source: delegateDetails.avatar ?? '',
+                    name: delegateDetails.displayName ?? '',
+                    id: delegateAccountID,
+                };
             }
+            icons = updatedIcons;
         }
+    }
 
-        return result;
-    }, [optionItem?.icons, skipDelegate, delegateAccountID, personalDetails]);
-
-    const delegateTooltipAccountID = useMemo(() => {
-        if (!skipDelegate && delegateAccountID && personalDetails?.[delegateAccountID] && optionItem?.icons?.length) {
-            return Number(optionItem.icons.at(0)?.id ?? CONST.DEFAULT_NUMBER_ID);
-        }
-        return undefined;
-    }, [skipDelegate, delegateAccountID, personalDetails, optionItem?.icons]);
+    let delegateTooltipAccountID: number | undefined;
+    if (!skipDelegate && delegateAccountID && personalDetails?.[delegateAccountID] && optionItem?.icons?.length) {
+        delegateTooltipAccountID = Number(optionItem.icons.at(0)?.id ?? CONST.DEFAULT_NUMBER_ID);
+    }
 
     const firstIcon = optionItem.icons?.at(0);
 
