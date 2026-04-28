@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {useCallback, useEffect} from 'react';
+import {useEffect} from 'react';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {openSearch, search} from '@libs/actions/Search';
@@ -32,18 +32,18 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
     const isSnapshotSearchLoading = !!currentSearchResults?.search?.isLoading;
 
     // Clear selected transactions when navigating to a different search query
-    const clearOnHashChange = useCallback(() => {
+    function clearOnHashChange() {
         if (hash === undefined) {
             return;
         }
         clearSelectedTransactions(hash);
-    }, [hash, clearSelectedTransactions]);
+    }
 
     useFocusEffect(clearOnHashChange);
 
     // useEffect supplements useFocusEffect: it handles both the initial mount
     // and cases where route params change without a navigation event (e.g. sorting).
-    useEffect(clearOnHashChange, [clearOnHashChange]);
+    useEffect(clearOnHashChange, [hash, clearSelectedTransactions]);
 
     // Fire search() when the query changes (hash). This runs at the page level so the
     // API request starts in parallel with the skeleton, before Search mounts its 14+ useOnyx hooks.
@@ -58,19 +58,16 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
     }, [hash, isOffline, shouldUseLiveData, queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals]);
 
-    useFocusEffect(
-        useCallback(() => {
-            openSearch();
-            if (!queryJSON || isSnapshotDataLoaded || isSnapshotSearchLoading) {
-                return;
-            }
-            search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
-        }, [queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals]),
-    );
-
-    useEffect(() => {
+    useFocusEffect(() => {
         openSearch();
-    }, []);
+    });
+
+    useFocusEffect(() => {
+        if (!queryJSON || isSnapshotDataLoaded || isSnapshotSearchLoading) {
+            return;
+        }
+        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
+    });
 
     useEffect(() => {
         if (!prevIsOffline || isOffline) {
