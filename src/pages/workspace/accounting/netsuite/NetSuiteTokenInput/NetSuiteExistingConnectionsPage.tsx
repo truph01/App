@@ -3,7 +3,7 @@ import {View} from 'react-native';
 import ConnectionLayout from '@components/ConnectionLayout';
 import MenuItemList from '@components/MenuItemList';
 import useLocalize from '@hooks/useLocalize';
-import useReusablePoliciesConnectedToNetSuite from '@hooks/useReusablePoliciesConnectedToNetSuite';
+import useReusablePoliciesConnectedTo from '@hooks/useReusablePoliciesConnectedTo';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {copyExistingPolicyConnection} from '@libs/actions/connections';
 import Navigation from '@libs/Navigation/Navigation';
@@ -20,7 +20,7 @@ function NetSuiteExistingConnectionsPage({route}: ExistingConnectionsPageProps) 
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
     const policyID: string = route.params.policyID;
-    const {reusablePoliciesConnectedToNetSuite} = useReusablePoliciesConnectedToNetSuite(policyID);
+    const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToNetSuite} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.NETSUITE, policyID);
 
     const menuItems = reusablePoliciesConnectedToNetSuite.map((policy) => {
         const lastSuccessfulSyncDate = policy.connections?.netsuite.lastSyncDate;
