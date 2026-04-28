@@ -62,7 +62,6 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
                 return;
             }
             search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [queryJSON, currentSearchKey, shouldCalculateTotals]),
     );
 
