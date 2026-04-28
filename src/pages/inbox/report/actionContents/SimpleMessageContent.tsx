@@ -6,6 +6,7 @@ import {
     getDemotedFromWorkspaceMessage,
     getDismissedViolationMessageText,
     getMarkedReimbursedMessage,
+    getMessageOfOldDotReportAction,
     getOriginalMessage,
     getRemovedFromApprovalChainMessage,
     getReportAction,
@@ -43,6 +44,7 @@ const SIMPLE_MESSAGE_ACTION_TYPES = new Set<string>([
     CONST.REPORT.ACTIONS.TYPE.DEMOTED_FROM_WORKSPACE,
     CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_3DS_TRANSACTION_APPROVAL,
     CONST.REPORT.ACTIONS.TYPE.REMOVED_FROM_APPROVAL_CHAIN,
+    CONST.REPORT.ACTIONS.TYPE.MARK_REIMBURSED_FROM_INTEGRATION,
 ]);
 
 function isSimpleMessageAction(action: OnyxTypes.ReportAction): boolean {
@@ -110,6 +112,9 @@ function SimpleMessageContent({action, report}: SimpleMessageContentProps) {
     }
     if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.REMOVED_FROM_APPROVAL_CHAIN)) {
         return <ReportActionItemBasicMessage message={getRemovedFromApprovalChainMessage(translate, action)} />;
+    }
+    if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.MARK_REIMBURSED_FROM_INTEGRATION)) {
+        return <ReportActionItemBasicMessage message={getMessageOfOldDotReportAction(translate, action)} />;
     }
 
     return null;
