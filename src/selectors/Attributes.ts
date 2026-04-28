@@ -14,4 +14,4 @@ const reportByIDsSelector = (reportIDs: string[]) => (attributes: OnyxEntry<Repo
         {} as Record<string, ReportAttributes>,
     );
 
-export default {reportByIDsSelector};
+export default reportByIDsSelector;
