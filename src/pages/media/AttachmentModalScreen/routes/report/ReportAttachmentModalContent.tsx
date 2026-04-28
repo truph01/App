@@ -46,7 +46,7 @@ function ReportAttachmentModalContent({route, navigation}: AttachmentModalScreen
     const reportActionReportID = originalReportID ?? reportID;
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportActionReportID}`);
-    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportActionReportID}`);
+    const [reportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportActionReportID}`);
 
     useNavigateToReportOnRefresh({source: sourceParam, reportID});
 
@@ -60,7 +60,7 @@ function ReportAttachmentModalContent({route, navigation}: AttachmentModalScreen
     let isLoading = false;
     if (!(isOffline || isReportNotFound(report) || !reportActionReportID)) {
         const isEmptyReport = isEmptyObject(report);
-        isLoading = !!isLoadingApp || isEmptyReport || (reportMetadata?.isLoadingInitialReportActions !== false && shouldFetchReport);
+        isLoading = !!isLoadingApp || isEmptyReport || (reportLoadingState?.isLoadingInitialReportActions !== false && shouldFetchReport);
     }
 
     useEffect(() => {
