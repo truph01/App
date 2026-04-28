@@ -55,13 +55,16 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
         search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
     }, [hash, isOffline, shouldUseLiveData, queryJSON, currentSearchKey, shouldCalculateTotals, currentSearchResults]);
 
-    useFocusEffect(() => {
-        openSearch();
-        if (!queryJSON) {
-            return;
-        }
-        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
-    });
+    useFocusEffect(
+        useCallback(() => {
+            openSearch();
+            if (!queryJSON) {
+                return;
+            }
+            search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [queryJSON, currentSearchKey, shouldCalculateTotals]),
+    );
 
     useEffect(() => {
         openSearch();
