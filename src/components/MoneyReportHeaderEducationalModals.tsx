@@ -48,7 +48,7 @@ function MoneyReportHeaderEducationalModals({reportID, ref}: MoneyReportHeaderEd
     const {reportActions: unfilteredReportActions} = usePaginatedReportActions(moneyRequestReport?.reportID);
     const reportActions = getFilteredReportActionsForReportView(unfilteredReportActions);
     const {transactions: reportTransactions} = useTransactionsAndViolationsForReport(moneyRequestReport?.reportID);
-    const {email: currentUserLogin = '', accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const {login: currentUserLogin, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
     // Derive transaction thread and parent action
     const nonDeletedTransactions = getAllNonDeletedTransactions(reportTransactions, reportActions, isOffline, true);
@@ -74,7 +74,7 @@ function MoneyReportHeaderEducationalModals({reportID, ref}: MoneyReportHeaderEd
         setIsHoldEducationalModalVisible(false);
         setNameValuePair(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION, true, false, !shouldFailAllRequests);
         if (requestParentReportAction) {
-            changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin, currentUserAccountID);
+            changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin ?? '', currentUserAccountID);
         }
     };
 
@@ -82,7 +82,7 @@ function MoneyReportHeaderEducationalModals({reportID, ref}: MoneyReportHeaderEd
         if (rejectModalAction === CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD) {
             dismissRejectUseExplanation();
             if (requestParentReportAction) {
-                changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin, currentUserAccountID);
+                changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin ?? '', currentUserAccountID);
             }
         } else if (rejectModalAction === CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT_BULK) {
             dismissRejectUseExplanation();

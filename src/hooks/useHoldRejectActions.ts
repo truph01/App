@@ -39,7 +39,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
     const [moneyRequestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(moneyRequestReport?.chatReportID)}`);
     const {transactionThreadReport} = useTransactionThreadReport(reportID);
-    const {email: currentUserLogin = '', accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const {login: currentUserLogin, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
     const [reportActionsForParent] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(moneyRequestReport?.reportID)}`);
     const requestParentReportAction = transactionThreadReport?.parentReportActionID ? reportActionsForParent?.[transactionThreadReport.parentReportActionID] : undefined;
@@ -76,7 +76,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
                 const isDismissed = isReportSubmitter ? dismissedHoldUseExplanation : dismissedRejectUseExplanation;
 
                 if (isDismissed || isChatReportDM) {
-                    changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin, currentUserAccountID);
+                    changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin ?? '', currentUserAccountID);
                 } else if (isReportSubmitter) {
                     onHoldEducationalOpen();
                 } else {
@@ -99,7 +99,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
                     return;
                 }
 
-                changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin, currentUserAccountID);
+                changeMoneyRequestHoldStatus(requestParentReportAction, transaction, isOffline, currentUserLogin ?? '', currentUserAccountID);
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.REJECT]: {

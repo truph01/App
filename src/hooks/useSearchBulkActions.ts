@@ -1313,7 +1313,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                             selectedTransactions[transactionID].reportAction?.childReportID,
                             policies?.[`${ONYXKEYS.COLLECTION.POLICY}${selectedTransactions[transactionID].policyID}`],
                             isOffline,
-                            currentUserPersonalDetails?.email ?? '',
+                            currentUserPersonalDetails?.login ?? '',
                             currentUserPersonalDetails?.accountID,
                         );
                     }

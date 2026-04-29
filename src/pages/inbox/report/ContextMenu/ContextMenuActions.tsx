@@ -603,13 +603,13 @@ const ContextMenuActions: ContextMenuAction[] = [
 
             if (closePopover) {
                 hideContextMenu(false, () =>
-                    changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.email ?? '', currentUserPersonalDetails.accountID),
+                    changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.login ?? '', currentUserPersonalDetails.accountID),
                 );
                 return;
             }
 
             // No popover to hide, call changeMoneyRequestHoldStatus immediately
-            changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.email ?? '', currentUserPersonalDetails.accountID);
+            changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.login ?? '', currentUserPersonalDetails.accountID);
         },
         getDescription: () => {},
         sentryLabel: CONST.SENTRY_LABEL.CONTEXT_MENU.UNHOLD,
@@ -633,13 +633,13 @@ const ContextMenuActions: ContextMenuAction[] = [
 
             if (closePopover) {
                 hideContextMenu(false, () =>
-                    changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.email ?? '', currentUserPersonalDetails.accountID),
+                    changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.login ?? '', currentUserPersonalDetails.accountID),
                 );
                 return;
             }
 
             // No popover to hide, call changeMoneyRequestHoldStatus immediately
-            changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.email ?? '', currentUserPersonalDetails.accountID);
+            changeMoneyRequestHoldStatus(moneyRequestAction, iouTransaction, isOffline, currentUserPersonalDetails?.login ?? '', currentUserPersonalDetails.accountID);
         },
         getDescription: () => {},
         sentryLabel: CONST.SENTRY_LABEL.CONTEXT_MENU.HOLD,
