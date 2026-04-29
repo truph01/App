@@ -647,7 +647,17 @@ function MoneyRequestReportTransactionList({
                     isDesktopTableLayout && [styles.highlightBG, styles.searchTableTopRadius, styles.mh5, styles.borderBottom],
                 ]}
             >
-                <View style={[styles.dFlex, styles.flexRow, styles.pv2, styles.pr4, StyleUtils.getPaddingLeft(variables.w12)]}>
+                <View
+                    style={[
+                        styles.dFlex,
+                        styles.flexRow,
+                        styles.alignItemsCenter,
+                        styles.pv2,
+                        styles.pr4,
+                        StyleUtils.getPaddingLeft(variables.w12),
+                        isDesktopTableLayout && {minHeight: variables.tableGroupRowHeight},
+                    ]}
+                >
                     <Checkbox
                         onPress={() => {
                             if (selectedTransactionIDs.length !== 0) {
@@ -660,8 +670,9 @@ function MoneyRequestReportTransactionList({
                         isIndeterminate={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length !== transactionsWithoutPendingDelete.length}
                         isChecked={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length === transactionsWithoutPendingDelete.length}
                         containerStyle={isDesktopTableLayout && styles.m0}
+                        style={isDesktopTableLayout && styles.mr3}
                     />
-                    {isMediumScreenWidth && !shouldScrollHorizontally && <Text style={[styles.textStrong, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>}
+                    {isMediumScreenWidth && !shouldScrollHorizontally && <Text style={[styles.labelStrong]}>{translate('workspace.people.selectAll')}</Text>}
                 </View>
                 {(!isMediumScreenWidth || shouldScrollHorizontally) && (
                     <MoneyRequestReportTableHeader
