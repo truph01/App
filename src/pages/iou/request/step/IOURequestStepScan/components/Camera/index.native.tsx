@@ -366,7 +366,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
                     <AttachmentPicker
                         onOpenPicker={() => {
                             setIsAttachmentPickerActive(true);
-                            onAttachmentPickerStatusChange(true);
+                            onAttachmentPickerStatusChange?.(true);
                         }}
                         fileLimit={shouldAcceptMultipleFiles ? CONST.API_ATTACHMENT_VALIDATIONS.MAX_FILE_LIMIT : 1}
                         shouldValidateImage={false}
@@ -380,10 +380,10 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
                                 onPress={() => {
                                     openPicker({
                                         onPicked: (data) => emitPickedFiles(data),
-                                        onCanceled: () => onAttachmentPickerStatusChange(false),
+                                        onCanceled: () => onAttachmentPickerStatusChange?.(false),
                                         onClosed: () => {
                                             setIsAttachmentPickerActive(false);
-                                            onAttachmentPickerStatusChange(false);
+                                            onAttachmentPickerStatusChange?.(false);
                                         },
                                     });
                                 }}
