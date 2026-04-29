@@ -21,6 +21,7 @@ import CONST from '@src/CONST';
 import SCREENS from '@src/SCREENS';
 import AccountManagerBanner from './AccountManagerBanner';
 import {AgentZeroStatusProvider} from './AgentZeroStatusContext';
+import {ConciergeDraftProvider} from './ConciergeDraftContext';
 import DeleteTransactionNavigateBackHandler from './DeleteTransactionNavigateBackHandler';
 import LinkedActionNotFoundGuard from './LinkedActionNotFoundGuard';
 import ReactionListWrapper from './ReactionListWrapper';
@@ -143,13 +144,15 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                                     <View style={[styles.flex1, styles.flexRow]}>
                                         {!shouldDeferNonEssentials && <WideRHPReceiptPanel />}
                                         <AgentZeroStatusProvider reportID={reportIDFromRoute}>
-                                            <View
-                                                style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}
-                                                testID="report-actions-view-wrapper"
-                                            >
-                                                <ReportActionsList />
-                                                {shouldDeferNonEssentials ? <ReportActionComposePlaceholder /> : <ReportFooter />}
-                                            </View>
+                                            <ConciergeDraftProvider reportID={reportIDFromRoute}>
+                                                <View
+                                                    style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}
+                                                    testID="report-actions-view-wrapper"
+                                                >
+                                                    <ReportActionsList />
+                                                    {shouldDeferNonEssentials ? <ReportActionComposePlaceholder /> : <ReportFooter />}
+                                                </View>
+                                            </ConciergeDraftProvider>
                                         </AgentZeroStatusProvider>
                                     </View>
                                     <PortalHost name="suggestions" />
