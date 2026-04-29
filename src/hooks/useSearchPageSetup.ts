@@ -41,8 +41,12 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
 
     useFocusEffect(clearOnHashChange);
 
+    // useEffect supplements useFocusEffect: it handles both the initial mount
+    // and cases where route params change without a navigation event (e.g. sorting).
     useEffect(clearOnHashChange, [hash, clearSelectedTransactions]);
 
+    // Fire search() when the query changes (hash). This runs at the page level so the
+    // API request starts in parallel with the skeleton, before Search mounts its 14+ useOnyx hooks.
     useEffect(() => {
         if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
             return;
