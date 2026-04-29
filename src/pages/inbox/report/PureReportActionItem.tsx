@@ -1209,9 +1209,11 @@ function PureReportActionItem({
                         </View>
                     )}
                 </Hoverable>
-                <View style={styles.reportActionSystemMessageContainer}>
-                    <InlineSystemMessage message={action.error} />
-                </View>
+                {!!action.error && (
+                    <View style={styles.reportActionSystemMessageContainer}>
+                        <InlineSystemMessage message={action.error} />
+                    </View>
+                )}
             </PressableWithSecondaryInteraction>
         </View>
     );
