@@ -52,9 +52,13 @@ function collectAnchors(doc: Document): Anchor[] {
             anchors.push({path: path.slice()});
             return;
         }
-        elem.children.forEach((child, i) => visit(child, [...path, i]));
+        for (const [i, child] of elem.children.entries()) {
+            visit(child, [...path, i]);
+        }
     };
-    doc.children.forEach((child, i) => visit(child, [i]));
+    for (const [i, child] of doc.children.entries()) {
+        visit(child, [i]);
+    }
     return anchors;
 }
 

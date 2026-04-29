@@ -30,8 +30,14 @@ const LONG_HTML =
 
 const fakeLongConciergeAction = {
     ...fakeConciergeAction,
-    message: [{html: LONG_HTML, text: LONG_HTML.replace(/<[^>]+>/g, ''), type: CONST.REPORT.MESSAGE.TYPE.COMMENT}],
+    message: [{html: LONG_HTML, text: LONG_HTML.replaceAll(/<[^>]+>/g, ''), type: CONST.REPORT.MESSAGE.TYPE.COMMENT}],
 } as ReportAction;
+
+/** Tuple of (message, sendNow?, parameters?) for Log.info calls — matches the
+ *  arg list usePendingConciergeResponse passes. Typing the spy's `.mock.calls`
+ *  via this lets the find/filter callbacks access call[0]/[2] without tripping
+ *  @typescript-eslint/no-unsafe-member-access. */
+type LogInfoCall = [string, boolean?, Record<string, unknown>?];
 
 /** Wait for a given number of ms (real timer) */
 function delay(ms: number): Promise<void> {
@@ -233,7 +239,8 @@ describe('usePendingConciergeResponse', () => {
             await waitForBatchedUpdates();
 
             // Then [ConciergeTrickle] start should have fired with token + duration metadata
-            const startCall = logSpy.mock.calls.find((call) => call[0] === '[ConciergeTrickle] start');
+            const calls = logSpy.mock.calls as LogInfoCall[];
+            const startCall = calls.find((call) => call[0] === '[ConciergeTrickle] start');
             expect(startCall).toBeDefined();
             const payload = startCall?.[2] as {reportActionID?: string; tokenCount?: number; durationMs?: number} | undefined;
             expect(payload?.reportActionID).toBe(REPORT_ACTION_ID);
@@ -266,7 +273,8 @@ describe('usePendingConciergeResponse', () => {
             expect(reportActions?.[REPORT_ACTION_ID]?.actorAccountID).toBe(CONST.ACCOUNT_ID.CONCIERGE);
 
             // And [ConciergeTrickle] complete should have fired with reason 'natural'
-            const completeCall = logSpy.mock.calls.find((call) => call[0] === '[ConciergeTrickle] complete');
+            const calls = logSpy.mock.calls as LogInfoCall[];
+            const completeCall = calls.find((call) => call[0] === '[ConciergeTrickle] complete');
             expect(completeCall).toBeDefined();
             const payload = completeCall?.[2] as {reason?: string} | undefined;
             expect(payload?.reason).toBe('natural');
@@ -289,10 +297,12 @@ describe('usePendingConciergeResponse', () => {
             await waitForBatchedUpdates();
 
             // Then no completion telemetry should fire after unmount
-            const completeCallsBefore = logSpy.mock.calls.filter((call) => call[0] === '[ConciergeTrickle] complete').length;
+            const callsBefore = logSpy.mock.calls as LogInfoCall[];
+            const completeCallsBefore = callsBefore.filter((call) => call[0] === '[ConciergeTrickle] complete').length;
             await delay(500);
             await waitForBatchedUpdates();
-            const completeCallsAfter = logSpy.mock.calls.filter((call) => call[0] === '[ConciergeTrickle] complete').length;
+            const callsAfter = logSpy.mock.calls as LogInfoCall[];
+            const completeCallsAfter = callsAfter.filter((call) => call[0] === '[ConciergeTrickle] complete').length;
 
             expect(completeCallsAfter).toBe(completeCallsBefore);
 
