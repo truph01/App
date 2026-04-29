@@ -594,10 +594,7 @@ function MoneyRequestReportTransactionList({
                   pendingAction: undefined,
               };
               return (
-                  <View
-                      key={group.groupKey}
-                      style={!shouldUseNarrowLayout && styles.gap2}
-                  >
+                  <View key={group.groupKey}>
                       <MoneyRequestReportGroupHeader
                           group={group}
                           groupKey={group.groupKey}
@@ -621,7 +618,7 @@ function MoneyRequestReportTransactionList({
 
     const transactionListContent = (
         <View
-            style={[listHorizontalPadding, !shouldUseNarrowLayout && styles.gap2, shouldUseNarrowLayout ? styles.pb2 : styles.pb4, !shouldUseNarrowLayout && styles.mb2]}
+            style={[listHorizontalPadding, shouldUseNarrowLayout ? styles.pb2 : styles.pb4]}
             onLayout={onLayout}
         >
             {narrowListWrapper ? <View style={narrowListWrapper}>{transactionItems}</View> : transactionItems}

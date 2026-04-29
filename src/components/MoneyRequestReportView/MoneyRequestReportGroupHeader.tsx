@@ -14,9 +14,6 @@ import CONST from '@src/CONST';
 import type {GroupedTransactions} from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
-const MOBILE_HEIGHT_WITH_CHECKBOX = 20;
-const MOBILE_HEIGHT_WITHOUT_CHECKBOX = 16;
-
 type MoneyRequestReportGroupHeaderProps = {
     /** The grouped transaction data */
     group: GroupedTransactions;
@@ -79,18 +76,7 @@ function MoneyRequestReportGroupHeader({
 
     const shouldShowCheckbox = isSelectionModeEnabled || !shouldUseNarrowLayout;
 
-    const conditionalHeight = useMemo(
-        () => (shouldUseNarrowLayout ? {height: shouldShowCheckbox ? MOBILE_HEIGHT_WITH_CHECKBOX : MOBILE_HEIGHT_WITHOUT_CHECKBOX} : {minHeight: variables.tableGroupRowHeight}),
-        [shouldUseNarrowLayout, shouldShowCheckbox],
-    );
-
-    const textStyle = useMemo(
-        () =>
-            shouldUseNarrowLayout
-                ? [styles.textBold, {fontSize: variables.fontSizeLabel, lineHeight: shouldShowCheckbox ? MOBILE_HEIGHT_WITH_CHECKBOX : MOBILE_HEIGHT_WITHOUT_CHECKBOX}]
-                : [styles.labelStrong],
-        [shouldUseNarrowLayout, shouldShowCheckbox, styles],
-    );
+    const textStyle = useMemo(() => (shouldUseNarrowLayout ? {fontSize: variables.fontSizeLabel, lineHeight: 16} : [styles.labelStrong]), [shouldUseNarrowLayout, styles]);
 
     const handleToggleSelection = useCallback(() => {
         onToggleSelection?.(groupKey);
@@ -108,8 +94,8 @@ function MoneyRequestReportGroupHeader({
                       styles.borderBottom,
                       isSelected && {borderColor: theme.buttonHoveredBG},
                   ]
-                : [styles.ph4, styles.pv3, styles.borderBottom, conditionalHeight],
-        [isDesktopTableLayout, styles, theme, isSelected, conditionalHeight],
+                : [styles.ph4, styles.pv3, styles.borderBottom],
+        [isDesktopTableLayout, styles, theme, isSelected],
     );
 
     return (
@@ -124,17 +110,17 @@ function MoneyRequestReportGroupHeader({
                             onPress={handleToggleSelection}
                             accessibilityLabel={translate('reportLayout.selectGroup', {groupName: displayName})}
                             containerStyle={isDesktopTableLayout && styles.m0}
-                            style={styles.mr2}
+                            style={isDesktopTableLayout ? styles.mr3 : styles.mr2}
                         />
                     )}
                     <Text
-                        style={[textStyle, styles.flexShrink1, shouldShowCheckbox && styles.ml2]}
+                        style={[styles.textBold, textStyle, styles.flexShrink1, shouldShowCheckbox && !isDesktopTableLayout && styles.ml2]}
                         numberOfLines={1}
                     >
                         {displayName}
                     </Text>
-                    <Text style={[textStyle, styles.mh1]}>{CONST.DOT_SEPARATOR}</Text>
-                    <Text style={[textStyle]}>{formattedAmount}</Text>
+                    <Text style={[styles.textBold, textStyle, styles.mh1]}>{CONST.DOT_SEPARATOR}</Text>
+                    <Text style={[styles.textBold, textStyle]}>{formattedAmount}</Text>
                 </View>
             </View>
         </OfflineWithFeedback>
