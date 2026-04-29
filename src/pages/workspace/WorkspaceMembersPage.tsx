@@ -620,11 +620,12 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         isOffline && data?.some((member) => member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
     const shouldShowSearchBar = data.length > CONST.SEARCH_ITEM_LIMIT;
     const debouncedFilteredData = useDebouncedValue(filteredData, CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
-    const hasNoFilteredMembers = filteredData.length === 0;
-    const hasNoDebouncedFilteredMembers = debouncedFilteredData?.length === 0;
-    const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && hasNoFilteredMembers;
+    const isFilteringMembers = filteredData?.length < debouncedFilteredData?.length;
+    const displayedFilteredData = isFilteringMembers ? debouncedFilteredData : filteredData;
+    const hasNoDisplayedMembers = displayedFilteredData.length === 0;
     const shouldShowRoleFilter = data.length > 0;
-    const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && hasNoFilteredMembers && hasNoDebouncedFilteredMembers;
+    const shouldShowRoleFilterEmptyState = shouldShowRoleFilter && !!selectedRoleFilter && inputValue.length === 0 && hasNoDisplayedMembers;
+    const shouldShowEmptySearchMessage = !shouldShowRoleFilterEmptyState && hasNoDisplayedMembers;
     const noResultsMessage = translate('common.noResultsFoundMatching', inputValue);
 
     // SearchBar's built-in empty state also controls screen-reader announcements.
