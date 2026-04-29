@@ -153,10 +153,13 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             });
             dispatch('started', tokens.at(1) ?? '');
             lastStage = 1;
+            const lastIndex = tokens.length - 1;
             intervalID = setInterval(() => {
                 const elapsed = Date.now() - trickleStart;
                 const progress = easeOut(elapsed / effectiveDuration);
-                const stage = Math.min(tokens.length - 1, Math.max(0, Math.ceil(progress * (tokens.length - 1))));
+                // progress ∈ [0,1] (easeOut clamps) and lastIndex ≥ 99 (shouldTrickle gate),
+                // so `progress * lastIndex` is always non-negative — only the upper bound needs clamping.
+                const stage = Math.min(lastIndex, Math.ceil(progress * lastIndex));
                 if (stage > lastStage) {
                     lastStage = stage;
                     dispatch('updated', tokens.at(stage) ?? '');
