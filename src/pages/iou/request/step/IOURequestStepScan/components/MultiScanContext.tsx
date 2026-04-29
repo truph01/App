@@ -1,5 +1,4 @@
 import React, {createContext, useContext, useState} from 'react';
-import {InteractionManager} from 'react-native';
 import useOnyx from '@hooks/useOnyx';
 import {dismissProductTraining} from '@libs/actions/Welcome';
 import useScanRouteParams from '@pages/iou/request/step/IOURequestStepScan/hooks/useScanRouteParams';
@@ -67,8 +66,8 @@ function MultiScanProvider({children}: MultiScanProviderProps) {
     }
 
     function dismissEducationalPopup() {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated -- InteractionManager is standard RN API for deferred work
-        InteractionManager.runAfterInteractions(() => {
+        // Defer dismissal to avoid updating state during the modal close animation
+        requestAnimationFrame(() => {
             dismissProductTraining(CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.MULTI_SCAN_EDUCATIONAL_MODAL);
             setShowEducationalPopup(false);
         });
