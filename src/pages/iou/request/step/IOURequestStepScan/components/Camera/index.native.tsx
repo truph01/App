@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Alert, StyleSheet, View} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {GestureDetector} from 'react-native-gesture-handler';
@@ -58,14 +58,14 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
     // Ref for double-tap protection (doesn't trigger re-render)
     const isCapturingPhoto = useRef(false);
 
-    const onFocusStart = useCallback(() => {
+    const onFocusStart = () => {
         isCapturingPhoto.current = false;
-    }, []);
+    };
 
-    const onFocusCleanup = useCallback(() => {
+    const onFocusCleanup = () => {
         cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
         cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-    }, []);
+    };
 
     const {
         camera,
@@ -95,7 +95,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
         {videoResolution: {width: windowHeight, height: windowWidth}},
     ]);
     const cameraAspectRatio = getCameraAspectRatio(format, isInLandscapeMode);
-    const fps = useMemo(() => (format ? Math.min(Math.max(30, format.minFps), format.maxFps) : 30), [format]);
+    const fps = format ? Math.min(Math.max(30, format.minFps), format.maxFps) : 30;
 
     // Track camera init telemetry
     const cameraInitSpanStarted = useRef(false);
@@ -107,10 +107,10 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
         opacity: blinkOpacity.get(),
     }));
 
-    const showBlink = useCallback(() => {
+    const showBlink = () => {
         blinkOpacity.set(withSequence(withTiming(1, {duration: BLINK_DURATION_MS}), withTiming(0, {duration: BLINK_DURATION_MS})));
         HapticFeedback.press();
-    }, [blinkOpacity]);
+    };
 
     // Start camera init span when permission is granted and camera is ready
     useEffect(() => {
@@ -145,7 +145,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
         };
     }, []);
 
-    const handleCameraInitialized = useCallback(() => {
+    const handleCameraInitialized = () => {
         if (cameraInitialized.current) {
             return;
         }
@@ -172,18 +172,18 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
             });
 
         onCameraInitialized?.();
-    }, [onCameraInitialized]);
+    };
 
-    const maybeCancelShutterSpan = useCallback(() => {
+    const maybeCancelShutterSpan = () => {
         if (isMultiScanEnabled) {
             return;
         }
 
         cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
         cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-    }, [isMultiScanEnabled]);
+    };
 
-    const capturePhoto = useCallback(() => {
+    const capturePhoto = () => {
         if (!isMultiScanEnabled) {
             startSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION, {
                 name: CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION,
@@ -248,21 +248,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
                 showCameraAlert();
                 Log.warn('Error taking photo', error);
             });
-    }, [
-        askForPermissions,
-        camera,
-        cameraPermissionStatus,
-        flash,
-        hasFlash,
-        isInLandscapeMode,
-        isMultiScanEnabled,
-        isPlatformMuted,
-        maybeCancelShutterSpan,
-        onCapture,
-        setDidCapturePhoto,
-        showBlink,
-        translate,
-    ]);
+    };
 
     const emitPickedFiles = (files: FileObject[]) => {
         for (const file of files) {

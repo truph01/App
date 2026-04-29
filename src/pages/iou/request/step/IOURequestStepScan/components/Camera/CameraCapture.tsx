@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Animated, {useAnimatedStyle, useSharedValue, withSequence, withTiming} from 'react-native-reanimated';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -43,10 +43,10 @@ function CameraCapture({onCapture, shouldAcceptMultipleFiles = false, onLayout}:
     const {isMultiScanEnabled, canUseMultiScan} = useMultiScanState();
     const {toggleMultiScan} = useMultiScanActions();
 
-    const onUnmount = useCallback(() => {
+    const onUnmount = () => {
         cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
         cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
-    }, []);
+    };
 
     const {
         cameraRef,
