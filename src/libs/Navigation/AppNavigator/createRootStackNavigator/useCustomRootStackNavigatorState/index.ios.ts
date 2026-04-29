@@ -6,9 +6,12 @@ import type {NavigationRoute, SplitNavigatorName} from '@libs/Navigation/types';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ensureTabNavigatorRoutes from './ensureTabNavigatorRoutes';
 
-// Fix iOS swipe-back: slicing tab state breaks rehydration. Skip until 3+ stacked TAB_NAVIGATORs.
-// https://github.com/Expensify/App/issues/89006
-const SKIP_SLICE_TAB_THRESHOLD = 3;
+// TODO: deploy-blocker hotfix for #89006 — slicing tab state breaks rehydration on iOS swipe-back.
+// Skipping the slice until we exceed the threshold preserves the underlying TAB_NAVIGATOR's nested
+// state so the gesture restores it correctly. This is a temporary fix; the proper solution is to
+// rebuild the TAB_NAVIGATOR state from `preservedNavigatorStates` on rehydration so the magic
+// number can go away. We'll address this shortly — tracked in https://github.com/Expensify/App/issues/89179.
+const SKIP_SLICE_TAB_THRESHOLD = 4;
 
 // Swiping back on iOS does not work properly when the preloaded route has gestureEnabled set to false.
 // Therefore, on screens where swiping should work, preloadedRoutes will be an empty array during rendering to ensure swiping works properly.
