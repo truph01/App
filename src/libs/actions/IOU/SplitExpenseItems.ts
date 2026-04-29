@@ -5,8 +5,8 @@ import {getCurrencySymbol} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import {calculateAmount as calculateIOUAmount} from '@libs/IOUUtils';
 import {toLocaleDigit} from '@libs/LocaleDigitUtils';
-import * as Localize from '@libs/Localize';
-import * as NumberUtils from '@libs/NumberUtils';
+import {translate} from '@libs/Localize';
+import {rand64} from '@libs/NumberUtils';
 import {getTransactionDetails} from '@libs/ReportUtils';
 import {buildOptimisticTransaction, getAmount, getCurrency, isDistanceRequest as isDistanceRequestTransactionUtils} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
@@ -36,7 +36,7 @@ function getDistanceMerchantFromDistance(distanceInUnits: number, unit: Unit | u
         unit,
         rate,
         currencyForMerchant,
-        (phrase, ...parameters) => Localize.translate(currentLocale, phrase, ...parameters),
+        (phrase, ...parameters) => translate(currentLocale, phrase, ...parameters),
         (digit) => toLocaleDigit(currentLocale, digit),
         getCurrencySymbol,
         true,
@@ -230,7 +230,7 @@ function addSplitExpenseField(
 
     const newSplitExpense = initSplitExpenseItemData(transaction, transactionReport, {
         amount: 0,
-        transactionID: NumberUtils.rand64(),
+        transactionID: rand64(),
         reportID: draftTransaction?.reportID,
         customUnit,
         merchant,
@@ -374,7 +374,7 @@ function resetSplitExpensesByDateRange(
         const amount = calculateIOUAmount(lastIndex, total, currency, index === lastIndex, true);
         let splitExpense = initSplitExpenseItemData(transaction, transactionReport, {
             amount,
-            transactionID: NumberUtils.rand64(),
+            transactionID: rand64(),
             reportID: transaction?.reportID,
             created: format(date, CONST.DATE.FNS_FORMAT_STRING),
         });
