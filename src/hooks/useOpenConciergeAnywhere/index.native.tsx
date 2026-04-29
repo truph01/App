@@ -5,7 +5,8 @@ import {navigateToConciergeChat} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 /**
- * Returns a callback that navigates to the Concierge chat on native (opens the side panel on web instead).
+ * Returns a callback that navigates to the Concierge chat on native (opens the side panel on web instead),
+ * and a flag indicating that the concierge is not opened in the side panel.
  */
 function useOpenConciergeAnywhere() {
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
@@ -14,9 +15,11 @@ function useOpenConciergeAnywhere() {
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
-    return () => {
+    const openConciergeAnywhere = () => {
         navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas);
     };
+
+    return {openConciergeAnywhere, isInSidePanel: false};
 }
 
 export default useOpenConciergeAnywhere;

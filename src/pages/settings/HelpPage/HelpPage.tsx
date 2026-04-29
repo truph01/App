@@ -39,7 +39,7 @@ function HelpPage() {
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
-    const openConciergeAnywhere = useOpenConciergeAnywhere();
+    const {openConciergeAnywhere} = useOpenConciergeAnywhere();
 
     const menuItems = [
         {

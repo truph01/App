@@ -1,6 +1,5 @@
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
-import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useOnyx from '@hooks/useOnyx';
 import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -16,9 +15,8 @@ function useAskConcierge() {
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [conciergeReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(conciergeReportID)}`);
     const {timezone, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
-    const openConciergeAnywhere = useOpenConciergeAnywhere();
+    const {openConciergeAnywhere, isInSidePanel} = useOpenConciergeAnywhere();
     const delegateAccountID = useDelegateAccountID();
-    const isInSidePanel = useIsInSidePanel();
 
     return (searchQuery: string) => {
         openConciergeAnywhere();
