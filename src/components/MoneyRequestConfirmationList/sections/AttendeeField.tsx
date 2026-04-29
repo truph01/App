@@ -6,8 +6,8 @@ import UserPills from '@components/UserPills';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {enrichAndSortAttendees} from '@libs/AttendeeUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getAttendees} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
@@ -34,24 +34,7 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
     const shouldDisplayAttendeesError = formError === 'violations.missingAttendees';
 
     const rawIouAttendees = getAttendees(transaction, currentUserPersonalDetails);
-    // Enrich + sort once so pills and accessibility label share one canonical order.
-    const iouAttendees = Array.isArray(rawIouAttendees)
-        ? sortAlphabetically(
-              rawIouAttendees.map((a) => {
-                  const pd = a?.accountID ? personalDetailsList?.[a.accountID] : undefined;
-                  const freshAvatar = typeof pd?.avatar === 'string' ? pd.avatar : undefined;
-                  return {
-                      ...a,
-                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional || to fall back when personalDetails has an empty string
-                      displayName: pd?.displayName || a?.displayName,
-                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional || to fall back when personalDetails has an empty string
-                      avatarUrl: freshAvatar || a?.avatarUrl,
-                  };
-              }),
-              'displayName',
-              localeCompare,
-          )
-        : rawIouAttendees;
+    const iouAttendees = enrichAndSortAttendees(rawIouAttendees, personalDetailsList, localeCompare);
 
     return (
         <MenuItemWithTopDescription
