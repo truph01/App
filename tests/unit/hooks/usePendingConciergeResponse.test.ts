@@ -1,6 +1,7 @@
 import {renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import usePendingConciergeResponse from '@hooks/usePendingConciergeResponse';
+import Log from '@libs/Log';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction} from '@src/types/onyx';
@@ -18,6 +19,18 @@ const fakeConciergeAction = {
     actorAccountID: CONST.ACCOUNT_ID.CONCIERGE,
     actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
     message: [{html: 'To set up QuickBooks, go to Settings...', text: 'To set up QuickBooks, go to Settings...', type: CONST.REPORT.MESSAGE.TYPE.COMMENT}],
+} as ReportAction;
+
+/** Long HTML with >100 chars of plain text → tokenizeForReveal emits ≥100 char-level
+ *  anchors → the hook's `tokens.length >= 100` gate opts INTO the trickle path. */
+const LONG_HTML =
+    '<p>To connect Xero to Expensify, go to Settings &gt; Workspaces and select your workspace.</p>' +
+    '<ol><li>Click <strong>More features</strong>, then in the <strong>Integrate</strong> section toggle <strong>Accounting</strong>.</li>' +
+    '<li>Click <strong>Connect</strong> next to Xero.</li><li>Log in to Xero as an administrator and authorize the connection.</li></ol>';
+
+const fakeLongConciergeAction = {
+    ...fakeConciergeAction,
+    message: [{html: LONG_HTML, text: LONG_HTML.replace(/<[^>]+>/g, ''), type: CONST.REPORT.MESSAGE.TYPE.COMMENT}],
 } as ReportAction;
 
 /** Wait for a given number of ms (real timer) */
@@ -191,5 +204,101 @@ describe('usePendingConciergeResponse', () => {
         // Then REPORT_ACTIONS should remain empty
         const reportActions = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}` as const);
         expect(reportActions).toBeUndefined();
+    });
+
+    describe('trickle path (long replies, ≥100 char-level anchors)', () => {
+        let logSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            logSpy = jest.spyOn(Log, 'info').mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            logSpy.mockRestore();
+        });
+
+        it('emits a [ConciergeTrickle] start telemetry log when the gate opens', async () => {
+            // Given a long pending Concierge response (passes the tokens.length >= 100 gate)
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}`, {
+                reportAction: fakeLongConciergeAction,
+                displayAfter: Date.now() + SHORT_DELAY,
+            });
+            await waitForBatchedUpdates();
+
+            const {unmount} = renderHook(() => usePendingConciergeResponse(REPORT_ID));
+            await waitForBatchedUpdates();
+
+            // Wait for the displayAfter delay so startTrickle fires
+            await delay(SHORT_DELAY + 50);
+            await waitForBatchedUpdates();
+
+            // Then [ConciergeTrickle] start should have fired with token + duration metadata
+            const startCall = logSpy.mock.calls.find((call) => call[0] === '[ConciergeTrickle] start');
+            expect(startCall).toBeDefined();
+            const payload = startCall?.[2] as {reportActionID?: string; tokenCount?: number; durationMs?: number} | undefined;
+            expect(payload?.reportActionID).toBe(REPORT_ACTION_ID);
+            expect(payload?.tokenCount ?? 0).toBeGreaterThanOrEqual(100);
+            expect(payload?.durationMs).toBeGreaterThan(0);
+
+            unmount();
+        });
+
+        it('completes naturally and applies the action to REPORT_ACTIONS', async () => {
+            // Given a long pending response
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}`, {
+                reportAction: fakeLongConciergeAction,
+                displayAfter: Date.now() + SHORT_DELAY,
+            });
+            await waitForBatchedUpdates();
+
+            // Use fake timers so we don't have to wait the real 15s trickle window
+            jest.useFakeTimers({doNotFake: ['Date']});
+
+            renderHook(() => usePendingConciergeResponse(REPORT_ID));
+
+            // Advance past displayAfter + the full trickle duration + slack
+            jest.advanceTimersByTime(SHORT_DELAY + 16_000);
+            jest.useRealTimers();
+            await waitForBatchedUpdates();
+
+            // Then the action should be applied to REPORT_ACTIONS (post-completion)
+            const reportActions = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}` as const);
+            expect(reportActions?.[REPORT_ACTION_ID]?.actorAccountID).toBe(CONST.ACCOUNT_ID.CONCIERGE);
+
+            // And [ConciergeTrickle] complete should have fired with reason 'natural'
+            const completeCall = logSpy.mock.calls.find((call) => call[0] === '[ConciergeTrickle] complete');
+            expect(completeCall).toBeDefined();
+            const payload = completeCall?.[2] as {reason?: string} | undefined;
+            expect(payload?.reason).toBe('natural');
+        });
+
+        it('cleans up the interval on unmount mid-trickle', async () => {
+            // Given a long pending response
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${REPORT_ID}`, {
+                reportAction: fakeLongConciergeAction,
+                displayAfter: Date.now() + SHORT_DELAY,
+            });
+            await waitForBatchedUpdates();
+
+            const {unmount} = renderHook(() => usePendingConciergeResponse(REPORT_ID));
+            await waitForBatchedUpdates();
+
+            // Let the trickle start (past displayAfter) but unmount before completion
+            await delay(SHORT_DELAY + 200);
+            unmount();
+            await waitForBatchedUpdates();
+
+            // Then no completion telemetry should fire after unmount
+            const completeCallsBefore = logSpy.mock.calls.filter((call) => call[0] === '[ConciergeTrickle] complete').length;
+            await delay(500);
+            await waitForBatchedUpdates();
+            const completeCallsAfter = logSpy.mock.calls.filter((call) => call[0] === '[ConciergeTrickle] complete').length;
+
+            expect(completeCallsAfter).toBe(completeCallsBefore);
+
+            // And REPORT_ACTIONS should NOT contain the action (trickle was cancelled mid-way)
+            const reportActions = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}` as const);
+            expect(reportActions?.[REPORT_ACTION_ID]).toBeUndefined();
+        });
     });
 });
