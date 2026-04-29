@@ -2014,13 +2014,14 @@ describe('SearchQueryUtils', () => {
             expect(second?.view).toBe('bar');
         });
 
-        test('returns equal result on repeated calls with the same query', () => {
+        test('returns equal but independent results on repeated calls with the same query', () => {
             const query = 'type:expense status:outstanding';
 
             const first = buildSearchQueryJSON(query);
             const second = buildSearchQueryJSON(query);
 
             expect(first).toEqual(second);
+            expect(first).not.toBe(second);
         });
 
         test('returns independent results for the same query with different rawQuery values', () => {

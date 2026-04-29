@@ -580,14 +580,16 @@ function getRawFilterListFromQuery(rawQuery: SearchQueryString) {
 // Cache for buildSearchQueryJSON to avoid re-running the PEG parser for identical queries.
 // This is a pure function called from 64+ sites — many fire during the same render cycle
 // with identical query strings, each running the full parser from scratch.
-// Return the cached object itself so callers can safely depend on referential stability
-// when query/rawQuery are unchanged.
 const buildSearchQueryJSONCache = new Map<string, SearchQueryJSON | undefined>();
 const BUILD_SEARCH_QUERY_JSON_CACHE_MAX_SIZE = 50;
 const BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR = '\x00'; // Null byte prevents collisions if query/rawQuery contain arbitrary strings
 
-function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
-    const cacheKey = rawQuery ? `${query}${BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR}${rawQuery}` : query;
+function getBuildSearchQueryJSONCacheKey(query: SearchQueryString, rawQuery?: SearchQueryString) {
+    return rawQuery ? `${query}${BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR}${rawQuery}` : query;
+}
+
+function getCachedSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
+    const cacheKey = getBuildSearchQueryJSONCacheKey(query, rawQuery);
     if (buildSearchQueryJSONCache.has(cacheKey)) {
         return buildSearchQueryJSONCache.get(cacheKey);
     }
@@ -635,6 +637,19 @@ function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQuerySt
     } catch (e) {
         console.error(`Error when parsing SearchQuery: "${query}"`, e);
     }
+}
+
+function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
+    const result = getCachedSearchQueryJSON(query, rawQuery);
+    return result ? {...result} : result;
+}
+
+/**
+ * Like buildSearchQueryJSON, but returns the cached object itself for callers that need
+ * referential stability. Treat the returned object as read-only.
+ */
+function buildSearchQueryJSONStable(query: SearchQueryString, rawQuery?: SearchQueryString) {
+    return getCachedSearchQueryJSON(query, rawQuery);
 }
 
 /**
@@ -2120,6 +2135,7 @@ export {
     getDateRangeForPreset,
     isFilterSupported,
     buildSearchQueryJSON,
+    buildSearchQueryJSONStable,
     buildSearchQueryString,
     buildUserReadableQueryString,
     getDisplayQueryFiltersForKey,
