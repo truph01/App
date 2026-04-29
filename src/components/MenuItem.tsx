@@ -458,6 +458,9 @@ type MenuItemBaseProps = ForwardedFSClassProps &
 
         /** Additional styles for the right icon wrapper */
         rightIconWrapperStyle?: StyleProp<ViewStyle>;
+
+        /** Whether to ignore compact popover menu styling for this item */
+        shouldIgnoreCompactStyle?: boolean;
     };
 
 type MenuItemProps = (IconProps | AvatarProps | NoIcon) & MenuItemBaseProps;
@@ -606,6 +609,7 @@ function MenuItem({
     tabIndex = 0,
     rightIconWrapperStyle,
     titleAccessibilityRole,
+    shouldIgnoreCompactStyle = false,
 }: MenuItemProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FallbackAvatar', 'DotIndicator', 'Checkmark', 'NewWindow']);
     const {translate} = useLocalize();
@@ -620,7 +624,7 @@ function MenuItem({
     const popoverAnchor = useRef<View>(null);
     const deviceHasHoverSupport = hasHoverSupport();
     const isCompactMenu = useIsCompactMenu();
-    const isCompactPopoverItem = isCompactMenu && !isSmallScreenWidth;
+    const isCompactPopoverItem = isCompactMenu && !isSmallScreenWidth && !shouldIgnoreCompactStyle;
     const compactIconStyle = isCompactPopoverItem && iconType === CONST.ICON_TYPE_ICON && {width: variables.iconSizeNormal};
     const isCompact = viewMode === CONST.OPTION_MODE.COMPACT;
     const isDeleted = style && Array.isArray(style) ? style.includes(styles.offlineFeedbackDeleted) : false;
