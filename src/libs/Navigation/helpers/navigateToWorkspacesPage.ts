@@ -57,7 +57,7 @@ const navigateToWorkspacesPage = ({currentUserLogin, shouldUseNarrowLayout, poli
     // https://github.com/Expensify/App/issues/89009
     if (rootState) {
         const topRootIndex = rootState.index ?? rootState.routes.length - 1;
-        const olderTabIdx = rootState.routes.findIndex((route, idx) => {
+        const olderTabIdx = rootState.routes.findLastIndex((route, idx) => {
             if (idx >= topRootIndex || route.name !== NAVIGATORS.TAB_NAVIGATOR) {
                 return false;
             }
