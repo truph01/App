@@ -96,6 +96,10 @@ function SearchChangeApproverPage() {
     const [onyxReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: getOnyxReports});
 
     const hasAutoAppliedRef = useRef(false);
+    // True once changeApprover() has dispatched a cross-navigator hop to WORKSPACE_UPGRADE.
+    // Guards the auto-close in useLayoutEffect against firing during the upgrade round-trip,
+    // which would dismiss the RHP that should reopen on the Add Approver page after upgrade.
+    const hasInitiatedUpgradeRef = useRef(false);
     const prevSelectedReportsLength = useRef(0);
     useEffect(() => {
         if (!hasLoadedApp || !selectedReports.length || prevSelectedReportsLength.current === selectedReports.length) {
@@ -123,12 +127,18 @@ function SearchChangeApproverPage() {
             const policiesToUpgrade = selectedPolicies.filter((policy) => !isControlPolicy(policy));
             if (policiesToUpgrade.length > 1) {
                 // Bulk upgrade is not supported, so show a general page to guide the user to upgrade manually
-                Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(undefined, undefined, ROUTES.CHANGE_APPROVER_SEARCH_RHP));
+                hasInitiatedUpgradeRef.current = true;
+                Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(undefined, undefined, ROUTES.CHANGE_APPROVER_SEARCH_RHP.getRoute()));
                 return;
             }
             if (policiesToUpgrade.length === 1) {
+                hasInitiatedUpgradeRef.current = true;
                 Navigation.navigate(
-                    ROUTES.WORKSPACE_UPGRADE.getRoute(policiesToUpgrade.at(0)?.id, CONST.UPGRADE_FEATURE_INTRO_MAPPING.multiApprovalLevels.alias, ROUTES.CHANGE_APPROVER_SEARCH_RHP),
+                    ROUTES.WORKSPACE_UPGRADE.getRoute(
+                        policiesToUpgrade.at(0)?.id,
+                        CONST.UPGRADE_FEATURE_INTRO_MAPPING.multiApprovalLevels.alias,
+                        ROUTES.CHANGE_APPROVER_SEARCH_RHP.getRoute(),
+                    ),
                 );
                 return;
             }
@@ -205,6 +215,13 @@ function SearchChangeApproverPage() {
     // avoiding a single-frame flash of an empty list after reports are cleared.
     useLayoutEffect(() => {
         if (selectedReports.length && approverTypes.at(0)) {
+            return;
+        }
+
+        // Skip the auto-close while an upgrade round-trip is in flight: selectedReports may be
+        // transiently empty as navigation hops to WORKSPACE_UPGRADE and back, and dismissing
+        // the RHP here would close the Add Approver flow that is about to take over.
+        if (hasInitiatedUpgradeRef.current) {
             return;
         }
 
