@@ -19,6 +19,12 @@ module.exports = {
         '<rootDir>/node_modules/@expensify/react-native-live-markdown/lib/commonjs/parseExpensiMark.js',
     ],
     testPathIgnorePatterns: ['<rootDir>/node_modules'],
+    // Worktrees under .worktrees/ each contain their own modules/hybrid-app/package.json,
+    // which trips jest-haste-map's "duplicate manual mock" / "duplicate package name"
+    // assertion when local jest runs see all of them at once. Worktrees are dev-only
+    // (used by the agent-ctl pipeline + manual debugging) and never tested against
+    // directly — exclude them from haste-map indexing entirely.
+    modulePathIgnorePatterns: ['<rootDir>/.worktrees/'],
     globals: {
         __DEV__: true,
         WebSocket: {},
