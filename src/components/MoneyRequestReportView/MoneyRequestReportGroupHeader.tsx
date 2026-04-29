@@ -108,7 +108,7 @@ function MoneyRequestReportGroupHeader({
                       styles.borderBottom,
                       isSelected && {borderColor: theme.buttonHoveredBG},
                   ]
-                : [styles.reportLayoutGroupHeader, conditionalHeight],
+                : [styles.ph4, styles.pv3, styles.borderBottom, conditionalHeight],
         [isDesktopTableLayout, styles, theme, isSelected, conditionalHeight],
     );
 

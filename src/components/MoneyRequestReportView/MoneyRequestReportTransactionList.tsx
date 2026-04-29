@@ -596,7 +596,7 @@ function MoneyRequestReportTransactionList({
               return (
                   <View
                       key={group.groupKey}
-                      style={!isDesktopTableLayout && styles.gap2}
+                      style={!shouldUseNarrowLayout && styles.gap2}
                   >
                       <MoneyRequestReportGroupHeader
                           group={group}
@@ -621,7 +621,7 @@ function MoneyRequestReportTransactionList({
 
     const transactionListContent = (
         <View
-            style={[listHorizontalPadding, !isDesktopTableLayout && styles.gap2, shouldUseNarrowLayout ? styles.pb2 : styles.pb4, !isDesktopTableLayout && styles.mb2]}
+            style={[listHorizontalPadding, !shouldUseNarrowLayout && styles.gap2, shouldUseNarrowLayout ? styles.pb2 : styles.pb4, !shouldUseNarrowLayout && styles.mb2]}
             onLayout={onLayout}
         >
             {narrowListWrapper ? <View style={narrowListWrapper}>{transactionItems}</View> : transactionItems}
