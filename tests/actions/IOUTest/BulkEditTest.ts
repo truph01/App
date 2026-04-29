@@ -1331,6 +1331,8 @@ describe('actions/IOU/BulkEdit', () => {
                 hash: undefined,
                 introSelected: undefined,
                 betas: undefined,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             });
 
             const params = writeSpy.mock.calls.at(0)?.[1] as {updates: string};
@@ -1398,6 +1400,8 @@ describe('actions/IOU/BulkEdit', () => {
                 hash: undefined,
                 introSelected: undefined,
                 betas: undefined,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             });
 
             const params = writeSpy.mock.calls.at(0)?.[1] as {updates: string};
@@ -1461,6 +1465,8 @@ describe('actions/IOU/BulkEdit', () => {
                 hash: undefined,
                 introSelected: undefined,
                 betas: undefined,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             });
 
             const params = writeSpy.mock.calls.at(0)?.[1] as {updates: string};
