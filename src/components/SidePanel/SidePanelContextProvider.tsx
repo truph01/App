@@ -89,6 +89,16 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     const reportID = (isRHPAdminsRoom || isRHPHomePage) && isUserAdmin && isPolicyActive && adminsChatReportID ? adminsChatReportID : conciergeReportID;
 
     const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
+    const [prevShouldHideSidePanel, setPrevShouldHideSidePanel] = useState(shouldHideSidePanel);
+
+    if (prevShouldHideSidePanel !== shouldHideSidePanel) {
+        setPrevShouldHideSidePanel(shouldHideSidePanel);
+        if (shouldHideSidePanel) {
+            setSessionStartTime(null);
+        } else if (!sessionStartTime) {
+            setSessionStartTime(DateUtils.getDBTime());
+        }
+    }
 
     useEffect(() => {
         sidePanelWidthRef.current = sidePanelWidth;
