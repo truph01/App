@@ -30,6 +30,8 @@ function SearchActionHeaderContent({action, report, isWhisper, onPress, children
     const {translate} = useLocalize();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
+    const reportName = getChatListItemReportName(action, report, conciergeReportID);
+
     return (
         <View style={[styles.p4]}>
             <View style={styles.webViewStyles.tagStyles.ol}>
@@ -42,7 +44,7 @@ function SearchActionHeaderContent({action, report, isWhisper, onPress, children
                         }}
                         numberOfLines={1}
                     >
-                        {getChatListItemReportName(action, report, conciergeReportID)}
+                        {reportName}
                     </TextLink>
                 </View>
                 {children}
