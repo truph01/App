@@ -206,7 +206,6 @@ function MoneyRequestConfirmationList({
 
     const {isTestReceipt, shouldShowProductTrainingTooltip, renderProductTrainingTooltip} = useReceiptTraining({
         transaction,
-        selectedParticipantsProp,
     });
 
     const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
