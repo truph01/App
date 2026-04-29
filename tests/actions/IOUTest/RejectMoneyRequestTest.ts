@@ -296,6 +296,7 @@ describe('actions/IOU/RejectMoneyRequest', () => {
 
         it('queues getParsedComment output for REJECT_EXPENSE_REPORT when reject reason contains markdown', async () => {
             const markdownComment = 'Rejected because **important**';
+
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const writeSpy = jest.spyOn(API, 'write').mockImplementation(jest.fn());
 
