@@ -96,7 +96,7 @@ type UseConfirmationValidationParams = {
     isNewManualExpenseFlowEnabled: boolean;
 
     /** Truthy when the route to the confirmation page has a known error */
-    routeError: boolean | string | null | undefined;
+    routeError: string | null | undefined;
 };
 
 /**

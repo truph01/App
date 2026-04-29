@@ -25,7 +25,7 @@ type BuildConfirmActionParams = {
     reportID: string;
 
     /** Truthy when the route to the confirmation page has a known error */
-    routeError: boolean | string | null | undefined;
+    routeError: string | null | undefined;
 
     /** Current form-level error key, or '' when no error is set */
     formError: TranslationPaths | '';
