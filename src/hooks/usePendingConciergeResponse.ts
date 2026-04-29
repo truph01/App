@@ -28,11 +28,8 @@ function easeOut(t: number): number {
 }
 
 /**
- * Multi-chunk payloads trickle into the `ConciergeDraftContext` reducer over
- * `DEFAULT_STREAM_DURATION_MS` so the synthetic report action behaves
- * identically to server-driven streaming. `REPORT_ACTIONS` is written only
- * at completion, preserving LHN previews / push / search snapshots.
- * Single-chunk payloads keep the binary reveal at `displayAfter`.
+ * Long Concierge replies trickle into `ConciergeDraftContext`; short ones keep
+ * the binary reveal at `displayAfter`. `REPORT_ACTIONS` is written at completion.
  */
 function usePendingConciergeResponse(reportID: string | undefined) {
     const [pendingResponse] = useOnyx(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`);

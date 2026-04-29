@@ -739,9 +739,7 @@ function ReportActionsList({
     }, [parentReportAction, renderedVisibleReportActions, report]);
 
     // Precompute a reportActionID → index map so renderItem can resolve the real index in O(1)
-    // instead of scanning renderedVisibleReportActions with indexOf on every render. Build from
-    // renderedVisibleReportActions (which includes the synthetic draft when active) so the
-    // synthetic-bubble index resolves correctly during a Concierge trickle.
+    // instead of scanning renderedVisibleReportActions with indexOf on every render.
     const actionIndexMap = useMemo(() => {
         const map = new Map<string, number>();
         for (const [i, action] of renderedVisibleReportActions.entries()) {

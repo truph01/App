@@ -20,9 +20,9 @@ type Anchor = {
 };
 
 /**
- * Emits one anchor per word/whitespace run inside text nodes and one per
- * atomic-tag subtree. Formatting elements (<strong>, <em>, ...) recurse so
- * bold appears as words become bold, rather than in one jump.
+ * Emits one anchor per character inside text nodes and one per atomic-tag
+ * subtree. Formatting elements (<strong>, <em>, ...) recurse so bold appears
+ * progressively rather than in one jump.
  */
 function collectAnchors(doc: Document): Anchor[] {
     const anchors: Anchor[] = [];
@@ -32,10 +32,8 @@ function collectAnchors(doc: Document): Anchor[] {
             if (text.length === 0) {
                 return;
             }
-            // One anchor per character for ChatGPT-style streaming feel.
-            // Atomic tags below still emit a single anchor for the whole tag,
-            // so mentions/emoji/anchors/code never render half-rendered even
-            // at this granularity.
+            // One anchor per character — atomic tags below emit a single anchor
+            // per subtree, so mentions/emoji/anchors/code stay whole.
             for (let i = 1; i <= text.length; i += 1) {
                 anchors.push({path: path.slice(), textEndIdx: i});
             }
@@ -71,10 +69,8 @@ function collectAnchors(doc: Document): Anchor[] {
 }
 
 /**
- * Builds a partial node forest up to and including `anchor`, truncating the
- * leaf text node at the anchor offset. Only the path branch is shallow-cloned
- * with a new children array; sibling references stay untouched so
- * dom-serializer renders them as-is.
+ * Builds a partial node forest up to `anchor`. Only the path branch is
+ * shallow-cloned; siblings stay referentially equal for dom-serializer.
  */
 function buildClippedNodes(doc: Document, anchor: Anchor): AnyNode[] {
     const clip = (siblings: readonly AnyNode[], depth: number): AnyNode[] => {
@@ -101,10 +97,8 @@ function buildClippedNodes(doc: Document, anchor: Anchor): AnyNode[] {
 }
 
 /**
- * Pre-computes progressive HTML stages with word-level granularity. Formatting
- * wrappers (<strong>, <em>, ...) recurse so bold reveals progressively;
- * atomic primitives (mentions, emoji, links, code, images) stay whole.
- * Stage 0 is empty; the final stage equals the input.
+ * Pre-computes progressive HTML stages at character granularity. Atomic
+ * primitives (mentions, emoji, links, code, images) stay whole.
  */
 function tokenizeForReveal(html: string): string[] {
     if (!html) {
