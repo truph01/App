@@ -556,8 +556,11 @@ function MoneyRequestReportTransactionList({
 
     const isDesktopTableLayout = !shouldUseNarrowLayout;
 
-    const allTransactions = shouldShowGroupedTransactions ? groupedTransactions.flatMap((group) => group.transactions) : resolvedTransactions;
-    const lastTransactionID = showPendingExpensePlaceholder ? undefined : allTransactions.at(-1)?.transactionID;
+    const lastTransactionID = useMemo(() => {
+        const allTransactions = shouldShowGroupedTransactions ? groupedTransactions.flatMap((group) => group.transactions) : resolvedTransactions;
+        const nonDeletedTransactions = allTransactions.filter((t) => !isTransactionPendingDelete(t));
+        return nonDeletedTransactions.at(-1)?.transactionID;
+    }, [shouldShowGroupedTransactions, groupedTransactions, resolvedTransactions]);
 
     const renderTransactionItem = (transaction: TransactionWithOptionalHighlight) => (
         <MoneyRequestReportTransactionItem
@@ -582,41 +585,46 @@ function MoneyRequestReportTransactionList({
         />
     );
 
+    const transactionItems = shouldShowGroupedTransactions
+        ? groupedTransactions.map((group) => {
+              const selectionState = groupSelectionState.get(group.groupKey) ?? {
+                  isSelected: false,
+                  isIndeterminate: false,
+                  isDisabled: false,
+                  pendingAction: undefined,
+              };
+              return (
+                  <View
+                      key={group.groupKey}
+                      style={!isDesktopTableLayout && styles.gap2}
+                  >
+                      <MoneyRequestReportGroupHeader
+                          group={group}
+                          groupKey={group.groupKey}
+                          currency={report?.currency ?? ''}
+                          isGroupedByTag={currentGroupBy === CONST.REPORT_LAYOUT.GROUP_BY.TAG}
+                          isSelectionModeEnabled={isMobileSelectionModeEnabled}
+                          isSelected={selectionState.isSelected}
+                          isIndeterminate={selectionState.isIndeterminate}
+                          isDisabled={selectionState.isDisabled}
+                          onToggleSelection={toggleGroupSelection}
+                          pendingAction={selectionState.pendingAction}
+                          shouldUseNarrowLayout={shouldUseNarrowLayout}
+                      />
+                      {group.transactions.map((transaction) => renderTransactionItem(transaction))}
+                  </View>
+              );
+          })
+        : resolvedTransactions.map((transaction) => renderTransactionItem(transaction));
+
+    const narrowListWrapper = shouldUseNarrowLayout ? [styles.highlightBG, styles.searchTableTopRadius, styles.searchTableBottomRadius, styles.overflowHidden] : undefined;
+
     const transactionListContent = (
         <View
-            style={[listHorizontalPadding, !isDesktopTableLayout && styles.gap2, styles.pb4, !isDesktopTableLayout && styles.mb2]}
+            style={[listHorizontalPadding, !isDesktopTableLayout && styles.gap2, shouldUseNarrowLayout ? styles.pb2 : styles.pb4, !isDesktopTableLayout && styles.mb2]}
             onLayout={onLayout}
         >
-            {shouldShowGroupedTransactions
-                ? groupedTransactions.map((group) => {
-                      const selectionState = groupSelectionState.get(group.groupKey) ?? {
-                          isSelected: false,
-                          isIndeterminate: false,
-                          isDisabled: false,
-                          pendingAction: undefined,
-                      };
-                      return (
-                          <View
-                              key={group.groupKey}
-                              style={!isDesktopTableLayout && styles.gap2}
-                          >
-                              <MoneyRequestReportGroupHeader
-                                  group={group}
-                                  groupKey={group.groupKey}
-                                  currency={report?.currency ?? ''}
-                                  isGroupedByTag={currentGroupBy === CONST.REPORT_LAYOUT.GROUP_BY.TAG}
-                                  isSelectionModeEnabled={isMobileSelectionModeEnabled}
-                                  isSelected={selectionState.isSelected}
-                                  isIndeterminate={selectionState.isIndeterminate}
-                                  isDisabled={selectionState.isDisabled}
-                                  onToggleSelection={toggleGroupSelection}
-                                  pendingAction={selectionState.pendingAction}
-                              />
-                              {group.transactions.map((transaction) => renderTransactionItem(transaction))}
-                          </View>
-                      );
-                  })
-                : resolvedTransactions.map((transaction) => renderTransactionItem(transaction))}
+            {narrowListWrapper ? <View style={narrowListWrapper}>{transactionItems}</View> : transactionItems}
             {showPendingExpensePlaceholder && (
                 <SearchRowSkeleton
                     shouldAnimate
@@ -701,7 +709,7 @@ function MoneyRequestReportTransactionList({
 
     return (
         <>
-            <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, styles.ph5, styles.pb2]}>
+            <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, styles.ph5, shouldUseNarrowLayout ? styles.pb3 : styles.pb2]}>
                 {shouldShowGroupedTransactions && (
                     <DropdownButton
                         label={translate('search.display.groupBy')}

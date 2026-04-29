@@ -14,7 +14,6 @@ import CONST from '@src/CONST';
 import type {GroupedTransactions} from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
-// Height constants
 const MOBILE_HEIGHT_WITH_CHECKBOX = 20;
 const MOBILE_HEIGHT_WITHOUT_CHECKBOX = 16;
 
@@ -48,6 +47,9 @@ type MoneyRequestReportGroupHeaderProps = {
 
     /** Pending action for offline feedback styling (Pattern B - Optimistic WITH Feedback) */
     pendingAction?: PendingAction;
+
+    /** Whether to use narrow layout */
+    shouldUseNarrowLayout?: boolean;
 };
 
 function MoneyRequestReportGroupHeader({
@@ -61,13 +63,14 @@ function MoneyRequestReportGroupHeader({
     isDisabled = false,
     onToggleSelection,
     pendingAction,
+    shouldUseNarrowLayout: shouldUseNarrowLayoutProp,
 }: MoneyRequestReportGroupHeaderProps) {
     const {convertToDisplayString} = useCurrencyListActions();
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {shouldUseNarrowLayout} = useResponsiveLayoutOnWideRHP();
+    const {shouldUseNarrowLayout: shouldUseNarrowLayoutHook} = useResponsiveLayoutOnWideRHP();
+    const shouldUseNarrowLayout = shouldUseNarrowLayoutProp ?? shouldUseNarrowLayoutHook;
     const isDesktopTableLayout = !shouldUseNarrowLayout;
 
     const cleanedGroupName = isGroupedByTag && group.groupName ? getCommaSeparatedTagNameWithSanitizedColons(group.groupName) : group.groupName;

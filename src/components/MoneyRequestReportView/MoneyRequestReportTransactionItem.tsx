@@ -124,6 +124,7 @@ function MoneyRequestReportTransactionItem({
         shouldHighlight: shouldBeHighlighted,
         highlightColor: theme.messageHighlightBG,
         backgroundColor: theme.highlightBG,
+        shouldApplyOtherStyles: !shouldUseNarrowLayout,
     });
 
     return (
@@ -141,7 +142,7 @@ function MoneyRequestReportTransactionItem({
                 role={getButtonRole(true)}
                 isNested
                 id={transaction.transactionID}
-                style={[styles.transactionListItemStyle, isDesktopTableLayout && StyleUtils.getSearchTableRowPressableStyle(isLastItem, isSelected)]}
+                style={[styles.transactionListItemStyle, isDesktopTableLayout ? StyleUtils.getSearchTableRowPressableStyle(isLastItem, isSelected) : styles.noBorderRadius]}
                 hoverStyle={[!isPendingDelete && styles.hoveredComponentBG, isSelected && styles.activeComponentBG]}
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                 onPressIn={() => canUseTouchScreen() && ControlSelection.block()}
@@ -151,7 +152,7 @@ function MoneyRequestReportTransactionItem({
                 }}
                 disabled={isTransactionPendingDelete(transaction)}
                 ref={viewRef}
-                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone]}
+                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone, shouldUseNarrowLayout && !isLastItem && styles.borderBottom]}
             >
                 {({hovered}) => (
                     <TransactionItemRow
