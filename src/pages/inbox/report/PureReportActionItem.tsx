@@ -252,9 +252,6 @@ type PureReportActionItemProps = {
     /** Gets all transactions on an IOU report with a receipt */
     getTransactionsWithReceipts?: (iouReportID: string | undefined) => OnyxTypes.Transaction[];
 
-    /** Whether the current user is the only participant in the report */
-    isCurrentUserTheOnlyParticipant?: (participantAccountIDs?: number[]) => boolean;
-
     /** Function to clear an error from a transaction */
     clearError?: (transactionID: string) => void;
 
@@ -326,7 +323,6 @@ function PureReportActionItem({
     resolveActionableReportMentionWhisper = () => {},
     resolveActionableMentionWhisper = () => {},
     isClosedExpenseReportWithNoExpenses,
-    isCurrentUserTheOnlyParticipant = () => false,
     getTransactionsWithReceipts = () => [],
     clearError = () => {},
     clearAllRelatedReportActionErrors = () => {},
