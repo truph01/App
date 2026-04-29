@@ -43,6 +43,7 @@ jest.mock('@libs/Navigation/Navigation', () => ({
 }));
 
 jest.mock('@libs/Navigation/helpers/getPathFromState', () => ({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: jest.fn(),
 }));
