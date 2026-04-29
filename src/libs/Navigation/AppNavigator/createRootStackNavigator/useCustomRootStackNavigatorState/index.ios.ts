@@ -6,6 +6,10 @@ import type {NavigationRoute, SplitNavigatorName} from '@libs/Navigation/types';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ensureTabNavigatorRoutes from './ensureTabNavigatorRoutes';
 
+// Fix iOS swipe-back: slicing tab state breaks rehydration. Skip until 3+ stacked TAB_NAVIGATORs.
+// https://github.com/Expensify/App/issues/89006
+const SKIP_SLICE_TAB_THRESHOLD = 3;
+
 // Swiping back on iOS does not work properly when the preloaded route has gestureEnabled set to false.
 // Therefore, on screens where swiping should work, preloadedRoutes will be an empty array during rendering to ensure swiping works properly.
 // Once this bug is fixed, this file should be deleted and index.android.ts renamed to index.native.ts.
@@ -35,12 +39,19 @@ function getShouldHidePreloadedRoutes(route?: NavigationRoute) {
 // This is an optimization to keep mounted only last few screens in the stack.
 // On native platforms, we store the last two routes to handle swiping back.
 export default function useCustomRootStackNavigatorState({state}: CustomStateHookProps) {
-    const lastSplitIndex = state.routes.findLastIndex((route) => isFullScreenName(route.name));
-    const indexToSlice = Math.max(0, lastSplitIndex - 1);
-    const slicedRoutes = state.routes.slice(indexToSlice, state.routes.length);
-    const routesToRender = ensureTabNavigatorRoutes(slicedRoutes, indexToSlice, state.routes);
+    const tabCount = state.routes.reduce((acc, route) => (route.name === NAVIGATORS.TAB_NAVIGATOR ? acc + 1 : acc), 0);
 
-    const stateToRender = {...state, routes: routesToRender, index: routesToRender.length - 1};
+    let stateToRender: typeof state;
+    if (tabCount <= SKIP_SLICE_TAB_THRESHOLD) {
+        stateToRender = state;
+    } else {
+        const lastSplitIndex = state.routes.findLastIndex((route) => isFullScreenName(route.name));
+        const indexToSlice = Math.max(0, lastSplitIndex - 1);
+        const slicedRoutes = state.routes.slice(indexToSlice, state.routes.length);
+        const routesToRender = ensureTabNavigatorRoutes(slicedRoutes, indexToSlice, state.routes);
+        stateToRender = {...state, routes: routesToRender, index: routesToRender.length - 1};
+    }
+
     if (getShouldHidePreloadedRoutes(stateToRender.routes.at(-1))) {
         return {...stateToRender, preloadedRoutes: []};
     }
