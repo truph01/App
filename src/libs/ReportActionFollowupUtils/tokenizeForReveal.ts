@@ -52,19 +52,9 @@ function collectAnchors(doc: Document): Anchor[] {
             anchors.push({path: path.slice()});
             return;
         }
-        for (let i = 0; i < elem.children.length; i++) {
-            const child = elem.children.at(i);
-            if (child) {
-                visit(child, [...path, i]);
-            }
-        }
+        elem.children.forEach((child, i) => visit(child, [...path, i]));
     };
-    for (let i = 0; i < doc.children.length; i++) {
-        const child = doc.children.at(i);
-        if (child) {
-            visit(child, [i]);
-        }
-    }
+    doc.children.forEach((child, i) => visit(child, [i]));
     return anchors;
 }
 

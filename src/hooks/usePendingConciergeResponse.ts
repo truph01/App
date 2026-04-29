@@ -83,10 +83,10 @@ function usePendingConciergeResponse(reportID: string | undefined) {
         let effectiveDuration = DEFAULT_STREAM_DURATION_MS;
         let lastStage = 0;
         let cancelled = false;
-        // Track whether/when acceleration fired so the [complete] log can
-        // attribute the completion reason and arrival point of `reportComment`.
-        let arrivedAtProgress: number | undefined;
-        let arrivedAtElapsedMs: number | undefined;
+        // Snapshot of trickle progress at the moment the canonical reportComment
+        // arrives. Presence (`arrival !== undefined`) doubles as the
+        // "acceleration fired" check that selects the completion reason below.
+        let arrival: {progress: number; elapsedMs: number} | undefined;
 
         const dispatch = (status: ConciergeDraftEvent['status'], finalRenderedHTML: string) => {
             if (cancelled) {
@@ -111,7 +111,7 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             }
             const totalElapsedMs = trickleStart === 0 ? 0 : Date.now() - trickleStart;
             let reason: 'natural' | 'accelerated' | 'stale_cap' = 'natural';
-            if (arrivedAtProgress !== undefined) {
+            if (arrival) {
                 reason = 'accelerated';
             } else if (totalElapsedMs >= TRICKLE_HARD_CAP_MS) {
                 reason = 'stale_cap';
@@ -122,8 +122,8 @@ function usePendingConciergeResponse(reportID: string | undefined) {
                 tokenCount: tokens.length,
                 durationMs: effectiveDuration,
                 totalElapsedMs,
-                arrivedAtProgress,
-                arrivedAtElapsedMs,
+                arrivedAtProgress: arrival?.progress,
+                arrivedAtElapsedMs: arrival?.elapsedMs,
             });
             dispatch('completed', tokens.at(-1) ?? fullHtml);
             applyPendingConciergeAction(reportID, reportAction);
@@ -137,8 +137,7 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             // Compressing effectiveDuration is what makes progress hit 1 within
             // ACCELERATED_REMAINING_MS — the next tick observes progress >= 1
             // and runs completeAndApply via the normal path.
-            arrivedAtProgress = easeOut(elapsed / effectiveDuration);
-            arrivedAtElapsedMs = elapsed;
+            arrival = {progress: easeOut(elapsed / effectiveDuration), elapsedMs: elapsed};
             effectiveDuration = elapsed + ACCELERATED_REMAINING_MS;
         };
 
