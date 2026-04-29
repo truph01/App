@@ -41,8 +41,6 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
 
     useFocusEffect(clearOnHashChange);
 
-    // useEffect supplements useFocusEffect: it handles both the initial mount
-    // and cases where route params change without a navigation event (e.g. sorting).
     useEffect(clearOnHashChange, [hash, clearSelectedTransactions]);
 
     useEffect(() => {
@@ -58,16 +56,6 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
 
     useFocusEffect(() => {
         openSearch();
-    });
-
-    useFocusEffect(() => {
-        if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
-            return;
-        }
-        if (isSnapshotDataLoaded || isSnapshotSearchLoading) {
-            return;
-        }
-        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
     });
 
     useEffect(() => {
