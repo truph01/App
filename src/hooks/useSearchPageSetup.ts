@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {openSearch, search} from '@libs/actions/Search';
@@ -47,30 +47,33 @@ function useSearchPageSetup(queryJSON: SearchQueryJSON | undefined) {
 
     // Fire search() when the query changes (hash). This runs at the page level so the
     // API request starts in parallel with the skeleton, before Search mounts its 14+ useOnyx hooks.
+    const fireSearchIfNeeded = useCallback(
+        (skipWaitForWrites: boolean) => {
+            if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
+                return;
+            }
+            if (isSnapshotDataLoaded || isSnapshotSearchLoading) {
+                return;
+            }
+            search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites});
+        },
+        [queryJSON, hash, shouldUseLiveData, isOffline, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals],
+    );
+
     useEffect(() => {
-        if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
-            return;
-        }
-        if (isSnapshotDataLoaded || isSnapshotSearchLoading) {
-            return;
-        }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
-    }, [hash, isOffline, shouldUseLiveData, queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals]);
+        fireSearchIfNeeded(shouldSkipWaitForWrites);
+    }, [fireSearchIfNeeded]);
 
     useFocusEffect(() => {
         openSearch();
     });
 
-    useFocusEffect(() => {
-        if (!queryJSON || hash === undefined || shouldUseLiveData || isOffline) {
-            return;
-        }
-        if (isSnapshotDataLoaded || isSnapshotSearchLoading) {
-            return;
-        }
-        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: true});
-    });
+    useFocusEffect(
+        useCallback(() => {
+            fireSearchIfNeeded(true);
+        }, [fireSearchIfNeeded]),
+    );
 
     useEffect(() => {
         if (!prevIsOffline || isOffline) {
