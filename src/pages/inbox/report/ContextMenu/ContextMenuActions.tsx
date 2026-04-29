@@ -310,6 +310,7 @@ type ContextMenuActionPayload = {
     bankAccountList: OnyxEntry<BankAccountList>;
     isOffline: boolean;
     conciergeReportID: string | undefined;
+    delegateAccountID: number | undefined;
 };
 
 type OnPress = (closePopover: boolean, payload: ContextMenuActionPayload, selection?: string, reportID?: string, draftMessage?: string) => void;
@@ -486,7 +487,7 @@ const ContextMenuActions: ContextMenuAction[] = [
 
             return hasReasoning(reportAction);
         },
-        onPress: (closePopover, {reportAction, childReport, originalReport, translate, currentUserPersonalDetails, introSelected, isSelfTourViewed, betas}) => {
+        onPress: (closePopover, {reportAction, childReport, originalReport, translate, currentUserPersonalDetails, introSelected, betas, isSelfTourViewed, delegateAccountID}) => {
             if (!originalReport?.reportID) {
                 return;
             }
@@ -503,6 +504,7 @@ const ContextMenuActions: ContextMenuAction[] = [
                             introSelected,
                             betas,
                             isSelfTourViewed,
+                            delegateAccountID,
                             currentUserPersonalDetails?.timezone,
                         );
                     });
@@ -510,7 +512,18 @@ const ContextMenuActions: ContextMenuAction[] = [
                 return;
             }
 
-            explain(childReport, originalReport, reportAction, translate, currentUserPersonalDetails.accountID, introSelected, betas, isSelfTourViewed, currentUserPersonalDetails?.timezone);
+            explain(
+                childReport,
+                originalReport,
+                reportAction,
+                translate,
+                currentUserPersonalDetails.accountID,
+                introSelected,
+                betas,
+                isSelfTourViewed,
+                delegateAccountID,
+                currentUserPersonalDetails?.timezone,
+            );
         },
         getDescription: () => {},
         sentryLabel: CONST.SENTRY_LABEL.CONTEXT_MENU.EXPLAIN,
