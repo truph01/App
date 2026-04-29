@@ -653,7 +653,7 @@ function MoneyRequestReportTransactionList({
                         styles.flexRow,
                         styles.alignItemsCenter,
                         styles.pv2,
-                        styles.pr4,
+                        !isDesktopTableLayout && styles.pr4,
                         StyleUtils.getPaddingLeft(variables.w12),
                         isDesktopTableLayout && {minHeight: variables.tableGroupRowHeight},
                     ]}
