@@ -154,12 +154,12 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     }
 
     const isDynamicRoute = !!findMatchingDynamicSuffix(normalizedPath);
+    const typedPayload = (action as {payload: {name?: string; params?: ActionPayloadParams}}).payload;
 
     // If a RIGHT_MODAL_NAVIGATOR already sits below the focused TAB_NAVIGATOR, NAVIGATE pops back to it
     // (dropping the tab above) instead of stacking - anchoring the new RHP on the wrong tab.
     // PUSH so the new RHP lands above the current tab. See https://github.com/Expensify/App/issues/88965.
-    const actionPayload = (action as {payload?: {name?: string}}).payload;
-    const targetIsRightModal = actionPayload?.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
+    const targetIsRightModal = typedPayload?.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
     const focusIsOnTabNavigator = currentState.routes[currentState.index]?.name === NAVIGATORS.TAB_NAVIGATOR;
     const isRhpNavigationFromStackedTab =
         targetIsRightModal && focusIsOnTabNavigator && currentState.routes.some((route, index) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR && index < currentState.index);
@@ -186,7 +186,6 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     // When something other than TAB_NAVIGATOR is on top of the stack and we're navigating
     // to TAB_NAVIGATOR, PUSH a new instance above (e.g., above RHP).
     const currentTopRoute = currentState.routes[currentState.index];
-    const typedPayload = (action as {payload: {name?: string; params?: ActionPayloadParams}}).payload;
     if (currentTopRoute?.name !== NAVIGATORS.TAB_NAVIGATOR && typedPayload.name === NAVIGATORS.TAB_NAVIGATOR) {
         (action as {type: string}).type = CONST.NAVIGATION.ACTION_TYPE.PUSH;
     }
