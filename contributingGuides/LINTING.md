@@ -20,7 +20,7 @@ npm run lint -- --show-warnings
 # Continuously re-lint changed files as you edit:
 npm run lint-watch
 
-# HTML dashboard: seatbelt baseline broken down by rule and by file (optional git charts):
+# HTML dashboard: seatbelt baseline broken down by rule and by file:
 npm run eslint-report
 ```
 
@@ -68,9 +68,7 @@ npm run lint -- src/components/Foo/index.tsx src/libs/bar.ts
 
 ### "What if I want to see lint errors broken down by type or by file?"
 
-Use `npm run eslint-report`. Implementation lives in [`scripts/eslint-report.ts`](../scripts/eslint-report.ts): it reads [`config/eslint/eslint.seatbelt.tsv`](../config/eslint/eslint.seatbelt.tsv) and writes an HTML report with aggregated tables — violations grouped by ESLint rule and by source file — plus optional Chart.js history graphs when git history is available. After generating the report, your default browser opens unless you pass `--no-open` or run with `CI` set.
-
-If `eslint-report` is not listed under `scripts` in your root [`package.json`](../package.json), merge `origin/main` into your branch — the helper was added on `main` after older branches diverged.
+Use `npm run eslint-report`. It will show an HTML report of current lint errors in the project (populated from `eslint.seatbelt.tsv`)
 
 ```bash
 npm run eslint-report
