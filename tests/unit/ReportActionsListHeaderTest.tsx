@@ -2,17 +2,9 @@ import {render, screen} from '@testing-library/react-native';
 import React from 'react';
 import ReportActionsListHeader from '@pages/inbox/report/ReportActionsListHeader';
 
-const CONCIERGE_REPORT_ID = '7000';
-const OTHER_REPORT_ID = '42';
+const REPORT_ID = '42';
 
-const mockUseIsInSidePanel = jest.fn<boolean, []>();
 const mockUseOnyx = jest.fn<unknown[], [string]>();
-
-jest.mock('@hooks/useIsInSidePanel', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    __esModule: true,
-    default: () => mockUseIsInSidePanel(),
-}));
 
 jest.mock('@hooks/useOnyx', () => ({
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -40,68 +32,34 @@ jest.mock('@pages/inbox/report/ListBoundaryLoader', () => {
     };
 });
 
-function stubOnyx({reportID, conciergeReportID}: {reportID: string; conciergeReportID: string}) {
-    mockUseOnyx.mockImplementation((key: string) => {
-        if (key.startsWith('report_')) {
-            return [{reportID, chatType: undefined, participants: {[conciergeReportID]: {}}}];
-        }
-        if (key === 'conciergeReportID') {
-            return [conciergeReportID];
-        }
-        return [undefined];
-    });
-}
-
 describe('ReportActionsListHeader', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        mockUseOnyx.mockImplementation((key: string) => {
+            if (key.startsWith('report_')) {
+                return [{reportID: REPORT_ID}];
+            }
+            return [undefined];
+        });
     });
 
-    it('always renders ListBoundaryLoader', () => {
-        mockUseIsInSidePanel.mockReturnValue(false);
-        stubOnyx({reportID: OTHER_REPORT_ID, conciergeReportID: CONCIERGE_REPORT_ID});
+    it('renders ListBoundaryLoader', () => {
         render(
             <ReportActionsListHeader
-                reportID={OTHER_REPORT_ID}
+                reportID={REPORT_ID}
                 onRetry={jest.fn()}
             />,
         );
         expect(screen.getByTestId('ListBoundaryLoader')).toBeTruthy();
     });
 
-    it('renders ConciergeThinkingMessage only when in the concierge side panel', () => {
-        mockUseIsInSidePanel.mockReturnValue(true);
-        stubOnyx({reportID: CONCIERGE_REPORT_ID, conciergeReportID: CONCIERGE_REPORT_ID});
+    it('renders ConciergeThinkingMessage and delegates visibility gating to that component', () => {
         render(
             <ReportActionsListHeader
-                reportID={CONCIERGE_REPORT_ID}
+                reportID={REPORT_ID}
                 onRetry={jest.fn()}
             />,
         );
         expect(screen.getByTestId('ConciergeThinkingMessage')).toBeTruthy();
-    });
-
-    it('does not render ConciergeThinkingMessage outside the side panel', () => {
-        mockUseIsInSidePanel.mockReturnValue(false);
-        stubOnyx({reportID: CONCIERGE_REPORT_ID, conciergeReportID: CONCIERGE_REPORT_ID});
-        render(
-            <ReportActionsListHeader
-                reportID={CONCIERGE_REPORT_ID}
-                onRetry={jest.fn()}
-            />,
-        );
-        expect(screen.queryByTestId('ConciergeThinkingMessage')).toBeNull();
-    });
-
-    it('does not render ConciergeThinkingMessage for non-concierge reports in the side panel', () => {
-        mockUseIsInSidePanel.mockReturnValue(true);
-        stubOnyx({reportID: OTHER_REPORT_ID, conciergeReportID: CONCIERGE_REPORT_ID});
-        render(
-            <ReportActionsListHeader
-                reportID={OTHER_REPORT_ID}
-                onRetry={jest.fn()}
-            />,
-        );
-        expect(screen.queryByTestId('ConciergeThinkingMessage')).toBeNull();
     });
 });
