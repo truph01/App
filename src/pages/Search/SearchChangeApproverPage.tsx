@@ -102,6 +102,13 @@ function SearchChangeApproverPage() {
     // "Change approver" flow after upgrading workspace. See https://github.com/Expensify/App/pull/89192.
     const hasInitiatedUpgradeRef = useRef(false);
     const prevSelectedReportsLength = useRef(0);
+
+    useEffect(() => {
+        if (selectedReports.length > 0) {
+            hasInitiatedUpgradeRef.current = false;
+        }
+    }, [selectedReports.length]);
+
     useEffect(() => {
         if (!hasLoadedApp || !selectedReports.length || prevSelectedReportsLength.current === selectedReports.length) {
             return;
