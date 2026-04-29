@@ -172,7 +172,7 @@ function SearchEditMultiplePage() {
             introSelected,
             betas,
             currentUserAccountID,
-            currentUserLogin ?? '',
+            currentUserLogin: currentUserLogin ?? '',
         });
         // Bulk edit can start from report (ID-based selection) or search (map-based selection),
         // so clear both stores to keep deselection behavior consistent.
