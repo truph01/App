@@ -1408,6 +1408,14 @@ describe('TransactionUtils', () => {
             expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('User 9, User 10');
         });
 
+        it('compares case-insensitively so the joined string matches pill order', () => {
+            const attendees: Attendee[] = [
+                {email: 'b@x.com', displayName: 'Bob', avatarUrl: '', login: 'b@x.com'},
+                {email: 'a@x.com', displayName: 'alice', avatarUrl: '', login: 'a@x.com'},
+            ];
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('alice, Bob');
+        });
+
         it('returns empty string for empty array', () => {
             expect(TransactionUtils.getAttendeesListDisplayString([])).toBe('');
         });

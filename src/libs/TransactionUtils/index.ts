@@ -1220,8 +1220,9 @@ function getAttendeesDisplayCollator(): Intl.Collator {
  */
 function getAttendeesListDisplayString(attendees: Attendee[]): string {
     const collator = getAttendeesDisplayCollator();
+    // Lowercase to match sortAlphabetically (the pill sort) so joined string and pill order never disagree on case.
     return [...attendees]
-        .sort((a, b) => collator.compare(a.displayName ?? a.login ?? '', b.displayName ?? b.login ?? ''))
+        .sort((a, b) => collator.compare((a.displayName ?? a.login ?? '').toLowerCase(), (b.displayName ?? b.login ?? '').toLowerCase()))
         .map((item) => item.displayName ?? item.login)
         .join(', ');
 }
