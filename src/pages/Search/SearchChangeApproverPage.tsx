@@ -96,9 +96,10 @@ function SearchChangeApproverPage() {
     const [onyxReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: getOnyxReports});
 
     const hasAutoAppliedRef = useRef(false);
-    // True once changeApprover() has dispatched a cross-navigator hop to WORKSPACE_UPGRADE.
-    // Guards the auto-close in useLayoutEffect against firing during the upgrade round-trip,
-    // which would dismiss the RHP that should reopen on the Add Approver page after upgrade.
+    // Set when navigating to WORKSPACE_UPGRADE; prevents the auto-close from dismissing the RHP
+    // during the upgrade round-trip before it reopens on the Add Approver page.
+    // TODO: drop this ref once the CHANGE_APPROVER_SEARCH_RHP `backTo` is removed so navigation matches the regular
+    // "Change approver" flow after upgrading workspace. See https://github.com/Expensify/App/pull/89192.
     const hasInitiatedUpgradeRef = useRef(false);
     const prevSelectedReportsLength = useRef(0);
     useEffect(() => {
@@ -218,9 +219,8 @@ function SearchChangeApproverPage() {
             return;
         }
 
-        // Skip the auto-close while an upgrade round-trip is in flight: selectedReports may be
-        // transiently empty as navigation hops to WORKSPACE_UPGRADE and back, and dismissing
-        // the RHP here would close the Add Approver flow that is about to take over.
+        // Skip during an upgrade round-trip: selectedReports may be transiently empty while
+        // navigating to WORKSPACE_UPGRADE, and closing the RHP would kill the Add Approver flow.
         if (hasInitiatedUpgradeRef.current) {
             return;
         }
