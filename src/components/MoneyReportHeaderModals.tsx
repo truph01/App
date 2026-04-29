@@ -8,7 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViolationsForReport';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import getPlatform from '@libs/getPlatform';
-import {getNonHeldAndFullAmount, hasHeldExpensesFromTransactions as hasHeldExpensesReportUtils} from '@libs/ReportUtils';
+import {getNonHeldAndFullAmount, hasOnlyHeldExpenses as hasOnlyHeldExpensesReportUtils} from '@libs/ReportUtils';
 import {canIOUBePaid as canIOUBePaidAction} from '@userActions/IOU/ReportWorkflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -44,7 +44,7 @@ function MoneyReportHeaderModals({reportID, children}: MoneyReportHeaderModalsPr
     const onlyShowPayElsewhere = !canIOUBePaid && canIOUBePaidAction(moneyRequestReport, chatReport, policy, bankAccountList, undefined, true);
     const shouldShowPayButton = canIOUBePaid || onlyShowPayElsewhere;
     const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(moneyRequestReport, shouldShowPayButton);
-    const hasHeldExpenses = hasHeldExpensesReportUtils(transactions);
+    const hasOnlyHeldExpenses = hasOnlyHeldExpensesReportUtils(moneyRequestReport?.reportID, transactions);
     const transactionIDs = transactions.map((t) => t.transactionID);
 
     // Imperative modals
@@ -76,9 +76,9 @@ function MoneyReportHeaderModals({reportID, children}: MoneyReportHeaderModalsPr
                 requestType,
                 paymentType,
                 methodID,
-                nonHeldAmount: !hasHeldExpenses && hasValidNonHeldAmount ? nonHeldAmount : undefined,
+                nonHeldAmount: !hasOnlyHeldExpenses && hasValidNonHeldAmount ? nonHeldAmount : undefined,
                 fullAmount,
-                hasNonHeldExpenses: !hasHeldExpenses,
+                hasNonHeldExpenses: !hasOnlyHeldExpenses,
                 transactionCount: transactionIDs.length,
                 onConfirm,
             });
