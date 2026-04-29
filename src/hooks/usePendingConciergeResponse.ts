@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {applyPendingConciergeAction, discardPendingConciergeAction} from '@libs/actions/Report/SuggestedFollowup';
 import Log from '@libs/Log';
@@ -35,14 +35,13 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     const [pendingResponse] = useOnyx(`${ONYXKEYS.COLLECTION.PENDING_CONCIERGE_RESPONSE}${reportID}`);
     const reportActionID = pendingResponse?.reportAction?.reportActionID;
     const fullHtml = pendingResponse?.reportAction ? getReportActionHtml(pendingResponse.reportAction) : '';
-    const persistedActionSelector = useCallback(
-        (actions: OnyxEntry<ReportActions>): ReportAction | undefined => (reportActionID && actions ? actions[reportActionID] : undefined),
-        [reportActionID],
-    );
+    // React Compiler auto-memoizes the selector closure and the tokenize result;
+    // explicit useCallback/useMemo would just shadow the compiler's analysis.
+    const persistedActionSelector = (actions: OnyxEntry<ReportActions>): ReportAction | undefined => (reportActionID && actions ? actions[reportActionID] : undefined);
     const [persistedAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {selector: persistedActionSelector});
     const {dispatchLocalDraftEvent} = useConciergeDraftActions();
 
-    const tokens = useMemo(() => tokenizeForReveal(fullHtml), [fullHtml]);
+    const tokens = tokenizeForReveal(fullHtml);
     const accelerateRef = useRef<((nowMs: number) => void) | null>(null);
 
     // Reconciliation: when the canonical reportComment lands in REPORT_ACTIONS
@@ -126,7 +125,16 @@ function usePendingConciergeResponse(reportID: string | undefined) {
                 arrivedAtElapsedMs: arrival?.elapsedMs,
             });
             dispatch('completed', tokens.at(-1) ?? fullHtml);
-            applyPendingConciergeAction(reportID, reportAction);
+            // If acceleration fired, the canonical reportComment already landed in
+            // REPORT_ACTIONS. Re-applying our older optimistic payload would clobber
+            // server-added markup (e.g. follow-up buttons) until the next server
+            // update. Just clear the pending state in that case — the synthetic
+            // bubble fades into the canonical row.
+            if (arrival) {
+                discardPendingConciergeAction(reportID);
+            } else {
+                applyPendingConciergeAction(reportID, reportAction);
+            }
         };
 
         accelerateRef.current = (nowMs: number) => {
