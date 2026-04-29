@@ -32,6 +32,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
             },
         },
         [SCREENS.WORKSPACE_AVATAR]: ROUTES.WORKSPACE_AVATAR.route,
+        [SCREENS.WORKSPACE_DOCUMENT]: ROUTES.WORKSPACE_DOCUMENT.route,
         [SCREENS.REPORT_AVATAR]: ROUTES.REPORT_AVATAR.route,
         [SCREENS.TRANSACTION_RECEIPT]: ROUTES.TRANSACTION_RECEIPT.route,
         [SCREENS.MONEY_REQUEST.RECEIPT_PREVIEW]: ROUTES.MONEY_REQUEST_RECEIPT_PREVIEW.route,
@@ -45,7 +46,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                     exact: true,
                 },
                 [SCREENS.AUTO_SUBMIT_ROOT]: ROUTES.AUTO_SUBMIT_MODAL_ROOT,
-                [SCREENS.CHANGE_POLICY_EDUCATIONAL_ROOT]: ROUTES.CHANGE_POLICY_EDUCATIONAL.route,
+                [SCREENS.DYNAMIC_CHANGE_POLICY_EDUCATIONAL_ROOT]: DYNAMIC_ROUTES.CHANGE_POLICY_EDUCATIONAL.path,
             },
         },
         [NAVIGATORS.EXPLANATION_MODAL_NAVIGATOR]: {
@@ -523,8 +524,8 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.SETTINGS.SUBSCRIPTION.DISABLE_AUTO_RENEW_SURVEY]: {
                             path: ROUTES.SETTINGS_SUBSCRIPTION_DISABLE_AUTO_RENEW_SURVEY,
                         },
-                        [SCREENS.SETTINGS.SUBSCRIPTION.REQUEST_EARLY_CANCELLATION]: {
-                            path: ROUTES.SETTINGS_SUBSCRIPTION_REQUEST_EARLY_CANCELLATION,
+                        [SCREENS.SETTINGS.SUBSCRIPTION.CANCEL_SUBSCRIPTION]: {
+                            path: ROUTES.SETTINGS_SUBSCRIPTION_CANCEL_SUBSCRIPTION,
                         },
                         [SCREENS.SETTINGS.SUBSCRIPTION.SUBSCRIPTION_DOWNGRADE_BLOCKED]: {
                             path: ROUTES.SETTINGS_SUBSCRIPTION_DOWNGRADE_BLOCKED.route,
@@ -1523,18 +1524,8 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                                 orderWeight: Number,
                             },
                         },
-                        [SCREENS.SETTINGS_TAGS.SETTINGS_TAG_APPROVER]: {
-                            path: ROUTES.SETTINGS_TAG_APPROVER.route,
-                            parse: {
-                                orderWeight: Number,
-                            },
-                        },
-                        [SCREENS.SETTINGS_TAGS.SETTINGS_TAG_LIST_VIEW]: {
-                            path: ROUTES.SETTINGS_TAG_LIST_VIEW.route,
-                            parse: {
-                                orderWeight: Number,
-                            },
-                        },
+                        [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_APPROVER]: DYNAMIC_ROUTES.SETTINGS_TAG_APPROVER.path,
+                        [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_LIST_VIEW]: DYNAMIC_ROUTES.SETTINGS_TAG_LIST_VIEW.path,
                         [SCREENS.SETTINGS_TAGS.SETTINGS_TAG_GL_CODE]: {
                             path: ROUTES.SETTINGS_TAG_GL_CODE.route,
                             parse: {
