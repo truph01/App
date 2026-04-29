@@ -281,6 +281,8 @@ function ExpenseReportListItem<TItem extends ListItem>({
                 animatedHighlightStyle,
                 isPendingDelete && styles.cursorDisabled,
                 isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+                !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
+                !isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
                 !isLargeScreenWidth && !isLastItem && styles.borderBottom,
             ]}
             accessible={false}
