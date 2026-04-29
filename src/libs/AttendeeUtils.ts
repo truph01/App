@@ -136,14 +136,19 @@ function syncMissingAttendeesViolation<T extends {name: string}>(
 }
 
 /**
- * Enrich each attendee with the live displayName/avatar from `personalDetails` and return them sorted alphabetically.
- * Centralised so every attendee renderer (pills, copy value, accessibility label, violation check) shares one canonical order.
+ * Enrich each attendee with live `personalDetails` and return them sorted alphabetically by displayName.
  */
+function enrichAndSortAttendees(attendees: Attendee[], personalDetailsList: OnyxEntry<PersonalDetailsList>, localeCompare: LocaleContextProps['localeCompare']): Attendee[];
 function enrichAndSortAttendees(
-    attendees: Attendee[] | undefined,
+    attendees: Attendee[] | string | undefined,
     personalDetailsList: OnyxEntry<PersonalDetailsList>,
     localeCompare: LocaleContextProps['localeCompare'],
-): Attendee[] | undefined {
+): Attendee[] | string | undefined;
+function enrichAndSortAttendees(
+    attendees: Attendee[] | string | undefined,
+    personalDetailsList: OnyxEntry<PersonalDetailsList>,
+    localeCompare: LocaleContextProps['localeCompare'],
+): Attendee[] | string | undefined {
     if (!Array.isArray(attendees)) {
         return attendees;
     }

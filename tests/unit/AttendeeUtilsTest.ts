@@ -86,38 +86,47 @@ describe('AttendeeUtils', () => {
                 {email: 'a@x.com', displayName: 'apple', avatarUrl: '', login: 'a@x.com'},
             ];
 
-            expect(enrichAndSortAttendees(attendees, undefined, localeCompare)?.map((a) => a.displayName)).toEqual(['apple', 'banana']);
+            expect(enrichAndSortAttendees(attendees, undefined, localeCompare).map((a) => a.displayName)).toEqual(['apple', 'banana']);
         });
 
         it('enriches displayName and avatar from personalDetails when accountID matches', () => {
-            const attendees: Attendee[] = [{accountID: 1, displayName: 'Old', avatarUrl: 'old.png'} as Attendee];
-            const personalDetailsList = {1: {accountID: 1, displayName: 'New', avatar: 'new.png'}} as unknown as PersonalDetailsList;
+            const accountID = 1;
+            const attendees: Attendee[] = [{accountID, displayName: 'Old', avatarUrl: 'old.png'}];
+            const personalDetailsList: PersonalDetailsList = {[accountID]: {accountID, displayName: 'New', avatar: 'new.png'}};
 
             const result = enrichAndSortAttendees(attendees, personalDetailsList, localeCompare);
 
-            expect(result?.[0].displayName).toBe('New');
-            expect(result?.[0].avatarUrl).toBe('new.png');
+            expect(result.at(0)?.displayName).toBe('New');
+            expect(result.at(0)?.avatarUrl).toBe('new.png');
         });
 
         it('falls back to stored value when personalDetails has empty strings', () => {
-            const attendees: Attendee[] = [{accountID: 1, displayName: 'Stored', avatarUrl: 'stored.png'} as Attendee];
-            const personalDetailsList = {1: {accountID: 1, displayName: '', avatar: ''}} as unknown as PersonalDetailsList;
+            const accountID = 1;
+            const attendees: Attendee[] = [{accountID, displayName: 'Stored', avatarUrl: 'stored.png'}];
+            const personalDetailsList: PersonalDetailsList = {[accountID]: {accountID, displayName: '', avatar: ''}};
 
             const result = enrichAndSortAttendees(attendees, personalDetailsList, localeCompare);
 
-            expect(result?.[0].displayName).toBe('Stored');
-            expect(result?.[0].avatarUrl).toBe('stored.png');
+            expect(result.at(0)?.displayName).toBe('Stored');
+            expect(result.at(0)?.avatarUrl).toBe('stored.png');
         });
 
         it('sorts using enriched displayName so a profile rename moves the pill', () => {
-            const attendees: Attendee[] = [{accountID: 1, displayName: 'alice', avatarUrl: ''} as Attendee, {accountID: 2, displayName: 'bob', avatarUrl: ''} as Attendee];
-            const personalDetailsList = {1: {accountID: 1, displayName: 'zoe'}} as unknown as PersonalDetailsList;
+            const renamedAccountID = 1;
+            const attendees: Attendee[] = [
+                {accountID: renamedAccountID, displayName: 'alice', avatarUrl: ''},
+                {accountID: 2, displayName: 'bob', avatarUrl: ''},
+            ];
+            const personalDetailsList: PersonalDetailsList = {[renamedAccountID]: {accountID: renamedAccountID, displayName: 'zoe'}};
 
-            expect(enrichAndSortAttendees(attendees, personalDetailsList, localeCompare)?.map((a) => a.displayName)).toEqual(['bob', 'zoe']);
+            expect(enrichAndSortAttendees(attendees, personalDetailsList, localeCompare).map((a) => a.displayName)).toEqual(['bob', 'zoe']);
         });
 
         it('does not mutate the input array', () => {
-            const attendees: Attendee[] = [{displayName: 'banana', avatarUrl: ''} as Attendee, {displayName: 'apple', avatarUrl: ''} as Attendee];
+            const attendees: Attendee[] = [
+                {displayName: 'banana', avatarUrl: ''},
+                {displayName: 'apple', avatarUrl: ''},
+            ];
             const snapshot = [...attendees];
 
             enrichAndSortAttendees(attendees, undefined, localeCompare);

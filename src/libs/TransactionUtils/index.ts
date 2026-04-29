@@ -1201,15 +1201,27 @@ function getAttendees(transaction: OnyxInputOrEntry<Transaction>, currentUserPer
     return attendees;
 }
 
-// Mirrors LocaleContextProvider so output here matches the user-facing pill order.
-const ATTENDEES_DISPLAY_COLLATOR = new Intl.Collator(undefined, {usage: 'sort', sensitivity: 'variant', numeric: true, caseFirst: 'upper'});
+// Mirrors LocaleContextProvider (same options + same IntlStore source) so non-React callers sort by the user's preferred locale.
+const ATTENDEES_DISPLAY_COLLATOR_OPTIONS: Intl.CollatorOptions = {usage: 'sort', sensitivity: 'variant', numeric: true, caseFirst: 'upper'};
+const attendeesDisplayCollatorCache = new Map<string, Intl.Collator>();
+
+function getAttendeesDisplayCollator(): Intl.Collator {
+    const locale = IntlStore.getCurrentLocale() ?? '';
+    let collator = attendeesDisplayCollatorCache.get(locale);
+    if (!collator) {
+        collator = new Intl.Collator(locale || undefined, ATTENDEES_DISPLAY_COLLATOR_OPTIONS);
+        attendeesDisplayCollatorCache.set(locale, collator);
+    }
+    return collator;
+}
 
 /**
- * Return the attendees list as an alphabetically sorted display string. Sorting here keeps every consumer in sync.
+ * Returns attendees joined as an alphabetically sorted display string. Sort is part of the contract — every consumer relies on it.
  */
 function getAttendeesListDisplayString(attendees: Attendee[]): string {
+    const collator = getAttendeesDisplayCollator();
     return [...attendees]
-        .sort((a, b) => ATTENDEES_DISPLAY_COLLATOR.compare(a.displayName ?? a.login ?? '', b.displayName ?? b.login ?? ''))
+        .sort((a, b) => collator.compare(a.displayName ?? a.login ?? '', b.displayName ?? b.login ?? ''))
         .map((item) => item.displayName ?? item.login)
         .join(', ');
 }
