@@ -11,7 +11,7 @@ import useRootNavigationState from '@hooks/useRootNavigationState';
 import useTodos from '@hooks/useTodos';
 import {getDeepestFocusedScreen} from '@libs/Navigation/Navigation';
 import {isMoneyRequestReport} from '@libs/ReportUtils';
-import {buildSearchQueryJSONStable, buildSearchQueryString} from '@libs/SearchQueryUtils';
+import {buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUtils';
 import type {SearchKey, SearchTypeMenuItem} from '@libs/SearchUIUtils';
 import {getSuggestedSearches, isTodoSearch, isTransactionListItemType, isTransactionReportGroupListItemType} from '@libs/SearchUIUtils';
 import {hasValidModifiedAmount} from '@libs/TransactionUtils';
@@ -98,7 +98,7 @@ function SearchContextProvider({children}: SearchContextProps) {
     const queryParam = useRootNavigationState((state) => selectSearchQueryParam(state ?? navigation.getState()));
     const rawQueryParam = useRootNavigationState((state) => selectSearchRawQueryParam(state ?? navigation.getState()));
     const definedQueryParam = usePreviousDefined(queryParam) ?? buildSearchQueryString();
-    const currentSearchQueryJSON = buildSearchQueryJSONStable(definedQueryParam, rawQueryParam);
+    const currentSearchQueryJSON = buildSearchQueryJSON(definedQueryParam, rawQueryParam);
 
     const areTransactionsEmpty = useRef(true);
     const [lastSearchType, setLastSearchType] = useState<string>();
