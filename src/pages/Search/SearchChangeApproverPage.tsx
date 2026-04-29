@@ -104,9 +104,10 @@ function SearchChangeApproverPage() {
     const prevSelectedReportsLength = useRef(0);
 
     useEffect(() => {
-        if (selectedReports.length > 0) {
-            hasInitiatedUpgradeRef.current = false;
+        if (selectedReports.length === 0) {
+            return;
         }
+        hasInitiatedUpgradeRef.current = false;
     }, [selectedReports.length]);
 
     useEffect(() => {
