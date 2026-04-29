@@ -79,8 +79,8 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const shouldShowUnreportedTransactionsSkeletons = isLoadingUnreportedTransactions && hasMoreUnreportedTransactionsResults && !isOffline;
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
-    const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: openExpenseReportIDsSelector});
-    const [reportDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT, {selector: openExpenseReportIDsSelector});
+    const [allOpenReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: openExpenseReportIDsSelector});
+    const [openReportDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT, {selector: openExpenseReportIDsSelector});
     const isInLandscapeMode = useIsInLandscapeMode();
     const initialSkeletonReasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'AddExistingExpense.InitialSkeleton',
@@ -101,7 +101,7 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
             }
             return Object.values(transactions || {}).filter((item) => {
                 const isUnreported = isUnreportedTransaction(item);
-                const isOnOpenExpenseReport = !!(item?.reportID && (allReports?.[item.reportID] ?? reportDrafts?.[item.reportID]));
+                const isOnOpenExpenseReport = !!(item?.reportID && (allOpenReports?.[item.reportID] ?? openReportDrafts?.[item.reportID]));
                 if (!isUnreported && !isOnOpenExpenseReport) {
                     return false;
                 }
@@ -142,7 +142,7 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
                 return true;
             });
         },
-        [policy, report, cardList, currentUserAccountID, reportID, allReports, reportDrafts],
+        [policy, report, cardList, currentUserAccountID, reportID, allOpenReports, openReportDrafts],
     );
 
     const [transactions = getEmptyArray<Transaction>()] = useOnyx(
