@@ -1391,6 +1391,38 @@ describe('TransactionUtils', () => {
         });
     });
 
+    describe('getAttendeesListDisplayString', () => {
+        it('returns attendees alphabetically regardless of insertion order (deploy blocker #89130)', () => {
+            const attendees: Attendee[] = [
+                {email: 'b@x.com', displayName: 'banana', avatarUrl: '', login: 'b@x.com'},
+                {email: 'a@x.com', displayName: 'apple', avatarUrl: '', login: 'a@x.com'},
+            ];
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('apple, banana');
+        });
+
+        it('uses numeric-aware sort so "User 9" comes before "User 10"', () => {
+            const attendees: Attendee[] = [
+                {email: '10@x.com', displayName: 'User 10', avatarUrl: '', login: '10@x.com'},
+                {email: '9@x.com', displayName: 'User 9', avatarUrl: '', login: '9@x.com'},
+            ];
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('User 9, User 10');
+        });
+
+        it('returns empty string for empty array', () => {
+            expect(TransactionUtils.getAttendeesListDisplayString([])).toBe('');
+        });
+
+        it('does not mutate the input array', () => {
+            const attendees: Attendee[] = [
+                {email: 'b@x.com', displayName: 'banana', avatarUrl: '', login: 'b@x.com'},
+                {email: 'a@x.com', displayName: 'apple', avatarUrl: '', login: 'a@x.com'},
+            ];
+            const snapshot = [...attendees];
+            TransactionUtils.getAttendeesListDisplayString(attendees);
+            expect(attendees).toEqual(snapshot);
+        });
+    });
+
     describe('isCategoryBeingAnalyzed', () => {
         it('should return false for undefined transaction', () => {
             expect(TransactionUtils.isCategoryBeingAnalyzed(undefined)).toBe(false);

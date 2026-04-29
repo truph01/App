@@ -893,7 +893,7 @@ describe('MergeTransactionUtils', () => {
             expect(result).toBe('Department, Engineering, Frontend');
         });
 
-        it('should return correct value for attendees field', () => {
+        it('should return attendees in alphabetical order regardless of insertion order', () => {
             const transaction = {
                 ...createRandomTransaction(0),
                 comment: {
@@ -906,7 +906,7 @@ describe('MergeTransactionUtils', () => {
             };
             const result = getDisplayValue('attendees', transaction, undefined, translateLocal);
 
-            expect(result).toBe('Test User 2, Test User 1');
+            expect(result).toBe('Test User 1, Test User 2');
         });
 
         it('should return string values directly', () => {

@@ -33,7 +33,25 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
     const personalDetailsList = usePersonalDetails();
     const shouldDisplayAttendeesError = formError === 'violations.missingAttendees';
 
-    const iouAttendees = getAttendees(transaction, currentUserPersonalDetails);
+    const rawIouAttendees = getAttendees(transaction, currentUserPersonalDetails);
+    // Enrich + sort once so pills and accessibility label share one canonical order.
+    const iouAttendees = Array.isArray(rawIouAttendees)
+        ? sortAlphabetically(
+              rawIouAttendees.map((a) => {
+                  const pd = a?.accountID ? personalDetailsList?.[a.accountID] : undefined;
+                  const freshAvatar = typeof pd?.avatar === 'string' ? pd.avatar : undefined;
+                  return {
+                      ...a,
+                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional || to fall back when personalDetails has an empty string
+                      displayName: pd?.displayName || a?.displayName,
+                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional || to fall back when personalDetails has an empty string
+                      avatarUrl: freshAvatar || a?.avatarUrl,
+                  };
+              }),
+              'displayName',
+              localeCompare,
+          )
+        : rawIouAttendees;
 
     return (
         <MenuItemWithTopDescription
@@ -47,21 +65,7 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
             titleComponent={
                 Array.isArray(iouAttendees) ? (
                     <UserPills
-                        users={sortAlphabetically(
-                            iouAttendees.map((a) => {
-                                const pd = a?.accountID ? personalDetailsList?.[a.accountID] : undefined;
-                                const freshAvatar = typeof pd?.avatar === 'string' ? pd.avatar : undefined;
-                                return {
-                                    ...a,
-                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                                    displayName: pd?.displayName || a?.displayName,
-                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                                    avatarUrl: freshAvatar || a?.avatarUrl,
-                                };
-                            }),
-                            'displayName',
-                            localeCompare,
-                        ).map((a) => ({
+                        users={iouAttendees.map((a) => ({
                             avatar: a?.avatarUrl,
                             displayName: a?.displayName ?? a?.login ?? a?.email ?? '',
                             accountID: a?.accountID,

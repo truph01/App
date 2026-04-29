@@ -1201,11 +1201,17 @@ function getAttendees(transaction: OnyxInputOrEntry<Transaction>, currentUserPer
     return attendees;
 }
 
+// Mirrors LocaleContextProvider so output here matches the user-facing pill order.
+const ATTENDEES_DISPLAY_COLLATOR = new Intl.Collator(undefined, {usage: 'sort', sensitivity: 'variant', numeric: true, caseFirst: 'upper'});
+
 /**
- * Return the list of attendees as a string of display names/logins.
+ * Return the attendees list as an alphabetically sorted display string. Sorting here keeps every consumer in sync.
  */
 function getAttendeesListDisplayString(attendees: Attendee[]): string {
-    return attendees.map((item) => item.displayName ?? item.login).join(', ');
+    return [...attendees]
+        .sort((a, b) => ATTENDEES_DISPLAY_COLLATOR.compare(a.displayName ?? a.login ?? '', b.displayName ?? b.login ?? ''))
+        .map((item) => item.displayName ?? item.login)
+        .join(', ');
 }
 
 /**

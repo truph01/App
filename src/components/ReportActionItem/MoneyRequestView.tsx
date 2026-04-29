@@ -284,7 +284,25 @@ function MoneyRequestView({
     const isTransactionScanning = isScanning(updatedTransaction ?? transaction);
     const hasRoute = hasRouteTransactionUtils(transactionBackup ?? transaction, isDistanceRequest);
 
-    const actualAttendees = isFromMergeTransaction && updatedTransaction ? updatedTransaction.comment?.attendees : transactionAttendees;
+    const rawActualAttendees = isFromMergeTransaction && updatedTransaction ? updatedTransaction.comment?.attendees : transactionAttendees;
+    // Enrich + sort once so pills, hover-Copy value, accessibility label, and violation check share one canonical order.
+    const actualAttendees = Array.isArray(rawActualAttendees)
+        ? sortAlphabetically(
+              rawActualAttendees.map((a) => {
+                  const pd = a?.accountID ? personalDetailsList?.[a.accountID] : undefined;
+                  const freshAvatar = typeof pd?.avatar === 'string' ? pd.avatar : undefined;
+                  return {
+                      ...a,
+                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional || to fall back when personalDetails has an empty string
+                      displayName: pd?.displayName || a?.displayName,
+                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- intentional || to fall back when personalDetails has an empty string
+                      avatarUrl: freshAvatar || a?.avatarUrl,
+                  };
+              }),
+              'displayName',
+              localeCompare,
+          )
+        : rawActualAttendees;
 
     // Use the updated transaction amount in merge flow to have correct positive/negative sign
     const actualAmount = isFromMergeTransaction && updatedTransaction ? updatedTransaction.amount : transactionAmount;
@@ -1178,21 +1196,7 @@ function MoneyRequestView({
                             titleComponent={
                                 Array.isArray(actualAttendees) ? (
                                     <UserPills
-                                        users={sortAlphabetically(
-                                            actualAttendees.map((a) => {
-                                                const pd = a?.accountID ? personalDetailsList?.[a.accountID] : undefined;
-                                                const freshAvatar = typeof pd?.avatar === 'string' ? pd.avatar : undefined;
-                                                return {
-                                                    ...a,
-                                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                                                    displayName: pd?.displayName || a?.displayName,
-                                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                                                    avatarUrl: freshAvatar || a?.avatarUrl,
-                                                };
-                                            }),
-                                            'displayName',
-                                            localeCompare,
-                                        ).map((a) => ({
+                                        users={actualAttendees.map((a) => ({
                                             avatar: a?.avatarUrl,
                                             displayName: a?.displayName ?? a?.login ?? a?.email ?? '',
                                             accountID: a?.accountID,
