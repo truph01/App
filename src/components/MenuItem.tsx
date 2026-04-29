@@ -628,7 +628,7 @@ function MenuItem({
     const compactIconStyle = isCompactPopoverItem && iconType === CONST.ICON_TYPE_ICON && {width: variables.iconSizeNormal};
     const isCompact = viewMode === CONST.OPTION_MODE.COMPACT;
     const isDeleted = style && Array.isArray(style) ? style.includes(styles.offlineFeedbackDeleted) : false;
-    const descriptionVerticalMargin = shouldShowDescriptionOnTop ? styles.mb1 : styles.mt1;
+    const descriptionVerticalMargin = shouldShowDescriptionOnTop ? styles.mb1 : isCompactPopoverItem ? styles.mt0Half : styles.mt1;
     const menuItemLoadingReasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'MenuItem',
     };
