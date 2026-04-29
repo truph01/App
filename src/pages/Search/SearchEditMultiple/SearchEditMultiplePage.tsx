@@ -26,7 +26,15 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
-import {getTransactionEditContext, isBulkEditTaxTrackingEnabled, withSnapshotReportActions, withSnapshotReports, withSnapshotTransactions} from './SearchEditMultipleUtils';
+import {
+    areAllTransactionsExpenseCompatible,
+    getTransactionEditContext,
+    hasCustomUnitMerchantInSelection,
+    isBulkEditTaxTrackingEnabled,
+    withSnapshotReportActions,
+    withSnapshotReports,
+    withSnapshotTransactions,
+} from './SearchEditMultipleUtils';
 
 function SearchEditMultiplePage() {
     const {translate} = useLocalize();
@@ -72,8 +80,7 @@ function SearchEditMultiplePage() {
 
     const hasPartiallyEditableTransaction = isFieldDisabledForAnyTransaction(CONST.EDIT_REQUEST_FIELD.AMOUNT);
 
-    const hasPartiallyEditableMerchantTransaction =
-        isFieldDisabledForAnyTransaction(CONST.EDIT_REQUEST_FIELD.MERCHANT) || selectedTransactionContexts.some(({transaction}) => isDistanceRequest(transaction));
+    const hasPartiallyEditableMerchantTransaction = isFieldDisabledForAnyTransaction(CONST.EDIT_REQUEST_FIELD.MERCHANT) || hasCustomUnitMerchantInSelection(selectedTransactionContexts);
 
     const hasPartiallyEditableTaxRateTransaction =
         isFieldDisabledForAnyTransaction(CONST.EDIT_REQUEST_FIELD.TAX_RATE) || selectedTransactionContexts.some(({transaction}) => isDistanceRequest(transaction));
@@ -104,14 +111,9 @@ function SearchEditMultiplePage() {
     const policyTagLists = getTagLists(policyTags);
 
     const isTaxTrackingEnabled = isBulkEditTaxTrackingEnabled(selectedTransactionContexts, policy, hasPerDiemOrTimeTransaction);
-    const areSelectedTransactionsExpenses = selectedTransactionContexts.every(({transaction, report}) => {
-        if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
-            return true;
-        }
-        return !isIOUReport(report);
-    });
+    const areSelectedTransactionsExpenses = areAllTransactionsExpenseCompatible(selectedTransactionContexts);
     const areCategoriesEnabled = areSelectedTransactionsExpenses && !!policy?.areCategoriesEnabled && hasEnabledOptions(policyCategories ?? {});
-    const areTagsEnabled = !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
+    const areTagsEnabled = areSelectedTransactionsExpenses && !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
 
     useEffect(() => {
         return () => {
