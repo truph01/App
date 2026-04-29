@@ -1,5 +1,6 @@
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
+import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useOnyx from '@hooks/useOnyx';
 import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -17,6 +18,7 @@ function useAskConcierge() {
     const {timezone, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const openConciergeAnywhere = useOpenConciergeAnywhere();
     const delegateAccountID = useDelegateAccountID();
+    const isInSidePanel = useIsInSidePanel();
 
     return (searchQuery: string) => {
         openConciergeAnywhere();
@@ -31,7 +33,7 @@ function useAskConcierge() {
             timezoneParam: timezone ?? CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID,
             shouldPlaySound: true,
-            isInSidePanel: true,
+            isInSidePanel,
             delegateAccountID,
         });
     };
