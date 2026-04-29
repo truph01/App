@@ -2530,7 +2530,7 @@ const expenseReportStatusFilterMapping: Record<string, ExpenseReportStatusPredic
 
 //  Determines whether the current search results should be optimistically updated
 function shouldOptimisticallyUpdateSearch(
-    currentSearchQueryJSON: SearchQueryJSON,
+    currentSearchQueryJSON: Readonly<SearchQueryJSON>,
     iouReport: OnyxEntry<OnyxTypes.Report>,
     isInvoice: boolean | undefined,
     transaction?: OnyxEntry<OnyxTypes.Transaction>,
