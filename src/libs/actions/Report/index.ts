@@ -1968,7 +1968,7 @@ function createTransactionThreadReport(
     const optimisticTransactionThread = buildTransactionThread(iouReportAction, reportToUse, undefined, optimisticTransactionThreadReportID);
     const shouldAddPendingFields = transaction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD || iouReportAction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
     const participantAccountIDsForDetails = [currentUserAccountID];
-    if (iouReportAction?.actorAccountID) {
+    if (iouReportAction?.actorAccountID && iouReportAction.actorAccountID !== currentUserAccountID) {
         participantAccountIDsForDetails.push(iouReportAction.actorAccountID);
     }
     const participantLogins = PersonalDetailsUtils.getLoginsByAccountIDs(participantAccountIDsForDetails);
