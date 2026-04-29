@@ -1,9 +1,7 @@
 import {renderHook} from '@testing-library/react-native';
 import useReceiptTraining from '@components/MoneyRequestConfirmationList/hooks/useReceiptTraining';
 import type * as OnyxTypes from '@src/types/onyx';
-import type {Participant} from '@src/types/onyx/IOU';
 
-jest.mock('@hooks/usePermissions', () => () => ({isBetaEnabled: () => false}));
 jest.mock('@components/ProductTrainingContext', () => ({
     useProductTrainingContext: () => ({
         shouldShowProductTrainingTooltip: false,
@@ -20,7 +18,6 @@ describe('useReceiptTraining', () => {
         const {result} = renderHook(() =>
             useReceiptTraining({
                 transaction: makeTransaction({isTestReceipt: true}),
-                selectedParticipantsProp: [] as Participant[],
             }),
         );
         expect(result.current.isTestReceipt).toBe(true);
@@ -30,7 +27,6 @@ describe('useReceiptTraining', () => {
         const {result} = renderHook(() =>
             useReceiptTraining({
                 transaction: makeTransaction({}),
-                selectedParticipantsProp: [] as Participant[],
             }),
         );
         expect(result.current.isTestReceipt).toBe(false);
@@ -40,7 +36,6 @@ describe('useReceiptTraining', () => {
         const {result} = renderHook(() =>
             useReceiptTraining({
                 transaction: undefined,
-                selectedParticipantsProp: [] as Participant[],
             }),
         );
         expect(result.current.isTestReceipt).toBe(false);
@@ -50,7 +45,6 @@ describe('useReceiptTraining', () => {
         const {result} = renderHook(() =>
             useReceiptTraining({
                 transaction: makeTransaction({}),
-                selectedParticipantsProp: [] as Participant[],
             }),
         );
         expect(typeof result.current.shouldShowProductTrainingTooltip).toBe('boolean');
