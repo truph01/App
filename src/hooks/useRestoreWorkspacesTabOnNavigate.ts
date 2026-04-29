@@ -59,7 +59,7 @@ function useRestoreWorkspacesTabOnNavigate() {
             ?.routes?.findLast((route) => route.name === NAVIGATORS.WORKSPACE_NAVIGATOR)
             ?.state?.routes?.findLast((route) => isWorkspaceNavigatorRouteName(route.name));
         if (sessionRoute) {
-            return {lastWorkspacesTabNavigatorRoute: sessionRoute, workspacesTabState: sessionRoute.state};
+            return {lastWorkspacesTabNavigatorRoute: sessionRoute, workspacesTabState: sessionRoute.state, topmostFullScreenRoute};
         }
 
         return {topmostFullScreenRoute};
