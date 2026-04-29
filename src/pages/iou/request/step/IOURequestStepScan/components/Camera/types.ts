@@ -21,6 +21,9 @@ type CameraProps = {
 
     /** Called when the native camera finishes initializing (useful for preloading subsequent screens) */
     onCameraInitialized?: () => void;
+
+    /** Called when the attachment picker opens or closes (useful for showing/hiding a full-screen loader) */
+    onAttachmentPickerStatusChange?: (isOpen: boolean) => void;
 };
 
 export default CameraProps;

@@ -43,7 +43,7 @@ const BLINK_DURATION_MS = 80;
  * Renders a react-native-vision-camera viewfinder with shutter, flash toggle, gallery picker, and focus gesture.
  * Calls `onCapture(file, source)` for each photo taken or file picked from the gallery.
  */
-function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCameraInitialized}: CameraProps) {
+function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCameraInitialized, onAttachmentPickerStatusChange}: CameraProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -366,6 +366,7 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
                     <AttachmentPicker
                         onOpenPicker={() => {
                             setIsAttachmentPickerActive(true);
+                            onAttachmentPickerStatusChange?.(true);
                         }}
                         fileLimit={shouldAcceptMultipleFiles ? CONST.API_ATTACHMENT_VALIDATIONS.MAX_FILE_LIMIT : 1}
                         shouldValidateImage={false}
@@ -379,9 +380,10 @@ function Camera({onCapture, shouldAcceptMultipleFiles = false, onLayout, onCamer
                                 onPress={() => {
                                     openPicker({
                                         onPicked: (data) => emitPickedFiles(data),
-                                        onCanceled: () => {},
+                                        onCanceled: () => onAttachmentPickerStatusChange?.(false),
                                         onClosed: () => {
                                             setIsAttachmentPickerActive(false);
+                                            onAttachmentPickerStatusChange?.(false);
                                         },
                                     });
                                 }}
