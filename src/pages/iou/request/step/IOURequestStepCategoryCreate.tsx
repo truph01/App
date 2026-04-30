@@ -209,8 +209,6 @@ function IOURequestStepCategoryCreate({
     );
 }
 
-/* eslint-disable rulesdir/no-negated-variables */
 const IOURequestStepCategoryCreateWithFullTransactionOrNotFound = withFullTransactionOrNotFound(IOURequestStepCategoryCreate);
-/* eslint-disable rulesdir/no-negated-variables */
 const IOURequestStepCategoryCreateWithWritableReportOrNotFound = withWritableReportOrNotFound(IOURequestStepCategoryCreateWithFullTransactionOrNotFound);
 export default IOURequestStepCategoryCreateWithWritableReportOrNotFound;
