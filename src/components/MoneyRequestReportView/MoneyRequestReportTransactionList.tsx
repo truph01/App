@@ -683,6 +683,7 @@ function MoneyRequestReportTransactionList({
                         dateColumnSize={dateColumnSize}
                         amountColumnSize={amountColumnSize}
                         taxAmountColumnSize={taxAmountColumnSize}
+                        shouldRemoveTotalColumnFlex
                         onSortPress={(selectedSortBy, selectedSortOrder) => {
                             if (!isSortableColumnName(selectedSortBy)) {
                                 return;
