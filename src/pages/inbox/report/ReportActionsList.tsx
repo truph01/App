@@ -119,9 +119,6 @@ type ReportActionsListProps = {
     /** Whether the optimistic CREATED report action was added */
     hasCreatedActionAdded?: boolean;
 
-    /** Whether this is a Concierge chat in the side panel */
-    isConciergeSidePanel?: boolean;
-
     /** Whether the chat history is hidden (concierge side panel fresh state) */
     showHiddenHistory?: boolean;
 
@@ -165,7 +162,6 @@ function ReportActionsList({
     listID,
     parentReportActionForTransactionThread,
     hasCreatedActionAdded,
-    isConciergeSidePanel,
     showHiddenHistory,
     hasPreviousMessages,
     onShowPreviousMessages,
@@ -743,14 +739,13 @@ function ReportActionsList({
                         reportNameValuePairsOrigin={reportNameValuePairs?.origin}
                         reportNameValuePairsOriginalID={reportNameValuePairs?.originalID}
                     />
-                    {!!isConciergeSidePanel && !!onShowPreviousMessages && (
-                        <ShowPreviousMessagesButton
-                            actionType={reportAction.actionName}
-                            hasPreviousMessages={!!hasPreviousMessages}
-                            showFullHistory={!showHiddenHistory}
-                            onPress={onShowPreviousMessages}
-                        />
-                    )}
+                    <ShowPreviousMessagesButton
+                        reportID={report.reportID}
+                        actionType={reportAction.actionName}
+                        hasPreviousMessages={!!hasPreviousMessages}
+                        showFullHistory={!showHiddenHistory}
+                        onPress={onShowPreviousMessages}
+                    />
                 </>
             );
         },
@@ -776,7 +771,6 @@ function ReportActionsList({
             reportNameValuePairs?.origin,
             reportNameValuePairs?.originalID,
             reportActionsFromOnyx,
-            isConciergeSidePanel,
             showHiddenHistory,
             hasPreviousMessages,
             onShowPreviousMessages,
