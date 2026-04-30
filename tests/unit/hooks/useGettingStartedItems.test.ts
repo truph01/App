@@ -26,6 +26,13 @@ jest.mock('@userActions/Policy/Policy', () => ({enableCompanyCards: jest.fn(), e
 
 const POLICY_ID = '1';
 
+// Trial dates relative to today so the 60-day Getting Started window check
+// (isWithinGettingStartedPeriod) doesn't drift out of bounds as wall time
+// passes. The previously-hardcoded values passed at landing time but started
+// failing 60+ days later when the trial cutoff swept past them.
+const RECENT_TRIAL_START = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
+const FUTURE_TRIAL_END = new Date(Date.now() + 23 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
+
 function buildPolicy(overrides: Partial<Policy> = {}): Policy {
     return {
         ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM, 'Test Workspace'),
@@ -80,8 +87,8 @@ describe('useGettingStartedItems', () => {
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             const policy = buildPolicy();
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
@@ -96,8 +103,8 @@ describe('useGettingStartedItems', () => {
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             const policy = buildPolicy();
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
@@ -121,8 +128,8 @@ describe('useGettingStartedItems', () => {
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             const policy = buildPolicy();
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
             await Onyx.merge(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION, CONST.POLICY.CONNECTIONS.NAME.QBO as never);
             await waitForBatchedUpdates();
 
@@ -727,8 +734,8 @@ describe('useGettingStartedItems', () => {
     describe('edge cases', () => {
         it('should be hidden when active policy ID is missing', async () => {
             await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM});
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
@@ -754,8 +761,8 @@ describe('useGettingStartedItems', () => {
         it('should be hidden when policy data does not exist', async () => {
             await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM});
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, 'nonexistent-policy');
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
@@ -810,8 +817,8 @@ describe('useGettingStartedItems', () => {
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             const policy = buildPolicy();
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
             await Onyx.merge(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION, CONST.POLICY.CONNECTIONS.NAME.QBO as never);
             await waitForBatchedUpdates();
 

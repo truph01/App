@@ -10,6 +10,12 @@ import waitForBatchedUpdates from '../../../../utils/waitForBatchedUpdates';
 
 const TEST_POLICY_ID = 'ABC123';
 
+// Trial dates relative to today so the 60-day Getting Started window check
+// (isWithinGettingStartedPeriod) doesn't drift out of bounds as wall time
+// passes. Previously-hardcoded values passed at landing time but started
+// failing 60+ days later when the trial cutoff swept past them.
+const RECENT_TRIAL_START = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
+
 jest.mock('@libs/Navigation/Navigation', () => ({
     navigate: jest.fn(),
     setNavigationActionToMicrotaskQueue: jest.fn((callback: () => void) => callback()),
@@ -51,7 +57,7 @@ async function setManageTeamUserState(overrides?: {
     hasConfiguredRules?: boolean;
     trialStartDate?: string;
 }) {
-    const trialStart = overrides?.trialStartDate ?? '2026-03-01';
+    const trialStart = overrides?.trialStartDate ?? RECENT_TRIAL_START;
 
     await Onyx.set(ONYXKEYS.NVP_INTRO_SELECTED, {
         choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
@@ -101,7 +107,7 @@ describe('GettingStartedSection', () => {
                 choice: CONST.ONBOARDING_CHOICES.PERSONAL_SPEND,
             });
             await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, TEST_POLICY_ID);
-            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
+            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
             await waitForBatchedUpdates();
 
             renderGettingStartedSection();
@@ -126,7 +132,7 @@ describe('GettingStartedSection', () => {
                 choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
             });
             await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, TEST_POLICY_ID);
-            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
+            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
             await Onyx.set(
                 `${ONYXKEYS.COLLECTION.POLICY}${TEST_POLICY_ID}` as never,
                 {
@@ -151,7 +157,7 @@ describe('GettingStartedSection', () => {
                 choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
             });
             await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, TEST_POLICY_ID);
-            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
+            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
             await Onyx.set(
                 `${ONYXKEYS.COLLECTION.POLICY}${TEST_POLICY_ID}` as never,
                 {
@@ -183,7 +189,7 @@ describe('GettingStartedSection', () => {
         it('renders when manage-team intent is set via fallback ONBOARDING_PURPOSE_SELECTED', async () => {
             await Onyx.set(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED, CONST.ONBOARDING_CHOICES.MANAGE_TEAM as never);
             await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, TEST_POLICY_ID);
-            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
+            await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
             await Onyx.set(
                 `${ONYXKEYS.COLLECTION.POLICY}${TEST_POLICY_ID}` as never,
                 {
