@@ -34,6 +34,7 @@ function TravelCVVPage() {
     const illustrations = useMemoizedLazyIllustrations(['TravelCVV']);
 
     const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [, lockAccountDetailsMetadata] = useOnyx(ONYXKEYS.NVP_PRIVATE_LOCK_ACCOUNT_DETAILS);
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
 
@@ -47,6 +48,7 @@ function TravelCVVPage() {
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
     const isLoadingAccount = isLoadingOnyxValue(accountMetadata);
+    const isLoadingLockAccountDetails = isLoadingOnyxValue(lockAccountDetailsMetadata);
 
     // Auto-navigate to the magic code screen on first mount so the user
     // doesn't have to click "Reveal Details" manually.
@@ -55,8 +57,9 @@ function TravelCVVPage() {
         if (hasAutoNavigatedRef.current) {
             return;
         }
-        // Wait for the account Onyx record to load so isSignedInAsDelegate is reliable
-        if (isLoadingAccount) {
+        // Wait for both the account and lock-account-details Onyx records to load
+        // so isSignedInAsDelegate and isAccountLocked are reliable
+        if (isLoadingAccount || isLoadingLockAccountDetails) {
             return;
         }
         if (cvv || isSignedInAsDelegate || isOffline || isAccountLocked) {
@@ -65,7 +68,7 @@ function TravelCVVPage() {
         hasAutoNavigatedRef.current = true;
         resetValidateActionCodeSent();
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [isLoadingAccount, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
+    }, [isLoadingAccount, isLoadingLockAccountDetails, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
 
     const handleRevealDetailsPress = useCallback(() => {
         if (isAccountLocked) {
