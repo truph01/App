@@ -19,6 +19,7 @@ import {resetValidateActionCodeSent} from '@libs/actions/User';
 import Navigation from '@libs/Navigation/Navigation';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider';
 
 /**
@@ -32,7 +33,7 @@ function TravelCVVPage() {
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['TravelCVV']);
 
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
 
@@ -54,7 +55,7 @@ function TravelCVVPage() {
             return;
         }
         // Wait for the account Onyx record to load so isSignedInAsDelegate is reliable
-        if (account === undefined) {
+        if (isLoadingOnyxValue(accountMetadata)) {
             return;
         }
         if (cvv || isSignedInAsDelegate || isOffline || isAccountLocked) {
@@ -63,7 +64,7 @@ function TravelCVVPage() {
         hasAutoNavigatedRef.current = true;
         resetValidateActionCodeSent();
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [account, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
+    }, [accountMetadata, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
 
     const handleRevealDetailsPress = useCallback(() => {
         if (isAccountLocked) {
