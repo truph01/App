@@ -62,6 +62,7 @@ const SKIPPED_FILTERS = new Set<SearchAdvancedFiltersKey>([
     FILTER_KEYS.PAYER,
     FILTER_KEYS.ACTION,
     FILTER_KEYS.COLUMNS,
+    FILTER_KEYS.KEYWORD,
 ]);
 
 function getFilterSentryLabel(filterKey: SearchAdvancedFiltersKey | SearchFilterKey | ReportFieldKey) {
@@ -294,7 +295,6 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
             case FILTER_KEYS.MERCHANT:
             case FILTER_KEYS.DESCRIPTION:
             case FILTER_KEYS.REPORT_ID:
-            case FILTER_KEYS.KEYWORD:
             case FILTER_KEYS.TITLE:
             case FILTER_KEYS.WITHDRAWAL_ID: {
                 return {
