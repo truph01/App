@@ -137,7 +137,7 @@ function SearchChangeApproverPage() {
             if (policiesToUpgrade.length > 1) {
                 // Bulk upgrade is not supported, so show a general page to guide the user to upgrade manually
                 hasInitiatedUpgradeRef.current = true;
-                Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(undefined, undefined, ROUTES.CHANGE_APPROVER_ADD_APPROVER_SEARCH_RHP));
+                Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(undefined, undefined, ROUTES.CHANGE_APPROVER_ADD_APPROVER_SEARCH_RHP), {forceReplace: true});
                 return;
             }
             if (policiesToUpgrade.length === 1) {
@@ -148,6 +148,7 @@ function SearchChangeApproverPage() {
                         CONST.UPGRADE_FEATURE_INTRO_MAPPING.multiApprovalLevels.alias,
                         ROUTES.CHANGE_APPROVER_ADD_APPROVER_SEARCH_RHP,
                     ),
+                    {forceReplace: true},
                 );
                 return;
             }
