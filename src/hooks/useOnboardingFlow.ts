@@ -66,11 +66,6 @@ function useOnboardingFlowRouter() {
                 return;
             }
 
-            if (currentUrl.endsWith('/r')) {
-                // Don't trigger onboarding if we are in the middle of a redirect to a report
-                return;
-            }
-
             if (CONFIG.IS_HYBRID_APP) {
                 // For single entries, such as using the Travel feature from OldDot, we don't want to show onboarding
                 if (isSingleNewDotEntry) {
