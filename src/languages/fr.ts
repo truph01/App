@@ -4833,7 +4833,7 @@ ${amount} pour ${merchant} - ${date}`,
 
                             Si vous souhaitez définir un fournisseur spécifique pour chaque carte, accédez à *Paramètres > Domaines > Cartes d’entreprise*.
                         `),
-                        travelDescription: 'Travel expenses will export as journal entries to the NetSuite account specified below.',
+                        travelDescription: 'Les frais de voyage seront exportés sous forme d’écritures de journal vers le compte NetSuite indiqué ci-dessous.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:
