@@ -47,10 +47,10 @@ type PolicyCategory = OnyxCommon.OnyxValueWithOfflineFeedback<{
     expenseLimitType?: PolicyCategoryExpenseLimitType;
 
     /** Max expense amount with no receipt violation */
-    maxAmountNoReceipt?: number;
+    maxAmountNoReceipt?: number | null;
 
     /** Max expense amount with no itemized receipt violation */
-    maxAmountNoItemizedReceipt?: number;
+    maxAmountNoItemizedReceipt?: number | null;
 
     /** If true, not providing attendees for a transaction with this category will trigger a violation */
     areAttendeesRequired?: boolean;

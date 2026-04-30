@@ -30,7 +30,7 @@ function formatDefaultTaxRateText(translate: LocaleContextProps['translate'], ta
 function formatRequireReceiptsOverText(
     translate: LocaleContextProps['translate'],
     policy: Policy,
-    categoryMaxAmountNoReceipt: number | undefined,
+    categoryMaxAmountNoReceipt: number | null | undefined,
     convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
 ) {
     const isAlwaysSelected = categoryMaxAmountNoReceipt === 0;
@@ -54,7 +54,7 @@ function formatRequireReceiptsOverText(
 function formatRequireItemizedReceiptsOverText(
     translate: LocaleContextProps['translate'],
     policy: Policy,
-    categoryMaxAmountNoItemizedReceipt: number | undefined,
+    categoryMaxAmountNoItemizedReceipt: number | null | undefined,
     convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
 ) {
     const isAlwaysSelected = categoryMaxAmountNoItemizedReceipt === 0;
