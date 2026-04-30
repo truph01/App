@@ -202,10 +202,7 @@ function getDevicePreferredLocale(): Locale {
 const COLLATOR_OPTIONS: Intl.CollatorOptions = {usage: 'sort', sensitivity: 'variant', numeric: true, caseFirst: 'upper'};
 const localeCompareCache = new Map<string, (a: string, b: string) => number>();
 
-/**
- * Locale-aware string comparator for non-React callers (mirrors `translateLocal`). React code should use the
- * `localeCompare` returned by `useLocalize` instead.
- */
+/** Mirrors `translateLocal` for non-React callers. React code should use `useLocalize().localeCompare`. */
 function localeCompareLocal(a: string, b: string): number {
     const locale = IntlStore.getCurrentLocale() ?? '';
     let compare = localeCompareCache.get(locale);
