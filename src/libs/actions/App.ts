@@ -160,7 +160,6 @@ Onyx.connectWithoutView({
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define -- clearOnyxAndResetApp is defined later in this file but must be called here in the RESET_REQUIRED callback
         clearOnyxAndResetApp().finally(() => {
             // Set this to false to reset the flag for this client
             Onyx.set(ONYXKEYS.RESET_REQUIRED, false);
