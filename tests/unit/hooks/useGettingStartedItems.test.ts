@@ -1,4 +1,4 @@
-import {renderHook} from '@testing-library/react-native';
+import {renderHook, waitFor} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import useGettingStartedItems from '@pages/home/GettingStartedSection/hooks/useGettingStartedItems';
 import CONST from '@src/CONST';
@@ -127,9 +127,10 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
-            await waitForBatchedUpdates();
-
-            expect(result.current.shouldShowSection).toBe(true);
+            // The hook reads ONBOARDING_PURPOSE_SELECTED via a separate useOnyx
+            // subscription whose callback can land a tick after the others; poll
+            // with waitFor instead of relying on a single batched-updates flush.
+            await waitFor(() => expect(result.current.shouldShowSection).toBe(true));
         });
 
         it('should be hidden after 60 days from NVP_FIRST_DAY_FREE_TRIAL', async () => {
@@ -815,9 +816,10 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
-            await waitForBatchedUpdates();
-
-            expect(result.current.shouldShowSection).toBe(true);
+            // Same reasoning as the ONBOARDING_PURPOSE_SELECTED fallback test above:
+            // poll until the hook's dependent useOnyx chain settles instead of
+            // relying on a single flush.
+            await waitFor(() => expect(result.current.shouldShowSection).toBe(true));
         });
     });
 });
