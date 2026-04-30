@@ -4,6 +4,7 @@ import type {OnyxEntry, OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import * as API from '@libs/API';
 import type {AddDelegateParams as APIAddDelegateParams, RemoveDelegateParams as APIRemoveDelegateParams, UpdateDelegateRoleParams as APIUpdateDelegateRoleParams} from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
+import DateUtils from '@libs/DateUtils';
 import * as ErrorUtils from '@libs/ErrorUtils';
 import Log from '@libs/Log';
 import {clearPreservedSearchNavigatorStates} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
@@ -40,6 +41,20 @@ const KEYS_TO_PRESERVE_DELEGATE_ACCESS = [
     ONYXKEYS.COLLECTION.PASSKEY_CREDENTIALS,
     ONYXKEYS.COLLECTION.DEVICE_BIOMETRICS,
 ];
+
+/**
+ * Reset Onyx for a delegate-access transition while seeding LAST_FULL_RECONNECT_TIME=now.
+ *
+ * subscribeToFullReconnect compares this timestamp against the server-supplied
+ * NVP_RECONNECT_APP_IF_FULL_RECONNECT_BEFORE that lands in OpenApp's response.onyxData.
+ * Because applyHTTPSOnyxUpdates applies response.onyxData before successData, the
+ * timestamp would still be empty when the comparison runs, falsely triggering a
+ * duplicate ReconnectApp on top of the OpenApp that follows the transition. Seeding
+ * it to `now` short-circuits the subscriber until OpenApp's successData refreshes it.
+ */
+function clearOnyxForDelegateTransition(): Promise<void> {
+    return Onyx.merge(ONYXKEYS.LAST_FULL_RECONNECT_TIME, DateUtils.getDBTime()).then(() => Onyx.clear([...KEYS_TO_PRESERVE_DELEGATE_ACCESS, ONYXKEYS.LAST_FULL_RECONNECT_TIME]));
+}
 
 type WithDelegatedAccess = {
     // Optional keeps call sites clean, but still encourages passing `account?.delegatedAccess`.
@@ -195,7 +210,7 @@ function connect({email, delegatedAccess, credentials, session, activePolicyID, 
                 })
                 .then(() => {
                     NetworkStore.setAuthToken(response?.restrictedToken ?? null);
-                    return Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS);
+                    return clearOnyxForDelegateTransition();
                 })
                 .then(() => {
                     confirmReadyToOpenApp();
@@ -294,7 +309,7 @@ function disconnect({stashedCredentials, stashedSession}: DisconnectParams) {
                 })
                 .then(() => {
                     NetworkStore.setAuthToken(response?.authToken ?? null);
-                    return Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS);
+                    return clearOnyxForDelegateTransition();
                 })
                 .then(() => {
                     Onyx.set(ONYXKEYS.CREDENTIALS, {
@@ -663,7 +678,7 @@ function updateDelegateRole({email, role, validateCode, delegatedAccess}: Update
 }
 
 function restoreDelegateSession<TKey extends OnyxKey>(authenticateResponse: Response<TKey>) {
-    Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS).then(() => {
+    clearOnyxForDelegateTransition().then(() => {
         updateSessionAuthTokens(authenticateResponse?.authToken, authenticateResponse?.encryptedAuthToken);
         updateSessionUser(authenticateResponse?.accountID, authenticateResponse?.email);
 
@@ -690,5 +705,5 @@ export {
     updateDelegateRole,
     removeDelegate,
     openSecuritySettingsPage,
-    KEYS_TO_PRESERVE_DELEGATE_ACCESS,
+    clearOnyxForDelegateTransition,
 };
