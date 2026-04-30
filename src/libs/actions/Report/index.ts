@@ -5422,7 +5422,7 @@ function buildParticipantsInviteData(
             if (accountID in (targetReport.participants ?? {})) {
                 return acc;
             }
-            // eslint-disable-next-line no-param-reassign -- Mutating the reduce accumulator is intentional
+
             acc[accountID] = {
                 notificationPreference: defaultPref,
                 role: CONST.REPORT.ROLE.MEMBER,

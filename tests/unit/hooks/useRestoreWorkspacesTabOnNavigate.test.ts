@@ -48,7 +48,6 @@ jest.mock('@libs/Navigation/helpers/getPathFromState', () => ({
     default: jest.fn(),
 }));
 
-// eslint-disable-next-line no-restricted-syntax
 jest.mock('@libs/PolicyUtils', () => ({
     shouldShowPolicy: jest.fn(() => true),
     isPendingDeletePolicy: jest.fn(() => false),
@@ -62,7 +61,6 @@ const useRestoreWorkspacesTabOnNavigate = (require('@hooks/useRestoreWorkspacesT
 
 const PolicyUtils = require('@libs/PolicyUtils') as {shouldShowPolicy: jest.Mock; isPendingDeletePolicy: jest.Mock};
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const lastVisitedTabPathUtils = require('@libs/Navigation/helpers/lastVisitedTabPathUtils') as {getWorkspacesTabStateFromSessionStorage: jest.Mock};
 
 function setupOnyxForPolicy() {

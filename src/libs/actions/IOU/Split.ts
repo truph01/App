@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import {fastMerge} from 'expensify-common';
 // eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
