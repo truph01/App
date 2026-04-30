@@ -42,6 +42,12 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
         Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.getRoute(backTo));
     }, [session?.email, contactMethod, loginData?.pendingFields?.defaultLogin, backTo]);
 
+    useEffect(() => {
+        return () => {
+            clearContactMethodErrors(contactMethod, 'defaultLogin');
+        };
+    }, [contactMethod]);
+
     if (!contactMethod || !loginData) {
         return (
             <ScreenWrapper testID="SetDefaultContactMethodConfirmMagicCodePage">
