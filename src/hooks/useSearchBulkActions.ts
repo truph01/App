@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -723,7 +724,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                         );
                         return;
                     }
-                    const invite = moveIOUReportToPolicyAndInviteSubmitter(itemReport, adminPolicy, formatPhoneNumber, policyExpenseChatReportActions, reportTransactions);
+                    const invite = moveIOUReportToPolicyAndInviteSubmitter(itemReport, adminPolicy, formatPhoneNumber, policyExpenseChatReportActions, accountID, reportTransactions);
                     if (!invite?.policyExpenseChatReportID) {
                         moveIOUReportToPolicy(itemReport, adminPolicy, false, reportTransactions);
                     }
@@ -790,6 +791,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             policyExpenseChatReportActions,
             formatPhoneNumber,
             clearSelectedTransactions,
+            accountID,
         ],
     );
 
@@ -1190,7 +1192,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 text: translate('iou.changeApprover.title'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_APPROVER,
                 shouldCloseModalOnSelect: true,
-                onSelected: () => Navigation.navigate(ROUTES.CHANGE_APPROVER_SEARCH_RHP),
+                onSelected: () => navigateToSearchRHP(ROUTES.CHANGE_APPROVER_SEARCH_RHP),
             });
         }
 
