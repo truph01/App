@@ -6,178 +6,107 @@
 import {parse} from '@babel/parser';
 
 const NO_DEPRECATED_RULE_ID = '@typescript-eslint/no-deprecated';
+
+// AST keys to ignore while walking children: positions, comments, etc.
+const NON_CHILD_KEYS = new Set(['loc', 'start', 'end', 'extra', 'leadingComments', 'trailingComments', 'innerComments']);
+
+// Node types whose children are part of a single dotted/qualified expression
+// (e.g. `Foo.bar`, `Foo?.bar`, `Foo.bar` in TS type position).
+const MEMBER_LIKE_TYPES = new Set(['MemberExpression', 'OptionalMemberExpression', 'TSQualifiedName']);
+
 const sourceByFilename = new Map();
 
-/**
- * Extracts the backtick-quoted API name from a no-deprecated message.
- * Message shapes: `` `name` is deprecated. `` / `` `name` is deprecated. reason ``
- *
- * @param {import('eslint').Linter.LintMessage} message
- * @returns {string | null}
- */
-function extractDeprecatedApiName(message) {
-    const match = /^`([^`]+)`/.exec(message.message);
-    return match ? match[1] : null;
-}
+const isAstNode = (value) => !!value && typeof value === 'object' && typeof value.type === 'string' && typeof value.start === 'number' && typeof value.end === 'number';
 
-/**
- * Converts an API name to a stable rule ID suffix (trims; collapses whitespace
- * and `/` to `_`; preserves `.`, `#`, `$`, `@`).
- *
- * @param {string} apiName
- * @returns {string}
- */
-function toRuleIdSuffix(apiName) {
-    return apiName.trim().replaceAll(/[\s/]+/g, '_');
-}
-
-/**
- * @param {string} source
- * @returns {number[]}
- */
-function getLineStarts(source) {
-    const lineStarts = [0];
-    for (let index = 0; index < source.length; index++) {
-        if (source.at(index) === '\n') {
-            lineStarts.push(index + 1);
+/** Iterate over a node's direct AST children, skipping non-child metadata. */
+function* astChildren(node) {
+    for (const [key, value] of Object.entries(node)) {
+        if (NON_CHILD_KEYS.has(key)) {
+            continue;
+        }
+        for (const child of Array.isArray(value) ? value : [value]) {
+            if (isAstNode(child)) {
+                yield child;
+            }
         }
     }
-    return lineStarts;
 }
 
-/**
- * @param {number[]} lineStarts
- * @param {number} line
- * @param {number} column
- * @returns {number | null}
- */
-function getIndexFromLocation(lineStarts, line, column) {
-    const lineStart = lineStarts.at(line - 1);
-    if (lineStart === undefined) {
-        return null;
+/** Convert ESLint's 1-based (line, column) into a 0-based source offset, or -1 if line is out of range. */
+function lineColumnToOffset(source, line, column) {
+    let lineStart = 0;
+    for (let currentLine = 1; currentLine < line; currentLine++) {
+        const nextNewline = source.indexOf('\n', lineStart);
+        if (nextNewline < 0) {
+            return -1;
+        }
+        lineStart = nextNewline + 1;
     }
-
     return lineStart + column - 1;
 }
 
 /**
- * @param {unknown} value
- * @returns {value is {type: string; start: number; end: number}}
+ * Walk down the AST following children whose range contains `offset`.
+ * Returns the ancestor path (root → deepest) or `null` if the offset is out of range.
  */
-function isAstNode(value) {
-    return !!value && typeof value === 'object' && typeof value.type === 'string' && typeof value.start === 'number' && typeof value.end === 'number';
-}
-
-/**
- * @param {unknown} node
- * @param {WeakMap<object, object>} parentByNode
- * @param {object | null} parent
- */
-function collectParents(node, parentByNode, parent = null) {
-    if (!isAstNode(node)) {
-        return;
-    }
-
-    if (parent) {
-        parentByNode.set(node, parent);
-    }
-
-    for (const [key, value] of Object.entries(node)) {
-        if (['loc', 'start', 'end', 'extra', 'leadingComments', 'trailingComments', 'innerComments'].includes(key)) {
-            continue;
-        }
-        if (Array.isArray(value)) {
-            for (const child of value) {
-                collectParents(child, parentByNode, node);
-            }
-            continue;
-        }
-        collectParents(value, parentByNode, node);
-    }
-}
-
-/**
- * @param {unknown} node
- * @param {number} index
- * @returns {object | null}
- */
-function findSmallestNodeAtIndex(node, index) {
-    if (!isAstNode(node) || index < node.start || index > node.end) {
+function findAstPathAtOffset(root, offset) {
+    if (offset < 0 || offset < root.start || offset > root.end) {
         return null;
     }
-
-    let smallest = node;
-    for (const [key, value] of Object.entries(node)) {
-        if (['loc', 'start', 'end', 'extra', 'leadingComments', 'trailingComments', 'innerComments'].includes(key)) {
-            continue;
-        }
-        const candidates = Array.isArray(value) ? value : [value];
-        for (const child of candidates) {
-            const childMatch = findSmallestNodeAtIndex(child, index);
-            if (childMatch && childMatch.end - childMatch.start <= smallest.end - smallest.start) {
-                smallest = childMatch;
+    const path = [root];
+    while (true) {
+        const current = path.at(-1);
+        let descended = false;
+        for (const child of astChildren(current)) {
+            if (offset >= child.start && offset <= child.end) {
+                path.push(child);
+                descended = true;
+                break;
             }
         }
+        if (!descended) {
+            return path;
+        }
     }
-
-    return smallest;
 }
 
-/**
- * @param {object} node
- * @param {WeakMap<object, object>} parentByNode
- * @returns {object}
- */
-function getTopMemberLikeNode(node, parentByNode) {
-    let current = node;
-    let parent = parentByNode.get(current);
-
-    while (
-        parent &&
-        ((parent.type === 'MemberExpression' && (parent.property === current || parent.object === current)) ||
-            (parent.type === 'OptionalMemberExpression' && (parent.property === current || parent.object === current)) ||
-            (parent.type === 'TSQualifiedName' && (parent.left === current || parent.right === current)))
-    ) {
-        current = parent;
-        parent = parentByNode.get(current);
+/** Walk a path upward through any wrapping member/qualified expression and return the topmost. */
+function topOfMemberChain(path) {
+    let topIndex = path.length - 1;
+    while (topIndex > 0 && MEMBER_LIKE_TYPES.has(path.at(topIndex - 1).type)) {
+        topIndex--;
     }
-
-    return current;
+    return path.at(topIndex);
 }
 
-/**
- * @param {string} source
- * @returns {{source: string; ast: object; parentByNode: WeakMap<object, object>; lineStarts: number[]} | null}
- */
-function createSourceContext(source) {
+function parseSourceOrNull(source) {
     try {
-        const ast = parse(source, {sourceType: 'module', plugins: ['typescript', 'jsx']});
-        const parentByNode = new WeakMap();
-        collectParents(ast, parentByNode);
-        return {source, ast, parentByNode, lineStarts: getLineStarts(source)};
+        return parse(source, {sourceType: 'module', plugins: ['typescript', 'jsx']});
     } catch {
         return null;
     }
 }
 
-/**
- * @param {{source: string; ast: object; parentByNode: WeakMap<object, object>; lineStarts: number[]}} sourceContext
- * @param {import('eslint').Linter.LintMessage} message
- * @returns {string | null}
- */
-function extractApiNameFromSource(sourceContext, message) {
-    const index = getIndexFromLocation(sourceContext.lineStarts, message.line, message.column);
-    if (index === null) {
+/** Slice the full deprecated expression (e.g. `StyleSheet.absoluteFillObject`) at the lint location, or null on miss. */
+function getDeprecatedExpressionFromSource(source, ast, message) {
+    const offset = lineColumnToOffset(source, message.line, message.column);
+    const path = findAstPathAtOffset(ast, offset);
+    if (!path) {
         return null;
     }
+    const top = topOfMemberChain(path);
+    return source.slice(top.start, top.end);
+}
 
-    const node = findSmallestNodeAtIndex(sourceContext.ast, index);
-    if (!node) {
-        return null;
-    }
+/** Fallback: parse the symbol name out of the lint message text. */
+function getSymbolNameFromMessage(message) {
+    const match = /^`([^`]+)`/.exec(message.message);
+    return match ? match.at(1) : null;
+}
 
-    const topMemberLikeNode = getTopMemberLikeNode(node, sourceContext.parentByNode);
-    return sourceContext.source.slice(topMemberLikeNode.start, topMemberLikeNode.end);
+/** Trim; collapse whitespace and `/` to `_`. Preserves `.`, `#`, `$`, `@`. */
+function toRuleIdSuffix(apiName) {
+    return apiName.trim().replaceAll(/[\s/]+/g, '_');
 }
 
 /**
@@ -187,13 +116,13 @@ function extractApiNameFromSource(sourceContext, message) {
  */
 function stratifyMessages(messages, source) {
     const hasNoDeprecatedMessages = messages.some((message) => message.ruleId === NO_DEPRECATED_RULE_ID);
-    const sourceContext = source && hasNoDeprecatedMessages ? createSourceContext(source) : null;
+    const ast = source && hasNoDeprecatedMessages ? parseSourceOrNull(source) : null;
 
     return messages.map((message) => {
         if (message.ruleId !== NO_DEPRECATED_RULE_ID) {
             return message;
         }
-        const apiName = (sourceContext && extractApiNameFromSource(sourceContext, message)) || extractDeprecatedApiName(message);
+        const apiName = (ast && getDeprecatedExpressionFromSource(source, ast, message)) || getSymbolNameFromMessage(message);
         if (!apiName) {
             return message;
         }
