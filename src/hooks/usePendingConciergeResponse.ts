@@ -146,12 +146,11 @@ function usePendingConciergeResponse(reportID: string | undefined) {
                 arrivedAtElapsedMs: arrival?.elapsedMs,
             });
             dispatch('completed', snapshotTokens.at(-1) ?? snapshotHtml);
-            // If the canonical reportComment is already in REPORT_ACTIONS at completion
-            // time — whether acceleration fired or it landed during the pre-trickle
-            // setTimeout (when accelerate runs but no-ops because intervalID is null) —
-            // re-applying our older optimistic would clobber server-added markup
-            // (follow-up buttons, deep-link Pressables) until the next server update.
-            // Read live from the ref so we catch arrivals the accelerator missed.
+            // Don't reapply our older optimistic when the canonical is already there —
+            // it would clobber server-added markup (follow-up buttons, deep-link
+            // Pressables). `arrival` covers the accelerator path; the live ref read
+            // catches arrivals during the pre-trickle setTimeout where the accelerator
+            // no-ops on null intervalID.
             if (arrival || trickleInputsRef.current.persistedAction) {
                 discardPendingConciergeAction(reportID);
             } else {
