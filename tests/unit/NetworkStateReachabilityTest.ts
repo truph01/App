@@ -112,31 +112,15 @@ describe('NetworkState — reachability recovery triggers reconnect', () => {
         expect(reconnectListener).toHaveBeenCalledTimes(1);
     });
 
-    test('null→true on a fresh subscription does NOT fire reconnect listener', () => {
+    test('null→true fires reconnect listener', () => {
         const reconnectListener = jest.fn();
         onReachabilityConfirmed(reconnectListener);
 
-        // After a fresh subscription, the first events deliver current state. NetInfo may
-        // emit null first while the initial Ping is in flight, then true once it completes.
-        // This is not a recovery — only false→true (or an explicit prev=null reset) is.
+        // Simulate losing reachability tracking (null) then recovering
         fireNetInfoState({isInternetReachable: null});
         fireNetInfoState({isInternetReachable: true});
 
-        expect(reconnectListener).not.toHaveBeenCalled();
-    });
-
-    test('true→null→true does NOT fire reconnect listener (transient state, no confirmed offline)', () => {
-        const reconnectListener = jest.fn();
-        onReachabilityConfirmed(reconnectListener);
-
-        // Establish a baseline reachable state
-        fireNetInfoState({isInternetReachable: true});
-        // NetInfo briefly loses track without confirming offline (e.g. during a poll gap)
-        fireNetInfoState({isInternetReachable: null});
-        // Reachability comes back. Since we never went through false, this is not a recovery.
-        fireNetInfoState({isInternetReachable: true});
-
-        expect(reconnectListener).not.toHaveBeenCalled();
+        expect(reconnectListener).toHaveBeenCalledTimes(1);
     });
 
     test('undefined→true does NOT fire reconnect listener (boot event)', () => {

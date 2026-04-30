@@ -20,6 +20,7 @@ let unsubscribeNetInfo: (() => void) | null = null;
 let prevIsInternetReachable: boolean | null | undefined;
 let isPoorConnectionSimulated: boolean | undefined;
 let networkTimeSkew = 0;
+let suppressNextReachabilityRestored = false;
 
 // Subscriber sets
 const listeners = new Set<() => void>();
@@ -268,16 +269,20 @@ function setRandomNetworkStatus(initialCall = false) {
  * Must unsubscribe before calling configure() — configure tears down NetInfo internal state.
  */
 function configureAndSubscribe() {
+    // Treat this as a reconfigure (not an initial subscription) when there's already a listener.
+    // Reconfigure tears down NetInfo internal state, so the new subscription emits a synthetic
+    // null→true transition that would look like a recovery — suppress the next would-be recovery
+    // until reachability settles. Initial subscription is left untouched so boot behavior is
+    // unchanged (prev=undefined boot guard already covers it).
+    const isReconfigure = unsubscribeNetInfo !== null;
     if (unsubscribeNetInfo) {
         unsubscribeNetInfo();
         unsubscribeNetInfo = null;
     }
 
-    // Reset to the same "fresh subscription" state as boot. The listener's `prev !== undefined`
-    // guard then blocks the synthetic null→true transition that NetInfo emits while reconfiguring
-    // (which would otherwise look like a recovery and fire a duplicate openApp/reconnectApp,
-    // e.g. on accountID change for a delegate switch).
-    prevIsInternetReachable = undefined;
+    if (isReconfigure) {
+        suppressNextReachabilityRestored = true;
+    }
 
     if (!CONFIG.IS_USING_LOCAL_WEB) {
         NetInfo.configure({
@@ -315,21 +320,25 @@ function configureAndSubscribe() {
             setInternetUnreachable(true);
         }
 
-        // Treat false→true as genuine recovery (NetInfo previously confirmed unreachable, now
-        // confirmed back), and null→true when prev was explicitly reset to null by debug-tool
-        // toggles (setForceOffline / setFailAllRequests / simulatePoorConnection) that need to
-        // force a recovery on the next definitive state. Block undefined→true — that's the
-        // first event on a fresh subscription, not a recovery.
+        // Treat false→true and null→true as genuine recovery. Both mean NetInfo previously
+        // lost reachability (false = confirmed unreachable, null = lost track during outage)
+        // and has now confirmed it's back. Only block undefined→true — that's the initial
+        // NetInfo event on subscribe which delivers current state, not a recovery. Firing
+        // onReachabilityRestored() on boot would duplicate openApp()/reconnectApp().
         if (!shouldForceOffline && state.isInternetReachable === true && prevIsInternetReachable !== true && prevIsInternetReachable !== undefined) {
-            Log.info(`[NetworkState] Internet reachability restored (${prevIsInternetReachable}→true)`);
-            onReachabilityRestored();
+            if (suppressNextReachabilityRestored) {
+                Log.info(`[NetworkState] Suppressing recovery on first stable state after reconfigure (${prevIsInternetReachable}→true)`);
+            } else {
+                Log.info(`[NetworkState] Internet reachability restored (${prevIsInternetReachable}→true)`);
+                onReachabilityRestored();
+            }
         }
-        // Only track definitive reachable/unreachable states. Ignoring null/undefined keeps the
-        // synthetic true→null→true sequence NetInfo emits during reconfigure from looking like a
-        // recovery transition (and lets configureAndSubscribe's `prev = undefined` reset stick).
+        // End the post-reconfigure suppression window once reachability settles into a definitive
+        // state. Null/undefined are transient and should not end the window.
         if (state.isInternetReachable === true || state.isInternetReachable === false) {
-            prevIsInternetReachable = state.isInternetReachable;
+            suppressNextReachabilityRestored = false;
         }
+        prevIsInternetReachable = state.isInternetReachable;
     });
 }
 
