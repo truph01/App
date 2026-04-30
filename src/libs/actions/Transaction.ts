@@ -1160,6 +1160,10 @@ function changeTransactionsReport({
                 policyCategories ?? {},
                 policyHasDependentTags,
                 false,
+                undefined,
+                undefined,
+                undefined,
+                true,
             );
             optimisticData.push(violationData);
             failureData.push({

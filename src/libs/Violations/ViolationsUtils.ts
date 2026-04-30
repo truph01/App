@@ -350,6 +350,7 @@ const ViolationsUtils = {
         isSelfDM?: boolean,
         iouReport?: OnyxEntry<Report>,
         isFromExpenseReport?: boolean,
+        shouldRemoveRejectedExpenseViolation?: boolean,
     ): OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS> {
         const isScanning = TransactionUtils.isScanning(updatedTransaction);
         const isScanRequest = TransactionUtils.isScanRequest(updatedTransaction);
@@ -364,8 +365,9 @@ const ViolationsUtils = {
 
         let newTransactionViolations = [...transactionViolations];
 
-        // Remove AUTO_REPORTED_REJECTED_EXPENSE violation when the submitter edits the expense
-        if (iouReport && isFromExpenseReport && isCurrentUserSubmitter(iouReport)) {
+        // Remove AUTO_REPORTED_REJECTED_EXPENSE violation when the submitter edits the expense, when the transaction is moved to a different report,
+        // or when explicitly requested (e.g. from changeTransactionsReport)
+        if (shouldRemoveRejectedExpenseViolation || (iouReport && isFromExpenseReport && isCurrentUserSubmitter(iouReport))) {
             const hasRejectedExpenseViolation = newTransactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE);
             if (hasRejectedExpenseViolation) {
                 newTransactionViolations = newTransactionViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE);

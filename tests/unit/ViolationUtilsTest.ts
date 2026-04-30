@@ -1274,6 +1274,38 @@ describe('getViolationsOnyxData', () => {
             expect(result.value).toEqual([]);
         });
     });
+
+    describe('shouldRemoveRejectedExpenseViolation (move transaction / explicit removal)', () => {
+        const autoRejectedViolation: TransactionViolation = {
+            name: CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE,
+            type: CONST.VIOLATION_TYPES.VIOLATION,
+            showInReview: true,
+        };
+
+        it('removes AUTO_REPORTED_REJECTED_EXPENSE from output when the 11th param is true', () => {
+            const result = ViolationsUtils.getViolationsOnyxData(
+                transaction,
+                [autoRejectedViolation],
+                policy,
+                policyTags,
+                policyCategories,
+                false,
+                false,
+                undefined,
+                undefined,
+                undefined,
+                true,
+            );
+            const violations = (result.value ?? []) as TransactionViolation[];
+            expect(violations.some((v) => v.name === CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE)).toBe(false);
+        });
+
+        it('keeps AUTO_REPORTED_REJECTED_EXPENSE when the 11th param is omitted and submitter-edit branch does not apply', () => {
+            const result = ViolationsUtils.getViolationsOnyxData(transaction, [autoRejectedViolation], policy, policyTags, policyCategories, false, false);
+            const violations = (result.value ?? []) as TransactionViolation[];
+            expect(violations.some((v) => v.name === CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE)).toBe(true);
+        });
+    });
 });
 
 const getFakeTransaction = (transactionID: string, comment?: Transaction['comment']) => ({
