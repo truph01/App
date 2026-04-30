@@ -11669,15 +11669,11 @@ function prepareOnboardingOnyxData({
     // Includes MICRO_SMALL, MICRO_MEDIUM, and the deprecated MICRO for backwards compatibility.
     const isPhase1Cohort =
         companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL || companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_MEDIUM || companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO;
-    // Followups path activates for MANAGE_TEAM + Phase 1 cohort, OR MANAGE_TEAM + suggestedFollowups beta.
-    // Independent of isPostingTasksInAdminsRoom's `+`/phone-primary filter — that filter scopes the
-    // trial-banner placement (#53895, #71355), which is a separate concern. The followups feature
-    // should reach all MANAGE_TEAM cohort users, including `+` test accounts and phone-primary signups.
+    // Followups path: MANAGE_TEAM + (Phase 1 cohort OR suggestedFollowups beta). Reaches every
+    // MANAGE_TEAM cohort user, including `+` aliases and phone-primary signups.
     const shouldUseFollowupsInsteadOfTasks =
         engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && (isPhase1Cohort || Permissions.isBetaEnabled(CONST.BETAS.SUGGESTED_FOLLOWUPS, betas, betaConfiguration));
-    // Posts to #admins room in either path: assigned-guide tasks (existing behavior) or
-    // Concierge-authored followups (Phase 1). Followups override the trial-banner-scoped `+` filter
-    // so cohort users land in #admins regardless of email shape.
+    // Post to #admins room when followups fire OR the existing tasks-in-admins predicate approves.
     const shouldPostTasksInAdminsRoom = shouldUseFollowupsInsteadOfTasks || isPostingTasksInAdminsRoom(engagementChoice);
     const adminsChatReport = deprecatedAllReports?.[`${ONYXKEYS.COLLECTION.REPORT}${adminsChatReportID}`];
     const conciergeChat =
