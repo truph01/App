@@ -38,6 +38,9 @@ const TAB_NAVIGATOR_ROUTES: NavigationPartialRoute[] = TAB_SCREENS.map((name) =>
  * Screens that are registered in PublicScreens (unauthenticated navigator) and should not
  * have TabNavigator prepended, because when the user is unauthenticated TabNavigator does
  * not exist in the navigator tree and the RESET action would fail.
+ *
+ * Keep in sync with the screens registered in PublicScreens.tsx (excluding SCREENS.HOME,
+ * which doubles as the authenticated home tab, and navigator entries).
  */
 const PUBLIC_SCREENS = new Set<string>([
     SCREENS.VALIDATE_LOGIN,
