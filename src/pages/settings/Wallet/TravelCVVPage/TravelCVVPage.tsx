@@ -72,7 +72,11 @@ function TravelCVVPage() {
             hasAutoNavigatedRef.current = true;
             return;
         }
-        // Transient conditions — don't set the ref so the effect retries
+        // Transient conditions — we intentionally do NOT set hasAutoNavigatedRef here.
+        // isOffline and isAccountLocked can change at any time (e.g. the user regains
+        // connectivity or the account is unlocked). By leaving the ref unset, the
+        // effect will re-run and auto-navigate once the blocking condition clears,
+        // rather than permanently giving up and forcing the user to tap "Reveal Details".
         if (isOffline || isAccountLocked) {
             return;
         }
