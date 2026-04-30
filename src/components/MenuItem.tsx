@@ -253,7 +253,7 @@ type MenuItemBaseProps = ForwardedFSClassProps &
         subtitle?: string | number;
 
         /** Any additional styles to apply to the subtitle */
-        subtitleStyle?: StyleProp<TextStyle>;
+        subtitleStyle?: StyleProp<ViewStyle>;
 
         /** Should the title show with normal font weight (not bold) */
         shouldShowBasicTitle?: boolean;
