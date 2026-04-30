@@ -1103,8 +1103,8 @@ function MenuItem({
                                                 )}
                                                 {/* Since subtitle can be of type number, we should allow 0 to be shown */}
                                                 {(subtitle === 0 || !!subtitle) && (
-                                                    <View style={[styles.justifyContentCenter, styles.mr1]}>
-                                                        <Text style={[styles.textLabelSupporting, ...(combinedStyle as TextStyle[]), subtitleStyle]}>{subtitle}</Text>
+                                                    <View style={[styles.justifyContentCenter, styles.mr1, subtitleStyle]}>
+                                                        <Text style={[styles.textLabelSupporting, ...(combinedStyle as TextStyle[])]}>{subtitle}</Text>
                                                     </View>
                                                 )}
                                                 {(!!rightIconAccountID || !!rightIconReportID) && (
