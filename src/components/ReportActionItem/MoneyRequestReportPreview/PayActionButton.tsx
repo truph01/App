@@ -164,7 +164,7 @@ function PayActionButton({
                     introSelected,
                     iouReportCurrentNextStepDeprecated: iouReportNextStep,
                     currentUserAccountID,
-                    currentUserLogin: currentUserEmail,
+                    currentUserLogin: currentUserDetails.login ?? '',
                     activePolicy,
                     policy,
                     betas,
