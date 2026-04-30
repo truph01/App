@@ -1,6 +1,4 @@
 import {useFocusEffect, useRoute} from '@react-navigation/native';
-import {isUserValidatedSelector} from '@selectors/Account';
-import {tierNameSelector} from '@selectors/UserWallet';
 import type {FlashListProps, FlashListRef, ViewToken} from '@shopify/flash-list';
 import React, {useCallback, useContext, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {ForwardedRef} from 'react';
@@ -305,8 +303,6 @@ function SearchList({
     const hasItemsBeingRemoved = prevDataLength && prevDataLength > data.length;
     const personalDetails = usePersonalDetails();
 
-    const [userWalletTierName] = useOnyx(ONYXKEYS.USER_WALLET, {selector: tierNameSelector});
-    const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector});
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID);
     const [lastPaymentMethod] = useOnyx(ONYXKEYS.NVP_LAST_PAYMENT_METHOD);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
@@ -421,6 +417,10 @@ function SearchList({
 
     useImperativeHandle(ref, () => ({scrollToIndex}), [scrollToIndex]);
 
+    const isItemVisible = useCallback((item: SearchListItem) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isOffline, [isOffline]);
+    const firstVisibleIndex = useMemo(() => data.findIndex(isItemVisible), [data, isItemVisible]);
+    const lastVisibleIndex = useMemo(() => data.findLastIndex(isItemVisible), [data, isItemVisible]);
+
     const renderItem = useCallback(
         (item: SearchListItem, index: number, isItemFocused: boolean, onFocus?: (event: NativeSyntheticEvent<ExtendedTargetedEvent>) => void) => {
             const isDisabled = item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
@@ -457,8 +457,6 @@ function SearchList({
                         personalPolicyID={personalPolicyID}
                         userBillingGracePeriodEnds={userBillingGracePeriodEnds}
                         ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
-                        userWalletTierName={userWalletTierName}
-                        isUserValidated={isUserValidated}
                         personalDetails={personalDetails}
                         userBillingFundID={userBillingFundID}
                         isOffline={isOffline}
@@ -468,8 +466,8 @@ function SearchList({
                         newTransactionID={newTransactionID}
                         onUndelete={handleUndelete}
                         keyForList={item.keyForList}
-                        isFirstItem={index === 0}
-                        isLastItem={index === data.length - 1 && !ListFooterComponent}
+                        isFirstItem={index === firstVisibleIndex}
+                        isLastItem={index === lastVisibleIndex && !ListFooterComponent}
                     />
                 </Animated.View>
             );
@@ -491,8 +489,6 @@ function SearchList({
             hash,
             columns,
             policies,
-            userWalletTierName,
-            isUserValidated,
             personalDetails,
             userBillingFundID,
             isOffline,
@@ -506,6 +502,8 @@ function SearchList({
             ListFooterComponent,
             policyForMovingExpenses,
             handleUndelete,
+            firstVisibleIndex,
+            lastVisibleIndex,
         ],
     );
 

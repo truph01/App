@@ -168,7 +168,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
     Beta,
-    DismissedProductTraining,
     Login,
     OnyxInputOrEntry,
     PersonalDetails,
@@ -2393,37 +2392,13 @@ function prepareReportOptionsForDisplay(
 }
 
 /**
- * Whether user submitted already an expense or scanned receipt
- */
-function getIsUserSubmittedExpenseOrScannedReceipt(nvpDismissedProductTraining: OnyxEntry<DismissedProductTraining>): boolean {
-    return !!nvpDismissedProductTraining?.[CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_TOOLTIP];
-}
-
-/**
- * Whether the report is a Manager McTest report
- */
-function isManagerMcTestReport(report: SearchOption<Report>): boolean {
-    return report.participantsList?.some((participant) => participant.accountID === CONST.ACCOUNT_ID.MANAGER_MCTEST) ?? false;
-}
-
-/**
  * Returns a list of logins that should be restricted (i.e., hidden or excluded in the UI)
  * based on dynamic business logic and feature flags.
  * Centralizes restriction logic to avoid scattering conditions across the codebase.
  */
-function getRestrictedLogins(
-    config: GetOptionsConfig,
-    options: OptionList,
-    canShowManagerMcTest: boolean,
-    nvpDismissedProductTraining: OnyxEntry<DismissedProductTraining>,
-): Record<string, boolean> {
-    const userHasReportWithManagerMcTest = Object.values(options.reports).some((report) => isManagerMcTestReport(report));
+function getRestrictedLogins(config: GetOptionsConfig, options: OptionList, canShowManagerMcTest: boolean): Record<string, boolean> {
     return {
-        [CONST.EMAIL.MANAGER_MCTEST]:
-            !canShowManagerMcTest ||
-            (getIsUserSubmittedExpenseOrScannedReceipt(nvpDismissedProductTraining) && !userHasReportWithManagerMcTest) ||
-            !Permissions.isBetaEnabled(CONST.BETAS.NEWDOT_MANAGER_MCTEST, config.betas) ||
-            isCurrentUserMemberOfAnyPolicy(),
+        [CONST.EMAIL.MANAGER_MCTEST]: !canShowManagerMcTest || !Permissions.isBetaEnabled(CONST.BETAS.NEWDOT_MANAGER_MCTEST, config.betas) || isCurrentUserMemberOfAnyPolicy(),
     };
 }
 
@@ -2434,7 +2409,6 @@ function getValidOptions(
     options: OptionList,
     policiesCollection: OnyxCollection<Policy>,
     draftComments: OnyxCollection<string> | undefined,
-    nvpDismissedProductTraining: OnyxEntry<DismissedProductTraining>,
     loginList: OnyxEntry<Login>,
     currentUserAccountID: number,
     currentUserEmail: string,
@@ -2448,7 +2422,7 @@ function getValidOptions(
         selectedOptions = [],
         shouldSeparateSelfDMChat = false,
         shouldSeparateWorkspaceChat = false,
-        excludeHiddenThreads = false,
+        excludeHidden = false,
         canShowManagerMcTest = false,
         searchString,
         searchInputValue,
@@ -2465,7 +2439,7 @@ function getValidOptions(
         ...config
     }: GetOptionsConfig = {},
 ): Options {
-    const restrictedLogins = getRestrictedLogins(config, options, canShowManagerMcTest, nvpDismissedProductTraining);
+    const restrictedLogins = getRestrictedLogins(config, options, canShowManagerMcTest);
 
     // Gather shared configs:
     // Hard exclusions: cannot be selected at all
@@ -2524,6 +2498,18 @@ function getValidOptions(
         };
 
         const filteringFunction = (report: SearchOption<Report>) => {
+            if (excludeHidden) {
+                if (report.isThread && report.notificationPreference === CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN) {
+                    return false;
+                }
+                if (!report.isThread) {
+                    const participant = report.item?.participants?.[currentUserAccountID];
+                    if (participant && isHiddenForCurrentUser(participant.notificationPreference)) {
+                        return false;
+                    }
+                }
+            }
+
             const policy = policiesCollection?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
             if (!isSearchTermsFound(report)) {
                 return false;
@@ -2692,10 +2678,6 @@ function getValidOptions(
         }
     }
 
-    if (excludeHiddenThreads) {
-        recentReportOptions = recentReportOptions.filter((option) => !option.isThread || option.notificationPreference !== CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN);
-    }
-
     let userToInvite: SearchOptionData | null = null;
     if (includeUserToInvite) {
         userToInvite = filterUserToInvite(
@@ -2725,7 +2707,6 @@ function getValidOptions(
 
 type SearchOptionsConfig = {
     options: OptionList;
-    nvpDismissedProductTraining: OnyxEntry<DismissedProductTraining>;
     draftComments: OnyxCollection<string>;
     betas?: Beta[];
     isUsedInChatFinder?: boolean;
@@ -2756,7 +2737,6 @@ type SearchOptionsConfig = {
 function getSearchOptions({
     options,
     draftComments,
-    nvpDismissedProductTraining,
     betas,
     isUsedInChatFinder = true,
     includeReadOnly = true,
@@ -2779,7 +2759,7 @@ function getSearchOptions({
     sortedActions,
     conciergeReportID,
 }: SearchOptionsConfig): Options {
-    const optionList = getValidOptions(options, policyCollection, draftComments, nvpDismissedProductTraining, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
+    const optionList = getValidOptions(options, policyCollection, draftComments, loginList, currentUserAccountID, currentUserEmail, conciergeReportID, {
         betas,
         includeRecentReports,
         includeMultipleParticipantReports: true,
@@ -2792,7 +2772,7 @@ function getSearchOptions({
         includeReadOnly,
         includeSelfDM: true,
         shouldBoldTitleByDefault: !isUsedInChatFinder,
-        excludeHiddenThreads: true,
+        excludeHidden: true,
         maxElements: maxResults,
         includeCurrentUser,
         searchString: searchQuery,
@@ -3429,7 +3409,6 @@ export {
     getHeaderMessageForNonUserList,
     getIOUConfirmationOptionsFromPayeePersonalDetail,
     getIOUReportIDOfLastAction,
-    getIsUserSubmittedExpenseOrScannedReceipt,
     getLastActorDisplayName,
     getLastActorDisplayNameFromLastVisibleActions,
     getLastMessageTextForReport,

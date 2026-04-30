@@ -261,6 +261,7 @@ const webViewStyles = (theme: ThemeColors) =>
 const compactPopoverMenuItemBaseStyle = {
     ...spacing.ph5,
     ...spacing.pv1,
+    minHeight: variables.componentSizeLarge,
     alignItems: 'center' as const,
 };
 
