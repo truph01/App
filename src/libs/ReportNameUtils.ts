@@ -72,7 +72,6 @@ import {
     getRenamedCardFeedMessage,
     getReportAction,
     getReportActionMessage as getReportActionMessageFromActionsUtils,
-    getReportActionMessageText,
     getReportActionText,
     getSettlementAccountLockedMessage,
     getSubmitsToUpdateMessage,
