@@ -53,7 +53,8 @@ const navigateToWorkspacesPage = ({currentUserLogin, shouldUseNarrowLayout, poli
         return;
     }
 
-    // Pop down to the older TAB_NAVIGATOR that still holds the user's workspace state.
+    // Pop to the older TAB_NAVIGATOR holding the workspace state. Target the root stack
+    // explicitly so POP bypasses SearchFullscreenNavigator's PUSH_PARAMS interceptor.
     // https://github.com/Expensify/App/issues/89009
     if (rootState) {
         const topRootIndex = rootState.index ?? rootState.routes.length - 1;
@@ -70,7 +71,7 @@ const navigateToWorkspacesPage = ({currentUserLogin, shouldUseNarrowLayout, poli
             return !!wsState?.routes?.length;
         });
         if (olderTabIdx !== -1) {
-            navigationRef.dispatch(StackActions.pop(topRootIndex - olderTabIdx));
+            navigationRef.dispatch({...StackActions.pop(topRootIndex - olderTabIdx), target: rootState.key});
             return;
         }
     }
