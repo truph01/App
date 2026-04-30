@@ -5131,10 +5131,10 @@ describe('ReportUtils', () => {
             const unholdRequestSpy = jest.spyOn(HoldUtils, 'unholdRequest').mockImplementation(() => undefined);
 
             // When changeMoneyRequestHoldStatus is called
-            changeMoneyRequestHoldStatus(reportAction, iouTransaction, false);
+            changeMoneyRequestHoldStatus(reportAction, iouTransaction, false, currentUserEmail, currentUserAccountID);
 
             // Then unholdRequest should be called with the correct parameters and navigation should not be called
-            expect(unholdRequestSpy).toHaveBeenCalledWith(transactionID, childReportID, expect.objectContaining({id: policyID}), false);
+            expect(unholdRequestSpy).toHaveBeenCalledWith(transactionID, childReportID, expect.objectContaining({id: policyID}), false, currentUserEmail, currentUserAccountID);
             expect(Navigation.navigate).not.toHaveBeenCalled();
         });
 
@@ -5176,7 +5176,7 @@ describe('ReportUtils', () => {
             await waitForBatchedUpdates();
 
             // When changeMoneyRequestHoldStatus is called
-            changeMoneyRequestHoldStatus(reportAction, iouTransaction, false);
+            changeMoneyRequestHoldStatus(reportAction, iouTransaction, false, currentUserEmail, currentUserAccountID);
 
             // Then navigation should be called with the correct parameters
             expect(Navigation.navigate).toHaveBeenCalledWith(
