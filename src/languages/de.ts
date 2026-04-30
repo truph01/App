@@ -2723,11 +2723,8 @@ ${amount} für ${merchant} – ${date}`,
     agentsPage: {
         title: 'Agenten',
         subtitle: 'Automatisiere Aufgaben mit benutzerdefinierten Agenten.',
-        newAgent: 'Neuer Agent',
-        emptyAgents: {
-            title: 'Noch keine Agenten erstellt',
-            subtitle: 'Höre auf, selbst zu arbeiten. Gebe stattdessen einen Agenten befehle und spare dir viel Zeit.',
-        },
+        newAgent: 'Neue*r Agent*in',
+        emptyAgents: {title: 'Keine Agenten erstellt', subtitle: 'Hör auf, Dinge manuell zu erledigen. Weise stattdessen einen Agenten an und spare dir jede Menge Zeit.'},
     },
     expenseRulesPage: {
         title: 'Ausgabenregeln',

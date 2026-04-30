@@ -2727,13 +2727,10 @@ ${amount} pour ${merchant} - ${date}`,
         bankAccountLastFour: (lastFour: string) => `Compte bancaire • ${lastFour}`,
     },
     agentsPage: {
-        title: 'Agents',
+        title: 'Agent·e·s',
         subtitle: 'Automatisez les tâches avec des agents personnalisés.',
         newAgent: 'Nouvel agent',
-        emptyAgents: {
-            title: 'Aucun agent créé',
-            subtitle: 'Arrêtez de faire des choses manuellement. Instruisez un agent à la place et économisez-vous beaucoup de temps.',
-        },
+        emptyAgents: {title: 'Aucun agent créé', subtitle: 'Arrêtez de tout faire manuellement. Donnez plutôt des instructions à un agent et gagnez beaucoup de temps.'},
     },
     expenseRulesPage: {
         title: 'Règles de dépenses',

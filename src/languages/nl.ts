@@ -2715,12 +2715,9 @@ ${amount} voor ${merchant} - ${date}`,
     },
     agentsPage: {
         title: 'Agenten',
-        subtitle: 'Automatiseer taken met aangepaste agenten.',
-        newAgent: 'Nieuwe agent',
-        emptyAgents: {
-            title: 'Geen agenten gemaakt',
-            subtitle: 'Stop met het handmatig doen van dingen. Instruct een agent in plaats daarvan en bespaar je veel tijd.',
-        },
+        subtitle: 'Automatiseer taken met aangepaste agents.',
+        newAgent: 'Nieuwe medewerker',
+        emptyAgents: {title: 'Geen agents aangemaakt', subtitle: 'Stop met dingen handmatig doen. Geef in plaats daarvan een opdracht aan een agent en bespaar jezelf veel tijd.'},
     },
     expenseRulesPage: {
         title: 'Declaratieregels',

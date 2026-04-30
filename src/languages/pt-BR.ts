@@ -2710,10 +2710,7 @@ ${amount} para ${merchant} - ${date}`,
         title: 'Agentes',
         subtitle: 'Automatize tarefas com agentes personalizados.',
         newAgent: 'Novo agente',
-        emptyAgents: {
-            title: 'Nenhum agente criado',
-            subtitle: 'Pare de fazer coisas manualmente. Instrua um agente em vez disso e economize muito tempo.',
-        },
+        emptyAgents: {title: 'Nenhum agente criado', subtitle: 'Pare de fazer tudo manualmente. Instrua um agente e economize muito tempo.'},
     },
     expenseRulesPage: {
         title: 'Regras de despesas',

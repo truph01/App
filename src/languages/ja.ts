@@ -2690,12 +2690,9 @@ ${date} の ${merchant} への ${amount}`,
     },
     agentsPage: {
         title: 'エージェント',
-        subtitle: 'カスタムエージェントでタスクを自動化します。',
+        subtitle: 'カスタムエージェントでタスクを自動化。',
         newAgent: '新しいエージェント',
-        emptyAgents: {
-            title: 'エージェントが作成されていません',
-            subtitle: '手動での作業をやめて、エージェントに指示してください。あなたの時間を節約しましょう。',
-        },
+        emptyAgents: {title: 'エージェントは作成されていません', subtitle: '手作業はやめて、代わりにエージェントに指示を出して、時間を大幅に節約しましょう。'},
     },
     expenseRulesPage: {
         title: '経費ルール',
