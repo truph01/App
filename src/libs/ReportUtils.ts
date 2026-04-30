@@ -111,7 +111,7 @@ import getBase62ReportID from './getBase62ReportID';
 import {isReportMessageAttachment} from './isReportMessageAttachment';
 import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from './LocalePhoneNumber';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
-import {translateLocal} from './Localize';
+import {localeCompareLocal, translateLocal} from './Localize';
 import Log from './Log';
 import {isEmailPublicDomain} from './LoginUtils';
 // eslint-disable-next-line import/no-cycle
@@ -5862,6 +5862,7 @@ function getReportName(reportNameInformation: GetReportNameParams): string {
             const modifiedMessageWithHTML = getForReportAction({
                 // eslint-disable-next-line @typescript-eslint/no-deprecated -- translateLocal is deprecated; getReportName is non-React code that cannot use the translate hook
                 translate: translateLocal,
+                localeCompare: localeCompareLocal,
                 reportAction: parentReportAction,
                 policy,
                 movedFromReport,

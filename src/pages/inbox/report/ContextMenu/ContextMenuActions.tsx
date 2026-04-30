@@ -18,6 +18,7 @@ import {getEnvironmentURL} from '@libs/Environment/Environment';
 import fileDownload from '@libs/fileDownload';
 import getAttachmentDetails from '@libs/fileDownload/getAttachmentDetails';
 import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from '@libs/LocalePhoneNumber';
+import {localeCompareLocal} from '@libs/Localize';
 import {getForReportAction} from '@libs/ModifiedExpenseMessage';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
@@ -852,6 +853,7 @@ const ContextMenuActions: ContextMenuAction[] = [
                 } else if (isModifiedExpenseAction(reportAction)) {
                     const modifyExpenseMessageWithHTML = getForReportAction({
                         translate,
+                        localeCompare: localeCompareLocal,
                         reportAction,
                         policy,
                         movedFromReport,

@@ -18,7 +18,7 @@ type ModifiedExpenseContentProps = {
 };
 
 function ModifiedExpenseContent({action, report, childReport, originalReport}: ModifiedExpenseContentProps) {
-    const {translate} = useLocalize();
+    const {translate, localeCompare} = useLocalize();
     const {email: currentUserEmail} = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
@@ -32,6 +32,7 @@ function ModifiedExpenseContent({action, report, childReport, originalReport}: M
 
     const modifiedExpenseMessage = getForReportAction({
         translate,
+        localeCompare,
         reportAction: action,
         policy,
         movedFromReport,

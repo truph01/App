@@ -5,6 +5,7 @@ import lodashSet from 'lodash/set';
 import type {NullishDeep, OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
+import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import type {Coordinate} from '@components/MapView/MapViewTypes';
 import utils from '@components/MapView/utils';
 import type {UnreportedExpenseListItemType} from '@components/Search/SearchList/ListItem/types';
@@ -1201,28 +1202,13 @@ function getAttendees(transaction: OnyxInputOrEntry<Transaction>, currentUserPer
     return attendees;
 }
 
-// Mirrors LocaleContextProvider (same options + same IntlStore source) so non-React callers sort by the user's preferred locale.
-const ATTENDEES_DISPLAY_COLLATOR_OPTIONS: Intl.CollatorOptions = {usage: 'sort', sensitivity: 'variant', numeric: true, caseFirst: 'upper'};
-const attendeesDisplayCollatorCache = new Map<string, Intl.Collator>();
-
-function getAttendeesDisplayCollator(): Intl.Collator {
-    const locale = IntlStore.getCurrentLocale() ?? '';
-    let collator = attendeesDisplayCollatorCache.get(locale);
-    if (!collator) {
-        collator = new Intl.Collator(locale || undefined, ATTENDEES_DISPLAY_COLLATOR_OPTIONS);
-        attendeesDisplayCollatorCache.set(locale, collator);
-    }
-    return collator;
-}
-
 /**
  * Returns attendees joined as an alphabetically sorted display string. Sort is part of the contract — every consumer relies on it.
  */
-function getAttendeesListDisplayString(attendees: Attendee[]): string {
-    const collator = getAttendeesDisplayCollator();
+function getAttendeesListDisplayString(attendees: Attendee[], localeCompare: LocaleContextProps['localeCompare']): string {
     // Lowercase to match sortAlphabetically (the pill sort) so joined string and pill order never disagree on case.
     return [...attendees]
-        .sort((a, b) => collator.compare((a.displayName ?? a.login ?? '').toLowerCase(), (b.displayName ?? b.login ?? '').toLowerCase()))
+        .sort((a, b) => localeCompare((a.displayName ?? a.login ?? '').toLowerCase(), (b.displayName ?? b.login ?? '').toLowerCase()))
         .map((item) => item.displayName ?? item.login)
         .join(', ');
 }
@@ -1230,10 +1216,10 @@ function getAttendeesListDisplayString(attendees: Attendee[]): string {
 /**
  * Return the list of attendees as a string and modified list of attendees as a string if present.
  */
-function getFormattedAttendees(modifiedAttendees?: Attendee[], attendees?: Attendee[]): [string, string] {
+function getFormattedAttendees(localeCompare: LocaleContextProps['localeCompare'], modifiedAttendees?: Attendee[], attendees?: Attendee[]): [string, string] {
     const oldAttendees = modifiedAttendees ?? [];
     const newAttendees = attendees ?? [];
-    return [getAttendeesListDisplayString(oldAttendees), getAttendeesListDisplayString(newAttendees)];
+    return [getAttendeesListDisplayString(oldAttendees, localeCompare), getAttendeesListDisplayString(newAttendees, localeCompare)];
 }
 
 /**

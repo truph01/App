@@ -1392,12 +1392,14 @@ describe('TransactionUtils', () => {
     });
 
     describe('getAttendeesListDisplayString', () => {
+        const localeCompare = (a: string, b: string) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'variant', caseFirst: 'upper'});
+
         it('returns attendees alphabetically regardless of insertion order (deploy blocker #89130)', () => {
             const attendees: Attendee[] = [
                 {email: 'b@x.com', displayName: 'banana', avatarUrl: '', login: 'b@x.com'},
                 {email: 'a@x.com', displayName: 'apple', avatarUrl: '', login: 'a@x.com'},
             ];
-            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('apple, banana');
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees, localeCompare)).toBe('apple, banana');
         });
 
         it('uses numeric-aware sort so "User 9" comes before "User 10"', () => {
@@ -1405,7 +1407,7 @@ describe('TransactionUtils', () => {
                 {email: '10@x.com', displayName: 'User 10', avatarUrl: '', login: '10@x.com'},
                 {email: '9@x.com', displayName: 'User 9', avatarUrl: '', login: '9@x.com'},
             ];
-            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('User 9, User 10');
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees, localeCompare)).toBe('User 9, User 10');
         });
 
         it('compares case-insensitively so the joined string matches pill order', () => {
@@ -1413,11 +1415,11 @@ describe('TransactionUtils', () => {
                 {email: 'b@x.com', displayName: 'Bob', avatarUrl: '', login: 'b@x.com'},
                 {email: 'a@x.com', displayName: 'alice', avatarUrl: '', login: 'a@x.com'},
             ];
-            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('alice, Bob');
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees, localeCompare)).toBe('alice, Bob');
         });
 
         it('returns empty string for empty array', () => {
-            expect(TransactionUtils.getAttendeesListDisplayString([])).toBe('');
+            expect(TransactionUtils.getAttendeesListDisplayString([], localeCompare)).toBe('');
         });
 
         it('does not mutate the input array', () => {
@@ -1426,7 +1428,7 @@ describe('TransactionUtils', () => {
                 {email: 'a@x.com', displayName: 'apple', avatarUrl: '', login: 'a@x.com'},
             ];
             const snapshot = [...attendees];
-            TransactionUtils.getAttendeesListDisplayString(attendees);
+            TransactionUtils.getAttendeesListDisplayString(attendees, localeCompare);
             expect(attendees).toEqual(snapshot);
         });
     });

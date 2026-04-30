@@ -199,5 +199,23 @@ function getDevicePreferredLocale(): Locale {
     return RNLocalize.findBestLanguageTag(Object.values(CONST.LOCALES))?.languageTag ?? CONST.LOCALES.DEFAULT;
 }
 
+const COLLATOR_OPTIONS: Intl.CollatorOptions = {usage: 'sort', sensitivity: 'variant', numeric: true, caseFirst: 'upper'};
+const localeCompareCache = new Map<string, (a: string, b: string) => number>();
+
+/**
+ * Locale-aware string comparator for non-React callers (mirrors `translateLocal`). React code should use the
+ * `localeCompare` returned by `useLocalize` instead.
+ */
+function localeCompareLocal(a: string, b: string): number {
+    const locale = IntlStore.getCurrentLocale() ?? '';
+    let compare = localeCompareCache.get(locale);
+    if (!compare) {
+        const collator = new Intl.Collator(locale || undefined, COLLATOR_OPTIONS);
+        compare = (left, right) => collator.compare(left, right);
+        localeCompareCache.set(locale, compare);
+    }
+    return compare(a, b);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-deprecated
-export {translate, translateLocal, formatList, formatMessageElementList, getDevicePreferredLocale};
+export {translate, translateLocal, localeCompareLocal, formatList, formatMessageElementList, getDevicePreferredLocale};
