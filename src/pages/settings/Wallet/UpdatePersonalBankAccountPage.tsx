@@ -29,6 +29,15 @@ const PAGE_NAME = CONST.UPDATE_PERSONAL_BANK_ACCOUNT.PAGE_NAME;
 
 const PAGE_NAMES: string[] = [PAGE_NAME.LEGAL_NAME, PAGE_NAME.ADDRESS, PAGE_NAME.PHONE_NUMBER];
 
+type SubmittedAddress = {
+    addressStreet: string;
+    addressStreet2: string;
+    addressCity: string;
+    addressState: string;
+    addressZipCode: string;
+    country: string | undefined;
+};
+
 function UpdateLegalName({isEditing, onNext, onMove}: SubStepProps) {
     return (
         <LegalName
@@ -124,10 +133,13 @@ function UpdatePersonalBankAccountPage() {
         Navigation.goBack(ROUTES.SETTINGS_WALLET);
     };
 
-    const submitPersonalInfo = () => {
+    const submitPersonalInfo = (finishData?: unknown) => {
         if (!personalBankAccount?.bankAccountID || personalBankAccount?.isLoading) {
             return;
         }
+
+        // AddressStep forwards its form values via finishData so prefilled fields (e.g. auto-filled zip) aren't lost.
+        const submittedAddress = finishData as SubmittedAddress | undefined;
 
         const existingData = bankAccountList?.[String(personalBankAccount.bankAccountID)]?.accountData?.additionalData;
         const currentAddress = getCurrentAddress(privatePersonalDetails);
@@ -142,7 +154,13 @@ function UpdatePersonalBankAccountPage() {
         let addressState: string;
         let addressZipCode: string;
 
-        if (homeAddressDraft?.addressLine1) {
+        if (submittedAddress?.addressStreet) {
+            addressStreet = submittedAddress.addressStreet;
+            addressStreet2 = submittedAddress.addressStreet2;
+            addressCity = submittedAddress.addressCity;
+            addressState = submittedAddress.addressState;
+            addressZipCode = submittedAddress.addressZipCode;
+        } else if (homeAddressDraft?.addressLine1) {
             addressStreet = homeAddressDraft.addressLine1;
             addressStreet2 = homeAddressDraft.addressLine2 ?? '';
             addressCity = homeAddressDraft.city ?? '';
@@ -211,9 +229,9 @@ function UpdatePersonalBankAccountPage() {
         prevPage();
     };
 
-    const handleNextPage = () => {
+    const handleNextPage = (data?: unknown) => {
         clearPersonalBankAccountErrors();
-        nextPage();
+        nextPage(data);
     };
 
     if (shouldShowSuccess) {

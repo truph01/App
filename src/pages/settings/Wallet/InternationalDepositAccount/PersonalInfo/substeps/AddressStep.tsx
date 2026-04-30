@@ -107,15 +107,16 @@ function AddressStep({onNext, isEditing, shouldSaveDraft = false, shouldHideCoun
     };
 
     const updateAddress = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.HOME_ADDRESS_FORM>) => {
-        setDraftValues(ONYXKEYS.FORMS.PERSONAL_BANK_ACCOUNT_FORM, {
+        const submittedAddress = {
             addressStreet: values.addressLine1?.trim() ?? '',
             addressStreet2: values.addressLine2?.trim() ?? '',
             addressCity: values.city?.trim() ?? '',
             addressState: values.state?.trim() ?? '',
             addressZipCode: values?.zipPostCode?.trim().toUpperCase() ?? '',
             country: currentCountry,
-        });
-        onNext();
+        };
+        setDraftValues(ONYXKEYS.FORMS.PERSONAL_BANK_ACCOUNT_FORM, submittedAddress);
+        onNext(submittedAddress);
     };
 
     return (
