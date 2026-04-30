@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
@@ -45,6 +45,25 @@ function TravelCVVPage() {
     useEffect(() => () => setCvv(null), [setCvv]);
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
+
+    // Auto-navigate to the magic code screen on first mount so the user
+    // doesn't have to click "Reveal Details" manually.
+    const hasAutoNavigatedRef = useRef(false);
+    useEffect(() => {
+        if (hasAutoNavigatedRef.current) {
+            return;
+        }
+        // Wait for the account Onyx record to load so isSignedInAsDelegate is reliable
+        if (account === undefined) {
+            return;
+        }
+        if (cvv || isSignedInAsDelegate || isOffline || isAccountLocked) {
+            return;
+        }
+        hasAutoNavigatedRef.current = true;
+        resetValidateActionCodeSent();
+        Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
+    }, [account, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
 
     const handleRevealDetailsPress = useCallback(() => {
         if (isAccountLocked) {
