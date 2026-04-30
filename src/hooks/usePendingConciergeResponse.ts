@@ -48,9 +48,9 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     // pendingResponse/tokens/fullHtml — without this snapshot, those non-content
     // updates would cancel the running interval and restart the reveal. The
     // useEffect keeps ref writes in the commit phase (React-Compiler-safe).
-    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent});
+    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent, persistedAction});
     useEffect(() => {
-        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent};
+        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent, persistedAction};
     });
 
     // Reconciliation: when the canonical reportComment lands in REPORT_ACTIONS
@@ -146,12 +146,13 @@ function usePendingConciergeResponse(reportID: string | undefined) {
                 arrivedAtElapsedMs: arrival?.elapsedMs,
             });
             dispatch('completed', snapshotTokens.at(-1) ?? snapshotHtml);
-            // If acceleration fired, the canonical reportComment already landed in
-            // REPORT_ACTIONS. Re-applying our older optimistic payload would clobber
-            // server-added markup (e.g. follow-up buttons) until the next server
-            // update. Just clear the pending state in that case — the synthetic
-            // bubble fades into the canonical row.
-            if (arrival) {
+            // If the canonical reportComment is already in REPORT_ACTIONS at completion
+            // time — whether acceleration fired or it landed during the pre-trickle
+            // setTimeout (when accelerate runs but no-ops because intervalID is null) —
+            // re-applying our older optimistic would clobber server-added markup
+            // (follow-up buttons, deep-link Pressables) until the next server update.
+            // Read live from the ref so we catch arrivals the accelerator missed.
+            if (arrival || trickleInputsRef.current.persistedAction) {
                 discardPendingConciergeAction(reportID);
             } else {
                 applyPendingConciergeAction(reportID, reportAction);
