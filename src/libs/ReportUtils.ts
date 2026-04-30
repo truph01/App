@@ -11670,7 +11670,7 @@ function prepareOnboardingOnyxData({
     const isPhase1Cohort =
         companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL || companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_MEDIUM || companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO;
     // Followups path: MANAGE_TEAM + (Phase 1 cohort OR suggestedFollowups beta). Reaches every
-    // MANAGE_TEAM cohort user, including `+` aliases and phone-primary signups.
+    // MANAGE_TEAM cohort user, including `+` aliases and phone-primary sign-ups.
     const shouldUseFollowupsInsteadOfTasks =
         engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && (isPhase1Cohort || Permissions.isBetaEnabled(CONST.BETAS.SUGGESTED_FOLLOWUPS, betas, betaConfiguration));
     // Post to #admins room when followups fire OR the existing tasks-in-admins predicate approves.

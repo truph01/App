@@ -811,7 +811,7 @@ describe('ReportUtils', () => {
 
         it('should generate followups (not tasks) for `+` email users in the MANAGE_TEAM + MICRO Phase 1 cohort', async () => {
             // Phase 1 cohort opens the followups path to all MANAGE_TEAM 1-10 users — including `+` aliases
-            // and phone-primary signups. The `+` exclusion in `isPostingTasksInAdminsRoom` was scoped to
+            // and phone-primary sign-ups. The `+` exclusion in `isPostingTasksInAdminsRoom` was scoped to
             // the trial-banner placement (PR #53895, #71355) and must not block followups for cohort users.
             const adminsChatReportID = '1';
             await waitForBatchedUpdates();
