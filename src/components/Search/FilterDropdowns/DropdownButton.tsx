@@ -195,7 +195,7 @@ function DropdownButton({
                             <Button
                                 small
                                 shouldRemoveLeftBorderRadius
-                                innerStyles={[styles.pl0, styles.pr0half, styles.dropDownButtonCartIcon]}
+                                innerStyles={[styles.pl0, styles.pr0half, styles.filterDropDownCloseIcon]}
                                 onPress={onClosePress}
                             >
                                 <Icon
