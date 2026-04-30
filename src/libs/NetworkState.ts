@@ -274,13 +274,16 @@ function configureAndSubscribe() {
     // null→true transition that would look like a recovery — suppress the next would-be recovery
     // until reachability settles. Initial subscription is left untouched so boot behavior is
     // unchanged (prev=undefined boot guard already covers it).
+    // Skip suppression when prev was already false: the app was genuinely offline before
+    // reconfigure, so the next true is a real recovery we must not drop (otherwise
+    // internetUnreachable stays set and the app is stuck offline until a new outage cycle).
     const isReconfigure = unsubscribeNetInfo !== null;
     if (unsubscribeNetInfo) {
         unsubscribeNetInfo();
         unsubscribeNetInfo = null;
     }
 
-    if (isReconfigure) {
+    if (isReconfigure && prevIsInternetReachable !== false) {
         suppressNextReachabilityRestored = true;
     }
 

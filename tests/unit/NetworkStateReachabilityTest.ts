@@ -199,6 +199,26 @@ describe('NetworkState — reachability recovery triggers reconnect', () => {
         expect(reconnectListener).toHaveBeenCalledTimes(1);
     });
 
+    test('genuine offline before reconfigure still recovers on the next true', () => {
+        // Boot offline scenario: NetInfo confirms unreachable BEFORE SESSION hydrates and triggers
+        // a reconfigure. The post-reconfigure true must NOT be suppressed — otherwise the app would
+        // remain stuck with internetUnreachable=true until a brand new outage cycle.
+        const reconnectListener = jest.fn();
+        onReachabilityConfirmed(reconnectListener);
+
+        // Cold boot: null then false → app is genuinely offline, prev=false
+        fireNetInfoState({isInternetReachable: null});
+        fireNetInfoState({isInternetReachable: false});
+
+        // SESSION hydrates → reconfigure happens while we are still offline
+        fireSessionChange(42);
+
+        // New subscription's first definitive event recovers
+        fireNetInfoState({isInternetReachable: true});
+
+        expect(reconnectListener).toHaveBeenCalledTimes(1);
+    });
+
     test('turning off force-offline resets prevIsInternetReachable so next refresh triggers reconnect', () => {
         const reconnectListener = jest.fn();
         onReachabilityConfirmed(reconnectListener);
