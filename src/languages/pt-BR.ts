@@ -4794,6 +4794,7 @@ ${amount} para ${merchant} - ${date}`,
 
                             Se quiser definir um fornecedor específico para cada cartão, vá em *Configurações > Domínios > Cartões Corporativos*.
                         `),
+                        travelDescription: 'As despesas de viagem serão exportadas como lançamentos contábeis para a conta NetSuite especificada abaixo.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:

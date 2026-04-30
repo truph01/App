@@ -4738,6 +4738,7 @@ ${amount} para ${merchant} - ${date}`,
 
                             Si deseas establecer un proveedor específico para cada tarjeta, ve a *Configuraciones > Dominios > Tarjetas de Empresa*.
                         `),
+                        travelDescription: 'Los gastos de viaje se exportarán como asientos contables a la cuenta de NetSuite especificada a continuación.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:

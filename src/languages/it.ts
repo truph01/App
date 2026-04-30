@@ -4807,6 +4807,7 @@ ${amount} per ${merchant} - ${date}`,
 
                             Se desideri impostare un fornitore specifico per ogni carta, vai su *Impostazioni > Domini > Carte aziendali*.
                         `),
+                        travelDescription: 'Le spese di viaggio verranno esportate come registrazioni contabili sull’account NetSuite specificato di seguito.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:

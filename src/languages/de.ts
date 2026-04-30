@@ -4823,6 +4823,7 @@ ${amount} für ${merchant} – ${date}`,
 
                             Wenn du für jede Karte einen bestimmten Lieferanten festlegen möchtest, gehe zu *Einstellungen > Domains > Firmenkarten*.
                         `),
+                        travelDescription: 'Reisekosten werden als Journaleinträge in das unten angegebene NetSuite-Konto exportiert.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:

@@ -4791,6 +4791,7 @@ ${amount} dla ${merchant} - ${date}`,
 
                             Jeśli chcesz ustawić konkretnego dostawcę dla każdej karty, przejdź do *Ustawienia > Domeny > Karty firmowe*.
                         `),
+                        travelDescription: 'Wydatki na podróże służbowe zostaną wyeksportowane jako zapisy księgowe na konto NetSuite wskazane poniżej.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:

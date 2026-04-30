@@ -4685,6 +4685,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
 
                             如果你希望为每张卡设置特定供应商，请前往 *设置 > 域 > 公司卡*。
                         `),
+                        travelDescription: '差旅报销将作为日记账分录导出到下方指定的 NetSuite 账户。',
                     },
                 },
                 expenseReportDestinationConfirmDescription:

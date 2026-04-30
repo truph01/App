@@ -4800,6 +4800,7 @@ ${amount} voor ${merchant} - ${date}`,
 
                             Als je voor elke kaart een specifieke leverancier wilt instellen, ga dan naar *Instellingen > Domeinen > Bedrijfspassen*.
                         `),
+                        travelDescription: 'Reiskosten worden geëxporteerd als journaalposten naar de hieronder opgegeven NetSuite-rekening.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:
