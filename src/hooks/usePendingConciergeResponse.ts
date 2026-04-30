@@ -48,27 +48,20 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     // pendingResponse/tokens/fullHtml — without this snapshot, those non-content
     // updates would cancel the running interval and restart the reveal. The
     // useEffect keeps ref writes in the commit phase (React-Compiler-safe).
-    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent, persistedAction});
+    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent});
     useEffect(() => {
-        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent, persistedAction};
+        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent};
     });
 
     // Reconciliation: when the canonical reportComment lands in REPORT_ACTIONS
     // mid-trickle, fire the running loop's accelerator so the remaining reveal
-    // finishes in ~1.5s instead of snapping the synthetic bubble closed. If the
-    // canonical lands while no trickle is running (e.g. arrived while the user
-    // was on a different report), drop the pending optimistic so we don't
-    // reapply it on top of the canonical on remount.
+    // finishes in ~1.5s instead of snapping the synthetic bubble closed.
     useEffect(() => {
-        if (!persistedAction) {
+        if (!persistedAction || !accelerateRef.current) {
             return;
         }
-        if (accelerateRef.current) {
-            accelerateRef.current(Date.now());
-        } else {
-            discardPendingConciergeAction(reportID);
-        }
-    }, [persistedAction, reportID]);
+        accelerateRef.current(Date.now());
+    }, [persistedAction]);
 
     useEffect(() => {
         if (!reportID || !reportActionID) {
@@ -78,15 +71,8 @@ function usePendingConciergeResponse(reportID: string | undefined) {
         // when it began; subsequent updates that share this same reportActionID don't
         // disturb the in-progress reveal. A genuinely new Concierge reply produces a
         // new reportActionID and re-enters this effect via the deps below.
-        const {pendingResponse: snapshot, fullHtml: snapshotHtml, tokens: snapshotTokens, persistedAction: snapshotPersisted} = trickleInputsRef.current;
+        const {pendingResponse: snapshot, fullHtml: snapshotHtml, tokens: snapshotTokens} = trickleInputsRef.current;
         if (!snapshot) {
-            return;
-        }
-        // If the canonical reportComment is already in REPORT_ACTIONS at mount,
-        // there's nothing to optimistically reveal — discard pending so we don't
-        // re-apply the optimistic on top of the canonical.
-        if (snapshotPersisted) {
-            discardPendingConciergeAction(reportID);
             return;
         }
         const {reportAction, displayAfter} = snapshot;
@@ -186,13 +172,6 @@ function usePendingConciergeResponse(reportID: string | undefined) {
 
         const startTrickle = () => {
             if (cancelled) {
-                return;
-            }
-            // Late-arrival guard: the canonical reportComment may have landed
-            // during the pre-trickle setTimeout window. Skip the trickle so we
-            // don't apply the optimistic on top of the canonical at completion.
-            if (trickleInputsRef.current.persistedAction) {
-                discardPendingConciergeAction(reportID);
                 return;
             }
             // Anchor to displayAfter so revisit resumes at the wall-clock-correct
