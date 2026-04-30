@@ -105,6 +105,7 @@ describe('GettingStartedSection', () => {
             await waitForBatchedUpdates();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.queryByText('homePage.gettingStartedSection.title')).toBeNull();
         });
@@ -115,6 +116,7 @@ describe('GettingStartedSection', () => {
             });
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.queryByText('homePage.gettingStartedSection.title')).toBeNull();
         });
@@ -139,6 +141,7 @@ describe('GettingStartedSection', () => {
             await waitForBatchedUpdates();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.queryByText('homePage.gettingStartedSection.title')).toBeNull();
         });
@@ -163,6 +166,7 @@ describe('GettingStartedSection', () => {
             await waitForBatchedUpdates();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.queryByText('homePage.gettingStartedSection.title')).toBeNull();
         });
@@ -171,6 +175,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.title')).toBeTruthy();
         });
@@ -193,6 +198,7 @@ describe('GettingStartedSection', () => {
             await waitForBatchedUpdates();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.title')).toBeTruthy();
         });
@@ -203,6 +209,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.title')).toBeTruthy();
         });
@@ -213,6 +220,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.createWorkspace')).toBeTruthy();
         });
@@ -221,6 +229,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({integration: 'quickbooksOnline', areAccountingEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText(/homePage\.gettingStartedSection\.connectAccounting/)).toBeTruthy();
         });
@@ -229,6 +238,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({integration: 'xero', areAccountingEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText(/homePage\.gettingStartedSection\.connectAccounting/)).toBeTruthy();
         });
@@ -237,6 +247,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({integration: 'other', areCategoriesEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.customizeCategories')).toBeTruthy();
             expect(screen.queryByText(/homePage\.gettingStartedSection\.connectAccounting/)).toBeNull();
@@ -246,6 +257,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({integration: 'none', areCategoriesEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.customizeCategories')).toBeTruthy();
         });
@@ -254,6 +266,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({areCompanyCardsEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.linkCompanyCards')).toBeTruthy();
         });
@@ -262,6 +275,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({areCompanyCardsEnabled: false});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.linkCompanyCards')).toBeTruthy();
         });
@@ -270,6 +284,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({areRulesEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText('homePage.gettingStartedSection.setupRules')).toBeTruthy();
         });
@@ -278,6 +293,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({areRulesEnabled: false});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.queryByText('homePage.gettingStartedSection.setupRules')).toBeNull();
         });
@@ -291,6 +307,7 @@ describe('GettingStartedSection', () => {
             });
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const allRows = screen.getAllByText(/homePage\.gettingStartedSection\./);
             const rowTexts = allRows.map((el) => (el.props as {children: string}).children);
@@ -310,6 +327,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const createRow = screen.getByText('homePage.gettingStartedSection.createWorkspace');
             const parentRow = createRow.parent;
@@ -324,6 +342,7 @@ describe('GettingStartedSection', () => {
             });
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             expect(screen.getByText(/homePage\.gettingStartedSection\.connectAccounting/)).toBeTruthy();
         });
@@ -334,6 +353,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState();
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const row = screen.getByText('homePage.gettingStartedSection.createWorkspace');
             fireEvent.press(row);
@@ -345,6 +365,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({integration: 'quickbooksOnline', areAccountingEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const row = screen.getByText(/homePage\.gettingStartedSection\.connectAccounting/);
             fireEvent.press(row);
@@ -356,6 +377,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({integration: 'other', areCategoriesEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const row = screen.getByText('homePage.gettingStartedSection.customizeCategories');
             fireEvent.press(row);
@@ -367,6 +389,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({areCompanyCardsEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const row = screen.getByText('homePage.gettingStartedSection.linkCompanyCards');
             fireEvent.press(row);
@@ -378,6 +401,7 @@ describe('GettingStartedSection', () => {
             await setManageTeamUserState({areRulesEnabled: true});
 
             renderGettingStartedSection();
+            await waitForBatchedUpdates();
 
             const row = screen.getByText('homePage.gettingStartedSection.setupRules');
             fireEvent.press(row);

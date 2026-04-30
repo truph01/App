@@ -85,6 +85,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
             expect(result.current.items).toEqual([]);
@@ -100,6 +101,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
         });
@@ -108,6 +110,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(true);
             expect(result.current.items.length).toBeGreaterThan(0);
@@ -124,6 +127,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(true);
         });
@@ -138,6 +142,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
         });
@@ -152,6 +157,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(true);
         });
@@ -166,6 +172,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
         });
@@ -179,6 +186,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
         });
@@ -189,6 +197,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const createWorkspaceItem = result.current.items.find((item) => item.key === 'createWorkspace');
             expect(createWorkspaceItem).toBeDefined();
@@ -198,6 +207,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const createWorkspaceItem = result.current.items.find((item) => item.key === 'createWorkspace');
             expect(createWorkspaceItem?.isComplete).toBe(true);
@@ -207,6 +217,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.items.at(0)?.key).toBe('createWorkspace');
         });
@@ -215,6 +226,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const createWorkspaceItem = result.current.items.find((item) => item.key === 'createWorkspace');
             expect(createWorkspaceItem?.route).toBe(ROUTES.WORKSPACE_OVERVIEW.getRoute(POLICY_ID));
@@ -234,6 +246,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: key, policy: {areConnectionsEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem).toBeDefined();
@@ -244,6 +257,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO, policy: {areConnectionsEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem?.route).toBe(ROUTES.WORKSPACE_ACCOUNTING.getRoute(POLICY_ID));
@@ -256,6 +270,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem?.isComplete).toBe(false);
@@ -277,6 +292,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem?.isComplete).toBe(true);
@@ -298,6 +314,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem?.isComplete).toBe(false);
@@ -319,6 +336,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem?.isComplete).toBe(true);
@@ -328,6 +346,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO, policy: {areConnectionsEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem).toBeUndefined();
@@ -348,6 +367,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem).toBeDefined();
@@ -358,6 +378,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem).toBeDefined();
@@ -367,6 +388,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: CONST.POLICY.CONNECTIONS.NAME.QBO, policy: {areConnectionsEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem?.isFeatureEnabled).toBe(true);
@@ -388,6 +410,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem).toBeDefined();
@@ -402,6 +425,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting, policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem).toBeDefined();
@@ -411,6 +435,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: 'none', policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem?.isFeatureEnabled).toBe(true);
@@ -420,6 +445,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: 'none', policy: {areCategoriesEnabled: false}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem).toBeDefined();
@@ -430,6 +456,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: 'none', policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem?.route).toBe(ROUTES.WORKSPACE_CATEGORIES.getRoute(POLICY_ID));
@@ -439,6 +466,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: 'none', policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const connectItem = result.current.items.find((item) => item.key === 'connectAccounting');
             expect(connectItem).toBeUndefined();
@@ -448,6 +476,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: 'none', policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem?.isComplete).toBe(false);
@@ -472,6 +501,7 @@ describe('useGettingStartedItems', () => {
             await setupManageTeamScenario({accounting: 'none', policy: {areCategoriesEnabled: true}});
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const categoriesItem = result.current.items.find((item) => item.key === 'customizeCategories');
             expect(categoriesItem?.isComplete).toBe(true);
@@ -486,6 +516,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const companyCardsItem = result.current.items.find((item) => item.key === 'linkCompanyCards');
             expect(companyCardsItem).toBeDefined();
@@ -498,6 +529,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const companyCardsItem = result.current.items.find((item) => item.key === 'linkCompanyCards');
             expect(companyCardsItem?.isFeatureEnabled).toBe(true);
@@ -510,6 +542,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const companyCardsItem = result.current.items.find((item) => item.key === 'linkCompanyCards');
             expect(companyCardsItem?.isFeatureEnabled).toBe(false);
@@ -522,6 +555,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const companyCardsItem = result.current.items.find((item) => item.key === 'linkCompanyCards');
             expect(companyCardsItem?.route).toBe(ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(POLICY_ID));
@@ -534,6 +568,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const companyCardsItem = result.current.items.find((item) => item.key === 'linkCompanyCards');
             expect(companyCardsItem?.isComplete).toBe(false);
@@ -548,6 +583,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem).toBeDefined();
@@ -560,6 +596,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem).toBeUndefined();
@@ -572,6 +609,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem).toBeUndefined();
@@ -584,6 +622,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem?.route).toBe(ROUTES.WORKSPACE_RULES.getRoute(POLICY_ID));
@@ -596,6 +635,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem?.isComplete).toBe(false);
@@ -619,6 +659,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem?.isComplete).toBe(true);
@@ -634,6 +675,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const rulesItem = result.current.items.find((item) => item.key === 'setupRules');
             expect(rulesItem?.isComplete).toBe(true);
@@ -648,6 +690,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const keys = result.current.items.map((item) => item.key);
             expect(keys).toEqual(['createWorkspace', 'connectAccounting', 'linkCompanyCards', 'setupRules']);
@@ -660,6 +703,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const keys = result.current.items.map((item) => item.key);
             expect(keys).toEqual(['createWorkspace', 'customizeCategories', 'linkCompanyCards', 'setupRules']);
@@ -672,6 +716,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             const keys = result.current.items.map((item) => item.key);
             expect(keys).toEqual(['createWorkspace', 'connectAccounting', 'linkCompanyCards']);
@@ -686,6 +731,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
             expect(result.current.items).toEqual([]);
@@ -698,6 +744,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
             expect(result.current.items).toEqual([]);
@@ -711,6 +758,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
             expect(result.current.items).toEqual([]);
@@ -723,6 +771,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(false);
             expect(result.current.items).toEqual([]);
@@ -735,6 +784,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(true);
             expect(result.current.items.length).toBeGreaterThan(0);
@@ -747,6 +797,7 @@ describe('useGettingStartedItems', () => {
             });
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(true);
             expect(result.current.items.length).toBeGreaterThan(0);
@@ -764,6 +815,7 @@ describe('useGettingStartedItems', () => {
             await waitForBatchedUpdates();
 
             const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
 
             expect(result.current.shouldShowSection).toBe(true);
         });
