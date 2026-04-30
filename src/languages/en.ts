@@ -2773,6 +2773,15 @@ const translations = {
         defaultPaymentMethod: 'Default',
         bankAccountLastFour: (lastFour: string) => `Bank Account • ${lastFour}`,
     },
+    agentsPage: {
+        title: 'Agents',
+        subtitle: 'Automate tasks with custom agents.',
+        newAgent: 'New agent',
+        emptyAgents: {
+            title: 'No agents created',
+            subtitle: 'Stop manually doing stuff. Instruct an agent instead and save yourself lots of time.',
+        },
+    },
     expenseRulesPage: {
         title: 'Expense rules',
         subtitle: 'These rules will apply to your expenses.',

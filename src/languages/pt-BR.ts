@@ -2706,6 +2706,15 @@ ${amount} para ${merchant} - ${date}`,
         defaultPaymentMethod: 'Padrão',
         bankAccountLastFour: (lastFour: string) => `Conta bancária • ${lastFour}`,
     },
+    agentsPage: {
+        title: 'Agentes',
+        subtitle: 'Automatize tarefas com agentes personalizados.',
+        newAgent: 'Novo agente',
+        emptyAgents: {
+            title: 'Nenhum agente criado',
+            subtitle: 'Pare de fazer coisas manualmente. Instrua um agente em vez disso e economize muito tempo.',
+        },
+    },
     expenseRulesPage: {
         title: 'Regras de despesas',
         findRule: 'Encontrar regra',

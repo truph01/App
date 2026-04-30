@@ -2688,6 +2688,15 @@ ${date} の ${merchant} への ${amount}`,
         defaultPaymentMethod: 'デフォルト',
         bankAccountLastFour: (lastFour: string) => `銀行口座・${lastFour}`,
     },
+    agentsPage: {
+        title: 'エージェント',
+        subtitle: 'カスタムエージェントでタスクを自動化します。',
+        newAgent: '新しいエージェント',
+        emptyAgents: {
+            title: 'エージェントが作成されていません',
+            subtitle: '手動での作業をやめて、エージェントに指示してください。あなたの時間を節約しましょう。',
+        },
+    },
     expenseRulesPage: {
         title: '経費ルール',
         findRule: 'ルールを検索',

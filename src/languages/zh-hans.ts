@@ -2638,6 +2638,15 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         defaultPaymentMethod: '默认',
         bankAccountLastFour: (lastFour: string) => `银行账户 • ${lastFour}`,
     },
+    agentsPage: {
+        title: '智能体',
+        subtitle: '使用自定义智能体自动化任务。',
+        newAgent: '新建智能体',
+        emptyAgents: {
+            title: '未创建任何智能体',
+            subtitle: '停止手动操作。改为指示智能体，节省大量时间。',
+        },
+    },
     expenseRulesPage: {
         title: '报销规则',
         findRule: '查找规则',

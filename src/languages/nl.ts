@@ -2713,6 +2713,15 @@ ${amount} voor ${merchant} - ${date}`,
         defaultPaymentMethod: 'Standaard',
         bankAccountLastFour: (lastFour: string) => `Bankrekening • ${lastFour}`,
     },
+    agentsPage: {
+        title: 'Agenten',
+        subtitle: 'Automatiseer taken met aangepaste agenten.',
+        newAgent: 'Nieuwe agent',
+        emptyAgents: {
+            title: 'Geen agenten gemaakt',
+            subtitle: 'Stop met het handmatig doen van dingen. Instruct een agent in plaats daarvan en bespaar je veel tijd.',
+        },
+    },
     expenseRulesPage: {
         title: 'Declaratieregels',
         findRule: 'Regel zoeken',
