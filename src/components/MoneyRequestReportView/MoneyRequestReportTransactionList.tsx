@@ -581,7 +581,7 @@ function MoneyRequestReportTransactionList({
             scrollToNewTransaction={transaction.transactionID === newTransactions?.at(0)?.transactionID ? scrollToNewTransaction : undefined}
             onArrowRightPress={handleArrowRightPress}
             nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards ?? {}}
-            isLastItem={transaction.transactionID === lastTransactionID}
+            isLastItem={!showPendingExpensePlaceholder && transaction.transactionID === lastTransactionID}
         />
     );
 
