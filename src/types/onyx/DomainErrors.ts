@@ -46,6 +46,11 @@ type DomainSecurityGroupErrors = {
     nameErrors?: OnyxCommon.Errors;
 
     /**
+     * Errors related to the default security group ID setting
+     */
+    defaultSecurityGroupIDErrors?: OnyxCommon.Errors;
+
+    /**
      * Errors related to the restricted expense workspace creation
      */
     enableRestrictedPolicyCreationErrors?: OnyxCommon.Errors;
