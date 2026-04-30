@@ -60,12 +60,16 @@ function TravelCVVPage() {
         if (hasAutoNavigatedRef.current) {
             return;
         }
-        if (isLoadingAccount || isLoadingLockAccountDetails) {
-            return;
-        }
-        // Permanent conditions — set the ref so we never re-check
+        // If the verify-account (magic code) screen is already in the navigation
+        // stack, the user has previously visited it during this mount cycle (e.g.
+        // they completed or cancelled the magic code flow and returned here).
+        // Skip auto-navigation so we don't push a duplicate screen. This check
+        // runs before the loading guards because it doesn't depend on Onyx data.
         if (isVerifyAccountInStack) {
             hasAutoNavigatedRef.current = true;
+            return;
+        }
+        if (isLoadingAccount || isLoadingLockAccountDetails) {
             return;
         }
         if (cvv || isSignedInAsDelegate) {
