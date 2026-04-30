@@ -58,7 +58,7 @@ function getIndexFromLocation(source, line, column) {
  * @returns {value is {type: string; start: number; end: number}}
  */
 function isAstNode(value) {
-    return Boolean(value && typeof value === 'object' && typeof value.type === 'string' && typeof value.start === 'number' && typeof value.end === 'number');
+    return !!value && typeof value === 'object' && typeof value.type === 'string' && typeof value.start === 'number' && typeof value.end === 'number';
 }
 
 /**
@@ -80,7 +80,9 @@ function collectParents(node, parentByNode, parent = null) {
             continue;
         }
         if (Array.isArray(value)) {
-            value.forEach((child) => collectParents(child, parentByNode, node));
+            for (const child of value) {
+                collectParents(child, parentByNode, node);
+            }
             continue;
         }
         collectParents(value, parentByNode, node);

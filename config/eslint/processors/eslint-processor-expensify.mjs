@@ -14,7 +14,8 @@ export default {
 
     preprocess(text, filename) {
         const [textResult] = reactCompilerCompatProcessor.preprocess(text, filename);
-        return seatbeltProcessor.preprocess(textResult, filename);
+        const [afterStratifyPreprocess] = stratifyNoDeprecatedProcessor.preprocess(textResult, filename);
+        return seatbeltProcessor.preprocess(afterStratifyPreprocess, filename);
     },
 
     postprocess(messagesPerBlock, filename) {
