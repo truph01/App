@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback} from 'react';
 import {View} from 'react-native';
 import Checkbox from '@components/Checkbox';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -76,27 +76,23 @@ function MoneyRequestReportGroupHeader({
 
     const shouldShowCheckbox = isSelectionModeEnabled || !shouldUseNarrowLayout;
 
-    const textStyle = useMemo(() => (shouldUseNarrowLayout ? {fontSize: variables.fontSizeLabel, lineHeight: 16} : [styles.labelStrong]), [shouldUseNarrowLayout, styles]);
+    const textStyle = shouldUseNarrowLayout ? {fontSize: variables.fontSizeLabel, lineHeight: 16} : [styles.labelStrong];
 
     const handleToggleSelection = useCallback(() => {
         onToggleSelection?.(groupKey);
     }, [onToggleSelection, groupKey]);
 
-    const desktopGroupHeaderStyle = useMemo(
-        () =>
-            isDesktopTableLayout
-                ? [
-                      {minHeight: variables.tableGroupRowHeight},
-                      styles.justifyContentCenter,
-                      styles.highlightBG,
-                      styles.pv2,
-                      styles.ph3,
-                      styles.borderBottom,
-                      isSelected && {borderColor: theme.buttonHoveredBG},
-                  ]
-                : [styles.ph4, styles.pv3, styles.borderBottom],
-        [isDesktopTableLayout, styles, theme, isSelected],
-    );
+    const desktopGroupHeaderStyle = isDesktopTableLayout
+        ? [
+              {minHeight: variables.tableGroupRowHeight},
+              styles.justifyContentCenter,
+              styles.highlightBG,
+              styles.pv2,
+              styles.ph3,
+              styles.borderBottom,
+              isSelected && {borderColor: theme.buttonHoveredBG},
+          ]
+        : [styles.ph4, styles.pv3, styles.borderBottom];
 
     return (
         <OfflineWithFeedback pendingAction={pendingAction}>
