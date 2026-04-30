@@ -186,12 +186,12 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
     // snapshot after approving it). The inner component falls back to a cached list so the
     // carousel stays visible for continued navigation. setState during render is the React-
     // recommended pattern for storing information from previous renders.
-    const [hasGuardEverPassed, setHasGuardEverPassed] = useState(false);
-    if (isLiveGuardSatisfied && !hasGuardEverPassed) {
-        setHasGuardEverPassed(true);
+    const [shouldKeepMounted, setShouldKeepMounted] = useState(false);
+    if (isLiveGuardSatisfied && !shouldKeepMounted) {
+        setShouldKeepMounted(true);
     }
 
-    if (!isLiveGuardSatisfied && !hasGuardEverPassed) {
+    if (!shouldKeepMounted) {
         return null;
     }
 
