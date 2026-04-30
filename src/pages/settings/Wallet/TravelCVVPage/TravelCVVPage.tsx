@@ -46,6 +46,7 @@ function TravelCVVPage() {
     useEffect(() => () => setCvv(null), [setCvv]);
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
+    const isLoadingAccount = isLoadingOnyxValue(accountMetadata);
 
     // Auto-navigate to the magic code screen on first mount so the user
     // doesn't have to click "Reveal Details" manually.
@@ -55,7 +56,7 @@ function TravelCVVPage() {
             return;
         }
         // Wait for the account Onyx record to load so isSignedInAsDelegate is reliable
-        if (isLoadingOnyxValue(accountMetadata)) {
+        if (isLoadingAccount) {
             return;
         }
         if (cvv || isSignedInAsDelegate || isOffline || isAccountLocked) {
@@ -64,7 +65,7 @@ function TravelCVVPage() {
         hasAutoNavigatedRef.current = true;
         resetValidateActionCodeSent();
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [accountMetadata, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
+    }, [isLoadingAccount, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
 
     const handleRevealDetailsPress = useCallback(() => {
         if (isAccountLocked) {
