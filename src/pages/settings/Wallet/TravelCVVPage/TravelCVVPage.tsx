@@ -1,3 +1,4 @@
+import {useNavigationState} from '@react-navigation/native';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
@@ -19,6 +20,7 @@ import {resetValidateActionCodeSent} from '@libs/actions/User';
 import Navigation from '@libs/Navigation/Navigation';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import SCREENS from '@src/SCREENS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider';
 
@@ -49,6 +51,7 @@ function TravelCVVPage() {
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
     const isLoadingAccount = isLoadingOnyxValue(accountMetadata);
     const isLoadingLockAccountDetails = isLoadingOnyxValue(lockAccountDetailsMetadata);
+    const isVerifyAccountInStack = useNavigationState((state) => state.routes.some((route) => route.name === SCREENS.SETTINGS.WALLET.TRAVEL_CVV_VERIFY_ACCOUNT));
 
     // Auto-navigate to the magic code screen on first mount so the user
     // doesn't have to click "Reveal Details" manually.
@@ -57,18 +60,26 @@ function TravelCVVPage() {
         if (hasAutoNavigatedRef.current) {
             return;
         }
-        // Wait for both the account and lock-account-details Onyx records to load
-        // so isSignedInAsDelegate and isAccountLocked are reliable
         if (isLoadingAccount || isLoadingLockAccountDetails) {
             return;
         }
-        if (cvv || isSignedInAsDelegate || isOffline || isAccountLocked) {
+        // Permanent conditions — set the ref so we never re-check
+        if (isVerifyAccountInStack) {
+            hasAutoNavigatedRef.current = true;
+            return;
+        }
+        if (cvv || isSignedInAsDelegate) {
+            hasAutoNavigatedRef.current = true;
+            return;
+        }
+        // Transient conditions — don't set the ref so the effect retries
+        if (isOffline || isAccountLocked) {
             return;
         }
         hasAutoNavigatedRef.current = true;
         resetValidateActionCodeSent();
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [isLoadingAccount, isLoadingLockAccountDetails, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
+    }, [isLoadingAccount, isLoadingLockAccountDetails, cvv, isSignedInAsDelegate, isOffline, isAccountLocked, isVerifyAccountInStack]);
 
     const handleRevealDetailsPress = useCallback(() => {
         if (isAccountLocked) {
