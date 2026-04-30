@@ -11,13 +11,11 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction, ReportActions} from '@src/types/onyx';
 import useOnyx from './useOnyx';
 
-/** If displayAfter is more than this far in the past, the response is stale (e.g. app was killed and restarted). */
-const STALE_THRESHOLD_MS = 10_000;
 /** Default trickle duration. Targets ~19 chars/sec start (~7/sec end after ease-out) across a typical multi-paragraph response — visibly streaming without dragging the user past the moment they want to read. */
 const DEFAULT_STREAM_DURATION_MS = 15_000;
 /** Trickle tick cadence. 80ms targets ~1 char per tick at char-level granularity — fast enough that the reveal feels continuous, slow enough that the synthetic-bubble re-render budget stays comfortable on RNW (~12 dispatches/sec). */
 const TICK_INTERVAL_MS = 80;
-/** Hard cap on running trickle. If the loop is still alive past this, force completion to avoid pinning a synthetic bubble forever. */
+/** Hard cap on a running trickle and staleness gate on revisit. Past this many ms after `displayAfter`, the canonical reportComment is expected to be in REPORT_ACTIONS already, so we discard the optimistic rather than resume a doomed reveal. */
 const TRICKLE_HARD_CAP_MS = 60_000;
 /** Once the real reportComment lands in REPORT_ACTIONS, finish the remaining reveal within this window. */
 const ACCELERATED_REMAINING_MS = 1_500;
@@ -50,20 +48,27 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     // pendingResponse/tokens/fullHtml — without this snapshot, those non-content
     // updates would cancel the running interval and restart the reveal. The
     // useEffect keeps ref writes in the commit phase (React-Compiler-safe).
-    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent});
+    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent, persistedAction});
     useEffect(() => {
-        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent};
+        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent, persistedAction};
     });
 
     // Reconciliation: when the canonical reportComment lands in REPORT_ACTIONS
     // mid-trickle, fire the running loop's accelerator so the remaining reveal
-    // finishes in ~1.5s instead of snapping the synthetic bubble closed.
+    // finishes in ~1.5s instead of snapping the synthetic bubble closed. If the
+    // canonical lands while no trickle is running (e.g. arrived while the user
+    // was on a different report), drop the pending optimistic so we don't
+    // reapply it on top of the canonical on remount.
     useEffect(() => {
-        if (!persistedAction || !accelerateRef.current) {
+        if (!persistedAction) {
             return;
         }
-        accelerateRef.current(Date.now());
-    }, [persistedAction]);
+        if (accelerateRef.current) {
+            accelerateRef.current(Date.now());
+        } else {
+            discardPendingConciergeAction(reportID);
+        }
+    }, [persistedAction, reportID]);
 
     useEffect(() => {
         if (!reportID || !reportActionID) {
@@ -73,14 +78,23 @@ function usePendingConciergeResponse(reportID: string | undefined) {
         // when it began; subsequent updates that share this same reportActionID don't
         // disturb the in-progress reveal. A genuinely new Concierge reply produces a
         // new reportActionID and re-enters this effect via the deps below.
-        const {pendingResponse: snapshot, fullHtml: snapshotHtml, tokens: snapshotTokens} = trickleInputsRef.current;
+        const {pendingResponse: snapshot, fullHtml: snapshotHtml, tokens: snapshotTokens, persistedAction: snapshotPersisted} = trickleInputsRef.current;
         if (!snapshot) {
+            return;
+        }
+        // If the canonical reportComment is already in REPORT_ACTIONS at mount,
+        // there's nothing to optimistically reveal — discard pending so we don't
+        // re-apply the optimistic on top of the canonical.
+        if (snapshotPersisted) {
+            discardPendingConciergeAction(reportID);
             return;
         }
         const {reportAction, displayAfter} = snapshot;
         const remainingDelay = displayAfter - Date.now();
 
-        if (remainingDelay < -STALE_THRESHOLD_MS) {
+        // Past the hard cap from displayAfter, the server-side canonical reply
+        // is expected to be in REPORT_ACTIONS already. Skip the trickle.
+        if (remainingDelay < -TRICKLE_HARD_CAP_MS) {
             discardPendingConciergeAction(reportID);
             return;
         }
@@ -174,15 +188,35 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             if (cancelled) {
                 return;
             }
-            trickleStart = Date.now();
+            // Late-arrival guard: the canonical reportComment may have landed
+            // during the pre-trickle setTimeout window. Skip the trickle so we
+            // don't apply the optimistic on top of the canonical at completion.
+            if (trickleInputsRef.current.persistedAction) {
+                discardPendingConciergeAction(reportID);
+                return;
+            }
+            // Anchor to displayAfter so revisit resumes at the wall-clock-correct
+            // stage instead of restarting the reveal from char 0.
+            trickleStart = displayAfter;
+            const lastIndex = snapshotTokens.length - 1;
+            const elapsedAtStart = Date.now() - trickleStart;
+            const initialProgress = easeOut(elapsedAtStart / effectiveDuration);
+            // Floor at 1 so a fresh trickle (elapsed ≈ 0) still reveals the leading chunk on the first dispatch.
+            const initialStage = Math.max(1, Math.min(lastIndex, Math.ceil(initialProgress * lastIndex)));
             Log.info('[ConciergeTrickle] start', false, {
                 reportActionID,
                 tokenCount: snapshotTokens.length,
                 durationMs: effectiveDuration,
+                initialStage,
+                elapsedAtStart,
             });
-            dispatch('started', snapshotTokens.at(1) ?? '');
-            lastStage = 1;
-            const lastIndex = snapshotTokens.length - 1;
+            dispatch('started', snapshotTokens.at(initialStage) ?? '');
+            lastStage = initialStage;
+            // If revisited past the duration / cap, finish without scheduling ticks.
+            if (initialProgress >= 1 || elapsedAtStart >= TRICKLE_HARD_CAP_MS) {
+                completeAndApply();
+                return;
+            }
             intervalID = setInterval(() => {
                 const elapsed = Date.now() - trickleStart;
                 const progress = easeOut(elapsed / effectiveDuration);
