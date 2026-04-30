@@ -179,7 +179,7 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
     const snapshotGuardSelector = buildSnapshotGuardSelector(reportID);
     const [snapshotGuard = EMPTY_GUARD] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`, {selector: snapshotGuardSelector});
 
-    const isLiveGuardSatisfied = !!isExpenseReportSearch && snapshotGuard.hasMultiple && snapshotGuard.includesReport;
+    const isLiveGuardSatisfied = isExpenseReportSearch && snapshotGuard.hasMultiple && snapshotGuard.includesReport;
 
     // Once the live snapshot has satisfied the guard during this mount, keep the inner component
     // mounted even if the guard later flips false (e.g. the current report is removed from the
