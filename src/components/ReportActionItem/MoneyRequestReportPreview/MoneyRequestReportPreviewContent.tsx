@@ -130,10 +130,7 @@ function MoneyRequestReportPreviewContent({
     );
 
     const shouldShowLoading =
-        chatReportLoadingState != null &&
-        chatReportLoadingState.hasOnceLoadedReportActions !== true &&
-        transactions.length === 0 &&
-        !chatReportMetadata?.isOptimisticReport;
+        chatReportLoadingState != null && chatReportLoadingState.hasOnceLoadedReportActions !== true && transactions.length === 0 && !chatReportMetadata?.isOptimisticReport;
     // `hasOnceLoadedReportActions` becomes true before transactions populate fully,
     // so we defer the loading state update to ensure transactions are loaded
     const shouldShowLoadingDeferred = useDeferredValue(shouldShowLoading);
