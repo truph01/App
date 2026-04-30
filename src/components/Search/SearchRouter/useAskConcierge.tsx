@@ -4,7 +4,7 @@ import useOnyx from '@hooks/useOnyx';
 import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import useSidePanelReportID from '@hooks/useSidePanelReportID';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
-import {addComment} from '@userActions/Report';
+import {addComment, setConciergeThinkingKickoff} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
@@ -26,6 +26,7 @@ function useAskConcierge() {
         if (!targetReport || !targetReportID) {
             return;
         }
+        setConciergeThinkingKickoff();
         addComment({
             report: targetReport,
             notifyReportID: targetReportID,
