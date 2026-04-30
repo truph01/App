@@ -44,15 +44,12 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     const tokens = tokenizeForReveal(fullHtml);
     const accelerateRef = useRef<((nowMs: number) => void) | null>(null);
 
-    // Trickle inputs that change shape only when the underlying Concierge reply changes
-    // — captured into a ref so the trickle effect can re-run only on (reportID,
-    // reportActionID) without restarting on unrelated re-renders. The user typing in
-    // the composer, an unrelated Onyx emit, or a ConciergeDraftActions context
-    // refresh all produce reference churn for `pendingResponse`/`tokens`/`fullHtml`
-    // that previously cancelled the running trickle and started it over (Pujan's
-    // review on PR #89146 — composer-during-streaming). Updating via useEffect keeps
-    // ref-writes in the commit phase (React-Compiler-safe) while the trickle effect
-    // below reads the up-to-date values.
+    // Captured into a ref so the trickle effect can re-run only on the IDs that
+    // identify a distinct Concierge reply. Composer typing, unrelated Onyx emits,
+    // and ConciergeDraftActions context refreshes all produce reference churn for
+    // pendingResponse/tokens/fullHtml — without this snapshot, those non-content
+    // updates would cancel the running interval and restart the reveal. The
+    // useEffect keeps ref writes in the commit phase (React-Compiler-safe).
     const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent});
     useEffect(() => {
         trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent};
