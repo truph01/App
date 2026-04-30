@@ -273,6 +273,12 @@ function configureAndSubscribe() {
         unsubscribeNetInfo = null;
     }
 
+    // Reset to the same "fresh subscription" state as boot. The listener's `prev !== undefined`
+    // guard then blocks the synthetic null→true transition that NetInfo emits while reconfiguring
+    // (which would otherwise look like a recovery and fire a duplicate openApp/reconnectApp,
+    // e.g. on accountID change for a delegate switch).
+    prevIsInternetReachable = undefined;
+
     if (!CONFIG.IS_USING_LOCAL_WEB) {
         NetInfo.configure({
             reachabilityUrl: `${CONFIG.EXPENSIFY.DEFAULT_API_ROOT}api/Ping?accountID=${accountID ?? 'unknown'}`,
@@ -309,16 +315,21 @@ function configureAndSubscribe() {
             setInternetUnreachable(true);
         }
 
-        // Treat false→true and null→true as genuine recovery. Both mean NetInfo previously
-        // lost reachability (false = confirmed unreachable, null = lost track during outage)
-        // and has now confirmed it's back. Only block undefined→true — that's the initial
-        // NetInfo event on subscribe which delivers current state, not a recovery. Firing
-        // onReachabilityRestored() on boot would duplicate openApp()/reconnectApp().
+        // Treat false→true as genuine recovery (NetInfo previously confirmed unreachable, now
+        // confirmed back), and null→true when prev was explicitly reset to null by debug-tool
+        // toggles (setForceOffline / setFailAllRequests / simulatePoorConnection) that need to
+        // force a recovery on the next definitive state. Block undefined→true — that's the
+        // first event on a fresh subscription, not a recovery.
         if (!shouldForceOffline && state.isInternetReachable === true && prevIsInternetReachable !== true && prevIsInternetReachable !== undefined) {
             Log.info(`[NetworkState] Internet reachability restored (${prevIsInternetReachable}→true)`);
             onReachabilityRestored();
         }
-        prevIsInternetReachable = state.isInternetReachable;
+        // Only track definitive reachable/unreachable states. Ignoring null/undefined keeps the
+        // synthetic true→null→true sequence NetInfo emits during reconfigure from looking like a
+        // recovery transition (and lets configureAndSubscribe's `prev = undefined` reset stick).
+        if (state.isInternetReachable === true || state.isInternetReachable === false) {
+            prevIsInternetReachable = state.isInternetReachable;
+        }
     });
 }
 
