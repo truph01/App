@@ -31,6 +31,21 @@ const selectIsExpenseReportSearch = (lastSearchQuery: OnyxEntry<LastSearchParams
 
 const selectQueryHash = (lastSearchQuery: OnyxEntry<LastSearchParams>): number | undefined => lastSearchQuery?.queryJSON?.hash;
 
+const isSameReportList = (a: Array<string | undefined>, b: Array<string | undefined> | null): boolean => {
+    if (a === b) {
+        return true;
+    }
+    if (b === null || a.length !== b.length) {
+        return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+        if (a.at(i) !== b.at(i)) {
+            return false;
+        }
+    }
+    return true;
+};
+
 const buildSnapshotGuardSelector =
     (reportID: string | undefined) =>
     (snapshot: OnyxEntry<SearchResults>): SnapshotGuard => {
@@ -66,9 +81,12 @@ function MoneyRequestReportNavigationInner({reportID, shouldDisplayNarrowVersion
     // is refreshed and the current report drops out (e.g. after approving from Spend > Needs
     // Approval), keep using the cached list so the carousel stays populated and the user can
     // navigate to the next report instead of the arrows disappearing. setState during render is
-    // the React-recommended pattern for storing information from previous renders.
+    // the React-recommended pattern for storing information from previous renders. We compare
+    // by content rather than reference because useSearchSections rebuilds allReports via
+    // filter/map each render, so identity comparison would refire the setState every render and
+    // trigger an infinite update loop.
     const [lastValidReports, setLastValidReports] = useState<Array<string | undefined> | null>(null);
-    if (liveCurrentIndex !== -1 && allReports !== lastValidReports) {
+    if (liveCurrentIndex !== -1 && !isSameReportList(allReports, lastValidReports)) {
         setLastValidReports(allReports);
     }
     const effectiveAllReports = liveCurrentIndex === -1 && lastValidReports ? lastValidReports : allReports;
