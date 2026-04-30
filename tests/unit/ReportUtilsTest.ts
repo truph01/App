@@ -886,16 +886,14 @@ describe('ReportUtils', () => {
             mergeSpy.mockRestore();
         });
 
-        it('passes MICRO company size to onboarding task parameters', () => {
+        it('passes company size to onboarding task parameters', () => {
             const title = jest.fn();
             const description = jest.fn();
 
             prepareOnboardingOnyxData({
                 introSelected: undefined,
                 betas: undefined,
-                // PERSONAL_SPEND keeps the tasks path active for MICRO; MANAGE_TEAM + MICRO
-                // routes through Phase 1 followups, which suppresses task generation.
-                engagementChoice: CONST.ONBOARDING_CHOICES.PERSONAL_SPEND,
+                engagementChoice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
                 onboardingMessage: {
                     message: 'This is a test',
                     tasks: [
@@ -908,18 +906,19 @@ describe('ReportUtils', () => {
                     ],
                 },
                 adminsChatReportID: '1',
-                companySize: CONST.ONBOARDING_COMPANY_SIZE.MICRO,
+                // SMALL keeps the tasks path active; MICRO routes through Phase 1 followups (no tasks generated).
+                companySize: CONST.ONBOARDING_COMPANY_SIZE.SMALL,
             });
 
             expect(title).toHaveBeenCalledWith(
                 expect.objectContaining<OnboardingTaskLinks>({
-                    onboardingCompanySize: CONST.ONBOARDING_COMPANY_SIZE.MICRO,
+                    onboardingCompanySize: CONST.ONBOARDING_COMPANY_SIZE.SMALL,
                 }),
             );
 
             expect(description).toHaveBeenCalledWith(
                 expect.objectContaining<OnboardingTaskLinks>({
-                    onboardingCompanySize: CONST.ONBOARDING_COMPANY_SIZE.MICRO,
+                    onboardingCompanySize: CONST.ONBOARDING_COMPANY_SIZE.SMALL,
                 }),
             );
         });
