@@ -96,8 +96,8 @@ function SearchChangeApproverPage() {
     const [onyxReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: getOnyxReports});
 
     const hasAutoAppliedRef = useRef(false);
-    // Set when navigating to WORKSPACE_UPGRADE; prevents the auto-close from dismissing the RHP
-    // during the upgrade round-trip before it reopens on the Add Approver page.
+    // Set when navigating to WORKSPACE_UPGRADE; prevents the auto-close in useLayoutEffect from
+    // dismissing the RHP if selectedReports goes transiently empty before this page unmounts
     // TODO: drop this ref once the CHANGE_APPROVER_SEARCH_RHP `backTo` is removed so navigation matches the regular
     // "Change approver" flow after upgrading workspace. See https://github.com/Expensify/App/pull/89192.
     const hasInitiatedUpgradeRef = useRef(false);
@@ -137,7 +137,7 @@ function SearchChangeApproverPage() {
             if (policiesToUpgrade.length > 1) {
                 // Bulk upgrade is not supported, so show a general page to guide the user to upgrade manually
                 hasInitiatedUpgradeRef.current = true;
-                Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(undefined, undefined, ROUTES.CHANGE_APPROVER_SEARCH_RHP.getRoute()));
+                Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(undefined, undefined, ROUTES.CHANGE_APPROVER_ADD_APPROVER_SEARCH_RHP));
                 return;
             }
             if (policiesToUpgrade.length === 1) {
@@ -146,7 +146,7 @@ function SearchChangeApproverPage() {
                     ROUTES.WORKSPACE_UPGRADE.getRoute(
                         policiesToUpgrade.at(0)?.id,
                         CONST.UPGRADE_FEATURE_INTRO_MAPPING.multiApprovalLevels.alias,
-                        ROUTES.CHANGE_APPROVER_SEARCH_RHP.getRoute(),
+                        ROUTES.CHANGE_APPROVER_ADD_APPROVER_SEARCH_RHP,
                     ),
                 );
                 return;
