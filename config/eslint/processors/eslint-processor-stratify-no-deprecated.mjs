@@ -33,18 +33,25 @@ function toRuleIdSuffix(apiName) {
 
 /**
  * @param {string} source
- * @param {number} line
- * @param {number} column
- * @returns {number | null}
+ * @returns {number[]}
  */
-function getIndexFromLocation(source, line, column) {
+function getLineStarts(source) {
     const lineStarts = [0];
     for (let index = 0; index < source.length; index++) {
         if (source.at(index) === '\n') {
             lineStarts.push(index + 1);
         }
     }
+    return lineStarts;
+}
 
+/**
+ * @param {number[]} lineStarts
+ * @param {number} line
+ * @param {number} column
+ * @returns {number | null}
+ */
+function getIndexFromLocation(lineStarts, line, column) {
     const lineStart = lineStarts.at(line - 1);
     if (lineStart === undefined) {
         return null;
@@ -140,29 +147,37 @@ function getTopMemberLikeNode(node, parentByNode) {
 
 /**
  * @param {string} source
- * @param {import('eslint').Linter.LintMessage} message
- * @returns {string | null}
+ * @returns {{source: string; ast: object; parentByNode: WeakMap<object, object>; lineStarts: number[]} | null}
  */
-function extractApiNameFromSource(source, message) {
-    const index = getIndexFromLocation(source, message.line, message.column);
-    if (index === null) {
-        return null;
-    }
-
+function createSourceContext(source) {
     try {
         const ast = parse(source, {sourceType: 'module', plugins: ['typescript', 'jsx']});
         const parentByNode = new WeakMap();
         collectParents(ast, parentByNode);
-        const node = findSmallestNodeAtIndex(ast, index);
-        if (!node) {
-            return null;
-        }
-
-        const topMemberLikeNode = getTopMemberLikeNode(node, parentByNode);
-        return source.slice(topMemberLikeNode.start, topMemberLikeNode.end);
+        return {source, ast, parentByNode, lineStarts: getLineStarts(source)};
     } catch {
         return null;
     }
+}
+
+/**
+ * @param {{source: string; ast: object; parentByNode: WeakMap<object, object>; lineStarts: number[]}} sourceContext
+ * @param {import('eslint').Linter.LintMessage} message
+ * @returns {string | null}
+ */
+function extractApiNameFromSource(sourceContext, message) {
+    const index = getIndexFromLocation(sourceContext.lineStarts, message.line, message.column);
+    if (index === null) {
+        return null;
+    }
+
+    const node = findSmallestNodeAtIndex(sourceContext.ast, index);
+    if (!node) {
+        return null;
+    }
+
+    const topMemberLikeNode = getTopMemberLikeNode(node, sourceContext.parentByNode);
+    return sourceContext.source.slice(topMemberLikeNode.start, topMemberLikeNode.end);
 }
 
 /**
@@ -171,11 +186,14 @@ function extractApiNameFromSource(source, message) {
  * @returns {import('eslint').Linter.LintMessage[]}
  */
 function stratifyMessages(messages, source) {
+    const hasNoDeprecatedMessages = messages.some((message) => message.ruleId === NO_DEPRECATED_RULE_ID);
+    const sourceContext = source && hasNoDeprecatedMessages ? createSourceContext(source) : null;
+
     return messages.map((message) => {
         if (message.ruleId !== NO_DEPRECATED_RULE_ID) {
             return message;
         }
-        const apiName = (source && extractApiNameFromSource(source, message)) || extractDeprecatedApiName(message);
+        const apiName = (sourceContext && extractApiNameFromSource(sourceContext, message)) || extractDeprecatedApiName(message);
         if (!apiName) {
             return message;
         }
