@@ -13,7 +13,7 @@ import useShowSuperWideRHPVersion from '@components/WideRHPContextProvider/useSh
 import WideRHPOverlayWrapper from '@components/WideRHPOverlayWrapper';
 import useActionListContextValue from '@hooks/useActionListContextValue';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import useDismissOnReportRemoval from '@hooks/useDismissOnReportRemoval';
+import useDismissOnMoneyRequestReportRemoval from '@hooks/useDismissOnMoneyRequestReportRemoval';
 import useDocumentTitle from '@hooks/useDocumentTitle';
 import useIsReportReadyToDisplay from '@hooks/useIsReportReadyToDisplay';
 import useNetwork from '@hooks/useNetwork';
@@ -88,7 +88,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     const {email: currentUserEmail, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const isFocused = useIsFocused();
 
-    useDismissOnReportRemoval(reportIDFromRoute);
+    useDismissOnMoneyRequestReportRemoval(reportIDFromRoute);
 
     useEffect(() => {
         // Update last visit time when the expense super wide RHP report is focused

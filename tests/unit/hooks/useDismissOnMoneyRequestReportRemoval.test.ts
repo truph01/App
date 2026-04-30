@@ -1,7 +1,7 @@
 import type * as ReactNavigation from '@react-navigation/native';
 import {renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
-import useDismissOnReportRemoval from '@hooks/useDismissOnReportRemoval';
+import useDismissOnMoneyRequestReportRemoval from '@hooks/useDismissOnMoneyRequestReportRemoval';
 import Navigation from '@navigation/Navigation';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -41,7 +41,7 @@ function buildChatReport(id: string): Report {
     } as Report;
 }
 
-describe('useDismissOnReportRemoval', () => {
+describe('useDismissOnMoneyRequestReportRemoval', () => {
     beforeAll(() => {
         Onyx.init({keys: ONYXKEYS});
     });
@@ -57,7 +57,7 @@ describe('useDismissOnReportRemoval', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_A_ID}`, buildMoneyRequestReport(REPORT_A_ID));
         await waitForBatchedUpdates();
 
-        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
 
@@ -69,7 +69,7 @@ describe('useDismissOnReportRemoval', () => {
     });
 
     it('does not dismiss the modal on first render even if the report is missing', async () => {
-        renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
         await waitForBatchedUpdates();
@@ -82,7 +82,7 @@ describe('useDismissOnReportRemoval', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_A_ID}`, buildMoneyRequestReport(REPORT_A_ID));
         await waitForBatchedUpdates();
 
-        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
 
@@ -97,7 +97,7 @@ describe('useDismissOnReportRemoval', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_A_ID}`, buildChatReport(REPORT_A_ID));
         await waitForBatchedUpdates();
 
-        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
 
@@ -115,7 +115,7 @@ describe('useDismissOnReportRemoval', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_A_ID}`, buildMoneyRequestReport(REPORT_A_ID));
         await waitForBatchedUpdates();
 
-        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
 
@@ -132,7 +132,7 @@ describe('useDismissOnReportRemoval', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_A_ID}`, buildMoneyRequestReport(REPORT_A_ID, {stateNum: CONST.REPORT.STATE_NUM.OPEN}));
         await waitForBatchedUpdates();
 
-        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
 
@@ -161,7 +161,7 @@ describe('useDismissOnReportRemoval', () => {
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_A_ID}`, buildMoneyRequestReport(REPORT_A_ID, {stateNum: CONST.REPORT.STATE_NUM.OPEN}));
         await waitForBatchedUpdates();
 
-        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnReportRemoval(reportID), {
+        const {rerender} = renderHook(({reportID}: {reportID: string}) => useDismissOnMoneyRequestReportRemoval(reportID), {
             initialProps: {reportID: REPORT_A_ID},
         });
 

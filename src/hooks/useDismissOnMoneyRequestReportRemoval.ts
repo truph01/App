@@ -11,7 +11,7 @@ import usePrevious from './usePrevious';
  * Skips dismissal during route changes — the new report's data may not be loaded yet,
  * so the absent `report` should not be interpreted as removal.
  */
-function useDismissOnReportRemoval(reportIDFromRoute: string | undefined) {
+function useDismissOnMoneyRequestReportRemoval(reportIDFromRoute: string | undefined) {
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`);
     const prevReport = usePrevious(report);
     const prevReportIDFromRoute = usePrevious(reportIDFromRoute);
@@ -39,4 +39,4 @@ function useDismissOnReportRemoval(reportIDFromRoute: string | undefined) {
     }, [report, isFocused, prevReport, prevReportIDFromRoute, reportIDFromRoute]);
 }
 
-export default useDismissOnReportRemoval;
+export default useDismissOnMoneyRequestReportRemoval;
