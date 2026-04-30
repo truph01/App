@@ -44,6 +44,20 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     const tokens = tokenizeForReveal(fullHtml);
     const accelerateRef = useRef<((nowMs: number) => void) | null>(null);
 
+    // Trickle inputs that change shape only when the underlying Concierge reply changes
+    // — captured into a ref so the trickle effect can re-run only on (reportID,
+    // reportActionID) without restarting on unrelated re-renders. The user typing in
+    // the composer, an unrelated Onyx emit, or a ConciergeDraftActions context
+    // refresh all produce reference churn for `pendingResponse`/`tokens`/`fullHtml`
+    // that previously cancelled the running trickle and started it over (Pujan's
+    // review on PR #89146 — composer-during-streaming). Updating via useEffect keeps
+    // ref-writes in the commit phase (React-Compiler-safe) while the trickle effect
+    // below reads the up-to-date values.
+    const trickleInputsRef = useRef({pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent});
+    useEffect(() => {
+        trickleInputsRef.current = {pendingResponse, fullHtml, tokens, dispatchLocalDraftEvent};
+    });
+
     // Reconciliation: when the canonical reportComment lands in REPORT_ACTIONS
     // mid-trickle, fire the running loop's accelerator so the remaining reveal
     // finishes in ~1.5s instead of snapping the synthetic bubble closed.
@@ -55,10 +69,18 @@ function usePendingConciergeResponse(reportID: string | undefined) {
     }, [persistedAction]);
 
     useEffect(() => {
-        if (!pendingResponse || !reportID || !reportActionID) {
+        if (!reportID || !reportActionID) {
             return;
         }
-        const {reportAction, displayAfter} = pendingResponse;
+        // Snapshot inputs at effect start. The trickle commits to the content it had
+        // when it began; subsequent updates that share this same reportActionID don't
+        // disturb the in-progress reveal. A genuinely new Concierge reply produces a
+        // new reportActionID and re-enters this effect via the deps below.
+        const {pendingResponse: snapshot, fullHtml: snapshotHtml, tokens: snapshotTokens} = trickleInputsRef.current;
+        if (!snapshot) {
+            return;
+        }
+        const {reportAction, displayAfter} = snapshot;
         const remainingDelay = displayAfter - Date.now();
 
         if (remainingDelay < -STALE_THRESHOLD_MS) {
@@ -69,7 +91,7 @@ function usePendingConciergeResponse(reportID: string | undefined) {
         // Anchors are character-level. Short replies (~50–100 chars) keep the
         // binary reveal; longer ones (paragraphs / lists) cross the threshold
         // and get the smooth trickle.
-        const shouldTrickle = tokens.length >= 100 && !!fullHtml;
+        const shouldTrickle = snapshotTokens.length >= 100 && !!snapshotHtml;
         if (!shouldTrickle) {
             const timer = setTimeout(() => applyPendingConciergeAction(reportID, reportAction), Math.max(0, remainingDelay));
             return () => clearTimeout(timer);
@@ -92,7 +114,9 @@ function usePendingConciergeResponse(reportID: string | undefined) {
                 return;
             }
             sequence += 1;
-            dispatchLocalDraftEvent({
+            // Read dispatch fn from the ref so a context-provider refresh doesn't pin
+            // the trickle to a stale handler. The ref always points at the latest.
+            trickleInputsRef.current.dispatchLocalDraftEvent({
                 reportID,
                 reportActionID,
                 streamSessionID: session,
@@ -118,13 +142,13 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             Log.info('[ConciergeTrickle] complete', false, {
                 reportActionID,
                 reason,
-                tokenCount: tokens.length,
+                tokenCount: snapshotTokens.length,
                 durationMs: effectiveDuration,
                 totalElapsedMs,
                 arrivedAtProgress: arrival?.progress,
                 arrivedAtElapsedMs: arrival?.elapsedMs,
             });
-            dispatch('completed', tokens.at(-1) ?? fullHtml);
+            dispatch('completed', snapshotTokens.at(-1) ?? snapshotHtml);
             // If acceleration fired, the canonical reportComment already landed in
             // REPORT_ACTIONS. Re-applying our older optimistic payload would clobber
             // server-added markup (e.g. follow-up buttons) until the next server
@@ -156,12 +180,12 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             trickleStart = Date.now();
             Log.info('[ConciergeTrickle] start', false, {
                 reportActionID,
-                tokenCount: tokens.length,
+                tokenCount: snapshotTokens.length,
                 durationMs: effectiveDuration,
             });
-            dispatch('started', tokens.at(1) ?? '');
+            dispatch('started', snapshotTokens.at(1) ?? '');
             lastStage = 1;
-            const lastIndex = tokens.length - 1;
+            const lastIndex = snapshotTokens.length - 1;
             intervalID = setInterval(() => {
                 const elapsed = Date.now() - trickleStart;
                 const progress = easeOut(elapsed / effectiveDuration);
@@ -170,7 +194,7 @@ function usePendingConciergeResponse(reportID: string | undefined) {
                 const stage = Math.min(lastIndex, Math.ceil(progress * lastIndex));
                 if (stage > lastStage) {
                     lastStage = stage;
-                    dispatch('updated', tokens.at(stage) ?? '');
+                    dispatch('updated', snapshotTokens.at(stage) ?? '');
                 }
                 if (progress >= 1 || elapsed >= TRICKLE_HARD_CAP_MS) {
                     completeAndApply();
@@ -187,7 +211,7 @@ function usePendingConciergeResponse(reportID: string | undefined) {
             }
             accelerateRef.current = null;
         };
-    }, [pendingResponse, reportID, reportActionID, fullHtml, tokens, dispatchLocalDraftEvent]);
+    }, [reportID, reportActionID]);
 }
 
 export default usePendingConciergeResponse;
