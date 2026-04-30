@@ -19,12 +19,9 @@ module.exports = {
         '<rootDir>/node_modules/@expensify/react-native-live-markdown/lib/commonjs/parseExpensiMark.js',
     ],
     testPathIgnorePatterns: ['<rootDir>/node_modules'],
-    // .worktrees/ is a local-dev-only directory: developers may check out parallel
-    // branches there as git worktrees. Each worktree carries its own copy of
-    // modules/hybrid-app/package.json, which trips jest-haste-map's "duplicate
-    // manual mock" / "duplicate package name" assertion when a local jest run
-    // sees all of them at once. CI never creates worktrees, so this only affects
-    // local runs — exclude them from haste-map indexing entirely.
+    // .worktrees/ holds parallel git worktrees a developer may check out locally.
+    // Each one carries its own modules/hybrid-app/package.json, which trips
+    // jest-haste-map's "duplicate package name" assertion. Skip them entirely.
     modulePathIgnorePatterns: ['<rootDir>/.worktrees/'],
     globals: {
         __DEV__: true,
