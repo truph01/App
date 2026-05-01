@@ -70,8 +70,8 @@ type MoneyRequestReportTransactionItemProps = {
     /** List of cards for the user */
     nonPersonalAndWorkspaceCards: CardList;
 
-    /** Whether this is the last item in the list (used to skip border-bottom on narrow) */
-    isLastItem?: boolean;
+    /** Whether this is the first item in the list */
+    isFirstItem?: boolean;
 };
 
 function MoneyRequestReportTransactionItem({
@@ -91,7 +91,7 @@ function MoneyRequestReportTransactionItem({
     onArrowRightPress,
     shouldBeHighlighted,
     nonPersonalAndWorkspaceCards,
-    isLastItem = false,
+    isFirstItem = false,
 }: MoneyRequestReportTransactionItemProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -136,7 +136,7 @@ function MoneyRequestReportTransactionItem({
                 role={getButtonRole(true)}
                 isNested
                 id={transaction.transactionID}
-                style={[styles.transactionListItemStyle, shouldUseNarrowLayout && styles.noBorderRadius]}
+                style={[styles.transactionListItemStyle, shouldUseNarrowLayout && styles.noBorderRadius, shouldUseNarrowLayout && !isFirstItem && styles.borderTop]}
                 hoverStyle={[!isPendingDelete && styles.hoveredComponentBG, isSelected && styles.activeComponentBG]}
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                 onPressIn={() => canUseTouchScreen() && ControlSelection.block()}
@@ -146,7 +146,7 @@ function MoneyRequestReportTransactionItem({
                 }}
                 disabled={isTransactionPendingDelete(transaction)}
                 ref={viewRef}
-                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone, shouldUseNarrowLayout && !isLastItem && styles.borderBottom]}
+                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone]}
             >
                 {({hovered}) => (
                     <TransactionItemRow

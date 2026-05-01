@@ -27,11 +27,13 @@ import useHandleSelectionMode from '@hooks/useHandleSelectionMode';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useResponsiveLayoutOnWideRHP from '@hooks/useResponsiveLayoutOnWideRHP';
 import useStyleUtils from '@hooks/useStyleUtils';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {turnOnMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
@@ -141,6 +143,7 @@ function MoneyRequestReportTransactionList({
     useCopySelectionHelper();
     const {convertToDisplayString} = useCurrencyListActions();
     const styles = useThemeStyles();
+    const theme = useTheme();
     const StyleUtils = useStyleUtils();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Location', 'CheckSquare', 'ReceiptPlus', 'Columns', 'Plus']);
     const {translate, localeCompare} = useLocalize();
@@ -161,6 +164,7 @@ function MoneyRequestReportTransactionList({
     const formattedTaxAmount = convertToDisplayString(taxTotal, report?.currency);
     const shouldShowExpenseReportBreakDown = shouldShowExpenseBreakdown(transactions);
     const shouldShowBreakdown = shouldShowExpenseReportBreakDown || !!billableTotal || (!!taxTotal && isTaxEnabled);
+    const {isOffline} = useNetwork();
     const transactionsWithoutPendingDelete = useMemo(() => transactions.filter((t) => !isTransactionPendingDelete(t)), [transactions]);
     const currentUserDetails = useCurrentUserPersonalDetails();
     const isReportArchived = useReportIsArchived(report?.reportID);
@@ -556,9 +560,8 @@ function MoneyRequestReportTransactionList({
 
     const lastTransactionID = useMemo(() => {
         const allTransactions = shouldShowGroupedTransactions ? groupedTransactions.flatMap((group) => group.transactions) : resolvedTransactions;
-        const nonDeletedTransactions = allTransactions.filter((t) => !isTransactionPendingDelete(t));
-        return nonDeletedTransactions.at(-1)?.transactionID;
-    }, [shouldShowGroupedTransactions, groupedTransactions, resolvedTransactions]);
+        return allTransactions.findLast((t) => isOffline || !isTransactionPendingDelete(t))?.transactionID;
+    }, [shouldShowGroupedTransactions, groupedTransactions, resolvedTransactions, isOffline]);
 
     const transactionItems = shouldShowGroupedTransactions
         ? groupedTransactions.map((group) => {
@@ -587,31 +590,28 @@ function MoneyRequestReportTransactionList({
                           pendingAction={selectionState.pendingAction}
                           shouldUseNarrowLayout={shouldUseNarrowLayout}
                       />
-                      {group.transactions.map((transaction) => {
-                          const isLastItem = transaction.transactionID === lastTransactionID;
-                          return (
-                              <MoneyRequestReportTransactionItem
-                                  key={transaction.transactionID}
-                                  transaction={transaction}
-                                  shouldBeHighlighted={highlightedTransactionIDs.has(transaction.transactionID)}
-                                  columns={columnsToShow}
-                                  report={report}
-                                  policy={policy}
-                                  isSelectionModeEnabled={isMobileSelectionModeEnabled}
-                                  toggleTransaction={toggleTransaction}
-                                  isSelected={isTransactionSelected(transaction.transactionID)}
-                                  handleOnPress={handleOnPress}
-                                  handleLongPress={handleLongPress}
-                                  dateColumnSize={dateColumnSize}
-                                  amountColumnSize={amountColumnSize}
-                                  taxAmountColumnSize={taxAmountColumnSize}
-                                  scrollToNewTransaction={transaction.transactionID === newTransactions?.at(0)?.transactionID ? scrollToNewTransaction : undefined}
-                                  onArrowRightPress={handleArrowRightPress}
-                                  nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards ?? {}}
-                                  isLastItem={isLastItem}
-                              />
-                          );
-                      })}
+                      {group.transactions.map((transaction, index) => (
+                          <MoneyRequestReportTransactionItem
+                              key={transaction.transactionID}
+                              transaction={transaction}
+                              shouldBeHighlighted={highlightedTransactionIDs.has(transaction.transactionID)}
+                              columns={columnsToShow}
+                              report={report}
+                              policy={policy}
+                              isSelectionModeEnabled={isMobileSelectionModeEnabled}
+                              toggleTransaction={toggleTransaction}
+                              isSelected={isTransactionSelected(transaction.transactionID)}
+                              handleOnPress={handleOnPress}
+                              handleLongPress={handleLongPress}
+                              dateColumnSize={dateColumnSize}
+                              amountColumnSize={amountColumnSize}
+                              taxAmountColumnSize={taxAmountColumnSize}
+                              scrollToNewTransaction={transaction.transactionID === newTransactions?.at(0)?.transactionID ? scrollToNewTransaction : undefined}
+                              onArrowRightPress={handleArrowRightPress}
+                              nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards ?? {}}
+                              isLastItem={index === group.transactions.length - 1}
+                          />
+                      ))}
                   </View>
               );
           })
@@ -664,7 +664,17 @@ function MoneyRequestReportTransactionList({
 
     const tableHeaderContent = (
         <OfflineWithFeedback pendingAction={reportPendingAction}>
-            <View style={[styles.dFlex, styles.flexRow, styles.pl5, styles.pr16, styles.alignItemsCenter]}>
+            <View
+                style={[
+                    styles.dFlex,
+                    styles.flexRow,
+                    styles.pl5,
+                    styles.pr16,
+                    styles.alignItemsCenter,
+                    styles.borderBottom,
+                    selectedTransactionIDs.length > 0 && {borderColor: theme.buttonHoveredBG},
+                ]}
+            >
                 <View style={[styles.dFlex, styles.flexRow, styles.pv2, styles.pr4, StyleUtils.getPaddingLeft(variables.w12)]}>
                     <Checkbox
                         onPress={() => {

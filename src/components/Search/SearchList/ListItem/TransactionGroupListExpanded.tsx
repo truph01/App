@@ -224,7 +224,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                             isActionColumnWide={isActionColumnWide}
                         />
                     </View>
-                    <View style={[styles.borderBottom, styles.ml3, styles.mr3]} />
+                    <View style={[styles.borderBottom, styles.ml3, styles.mr3, visibleTransactions.at(0)?.isSelected && {borderColor: theme.buttonHoveredBG}]} />
                 </>
             )}
             {visibleTransactions.map((transaction, index) => {

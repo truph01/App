@@ -216,6 +216,7 @@ function TransactionListItem<TItem extends ListItem>({
                     pressableStyle,
                     isFocused && StyleUtils.getItemBackgroundColorStyle(!!item.isSelected, !!isFocused, !!item.isDisabled, theme.activeComponentBG, theme.hoverComponentBG),
                     isDeletedTransaction && styles.cursorDefault,
+                    !isLargeScreenWidth && !isFirstItem && styles.borderTop,
                 ]}
                 onFocus={onFocus}
                 wrapperStyle={[
@@ -226,7 +227,6 @@ function TransactionListItem<TItem extends ListItem>({
                     isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
                     !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
                     !isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
-                    !isLargeScreenWidth && !isLastItem && styles.borderBottom,
                 ]}
             >
                 {({hovered}) => (
