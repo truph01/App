@@ -13,7 +13,7 @@ jest.mock('@hooks/useOnyx', () => ({
 }));
 
 jest.mock('@pages/home/report/ConciergeThinkingMessage', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const {View: MockView} = require('react-native');
     return {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -23,7 +23,7 @@ jest.mock('@pages/home/report/ConciergeThinkingMessage', () => {
 });
 
 jest.mock('@pages/inbox/report/ListBoundaryLoader', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const {View: MockView} = require('react-native');
     return {
         // eslint-disable-next-line @typescript-eslint/naming-convention
