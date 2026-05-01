@@ -192,7 +192,6 @@ type GetTrackExpenseInformationParams = {
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     isSelfTourViewed: boolean;
-    hasActiveAdminPolicies?: boolean;
     defaultWorkspaceName?: string;
 };
 
@@ -832,7 +831,6 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
         quickAction,
         betas,
         isSelfTourViewed,
-        hasActiveAdminPolicies,
         defaultWorkspaceName,
     } = params;
     const {payeeAccountID = currentUserAccountIDParam, payeeEmail = currentUserEmailParam, participant} = participantParams;
@@ -976,7 +974,8 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
             currentUserEmailParam,
             introSelected,
             activePolicy,
-            hasActiveAdminPolicies,
+            // hasActiveAdminPolicies is only needed if lastUsedPaymentMethod is passed
+            hasActiveAdminPolicies: undefined,
             betas,
             isSelfTourViewed,
         });
@@ -2288,7 +2287,6 @@ function trackExpense(params: CreateTrackExpenseParams) {
         betas,
         draftTransactionIDs = [],
         isSelfTourViewed,
-        hasActiveAdminPolicies,
         defaultWorkspaceName,
     } = params;
     const {participant, payeeAccountID, payeeEmail} = participantParams;
@@ -2430,7 +2428,6 @@ function trackExpense(params: CreateTrackExpenseParams) {
         quickAction,
         betas,
         isSelfTourViewed,
-        hasActiveAdminPolicies,
         defaultWorkspaceName,
     }) ?? {};
     const activeReportID = isMoneyRequestReport ? report?.reportID : chatReport?.reportID;
