@@ -8,7 +8,13 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 
 type MoreFeaturesSectionProps = {
+    /** Section heading rendered above the toggles (e.g. "Spend", "Manage"). */
     title: string;
+
+    /**
+     * Toggle rows belonging to this section. An invisible filler row is appended automatically when
+     * an odd number of children is provided, so the wide-layout two-column grid stays aligned.
+     */
     children: React.ReactNode;
 };
 
@@ -52,7 +58,5 @@ function MoreFeaturesSection({title, children}: MoreFeaturesSectionProps) {
         </View>
     );
 }
-
-MoreFeaturesSection.displayName = 'MoreFeaturesSection';
 
 export default MoreFeaturesSection;
