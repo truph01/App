@@ -97,6 +97,7 @@ function AgentsPage() {
             style={[styles.defaultModalContainer]}
             testID={AgentsPage.displayName}
             shouldShowOfflineIndicatorInWideScreen
+            shouldMobileOfflineIndicatorStickToBottom={false}
             offlineIndicatorStyle={styles.mtAuto}
         >
             <HeaderWithBackButton
