@@ -180,11 +180,11 @@ function ExpenseReportListItem<TItem extends ListItem>({
             styles.mh0,
             isPendingDelete && styles.cursorDisabled,
             isLargeScreenWidth ? StyleUtils.getSearchTableRowPressableStyle(!!isLastItem, item.isSelected, {vertical: variables.tableRowPaddingVertical}) : styles.noBorderRadius,
+            !isLargeScreenWidth && !isLastItem && {...styles.borderBottom, borderColor: item.isSelected ? theme.buttonHoveredBG : theme.border},
             !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
             !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-            !isLargeScreenWidth && !isFirstItem && styles.borderTop,
         ],
-        [styles, item.isSelected, isLargeScreenWidth, isFirstItem, isLastItem, isPendingDelete, StyleUtils],
+        [styles, item.isSelected, isLargeScreenWidth, isFirstItem, isLastItem, isPendingDelete, StyleUtils, theme.border, theme.buttonHoveredBG],
     );
 
     const listItemWrapperStyle = useMemo(

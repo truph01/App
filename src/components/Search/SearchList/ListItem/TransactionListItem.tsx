@@ -122,6 +122,7 @@ function TransactionListItem<TItem extends ListItem>({
               }
             : {...styles.flexColumn, ...styles.alignItemsStretch},
         isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+        !isLargeScreenWidth && !isLastItem && {...styles.borderBottom, borderColor: item.isSelected ? theme.buttonHoveredBG : theme.border},
         !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
         !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
     ];
@@ -216,7 +217,6 @@ function TransactionListItem<TItem extends ListItem>({
                     pressableStyle,
                     isFocused && StyleUtils.getItemBackgroundColorStyle(!!item.isSelected, !!isFocused, !!item.isDisabled, theme.activeComponentBG, theme.hoverComponentBG),
                     isDeletedTransaction && styles.cursorDefault,
-                    !isLargeScreenWidth && !isFirstItem && styles.borderTop,
                 ]}
                 onFocus={onFocus}
                 wrapperStyle={[

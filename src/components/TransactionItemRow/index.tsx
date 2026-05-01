@@ -784,7 +784,7 @@ function TransactionItemRow({
                 {!!shouldShowBottomBorder && (
                     <View style={bgActiveStyles}>
                         <View style={styles.ph3}>
-                            <View style={[styles.borderBottom]} />
+                            <View style={[styles.borderBottom, isSelected && {borderColor: theme.buttonHoveredBG}]} />
                         </View>
                     </View>
                 )}
@@ -859,7 +859,7 @@ function TransactionItemRow({
             {!!shouldShowBottomBorder && (
                 <View style={bgActiveStyles}>
                     <View style={styles.ph3}>
-                        <View style={styles.borderBottom} />
+                        <View style={[styles.borderBottom, isSelected && {borderColor: theme.buttonHoveredBG}]} />
                     </View>
                 </View>
             )}

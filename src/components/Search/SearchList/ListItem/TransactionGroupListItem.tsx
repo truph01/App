@@ -214,6 +214,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
             ...(isLastItem ? styles.searchTableBottomRadius : {}),
         },
         isItemSelected && styles.activeComponentBG,
+        !isLargeScreenWidth && !isLastItem && {...styles.borderBottom, borderColor: isItemSelected ? theme.buttonHoveredBG : theme.border},
     ];
     const pressableRef = useRef<View>(null);
 
@@ -540,11 +541,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
                     styles.userSelectNone,
                     isLargeScreenWidth
                         ? [StyleUtils.getSearchTableGroupRowBorderStyle(isFirstItem, isLastItem, isItemSelected), isLastItem && styles.overflowHidden]
-                        : [
-                              !isFirstItem && styles.borderTop,
-                              isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
-                              isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-                          ],
+                        : [isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden], isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden]],
                 ]}
             >
                 {({hovered}) => (

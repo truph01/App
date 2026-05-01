@@ -70,8 +70,8 @@ type MoneyRequestReportTransactionItemProps = {
     /** List of cards for the user */
     nonPersonalAndWorkspaceCards: CardList;
 
-    /** Whether this is the first item in the list */
-    isFirstItem?: boolean;
+    /** Whether this is the last item in the list */
+    isLastItem?: boolean;
 };
 
 function MoneyRequestReportTransactionItem({
@@ -91,7 +91,7 @@ function MoneyRequestReportTransactionItem({
     onArrowRightPress,
     shouldBeHighlighted,
     nonPersonalAndWorkspaceCards,
-    isFirstItem = false,
+    isLastItem = false,
 }: MoneyRequestReportTransactionItemProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -136,7 +136,11 @@ function MoneyRequestReportTransactionItem({
                 role={getButtonRole(true)}
                 isNested
                 id={transaction.transactionID}
-                style={[styles.transactionListItemStyle, shouldUseNarrowLayout && styles.noBorderRadius, shouldUseNarrowLayout && !isFirstItem && styles.borderTop]}
+                style={[
+                    styles.transactionListItemStyle,
+                    shouldUseNarrowLayout && styles.noBorderRadius,
+                    shouldUseNarrowLayout && !isLastItem && {...styles.borderBottom, borderColor: isSelected ? theme.buttonHoveredBG : theme.border},
+                ]}
                 hoverStyle={[!isPendingDelete && styles.hoveredComponentBG, isSelected && styles.activeComponentBG]}
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                 onPressIn={() => canUseTouchScreen() && ControlSelection.block()}
@@ -170,6 +174,7 @@ function MoneyRequestReportTransactionItem({
                         }}
                         onArrowRightPress={() => onArrowRightPress?.(transaction.transactionID)}
                         isHover={hovered}
+                        shouldShowBottomBorder={shouldUseNarrowLayout && !isLastItem}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                     />
                 )}
