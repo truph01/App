@@ -715,8 +715,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
 
     useEffect(() => {
         fetchFeatures();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [fetchFeatures]);
 
     useNetwork({onReconnect: fetchFeatures});
 
