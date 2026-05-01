@@ -92,16 +92,17 @@ describe('PersistedRequests', () => {
         await waitForBatchedUpdates();
 
         const originalFile = global.File;
-        class MockFile {}
+        function MockFile() {}
         global.File = MockFile as unknown as typeof File;
 
         try {
+            const mockFile = Object.create(MockFile.prototype) as File;
             const newRequest: Request<'reportMetadata_1' | 'reportMetadata_2'> = {
                 command: 'OpenReport',
                 successData: [{key: 'reportMetadata_1', onyxMethod: 'set', value: {}}],
                 failureData: [{key: 'reportMetadata_2', onyxMethod: 'set', value: {}}],
                 requestID: 5,
-                data: {file: new MockFile() as unknown as File},
+                data: {file: mockFile},
             };
 
             PersistedRequests.updateOngoingRequest(newRequest);
@@ -193,6 +194,38 @@ describe('PersistedRequests persistence guarantees', () => {
                 expect(diskArray).toHaveLength(1);
             });
         });
+    });
+
+    it('processNextRequest should keep the in-memory ongoing request when data contains a File/Blob', async () => {
+        PersistedRequests.clear();
+        await waitForBatchedUpdates();
+
+        const originalFile = global.File;
+        function MockFile() {}
+        global.File = MockFile as unknown as typeof File;
+
+        try {
+            const mockFile = Object.create(MockFile.prototype) as File;
+            const requestWithFile: Request<'reportMetadata_1' | 'reportMetadata_2'> = {
+                command: 'OpenReport',
+                successData: [{key: 'reportMetadata_1', onyxMethod: 'merge', value: {}}],
+                failureData: [{key: 'reportMetadata_2', onyxMethod: 'merge', value: {}}],
+                requestID: 30,
+                data: {file: mockFile},
+            };
+
+            PersistedRequests.save(requestWithFile);
+            await waitForBatchedUpdates();
+
+            const nextRequest = PersistedRequests.processNextRequest();
+            await waitForBatchedUpdates();
+
+            expect(nextRequest).toEqual(requestWithFile);
+            expect(PersistedRequests.getOngoingRequest()).toEqual(requestWithFile);
+            expect((await OnyxUtils.get(ONYXKEYS.PERSISTED_ONGOING_REQUESTS)) == null).toBe(true);
+        } finally {
+            global.File = originalFile;
+        }
     });
 
     // BUG: save() at PersistedRequests.ts:124-134 does a read-modify-write

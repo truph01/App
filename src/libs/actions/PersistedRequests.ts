@@ -395,12 +395,23 @@ function processNextRequest(): AnyRequest | null {
     // (e.g. File objects in data.file or data.receipt). IndexedDB cannot clone
     // native File objects (DataCloneError). These requests cannot survive a crash
     // anyway since File references are lost on restart.
-    trackOnyxWrite(
-        Onyx.multiSet({
-            [ONYXKEYS.PERSISTED_REQUESTS]: persistedRequests,
-            [ONYXKEYS.PERSISTED_ONGOING_REQUESTS]: shouldPersistOngoingRequest(ongoingRequest) ? ongoingRequest : null,
-        }),
-    );
+    if (shouldPersistOngoingRequest(ongoingRequest)) {
+        trackOnyxWrite(
+            Onyx.multiSet({
+                [ONYXKEYS.PERSISTED_REQUESTS]: persistedRequests,
+                [ONYXKEYS.PERSISTED_ONGOING_REQUESTS]: ongoingRequest,
+            }),
+        );
+    } else {
+        trackOnyxWrite(
+            Onyx.multiSet({
+                [ONYXKEYS.PERSISTED_REQUESTS]: persistedRequests,
+                [ONYXKEYS.PERSISTED_ONGOING_REQUESTS]: null,
+            }),
+        ).finally(() => {
+            ongoingRequest = nextRequest;
+        });
+    }
 
     // Return the local reference, not `ongoingRequest`. The Onyx.multiSet above
     // triggers a synchronous callback (Onyx 3.0.46+) that overwrites `ongoingRequest`
