@@ -3392,6 +3392,11 @@ ${amount} para ${merchant} - ${date}`,
         confirmationStepHeader: 'Verifica tu información.',
         confirmationStepSubHeader: 'Verifica dos veces los detalles a continuación y marca la casilla de términos para confirmar.',
         toGetStarted: 'Agrega una cuenta bancaria personal para recibir reembolsos, pagar facturas o habilitar la Cartera de Expensify.',
+        updatePersonalInfo: 'Actualizar cuenta bancaria',
+        updatePersonalInfoFailure: 'No se pudo actualizar la información de la cuenta bancaria. Por favor, inténtalo de nuevo más tarde.',
+        updateSuccessTitle: '¡Cuenta bancaria actualizada!',
+        updateSuccessHeader: 'Cuenta bancaria actualizada',
+        updateSuccessMessage: 'Enhorabuena, tu cuenta bancaria está configurada y lista para recibir reembolsos.',
     },
     addPersonalBankAccountPage: {
         enterPassword: 'Escribe tu contraseña de Expensify',
@@ -4738,6 +4743,7 @@ ${amount} para ${merchant} - ${date}`,
 
                             Si deseas establecer un proveedor específico para cada tarjeta, ve a *Configuraciones > Dominios > Tarjetas de Empresa*.
                         `),
+                        travelDescription: 'Los gastos de viaje se exportarán como asientos contables a la cuenta de NetSuite especificada a continuación.',
                     },
                 },
                 expenseReportDestinationConfirmDescription:
@@ -7639,6 +7645,7 @@ ${amount} para ${merchant} - ${date}`,
         recentSearches: 'Búsquedas recientes',
         recentChats: 'Chats recientes',
         searchIn: 'Buscar en',
+        askConcierge: (message: string) => `Pregunta a Concierge “${message}”`,
         searchPlaceholder: 'Busca algo...',
         suggestions: 'Sugerencias',
         suggestionsAvailable: ({count}: {count: number}, query = '') => ({
