@@ -5410,6 +5410,10 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             oneMoreStepDescription: 'Es sieht so aus, als müssten wir Ihr Bankkonto manuell verifizieren. Bitte gehen Sie zu Concierge, wo bereits Anweisungen auf Sie warten.',
             gotIt: 'Verstanden',
             goToConcierge: 'Zu Concierge gehen',
+            exportAsCSV: 'Als CSV exportieren',
+            csvColumnType: 'Typ',
+            csvColumnLimitType: 'Limittyp',
+            csvColumnLimit: 'Limit',
         },
         categories: {
             deleteCategories: 'Kategorien löschen',
@@ -6849,8 +6853,6 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
             customRules: {
                 title: 'Spesenrichtlinie',
                 cardSubtitle: 'Hier ist die Spesenrichtlinie deines Teams hinterlegt, damit alle denselben Stand haben, was abgedeckt ist.',
-                policyDocument: 'Richtliniendokument',
-                policyText: 'Richtlinientext',
             },
             spendRules: {
                 title: 'Ausgaben',

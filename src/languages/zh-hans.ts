@@ -5252,6 +5252,10 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             oneMoreStepDescription: '看起来我们需要手动验证您的银行账户。请前往 Concierge 查看为您准备的操作说明。',
             gotIt: '明白了',
             goToConcierge: '前往 Concierge',
+            exportAsCSV: '导出为 CSV',
+            csvColumnType: '类型',
+            csvColumnLimitType: '限额类型',
+            csvColumnLimit: '限额',
         },
         categories: {
             deleteCategories: '删除类别',
@@ -6639,8 +6643,6 @@ ${reportName}
             customRules: {
                 title: '报销政策',
                 cardSubtitle: '这是你们团队的报销政策所在之处，让所有人都清楚哪些内容在报销范围之内。',
-                policyDocument: '政策文件',
-                policyText: '政策文本',
             },
             spendRules: {
                 title: '支出',

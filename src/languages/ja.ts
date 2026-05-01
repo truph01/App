@@ -5339,6 +5339,10 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             oneMoreStepDescription: '銀行口座を手動で確認する必要があるようです。指示が表示されていますので、Concierge 画面に進んでください。',
             gotIt: '了解しました',
             goToConcierge: 'Concierge へ移動',
+            exportAsCSV: 'CSVでエクスポート',
+            csvColumnType: 'タイプ',
+            csvColumnLimitType: '限度タイプ',
+            csvColumnLimit: '限度額',
         },
         categories: {
             deleteCategories: 'カテゴリを削除',
@@ -6757,8 +6761,6 @@ ${reportName}
             customRules: {
                 title: '経費ポリシー',
                 cardSubtitle: 'ここはチームの経費ポリシーが保存されている場所です。何が対象になるか、全員が同じ認識を持てます。',
-                policyDocument: 'ポリシー文書',
-                policyText: 'ポリシーテキスト',
             },
             spendRules: {
                 title: '支出',

@@ -5342,6 +5342,10 @@ const translations = {
             euUkDisclaimer:
                 'Cards provided to EEA residents are issued by Transact Payments Malta Limited and cards provided to UK residents are issued by Transact Payments Limited pursuant to license by Visa Europe Limited. Transact Payments Malta Limited is duly authorized and regulated by the Malta Financial Services Authority as a Financial Institution under the Financial Institution Act 1994. Registration number C 91879. Transact Payments Limited is authorized and regulated by the Gibraltar Financial Service Commission.',
             issueCard: 'Issue card',
+            exportAsCSV: 'Export as CSV',
+            csvColumnType: 'Type',
+            csvColumnLimitType: 'Limit type',
+            csvColumnLimit: 'Limit',
             findCard: 'Find card',
             newCard: 'New card',
             name: 'Name',
@@ -6862,8 +6866,6 @@ const translations = {
             customRules: {
                 title: 'Expense policy',
                 cardSubtitle: "Here's where your team's expense policy lives, so everyone's on the same page about what's covered.",
-                policyDocument: 'Policy document',
-                policyText: 'Policy text',
             },
             spendRules: {
                 title: 'Spend',
