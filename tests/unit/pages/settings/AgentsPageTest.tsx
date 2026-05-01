@@ -150,15 +150,16 @@ describe('AgentsPage', () => {
     });
 
     it('shows agent list when agents exist in Onyx', () => {
+        const TEST_ACCOUNT_ID = 12345;
         mockUseOnyx.mockImplementation((key) => {
             if (key === ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT) {
-                return [{[`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}12345`]: {prompt: 'Test prompt'}}, {status: 'loaded'}];
+                return [{[`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`]: {prompt: 'Test prompt'}}, {status: 'loaded'}];
             }
             if (key === ONYXKEYS.PERSONAL_DETAILS_LIST) {
                 return [
                     {
-                        12345: {
-                            accountID: 12345,
+                        [TEST_ACCOUNT_ID]: {
+                            accountID: TEST_ACCOUNT_ID,
                             displayName: 'Test Agent',
                             login: 'agent@example.com',
                             avatar: undefined,

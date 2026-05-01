@@ -7,9 +7,16 @@ import type {AvatarSource} from '@libs/UserAvatarUtils';
 import CONST from '@src/CONST';
 
 type AgentsListRowProps = {
+    /** Account ID of the agent */
     accountID: number;
+
+    /** Display name of the agent */
     displayName: string;
+
+    /** Login email of the agent */
     login: string;
+
+    /** Avatar source of the agent */
     avatar: AvatarSource;
 };
 
@@ -42,7 +49,7 @@ function AgentsListRow({accountID, displayName, login, avatar}: AgentsListRowPro
                     {login}
                 </Text>
             </View>
-            {/* Chat, Co-pilot and Edit buttons will be added in R1.3 */}
+            {/* Action buttons are deferred to R1.3 per phased rollout plan */}
         </View>
     );
 }
