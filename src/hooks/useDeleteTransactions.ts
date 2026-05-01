@@ -158,6 +158,7 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
                         reportID: report?.reportID ?? String(CONST.DEFAULT_NUMBER_ID),
                         originalTransactionID: transactionID,
                         splitExpenses: remainingSplitExpenses,
+                        splitExpensesTotal: remainingSplitExpenses.reduce((total, item) => total + item.amount, 0),
                     },
                     searchContext: {
                         currentSearchHash,
