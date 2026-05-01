@@ -1,5 +1,5 @@
 import {hasSeenTourSelector} from '@selectors/Onboarding';
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Hoverable from '@components/Hoverable';
@@ -152,7 +152,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         'Members',
     ]);
 
-    const onDisabledOrganizeSwitchPress = useCallback(async () => {
+    const onDisabledOrganizeSwitchPress = async () => {
         if (!hasAccountingConnection || !policyID) {
             return;
         }
@@ -166,9 +166,9 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             return;
         }
         Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
-    }, [hasAccountingConnection, policyID, showConfirmModal, translate]);
+    };
 
-    const onDisabledIntegrateSwitchPress = useCallback(async () => {
+    const onDisabledIntegrateSwitchPress = async () => {
         if (!hasAccountingConnection || !policyID) {
             return;
         }
@@ -182,9 +182,9 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             return;
         }
         Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
-    }, [hasAccountingConnection, policyID, showConfirmModal, translate]);
+    };
 
-    const onDisabledReceiptPartnersSwitchPress = useCallback(async () => {
+    const onDisabledReceiptPartnersSwitchPress = async () => {
         if (!isUberConnected) {
             return;
         }
@@ -194,9 +194,9 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             confirmText: translate('workspace.moreFeatures.receiptPartnersWarningModal.confirmText'),
             shouldShowCancelButton: false,
         });
-    }, [isUberConnected, showConfirmModal, translate]);
+    };
 
-    const onDisabledExpensifyCardSwitchPress = useCallback(async () => {
+    const onDisabledExpensifyCardSwitchPress = async () => {
         const {action} = await showConfirmModal({
             title: translate('workspace.moreFeatures.expensifyCard.disableCardTitle'),
             prompt: translate('workspace.moreFeatures.expensifyCard.disableCardPrompt'),
@@ -207,9 +207,9 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             return;
         }
         navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
-    }, [betas, conciergeReportID, currentUserAccountID, introSelected, isSelfTourViewed, showConfirmModal, translate]);
+    };
 
-    const onDisabledCompanyCardsSwitchPress = useCallback(async () => {
+    const onDisabledCompanyCardsSwitchPress = async () => {
         const {action} = await showConfirmModal({
             title: translate('workspace.moreFeatures.companyCards.disableCardTitle'),
             prompt: translate('workspace.moreFeatures.companyCards.disableCardPrompt'),
@@ -220,9 +220,9 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             return;
         }
         navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
-    }, [betas, conciergeReportID, currentUserAccountID, introSelected, isSelfTourViewed, showConfirmModal, translate]);
+    };
 
-    const onDisabledWorkflowPress = useCallback(async () => {
+    const onDisabledWorkflowPress = async () => {
         if (!isSmartLimitEnabled || !policyID) {
             return;
         }
@@ -236,7 +236,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             return;
         }
         Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID));
-    }, [isSmartLimitEnabled, policyID, showConfirmModal, translate]);
+    };
 
     const spendItems: Item[] = [
         {
@@ -618,106 +618,90 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         },
     ];
 
-    const getItemStyle = useCallback(
-        (item: Item, hovered: boolean) => [
-            styles.workspaceSectionMoreFeaturesItem,
-            shouldUseNarrowLayout && styles.flexBasis100,
-            shouldUseNarrowLayout && StyleUtils.getMinimumWidth(0),
-            hovered && item.isActive && !!item.onPress && styles.hoveredComponentBG,
-        ],
-        [styles.workspaceSectionMoreFeaturesItem, styles.flexBasis100, styles.hoveredComponentBG, shouldUseNarrowLayout, StyleUtils],
-    );
+    const getItemStyle = (item: Item, hovered: boolean) => [
+        styles.workspaceSectionMoreFeaturesItem,
+        shouldUseNarrowLayout && styles.flexBasis100,
+        shouldUseNarrowLayout && StyleUtils.getMinimumWidth(0),
+        hovered && item.isActive && !!item.onPress && styles.hoveredComponentBG,
+    ];
 
-    const renderItem = useCallback(
-        (item: Item) => (
-            <Hoverable key={item.titleTranslationKey}>
-                {(hovered) => (
-                    <View style={getItemStyle(item, hovered)}>
-                        <ToggleSettingOptionRow
-                            icon={item.icon}
-                            disabled={item.disabled}
-                            disabledAction={item.disabledAction}
-                            title={translate(item.titleTranslationKey)}
-                            titleStyle={styles.textStrong}
-                            subtitle={translate(item.subtitleTranslationKey)}
-                            switchAccessibilityLabel={translate(item.subtitleTranslationKey)}
-                            isActive={item.isActive}
-                            pendingAction={item.pendingAction}
-                            onToggle={item.action}
-                            showLockIcon={item.disabled}
-                            errors={item.errors}
-                            onCloseError={item.onCloseError}
-                            onPress={item.onPress}
-                        />
-                    </View>
-                )}
-            </Hoverable>
-        ),
-        [styles, translate, getItemStyle],
+    const renderItem = (item: Item) => (
+        <Hoverable key={item.titleTranslationKey}>
+            {(hovered) => (
+                <View style={getItemStyle(item, hovered)}>
+                    <ToggleSettingOptionRow
+                        icon={item.icon}
+                        disabled={item.disabled}
+                        disabledAction={item.disabledAction}
+                        title={translate(item.titleTranslationKey)}
+                        titleStyle={styles.textStrong}
+                        subtitle={translate(item.subtitleTranslationKey)}
+                        switchAccessibilityLabel={translate(item.subtitleTranslationKey)}
+                        isActive={item.isActive}
+                        pendingAction={item.pendingAction}
+                        onToggle={item.action}
+                        showLockIcon={item.disabled}
+                        errors={item.errors}
+                        onCloseError={item.onCloseError}
+                        onPress={item.onPress}
+                    />
+                </View>
+            )}
+        </Hoverable>
     );
 
     /** Used to fill row space in the Section items when there are odd number of items to create equal margins for last odd item. */
-    const sectionRowFillerItem = useCallback(
-        (section: SectionObject) => {
-            if (section.items.length % 2 === 0) {
-                return null;
-            }
+    const sectionRowFillerItem = (section: SectionObject) => {
+        if (section.items.length % 2 === 0) {
+            return null;
+        }
 
-            return (
-                <View
-                    key="section-filler-col"
-                    aria-hidden
-                    accessibilityElementsHidden
-                    style={[
-                        styles.workspaceSectionMoreFeaturesItem,
-                        shouldUseNarrowLayout && StyleUtils.getMinimumWidth(0),
-                        styles.p0,
-                        styles.mt0,
-                        styles.visibilityHidden,
-                        styles.bgTransparent,
-                    ]}
-                />
-            );
-        },
-        [styles, StyleUtils, shouldUseNarrowLayout],
-    );
-
-    const renderSection = useCallback(
-        (section: SectionObject) => (
+        return (
             <View
-                key={section.titleTranslationKey}
-                style={[styles.mt3, shouldUseNarrowLayout ? styles.workspaceSectionMobile : {}]}
+                key="section-filler-col"
+                aria-hidden
+                accessibilityElementsHidden
+                style={[
+                    styles.workspaceSectionMoreFeaturesItem,
+                    shouldUseNarrowLayout && StyleUtils.getMinimumWidth(0),
+                    styles.p0,
+                    styles.mt0,
+                    styles.visibilityHidden,
+                    styles.bgTransparent,
+                ]}
+            />
+        );
+    };
+
+    const renderSection = (section: SectionObject) => (
+        <View
+            key={section.titleTranslationKey}
+            style={[styles.mt3, shouldUseNarrowLayout ? styles.workspaceSectionMobile : {}]}
+        >
+            <Section
+                containerStyles={[styles.ph1, styles.pv0, styles.bgTransparent, styles.noBorderRadius]}
+                childrenStyles={[styles.flexRow, styles.flexWrap, styles.columnGap3]}
+                renderTitle={() => (
+                    <Text
+                        style={styles.mutedNormalTextLabel}
+                        accessibilityRole={CONST.ROLE.HEADER}
+                    >
+                        {translate(section.titleTranslationKey)}
+                    </Text>
+                )}
+                subtitleMuted
             >
-                <Section
-                    containerStyles={[styles.ph1, styles.pv0, styles.bgTransparent, styles.noBorderRadius]}
-                    childrenStyles={[styles.flexRow, styles.flexWrap, styles.columnGap3]}
-                    renderTitle={() => (
-                        <Text
-                            style={styles.mutedNormalTextLabel}
-                            accessibilityRole={CONST.ROLE.HEADER}
-                        >
-                            {translate(section.titleTranslationKey)}
-                        </Text>
-                    )}
-                    subtitleMuted
-                >
-                    {section.items.map(renderItem)}
-                    {sectionRowFillerItem(section)}
-                </Section>
-            </View>
-        ),
-        [shouldUseNarrowLayout, styles, renderItem, translate, sectionRowFillerItem],
+                {section.items.map(renderItem)}
+                {sectionRowFillerItem(section)}
+            </Section>
+        </View>
     );
 
-    const fetchFeatures = useCallback(() => {
+    useEffect(() => {
         openPolicyMoreFeaturesPage(route.params.policyID);
     }, [route.params.policyID]);
 
-    useEffect(() => {
-        fetchFeatures();
-    }, [fetchFeatures]);
-
-    useNetwork({onReconnect: fetchFeatures});
+    useNetwork({onReconnect: () => openPolicyMoreFeaturesPage(route.params.policyID)});
 
     return (
         <AccessOrNotFoundWrapper
