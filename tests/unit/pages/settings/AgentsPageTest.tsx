@@ -177,4 +177,22 @@ describe('AgentsPage', () => {
         expect(output).toContain('Test Agent');
         expect(output).not.toContain('agentsPage.emptyAgents.title');
     });
+
+    it('excludes agents whose personal details are missing from the list', () => {
+        const TEST_ACCOUNT_ID = 12345;
+        mockUseOnyx.mockImplementation((key) => {
+            if (key === ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT) {
+                return [{[`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`]: {prompt: 'Test prompt'}}, {status: 'loaded'}];
+            }
+            // personalDetailsList has no entry for TEST_ACCOUNT_ID
+            if (key === ONYXKEYS.PERSONAL_DETAILS_LIST) {
+                return [{}, {status: 'loaded'}];
+            }
+            return [undefined, {status: 'loaded'}];
+        });
+
+        const {toJSON} = render(<AgentsPage />);
+
+        expect(JSON.stringify(toJSON())).toContain('agentsPage.emptyAgents.title');
+    });
 });
