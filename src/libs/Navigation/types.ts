@@ -445,6 +445,14 @@ type SettingsNavigatorParamList = {
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };
+    [SCREENS.WORKSPACE.DYNAMIC_SPEND_CATEGORY_SELECTOR]: {
+        policyID: string;
+        groupID: string;
+    };
+    [SCREENS.WORKSPACE.DYNAMIC_DEFAULT_CATEGORY_SELECTOR]: {
+        policyID: string;
+        customUnitID: string;
+    };
     [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_IMPORT]: {
         policyID: string;
     };

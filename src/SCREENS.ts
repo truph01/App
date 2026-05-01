@@ -788,6 +788,8 @@ const SCREENS = {
         CATEGORIES_SETTINGS: 'Categories_Settings',
         DYNAMIC_CATEGORIES_IMPORT: 'Dynamic_Categories_Import',
         DYNAMIC_CATEGORIES_IMPORTED: 'Dynamic_Categories_Imported',
+        DYNAMIC_SPEND_CATEGORY_SELECTOR: 'Dynamic_Spend_Category_Selector',
+        DYNAMIC_DEFAULT_CATEGORY_SELECTOR: 'Dynamic_Default_Category_Selector',
         MORE_FEATURES: 'Workspace_More_Features',
         MEMBER_DETAILS: 'Workspace_Member_Details',
         MEMBER_DETAILS_ROLE: 'Workspace_Member_Details_Role',
