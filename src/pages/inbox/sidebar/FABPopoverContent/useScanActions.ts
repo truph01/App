@@ -55,7 +55,7 @@ function useScanActions() {
 
     const startQuickScan = () => {
         interceptAnonymousUser(() => {
-            if (policyChatPolicyID && policyChatPolicy && shouldRestrictUserBillableActions(policyChatPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
+            if (policyChatPolicyID && shouldRestrictUserBillableActions(policyChatPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, session?.accountID)) {
                 Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyChatPolicyID));
                 return;
             }
