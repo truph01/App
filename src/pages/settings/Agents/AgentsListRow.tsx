@@ -24,7 +24,7 @@ function AgentsListRow({accountID, displayName, login, avatar}: AgentsListRowPro
     const styles = useThemeStyles();
 
     return (
-        <View style={[styles.flexRow, styles.alignItemsCenter, styles.p5, styles.gap3]}>
+        <View style={[styles.flexRow, styles.alignItemsCenter, styles.highlightBG, styles.br3, styles.mh5, styles.mb3, styles.ph5, styles.pv3, styles.gap5]}>
             <Avatar
                 size={CONST.AVATAR_SIZE.DEFAULT}
                 source={avatar}
@@ -32,7 +32,7 @@ function AgentsListRow({accountID, displayName, login, avatar}: AgentsListRowPro
                 name={displayName}
                 type={CONST.ICON_TYPE_AVATAR}
             />
-            <View style={styles.flex1}>
+            <View style={[styles.flex1, styles.gap2]}>
                 <Text
                     numberOfLines={1}
                     style={styles.textStrong}
@@ -41,7 +41,7 @@ function AgentsListRow({accountID, displayName, login, avatar}: AgentsListRowPro
                 </Text>
                 <Text
                     numberOfLines={1}
-                    style={[styles.textMicro, styles.textSupporting]}
+                    style={styles.mutedNormalTextLabel}
                 >
                     {login}
                 </Text>
