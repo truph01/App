@@ -55,6 +55,7 @@ function AgentsPage() {
                     headerMedia={illustrations.TvScreenRobot}
                     title={translate('agentsPage.emptyAgents.title')}
                     subtitle={translate('agentsPage.emptyAgents.subtitle')}
+                    subtitleStyles={styles.agentsPageEmptyStateSubtitle}
                     headerStyles={styles.emptyStateCardIllustrationContainer}
                     headerContentStyles={styles.agentsPageEmptyStateIllustration}
                     buttons={[
