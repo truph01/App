@@ -99,9 +99,10 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
             if (!transactions) {
                 return [];
             }
+            const isIOU = isIOUReport(report);
             return Object.values(transactions || {}).filter((item) => {
                 const isUnreported = isUnreportedTransaction(item);
-                if (isIOUReport(report) && !isUnreported) {
+                if (isIOU && !isUnreported) {
                     return false;
                 }
 
@@ -131,7 +132,7 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
                 }
 
                 // Zero amount expenses are not allowed in IOU reports
-                if (isIOUReport(report) && transactionAmount === 0) {
+                if (isIOU && transactionAmount === 0) {
                     return false;
                 }
 
