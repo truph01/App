@@ -2783,7 +2783,7 @@ const translations = {
     },
     agentsPage: {
         title: 'Agents',
-        subtitle: 'Automate tasks with custom agents.',
+        subtitle: 'Create agents to handle your workflow. Skip the manual work and get hours back in your day.',
         newAgent: 'New agent',
         emptyAgents: {
             title: 'No agents created',

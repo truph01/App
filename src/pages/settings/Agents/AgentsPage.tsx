@@ -1,11 +1,15 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
+import {FlatList, View} from 'react-native';
+import Button from '@components/Button';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
+import Text from '@components/Text';
 import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -13,16 +17,28 @@ import Navigation from '@libs/Navigation/Navigation';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import {openAgentsPage} from '@userActions/Agent';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
+import AgentsListRow from './AgentsListRow';
+
+type AgentItem = {
+    accountID: number;
+    displayName: string;
+    login: string;
+    avatar: string;
+};
 
 function AgentsPage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot', 'AiBot']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'FallbackAvatar']);
     const {isBetaEnabled} = usePermissions();
     const isCustomAgentEnabled = isBetaEnabled(CONST.BETAS.CUSTOM_AGENT);
     useDocumentTitle(translate('agentsPage.title'));
+
+    const [agentPrompts] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT);
+    const [personalDetailsList] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
 
     useEffect(() => {
         if (!isCustomAgentEnabled) {
@@ -30,6 +46,51 @@ function AgentsPage() {
         }
         openAgentsPage();
     }, [isCustomAgentEnabled]);
+
+    const agentItems = useMemo<AgentItem[]>(
+        () =>
+            Object.keys(agentPrompts ?? {})
+                .map((key) => {
+                    const accountID = Number(key.slice(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT.length));
+                    const details = personalDetailsList?.[accountID];
+                    if (!details) {
+                        return null;
+                    }
+                    return {
+                        accountID,
+                        displayName: details.displayName ?? details.login ?? '',
+                        login: details.login ?? '',
+                        avatar: (details.avatar as string) ?? (icons.FallbackAvatar as string),
+                    };
+                })
+                .filter((item): item is AgentItem => item !== null),
+        [agentPrompts, personalDetailsList, icons.FallbackAvatar],
+    );
+
+    const renderItem = useCallback(
+        ({item}: {item: AgentItem}) => (
+            <AgentsListRow
+                accountID={item.accountID}
+                displayName={item.displayName}
+                login={item.login}
+                avatar={item.avatar}
+            />
+        ),
+        [],
+    );
+
+    const keyExtractor = useCallback((item: AgentItem) => String(item.accountID), []);
+
+    const hasAgents = agentItems.length > 0;
+
+    const newAgentButton = (
+        <Button
+            success
+            icon={icons.Plus}
+            text={translate('agentsPage.newAgent')}
+            onPress={() => {}}
+        />
+    );
 
     if (!isCustomAgentEnabled) {
         return <NotFoundPage />;
@@ -48,26 +109,34 @@ function AgentsPage() {
                 onBackButtonPress={() => Navigation.goBack()}
                 shouldShowBackButton={shouldUseNarrowLayout}
                 shouldUseHeadlineHeader
+                shouldDisplaySearchRouter
+                shouldDisplayHelpButton
                 title={translate('agentsPage.title')}
-            />
-            <ScrollView contentContainerStyle={[styles.flexGrow1, styles.flexShrink0]}>
-                <GenericEmptyStateComponent
-                    headerMedia={illustrations.TvScreenRobot}
-                    title={translate('agentsPage.emptyAgents.title')}
-                    subtitle={translate('agentsPage.emptyAgents.subtitle')}
-                    subtitleStyles={styles.agentsPageEmptyStateSubtitle}
-                    headerStyles={styles.emptyStateCardIllustrationContainer}
-                    headerContentStyles={styles.agentsPageEmptyStateIllustration}
-                    buttons={[
-                        {
-                            success: true,
-                            buttonAction: () => {},
-                            icon: icons.Plus,
-                            buttonText: translate('agentsPage.newAgent'),
-                        },
-                    ]}
-                />
-            </ScrollView>
+            >
+                {!shouldUseNarrowLayout && newAgentButton}
+            </HeaderWithBackButton>
+            {shouldUseNarrowLayout && <View style={[styles.ph5, styles.pb3]}>{newAgentButton}</View>}
+            {hasAgents ? (
+                <>
+                    <Text style={[styles.textSupporting, styles.ph5, styles.pb3, styles.pt3]}>{translate('agentsPage.subtitle')}</Text>
+                    <FlatList
+                        data={agentItems}
+                        renderItem={renderItem}
+                        keyExtractor={keyExtractor}
+                    />
+                </>
+            ) : (
+                <ScrollView contentContainerStyle={[styles.flexGrow1, styles.flexShrink0]}>
+                    <GenericEmptyStateComponent
+                        headerMedia={illustrations.TvScreenRobot}
+                        title={translate('agentsPage.emptyAgents.title')}
+                        subtitle={translate('agentsPage.emptyAgents.subtitle')}
+                        subtitleStyles={styles.agentsPageEmptyStateSubtitle}
+                        headerStyles={styles.emptyStateCardIllustrationContainer}
+                        headerContentStyles={styles.agentsPageEmptyStateIllustration}
+                    />
+                </ScrollView>
+            )}
         </ScreenWrapper>
     );
 }
