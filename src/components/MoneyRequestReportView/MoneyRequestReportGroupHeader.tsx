@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import Checkbox from '@components/Checkbox';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -68,7 +68,6 @@ function MoneyRequestReportGroupHeader({
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout: shouldUseNarrowLayoutHook} = useResponsiveLayoutOnWideRHP();
     const shouldUseNarrowLayout = shouldUseNarrowLayoutProp ?? shouldUseNarrowLayoutHook;
-    const isDesktopTableLayout = !shouldUseNarrowLayout;
 
     const cleanedGroupName = isGroupedByTag && group.groupName ? getCommaSeparatedTagNameWithSanitizedColons(group.groupName) : group.groupName;
     const displayName = cleanedGroupName || translate(isGroupedByTag ? 'reportLayout.noTag' : 'reportLayout.uncategorized');
@@ -78,11 +77,11 @@ function MoneyRequestReportGroupHeader({
 
     const textStyle = shouldUseNarrowLayout ? {fontSize: variables.fontSizeLabel, lineHeight: 16} : [styles.labelStrong];
 
-    const handleToggleSelection = useCallback(() => {
+    const handleToggleSelection = () => {
         onToggleSelection?.(groupKey);
-    }, [onToggleSelection, groupKey]);
+    };
 
-    const desktopGroupHeaderStyle = isDesktopTableLayout
+    const groupHeaderStyle = !shouldUseNarrowLayout
         ? [
               {minHeight: variables.tableGroupRowHeight},
               styles.justifyContentCenter,
@@ -96,7 +95,7 @@ function MoneyRequestReportGroupHeader({
 
     return (
         <OfflineWithFeedback pendingAction={pendingAction}>
-            <View style={desktopGroupHeaderStyle}>
+            <View style={groupHeaderStyle}>
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}>
                     {shouldShowCheckbox && (
                         <Checkbox
@@ -105,12 +104,12 @@ function MoneyRequestReportGroupHeader({
                             disabled={isDisabled}
                             onPress={handleToggleSelection}
                             accessibilityLabel={translate('reportLayout.selectGroup', {groupName: displayName})}
-                            containerStyle={isDesktopTableLayout && styles.m0}
-                            style={isDesktopTableLayout ? styles.mr3 : styles.mr2}
+                            containerStyle={!shouldUseNarrowLayout && styles.m0}
+                            style={!shouldUseNarrowLayout ? styles.mr3 : styles.mr2}
                         />
                     )}
                     <Text
-                        style={[styles.textBold, textStyle, styles.flexShrink1, shouldShowCheckbox && !isDesktopTableLayout && styles.ml2]}
+                        style={[styles.textBold, textStyle, styles.flexShrink1, shouldShowCheckbox && shouldUseNarrowLayout && styles.ml2]}
                         numberOfLines={1}
                     >
                         {displayName}

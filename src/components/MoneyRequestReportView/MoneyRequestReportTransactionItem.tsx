@@ -101,7 +101,6 @@ function MoneyRequestReportTransactionItem({
     const {isSmallScreenWidth, isMediumScreenWidth} = useResponsiveLayout();
     const {shouldUseNarrowLayout} = useResponsiveLayoutOnWideRHP();
     const theme = useTheme();
-    const isDesktopTableLayout = !shouldUseNarrowLayout;
     const isPendingDelete = isTransactionPendingDelete(transaction);
     const pendingAction = getTransactionPendingAction(transaction);
     // Filter violations based on user visibility and dismissal state at the row level.
@@ -120,7 +119,7 @@ function MoneyRequestReportTransactionItem({
     }, [scrollToNewTransaction, shouldBeHighlighted]);
 
     const animatedHighlightStyle = useAnimatedHighlightStyle({
-        borderRadius: isDesktopTableLayout ? 0 : variables.componentBorderRadius,
+        borderRadius: shouldUseNarrowLayout ? variables.componentBorderRadius : 0,
         shouldHighlight: shouldBeHighlighted,
         highlightColor: theme.messageHighlightBG,
         backgroundColor: theme.highlightBG,
@@ -130,7 +129,7 @@ function MoneyRequestReportTransactionItem({
     return (
         <OfflineWithFeedback
             pendingAction={pendingAction}
-            style={isDesktopTableLayout && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden]}
+            style={!shouldUseNarrowLayout && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden]}
         >
             <PressableWithFeedback
                 key={transaction.transactionID}
@@ -142,7 +141,7 @@ function MoneyRequestReportTransactionItem({
                 role={getButtonRole(true)}
                 isNested
                 id={transaction.transactionID}
-                style={[styles.transactionListItemStyle, isDesktopTableLayout ? StyleUtils.getSearchTableRowPressableStyle(isLastItem, isSelected) : styles.noBorderRadius]}
+                style={[styles.transactionListItemStyle, !shouldUseNarrowLayout ? StyleUtils.getSearchTableRowPressableStyle(isLastItem, isSelected) : styles.noBorderRadius]}
                 hoverStyle={[!isPendingDelete && styles.hoveredComponentBG, isSelected && styles.activeComponentBG]}
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                 onPressIn={() => canUseTouchScreen() && ControlSelection.block()}
@@ -170,7 +169,7 @@ function MoneyRequestReportTransactionItem({
                         onCheckboxPress={toggleTransaction}
                         columns={columns}
                         isDisabled={isPendingDelete}
-                        style={isDesktopTableLayout ? [styles.p3, styles.pv2, styles.noBorderRadius] : [styles.p4, styles.noBorderRadius]}
+                        style={!shouldUseNarrowLayout ? [styles.p3, styles.pv2, styles.noBorderRadius] : [styles.p4, styles.noBorderRadius]}
                         onButtonPress={() => {
                             handleOnPress(transaction.transactionID);
                         }}
