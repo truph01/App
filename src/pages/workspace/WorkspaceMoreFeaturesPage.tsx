@@ -119,7 +119,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
     const {showConfirmModal} = useConfirmModal();
-    const [isReceiptPartnersWarningModalOpen, setIsReceiptPartnersWarningModalOpen] = useState(false);
     const [isDisableExpensifyCardWarningModalOpen, setIsDisableExpensifyCardWarningModalOpen] = useState(false);
     const [isDisableCompanyCardsWarningModalOpen, setIsDisableCompanyCardsWarningModalOpen] = useState(false);
 
@@ -187,6 +186,18 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         }
         Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
     }, [hasAccountingConnection, policyID, showConfirmModal, translate]);
+
+    const onDisabledReceiptPartnersSwitchPress = useCallback(async () => {
+        if (!isUberConnected) {
+            return;
+        }
+        await showConfirmModal({
+            title: translate('workspace.moreFeatures.receiptPartnersWarningModal.featureEnabledTitle'),
+            prompt: translate('workspace.moreFeatures.receiptPartnersWarningModal.disconnectText'),
+            confirmText: translate('workspace.moreFeatures.receiptPartnersWarningModal.confirmText'),
+            shouldShowCancelButton: false,
+        });
+    }, [isUberConnected, showConfirmModal, translate]);
 
     const onDisabledWorkflowPress = useCallback(async () => {
         if (!isSmartLimitEnabled || !policyID) {
@@ -510,12 +521,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         subtitleTranslationKey: 'workspace.moreFeatures.receiptPartners.subtitle',
         isActive: policy?.receiptPartners?.enabled ?? false,
         pendingAction: policy?.pendingFields?.receiptPartners,
-        disabledAction: () => {
-            if (!isUberConnected) {
-                return;
-            }
-            setIsReceiptPartnersWarningModalOpen(true);
-        },
+        disabledAction: onDisabledReceiptPartnersSwitchPress,
         action: (isEnabled: boolean) => {
             if (!policyID) {
                 return;
@@ -720,21 +726,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     {sections.map(renderSection)}
                 </ScrollView>
 
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.receiptPartnersWarningModal.featureEnabledTitle')}
-                    onConfirm={() => {
-                        if (!policyID) {
-                            return;
-                        }
-                        setIsReceiptPartnersWarningModalOpen(false);
-                        // TODO: Navigate to Receipt Partners settings page when it exists
-                        // Navigation.navigate(ROUTES.POLICY_RECEIPT_PARTNERS.getRoute(policyID));
-                    }}
-                    isVisible={isReceiptPartnersWarningModalOpen}
-                    prompt={translate('workspace.moreFeatures.receiptPartnersWarningModal.disconnectText')}
-                    confirmText={translate('workspace.moreFeatures.receiptPartnersWarningModal.confirmText')}
-                    shouldShowCancelButton={false}
-                />
                 <ConfirmModal
                     title={translate('workspace.moreFeatures.expensifyCard.disableCardTitle')}
                     isVisible={isDisableExpensifyCardWarningModalOpen}
