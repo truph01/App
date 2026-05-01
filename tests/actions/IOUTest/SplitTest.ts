@@ -4605,9 +4605,9 @@ describe('updateSplitTransactions', () => {
                 reportID,
                 originalTransactionID: txID,
                 splitExpenses: [
-                    {transactionID: splitIDs[0], amount: splitAmount, created: DateUtils.getDBTime()},
-                    {transactionID: splitIDs[1], amount: splitAmount, created: DateUtils.getDBTime()},
-                    {transactionID: splitIDs[2], amount: splitAmount, created: DateUtils.getDBTime()},
+                    {transactionID: splitIDs.at(0) ?? '', amount: splitAmount, created: DateUtils.getDBTime()},
+                    {transactionID: splitIDs.at(1) ?? '', amount: splitAmount, created: DateUtils.getDBTime()},
+                    {transactionID: splitIDs.at(2) ?? '', amount: splitAmount, created: DateUtils.getDBTime()},
                 ],
                 splitExpensesTotal,
             },
