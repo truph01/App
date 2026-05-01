@@ -1,7 +1,6 @@
 import {hasSeenTourSelector} from '@selectors/Onboarding';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {View} from 'react-native';
-import ConfirmModal from '@components/ConfirmModal';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Hoverable from '@components/Hoverable';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
@@ -119,7 +118,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
     const {showConfirmModal} = useConfirmModal();
-    const [isDisableCompanyCardsWarningModalOpen, setIsDisableCompanyCardsWarningModalOpen] = useState(false);
 
     const perDiemCustomUnit = getPerDiemCustomUnit(policy);
     const distanceRateCustomUnit = getDistanceRateCustomUnit(policy);
@@ -203,6 +201,19 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             title: translate('workspace.moreFeatures.expensifyCard.disableCardTitle'),
             prompt: translate('workspace.moreFeatures.expensifyCard.disableCardPrompt'),
             confirmText: translate('workspace.moreFeatures.expensifyCard.disableCardButton'),
+            cancelText: translate('common.cancel'),
+        });
+        if (action !== ModalActions.CONFIRM) {
+            return;
+        }
+        navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
+    }, [betas, conciergeReportID, currentUserAccountID, introSelected, isSelfTourViewed, showConfirmModal, translate]);
+
+    const onDisabledCompanyCardsSwitchPress = useCallback(async () => {
+        const {action} = await showConfirmModal({
+            title: translate('workspace.moreFeatures.companyCards.disableCardTitle'),
+            prompt: translate('workspace.moreFeatures.companyCards.disableCardPrompt'),
+            confirmText: translate('workspace.moreFeatures.companyCards.disableCardButton'),
             cancelText: translate('common.cancel'),
         });
         if (action !== ModalActions.CONFIRM) {
@@ -302,9 +313,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             }
             enableCompanyCards(policyID, isEnabled, true);
         },
-        disabledAction: () => {
-            setIsDisableCompanyCardsWarningModalOpen(true);
-        },
+        disabledAction: onDisabledCompanyCardsSwitchPress,
         onPress: () => {
             if (!policyID) {
                 return;
@@ -735,19 +744,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     <Text style={[styles.ph5, styles.mb5, styles.mt3, styles.textSupporting, styles.workspaceSectionMobile]}>{translate('workspace.moreFeatures.subtitle')}</Text>
                     {sections.map(renderSection)}
                 </ScrollView>
-
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.companyCards.disableCardTitle')}
-                    isVisible={isDisableCompanyCardsWarningModalOpen}
-                    onConfirm={() => {
-                        setIsDisableCompanyCardsWarningModalOpen(false);
-                        navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
-                    }}
-                    onCancel={() => setIsDisableCompanyCardsWarningModalOpen(false)}
-                    prompt={translate('workspace.moreFeatures.companyCards.disableCardPrompt')}
-                    confirmText={translate('workspace.moreFeatures.companyCards.disableCardButton')}
-                    cancelText={translate('common.cancel')}
-                />
             </ScreenWrapper>
         </AccessOrNotFoundWrapper>
     );
