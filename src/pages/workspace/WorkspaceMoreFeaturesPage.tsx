@@ -119,7 +119,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
     const {showConfirmModal} = useConfirmModal();
-    const [isDisableExpensifyCardWarningModalOpen, setIsDisableExpensifyCardWarningModalOpen] = useState(false);
     const [isDisableCompanyCardsWarningModalOpen, setIsDisableCompanyCardsWarningModalOpen] = useState(false);
 
     const perDiemCustomUnit = getPerDiemCustomUnit(policy);
@@ -199,6 +198,19 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         });
     }, [isUberConnected, showConfirmModal, translate]);
 
+    const onDisabledExpensifyCardSwitchPress = useCallback(async () => {
+        const {action} = await showConfirmModal({
+            title: translate('workspace.moreFeatures.expensifyCard.disableCardTitle'),
+            prompt: translate('workspace.moreFeatures.expensifyCard.disableCardPrompt'),
+            confirmText: translate('workspace.moreFeatures.expensifyCard.disableCardButton'),
+            cancelText: translate('common.cancel'),
+        });
+        if (action !== ModalActions.CONFIRM) {
+            return;
+        }
+        navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
+    }, [betas, conciergeReportID, currentUserAccountID, introSelected, isSelfTourViewed, showConfirmModal, translate]);
+
     const onDisabledWorkflowPress = useCallback(async () => {
         if (!isSmartLimitEnabled || !policyID) {
             return;
@@ -267,9 +279,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                 }
                 enableExpensifyCard(policyID, isEnabled);
             },
-            disabledAction: () => {
-                setIsDisableExpensifyCardWarningModalOpen(true);
-            },
+            disabledAction: onDisabledExpensifyCardSwitchPress,
             onPress: () => {
                 if (!policyID) {
                     return;
@@ -726,18 +736,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     {sections.map(renderSection)}
                 </ScrollView>
 
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.expensifyCard.disableCardTitle')}
-                    isVisible={isDisableExpensifyCardWarningModalOpen}
-                    onConfirm={() => {
-                        setIsDisableExpensifyCardWarningModalOpen(false);
-                        navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
-                    }}
-                    onCancel={() => setIsDisableExpensifyCardWarningModalOpen(false)}
-                    prompt={translate('workspace.moreFeatures.expensifyCard.disableCardPrompt')}
-                    confirmText={translate('workspace.moreFeatures.expensifyCard.disableCardButton')}
-                    cancelText={translate('common.cancel')}
-                />
                 <ConfirmModal
                     title={translate('workspace.moreFeatures.companyCards.disableCardTitle')}
                     isVisible={isDisableCompanyCardsWarningModalOpen}
