@@ -295,6 +295,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
             screenName: SCREENS.SETTINGS.AGENTS.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.AGENTS,
             action: () => Navigation.navigate(ROUTES.SETTINGS_AGENTS),
+            badgeText: translate('common.beta'),
         });
     }
 
