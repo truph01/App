@@ -125,7 +125,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const settings = getCardSettings(cardSettings);
     const paymentBankAccountID = settings?.paymentBankAccountID;
 
-    const onDisabledOrganizeSwitchPress = async () => {
+    const warnAccountingManagesOrganizeFeature = async () => {
         if (!hasAccountingConnection || !policyID) {
             return;
         }
@@ -141,7 +141,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
     };
 
-    const onDisabledIntegrateSwitchPress = async () => {
+    const warnDisconnectAccountingFirst = async () => {
         if (!hasAccountingConnection || !policyID) {
             return;
         }
@@ -157,7 +157,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
     };
 
-    const onDisabledReceiptPartnersSwitchPress = async () => {
+    const warnReceiptPartnersStillConnected = async () => {
         if (!isUberConnected) {
             return;
         }
@@ -169,7 +169,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         });
     };
 
-    const onDisabledExpensifyCardSwitchPress = async () => {
+    const promptDisableExpensifyCardViaConcierge = async () => {
         const {action} = await showConfirmModal({
             title: translate('workspace.moreFeatures.expensifyCard.disableCardTitle'),
             prompt: translate('workspace.moreFeatures.expensifyCard.disableCardPrompt'),
@@ -182,7 +182,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
     };
 
-    const onDisabledCompanyCardsSwitchPress = async () => {
+    const promptDisableCompanyCardsViaConcierge = async () => {
         const {action} = await showConfirmModal({
             title: translate('workspace.moreFeatures.companyCards.disableCardTitle'),
             prompt: translate('workspace.moreFeatures.companyCards.disableCardPrompt'),
@@ -195,7 +195,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, false);
     };
 
-    const onDisabledWorkflowPress = async () => {
+    const promptDisableSmartLimitForWorkflows = async () => {
         if (!isSmartLimitEnabled || !policyID) {
             return;
         }
@@ -248,7 +248,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={isAccountingEnabled}
                             pendingAction={policy?.pendingFields?.areConnectionsEnabled}
                             disabled={hasAccountingConnection}
-                            disabledAction={onDisabledIntegrateSwitchPress}
+                            disabledAction={warnDisconnectAccountingFirst}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
@@ -276,7 +276,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={policy?.receiptPartners?.enabled ?? false}
                             pendingAction={policy?.pendingFields?.receiptPartners}
                             disabled={isUberConnected}
-                            disabledAction={onDisabledReceiptPartnersSwitchPress}
+                            disabledAction={warnReceiptPartnersStillConnected}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
@@ -337,7 +337,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={policy?.areCategoriesEnabled ?? false}
                             pendingAction={policy?.pendingFields?.areCategoriesEnabled}
                             disabled={hasAccountingConnection}
-                            disabledAction={onDisabledOrganizeSwitchPress}
+                            disabledAction={warnAccountingManagesOrganizeFeature}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
@@ -358,7 +358,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={policy?.areTagsEnabled ?? false}
                             pendingAction={policy?.pendingFields?.areTagsEnabled}
                             disabled={hasAccountingConnection}
-                            disabledAction={onDisabledOrganizeSwitchPress}
+                            disabledAction={warnAccountingManagesOrganizeFeature}
                             onToggle={(isEnabled) => {
                                 enablePolicyTags(policyData, isEnabled);
                             }}
@@ -376,7 +376,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={(policy?.tax?.trackingEnabled ?? false) || isSyncTaxEnabled}
                             pendingAction={policy?.pendingFields?.tax}
                             disabled={hasAccountingConnection}
-                            disabledAction={onDisabledOrganizeSwitchPress}
+                            disabledAction={warnAccountingManagesOrganizeFeature}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
@@ -404,7 +404,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={policy?.areWorkflowsEnabled ?? false}
                             pendingAction={policy?.pendingFields?.areWorkflowsEnabled}
                             disabled={isSmartLimitEnabled}
-                            disabledAction={onDisabledWorkflowPress}
+                            disabledAction={promptDisableSmartLimitForWorkflows}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
@@ -491,7 +491,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={policy?.areExpensifyCardsEnabled ?? false}
                             pendingAction={policy?.pendingFields?.areExpensifyCardsEnabled}
                             disabled={(!!policy?.areExpensifyCardsEnabled && !!paymentBankAccountID) || !isEmptyObject(cardsList)}
-                            disabledAction={onDisabledExpensifyCardSwitchPress}
+                            disabledAction={promptDisableExpensifyCardViaConcierge}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
@@ -512,7 +512,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             isActive={policy?.areCompanyCardsEnabled ?? false}
                             pendingAction={policy?.pendingFields?.areCompanyCardsEnabled}
                             disabled={!isEmptyObject(getCompanyFeeds(cardFeeds))}
-                            disabledAction={onDisabledCompanyCardsSwitchPress}
+                            disabledAction={promptDisableCompanyCardsViaConcierge}
                             onToggle={(isEnabled) => {
                                 if (!policyID) {
                                     return;
