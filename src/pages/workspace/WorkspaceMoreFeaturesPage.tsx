@@ -119,7 +119,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
     const {showConfirmModal} = useConfirmModal();
-    const [isOrganizeWarningModalOpen, setIsOrganizeWarningModalOpen] = useState(false);
     const [isIntegrateWarningModalOpen, setIsIntegrateWarningModalOpen] = useState(false);
     const [isReceiptPartnersWarningModalOpen, setIsReceiptPartnersWarningModalOpen] = useState(false);
     const [isDisableExpensifyCardWarningModalOpen, setIsDisableExpensifyCardWarningModalOpen] = useState(false);
@@ -158,12 +157,21 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         'Members',
     ]);
 
-    const onDisabledOrganizeSwitchPress = useCallback(() => {
-        if (!hasAccountingConnection) {
+    const onDisabledOrganizeSwitchPress = useCallback(async () => {
+        if (!hasAccountingConnection || !policyID) {
             return;
         }
-        setIsOrganizeWarningModalOpen(true);
-    }, [hasAccountingConnection]);
+        const {action} = await showConfirmModal({
+            title: translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle'),
+            prompt: translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledText'),
+            confirmText: translate('workspace.moreFeatures.connectionsWarningModal.manageSettings'),
+            cancelText: translate('common.cancel'),
+        });
+        if (action !== ModalActions.CONFIRM) {
+            return;
+        }
+        Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
+    }, [hasAccountingConnection, policyID, showConfirmModal, translate]);
 
     const onDisabledWorkflowPress = useCallback(async () => {
         if (!isSmartLimitEnabled || !policyID) {
@@ -702,21 +710,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     {sections.map(renderSection)}
                 </ScrollView>
 
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle')}
-                    onConfirm={() => {
-                        if (!policyID) {
-                            return;
-                        }
-                        setIsOrganizeWarningModalOpen(false);
-                        Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
-                    }}
-                    onCancel={() => setIsOrganizeWarningModalOpen(false)}
-                    isVisible={isOrganizeWarningModalOpen}
-                    prompt={translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledText')}
-                    confirmText={translate('workspace.moreFeatures.connectionsWarningModal.manageSettings')}
-                    cancelText={translate('common.cancel')}
-                />
                 <ConfirmModal
                     title={translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle')}
                     onConfirm={() => {
