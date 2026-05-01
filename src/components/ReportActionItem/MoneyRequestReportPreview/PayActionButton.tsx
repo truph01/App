@@ -165,6 +165,7 @@ function PayActionButton({
                     introSelected,
                     iouReportCurrentNextStepDeprecated: iouReportNextStep,
                     currentUserAccountID,
+                    currentUserLogin: currentUserDetails.login ?? '',
                     activePolicy,
                     policy,
                     chatReportPolicy,
