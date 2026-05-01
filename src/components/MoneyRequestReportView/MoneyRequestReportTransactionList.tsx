@@ -671,17 +671,7 @@ function MoneyRequestReportTransactionList({
 
     const tableHeaderContent = (
         <OfflineWithFeedback pendingAction={reportPendingAction}>
-            <View
-                style={[
-                    styles.dFlex,
-                    styles.flexRow,
-                    styles.pl5,
-                    styles.pr16,
-                    styles.alignItemsCenter,
-                    styles.borderBottom,
-                    selectedTransactionIDs.length > 0 && {borderColor: theme.buttonHoveredBG},
-                ]}
-            >
+            <View style={[styles.dFlex, styles.flexRow, styles.pl5, styles.pr16, styles.alignItemsCenter, StyleUtils.getSelectedBorderBottomStyle(selectedTransactionIDs.length > 0)]}>
                 <View style={[styles.dFlex, styles.flexRow, styles.pv2, styles.pr4, StyleUtils.getPaddingLeft(variables.w12)]}>
                     <Checkbox
                         onPress={() => {

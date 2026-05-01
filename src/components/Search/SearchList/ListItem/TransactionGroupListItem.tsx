@@ -214,7 +214,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
             ...(isLastItem ? styles.searchTableBottomRadius : {}),
         },
         isItemSelected && styles.activeComponentBG,
-        !isLargeScreenWidth && !isLastItem && {...styles.borderBottom, borderColor: isItemSelected ? theme.buttonHoveredBG : theme.border},
+        !isLargeScreenWidth && !isLastItem && StyleUtils.getSelectedBorderBottomStyle(isItemSelected),
     ];
     const pressableRef = useRef<View>(null);
 

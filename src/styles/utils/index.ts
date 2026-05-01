@@ -1845,6 +1845,11 @@ const createStyleUtils = (theme: ThemeColors, styles: ThemeStyles) => ({
         ...(padding?.horizontal !== undefined && {paddingHorizontal: padding.horizontal}),
     }),
 
+    getSelectedBorderBottomStyle: (isSelected?: boolean): ViewStyle => ({
+        ...styles.borderBottom,
+        borderColor: isSelected ? theme.buttonHoveredBG : theme.border,
+    }),
+
     getSearchTableHighlightBorderRadius: (isLargeScreenWidth: boolean): number => (isLargeScreenWidth ? 0 : variables.componentBorderRadius),
 
     getReportTableColumnStyles: (columnName: string, options: GetReportTableColumnStylesParams = {}): ViewStyle => {
