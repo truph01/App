@@ -4,11 +4,13 @@ import {View} from 'react-native';
 import ConfirmModal from '@components/ConfirmModal';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Hoverable from '@components/Hoverable';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
 import Text from '@components/Text';
 import useCardFeeds from '@hooks/useCardFeeds';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDefaultFundID from '@hooks/useDefaultFundID';
 import useIsPolicyConnectedToUberReceiptPartner from '@hooks/useIsPolicyConnectedToUberReceiptPartner';
@@ -78,7 +80,7 @@ type Item = {
     isActive: boolean;
     disabled?: boolean;
     action: (isEnabled: boolean) => void;
-    disabledAction?: () => void;
+    disabledAction?: () => void | Promise<void>;
     pendingAction: PendingAction | undefined;
     errors?: Errors;
     onCloseError?: () => void;
@@ -116,12 +118,12 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
+    const {showConfirmModal} = useConfirmModal();
     const [isOrganizeWarningModalOpen, setIsOrganizeWarningModalOpen] = useState(false);
     const [isIntegrateWarningModalOpen, setIsIntegrateWarningModalOpen] = useState(false);
     const [isReceiptPartnersWarningModalOpen, setIsReceiptPartnersWarningModalOpen] = useState(false);
     const [isDisableExpensifyCardWarningModalOpen, setIsDisableExpensifyCardWarningModalOpen] = useState(false);
     const [isDisableCompanyCardsWarningModalOpen, setIsDisableCompanyCardsWarningModalOpen] = useState(false);
-    const [isDisableWorkflowWarningModalOpen, setIsDisableWorkflowWarningModalOpen] = useState(false);
 
     const perDiemCustomUnit = getPerDiemCustomUnit(policy);
     const distanceRateCustomUnit = getDistanceRateCustomUnit(policy);
@@ -163,12 +165,21 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         setIsOrganizeWarningModalOpen(true);
     }, [hasAccountingConnection]);
 
-    const onDisabledWorkflowPress = useCallback(() => {
-        if (!isSmartLimitEnabled) {
+    const onDisabledWorkflowPress = useCallback(async () => {
+        if (!isSmartLimitEnabled || !policyID) {
             return;
         }
-        setIsDisableWorkflowWarningModalOpen(true);
-    }, [isSmartLimitEnabled]);
+        const {action} = await showConfirmModal({
+            title: translate('workspace.moreFeatures.workflowWarningModal.featureEnabledTitle'),
+            prompt: translate('workspace.moreFeatures.workflowWarningModal.featureEnabledText'),
+            confirmText: translate('workspace.moreFeatures.workflowWarningModal.confirmText'),
+            cancelText: translate('common.cancel'),
+        });
+        if (action !== ModalActions.CONFIRM) {
+            return;
+        }
+        Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID));
+    }, [isSmartLimitEnabled, policyID, showConfirmModal, translate]);
 
     const spendItems: Item[] = [
         {
@@ -758,18 +769,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     onCancel={() => setIsDisableCompanyCardsWarningModalOpen(false)}
                     prompt={translate('workspace.moreFeatures.companyCards.disableCardPrompt')}
                     confirmText={translate('workspace.moreFeatures.companyCards.disableCardButton')}
-                    cancelText={translate('common.cancel')}
-                />
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.workflowWarningModal.featureEnabledTitle')}
-                    isVisible={isDisableWorkflowWarningModalOpen}
-                    onConfirm={() => {
-                        setIsDisableWorkflowWarningModalOpen(false);
-                        Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID));
-                    }}
-                    onCancel={() => setIsDisableWorkflowWarningModalOpen(false)}
-                    prompt={translate('workspace.moreFeatures.workflowWarningModal.featureEnabledText')}
-                    confirmText={translate('workspace.moreFeatures.workflowWarningModal.confirmText')}
                     cancelText={translate('common.cancel')}
                 />
             </ScreenWrapper>
