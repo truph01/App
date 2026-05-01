@@ -119,7 +119,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const [cardFeeds] = useCardFeeds(policyID);
     const {showConfirmModal} = useConfirmModal();
-    const [isIntegrateWarningModalOpen, setIsIntegrateWarningModalOpen] = useState(false);
     const [isReceiptPartnersWarningModalOpen, setIsReceiptPartnersWarningModalOpen] = useState(false);
     const [isDisableExpensifyCardWarningModalOpen, setIsDisableExpensifyCardWarningModalOpen] = useState(false);
     const [isDisableCompanyCardsWarningModalOpen, setIsDisableCompanyCardsWarningModalOpen] = useState(false);
@@ -164,6 +163,22 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         const {action} = await showConfirmModal({
             title: translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle'),
             prompt: translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledText'),
+            confirmText: translate('workspace.moreFeatures.connectionsWarningModal.manageSettings'),
+            cancelText: translate('common.cancel'),
+        });
+        if (action !== ModalActions.CONFIRM) {
+            return;
+        }
+        Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
+    }, [hasAccountingConnection, policyID, showConfirmModal, translate]);
+
+    const onDisabledIntegrateSwitchPress = useCallback(async () => {
+        if (!hasAccountingConnection || !policyID) {
+            return;
+        }
+        const {action} = await showConfirmModal({
+            title: translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle'),
+            prompt: translate('workspace.moreFeatures.connectionsWarningModal.disconnectText'),
             confirmText: translate('workspace.moreFeatures.connectionsWarningModal.manageSettings'),
             cancelText: translate('common.cancel'),
         });
@@ -465,12 +480,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
             subtitleTranslationKey: 'workspace.moreFeatures.connections.subtitle',
             isActive: isAccountingEnabled,
             pendingAction: policy?.pendingFields?.areConnectionsEnabled,
-            disabledAction: () => {
-                if (!hasAccountingConnection) {
-                    return;
-                }
-                setIsIntegrateWarningModalOpen(true);
-            },
+            disabledAction: onDisabledIntegrateSwitchPress,
             action: (isEnabled: boolean) => {
                 if (!policyID) {
                     return;
@@ -710,21 +720,6 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                     {sections.map(renderSection)}
                 </ScrollView>
 
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle')}
-                    onConfirm={() => {
-                        if (!policyID) {
-                            return;
-                        }
-                        setIsIntegrateWarningModalOpen(false);
-                        Navigation.navigate(ROUTES.POLICY_ACCOUNTING.getRoute(policyID));
-                    }}
-                    onCancel={() => setIsIntegrateWarningModalOpen(false)}
-                    isVisible={isIntegrateWarningModalOpen}
-                    prompt={translate('workspace.moreFeatures.connectionsWarningModal.disconnectText')}
-                    confirmText={translate('workspace.moreFeatures.connectionsWarningModal.manageSettings')}
-                    cancelText={translate('common.cancel')}
-                />
                 <ConfirmModal
                     title={translate('workspace.moreFeatures.receiptPartnersWarningModal.featureEnabledTitle')}
                     onConfirm={() => {
