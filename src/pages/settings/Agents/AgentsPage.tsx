@@ -3,6 +3,7 @@ import {FlatList, View} from 'react-native';
 import Button from '@components/Button';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
@@ -24,7 +25,6 @@ type AgentItem = {
     accountID: number;
     displayName: string;
     login: string;
-    avatar: string;
 };
 
 function AgentsPage() {
@@ -32,13 +32,13 @@ function AgentsPage() {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot', 'AiBot']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'FallbackAvatar']);
+    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
     const {isBetaEnabled} = usePermissions();
     const isCustomAgentEnabled = isBetaEnabled(CONST.BETAS.CUSTOM_AGENT);
     useDocumentTitle(translate('agentsPage.title'));
 
     const [agentPrompts] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT);
-    const [personalDetailsList] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
+    const personalDetailsList = usePersonalDetails();
 
     useEffect(() => {
         if (!isCustomAgentEnabled) {
@@ -60,11 +60,10 @@ function AgentsPage() {
                         accountID,
                         displayName: details.displayName ?? details.login ?? '',
                         login: details.login ?? '',
-                        avatar: (details.avatar as string) ?? (icons.FallbackAvatar as string),
                     };
                 })
                 .filter((item): item is AgentItem => item !== null),
-        [agentPrompts, personalDetailsList, icons.FallbackAvatar],
+        [agentPrompts, personalDetailsList],
     );
 
     const renderItem = ({item}: {item: AgentItem}) => (
@@ -72,7 +71,6 @@ function AgentsPage() {
             accountID={item.accountID}
             displayName={item.displayName}
             login={item.login}
-            avatar={item.avatar}
         />
     );
 

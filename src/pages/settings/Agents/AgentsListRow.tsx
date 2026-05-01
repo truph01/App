@@ -1,9 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
-import Avatar from '@components/Avatar';
+import ReportActionAvatars from '@components/ReportActionAvatars';
 import Text from '@components/Text';
+import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
-import type {AvatarSource} from '@libs/UserAvatarUtils';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
 type AgentsListRowProps = {
@@ -15,25 +16,19 @@ type AgentsListRowProps = {
 
     /** Login email of the agent */
     login: string;
-
-    /** Avatar source of the agent */
-    avatar: AvatarSource;
 };
 
-function AgentsListRow({accountID, displayName, login, avatar}: AgentsListRowProps) {
+function AgentsListRow({accountID, displayName, login}: AgentsListRowProps) {
     const styles = useThemeStyles();
+    const StyleUtils = useStyleUtils();
 
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.highlightBG, styles.br3, styles.mh5, styles.mb3, styles.ph5, styles.pv3, styles.gap5]}>
-            <Avatar
-                size={CONST.AVATAR_SIZE.DEFAULT}
-                source={avatar}
-                avatarID={accountID}
-                name={displayName}
-                type={CONST.ICON_TYPE_AVATAR}
-                containerStyles={styles.agentsListRowAvatar}
-                imageStyles={styles.agentsListRowAvatar}
-                iconAdditionalStyles={styles.agentsListRowAvatarInner}
+            <ReportActionAvatars
+                accountIDs={[accountID]}
+                size={CONST.AVATAR_SIZE.LARGE_NORMAL}
+                shouldShowTooltip={false}
+                singleAvatarContainerStyle={[StyleUtils.getWidthAndHeightStyle(variables.avatarSizeLargeNormal)]}
             />
             <View style={[styles.flex1, styles.gap2]}>
                 <Text

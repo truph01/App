@@ -5500,19 +5500,6 @@ const staticStyles = (theme: ThemeColors) =>
             alignSelf: 'center',
         },
 
-        agentsListRowAvatar: {
-            width: variables.avatarSizeLargeNormal,
-            height: variables.avatarSizeLargeNormal,
-        },
-
-        agentsListRowAvatarInner: {
-            width: variables.avatarSizeLargeNormal,
-            height: variables.avatarSizeLargeNormal,
-            borderRadius: 24,
-            alignItems: 'center',
-            justifyContent: 'center',
-        },
-
         emptyStateFolderWithPaperIconSize: {
             width: 160,
             height: 100,

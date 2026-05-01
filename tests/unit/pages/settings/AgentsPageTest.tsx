@@ -1,5 +1,6 @@
 import {render} from '@testing-library/react-native';
 import React from 'react';
+import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import AgentsPage from '@pages/settings/Agents/AgentsPage';
@@ -36,10 +37,18 @@ jest.mock('@hooks/useDocumentTitle', () => jest.fn());
 
 jest.mock('@hooks/useLazyAsset', () => ({
     useMemoizedLazyIllustrations: jest.fn(() => ({TvScreenRobot: 1, AiBot: 1})),
-    useMemoizedLazyExpensifyIcons: jest.fn(() => ({Plus: 1, FallbackAvatar: 1})),
+    useMemoizedLazyExpensifyIcons: jest.fn(() => ({Plus: 1})),
 }));
 
 jest.mock('@hooks/useOnyx', () => jest.fn(() => [undefined, {status: 'loaded'}]));
+
+jest.mock('@components/OnyxListItemProvider', () => ({
+    usePersonalDetails: jest.fn(() => ({})),
+    useSession: jest.fn(() => ({})),
+    usePolicyCategories: jest.fn(() => ({})),
+    usePolicyTags: jest.fn(() => ({})),
+    useAllReportsTransactionsAndViolations: jest.fn(() => ({})),
+}));
 
 jest.mock('@libs/Navigation/Navigation', () => ({
     goBack: jest.fn(),
@@ -103,12 +112,14 @@ jest.mock('@pages/ErrorPage/NotFoundPage', () => {
 const mockUsePermissions = jest.mocked(usePermissions);
 const mockOpenAgentsPage = jest.mocked(openAgentsPage);
 const mockUseOnyx = jest.mocked(useOnyx);
+const mockUsePersonalDetails = jest.mocked(usePersonalDetails);
 
 describe('AgentsPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockUsePermissions.mockReturnValue({isBetaEnabled: () => true});
         mockUseOnyx.mockReturnValue([undefined, {status: 'loaded'}]);
+        mockUsePersonalDetails.mockReturnValue({});
     });
 
     it('renders page content when customAgent beta is enabled', () => {
@@ -155,20 +166,15 @@ describe('AgentsPage', () => {
             if (key === ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT) {
                 return [{[`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`]: {prompt: 'Test prompt'}}, {status: 'loaded'}];
             }
-            if (key === ONYXKEYS.PERSONAL_DETAILS_LIST) {
-                return [
-                    {
-                        [TEST_ACCOUNT_ID]: {
-                            accountID: TEST_ACCOUNT_ID,
-                            displayName: 'Test Agent',
-                            login: 'agent@example.com',
-                            avatar: undefined,
-                        },
-                    },
-                    {status: 'loaded'},
-                ];
-            }
             return [undefined, {status: 'loaded'}];
+        });
+        mockUsePersonalDetails.mockReturnValue({
+            [TEST_ACCOUNT_ID]: {
+                accountID: TEST_ACCOUNT_ID,
+                displayName: 'Test Agent',
+                login: 'agent@example.com',
+                avatar: undefined,
+            },
         });
 
         const {toJSON} = render(<AgentsPage />);
@@ -184,12 +190,10 @@ describe('AgentsPage', () => {
             if (key === ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT) {
                 return [{[`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`]: {prompt: 'Test prompt'}}, {status: 'loaded'}];
             }
-            // personalDetailsList has no entry for TEST_ACCOUNT_ID
-            if (key === ONYXKEYS.PERSONAL_DETAILS_LIST) {
-                return [{}, {status: 'loaded'}];
-            }
             return [undefined, {status: 'loaded'}];
         });
+        // personalDetailsList has no entry for TEST_ACCOUNT_ID
+        mockUsePersonalDetails.mockReturnValue({});
 
         const {toJSON} = render(<AgentsPage />);
 
