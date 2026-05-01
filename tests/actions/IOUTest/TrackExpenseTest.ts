@@ -681,7 +681,6 @@ describe('actions/IOU/TrackExpense', () => {
                 currentUserAccountIDParam: RORY_ACCOUNT_ID,
                 currentUserEmailParam: RORY_EMAIL,
                 introSelected: undefined,
-                activePolicyID: undefined,
                 quickAction: undefined,
                 recentWaypoints,
                 betas: [CONST.BETAS.ALL],
@@ -735,7 +734,7 @@ describe('actions/IOU/TrackExpense', () => {
                 currentUserAccountIDParam: RORY_ACCOUNT_ID,
                 currentUserEmailParam: RORY_EMAIL,
                 introSelected: undefined,
-                activePolicyID: undefined,
+                
                 quickAction: undefined,
                 recentWaypoints,
                 betas: [CONST.BETAS.ALL],
@@ -819,7 +818,7 @@ describe('actions/IOU/TrackExpense', () => {
                 currentUserAccountIDParam: RORY_ACCOUNT_ID,
                 currentUserEmailParam: RORY_EMAIL,
                 introSelected: undefined,
-                activePolicyID: undefined,
+                
                 quickAction: undefined,
                 recentWaypoints,
                 betas: [CONST.BETAS.ALL],
@@ -873,7 +872,7 @@ describe('actions/IOU/TrackExpense', () => {
                 currentUserAccountIDParam: RORY_ACCOUNT_ID,
                 currentUserEmailParam: RORY_EMAIL,
                 introSelected: undefined,
-                activePolicyID: undefined,
+                
                 quickAction: undefined,
                 recentWaypoints,
                 betas: [CONST.BETAS.ALL],
@@ -2079,7 +2078,7 @@ describe('actions/IOU/TrackExpense', () => {
                 currentUserAccountIDParam: TEST_USER_ACCOUNT_ID,
                 currentUserEmailParam: TEST_USER_LOGIN,
                 introSelected: undefined,
-                activePolicyID: undefined,
+                
                 quickAction: undefined,
                 recentWaypoints,
                 betas: [CONST.BETAS.ALL],

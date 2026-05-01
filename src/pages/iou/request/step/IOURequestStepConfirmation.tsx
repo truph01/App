@@ -12,12 +12,10 @@ import MoneyRequestConfirmationList from '@components/MoneyRequestConfirmationLi
 import {usePersonalDetails, usePolicyCategories} from '@components/OnyxListItemProvider';
 import PrevNextButtons from '@components/PrevNextButtons';
 import ScreenWrapper from '@components/ScreenWrapper';
-import useActivePolicy from '@hooks/useActivePolicy';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useFetchRoute from '@hooks/useFetchRoute';
 import useFilesValidation from '@hooks/useFilesValidation';
-import useHasActiveAdminPolicies from '@hooks/useHasActiveAdminPolicies';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -141,8 +139,6 @@ function IOURequestStepConfirmation({
         [transaction, transactionReport, reportWithDraftFallback, policyReal],
     );
 
-    const hasActiveAdminPolicies = useHasActiveAdminPolicies();
-    const activePolicy = useActivePolicy();
     const {policy} = usePolicyForTransaction({
         transaction: initialTransaction,
         reportPolicyID: realPolicyID ?? draftPolicyID,

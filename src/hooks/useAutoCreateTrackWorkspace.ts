@@ -11,8 +11,8 @@ import {completeOnboarding, extractRHPVariantFromResponse} from '@userActions/Re
 import {setOnboardingAdminsChatReportID, setOnboardingPolicyID} from '@userActions/Welcome';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {lastWorkspaceNumberSelector} from '@src/selectors/Policy';
 import type {OnboardingPurpose, OnboardingRHPVariant, Policy} from '@src/types/onyx';
+import useActivePolicy from './useActivePolicy';
 import useArchivedReportsIdSet from './useArchivedReportsIdSet';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from './useHasActiveAdminPolicies';
@@ -23,7 +23,6 @@ import useOnyx from './useOnyx';
 import usePermissions from './usePermissions';
 import usePreferredPolicy from './usePreferredPolicy';
 import useResponsiveLayout from './useResponsiveLayout';
-import useActivePolicy from './useActivePolicy';
 
 /**
  * Hook that provides a function to auto-create a workspace for Track (PERSONAL_SPEND)

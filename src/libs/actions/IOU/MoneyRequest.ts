@@ -112,7 +112,6 @@ type MoneyRequestStepScanParticipantsFlowParams = {
     quickAction: OnyxEntry<QuickAction>;
     policyRecentlyUsedCurrencies?: string[];
     introSelected?: IntroSelected;
-    activePolicyID?: string;
     files: ReceiptFile[];
     isTestTransaction?: boolean;
     locationPermissionGranted?: boolean;
@@ -329,7 +328,6 @@ function handleMoneyRequestStepScanParticipants({
     quickAction,
     policyRecentlyUsedCurrencies,
     introSelected,
-    activePolicyID,
     files,
     isTestTransaction = false,
     locationPermissionGranted = false,

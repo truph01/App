@@ -373,6 +373,7 @@ describe('actions/IOU/PayMoneyRequest', () => {
                         isSelfTourViewed: false,
                         betas: undefined,
                         hasActiveAdminPolicies: false,
+                        activePolicy: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -535,6 +536,7 @@ describe('actions/IOU/PayMoneyRequest', () => {
                         isSelfTourViewed: false,
                         betas: undefined,
                         hasActiveAdminPolicies: false,
+                        activePolicy: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -1115,6 +1117,7 @@ describe('actions/IOU/PayMoneyRequest', () => {
                         isSelfTourViewed: false,
                         betas: undefined,
                         hasActiveAdminPolicies: false,
+                        activePolicy: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -1238,6 +1241,7 @@ describe('actions/IOU/PayMoneyRequest', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1337,7 +1341,7 @@ describe('actions/IOU/PayMoneyRequest', () => {
                 introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
                 currentUserAccountIDParam: CARLOS_ACCOUNT_ID,
                 currentUserEmailParam: CARLOS_EMAIL,
-                activePolicyID: '123',
+                activePolicy: undefined,
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
