@@ -101,6 +101,10 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
             }
             return Object.values(transactions || {}).filter((item) => {
                 const isUnreported = isUnreportedTransaction(item);
+                if (isIOUReport(report) && !isUnreported) {
+                    return false;
+                }
+
                 const isOnOpenExpenseReport = !!(item?.reportID && (allOpenReports?.[item.reportID] ?? openReportDrafts?.[item.reportID]));
                 if (!isUnreported && !isOnOpenExpenseReport) {
                     return false;
@@ -121,8 +125,8 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
 
                 const transactionAmount = getTransactionDetails(item)?.amount ?? 0;
 
-                // Negative values are not allowed for unreported expenses
-                if (transactionAmount < 0) {
+                // Only block negative amounts for unreported expenses.
+                if (transactionAmount < 0 && isUnreported) {
                     return false;
                 }
 
