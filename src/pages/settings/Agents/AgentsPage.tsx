@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {FlatList, View} from 'react-native';
 import Button from '@components/Button';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
@@ -67,19 +67,16 @@ function AgentsPage() {
         [agentPrompts, personalDetailsList, icons.FallbackAvatar],
     );
 
-    const renderItem = useCallback(
-        ({item}: {item: AgentItem}) => (
-            <AgentsListRow
-                accountID={item.accountID}
-                displayName={item.displayName}
-                login={item.login}
-                avatar={item.avatar}
-            />
-        ),
-        [],
+    const renderItem = ({item}: {item: AgentItem}) => (
+        <AgentsListRow
+            accountID={item.accountID}
+            displayName={item.displayName}
+            login={item.login}
+            avatar={item.avatar}
+        />
     );
 
-    const keyExtractor = useCallback((item: AgentItem) => String(item.accountID), []);
+    const keyExtractor = (item: AgentItem) => String(item.accountID);
 
     const hasAgents = agentItems.length > 0;
 

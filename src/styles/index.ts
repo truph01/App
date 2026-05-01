@@ -5501,13 +5501,13 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         agentsListRowAvatar: {
-            width: 48,
-            height: 48,
+            width: variables.avatarSizeLargeNormal,
+            height: variables.avatarSizeLargeNormal,
         },
 
         agentsListRowAvatarInner: {
-            width: 48,
-            height: 48,
+            width: variables.avatarSizeLargeNormal,
+            height: variables.avatarSizeLargeNormal,
             borderRadius: 24,
             alignItems: 'center',
             justifyContent: 'center',

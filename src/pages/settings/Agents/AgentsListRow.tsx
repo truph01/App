@@ -7,16 +7,9 @@ import type {AvatarSource} from '@libs/UserAvatarUtils';
 import CONST from '@src/CONST';
 
 type AgentsListRowProps = {
-    /** Account ID of the agent */
     accountID: number;
-
-    /** Display name of the agent */
     displayName: string;
-
-    /** Login email of the agent */
     login: string;
-
-    /** Avatar source of the agent */
     avatar: AvatarSource;
 };
 
