@@ -90,6 +90,7 @@ const translations = {
         optional: 'Optional',
         new: 'New',
         newFeature: 'New feature',
+        beta: 'Beta',
         search: 'Search',
         reports: 'Reports',
         spend: 'Spend',
@@ -2772,6 +2773,15 @@ const translations = {
         addFirstPaymentMethod: 'Add a payment method to send and receive payments directly in the app.',
         defaultPaymentMethod: 'Default',
         bankAccountLastFour: (lastFour: string) => `Bank Account • ${lastFour}`,
+    },
+    agentsPage: {
+        title: 'Agents',
+        subtitle: 'Automate tasks with custom agents.',
+        newAgent: 'New agent',
+        emptyAgents: {
+            title: 'No agents created',
+            subtitle: 'Stop manually doing stuff. Instruct an agent instead and save yourself lots of time.',
+        },
     },
     expenseRulesPage: {
         title: 'Expense rules',

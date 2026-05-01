@@ -29,6 +29,7 @@ const translations: TranslationDeepObject<typeof en> = {
         optional: 'Opcional',
         new: 'Nuevo',
         newFeature: 'Nueva función',
+        beta: 'Beta',
         center: 'Centrar',
         search: 'Buscar',
         reports: 'Informes',
@@ -2602,6 +2603,15 @@ ${amount} para ${merchant} - ${date}`,
         addFirstPaymentMethod: 'Añade un método de pago para enviar y recibir pagos directamente desde la aplicación.',
         defaultPaymentMethod: 'Predeterminado',
         bankAccountLastFour: (lastFour) => `Cuenta bancaria • ${lastFour}`,
+    },
+    agentsPage: {
+        title: 'Agentes',
+        subtitle: 'Automatiza tareas con agentes personalizados.',
+        newAgent: 'Nuevo agente',
+        emptyAgents: {
+            title: 'No se han creado agentes.',
+            subtitle: 'Deja de hacer las cosas manualmente. En su lugar, instruye a un agente y ahorra mucho tiempo.',
+        },
     },
     expenseRulesPage: {
         title: 'Reglas de gastos',
