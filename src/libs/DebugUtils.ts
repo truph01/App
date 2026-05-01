@@ -973,6 +973,7 @@ function validateTransactionDraftProperty(key: keyof Transaction, value: string)
         case 'groupCurrency':
         case 'transactionType':
         case 'transactionThreadReportID':
+        case 'withdrawalID':
             return validateString(value);
         case 'created':
         case 'modifiedCreated':
