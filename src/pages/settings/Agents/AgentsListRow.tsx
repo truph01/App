@@ -31,6 +31,9 @@ function AgentsListRow({accountID, displayName, login, avatar}: AgentsListRowPro
                 avatarID={accountID}
                 name={displayName}
                 type={CONST.ICON_TYPE_AVATAR}
+                containerStyles={styles.agentsListRowAvatar}
+                imageStyles={styles.agentsListRowAvatar}
+                iconAdditionalStyles={styles.agentsListRowAvatarInner}
             />
             <View style={[styles.flex1, styles.gap2]}>
                 <Text
