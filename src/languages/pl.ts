@@ -5369,6 +5369,10 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             oneMoreStepDescription: 'Wygląda na to, że musimy ręcznie zweryfikować Twoje konto bankowe. Przejdź do Concierge, gdzie czekają na Ciebie dalsze instrukcje.',
             gotIt: 'Rozumiem',
             goToConcierge: 'Przejdź do Concierge',
+            exportAsCSV: 'Eksportuj jako CSV',
+            csvColumnType: 'Typ',
+            csvColumnLimitType: 'Typ limitu',
+            csvColumnLimit: 'Limit',
         },
         categories: {
             deleteCategories: 'Usuń kategorie',
@@ -6806,8 +6810,6 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             customRules: {
                 title: 'Polityka wydatków',
                 cardSubtitle: 'To tutaj znajduje się polityka wydatków Twojego zespołu, aby wszyscy mieli jasność co do tego, co jest objęte.',
-                policyDocument: 'Dokument polityki',
-                policyText: 'Tekst polityki',
             },
             spendRules: {
                 title: 'Wydatki',

@@ -5382,6 +5382,10 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             oneMoreStepDescription: 'Het lijkt erop dat we je bankrekening handmatig moeten verifiëren. Ga naar Concierge, waar de instructies voor je klaarstaan.',
             gotIt: 'Begrepen',
             goToConcierge: 'Ga naar Concierge',
+            exportAsCSV: 'Exporteren als CSV',
+            csvColumnType: 'Type',
+            csvColumnLimitType: 'Limiettype',
+            csvColumnLimit: 'Limiet',
         },
         categories: {
             deleteCategories: 'Categorieën verwijderen',
@@ -6814,8 +6818,6 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             customRules: {
                 title: 'Declaratiebeleid',
                 cardSubtitle: 'Hier staat het declaratiebeleid van je team, zodat iedereen hetzelfde beeld heeft van wat er wordt vergoed.',
-                policyDocument: 'Beleidsdocument',
-                policyText: 'Beleidstekst',
             },
             spendRules: {
                 title: 'Uitgaven',

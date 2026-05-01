@@ -304,6 +304,16 @@ const DYNAMIC_ROUTES = {
         path: 'imported',
         entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
     },
+    SPEND_CATEGORY_SELECTOR: {
+        path: 'spend-category-selector/:groupID',
+        entryScreens: [SCREENS.WORKSPACE.CATEGORIES_SETTINGS, SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS],
+        getRoute: (groupID: string) => `spend-category-selector/${groupID}` as const,
+    },
+    DEFAULT_CATEGORY_SELECTOR: {
+        path: 'default-category-selector/:customUnitID',
+        entryScreens: [SCREENS.WORKSPACE.DISTANCE_RATES_SETTINGS, SCREENS.WORKSPACE.PER_DIEM_SETTINGS],
+        getRoute: (customUnitID: string) => `default-category-selector/${customUnitID}` as const,
+    },
     WORKSPACE_INVITE: {
         path: 'invite',
         entryScreens: [SCREENS.WORKSPACE.PROFILE, SCREENS.WORKSPACE.MEMBERS],
@@ -2160,10 +2170,6 @@ const ROUTES = {
     WORKSPACE_AVATAR: {
         route: 'workspaces/:policyID/avatar',
         getRoute: (policyID: string, fallbackLetter?: UpperCaseCharacters) => `workspaces/${policyID}/avatar${fallbackLetter ? `?letter=${fallbackLetter}` : ''}` as const,
-    },
-    WORKSPACE_DOCUMENT: {
-        route: 'workspaces/:policyID/document',
-        getRoute: (policyID: string) => `workspaces/${policyID}/document` as const,
     },
     WORKSPACE_JOIN_USER: {
         route: 'workspaces/:policyID/join',

@@ -270,6 +270,7 @@ describe('actions/IOU/TrackExpense', () => {
                 transaction,
                 currentUserAccountID: RORY_ACCOUNT_ID,
                 currentUserEmail: RORY_EMAIL,
+                currentUserLocalCurrency: '',
             });
             await waitForBatchedUpdates();
 
@@ -1106,6 +1107,7 @@ describe('actions/IOU/TrackExpense', () => {
                 transaction: createdTransaction,
                 currentUserAccountID: RORY_ACCOUNT_ID,
                 currentUserEmail: RORY_EMAIL,
+                currentUserLocalCurrency: '',
             });
             await waitForBatchedUpdates();
 

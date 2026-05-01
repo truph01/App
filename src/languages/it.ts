@@ -5390,6 +5390,10 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             oneMoreStepDescription: 'Sembra che dobbiamo verificare manualmente il tuo conto bancario. Vai su Concierge, dove ti aspettano le istruzioni.',
             gotIt: 'Ho capito',
             goToConcierge: 'Vai a Concierge',
+            exportAsCSV: 'Esporta come CSV',
+            csvColumnType: 'Tipo',
+            csvColumnLimitType: 'Tipo di limite',
+            csvColumnLimit: 'Limite',
         },
         categories: {
             deleteCategories: 'Elimina categorie',
@@ -6834,8 +6838,6 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
             customRules: {
                 title: 'Politica di spesa',
                 cardSubtitle: 'Qui trovi il regolamento spese del tuo team, così tutti sono allineati su cosa è coperto.',
-                policyDocument: 'Documento di politica',
-                policyText: 'Testo della politica',
             },
             spendRules: {
                 title: 'Spesa',

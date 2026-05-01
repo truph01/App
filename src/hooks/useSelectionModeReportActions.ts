@@ -29,7 +29,7 @@ import {getSecondaryReportActions} from '@libs/ReportSecondaryActionUtils';
 import {
     getNextApproverAccountID,
     getNonHeldAndFullAmount,
-    hasHeldExpenses as hasHeldExpensesReportUtils,
+    hasHeldExpensesFromTransactions as hasHeldExpensesReportUtils,
     hasOnlyHeldExpenses as hasOnlyHeldExpensesReportUtils,
     hasUpdatedTotal,
     hasViolations as hasViolationsReportUtils,
@@ -153,7 +153,7 @@ function useSelectionModeReportActions({
     const shouldBlockSubmit = isBlockSubmitDueToStrictPolicyRules || isBlockSubmitDueToPreventSelfApproval;
 
     const canAllowSettlement = hasUpdatedTotal(report, policy);
-    const isAnyTransactionOnHold = hasHeldExpensesReportUtils(report?.reportID, transactions);
+    const isAnyTransactionOnHold = hasHeldExpensesReportUtils(transactions);
     const isInvoiceReport = isInvoiceReportUtil(report);
 
     const hasOnlyPendingTransactions = !!transactions && transactions.length > 0 && transactions.every((t) => isExpensifyCardTransaction(t) && isPending(t));
