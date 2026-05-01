@@ -2648,9 +2648,9 @@ ${amount}，商户：${merchant} - 日期：${date}`,
     },
     agentsPage: {
         title: '代理人',
-        subtitle: '使用自定义代理自动化任务。',
-        newAgent: '新代理',
-        emptyAgents: {title: '未创建代理', subtitle: '别再手动处理这些事情了。交给智能助理去执行，帮你节省大量时间。'},
+        subtitle: '通过自定义智能体自动化处理任务。',
+        newAgent: '新代理人',
+        emptyAgents: {title: '尚未创建代理', subtitle: '别再手动处理这些事情了。交给智能代理去执行，为自己节省大量时间。'},
     },
     expenseRulesPage: {
         title: '报销规则',

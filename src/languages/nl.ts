@@ -95,7 +95,7 @@ const translations: TranslationDeepObject<typeof en> = {
         optional: 'Optioneel',
         new: 'Nieuw',
         newFeature: 'Nieuwe functie',
-        beta: 'Beta',
+        beta: 'Bèta',
         search: 'Zoeken',
         reports: 'Rapporten',
         spend: 'Uitgaven',
