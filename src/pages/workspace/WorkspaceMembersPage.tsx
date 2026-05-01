@@ -689,7 +689,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     });
 
     const getCustomListHeader = () => {
-        if (filteredData.length === 0) {
+        if (hasNoDisplayedMembers) {
             return null;
         }
 
