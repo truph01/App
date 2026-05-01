@@ -1,4 +1,4 @@
-import {applyConciergeDraftEvent} from '@pages/inbox/conciergeDraftState';
+import {applyConciergeDraftEvent, getCachedDraft, setCachedDraft} from '@pages/inbox/conciergeDraftState';
 import CONST from '@src/CONST';
 
 const REPORT_ID = '123';
@@ -130,5 +130,42 @@ describe('conciergeDraftState', () => {
         );
 
         expect(otherReportDraft).toBe(initialDraft);
+    });
+
+    describe('draftCache', () => {
+        // Always start clean so tests don't leak state into each other.
+        beforeEach(() => {
+            setCachedDraft(REPORT_ID, null);
+        });
+
+        it('returns null for an unseen reportID', () => {
+            expect(getCachedDraft('never-stored')).toBeNull();
+        });
+
+        it('persists a draft across set/get and survives across calls (the remount survival contract)', () => {
+            const draft = applyConciergeDraftEvent(null, createDraftEvent(), REPORT_ID);
+            expect(draft).not.toBeNull();
+            setCachedDraft(REPORT_ID, draft);
+            expect(getCachedDraft(REPORT_ID)).toBe(draft);
+            // Simulating a remount: a fresh getCachedDraft call returns the same instance.
+            expect(getCachedDraft(REPORT_ID)).toBe(draft);
+        });
+
+        it('evicts when set to null (completed/failed/cleared reducer return)', () => {
+            const draft = applyConciergeDraftEvent(null, createDraftEvent(), REPORT_ID);
+            setCachedDraft(REPORT_ID, draft);
+            expect(getCachedDraft(REPORT_ID)).not.toBeNull();
+            setCachedDraft(REPORT_ID, null);
+            expect(getCachedDraft(REPORT_ID)).toBeNull();
+        });
+
+        it('keeps entries scoped per reportID (no cross-talk)', () => {
+            const draftA = applyConciergeDraftEvent(null, createDraftEvent(), REPORT_ID);
+            const draftB = applyConciergeDraftEvent(null, createDraftEvent({reportID: 'other'}), 'other');
+            setCachedDraft(REPORT_ID, draftA);
+            setCachedDraft('other', draftB);
+            expect(getCachedDraft(REPORT_ID)).toBe(draftA);
+            expect(getCachedDraft('other')).toBe(draftB);
+        });
     });
 });

@@ -40,6 +40,26 @@ function buildConciergeDraftReportAction({bodyMarkdown, created, finalRenderedHT
     } as ReportAction;
 }
 
+// Module-level cache so a chat re-mount (ReportScreen unmount/remount on chat
+// switch) preserves the in-progress draft. Without this the gate's local state
+// resets to null on every revisit and the synthetic bubble disappears for the
+// remount + Onyx-hydration window. Keyed by reportID; entries are evicted by
+// `setCachedDraft(reportID, null)` when the reducer returns null
+// (completed/failed/cleared).
+const draftCache = new Map<string, ConciergeDraft>();
+
+function getCachedDraft(reportID: string): ConciergeDraft | null {
+    return draftCache.get(reportID) ?? null;
+}
+
+function setCachedDraft(reportID: string, draft: ConciergeDraft | null): void {
+    if (draft) {
+        draftCache.set(reportID, draft);
+    } else {
+        draftCache.delete(reportID);
+    }
+}
+
 function applyConciergeDraftEvent(currentDraft: ConciergeDraft | null, event: ConciergeDraftEvent, reportID: string): ConciergeDraft | null {
     if (event.reportID !== reportID) {
         return currentDraft;
@@ -81,5 +101,5 @@ function applyConciergeDraftEvent(currentDraft: ConciergeDraft | null, event: Co
     };
 }
 
-export {applyConciergeDraftEvent, buildConciergeDraftReportAction};
+export {applyConciergeDraftEvent, buildConciergeDraftReportAction, getCachedDraft, setCachedDraft};
 export type {ConciergeDraft};

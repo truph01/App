@@ -19,6 +19,8 @@ const TICK_INTERVAL_MS = 80;
 const TRICKLE_HARD_CAP_MS = 60_000;
 /** Once the real reportComment lands in REPORT_ACTIONS, finish the remaining reveal within this window. */
 const ACCELERATED_REMAINING_MS = 1_500;
+/** Minimum char-level anchors before we opt into the trickle reveal. Replies under this fall back to the binary reveal at `displayAfter`. */
+const MIN_TRICKLE_TOKEN_COUNT = 100;
 
 function easeOut(t: number): number {
     const clamped = Math.max(0, Math.min(1, t));
@@ -88,7 +90,7 @@ function usePendingConciergeResponse(reportID: string | undefined) {
         // Anchors are character-level. Short replies (~50–100 chars) keep the
         // binary reveal; longer ones (paragraphs / lists) cross the threshold
         // and get the smooth trickle.
-        const shouldTrickle = snapshotTokens.length >= 100 && !!snapshotHtml;
+        const shouldTrickle = snapshotTokens.length >= MIN_TRICKLE_TOKEN_COUNT && !!snapshotHtml;
         if (!shouldTrickle) {
             const timer = setTimeout(() => applyPendingConciergeAction(reportID, reportAction), Math.max(0, remainingDelay));
             return () => clearTimeout(timer);

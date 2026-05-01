@@ -1,5 +1,5 @@
 import {getReportChatType} from '@selectors/Report';
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import useOnyx from '@hooks/useOnyx';
 import {getReportChannelName} from '@libs/actions/Report';
 import Log from '@libs/Log';
@@ -9,7 +9,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction} from '@src/types/onyx';
 import type {ConciergeDraft} from './conciergeDraftState';
-import {applyConciergeDraftEvent} from './conciergeDraftState';
+import {applyConciergeDraftEvent, getCachedDraft, setCachedDraft} from './conciergeDraftState';
 
 type ConciergeDraftState = {
     draftReportAction: ReportAction | null;
@@ -61,23 +61,34 @@ function ConciergeDraftProvider({reportID, children}: React.PropsWithChildren<{r
 }
 
 function ConciergeDraftGate({reportID, children}: React.PropsWithChildren<{reportID: string}>) {
-    const [draft, setDraft] = useState<ConciergeDraft | null>(null);
+    // Lazy-init from the module-level cache so a remount (ReportScreen
+    // unmount/remount on chat-switch) restores the in-progress draft on the
+    // first paint instead of flashing the synthetic bubble away.
+    const [draft, setDraft] = useState<ConciergeDraft | null>(() => getCachedDraft(reportID));
 
-    const clearDraft = useCallback(() => {
+    // React Compiler auto-memoizes; explicit useCallback/useMemo would just
+    // shadow the compiler's analysis (clean-react-0-compiler).
+    const clearDraft = () => {
+        setCachedDraft(reportID, null);
         setDraft(null);
-    }, []);
+    };
 
-    const dispatchLocalDraftEvent = useCallback(
-        (event: ConciergeDraftEvent) => {
-            setDraft((currentDraft) => applyConciergeDraftEvent(currentDraft, event, reportID));
-        },
-        [reportID],
-    );
+    const dispatchLocalDraftEvent = (event: ConciergeDraftEvent) => {
+        setDraft((currentDraft) => {
+            const next = applyConciergeDraftEvent(currentDraft, event, reportID);
+            setCachedDraft(reportID, next);
+            return next;
+        });
+    };
 
     useEffect(() => {
         const channelName = getReportChannelName(reportID);
+        // Inline the clear so the effect's deps stay scoped to reportID; closing
+        // over `clearDraft` would either drag it into deps (re-subscribing on
+        // every render) or trip exhaustive-deps.
         const handleResubscribe = () => {
-            clearDraft();
+            setCachedDraft(reportID, null);
+            setDraft(null);
         };
         const eventTypes = [
             Pusher.TYPE.CONCIERGE_DRAFT_STARTED,
@@ -93,7 +104,11 @@ function ConciergeDraftGate({reportID, children}: React.PropsWithChildren<{repor
                 eventType,
                 (eventData) => {
                     const conciergeDraftEvent = eventData as ConciergeDraftEvent;
-                    setDraft((currentDraft) => applyConciergeDraftEvent(currentDraft, conciergeDraftEvent, reportID));
+                    setDraft((currentDraft) => {
+                        const next = applyConciergeDraftEvent(currentDraft, conciergeDraftEvent, reportID);
+                        setCachedDraft(reportID, next);
+                        return next;
+                    });
                 },
                 handleResubscribe,
             );
@@ -110,23 +125,17 @@ function ConciergeDraftGate({reportID, children}: React.PropsWithChildren<{repor
                 subscription.unsubscribe();
             }
         };
-    }, [clearDraft, reportID]);
+    }, [reportID]);
 
-    const stateValue = useMemo<ConciergeDraftState>(
-        () => ({
-            draftReportAction: draft?.reportAction ?? null,
-            hasActiveDraft: !!draft?.reportAction,
-        }),
-        [draft?.reportAction],
-    );
+    const stateValue: ConciergeDraftState = {
+        draftReportAction: draft?.reportAction ?? null,
+        hasActiveDraft: !!draft?.reportAction,
+    };
 
-    const actionsValue = useMemo<ConciergeDraftActions>(
-        () => ({
-            clearDraft,
-            dispatchLocalDraftEvent,
-        }),
-        [clearDraft, dispatchLocalDraftEvent],
-    );
+    const actionsValue: ConciergeDraftActions = {
+        clearDraft,
+        dispatchLocalDraftEvent,
+    };
 
     return (
         <ConciergeDraftActionsContext.Provider value={actionsValue}>
