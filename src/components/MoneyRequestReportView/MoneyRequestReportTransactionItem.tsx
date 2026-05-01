@@ -146,7 +146,11 @@ function MoneyRequestReportTransactionItem({
                 }}
                 disabled={isTransactionPendingDelete(transaction)}
                 ref={viewRef}
-                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone]}
+                wrapperStyle={[
+                    animatedHighlightStyle,
+                    styles.userSelectNone,
+                    shouldUseNarrowLayout && !isLastItem && {...styles.borderBottom, borderColor: isSelected ? theme.buttonHoveredBG : theme.border},
+                ]}
             >
                 {({hovered}) => (
                     <TransactionItemRow
@@ -170,7 +174,6 @@ function MoneyRequestReportTransactionItem({
                         }}
                         onArrowRightPress={() => onArrowRightPress?.(transaction.transactionID)}
                         isHover={hovered}
-                        shouldShowBottomBorder={shouldUseNarrowLayout && !isLastItem}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                     />
                 )}

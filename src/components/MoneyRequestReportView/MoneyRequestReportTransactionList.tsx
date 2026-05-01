@@ -597,7 +597,7 @@ function MoneyRequestReportTransactionList({
                           pendingAction={selectionState.pendingAction}
                           shouldUseNarrowLayout={shouldUseNarrowLayout}
                       />
-                      {group.transactions.map((transaction, index) => (
+                      {group.transactions.map((transaction) => (
                           <MoneyRequestReportTransactionItem
                               key={transaction.transactionID}
                               transaction={transaction}
@@ -616,7 +616,7 @@ function MoneyRequestReportTransactionList({
                               scrollToNewTransaction={transaction.transactionID === newTransactions?.at(0)?.transactionID ? scrollToNewTransaction : undefined}
                               onArrowRightPress={handleArrowRightPress}
                               nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards ?? {}}
-                              isLastItem={index === group.transactions.length - 1}
+                              isLastItem={transaction.transactionID === lastTransactionID}
                           />
                       ))}
                   </View>
