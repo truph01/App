@@ -990,7 +990,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                         selectedItems={selectedEmployees}
                         canSelectMultiple={canSelectMultiple}
                         turnOnSelectionModeOnLongPress={isPolicyAdmin}
-                        onSelectAll={filteredData.length > 0 ? () => toggleAllUsers(filteredData) : undefined}
+                        onSelectAll={displayedFilteredData.length > 0 ? () => toggleAllUsers(displayedFilteredData) : undefined}
                         style={{
                             listItemTitleContainerStyles: shouldUseNarrowLayout ? undefined : styles.pr3,
                             contentContainerStyle: shouldShowRoleFilterEmptyState ? [styles.flex1, styles.mh100] : undefined,
