@@ -12,7 +12,6 @@ import {init, isClientTheLeader} from '@libs/ActiveClientManager';
 import Log from '@libs/Log';
 import getCurrentUrl from '@libs/Navigation/currentUrl';
 import Navigation from '@libs/Navigation/Navigation';
-import NetworkConnection from '@libs/NetworkConnection';
 import Pusher from '@libs/Pusher';
 import PusherConnectionManager from '@libs/PusherConnectionManager';
 import {getReportIDFromLink} from '@libs/ReportUtils';
@@ -62,29 +61,14 @@ function AuthScreensInitHandler() {
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [initialLastUpdateIDAppliedToClient] = useOnyx(ONYXKEYS.ONYX_UPDATES_LAST_UPDATE_ID_APPLIED_TO_CLIENT);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    const [lastUpdateIDAppliedToClient] = useOnyx(ONYXKEYS.ONYX_UPDATES_LAST_UPDATE_ID_APPLIED_TO_CLIENT);
-    const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const lastWorkspaceNumber = useLastWorkspaceNumber();
-    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const activePolicy = useActivePolicy();
-    const lastUpdateIDAppliedToClientRef = useRef(lastUpdateIDAppliedToClient);
-    const isLoadingAppRef = useRef(isLoadingApp);
-    lastUpdateIDAppliedToClientRef.current = lastUpdateIDAppliedToClient;
-    isLoadingAppRef.current = isLoadingApp;
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
     const reportAttributes = useReportAttributes();
     // We use a ref so the Pusher callback (registered once on mount) always reads the latest value without re-subscribing.
     const reportAttributesRef = useRef(reportAttributes);
     reportAttributesRef.current = reportAttributes;
-
-    const handleNetworkReconnect = () => {
-        if (isLoadingAppRef.current) {
-            App.openApp();
-        } else {
-            Log.info('[handleNetworkReconnect] Sending ReconnectApp');
-            App.reconnectApp(lastUpdateIDAppliedToClientRef.current);
-        }
-    };
 
     useEffect(() => {
         if (!Navigation.isActiveRoute(ROUTES.SIGN_IN_MODAL)) {
@@ -105,9 +89,6 @@ function AuthScreensInitHandler() {
                 Session.cleanupSession();
             };
         }
-
-        NetworkConnection.listenForReconnect();
-        NetworkConnection.onReconnect(() => handleNetworkReconnect());
 
         // Pusher initialization span
         startSpan(CONST.TELEMETRY.SPAN_NAVIGATION.PUSHER_INIT, {

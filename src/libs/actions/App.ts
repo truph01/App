@@ -53,9 +53,8 @@ Onyx.connectWithoutView({
 // `useOnyx` would trigger extra rerenders without affecting the View, so `Onyx.connectWithoutView` is used instead
 let isSidebarLoaded: boolean | undefined;
 Onyx.connectWithoutView({
-    key: ONYXKEYS.IS_SIDEBAR_LOADED,
+    key: ONYXKEYS.RAM_ONLY_IS_SIDEBAR_LOADED,
     callback: (val) => (isSidebarLoaded = val),
-    initWithStoredValues: false,
 });
 
 // `isUsingImportedState` is used in `openApp`, `reconnectApp`, and `clearOnyxAndResetApp` to prevent API calls when using imported state.
@@ -122,9 +121,9 @@ Onyx.connectWithoutView({
 
 const KEYS_TO_PRESERVE: OnyxKey[] = [
     ONYXKEYS.ACCOUNT,
-    ONYXKEYS.IS_CHECKING_PUBLIC_ROOM,
+    ONYXKEYS.RAM_ONLY_IS_CHECKING_PUBLIC_ROOM,
     ONYXKEYS.IS_LOADING_APP,
-    ONYXKEYS.IS_SIDEBAR_LOADED,
+    ONYXKEYS.RAM_ONLY_IS_SIDEBAR_LOADED,
     ONYXKEYS.MODAL,
     ONYXKEYS.NETWORK,
     ONYXKEYS.SESSION,
@@ -140,6 +139,8 @@ const KEYS_TO_PRESERVE: OnyxKey[] = [
     ONYXKEYS.IS_DEBUG_MODE_ENABLED,
     ONYXKEYS.COLLECTION.PASSKEY_CREDENTIALS,
     ONYXKEYS.COLLECTION.DEVICE_BIOMETRICS,
+    ONYXKEYS.STASHED_SESSION,
+    ONYXKEYS.STASHED_CREDENTIALS,
 
     // Preserve IS_USING_IMPORTED_STATE so that when the app restarts (especially in HybridApp mode),
     // we know if we're in imported state mode and should skip API calls that would cause infinite loading
@@ -163,7 +164,6 @@ Onyx.connectWithoutView({
             // Set this to false to reset the flag for this client
             Onyx.set(ONYXKEYS.RESET_REQUIRED, false);
 
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
             openApp();
         });
     },
@@ -221,7 +221,7 @@ function setSidebarLoaded() {
         return;
     }
 
-    Onyx.set(ONYXKEYS.IS_SIDEBAR_LOADED, true);
+    Onyx.set(ONYXKEYS.RAM_ONLY_IS_SIDEBAR_LOADED, true);
 }
 
 function setAppLoading(isLoading: boolean) {
@@ -571,6 +571,7 @@ type CreateWorkspaceWithPolicyDraftParams = {
     type?: PolicyType;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     hasActiveAdminPolicies: boolean;
+    isAnnualSubscription?: boolean;
 };
 
 /**
@@ -597,6 +598,7 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
         isSelfTourViewed,
         betas,
         hasActiveAdminPolicies,
+        isAnnualSubscription = false,
     } = params;
 
     const policyIDWithDefault = policyID || generatePolicyID();
@@ -625,8 +627,18 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
             isSelfTourViewed,
             betas,
             hasActiveAdminPolicies,
+            isAnnualSubscription,
         });
-        Navigation.navigate(routeToNavigate, {forceReplace: !transitionFromOldDot});
+
+        if (transitionFromOldDot) {
+            Navigation.navigate(routeToNavigate);
+        } else if (Navigation.isTopmostRouteModalScreen()) {
+            Navigation.dismissModal({
+                afterTransition: () => Navigation.navigate(routeToNavigate),
+            });
+        } else {
+            Navigation.navigate(routeToNavigate, {forceReplace: true});
+        }
     });
 }
 
@@ -688,6 +700,7 @@ type SavePolicyDraftByNewWorkspaceParams = {
     type?: PolicyType;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     hasActiveAdminPolicies: boolean;
+    isAnnualSubscription?: boolean;
 };
 
 /**
@@ -711,6 +724,7 @@ function savePolicyDraftByNewWorkspace({
     isSelfTourViewed,
     betas,
     hasActiveAdminPolicies,
+    isAnnualSubscription = false,
 }: SavePolicyDraftByNewWorkspaceParams) {
     createWorkspace({
         policyOwnerEmail,
@@ -731,6 +745,7 @@ function savePolicyDraftByNewWorkspace({
         isSelfTourViewed,
         betas,
         hasActiveAdminPolicies,
+        isAnnualSubscription,
     });
 }
 
@@ -907,7 +922,6 @@ export {
     handleRestrictedEvent,
     getMissingOnyxUpdates,
     finalReconnectAppAfterActivatingReliableUpdates,
-    savePolicyDraftByNewWorkspace,
     createWorkspaceWithPolicyDraftAndNavigateToIt,
     updateLastVisitedPath,
     createWorkspaceWithPolicyDraft,

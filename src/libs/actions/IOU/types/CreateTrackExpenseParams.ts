@@ -33,6 +33,7 @@ type CreateTrackExpenseParams = {
     draftTransactionIDs: string[] | undefined;
     isSelfTourViewed: boolean;
     hasActiveAdminPolicies?: boolean;
+    defaultWorkspaceName?: string;
 };
 
 export type {CreateTrackExpenseParams, TrackExpenseAccountantParams};

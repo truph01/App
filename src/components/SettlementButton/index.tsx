@@ -17,6 +17,7 @@ import RenderHTML from '@components/RenderHTML';
 import useActiveAdminPolicies from '@hooks/useActiveAdminPolicies';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useLastWorkspaceNumber from '@hooks/useLastWorkspaceNumber';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -46,7 +47,7 @@ import {handleUnvalidatedUserNavigation, useSettlementButtonPaymentMethods} from
 import shouldPopoverUseScrollView from '@libs/shouldPopoverUseScrollView';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {pressLockedBankAccount, setPersonalBankAccountContinueKYCOnSuccess} from '@userActions/BankAccounts';
-import {approveMoneyRequest} from '@userActions/IOU';
+import {approveMoneyRequest} from '@userActions/IOU/ReportWorkflow';
 import {navigateToConciergeChat} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -107,7 +108,8 @@ function SettlementButton({
     const {translate, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
     const policy = usePolicy(policyID);
-    const {accountID, email} = useCurrentUserPersonalDetails();
+    const expenseReportPolicy = usePolicy(iouReport?.policyID);
+    const {accountID, email = ''} = useCurrentUserPersonalDetails();
     const lastWorkspaceNumber = useLastWorkspaceNumber();
 
     // The app would crash due to subscribing to the entire report collection if chatReportID is an empty string. So we should have a fallback ID here.
@@ -166,9 +168,10 @@ function SettlementButton({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
+    const delegateAccountID = useDelegateAccountID();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     const isPayInvoiceViaExpensifyBetaEnabled = isBetaEnabled(CONST.BETAS.PAY_INVOICE_VIA_EXPENSIFY);
-    const hasViolations = hasViolationsReportUtils(iouReport?.reportID, transactionViolations, accountID, email ?? '');
+    const hasViolations = hasViolationsReportUtils(iouReport?.reportID, transactionViolations, accountID, email);
 
     const isInvoiceReport = (!isEmptyObject(iouReport) && isInvoiceReportUtil(iouReport)) || false;
 
@@ -220,13 +223,13 @@ function SettlementButton({
                     if (policy?.achAccount?.bankAccountID === undefined) {
                         return;
                     }
-                    pressLockedBankAccount(policy?.achAccount?.bankAccountID, translate, conciergeReportID);
+                    pressLockedBankAccount(policy?.achAccount?.bankAccountID, translate, conciergeReportID, delegateAccountID);
                     navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas);
                 });
                 return true;
             }
 
-            if (policy && shouldRestrictUserBillableActions(policy.id, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, policy)) {
+            if (policy && shouldRestrictUserBillableActions(policy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, currentUserAccountID)) {
                 Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
                 return true;
             }
@@ -255,6 +258,7 @@ function SettlementButton({
             isSelfTourViewed,
             betas,
             amountOwed,
+            delegateAccountID,
         ],
     );
 
@@ -326,6 +330,7 @@ function SettlementButton({
                         iconHeight: typeof account.icon === 'number' ? undefined : account.iconSize,
                         value: CONST.PAYMENT_METHODS.BUSINESS_BANK_ACCOUNT,
                         description: account.description,
+                        shouldIgnoreCompactStyle: true,
                         onSelected: () => {
                             if (checkForNecessaryAction(CONST.IOU.PAYMENT_TYPE.VBBA)) {
                                 return;
@@ -416,7 +421,6 @@ function SettlementButton({
                     return activePolicy.id;
                 }
 
-                const email = currentUserPersonalDetails.email ?? '';
                 return createWorkspace({
                     introSelected,
                     activePolicy,
@@ -502,6 +506,7 @@ function SettlementButton({
             } else {
                 approveMoneyRequest({
                     expenseReport: iouReport,
+                    expenseReportPolicy,
                     policy,
                     currentUserAccountIDParam: accountID,
                     currentUserEmailParam: email ?? '',
