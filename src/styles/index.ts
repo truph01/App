@@ -3646,6 +3646,16 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.overlay,
         },
 
+        bottomDockedModalDismissButton: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: variables.iconSizeXSmall,
+            backgroundColor: theme.transparent,
+            zIndex: 1,
+        },
+
         invisibleOverlay: {
             backgroundColor: theme.transparent,
             zIndex: 1000,
@@ -5383,6 +5393,11 @@ const staticStyles = (theme: ThemeColors) =>
             height: 190,
         },
 
+        agentsPageEmptyStateIllustration: {
+            width: 96,
+            height: 142,
+        },
+
         expensifyCardEmptyIllustration: {
             width: 280,
             height: 172,
@@ -5478,6 +5493,11 @@ const staticStyles = (theme: ThemeColors) =>
 
         emptyStateContent: {
             width: '100%',
+        },
+
+        agentsPageEmptyStateSubtitle: {
+            maxWidth: 335,
+            alignSelf: 'center',
         },
 
         emptyStateFolderWithPaperIconSize: {
