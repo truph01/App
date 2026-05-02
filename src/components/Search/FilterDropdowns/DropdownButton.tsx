@@ -151,7 +151,7 @@ function DropdownButton({
         return PopoverComponent({closeOverlay: toggleOverlay, isExpanded: isOverlayVisible, setPopoverWidth: setCustomPopoverWidth});
     }, [PopoverComponent, toggleOverlay, isOverlayVisible]);
 
-    const showCloseButton = !!onClosePress;
+    const shouldShowCloseButton = !!onClosePress;
 
     return (
         <View
@@ -168,10 +168,10 @@ function DropdownButton({
                 <View style={[styles.flexRow]}>
                     <Button
                         ref={triggerRef}
-                        innerStyles={[isOverlayVisible && styles.buttonHoveredBG, {maxWidth: 256}, innerStyles, showCloseButton && styles.pr2]}
+                        innerStyles={[isOverlayVisible && styles.buttonHoveredBG, {maxWidth: 256}, innerStyles, shouldShowCloseButton && styles.pr2]}
                         onPress={calculatePopoverPositionAndToggleOverlay}
                         sentryLabel={sentryLabel}
-                        shouldRemoveRightBorderRadius={showCloseButton}
+                        shouldRemoveRightBorderRadius={shouldShowCloseButton}
                         // eslint-disable-next-line react/jsx-props-no-spreading
                         {...(medium ? {medium: true} : {small: true})}
                     >
@@ -189,7 +189,7 @@ function DropdownButton({
                             </Text>
                         </CaretWrapper>
                     </Button>
-                    {showCloseButton && (
+                    {shouldShowCloseButton && (
                         <>
                             <View style={[styles.buttonDivider]} />
                             <Button
