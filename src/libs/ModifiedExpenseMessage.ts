@@ -1,7 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {Entries, ValueOf} from 'type-fest';
-import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
+import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Policy, PolicyTagLists, Report, ReportAction, ReportAttributesDerivedValue} from '@src/types/onyx';
@@ -246,7 +246,6 @@ function getRulesModifiedMessage(
  */
 function getForReportAction({
     translate,
-    localeCompare,
     reportAction,
     policy,
     movedFromReport,
@@ -256,7 +255,6 @@ function getForReportAction({
     reportAttributes,
 }: {
     translate: LocalizedTranslate;
-    localeCompare: LocaleContextProps['localeCompare'];
     reportAction: OnyxEntry<ReportAction>;
     policy: OnyxEntry<Policy>;
     movedFromReport?: OnyxEntry<Report>;
@@ -454,7 +452,7 @@ function getForReportAction({
 
     const hasModifiedAttendees = isReportActionOriginalMessageAnObject && 'oldAttendees' in reportActionOriginalMessage && 'newAttendees' in reportActionOriginalMessage;
     if (hasModifiedAttendees) {
-        const [oldAttendees, attendees] = getFormattedAttendees(localeCompare, reportActionOriginalMessage.newAttendees, reportActionOriginalMessage.oldAttendees);
+        const [oldAttendees, attendees] = getFormattedAttendees(reportActionOriginalMessage.newAttendees, reportActionOriginalMessage.oldAttendees);
         buildMessageFragmentForValue(translate, oldAttendees, attendees, translate('iou.attendees'), false, setFragments, removalFragments, changeFragments);
     }
 

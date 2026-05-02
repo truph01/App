@@ -24,7 +24,7 @@ import type {SelectedParticipant} from '@src/types/onyx/NewGroupChatDraft';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {convertToDisplayString} from './CurrencyUtils';
 import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from './LocalePhoneNumber';
-import {localeCompareLocal, translateLocal} from './Localize';
+import {translateLocal} from './Localize';
 // eslint-disable-next-line import/no-cycle
 import {getForReportAction, getMovedReportID} from './ModifiedExpenseMessage';
 import Parser from './Parser';
@@ -844,7 +844,6 @@ function computeChatThreadReportName(
         const movedToReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${getMovedReportID(parentReportAction, CONST.REPORT.MOVE_TYPE.TO)}`];
         const modifiedMessageWithHTML = getForReportAction({
             translate,
-            localeCompare: localeCompareLocal,
             reportAction: parentReportAction,
             movedFromReport,
             movedToReport,

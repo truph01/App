@@ -8,7 +8,7 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {enrichAndSortAttendees} from '@libs/AttendeeUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {getAttendees} from '@libs/TransactionUtils';
+import {getAttendees, getAttendeesListDisplayString} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -40,7 +40,7 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
         <MenuItemWithTopDescription
             key="attendees"
             shouldShowRightIcon={!isReadOnly}
-            accessibilityLabel={`${translate('iou.attendees')}, ${iouAttendees?.map((a) => a?.displayName ?? a?.login).join(', ')}`}
+            accessibilityLabel={`${translate('iou.attendees')}, ${Array.isArray(iouAttendees) ? getAttendeesListDisplayString(iouAttendees) : ''}`}
             description={`${translate('iou.attendees')} ${
                 iouAttendees?.length && iouAttendees.length > 1 && formattedAmountPerAttendee ? `\u00B7 ${formattedAmountPerAttendee} ${translate('common.perPerson')}` : ''
             }`}

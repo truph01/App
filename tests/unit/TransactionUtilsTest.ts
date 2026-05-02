@@ -1400,6 +1400,14 @@ describe('TransactionUtils', () => {
     describe('getAttendeesListDisplayString', () => {
         const localeCompare = (a: string, b: string) => a.localeCompare(b, undefined, {numeric: true, sensitivity: 'variant', caseFirst: 'upper'});
 
+        it('preserves insertion order when no localeCompare is provided', () => {
+            const attendees: Attendee[] = [
+                {email: 'b@x.com', displayName: 'banana', avatarUrl: '', login: 'b@x.com'},
+                {email: 'a@x.com', displayName: 'apple', avatarUrl: '', login: 'a@x.com'},
+            ];
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees)).toBe('banana, apple');
+        });
+
         it('returns attendees alphabetically regardless of insertion order (deploy blocker #89130)', () => {
             const attendees: Attendee[] = [
                 {email: 'b@x.com', displayName: 'banana', avatarUrl: '', login: 'b@x.com'},
@@ -1422,6 +1430,14 @@ describe('TransactionUtils', () => {
                 {email: 'a@x.com', displayName: 'alice', avatarUrl: '', login: 'a@x.com'},
             ];
             expect(TransactionUtils.getAttendeesListDisplayString(attendees, localeCompare)).toBe('alice, Bob');
+        });
+
+        it('strips the @expensify.sms domain so phone-login attendees render the same as in pills', () => {
+            const attendees: Attendee[] = [
+                {displayName: '+15551234567@expensify.sms', avatarUrl: '', login: '+15551234567@expensify.sms'},
+                {displayName: 'Alice', avatarUrl: '', login: 'alice@x.com'},
+            ];
+            expect(TransactionUtils.getAttendeesListDisplayString(attendees, localeCompare)).toBe('+15551234567, Alice');
         });
 
         it('returns empty string for empty array', () => {

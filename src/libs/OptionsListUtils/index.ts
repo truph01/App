@@ -14,7 +14,7 @@ import filterArrayByMatch from '@libs/filterArrayByMatch';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isReportMessageAttachment} from '@libs/isReportMessageAttachment';
 import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from '@libs/LocalePhoneNumber';
-import {localeCompareLocal, translateLocal} from '@libs/Localize';
+import {translateLocal} from '@libs/Localize';
 import {appendCountryCode, getPhoneNumberWithoutSpecialChars} from '@libs/LoginUtils';
 import {MaxHeap} from '@libs/MaxHeap';
 import {MinHeap} from '@libs/MinHeap';
@@ -750,7 +750,6 @@ function getLastMessageTextForReport({
     } else if (isModifiedExpenseAction(lastReportAction)) {
         const properSchemaForModifiedExpenseMessageWithHTML = getForReportAction({
             translate,
-            localeCompare: localeCompareLocal,
             reportAction: lastReportAction,
             policy,
             movedFromReport,

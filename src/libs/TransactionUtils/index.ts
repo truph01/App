@@ -1,4 +1,5 @@
 import {format, isValid, parse} from 'date-fns';
+import {Str} from 'expensify-common';
 import {deepEqual} from 'fast-equals';
 import lodashDeepClone from 'lodash/cloneDeep';
 import lodashSet from 'lodash/set';
@@ -1205,20 +1206,23 @@ function getAttendees(transaction: OnyxInputOrEntry<Transaction>, currentUserPer
 }
 
 /**
- * Returns attendees joined as an alphabetically sorted display string. Sort is part of the contract — every consumer relies on it.
+ * Returns attendees joined as a display string. Pass `localeCompare` to sort alphabetically (matches the pill sort);
+ * omit it to keep insertion order — used by non-React callers that don't want to thread the comparator.
+ * Strips the SMS domain so phone-login attendees render the same as in the rendered pills.
  */
-function getAttendeesListDisplayString(attendees: Attendee[], localeCompare: LocaleContextProps['localeCompare']): string {
-    // Lowercase to match sortAlphabetically (the pill sort) so joined string and pill order never disagree on case.
-    return [...attendees]
-        .sort((a, b) => localeCompare((a.displayName ?? a.login ?? '').toLowerCase(), (b.displayName ?? b.login ?? '').toLowerCase()))
-        .map((item) => item.displayName ?? item.login)
-        .join(', ');
+function getAttendeesListDisplayString(attendees: Attendee[], localeCompare?: LocaleContextProps['localeCompare']): string {
+    const getName = (a: Attendee) => Str.removeSMSDomain(a.displayName ?? a.login ?? '');
+    const ordered = localeCompare
+        ? // Lowercase to match sortAlphabetically (the pill sort) so joined string and pill order never disagree on case.
+          [...attendees].sort((a, b) => localeCompare(getName(a).toLowerCase(), getName(b).toLowerCase()))
+        : attendees;
+    return ordered.map(getName).join(', ');
 }
 
 /**
  * Return the list of attendees as a string and modified list of attendees as a string if present.
  */
-function getFormattedAttendees(localeCompare: LocaleContextProps['localeCompare'], modifiedAttendees?: Attendee[], attendees?: Attendee[]): [string, string] {
+function getFormattedAttendees(modifiedAttendees?: Attendee[], attendees?: Attendee[], localeCompare?: LocaleContextProps['localeCompare']): [string, string] {
     const oldAttendees = modifiedAttendees ?? [];
     const newAttendees = attendees ?? [];
     return [getAttendeesListDisplayString(oldAttendees, localeCompare), getAttendeesListDisplayString(newAttendees, localeCompare)];

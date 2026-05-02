@@ -7,7 +7,7 @@ import * as ReportNameUtils from '@libs/ReportNameUtils';
 import * as ReportUtils from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
-import {localeCompareLocal, translate} from '@src/libs/Localize';
+import {translate} from '@src/libs/Localize';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
 import type {OriginalMessageModifiedExpense} from '@src/types/onyx/OriginalMessage';
@@ -283,7 +283,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -311,7 +310,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -341,7 +339,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -373,7 +370,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -403,7 +399,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -438,7 +433,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -471,7 +465,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -497,7 +490,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -523,7 +515,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -549,7 +540,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -575,7 +565,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -601,7 +590,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -629,7 +617,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -659,7 +646,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -685,7 +671,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -713,7 +698,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -743,7 +727,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -769,7 +752,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -794,7 +776,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -823,7 +804,6 @@ describe('ModifiedExpenseMessage', () => {
                 const expectedResult = `changed the distance to ${reportAction.originalMessage.merchant} (previously ${reportAction.originalMessage.oldMerchant}), which updated the amount to $7.00 (previously $0.70)`;
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -851,7 +831,6 @@ describe('ModifiedExpenseMessage', () => {
                 const expectedResult = `changed the rate to ${reportAction.originalMessage.merchant} (previously ${reportAction.originalMessage.oldMerchant}), which updated the amount to $55.80 (previously $39.45)`;
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -877,7 +856,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -904,7 +882,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -931,7 +908,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -958,7 +934,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -985,7 +960,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1014,7 +988,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: mockPolicy,
                     policyTags: undefined,
@@ -1044,7 +1017,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1071,7 +1043,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1097,7 +1068,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1124,7 +1094,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1167,7 +1136,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: policyRulesPolicy,
                     policyTags: undefined,
@@ -1200,7 +1168,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: policyRulesPolicy,
                     policyTags: undefined,
@@ -1227,7 +1194,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: policyRulesPolicy,
                     policyTags: undefined,
@@ -1253,7 +1219,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: policyRulesPolicy,
                     policyTags: undefined,
@@ -1280,7 +1245,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: policyRulesPolicy,
                     policyTags: undefined,
@@ -1309,7 +1273,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: policyRulesPolicy,
                     policyTags: undefined,
@@ -1337,7 +1300,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1364,7 +1326,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1394,7 +1355,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1409,7 +1369,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1447,7 +1406,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1473,7 +1431,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1499,7 +1456,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1525,7 +1481,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1540,7 +1495,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1575,7 +1529,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1590,7 +1543,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1625,7 +1577,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1642,7 +1593,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1675,7 +1625,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: mockPolicy,
                     policyTags: undefined,
@@ -1707,7 +1656,6 @@ describe('ModifiedExpenseMessage', () => {
                 const expectedResult = `changed the distance to ${reportAction.originalMessage.merchant} (previously ${reportAction.originalMessage.oldMerchant}), which updated the amount to $7.00 (previously $0.70)`;
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1733,7 +1681,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     movedFromReport,
                     policy: undefined,
@@ -1766,7 +1713,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     movedFromReport,
                     policy,
@@ -1800,7 +1746,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     movedToReport,
                     policy,
@@ -1827,7 +1772,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     movedToReport,
                     policy: undefined,
@@ -1851,7 +1795,6 @@ describe('ModifiedExpenseMessage', () => {
             it('returns an empty string', () => {
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1864,7 +1807,6 @@ describe('ModifiedExpenseMessage', () => {
             it('returns an empty string even when a valid policy is provided', () => {
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1895,7 +1837,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1910,7 +1851,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1944,7 +1884,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -1959,7 +1898,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -1993,7 +1931,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -2008,7 +1945,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',
@@ -2039,7 +1975,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: undefined,
                     policyTags: undefined,
@@ -2054,7 +1989,6 @@ describe('ModifiedExpenseMessage', () => {
 
                 const result = getForReportAction({
                     translate: translateLocal,
-                    localeCompare: localeCompareLocal,
                     reportAction,
                     policy: {
                         id: '123',

@@ -82,6 +82,7 @@ import {
 } from '@libs/ReportUtils';
 import {hasEnabledTags, shouldShowDependentTagList} from '@libs/TagsOptionsListUtils';
 import {
+    getAttendeesListDisplayString,
     getBillable,
     getCurrency,
     getDescription,
@@ -803,7 +804,8 @@ function MoneyRequestView({
     const previousTagLength = getLengthOfTag(previousTag ?? '');
     const currentTagLength = getLengthOfTag(currentTransactionTag ?? '');
 
-    const getAttendeesTitle = Array.isArray(actualAttendees) ? actualAttendees.map((item) => item?.displayName ?? item?.login).join(', ') : '';
+    // actualAttendees is already sorted by enrichAndSortAttendees above; pass without localeCompare to preserve that order while stripping the SMS domain.
+    const getAttendeesTitle = Array.isArray(actualAttendees) ? getAttendeesListDisplayString(actualAttendees) : '';
     const attendeesCopyValue = !canEdit ? getAttendeesTitle : undefined;
 
     const tagList = policyTagLists.map(({name, orderWeight, tags}, index) => {

@@ -3,7 +3,7 @@ import {Str} from 'expensify-common';
 import type {ImageSourcePropType} from 'react-native';
 import EXPENSIFY_ICON_URL from '@assets/images/expensify-logo-round-clearspace.png';
 import * as AppUpdate from '@libs/actions/AppUpdate';
-import {localeCompareLocal, translateLocal} from '@libs/Localize';
+import {translateLocal} from '@libs/Localize';
 import {getForReportAction} from '@libs/ModifiedExpenseMessage';
 import {getTextFromHtml} from '@libs/ReportActionsUtils';
 import {getReportName} from '@libs/ReportNameUtils';
@@ -152,7 +152,6 @@ export default {
         const bodyWithHTML = getForReportAction({
             // eslint-disable-next-line @typescript-eslint/no-deprecated -- translateLocal is deprecated; BrowserNotifications is non-React code that cannot use the translate hook
             translate: translateLocal,
-            localeCompare: localeCompareLocal,
             reportAction,
             policy,
             movedFromReport,

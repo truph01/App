@@ -5,7 +5,6 @@ import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report} from '@src/types/onyx';
-import {localeCompareLocal} from '../../src/libs/Localize';
 import {getForReportAction} from '../../src/libs/ModifiedExpenseMessage';
 import createCollection from '../utils/collections/createCollection';
 import createRandomPolicy from '../utils/collections/policies';
@@ -69,7 +68,6 @@ test('[ModifiedExpenseMessage] getForReportAction on 1k reports and policies', a
     await measureFunction(() =>
         getForReportAction({
             translate: translateLocal,
-            localeCompare: localeCompareLocal,
             reportAction,
             policy: undefined,
             policyTags: mockedPolicyTags,
