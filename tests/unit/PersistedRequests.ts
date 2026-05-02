@@ -96,7 +96,8 @@ describe('PersistedRequests', () => {
         global.File = MockFile as unknown as typeof File;
 
         try {
-            const mockFile = Object.create(MockFile.prototype) as File;
+            const mockFilePrototype = MockFile.prototype as Record<string, never>;
+            const mockFile = Object.create(mockFilePrototype) as File;
             const newRequest: Request<'reportMetadata_1' | 'reportMetadata_2'> = {
                 command: 'OpenReport',
                 successData: [{key: 'reportMetadata_1', onyxMethod: 'set', value: {}}],
@@ -205,7 +206,8 @@ describe('PersistedRequests persistence guarantees', () => {
         global.File = MockFile as unknown as typeof File;
 
         try {
-            const mockFile = Object.create(MockFile.prototype) as File;
+            const mockFilePrototype = MockFile.prototype as Record<string, never>;
+            const mockFile = Object.create(mockFilePrototype) as File;
             const requestWithFile: Request<'reportMetadata_1' | 'reportMetadata_2'> = {
                 command: 'OpenReport',
                 successData: [{key: 'reportMetadata_1', onyxMethod: 'merge', value: {}}],
