@@ -47,6 +47,7 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
 
     sectionData.sort((a, b) => sortOptionsWithEmptyValue(a.value.toString(), b.value.toString(), localeCompare));
 
+    const firstSelectedKey = sectionData.find((item) => item.isSelected)?.keyForList;
     const noResultsFound = !sectionData.length;
     const sections = noResultsFound
         ? []
@@ -93,6 +94,7 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
         <SelectionListWithSections
             sections={sections}
             ListItem={MultiSelectListItem}
+            initiallyFocusedItemKey={firstSelectedKey}
             shouldClearInputOnSelect={false}
             shouldShowTextInput={shouldShowTextInput}
             textInputOptions={textInputOptions}
