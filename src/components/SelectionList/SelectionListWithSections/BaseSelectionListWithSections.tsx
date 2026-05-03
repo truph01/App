@@ -71,6 +71,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     shouldDebounceScrolling = false,
     shouldUpdateFocusedIndex = false,
     shouldScrollToFocusedIndex = true,
+    shouldClearInputOnSelect = true,
     shouldSingleExecuteRowSelect = false,
     shouldPreventDefaultFocusOnSelectRow = false,
     isRowMultilineSupported = false,
@@ -164,7 +165,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                 scrollToIndex(0);
             }
 
-            if (shouldShowTextInput) {
+            if (shouldShowTextInput && shouldClearInputOnSelect) {
                 textInputOptions?.onChangeText?.('');
             }
         }
