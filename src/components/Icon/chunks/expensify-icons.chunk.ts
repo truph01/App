@@ -30,6 +30,7 @@ import Binoculars from '@assets/images/binoculars.svg';
 import boltSlash from '@assets/images/bolt-slash.svg';
 import Bolt from '@assets/images/bolt.svg';
 import Bookmark from '@assets/images/bookmark.svg';
+import Bot from '@assets/images/bot.svg';
 import Box from '@assets/images/box.svg';
 import Bug from '@assets/images/bug.svg';
 import Building from '@assets/images/building.svg';
@@ -226,6 +227,7 @@ import Star from '@assets/images/Star.svg';
 import Stopwatch from '@assets/images/stopwatch.svg';
 import Suitcase from '@assets/images/suitcase.svg';
 import Sync from '@assets/images/sync.svg';
+import TablePencil from '@assets/images/table-pencil.svg';
 import Table from '@assets/images/table.svg';
 import Tag from '@assets/images/tag.svg';
 import Task from '@assets/images/task.svg';
@@ -285,6 +287,7 @@ const Expensicons = {
     Bell,
     Binoculars,
     Bolt,
+    Bot,
     Box,
     Bug,
     Building,
@@ -495,6 +498,7 @@ const Expensicons = {
     UserPlus,
     Feed,
     Table,
+    TablePencil,
     SpreadsheetComputer,
     Bookmark,
     Sparkles,
