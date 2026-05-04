@@ -9,19 +9,19 @@ type ReportActionsListHeaderProps = {
     /** The ID of the report being displayed */
     reportID: string;
 
-    /** Whether to hide the Concierge thinking message */
-    shouldHideConciergeThinkingMessage?: boolean;
-
     /** Callback to retry loading newer chats after an error */
     onRetry: () => void;
+
+    /** Whether the user has an active Concierge draft response — hides the thinking indicator */
+    hasActiveDraft?: boolean;
 };
 
-function ReportActionsListHeader({reportID, shouldHideConciergeThinkingMessage = false, onRetry}: ReportActionsListHeaderProps) {
+function ReportActionsListHeader({reportID, onRetry, hasActiveDraft}: ReportActionsListHeaderProps) {
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
 
     return (
         <>
-            {!shouldHideConciergeThinkingMessage && <ConciergeThinkingMessage report={report} />}
+            {!hasActiveDraft && <ConciergeThinkingMessage report={report} />}
             <ListBoundaryLoader
                 type={CONST.LIST_COMPONENTS.HEADER}
                 onRetry={onRetry}

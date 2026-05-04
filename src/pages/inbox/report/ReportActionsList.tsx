@@ -857,8 +857,8 @@ function ReportActionsList({
         return (
             <ReportActionsListHeader
                 reportID={report.reportID}
-                shouldHideConciergeThinkingMessage={hasActiveDraft}
                 onRetry={retryLoadNewerChatsError}
+                hasActiveDraft={hasActiveDraft}
             />
         );
     }, [canShowHeader, hasActiveDraft, report.reportID, retryLoadNewerChatsError]);
