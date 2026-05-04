@@ -311,7 +311,7 @@ describe('TimeSensitiveSection - UnlockBankAccount', () => {
         const cta = screen.getByText('homePage.timeSensitiveSection.ctaFix');
         fireEvent.press(cta);
 
-        expect(pressLockedBankAccount).toHaveBeenCalledWith(LOCKED_BANK_ACCOUNT_ID, expect.any(Function), CONCIERGE_REPORT_ID);
+        expect(pressLockedBankAccount).toHaveBeenCalledWith(LOCKED_BANK_ACCOUNT_ID, expect.any(Function), CONCIERGE_REPORT_ID, undefined);
         expect(navigateToConciergeChat).toHaveBeenCalledWith(CONCIERGE_REPORT_ID, undefined, ADMIN_ACCOUNT_ID, false, undefined);
     });
 });
