@@ -9063,6 +9063,9 @@ ${reportName}
                 `本当に ${newName} をデフォルトグループに設定しますか？新しいメンバーは、以前のデフォルトグループ (${currentName}) ではなく、このグループに招待されます。`,
             makeDefault: 'デフォルトに設定',
             neverMind: 'やめておく',
+            permissions: 'グループの権限',
+            StrictlyEnforceWorkspaceRules: 'ワークスペースのルールを厳密に適用する',
+            StrictlyEnforceWorkspaceRulesDescription: 'レポートを送信する前にすべてのワークスペースのルールを満たす必要があります。手動による例外は許可されていません。',
         },
     },
     proactiveAppReview: {
