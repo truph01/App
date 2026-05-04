@@ -213,19 +213,20 @@ function ReportActionsList({
             return sortedVisibleReportActions;
         }
 
-        let insertIndex = sortedVisibleReportActions.length;
         // Insert the synthetic draft into the already-descending render list without treating it as a persisted report action.
         for (const [index, action] of sortedVisibleReportActions.entries()) {
             if (action.reportActionID === draftReportAction.reportActionID) {
                 return sortedVisibleReportActions;
             }
-            if (insertIndex === sortedVisibleReportActions.length && isNewerReportAction(draftReportAction, action)) {
-                insertIndex = index;
+            if (isNewerReportAction(draftReportAction, action)) {
+                const visibleReportActionsWithDraft = [...sortedVisibleReportActions];
+                visibleReportActionsWithDraft.splice(index, 0, draftReportAction);
+                return visibleReportActionsWithDraft;
             }
         }
 
         const visibleReportActionsWithDraft = [...sortedVisibleReportActions];
-        visibleReportActionsWithDraft.splice(insertIndex, 0, draftReportAction);
+        visibleReportActionsWithDraft.push(draftReportAction);
         return visibleReportActionsWithDraft;
     }, [draftReportAction, sortedVisibleReportActions]);
     const draftMessageHTML = draftReportAction ? getReportActionMessage(draftReportAction)?.html : undefined;
