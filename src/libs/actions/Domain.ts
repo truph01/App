@@ -1836,7 +1836,7 @@ function updateDomainSecurityGroup(
     groupID: string,
     currentSecurityGroup: DomainSecurityGroup,
     newSettingValue: Partial<DomainSecurityGroup>,
-    settingsName: keyof Pick<DomainSecurityGroup, 'name' | 'enableRestrictedPolicyCreation'>,
+    settingsName: keyof Pick<DomainSecurityGroup, 'name' | 'enableStrictPolicyRules' | 'enableRestrictedPolicyCreation'>,
 ) {
     const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
     const newSecurityGroup = {...currentSecurityGroup, ...newSettingValue};
