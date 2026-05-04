@@ -68,7 +68,7 @@ function TransactionListItem<TItem extends ListItem>({
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
 
-    const {isLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
+    const {isLargeScreenWidth} = useResponsiveLayout();
     const {currentSearchHash, currentSearchKey, currentSearchResults} = useSearchStateContext();
     const snapshotReport = (currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`] ?? {}) as Report;
 
@@ -265,7 +265,7 @@ function TransactionListItem<TItem extends ListItem>({
                             style={[
                                 styles.p3,
                                 styles.pv2,
-                                shouldUseNarrowLayout && [styles.p0, styles.pt3, isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius],
+                                !isLargeScreenWidth && [styles.p0, styles.pt3, isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius],
                                 isLargeScreenWidth && (isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius),
                             ]}
                             violations={transactionViolations}
