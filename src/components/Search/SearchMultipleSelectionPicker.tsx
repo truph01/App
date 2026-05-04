@@ -36,8 +36,15 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
     const [initialSelectedIDs] = useState(() => new Set((initiallySelectedItems ?? []).map((item) => item.value.toString())));
     const [selectedItemIDs, setSelectedItemIDs] = useState(() => initialSelectedIDs);
     const [initiallyFocusedKey] = useState(() => {
-        const sorted = [...items].sort((a, b) => sortOptionsWithEmptyValue(a.value.toString(), b.value.toString(), localeCompare));
-        return sorted.find((item) => initialSelectedIDs.has(item.value.toString()))?.name;
+        let minItem: SearchMultipleSelectionPickerItem<T> | undefined;
+        for (const item of items) {
+            if (initialSelectedIDs.has(item.value.toString())) {
+                if (!minItem || sortOptionsWithEmptyValue(item.value.toString(), minItem.value.toString(), localeCompare) < 0) {
+                    minItem = item;
+                }
+            }
+        }
+        return minItem?.name;
     });
 
     const searchLower = debouncedSearchTerm.toLowerCase();
