@@ -2,6 +2,7 @@ import {hasSeenTourSelector} from '@selectors/Onboarding';
 import React from 'react';
 import BaseWidgetItem from '@components/BaseWidgetItem';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -26,6 +27,7 @@ function UnlockBankAccount({bankAccountID, policyName}: UnlockBankAccountProps) 
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const delegateAccountID = useDelegateAccountID();
 
     const title = policyName ? translate('homePage.timeSensitiveSection.unlockBankAccount.workspaceTitle') : translate('homePage.timeSensitiveSection.unlockBankAccount.personalTitle');
 
@@ -34,7 +36,7 @@ function UnlockBankAccount({bankAccountID, policyName}: UnlockBankAccountProps) 
         : translate('homePage.timeSensitiveSection.unlockBankAccount.personalSubtitle');
 
     const handleCtaPress = () => {
-        pressLockedBankAccount(bankAccountID, translate, conciergeReportID);
+        pressLockedBankAccount(bankAccountID, translate, conciergeReportID, delegateAccountID);
         navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas);
     };
 
