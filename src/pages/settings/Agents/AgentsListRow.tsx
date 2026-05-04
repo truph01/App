@@ -23,7 +23,7 @@ function AgentsListRow({accountID, displayName, login}: AgentsListRowProps) {
     const StyleUtils = useStyleUtils();
 
     return (
-        <View style={[styles.flexRow, styles.alignItemsCenter, styles.highlightBG, styles.br3, styles.mh5, styles.mb3, styles.ph5, styles.pv3, styles.gap3]}>
+        <View style={[styles.selectionListPressableItemWrapper, styles.mb2, styles.gap3]}>
             <ReportActionAvatars
                 accountIDs={[accountID]}
                 size={CONST.AVATAR_SIZE.LARGE_NORMAL}
