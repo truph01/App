@@ -23,14 +23,14 @@ function AgentsListRow({accountID, displayName, login}: AgentsListRowProps) {
     const StyleUtils = useStyleUtils();
 
     return (
-        <View style={[styles.flexRow, styles.alignItemsCenter, styles.highlightBG, styles.br3, styles.mh5, styles.mb3, styles.ph5, styles.pv3, styles.gap5]}>
+        <View style={[styles.flexRow, styles.alignItemsCenter, styles.highlightBG, styles.br3, styles.mh5, styles.mb3, styles.ph5, styles.pv3, styles.gap3]}>
             <ReportActionAvatars
                 accountIDs={[accountID]}
                 size={CONST.AVATAR_SIZE.LARGE_NORMAL}
                 shouldShowTooltip={false}
                 singleAvatarContainerStyle={[StyleUtils.getWidthAndHeightStyle(variables.avatarSizeLargeNormal)]}
             />
-            <View style={[styles.flex1, styles.gap2]}>
+            <View style={[styles.flex1, styles.gap1]}>
                 <Text
                     numberOfLines={1}
                     style={styles.textStrong}

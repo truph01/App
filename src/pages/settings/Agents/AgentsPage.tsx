@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, View} from 'react-native';
 import Button from '@components/Button';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
@@ -47,24 +47,20 @@ function AgentsPage() {
         openAgentsPage();
     }, [isCustomAgentEnabled]);
 
-    const agentItems = useMemo<AgentItem[]>(
-        () =>
-            Object.keys(agentPrompts ?? {})
-                .map((key) => {
-                    const accountID = Number(key.slice(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT.length));
-                    const details = personalDetailsList?.[accountID];
-                    if (!details) {
-                        return null;
-                    }
-                    return {
-                        accountID,
-                        displayName: details.displayName ?? details.login ?? '',
-                        login: details.login ?? '',
-                    };
-                })
-                .filter((item): item is AgentItem => item !== null),
-        [agentPrompts, personalDetailsList],
-    );
+    const agentItems: AgentItem[] = Object.keys(agentPrompts ?? {})
+        .map((key) => {
+            const accountID = Number(key.slice(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT.length));
+            const details = personalDetailsList?.[accountID];
+            if (!details) {
+                return null;
+            }
+            return {
+                accountID,
+                displayName: details.displayName ?? details.login ?? '',
+                login: details.login ?? '',
+            };
+        })
+        .filter((item): item is AgentItem => item !== null);
 
     const renderItem = ({item}: {item: AgentItem}) => (
         <AgentsListRow
