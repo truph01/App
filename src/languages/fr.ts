@@ -9211,11 +9211,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             makeDefault: 'Définir par défaut',
             neverMind: 'Peu importe',
             permissions: 'Autorisations du groupe',
-            StrictlyEnforceWorkspaceRules: 'Appliquer strictement les règles de l’espace de travail',
-            StrictlyEnforceWorkspaceRulesDescription:
+            strictlyEnforceWorkspaceRules: 'Appliquer strictement les règles de l’espace de travail',
+            strictlyEnforceWorkspaceRulesDescription:
                 'Toutes les règles de l’espace de travail doivent être respectées avant de soumettre un rapport. Aucune exception manuelle n’est autorisée.',
-            RestrictExpenseWorkspaceCreation: 'Restreindre la création/suppression d’espaces de travail de dépenses',
-            RestrictExpenseWorkspaceCreationDescription:
+            restrictExpenseWorkspaceCreation: 'Restreindre la création/suppression d’espaces de travail de dépenses',
+            restrictExpenseWorkspaceCreationDescription:
                 'Empêchez les membres de pouvoir créer un espace de travail de dépenses ou de se retirer d’un espace de travail de dépenses. Ceci est utile pour empêcher les gens d’utiliser Expensify afin de soumettre des rapports destinés à un usage hors de votre domaine, lorsqu’il est combiné à une application stricte des espaces de travail.',
         },
     },

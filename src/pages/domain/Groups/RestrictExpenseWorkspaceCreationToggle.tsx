@@ -9,7 +9,10 @@ import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@
 import ONYXKEYS from '@src/ONYXKEYS';
 
 type RestrictExpenseWorkspaceCreationToggleProps = {
+    /** The account ID of the domain */
     domainAccountID: number;
+
+    /** The ID of the security group */
     groupID: string;
 };
 
@@ -33,9 +36,9 @@ function RestrictExpenseWorkspaceCreationToggle({domainAccountID, groupID}: Rest
     return (
         <View style={styles.mv3}>
             <ToggleSettingOptionRow
-                title={translate('domain.groups.RestrictExpenseWorkspaceCreation')}
-                subtitle={translate('domain.groups.RestrictExpenseWorkspaceCreationDescription')}
-                switchAccessibilityLabel={translate('domain.groups.RestrictExpenseWorkspaceCreation')}
+                title={translate('domain.groups.restrictExpenseWorkspaceCreation')}
+                subtitle={translate('domain.groups.restrictExpenseWorkspaceCreationDescription')}
+                switchAccessibilityLabel={translate('domain.groups.restrictExpenseWorkspaceCreation')}
                 shouldPlaceSubtitleBelowSwitch
                 isActive={isEnabled}
                 onToggle={(enabled) => {

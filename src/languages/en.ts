@@ -9182,10 +9182,10 @@ const translations = {
             makeDefault: 'Make default',
             neverMind: 'Never mind',
             permissions: 'Group permissions',
-            StrictlyEnforceWorkspaceRules: 'Strictly enforce workspace rules',
-            StrictlyEnforceWorkspaceRulesDescription: 'All workspace rules must be met before submitting a report. No manual exceptions allowed.',
-            RestrictExpenseWorkspaceCreation: 'Restrict expense workspace creation/removal',
-            RestrictExpenseWorkspaceCreationDescription:
+            strictlyEnforceWorkspaceRules: 'Strictly enforce workspace rules',
+            strictlyEnforceWorkspaceRulesDescription: 'All workspace rules must be met before submitting a report. No manual exceptions allowed.',
+            restrictExpenseWorkspaceCreation: 'Restrict expense workspace creation/removal',
+            restrictExpenseWorkspaceCreationDescription:
                 'Prevent members from being able to create an expense workspace or remove themselves from an expense workspace. This is useful for preventing people from using Expensify to submit reports for use outside your domain when combined with strict workspace enforcement.',
         },
     },

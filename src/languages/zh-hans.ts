@@ -8905,10 +8905,10 @@ ${reportName}
             makeDefault: '设为默认',
             neverMind: '算了',
             permissions: '群组权限',
-            StrictlyEnforceWorkspaceRules: '严格执行工作空间规则',
-            StrictlyEnforceWorkspaceRulesDescription: '提交报告前必须满足所有工作空间规则。不允许手动例外。',
-            RestrictExpenseWorkspaceCreation: '限制创建/删除费用工作区',
-            RestrictExpenseWorkspaceCreationDescription:
+            strictlyEnforceWorkspaceRules: '严格执行工作空间规则',
+            strictlyEnforceWorkspaceRulesDescription: '提交报告前必须满足所有工作空间规则。不允许手动例外。',
+            restrictExpenseWorkspaceCreation: '限制创建/删除费用工作区',
+            restrictExpenseWorkspaceCreationDescription:
                 '阻止成员创建费用工作区或将自己从费用工作区中移除。当与严格的工作区执行相结合时，这有助于防止他人使用 Expensify 提交用于您域外的报表。',
         },
     },

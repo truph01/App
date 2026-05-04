@@ -9150,11 +9150,11 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             makeDefault: 'Standaard maken',
             neverMind: 'Laat maar',
             permissions: 'Groepsmachtigingen',
-            StrictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
-            StrictlyEnforceWorkspaceRulesDescription:
+            strictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
+            strictlyEnforceWorkspaceRulesDescription:
                 'Aan alle werkruimteregels moet worden voldaan voordat een rapport kan worden ingediend. Handmatige uitzonderingen zijn niet toegestaan.',
-            RestrictExpenseWorkspaceCreation: 'Aanmaken/verwijderen van onkostenwerkruimte beperken',
-            RestrictExpenseWorkspaceCreationDescription:
+            restrictExpenseWorkspaceCreation: 'Aanmaken/verwijderen van onkostenwerkruimte beperken',
+            restrictExpenseWorkspaceCreationDescription:
                 'Voorkom dat leden een onkostenwerkruimte kunnen aanmaken of zichzelf uit een onkostenwerkruimte kunnen verwijderen. Dit is nuttig om te voorkomen dat mensen Expensify gebruiken om rapporten in te dienen voor gebruik buiten jouw domein, wanneer dit wordt gecombineerd met strikte werkruimtehandhaving.',
         },
     },
