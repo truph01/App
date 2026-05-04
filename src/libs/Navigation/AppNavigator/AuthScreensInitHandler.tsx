@@ -51,6 +51,7 @@ function initializePusher(currentUserAccountID?: number, getReportAttributes?: (
 function AuthScreensInitHandler() {
     const currentUrl = getCurrentUrl();
     const delegatorEmail = getSearchParamFromUrl(currentUrl, 'delegatorEmail');
+    const ownerEmail = getSearchParamFromUrl(currentUrl, 'ownerEmail');
     const {translate} = useLocalize();
     const {initialURL, isAuthenticatedAtStartup} = useInitialURLState();
     const {setIsAuthenticatedAtStartup} = useInitialURLActions();
@@ -61,7 +62,7 @@ function AuthScreensInitHandler() {
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [initialLastUpdateIDAppliedToClient] = useOnyx(ONYXKEYS.ONYX_UPDATES_LAST_UPDATE_ID_APPLIED_TO_CLIENT);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    const lastWorkspaceNumber = useLastWorkspaceNumber();
+    const lastWorkspaceNumber = useLastWorkspaceNumber(ownerEmail ?? undefined);
     const activePolicy = useActivePolicy();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
