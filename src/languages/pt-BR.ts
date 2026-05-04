@@ -9140,8 +9140,11 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             makeDefault: 'Tornar padrão',
             neverMind: 'Deixa pra lá',
             permissions: 'Permissões do grupo',
-            StrictlyEnforceWorkspaceRules: 'Aplicar rigorosamente as regras do espaço de trabalho',
-            StrictlyEnforceWorkspaceRulesDescription: 'Todas as regras do espaço de trabalho devem ser atendidas antes de enviar um relatório. Não são permitidas exceções manuais.',
+            strictlyEnforceWorkspaceRules: 'Aplicar rigorosamente as regras do espaço de trabalho',
+            strictlyEnforceWorkspaceRulesDescription: 'Todas as regras do espaço de trabalho devem ser atendidas antes de enviar um relatório. Não são permitidas exceções manuais.',
+            restrictExpenseWorkspaceCreation: 'Restringir a criação/remoção de espaços de trabalho de despesas',
+            restrictExpenseWorkspaceCreationDescription:
+                'Impede que os membros possam criar um espaço de trabalho de despesas ou se removerem de um espaço de trabalho de despesas. Isso é útil para impedir que as pessoas usem o Expensify para enviar relatórios destinados ao uso fora do seu domínio, quando combinado com a aplicação rigorosa de espaços de trabalho.',
         },
     },
     proactiveAppReview: {

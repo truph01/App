@@ -9178,8 +9178,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             makeDefault: 'Imposta come predefinito',
             neverMind: 'Lascia perdere',
             permissions: 'Autorizzazioni del gruppo',
-            StrictlyEnforceWorkspaceRules: 'Applica rigorosamente le regole dello spazio di lavoro',
-            StrictlyEnforceWorkspaceRulesDescription: 'Tutte le regole dello spazio di lavoro devono essere soddisfatte prima di inviare un rapporto. Non sono consentite eccezioni manuali.',
+            strictlyEnforceWorkspaceRules: 'Applica rigorosamente le regole dello spazio di lavoro',
+            strictlyEnforceWorkspaceRulesDescription: 'Tutte le regole dello spazio di lavoro devono essere soddisfatte prima di inviare un rapporto. Non sono consentite eccezioni manuali.',
+            restrictExpenseWorkspaceCreation: 'Limita la creazione/rimozione dell’area di lavoro spese',
+            restrictExpenseWorkspaceCreationDescription:
+                'Impedisci ai membri di poter creare un’area di lavoro spese o di rimuoversi da un’area di lavoro spese. Questo è utile per impedire alle persone di utilizzare Expensify per inviare report destinati a un uso al di fuori del tuo dominio, se combinato con un’applicazione rigorosa dell’area di lavoro.',
         },
     },
     proactiveAppReview: {
