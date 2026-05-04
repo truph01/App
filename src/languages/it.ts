@@ -2725,9 +2725,9 @@ ${amount} per ${merchant} - ${date}`,
     },
     agentsPage: {
         title: 'Agenti',
-        subtitle: 'Automatizza le attività con agenti personalizzati.',
+        subtitle: 'Crea agenti per gestire il tuo flusso di lavoro. Elimina il lavoro manuale e recupera ore della tua giornata.',
         newAgent: 'Nuovo agente',
-        emptyAgents: {title: 'Nessun agente creato', subtitle: 'Smetti di fare le cose manualmente. Dai invece istruzioni a un agente e risparmia un sacco di tempo.'},
+        emptyAgents: {title: 'Nessun agente creato', subtitle: 'Smetti di fare le cose manualmente. Dai istruzioni a un agente e risparmia un sacco di tempo.'},
     },
     expenseRulesPage: {
         title: 'Regole spese',
