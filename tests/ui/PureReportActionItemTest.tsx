@@ -918,7 +918,6 @@ describe('PureReportActionItem', () => {
                         <ScreenWrapper testID="test">
                             <PortalProvider>
                                 <PureReportActionItem
-                                    personalPolicyID={undefined}
                                     report={report}
                                     parentReportAction={undefined}
                                     action={action}
@@ -966,7 +965,6 @@ describe('PureReportActionItem', () => {
                         <ScreenWrapper testID="test">
                             <PortalProvider>
                                 <PureReportActionItem
-                                    personalPolicyID={undefined}
                                     report={report}
                                     parentReportAction={undefined}
                                     action={action}
