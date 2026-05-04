@@ -36,10 +36,10 @@ import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigat
 import {
     getFirstVisibleReportActionID,
     getReportActionMessage,
-    getSortedReportActions,
     isConsecutiveActionMadeByPreviousActor,
     isCurrentActionUnread,
     isDeletedParentAction,
+    isNewerReportAction,
     isReportPreviewAction,
     isReversedTransaction,
     isSentMoneyReportAction,
@@ -209,11 +209,24 @@ function ReportActionsList({
     const isMoneyRequestOrInvoiceReport = useMemo(() => isMoneyRequestReport(report) || isInvoiceReport(report), [report]);
     const shouldFocusToTopOnMount = useMemo(() => isTransactionThreadReport || isMoneyRequestOrInvoiceReport, [isMoneyRequestOrInvoiceReport, isTransactionThreadReport]);
     const renderedVisibleReportActions = useMemo(() => {
-        if (!draftReportAction || sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID)) {
+        if (!draftReportAction) {
             return sortedVisibleReportActions;
         }
 
-        return getSortedReportActions([...sortedVisibleReportActions, draftReportAction], true);
+        let insertIndex = sortedVisibleReportActions.length;
+        // Insert the synthetic draft into the already-descending render list without treating it as a persisted report action.
+        for (const [index, action] of sortedVisibleReportActions.entries()) {
+            if (action.reportActionID === draftReportAction.reportActionID) {
+                return sortedVisibleReportActions;
+            }
+            if (insertIndex === sortedVisibleReportActions.length && isNewerReportAction(draftReportAction, action)) {
+                insertIndex = index;
+            }
+        }
+
+        const visibleReportActionsWithDraft = [...sortedVisibleReportActions];
+        visibleReportActionsWithDraft.splice(insertIndex, 0, draftReportAction);
+        return visibleReportActionsWithDraft;
     }, [draftReportAction, sortedVisibleReportActions]);
     const draftMessageHTML = draftReportAction ? getReportActionMessage(draftReportAction)?.html : undefined;
     const isSyntheticDraftVisible = !!draftReportAction && renderedVisibleReportActions !== sortedVisibleReportActions;
