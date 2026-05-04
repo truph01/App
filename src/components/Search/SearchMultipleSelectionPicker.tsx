@@ -35,7 +35,10 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
 
     const [initialSelectedIDs] = useState(() => new Set((initiallySelectedItems ?? []).map((item) => item.value.toString())));
     const [selectedItemIDs, setSelectedItemIDs] = useState(() => initialSelectedIDs);
-    const [initiallyFocusedKeyComputed] = useState(() => {
+    // Clear after mount to prevent FlashList from auto-scrolling when data changes
+    // cause the key to transition from "not found" to "found" (e.g., clearing a search).
+    // Deferred by one frame so FlashList processes the initial scroll first.
+    const [initiallyFocusedKey, setInitiallyFocusedKey] = useState(() => {
         let minItem: SearchMultipleSelectionPickerItem<T> | undefined;
         for (const item of items) {
             if (initialSelectedIDs.has(item.value.toString())) {
@@ -46,11 +49,6 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
         }
         return minItem?.name;
     });
-
-    // Clear after mount to prevent FlashList from auto-scrolling when data changes
-    // cause the key to transition from "not found" to "found" (e.g., clearing a search).
-    // Deferred by one frame so FlashList processes the initial scroll first.
-    const [initiallyFocusedKey, setInitiallyFocusedKey] = useState(initiallyFocusedKeyComputed);
     useEffect(() => {
         const id = requestAnimationFrame(() => {
             setInitiallyFocusedKey(undefined);
