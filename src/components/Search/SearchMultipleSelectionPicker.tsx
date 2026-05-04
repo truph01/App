@@ -47,12 +47,15 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
         return minItem?.name;
     });
 
-    // Clear after first render to prevent FlashList from auto-scrolling when data changes
+    // Clear after mount to prevent FlashList from auto-scrolling when data changes
     // cause the key to transition from "not found" to "found" (e.g., clearing a search).
+    // Deferred by one frame so FlashList processes the initial scroll first.
     const [initiallyFocusedKey, setInitiallyFocusedKey] = useState(initiallyFocusedKeyComputed);
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time clear after mount; prevents FlashList auto-scrolling when data changes cause the key to re-match
-        setInitiallyFocusedKey(undefined);
+        const id = requestAnimationFrame(() => {
+            setInitiallyFocusedKey(undefined);
+        });
+        return () => cancelAnimationFrame(id);
     }, []);
 
     const searchLower = debouncedSearchTerm.toLowerCase();
