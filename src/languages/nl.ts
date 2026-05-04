@@ -7498,6 +7498,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             `heeft de einddag van de afrekenperiode van kaartfeed "${feedName}" gewijzigd${newValue ? ` naar "${newValue}"` : ''}${previousValue ? ` (voorheen "${previousValue}")` : ''}`,
         addedReportField: (fieldType: string, fieldName?: string, defaultValue?: string) =>
             `heeft ${fieldType}-rapportveld "${fieldName}" toegevoegd${defaultValue ? ` met standaardwaarde "${defaultValue}"` : ''}`,
+        updatedRequireCompanyCards: ({enabled}: {enabled: boolean}) => `vereiste ${enabled ? 'ingeschakeld' : 'uitgeschakeld'} voor bedrijfskaarttransacties`,
     },
     roomMembersPage: {
         memberNotFound: 'Lid niet gevonden.',

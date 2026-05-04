@@ -7489,6 +7489,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             `zmienił dzień zakończenia okresu rozliczeniowego dla źródła karty „${feedName}”${newValue ? ` na „${newValue}”` : ''}${previousValue ? ` (wcześniej „${previousValue}”)` : ''}`,
         addedReportField: (fieldType: string, fieldName?: string, defaultValue?: string) =>
             `dodano pole raportu typu ${fieldType} „${fieldName}”${defaultValue ? ` z domyślną wartością „${defaultValue}”` : ''}`,
+        updatedRequireCompanyCards: ({enabled}: {enabled: boolean}) => `${enabled ? 'włączone' : 'wyłączone'} wymóg dotyczący zakupów kartą służbową`,
     },
     roomMembersPage: {
         memberNotFound: 'Nie znaleziono członka.',

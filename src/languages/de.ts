@@ -7535,6 +7535,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             `Kartenfeed-Tag für das Abrechnungsperiodenende von „${feedName}“ geändert${newValue ? ` in „${newValue}“` : ''}${previousValue ? ` (zuvor „${previousValue}“)` : ''}`,
         addedReportField: (fieldType: string, fieldName?: string, defaultValue?: string) =>
             `${fieldType}-Berichtsfeld „${fieldName}“${defaultValue ? ` mit Standardwert „${defaultValue}“` : ''} hinzugefügt`,
+        updatedRequireCompanyCards: ({enabled}: {enabled: boolean}) => `${enabled ? 'aktiviert' : 'deaktiviert'} die Anforderung für Firmenkartenkäufe`,
     },
     roomMembersPage: {
         memberNotFound: 'Mitglied nicht gefunden.',
