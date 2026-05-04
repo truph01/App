@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import MultiSelectListItem from '@components/SelectionList/ListItem/MultiSelectListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import useDebouncedState from '@hooks/useDebouncedState';
@@ -35,7 +35,7 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
 
     const [initialSelectedIDs] = useState(() => new Set((initiallySelectedItems ?? []).map((item) => item.value.toString())));
     const [selectedItemIDs, setSelectedItemIDs] = useState(() => initialSelectedIDs);
-    const [initiallyFocusedKey] = useState(() => {
+    const [initiallyFocusedKeyComputed] = useState(() => {
         let minItem: SearchMultipleSelectionPickerItem<T> | undefined;
         for (const item of items) {
             if (initialSelectedIDs.has(item.value.toString())) {
@@ -46,6 +46,15 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
         }
         return minItem?.name;
     });
+
+    // Clear after first render to prevent FlashList from auto-scrolling when data changes
+    // cause the key to transition from "not found" to "found" (e.g., clearing a search).
+    const initialFocusAppliedRef = useRef(false);
+    useEffect(() => {
+        initialFocusAppliedRef.current = true;
+    }, []);
+    // eslint-disable-next-line react-hooks/refs -- Reading ref to detect post-mount state; intentional one-time prop pattern
+    const initiallyFocusedKey = initialFocusAppliedRef.current ? undefined : initiallyFocusedKeyComputed;
 
     const searchLower = debouncedSearchTerm.toLowerCase();
     const sectionData: Array<{text: string; keyForList: string; isSelected: boolean; value: T; leftElement?: React.ReactNode}> = [];
