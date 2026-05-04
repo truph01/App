@@ -662,9 +662,15 @@ function BasePopoverMenu({
                         onLayout={onLayout}
                         style={[restMenuContainerStyle, restContainerStyles, isWeb ? styles.flex1 : styles.flexGrow1]}
                     >
-                        {renderHeaderText()}
-                        {enteredSubMenuIndexes.length > 0 && renderBackButtonItem()}
-                        {renderedMenuItems}
+                        <PopoverMenuContent
+                            shouldUseScrollView={shouldUseScrollView}
+                            contentContainerStyle={[scrollViewPaddingStyles, restScrollContainerStyle]}
+                            addBottomSafeAreaPadding={enableEdgeToEdgeBottomSafeAreaPadding}
+                        >
+                            {renderHeaderText()}
+                            {enteredSubMenuIndexes.length > 0 && renderBackButtonItem()}
+                            {renderedMenuItems}
+                        </PopoverMenuContent>
                     </View>
                 </CompactMenuContext.Provider>
             </FocusTrapForModal>
