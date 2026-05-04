@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import MultiSelectListItem from '@components/SelectionList/ListItem/MultiSelectListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import useDebouncedState from '@hooks/useDebouncedState';
@@ -49,12 +49,11 @@ function SearchMultipleSelectionPicker<T extends string | string[]>({
 
     // Clear after first render to prevent FlashList from auto-scrolling when data changes
     // cause the key to transition from "not found" to "found" (e.g., clearing a search).
-    const initialFocusAppliedRef = useRef(false);
+    const [initiallyFocusedKey, setInitiallyFocusedKey] = useState(initiallyFocusedKeyComputed);
     useEffect(() => {
-        initialFocusAppliedRef.current = true;
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- One-time clear after mount; prevents FlashList auto-scrolling when data changes cause the key to re-match
+        setInitiallyFocusedKey(undefined);
     }, []);
-    // eslint-disable-next-line react-hooks/refs -- Reading ref to detect post-mount state; intentional one-time prop pattern
-    const initiallyFocusedKey = initialFocusAppliedRef.current ? undefined : initiallyFocusedKeyComputed;
 
     const searchLower = debouncedSearchTerm.toLowerCase();
     const sectionData: Array<{text: string; keyForList: string; isSelected: boolean; value: T; leftElement?: React.ReactNode}> = [];
