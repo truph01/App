@@ -1,5 +1,6 @@
 import {flushDeferredWrite} from '@libs/deferredLayoutWrite';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
+// eslint-disable-next-line no-restricted-imports -- Testing submitDismissStrategies which uses TransitionTracker directly
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import {endSubmitFollowUpActionSpan, setPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
@@ -66,7 +67,6 @@ describe('submitDismissStrategies', () => {
         it('ends span, flushes deferred write, and runs callback in afterTransition', () => {
             dismissOnly(runAfterDismiss);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const opts = jest.mocked(Navigation.dismissModal).mock.calls.at(0)?.at(0) as {afterTransition: () => void} | undefined;
             opts?.afterTransition();
 
@@ -103,10 +103,7 @@ describe('submitDismissStrategies', () => {
 
             expect(setPendingSubmitFollowUpAction).toHaveBeenCalledWith(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, 'report-1');
             expect(Navigation.pop).toHaveBeenCalledWith('rhp-key');
-            expect(TransitionTracker.runAfterTransitions).toHaveBeenCalledWith(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                expect.objectContaining({callback: runAfterDismiss, waitForUpcomingTransition: true}),
-            );
+            expect(TransitionTracker.runAfterTransitions).toHaveBeenCalledWith(expect.objectContaining({callback: runAfterDismiss, waitForUpcomingTransition: true}));
         });
 
         it('navigates to search money request report when report has existing transactions on narrow layout', () => {
@@ -172,10 +169,7 @@ describe('submitDismissStrategies', () => {
             expect(setPendingSubmitFollowUpAction).toHaveBeenCalledWith(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, 'report-1');
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             expect(Navigation.dismissModalWithReport).toHaveBeenCalledWith({reportID: 'report-1'}, undefined, expect.objectContaining({onBeforeNavigate: expect.any(Function)}));
-            expect(TransitionTracker.runAfterTransitions).toHaveBeenCalledWith(
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                expect.objectContaining({callback: runAfterDismiss, waitForUpcomingTransition: true}),
-            );
+            expect(TransitionTracker.runAfterTransitions).toHaveBeenCalledWith(expect.objectContaining({callback: runAfterDismiss, waitForUpcomingTransition: true}));
         });
 
         it('calls dismissWideToSameReport when current report matches destination on wide layout', () => {
@@ -195,7 +189,6 @@ describe('submitDismissStrategies', () => {
 
             executeDismissModalStrategy('report-1', runAfterDismiss);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const opts = jest.mocked(Navigation.dismissModal).mock.calls.at(0)?.at(0) as {afterTransition: () => void} | undefined;
             opts?.afterTransition();
 
@@ -230,7 +223,6 @@ describe('submitDismissStrategies', () => {
 
             executeDismissModalStrategy('report-1', runAfterDismiss);
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const opts = jest.mocked(Navigation.revealRouteBeforeDismissingModal).mock.calls.at(0)?.at(1) as {afterTransition: () => void} | undefined;
             opts?.afterTransition();
 
@@ -244,7 +236,6 @@ describe('submitDismissStrategies', () => {
 
                 executeDismissModalStrategy('report-1', runAfterDismiss);
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const opts = jest.mocked(Navigation.dismissModalWithReport).mock.calls.at(0)?.at(2) as {onBeforeNavigate: (willOpenReport: boolean) => void} | undefined;
                 jest.mocked(setPendingSubmitFollowUpAction).mockClear();
                 opts?.onBeforeNavigate(true);
@@ -257,7 +248,6 @@ describe('submitDismissStrategies', () => {
 
                 executeDismissModalStrategy('report-1', runAfterDismiss);
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const opts = jest.mocked(Navigation.dismissModalWithReport).mock.calls.at(0)?.at(2) as {onBeforeNavigate: (willOpenReport: boolean) => void} | undefined;
                 jest.mocked(setPendingSubmitFollowUpAction).mockClear();
                 opts?.onBeforeNavigate(false);
