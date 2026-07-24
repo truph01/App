@@ -470,6 +470,7 @@ const translations = {
         perDiem: 'Per diem',
         validate: 'Validate',
         downloadAsPDF: 'Download as PDF',
+        downloadReceipts: 'Download receipts',
         downloadAsCSV: 'Download as CSV',
         submitViaPDF: 'Submit via PDF',
         print: 'Print',
@@ -10400,6 +10401,7 @@ const translations = {
         failedTitle: 'Export failed',
         csvFailedBody: 'Your export could not be completed. Please try again later.',
         pdfFailedBody: 'Your file could not be generated. Try again, or reach out to Concierge for help.',
+        receiptsFailedBody: 'Your receipts could not be downloaded. Please try again later.',
         readyPartialBody: ({count, total}: {count: number; total: number}) =>
             `${count} of ${total} reports exported. If it didn't automatically download, use the button below. See which reports failed in <concierge-link>Concierge</concierge-link>.`,
         close: 'Close',

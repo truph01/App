@@ -176,7 +176,16 @@ function ExportDownloadStatusModal({exportID, isVisible, onClose, failedBody}: E
         }
 
         if (isFailed) {
-            const resolvedFailedBody = failedBody ?? (exportType === CONST.EXPORT_DOWNLOAD.TYPE.CSV ? translate('exportDownload.csvFailedBody') : translate('exportDownload.pdfFailedBody'));
+            const getDefaultFailedBody = () => {
+                if (exportType === CONST.EXPORT_DOWNLOAD.TYPE.CSV) {
+                    return translate('exportDownload.csvFailedBody');
+                }
+                if (exportType === CONST.EXPORT_DOWNLOAD.TYPE.RECEIPTS) {
+                    return translate('exportDownload.receiptsFailedBody');
+                }
+                return translate('exportDownload.pdfFailedBody');
+            };
+            const resolvedFailedBody = failedBody ?? getDefaultFailedBody();
             return (
                 <>
                     <Text style={[styles.exportDownloadTitle, styles.mb2]}>{translate('exportDownload.failedTitle')}</Text>
